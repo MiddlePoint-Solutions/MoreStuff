@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+
+    <color name="colorPrimary">#ffffff</color>
+    <color name="colorPrimaryDark">#F3F0F1</color>
+    <color name="colorAccent">#ff971d</color>
+
+    <color name="bg_user_chat_item">#6485ff</color>
+    <color name="bg_app_chat_item">#8d87c1</color>
+    <color name="text_user_chat">#FFFFFF</color>
+
+    <!--  Original  -->
+<!--    <color name="bg_user_chat_item">#74B5FF</color>-->
+<!--    <color name="bg_app_chat_item">#FFBE74</color>-->
+
 </resources>

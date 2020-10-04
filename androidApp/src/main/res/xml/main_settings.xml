@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:persistent="true">
+
+    <PreferenceCategory app:title="Options">
+
+        <ListPreference
+            app:title="Select Theme"
+            app:key="@string/pref_key_app_theme"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Debug Settings">
+
+        <Preference
+            android:selectable="true"
+            app:key="debug_notification"
+            app:title="Notification" />
+
+        <SwitchPreference
+            app:title="Reminder debugging"
+            app:key="@string/pref_key_debug_reminder"
+            app:defaultValue="false"
+            />
+
+        <SeekBarPreference
+            android:max="360"
+            android:dependency="@string/pref_key_debug_reminder"
+            app:adjustable="true"
+            app:defaultValue="60"
+            app:key="@string/pref_key_debug_reminder_today_offset"
+            app:min="1"
+            app:seekBarIncrement="3"
+            app:showSeekBarValue="true"
+            app:summary="Adjust time in minutes reminder"
+            app:title="Today reminder delay" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="About">
+
+        <Preference
+            android:selectable="false"
+            app:key="version"
+            app:title="Version" />
+
+        <Preference
+            app:key="feedback"
+            app:summary="Share your thoughts or whatever"
+            app:title="Send feedback" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

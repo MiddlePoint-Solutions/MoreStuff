@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/reschedule_tasks_1_hour"
+        android:title="@string/option_one_hour" />
+
+    <item
+        android:id="@+id/reschedule_tasks_tomorrow"
+        android:title="@string/option_tomorrow" />
+
+    <item
+        android:id="@+id/reschedule_tasks_later"
+        android:title="@string/option_later" />
+
+    <item
+        android:id="@+id/reschedule_tasks_complete"
+        android:title="@string/option_complete" />
+</menu>

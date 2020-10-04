@@ -1,10 +1,31 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowLightStatusBar" tools:targetApi="23">@bool/lightStatusBar</item>
+
+        <item name="popupMenuStyle">@style/Widget.MaterialComponents.PopupMenu</item>
+        <item name="android:contextPopupMenuStyle" tools:targetApi="24">@style/Widget.MaterialComponents.PopupMenu.ContextMenu</item>
+        <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow</item>
+
+    </style>
+
+    <!-- Priority buttons style -->
+    <style name="PrioritySelectButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="cornerRadius">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="Theme.MaterialComponents.DayNight">
+        <item name="android:colorBackground">@color/colorPrimary</item>
     </style>
 
 </resources>

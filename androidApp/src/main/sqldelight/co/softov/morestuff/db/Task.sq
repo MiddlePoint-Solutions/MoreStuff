@@ -1,0 +1,40 @@
+
+CREATE TABLE task(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    create_time INTEGER NOT NULL,
+    complete_time INTEGER NOT NULL DEFAULT 0,
+    title TEXT NOT NULL
+    );
+
+selectAll:
+SELECT *
+FROM task
+ORDER BY datetime(create_time);
+
+selectAllActive:
+SELECT *
+FROM task
+WHERE complete_time = 0;
+
+selectAllComplete:
+SELECT *
+FROM task
+WHERE complete_time != 0
+ORDER BY complete_time DESC;
+
+selectTaskById:
+SELECT *
+FROM task
+WHERE id = ?;
+
+insertTask:
+INSERT INTO task(create_time, title)
+VALUES (?,?);
+
+updateTaskComplete:
+UPDATE task
+SET complete_time = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

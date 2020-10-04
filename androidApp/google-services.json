@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1068425502807",
+    "firebase_url": "https://morestuff-bff83.firebaseio.com",
+    "project_id": "morestuff-bff83",
+    "storage_bucket": "morestuff-bff83.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068425502807:android:9dbb335aedb4c5f00f4312",
+        "android_client_info": {
+          "package_name": "co.softov.morestuff.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1068425502807-5hudjarebdatf11mu7c56li70qsecf1g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAGKmh4u2wSctm7eOCS5vmpyu1RCzZZGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1068425502807-5hudjarebdatf11mu7c56li70qsecf1g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
