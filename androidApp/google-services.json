@@ -1,34 +1,34 @@
 {
   "project_info": {
-    "project_number": "1068425502807",
-    "firebase_url": "https://morestuff-bff83.firebaseio.com",
-    "project_id": "morestuff-bff83",
-    "storage_bucket": "morestuff-bff83.appspot.com"
+    "project_number": "646223321710",
+    "firebase_url": "https://morestuff-e2433.firebaseio.com",
+    "project_id": "morestuff-e2433",
+    "storage_bucket": "morestuff-e2433.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1068425502807:android:9dbb335aedb4c5f00f4312",
+        "mobilesdk_app_id": "1:646223321710:android:cb3415c89356fa0045a47f",
         "android_client_info": {
           "package_name": "co.softov.morestuff.android"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1068425502807-5hudjarebdatf11mu7c56li70qsecf1g.apps.googleusercontent.com",
+          "client_id": "646223321710-bceqgbmdd0au2nc1v0kedeqejols59vq.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCAGKmh4u2wSctm7eOCS5vmpyu1RCzZZGQ"
+          "current_key": "AIzaSyDzSyCTHsuCt-TkyPCn8L8bKSTeGAU3H4M"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1068425502807-5hudjarebdatf11mu7c56li70qsecf1g.apps.googleusercontent.com",
+              "client_id": "646223321710-bceqgbmdd0au2nc1v0kedeqejols59vq.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
