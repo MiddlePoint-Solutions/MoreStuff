@@ -19,7 +19,7 @@ import timber.log.Timber
 class CompleteTasksFragment : BaseListFragment() {
 
     private val viewModel: CompleteTasksViewModel by viewModel()
-    private val taskListAdapter: TaskListAdapter by inject()
+    private val taskListAdapter: TaskListAdapter = TaskListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

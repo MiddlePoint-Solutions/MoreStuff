@@ -2,9 +2,8 @@ package co.softov.morestuff.androidApp.domain.repository
 
 
 import co.softov.morestuff.androidApp.domain.Failure
-import co.softov.morestuff.androidApp.domain.model.SimpleResult
-import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.model.Message
+import co.softov.morestuff.androidApp.domain.model.SimpleResult
 
 interface MessageRepository {
 
@@ -12,16 +11,9 @@ interface MessageRepository {
 
     suspend fun getMessagesForTask(taskId: Long): SimpleResult<List<Message>>
 
-    suspend fun createTaskMessage(taskId: Long, content: String): SimpleResult<Boolean>
+    suspend fun createMessage(taskId: Long, contentType: Int, content: String): SimpleResult<Message>
 
-    suspend fun createScheduledMessageForTask(
-        taskId: Long,
-        content: String
-    ): SimpleResult<Message>
-
-    suspend fun createConfirmationMessageForTask(taskId: Long, content: String)
-
-    suspend fun addReminderReplyMessage(taskId: Long, content: String, replyType: ReplyType)
+    suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)
 }
 
-object MessageDoesNotExist: Failure.FeatureFailure()
+object MessageDoesNotExist : Failure.FeatureFailure()

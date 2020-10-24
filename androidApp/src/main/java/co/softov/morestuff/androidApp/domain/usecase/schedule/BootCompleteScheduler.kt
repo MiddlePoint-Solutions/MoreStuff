@@ -1,11 +1,12 @@
 package co.softov.morestuff.androidApp.domain.usecase.schedule
 
+import co.softov.morestuff.androidApp.data.utils.TimeUtils
+import co.softov.morestuff.androidApp.data.utils.scheduleLocalDateTime
 import co.softov.morestuff.androidApp.domain.Scheduler
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import timber.log.Timber
-import java.util.Calendar
 
 interface BootCompleteScheduler {
     suspend operator fun invoke(): SimpleResult<Boolean>
@@ -20,21 +21,26 @@ class BootCompleteSchedulerImpl(
         return when (val result = getActiveSchedules()) {
             is Result.Failure -> result
             is Result.Success -> {
-                reschedule(result.value)
+                reschedule(result.value.toMutableList())
                 Result.Success(true)
             }
         }
     }
 
-    private fun reschedule(activeSchedules: List<Schedule>) {
-        val currentTime = Calendar.getInstance().timeInMillis
+    private fun reschedule(activeSchedules: MutableList<Schedule>) {
+        val currentTime = TimeUtils.currentLocalDateTime
+        Timber.d("BootComplete, Current time: $currentTime")
+        Timber.d("BootComplete, active schedules: ${activeSchedules.size}")
 
-        Timber.d("execute, active schedules: ${activeSchedules.size}")
+        val futureSchedules = activeSchedules.filter { schedule ->
+            schedule.scheduleLocalDateTime?.let { it > currentTime } ?: false
+        }
 
-        val futureSchedules = activeSchedules.filter { it.scheduleTime > currentTime }
-        Timber.d("execute, future schedules: ${futureSchedules.size}")
-        futureSchedules.forEach {
-            scheduler.scheduleAtExact(it.id, it.scheduleTime)
+        Timber.d("BootComplete, rescheduling future tasks: ${futureSchedules.size}")
+        futureSchedules.forEach { schedule ->
+            schedule.scheduleTime?.let { time ->
+                scheduler.scheduleAtExact(schedule.id, time)
+            }
         }
 
         // TODO: Get missed schedules that were not fulfilled and create reminders for them
@@ -42,9 +48,9 @@ class BootCompleteSchedulerImpl(
         // TODO: How are we going to display this?
         //  What if there is a schedule that should show now and missed schedules?
         //  The priority goes to the current scheduled reminder and the missed schedules should be shown at a different time.
-        val pastSchedules = activeSchedules.filter { it.scheduleTime <= currentTime }
-        Timber.d("execute, missed schedules: ${pastSchedules.size}")
-        pastSchedules.forEach {
+        activeSchedules.removeAll(futureSchedules)
+        Timber.d("execute, missed schedules: ${activeSchedules.size}")
+        activeSchedules.forEach {
 
         }
     }

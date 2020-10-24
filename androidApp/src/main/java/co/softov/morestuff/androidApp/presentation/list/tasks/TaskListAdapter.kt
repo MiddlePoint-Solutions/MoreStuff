@@ -7,8 +7,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.task_list_item_expandable.view.*
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.databinding.TaskListItemExpandableBinding
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.androidApp.presentation.list.tasks.model.TaskListItemViewModel
 
@@ -34,9 +34,9 @@ TaskListAdapter :
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         fun bind(task: TaskListItemViewModel) {
-            itemView.apply {
+            TaskListItemExpandableBinding.bind(itemView).apply {
                 taskItemTitleText.text = task.title
-                isLongClickable = true
+                itemView.isLongClickable = true
 
                 layoutItemExpandedInfo.apply {
                     textTaskItemCreateDate.text =
@@ -48,7 +48,7 @@ TaskListAdapter :
                     textListItemCompleteDate.isVisible = task.completeTime.isNotEmpty()
                 }
 
-                setOnDebouncedClickListener {
+                itemView.setOnDebouncedClickListener {
                     task.expanded = task.expanded.not()
                     notifyItemChanged(adapterPosition)
                 }

@@ -1,19 +1,18 @@
 package co.softov.morestuff.androidApp.domain.usecase.schedule
 
-import kotlinx.coroutines.flow.Flow
 import co.softov.morestuff.androidApp.domain.model.ScheduleWithTitle
-import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
+import kotlinx.coroutines.flow.Flow
 
-interface GetSchedulesWithTitle {
+interface GetLaterSchedulesWithTitle {
     suspend operator fun invoke(): Flow<List<ScheduleWithTitle>>
 }
 
-class GetSchedulesWithTitleImpl(
+class GetLaterSchedulesWithTitleImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetSchedulesWithTitle {
+) : GetLaterSchedulesWithTitle {
     override suspend fun invoke(): Flow<List<ScheduleWithTitle>> {
-        return scheduleRepository.getActiveSchedulesWithTitleFlow()
+        return scheduleRepository.getActiveLaterSchedulesWithTitleFlow()
     }
 } 
 

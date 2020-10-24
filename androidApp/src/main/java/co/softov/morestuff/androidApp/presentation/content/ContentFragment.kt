@@ -16,6 +16,7 @@ import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedC
 import co.softov.morestuff.androidApp.app.presentation.fragment.BaseContainerFragment
 import co.softov.morestuff.androidApp.app.util.LifecycleValue
 import co.softov.morestuff.androidApp.domain.enums.Priority
+import co.softov.morestuff.androidApp.domain.enums.Priority.*
 import co.softov.morestuff.androidApp.presentation.content.adapter.ChatAdapter
 import co.softov.morestuff.androidApp.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.androidApp.presentation.dashboard.options.TimePickerFragment
@@ -154,17 +155,17 @@ class ContentFragment : BaseContainerFragment() {
 
         binding.apply {
             when (state.priority) {
-                is Priority.Later -> {
+                is Later -> {
                     buttonActionToday.isSelected = false
                     buttonActionTomorrow.isSelected = false
                     buttonActionLater.isSelected = true
                 }
-                is Priority.Today -> {
+                is Today -> {
                     buttonActionToday.isSelected = true
                     buttonActionTomorrow.isSelected = false
                     buttonActionLater.isSelected = false
                 }
-                is Priority.Tomorrow -> {
+                is Tomorrow -> {
                     buttonActionToday.isSelected = false
                     buttonActionTomorrow.isSelected = true
                     buttonActionLater.isSelected = false

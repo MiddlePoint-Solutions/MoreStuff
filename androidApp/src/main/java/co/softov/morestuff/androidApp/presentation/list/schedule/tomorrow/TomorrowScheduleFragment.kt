@@ -2,19 +2,16 @@ package co.softov.morestuff.androidApp.presentation.list.schedule.tomorrow
 
 import android.os.Bundle
 import android.view.View
-import co.softov.morestuff.android.R
-import co.softov.morestuff.android.databinding.FragmentTaskListBinding
 import co.softov.morestuff.androidApp.app.presentation.extension.observe
 import co.softov.morestuff.androidApp.presentation.list.BaseListFragment
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListAdapter
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewState
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TomorrowScheduleFragment : BaseListFragment() {
 
     private val viewModel: TomorrowScheduleViewModel by viewModel()
-    private val adapter: ScheduleListAdapter by inject()
+    private val scheduleAdapter: ScheduleListAdapter = ScheduleListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,13 +22,13 @@ class TomorrowScheduleFragment : BaseListFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.taskList.apply {
             registerForContextMenu(this)
-            this.adapter = adapter
+            adapter = scheduleAdapter
         }
         viewModel.loadData()
     }
 
     private fun onStateChange(state: ScheduleListViewState) {
-        adapter.submitList(state.data)
+        scheduleAdapter.submitList(state.data)
     }
 
     override fun rescheduleTaskOneHour(taskId: Long) {

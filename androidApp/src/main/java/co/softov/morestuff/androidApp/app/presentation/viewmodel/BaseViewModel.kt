@@ -3,13 +3,11 @@ package co.softov.morestuff.androidApp.app.presentation.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.androidApp.app.presentation.extension.toLiveData
-import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewEvent
-import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.androidApp.app.presentation.viewmodel.StateTimeTravelDebugger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 abstract
@@ -54,4 +52,6 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(initia
     protected open fun onLoadData() {}
 
     protected abstract fun onReduceState(event: ViewEvent): ViewState
+
+    fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch(block = block)
 }

@@ -1,4 +1,4 @@
-package co.softov.morestuff.androidapp
+package co.softov.morestuff.androidApp
 
 sealed class Constants {
 

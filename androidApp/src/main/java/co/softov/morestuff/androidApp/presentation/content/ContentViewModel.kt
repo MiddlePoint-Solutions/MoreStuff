@@ -5,27 +5,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.domain.enums.Priority
+import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
 import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
 import co.softov.morestuff.androidApp.domain.usecase.task.CreateTask
 import co.softov.morestuff.androidApp.domain.usecase.task.TaskParams
-import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.ChangePriority
-import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.Init
-import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.SetCustomTime
-import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.SetTimeOption
-import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.ShowChatData
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.CUSTOM
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.MORNING
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.ONE_HOUR
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.SOME_DAY
-import co.softov.morestuff.androidApp.presentation.dashboard.options.createLaterOptions
+import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.*
+import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.*
 import co.softov.morestuff.androidApp.presentation.dashboard.options.createTodayOptions
-import co.softov.morestuff.androidApp.presentation.dashboard.options.createTomorrowOptions
+import kotlinx.coroutines.launch
 
 class ContentViewModel(
     private val getPagedMessages: GetPagedMessages,
@@ -45,7 +36,6 @@ class ContentViewModel(
         sendEvent(ShowChatData(it))
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoadData() {
         sendEvent(Init)
         setupChatMessagesPaging()
@@ -71,14 +61,13 @@ class ContentViewModel(
             is ShowChatData -> state.copy(data = event.data)
             is ChangePriority -> {
                 val priorityItems = when (event.priority) {
-                    is Priority.Later -> laterOptions.createLaterOptions()
-                    is Priority.Today -> todayOptions.createTodayOptions()
-                    is Priority.Tomorrow -> tomorrowOptions.createTomorrowOptions()
+                    is Priority.Today -> Priority.Today(Default)
+                    is Priority.Tomorrow -> Priority.Tomorrow(Default)
+                    is Priority.Later -> Priority.Later(Default)
                 }
 
                 state.copy(
                     priority = event.priority,
-                    timeOptions = priorityItems,
                     currentTimeOptionId = 0
                 )
             }
@@ -115,42 +104,21 @@ class ContentViewModel(
 
     fun addNewTask(title: String) {
         viewModelScope.launch {
-            val params = TaskParams(title, taskTime, taskPriority)
+            val params = TaskParams(title, state.priority)
             createNewTask(params)
         }
     }
 
-    private val taskTime: Long
-        get() = when {
-            debug.debugReminders -> {
-                if (state.priority is Priority.Today) {
-                    debug.todayDebugTime
-                } else {
-                    state.timeOptions.first().time
-                }
-            }
-            else -> {
-                state.timeOptions.first().time
-            }
-        }
-
-    private val taskPriority: Priority
-        get() = when(state.priority) {
-            is Priority.Later -> Priority.Later(taskTime)
-            is Priority.Today -> Priority.Today(taskTime)
-            is Priority.Tomorrow -> Priority.Tomorrow(taskTime)
-        }
-
     fun selectedTodayPriority() {
-        sendEvent(ChangePriority(Priority.Today()))
+        sendEvent(ChangePriority(Priority.Today(Default)))
     }
 
     fun selectedTomorrowPriority() {
-        sendEvent(ChangePriority(Priority.Tomorrow()))
+        sendEvent(ChangePriority(Priority.Tomorrow(Default)))
     }
 
     fun selectedLaterPriority() {
-        sendEvent(ChangePriority(Priority.Later()))
+        sendEvent(ChangePriority(Priority.Later(Default)))
     }
 
     fun showTaskList() {

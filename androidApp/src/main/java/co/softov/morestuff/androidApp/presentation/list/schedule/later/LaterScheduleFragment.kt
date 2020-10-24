@@ -14,7 +14,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class LaterScheduleFragment : BaseListFragment() {
 
     private val viewModel: LaterScheduleViewModel by viewModel()
-    private val adapter: ScheduleListAdapter by inject()
+    private val scheduleAdapter: ScheduleListAdapter = ScheduleListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,13 +25,13 @@ class LaterScheduleFragment : BaseListFragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.taskList.apply {
             registerForContextMenu(this)
-            this.adapter = adapter
+            adapter = scheduleAdapter
         }
         viewModel.loadData()
     }
 
     private fun onStateChange(state: ScheduleListViewState) {
-        adapter.submitList(state.data)
+        scheduleAdapter.submitList(state.data)
     }
 
     override fun rescheduleTaskOneHour(taskId: Long) {

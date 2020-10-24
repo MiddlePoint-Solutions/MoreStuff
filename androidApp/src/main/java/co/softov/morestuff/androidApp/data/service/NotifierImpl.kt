@@ -12,11 +12,13 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.isAtLeastVersion
 import co.softov.morestuff.androidApp.app.receiver.NotificationReceiver
 import co.softov.morestuff.androidApp.app.receiver.createReplyIntent
-import co.softov.morestuff.androidApp.domain.enums.Message
+import co.softov.morestuff.androidApp.data.utils.toEpochMilliseconds
+import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
+import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.service.Notifier
-import java.util.Calendar
+import java.util.*
 
 class NotifierImpl(
     private val context: Context
@@ -36,7 +38,7 @@ class NotifierImpl(
 
     override fun showScheduleNotification(
         scheduleId: Long,
-        message: co.softov.morestuff.androidApp.domain.model.Message
+        message: Message
     ) {
         val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_chat_24dp)
@@ -51,15 +53,12 @@ class NotifierImpl(
         val later = createReplyIntentWithTitle(scheduleId, LATER)
         val snooze = createReplyIntentWithTitle(scheduleId, SNOOZE)
         val done = createReplyIntentWithTitle(scheduleId, DONE)
-        val cancel = createReplyIntentWithTitle(scheduleId, CANCEL)
-
-        val random = listOf(tomorrow, later).shuffled().first()
 
         builder
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
-            .addAction(R.drawable.ic_send_24dp, random.first, random.second)
+            .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
-            .setDeleteIntent(cancel.second)
+            .setDeleteIntent(later.second)
 
         notificationManager.notify(scheduleId.toInt(), builder.build())
     }
@@ -69,19 +68,17 @@ class NotifierImpl(
         type: ReplyType
     ): Pair<String, PendingIntent> {
         val actionText = when (type) {
-            CANCEL -> "Cancel"
             SNOOZE -> "1 Hour"
             TOMORROW -> "Tomorrow"
             LATER -> "Later"
             DONE -> "Done"
-            NONE -> ""
         }
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
 
     override fun showReminderNotificationReply(
         scheduleId: Long,
-        messages: List<co.softov.morestuff.androidApp.domain.model.Message>
+        messages: List<Message>
     ) {
         val messageStyle = getMessagingStyle(scheduleId.toInt(), messages)
         val notification: Notification =
@@ -100,7 +97,7 @@ class NotifierImpl(
 
     private fun getMessagingStyle(
         notificationId: Int,
-        messages: List<co.softov.morestuff.androidApp.domain.model.Message>
+        messages: List<Message>
     ): NotificationCompat.MessagingStyle {
 
         var style = getActiveNotificationById(notificationId)?.let {
@@ -110,22 +107,32 @@ class NotifierImpl(
         if (style == null) {
             style = NotificationCompat.MessagingStyle(appPerson)
             for (message in messages) {
-                style.addMessage(
-                    message.content, message.createTime, getMessagePerson(message.type)
-                )
+                val time = message.createTime.toEpochMilliseconds
+                addMessage(style, message, time)
             }
         } else {
-            val last = messages.last()
-            style.addMessage(last.content, last.createTime, getMessagePerson(last.type))
+            val message = messages.last()
+            val time = message.createTime.toEpochMilliseconds
+            addMessage(style, message, time)
         }
 
         return style
     }
 
-    private fun getMessagePerson(messageType: Message): Person {
+    private fun addMessage(
+        style: NotificationCompat.MessagingStyle,
+        message: Message,
+        time: Long
+    ) {
+        style.addMessage(
+            message.content, time, getMessagePerson(message.contentType)
+        )
+    }
+
+    private fun getMessagePerson(messageType: ContentType): Person {
         return when (messageType) {
-            Message.CONFIRM_NEW_TASK,
-            Message.TASK_REMINDER -> appPerson
+            ContentType.CONFIRM_NEW_TASK,
+            ContentType.TASK_REMINDER -> appPerson
             else -> userPerson
         }
     }

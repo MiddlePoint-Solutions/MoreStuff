@@ -8,8 +8,6 @@ data class ScheduleListViewState(
     val data: List<ScheduleListItemViewModel> = listOf()
 ) : BaseViewState
 
-sealed class ScheduleListViewEvent :
-    BaseViewEvent {
-    data class UpdateSchedule(val data: List<ScheduleListItemViewModel>) :
-        ScheduleListViewEvent()
+sealed class ScheduleListViewEvent : BaseViewEvent {
+    data class UpdateSchedule(val data: List<ScheduleListItemViewModel>) : ScheduleListViewEvent()
 }

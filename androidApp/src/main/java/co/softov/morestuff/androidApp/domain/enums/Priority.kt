@@ -1,7 +1,12 @@
 package co.softov.morestuff.androidApp.domain.enums
 
-sealed class Priority(val time: Long = 0) {
-    data class Later(val at: Long = 0) : Priority(at)
-    data class Today(val at: Long = 0) : Priority(at)
-    data class Tomorrow(val at: Long = 0) : Priority(at)
+sealed class Priority {
+    data class Today(val option: TimeOption) : Priority()
+    data class Tomorrow(val option: TimeOption) : Priority()
+    data class Later(val option: TimeOption) : Priority()
 }
+
+sealed class TimeOption {
+    object Default : TimeOption()
+}
+

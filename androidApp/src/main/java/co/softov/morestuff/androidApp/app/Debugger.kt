@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager
 import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.presentation.dashboard.addTime
 import java.util.Calendar
+import kotlin.time.minutes
 
 class Debugger(context: Context) : Debug {
 
@@ -28,8 +29,8 @@ class Debugger(context: Context) : Debug {
     override val debugReminders: Boolean
         get() = _debugReminders
 
-    override val todayDebugTime: Long
-        get() = Calendar.getInstance().addTime(hour = 0, minute = _todayDebugTime)
+    override val todayDebugTime: Int
+        get() = _todayDebugTime
 
     init {
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)

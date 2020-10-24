@@ -16,7 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class ActiveTasksFragment : BaseListFragment() {
 
     private val viewModel: ActiveTasksViewModel by viewModel()
-    private val taskListAdapter: TaskListAdapter by inject()
+    private val taskListAdapter: TaskListAdapter = TaskListAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

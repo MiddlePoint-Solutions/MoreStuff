@@ -13,7 +13,7 @@ interface CreateTask {
     suspend operator fun invoke(params: TaskParams): SimpleResult<Boolean>
 }
 
-data class TaskParams(val title: String, val time: Long, val priority: Priority)
+data class TaskParams(val title: String, val priority: Priority)
 
 class CreateNewTaskImpl(
     private val taskRepository: TaskRepository,
@@ -28,7 +28,7 @@ class CreateNewTaskImpl(
             is Result.Success -> {
                 createTaskMessage(result.value, params.title)
                 createConfirmationMessage(ConfirmParams(result.value, params.priority))
-                createSchedule(result.value, params.time)
+                createSchedule(result.value, params.priority)
                 Result.Success(true)
             }
         }

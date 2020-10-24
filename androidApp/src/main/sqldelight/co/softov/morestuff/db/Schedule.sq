@@ -1,12 +1,10 @@
-import co.softov.morestuff.androidApp.domain.enums.Message;
-
 CREATE TABLE schedule(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     task_id INTEGER NOT NULL,
-    create_time INTEGER NOT NULL,
-    schedule_time INTEGER NOT NULL DEFAULT 0,
-    type TEXT AS Message NOT NULL,
-    fulfilled INTEGER AS Boolean NOT NULL DEFAULT 0,
+    create_time TEXT NOT NULL,
+    schedule_time TEXT,
+    timezone TEXT NOT NULL,
+    active INTEGER AS Boolean NOT NULL DEFAULT 1,
     FOREIGN KEY(task_id) REFERENCES task(id)
     );
 
@@ -29,29 +27,53 @@ selectActiveScheduleByTaskId:
 SELECT *
 FROM schedule
 WHERE task_id = ?
-AND fulfilled = 0
+AND active = 1
 ORDER BY id DESC
 LIMIT 1;
 
 selectActiveSchedules:
 SELECT *
 FROM schedule
-WHERE fulfilled = 0;
+WHERE active = 1;
 
 selectActiveSchedulesWithTaskTitle:
 SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
 FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time = 0)
-AND schedule.fulfilled = 0
-ORDER BY schedule_time ASC;
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+WHERE schedule.active = 1
+ORDER BY schedule_time DESC;
+
+selectActiveTodaySchedulesWithTaskTitle:
+SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+FROM schedule
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+AND active = 1
+AND date(schedule_time) = date("now")
+ORDER BY schedule.id DESC;
+
+selectActiveLaterSchedulesWithTaskTitle:
+SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+FROM schedule
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+AND active = 1
+AND schedule_time IS NULL
+ORDER BY schedule.id DESC;
+
+selectTomorrowSchedulesWithTaskTitle:
+SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+FROM schedule
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+AND active = 1
+AND date(schedule_time) = date("now","+1 day")
+ORDER BY schedule.id DESC;
 
 insertSchedule:
-INSERT INTO schedule(task_id, create_time, schedule_time, type)
+INSERT INTO schedule(task_id, create_time, schedule_time, timezone)
 VALUES (?,?,?,?);
 
-updateScheduleFulfilled:
+updateScheduleActive:
 UPDATE schedule
-SET fulfilled = ?
+SET active = ?
 WHERE id = ?;
 
 lastInsertRowId:

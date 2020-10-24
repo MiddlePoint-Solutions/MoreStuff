@@ -16,6 +16,7 @@ repositories {
     google()
     jcenter()
     mavenCentral()
+    maven(url = "https://kotlin.bintray.com/kotlinx/")
 }
 
 android {
@@ -60,6 +61,7 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.0")
 
     // Androidx
     implementation("androidx.appcompat:appcompat:1.2.0")
@@ -71,23 +73,23 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
 
-    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.core:core-ktx:1.5.0-alpha04")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.paging:paging-runtime-ktx:2.1.2")
 
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.2")
 
     // Firebase
     implementation("com.google.firebase:firebase-crashlytics:17.2.2")
-    implementation("com.google.firebase:firebase-analytics:17.5.0")
+    implementation("com.google.firebase:firebase-analytics:17.6.0")
 
     // SQLDelight
-    implementation("com.squareup.sqldelight:android-driver:1.4.3")
-    implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.4.3")
-    implementation("com.squareup.sqldelight:android-paging-extensions:1.4.3")
-    implementation("com.squareup.sqldelight:sqlite-driver:1.4.3")
+    implementation("com.squareup.sqldelight:android-driver:1.4.4")
+    implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.4.4")
+    implementation("com.squareup.sqldelight:android-paging-extensions:1.4.4")
+    implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
 
     // Timber logging
     implementation("com.jakewharton.timber:timber:4.7.1")

@@ -8,7 +8,7 @@ import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import com.google.firebase.analytics.FirebaseAnalytics
 import co.softov.morestuff.androidApp.app.EmptyApplicationLifecycleCallback
-import co.softov.morestuff.androidApp.di.appModule
+import co.softov.morestuff.androidApp.di.dataModule
 import co.softov.morestuff.androidApp.di.domainModule
 import co.softov.morestuff.androidApp.di.presentationModule
 import org.koin.android.ext.koin.androidContext
@@ -34,7 +34,7 @@ class MsApplication : Application() {
             androidContext(this@MsApplication)
             modules(listOf(
                 domainModule,
-                appModule,
+                dataModule,
                 presentationModule
             ))
         }

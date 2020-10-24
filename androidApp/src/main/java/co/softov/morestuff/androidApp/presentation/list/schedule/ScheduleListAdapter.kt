@@ -8,8 +8,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.schedule_list_item_expandable.view.*
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.databinding.ScheduleListItemExpandableBinding
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.androidApp.presentation.list.schedule.model.ScheduleListItemViewModel
 
@@ -35,26 +35,25 @@ ScheduleListAdapter :
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
         fun bind(item: ScheduleListItemViewModel) {
-            itemView.apply {
-                isLongClickable = true
+            ScheduleListItemExpandableBinding.bind(itemView).apply {
+                itemView.isLongClickable = true
 
                 taskScheduleTitleText.text = item.taskTitle
                 textScheduleItemScheduleDate.text =
-                    resources.getString(R.string.text_scheduled_time_placeholder, item.scheduleTime)
+                    itemView.resources.getString(
+                        R.string.text_scheduled_time_placeholder,
+                        item.scheduleTime
+                    )
 
                 layoutItemExpandedInfo.apply {
                     isVisible = item.expanded
                 }
 
-                setOnDebouncedClickListener {
+                itemView.setOnDebouncedClickListener {
                     item.expanded = item.expanded.not()
                     notifyItemChanged(adapterPosition)
                 }
 
-                // setOnLongClickListener {
-                //     showMenu(it)
-                //     true
-                // }
             }
         }
     }

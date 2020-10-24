@@ -6,7 +6,7 @@ import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 
 interface SetScheduleResponseMessage {
-    suspend operator fun invoke(taskId: Long, title: String, type: ReplyType): SimpleResult<Boolean>
+    suspend operator fun invoke(taskId: Long, title: String, replyType: ReplyType): SimpleResult<Boolean>
 }
 
 class AddReminderReplyMessageImpl(
@@ -16,9 +16,9 @@ class AddReminderReplyMessageImpl(
     override suspend fun invoke(
         taskId: Long,
         title: String,
-        type: ReplyType
+        replyType: ReplyType
     ): SimpleResult<Boolean> {
-        messageRepository.addReminderReplyMessage(taskId, title, type)
+        messageRepository.addUserReplyMessage(taskId, replyType.value, title)
         return Result.Success(true)
     }
 }

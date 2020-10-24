@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
 import co.softov.morestuff.android.BuildConfig
@@ -22,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private var contentFragment: Fragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
         Timber.d("onCreate")
         setContentView(R.layout.activity_main)
@@ -50,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         contentFragment = ContentFragment()
-        // contentFragment = PriorityFragment()
 
         contentFragment?.let {
             supportFragmentManager
@@ -68,13 +69,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.frame_settings,
                 MainSettings()
             )
-            .commit()
-    }
-
-    private fun showTaskList() {
-        supportFragmentManager.beginTransaction()
-            .addToBackStack(null)
-            .add(R.id.frame_content, ListsFragment(), ListsFragment::class.java.simpleName)
             .commit()
     }
 

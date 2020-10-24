@@ -12,9 +12,7 @@ sealed class Result<out T, out E> {
     }
 
     inline fun <C> map(success: (T) -> C) {
-        when (this) {
-            is Success -> success(value)
-        }
+        if (this is Success) success(value)
     }
 }
 

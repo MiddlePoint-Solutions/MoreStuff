@@ -2,18 +2,17 @@ package co.softov.morestuff.androidApp.presentation.list.schedule.model
 
 import co.softov.morestuff.androidApp.domain.model.ScheduleWithTitle
 import java.text.SimpleDateFormat
-import java.util.Date
 
 class ScheduleListItemMapper {
 
+    val dateFormat =
+        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
+
     fun map(input: ScheduleWithTitle): ScheduleListItemViewModel {
 
-        val dateFormat =
-            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
-
         val scheduleTime = when (input.scheduleTime) {
-            0L -> "Later"
-            else -> dateFormat.format(Date(input.scheduleTime))
+            null -> "Later"
+            else -> input.scheduleTime
         }
 
         return ScheduleListItemViewModel(

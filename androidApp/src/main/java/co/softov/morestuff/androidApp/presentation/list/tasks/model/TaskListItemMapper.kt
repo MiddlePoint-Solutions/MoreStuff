@@ -1,8 +1,8 @@
 package co.softov.morestuff.androidApp.presentation.list.tasks.model
 
 import co.softov.morestuff.androidApp.domain.model.Task
+import kotlinx.datetime.toLocalDateTime
 import java.text.SimpleDateFormat
-import java.util.Date
 
 class TaskListItemMapper {
 
@@ -10,10 +10,10 @@ class TaskListItemMapper {
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
 
     fun map(input: Task): TaskListItemViewModel {
-        val createTime = dateFormat.format(Date(input.createTime))
+        val createTime = input.createTime.toLocalDateTime().toString()
         val completeTime = when (input.completeTime) {
-            0L -> ""
-            else -> dateFormat.format(Date(input.completeTime))
+            null -> ""
+            else -> input.completeTime.toLocalDateTime().toString()
         }
 
         return TaskListItemViewModel(

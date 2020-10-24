@@ -2,6 +2,7 @@ package co.softov.morestuff.androidApp.data.repository
 
 import co.softov.morestuff.androidApp.data.mapper.mapList
 import co.softov.morestuff.androidApp.data.mapper.taskDbMapper
+import co.softov.morestuff.androidApp.data.utils.TimeUtils
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.model.Task
@@ -12,7 +13,6 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.util.*
 
 class TaskRepositoryImpl(
     database: StuffDb,
@@ -22,7 +22,7 @@ class TaskRepositoryImpl(
     private val taskQueries = database.taskQueries
 
     override suspend fun createTask(title: String): SimpleResult<Long> {
-        val currentTime = Calendar.getInstance().timeInMillis
+        val currentTime = TimeUtils.currentLocalDateTimeString
         taskQueries.insertTask(currentTime, title)
         return Result.Success(taskQueries.lastInsertRowId().executeAsOne())
     }
@@ -48,7 +48,8 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun setTaskComplete(taskId: Long): SimpleResult<Boolean> {
-        taskQueries.updateTaskComplete(Calendar.getInstance().timeInMillis, taskId)
+        val time = TimeUtils.currentLocalDateTimeString
+        taskQueries.updateTaskComplete(time, taskId)
         return Result.Success(true)
     }
 }

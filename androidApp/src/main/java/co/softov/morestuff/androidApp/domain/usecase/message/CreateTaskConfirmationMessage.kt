@@ -1,14 +1,13 @@
 package co.softov.morestuff.androidApp.domain.usecase.message
 
-import kotlinx.coroutines.delay
+import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
-
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 interface CreateTaskConfirmationMessage {
     suspend operator fun invoke(params: ConfirmParams): SimpleResult<Boolean>
@@ -31,43 +30,29 @@ class CreateConfirmationMessageImpl(
             is Priority.Today -> createTodayConfirmationTitle(params.priority)
             is Priority.Tomorrow -> createTomorrowConfirmationTitle(params.priority)
         }
-        messageRepository.createConfirmationMessageForTask(params.taskId, confirmTitle)
+        messageRepository.createMessage(
+            params.taskId,
+            ContentType.CONFIRM_NEW_TASK.value,
+            confirmTitle
+        )
         return Result.Success(true)
     }
 
     private fun createTodayConfirmationTitle(
         today: Priority.Today
     ): String {
-        return if (today.time == 0L) {
-            "sometime today"
-        } else {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = today.time
-            "remind you today at ${timeFormat.format(today.time)}"
-        }
+        return "No worries, will remind you soon!"
     }
 
     private fun createTomorrowConfirmationTitle(
         tomorrow: Priority.Tomorrow
     ): String {
-        return if (tomorrow.time == 0L) {
-            "see you tomorrow"
-        } else {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = tomorrow.time
-            "remind you tomorrow at ${timeFormat.format(tomorrow.time)}"
-        }
+        return "Great, remind you tomorrow!"
     }
 
     private fun createLaterConfirmationTitle(
         later: Priority.Later
     ): String {
-        return if (later.time == 0L) {
-            "when later?"
-        } else {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = later.time
-            "remind you on ${formatter.format(calendar.time)}"
-        }
+        return "Saving this for later"
     }
 }

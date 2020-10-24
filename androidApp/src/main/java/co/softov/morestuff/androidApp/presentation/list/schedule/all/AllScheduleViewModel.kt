@@ -1,10 +1,6 @@
 package co.softov.morestuff.androidApp.presentation.list.schedule.all
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetSchedulesWithTitle
 import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleTask
 import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskComplete
@@ -13,6 +9,12 @@ import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListVie
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent.UpdateSchedule
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewState
 import co.softov.morestuff.androidApp.presentation.list.schedule.model.ScheduleListItemMapper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class AllScheduleViewModel(
     private val getSchedulesWithTitle: GetSchedulesWithTitle,
@@ -29,12 +31,13 @@ class AllScheduleViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoadData() {
         viewModelScope.launch {
-            getSchedulesWithTitle().map { flow ->
-                flow.onEach {
-                    val data = scheduleItemMapper.map(it)
-                    sendEvent(UpdateSchedule(data))
-                }.launchIn(this)
-            }
+            getSchedulesWithTitle()
+                .onEach {
+                    sendEvent(UpdateSchedule(scheduleItemMapper.map(it)))
+                }.catch { e ->
+                    Timber.e("AllScheduleViewModel, error: $e")
+                }
+                .launchIn(viewModelScope)
         }
     }
 

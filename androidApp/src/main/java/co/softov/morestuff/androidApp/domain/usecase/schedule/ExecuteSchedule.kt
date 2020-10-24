@@ -1,5 +1,6 @@
 package co.softov.morestuff.androidApp.domain.usecase.schedule
 
+import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.model.Task
@@ -26,18 +27,18 @@ class ExecuteScheduleImpl(
                 setScheduleFulfilled(scheduleId)
                 when (val task = getTask(schedule.value.taskId)) {
                     is Result.Failure -> task
-                    is Result.Success -> createScheduledMessage(scheduleId, task.value)
+                    is Result.Success -> createScheduleMessage(scheduleId, task.value)
                 }
             }
         }
     }
 
-    private suspend fun createScheduledMessage(
+    private suspend fun createScheduleMessage(
         scheduleId: Long,
         task: Task
     ): SimpleResult<Boolean> {
         return when (val message =
-            messageRepository.createScheduledMessageForTask(task.id, task.title)) {
+            messageRepository.createMessage(task.id, ContentType.TASK_REMINDER.value, task.title)) {
             is Result.Failure -> message
             is Result.Success -> {
                 notifier.showScheduleNotification(scheduleId, message.value)
