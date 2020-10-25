@@ -5,10 +5,7 @@ import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.TimeOption
 import co.softov.morestuff.androidApp.domain.service.TimeManager
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.ExperimentalTime
-import kotlin.time.hours
-import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class)
 class TimeManagerImpl(
@@ -26,10 +23,11 @@ class TimeManagerImpl(
     private fun getTimeForToday(option: TimeOption): String = when (option) {
         TimeOption.Default -> {
             val currentTime = when (debug.debugReminders) {
-                true -> TimeUtils.currentUtcInstant + debug.todayDebugTime.minutes
-                else -> TimeUtils.currentUtcInstant + 1.hours
+                true -> TimeUtils.todayLocalDateTimeByAdding(minute = debug.todayDebugTime)
+                else -> TimeUtils.todayLocalDateTimeByAdding(hour = 1)
+//                else -> TimeUtils.currentUtcInstant + 1.hours
             }
-            currentTime.toLocalDateTime(TimeUtils.currentTimeZone).toString()
+            currentTime.toString()
         }
     }
 

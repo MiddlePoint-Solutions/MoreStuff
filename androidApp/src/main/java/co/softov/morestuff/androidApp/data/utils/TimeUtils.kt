@@ -22,6 +22,24 @@ object TimeUtils {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
             }
 
+    fun todayLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
+        (currentUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
+            .run {
+                LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
+            }
+
+    fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime =
+        (currentUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
+            .run {
+                LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
+            }
+
+    val todayTimeStringPair: Pair<String, String>
+        get() = todayLocalDateTime(0, 0).toString() to todayLocalDateTime(23, 59).toString()
+
+    val tomorrowTimeStringPair: Pair<String, String>
+        get() = tomorrowLocalDateTime(0, 0).toString() to tomorrowLocalDateTime(23, 59).toString()
+
 }
 
 

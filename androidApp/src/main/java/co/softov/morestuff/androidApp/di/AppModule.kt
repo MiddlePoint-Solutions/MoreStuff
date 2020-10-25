@@ -73,8 +73,7 @@ val dataModule = module {
             mapScheduleDb = makeScheduleDbMapper(),
             mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
             mapLaterScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            mapTomorrowScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            mapTodayScheduleWithTitleDb = makeScheduleWithTitleDbMapper()
+            mapTimeScheduleWithTitleDb = makeScheduleWithTitleDbMapper()
         )
     }
 
