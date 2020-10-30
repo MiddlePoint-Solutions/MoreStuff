@@ -6,10 +6,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
 import co.softov.morestuff.androidApp.domain.model.Message
+import co.softov.morestuff.androidApp.domain.redux.AppState
+import co.softov.morestuff.androidApp.domain.redux.AppStore
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
 import co.softov.morestuff.androidApp.domain.usecase.task.CreateTask
 import co.softov.morestuff.androidApp.domain.usecase.task.TaskParams
@@ -21,7 +22,6 @@ import kotlinx.coroutines.launch
 class ContentViewModel(
     private val getPagedMessages: GetPagedMessages,
     private val createNewTask: CreateTask,
-    private val debug: Debug,
     private var conductor: ContentConductor?
 ) : BaseViewModel<ContentViewState, ContentViewEvent>(ContentViewState()) {
 
@@ -53,6 +53,10 @@ class ContentViewModel(
                 messageLiveData.observeForever(messagePageObserver)
             }
         }
+    }
+
+    override fun onAppStateChange(state: AppState) {
+
     }
 
     override fun onReduceState(event: ContentViewEvent): ContentViewState {
@@ -123,6 +127,10 @@ class ContentViewModel(
 
     fun showTaskList() {
         conductor?.showTaskList()
+    }
+
+    fun onBackPressed() {
+        router.exit()
     }
 
     override fun onCleared() {

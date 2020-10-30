@@ -8,7 +8,7 @@ import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import timber.log.Timber
 
-abstract class BaseContainerFragment : Fragment() {
+abstract class BaseFragment : Fragment() {
 
     @get:LayoutRes
     protected abstract val layoutResourceId: Int
@@ -21,4 +21,6 @@ abstract class BaseContainerFragment : Fragment() {
         inflater.inflate(layoutResourceId, container, false).also {
             Timber.v("onCreateView ${javaClass.simpleName}")
         }
+
+    open fun onBackPressed() {}
 }

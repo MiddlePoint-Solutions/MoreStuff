@@ -11,65 +11,80 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.iterator
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import co.softov.morestuff.androidApp.presentation.content.ContentFragment
-import co.softov.morestuff.androidApp.presentation.list.ListsFragment
-import co.softov.morestuff.androidApp.presentation.settings.MainSettings
-import timber.log.Timber
+import co.softov.morestuff.androidApp.app.presentation.fragment.BaseFragment
+import co.softov.morestuff.androidApp.app.presentation.fragment.FlowFragmentFactory
+import co.softov.morestuff.androidApp.presentation.Screens
+import com.github.terrakok.cicerone.Navigator
+import com.github.terrakok.cicerone.NavigatorHolder
+import com.github.terrakok.cicerone.Router
+import com.github.terrakok.cicerone.androidx.AppNavigator
+import org.koin.android.ext.android.inject
 
 class MainActivity : AppCompatActivity() {
 
-    private var contentFragment: Fragment? = null
+    private val navigatorHolder: NavigatorHolder by inject()
+
+    private val fragmentFactory: FlowFragmentFactory by inject()
+
+    private val navigator: Navigator by lazy {
+        object : AppNavigator(this, R.id.container, fragmentFactory = fragmentFactory) {
+
+            override fun setupFragmentTransaction(
+                fragmentTransaction: FragmentTransaction,
+                currentFragment: Fragment?,
+                nextFragment: Fragment?
+            ) {
+                fragmentTransaction.setReorderingAllowed(true)
+            }
+        }
+    }
+
+    private val currentFragment: BaseFragment?
+        get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
+
+    private val router: Router by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
-        Timber.d("onCreate")
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.layout_container)
 
         initViews()
-        addContent()
+        if (savedInstanceState == null) {
+            router.newRootScreen(Screens.ContentFlow)
+        }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        contentFragment = null
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        navigatorHolder.setNavigator(navigator)
+    }
+
+    override fun onPause() {
+        navigatorHolder.removeNavigator()
+        super.onPause()
+    }
+
+    override fun onBackPressed() {
+        currentFragment?.onBackPressed() ?: super.onBackPressed()
     }
 
     private fun initViews() {
         if (BuildConfig.DEBUG) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        setSupportActionBar(findViewById(R.id.my_toolbar))
-    }
-
-    private fun addContent() {
-
-        contentFragment?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .remove(it)
-                .commit()
-        }
-
-        contentFragment = ContentFragment()
-
-        contentFragment?.let {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.frame_content, it, it.javaClass.simpleName)
-                .commit()
-        }
     }
 
     private fun showMainSettings() {
-        supportFragmentManager
-            .beginTransaction()
-            .addToBackStack(null)
-            .replace(
-                R.id.frame_settings,
-                MainSettings()
-            )
-            .commit()
+//        supportFragmentManager
+//            .beginTransaction()
+//            .addToBackStack(null)
+//            .replace(
+//                R.id.frame_settings,
+//                MainSettings()
+//            )
+//            .commit()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

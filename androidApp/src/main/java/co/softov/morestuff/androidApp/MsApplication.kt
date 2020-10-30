@@ -6,11 +6,12 @@ import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import com.google.firebase.analytics.FirebaseAnalytics
 import co.softov.morestuff.androidApp.app.EmptyApplicationLifecycleCallback
 import co.softov.morestuff.androidApp.di.dataModule
 import co.softov.morestuff.androidApp.di.domainModule
+import co.softov.morestuff.androidApp.di.navigationModule
 import co.softov.morestuff.androidApp.di.presentationModule
+import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -22,24 +23,31 @@ class MsApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         setNightMode()
-
         registerActivityLifecycleCallbacks(ApplicationLifecycle())
+        initTimber()
+        initKoin()
+        initFirebase()
+    }
 
+    private fun initTimber() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
         }
+    }
 
+    private fun initKoin() {
         startKoin {
             androidLogger()
             androidContext(this@MsApplication)
-            modules(listOf(
-                domainModule,
-                dataModule,
-                presentationModule
-            ))
+            modules(
+                listOf(
+                    domainModule,
+                    dataModule,
+                    presentationModule,
+                    navigationModule
+                )
+            )
         }
-
-        initFirebase()
     }
 
     private fun setNightMode() {
@@ -56,7 +64,6 @@ class MsApplication : Application() {
     }
 
     companion object {
-
         var isForeground: Boolean = false
     }
 

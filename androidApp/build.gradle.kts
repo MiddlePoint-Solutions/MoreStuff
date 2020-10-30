@@ -7,6 +7,7 @@ plugins {
     id("com.squareup.sqldelight")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
+    id("koin")
 }
 group = "co.softov.morestuff"
 version = "1.0-SNAPSHOT"
@@ -81,9 +82,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:2.0.2")
 
+    // Navigation
+    implementation("com.github.terrakok:cicerone:6.1")
+
     // Firebase
     implementation("com.google.firebase:firebase-crashlytics:17.2.2")
-    implementation("com.google.firebase:firebase-analytics:17.6.0")
+    implementation("com.google.firebase:firebase-analytics:18.0.0")
 
     // SQLDelight
     implementation("com.squareup.sqldelight:android-driver:1.4.4")
@@ -95,8 +99,8 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     // Koin Android
-    implementation("org.koin:koin-android:2.2.0-rc-1")
-    implementation("org.koin:koin-androidx-scope:2.2.0-rc-1")
-    implementation("org.koin:koin-androidx-viewmodel:2.2.0-rc-1")
-    implementation("org.koin:koin-androidx-ext:2.2.0-rc-1")
+    implementation("org.koin:koin-android:2.2.0-rc-3")
+    implementation("org.koin:koin-androidx-scope:2.2.0-rc-3")
+    implementation("org.koin:koin-androidx-viewmodel:2.2.0-rc-3")
+    implementation("org.koin:koin-androidx-ext:2.2.0-rc-3")
 }

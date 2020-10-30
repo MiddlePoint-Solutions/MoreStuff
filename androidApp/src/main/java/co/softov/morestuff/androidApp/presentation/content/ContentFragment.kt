@@ -13,9 +13,8 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.databinding.FragmentContentBinding
 import co.softov.morestuff.androidApp.app.presentation.extension.observe
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
-import co.softov.morestuff.androidApp.app.presentation.fragment.BaseContainerFragment
+import co.softov.morestuff.androidApp.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.androidApp.app.util.LifecycleValue
-import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.Priority.*
 import co.softov.morestuff.androidApp.presentation.content.adapter.ChatAdapter
 import co.softov.morestuff.androidApp.presentation.dashboard.options.DatePickerFragment
@@ -25,7 +24,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
 
-class ContentFragment : BaseContainerFragment() {
+class ContentFragment : BaseFragment() {
 
     private val viewModel: ContentViewModel by viewModel {
         parametersOf(object : ContentConductor {
@@ -85,6 +84,10 @@ class ContentFragment : BaseContainerFragment() {
         binding.editChatInput.showSoftInputOnFocus = false
     }
 
+    override fun onBackPressed() {
+        viewModel.onBackPressed()
+    }
+
     private fun initViews() {
         setupChatList()
         setupChatInput()
@@ -127,7 +130,6 @@ class ContentFragment : BaseContainerFragment() {
                 }
             }
         }
-
     }
 
     private fun setupChatList() {
@@ -138,9 +140,9 @@ class ContentFragment : BaseContainerFragment() {
         binding.apply {
             recyclerChatMessages.apply {
                 adapter = chatAdapter
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = true
             }
-            (recyclerChatMessages.itemAnimator as SimpleItemAnimator).supportsChangeAnimations =
-                true
+
             val layoutManager = LinearLayoutManager(recyclerChatMessages.context)
             layoutManager.stackFromEnd = false
             layoutManager.reverseLayout = true

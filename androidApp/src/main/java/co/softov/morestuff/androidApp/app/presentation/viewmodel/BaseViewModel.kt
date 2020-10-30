@@ -5,14 +5,28 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.androidApp.app.presentation.extension.toLiveData
+import co.softov.morestuff.androidApp.domain.redux.AppState
+import co.softov.morestuff.androidApp.domain.redux.AppStore
+import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinApiExtension
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import kotlin.properties.Delegates
 
+
+@OptIn(KoinApiExtension::class)
 abstract
-class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(initialState: ViewState) :
-    ViewModel() {
+class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
+    initialState: ViewState
+) : ViewModel(), KoinComponent {
+
+    private val store: AppStore by inject()
+    protected val router: Router by inject()
 
     private val stateMutableLiveData = MutableLiveData<ViewState>()
     val stateLiveData = stateMutableLiveData.toLiveData()
@@ -47,11 +61,18 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(initia
 
     fun loadData() {
         onLoadData()
+
+        store.state
+            .onEach { onAppStateChange(it) }
+            .launchIn(viewModelScope)
     }
 
     protected open fun onLoadData() {}
 
+    protected open fun onAppStateChange(state: AppState) {}
+
     protected abstract fun onReduceState(event: ViewEvent): ViewState
 
-    fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch(block = block)
+    fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) =
+        viewModelScope.launch(block = block)
 }
