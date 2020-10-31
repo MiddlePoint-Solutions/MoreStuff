@@ -1,29 +1,21 @@
 package co.softov.morestuff.androidApp.presentation.list.tasks.complete
 
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
 import co.softov.morestuff.androidApp.domain.usecase.task.GetCompletedTasks
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.androidApp.presentation.list.BaseListViewModel
 import co.softov.morestuff.androidApp.presentation.list.tasks.TaskListViewEvent
 import co.softov.morestuff.androidApp.presentation.list.tasks.TaskListViewEvent.UpdateTasks
 import co.softov.morestuff.androidApp.presentation.list.tasks.TaskListViewState
 import co.softov.morestuff.androidApp.presentation.list.tasks.model.TaskListItemMapper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
-class CompleteTasksViewModel(
-    private val getCompleteTasks: GetCompletedTasks,
-    rescheduleTask: RescheduleUseCase,
-    setTaskComplete: SetTaskCompleteUseCase
-) : BaseListViewModel<TaskListViewState, TaskListViewEvent>(
-    rescheduleTask,
-    setTaskComplete,
-    TaskListViewState()
-) {
+class
+CompleteTasksViewModel(
+    private val getCompleteTasks: GetCompletedTasks
+) : BaseListViewModel<TaskListViewState, TaskListViewEvent>(TaskListViewState()) {
 
     private val taskListItemMapper = TaskListItemMapper()
 

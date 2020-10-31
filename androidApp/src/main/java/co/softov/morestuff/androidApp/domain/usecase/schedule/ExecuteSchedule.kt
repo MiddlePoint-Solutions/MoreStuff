@@ -3,10 +3,8 @@ package co.softov.morestuff.androidApp.domain.usecase.schedule
 import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
-import co.softov.morestuff.androidApp.domain.model.Task
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 import co.softov.morestuff.androidApp.domain.service.Notifier
-import co.softov.morestuff.androidApp.domain.usecase.task.GetTask
 
 interface ExecuteSchedule {
     suspend operator fun invoke(scheduleId: Long): SimpleResult<Boolean>
@@ -14,31 +12,28 @@ interface ExecuteSchedule {
 
 class ExecuteScheduleImpl(
     private val messageRepository: MessageRepository,
-    private val getSchedule: GetSchedule,
-    private val getTask: GetTask,
+    private val getScheduleWithTitle: GetScheduleWithTitle,
     private val setScheduleFulfilled: SetScheduleFulfilled,
     private val notifier: Notifier
 ) : ExecuteSchedule {
 
     override suspend fun invoke(scheduleId: Long): SimpleResult<Boolean> {
-        return when (val schedule = getSchedule(scheduleId)) {
+        return when (val schedule = getScheduleWithTitle(scheduleId)) {
             is Result.Failure -> schedule
             is Result.Success -> {
                 setScheduleFulfilled(scheduleId)
-                when (val task = getTask(schedule.value.taskId)) {
-                    is Result.Failure -> task
-                    is Result.Success -> createScheduleMessage(scheduleId, task.value)
-                }
+                createScheduleMessage(scheduleId, schedule.value.taskId, schedule.value.taskTitle)
             }
         }
     }
 
     private suspend fun createScheduleMessage(
         scheduleId: Long,
-        task: Task
+        taskId: Long,
+        title: String
     ): SimpleResult<Boolean> {
         return when (val message =
-            messageRepository.createMessage(task.id, ContentType.TASK_REMINDER.value, task.title)) {
+            messageRepository.createMessage(taskId, ContentType.TASK_REMINDER.value, title)) {
             is Result.Failure -> message
             is Result.Success -> {
                 notifier.showScheduleNotification(scheduleId, message.value)

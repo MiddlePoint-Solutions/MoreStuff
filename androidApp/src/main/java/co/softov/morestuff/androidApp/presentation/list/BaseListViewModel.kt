@@ -1,35 +1,31 @@
 package co.softov.morestuff.androidApp.presentation.list
 
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.androidApp.domain.enums.Priority
-import co.softov.morestuff.androidApp.domain.enums.TimeOption.*
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
+import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
+import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.RescheduleAction
+import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCompleteAction
 
 abstract
 class BaseListViewModel<State : BaseViewState, Event : BaseViewEvent>(
-    private val rescheduleTask: RescheduleUseCase,
-    private val setTaskComplete: SetTaskCompleteUseCase,
     initialState: State
 ) : BaseViewModel<State, Event>(initialState) {
 
     open fun rescheduleTaskLater(taskId: Long) {
-        viewModelScope.launch { rescheduleTask(taskId, Priority.Later(Default)) }
+        dispatchAppStoreAction(RescheduleAction(taskId, Priority.Later(Default)))
     }
 
     open fun rescheduleTaskOneHour(taskId: Long) {
-        viewModelScope.launch { rescheduleTask(taskId, Priority.Today(Default)) }
+        dispatchAppStoreAction(RescheduleAction(taskId, Priority.Today(Default)))
     }
 
     open fun rescheduleTaskTomorrow(taskId: Long) {
-        viewModelScope.launch { rescheduleTask(taskId, Priority.Tomorrow(Default)) }
+        dispatchAppStoreAction(RescheduleAction(taskId, Priority.Tomorrow(Default)))
     }
 
     open fun rescheduleTaskComplete(taskId: Long) {
-        viewModelScope.launch { setTaskComplete(taskId = taskId) }
+        dispatchAppStoreAction(TaskCompleteAction(taskId))
     }
 }

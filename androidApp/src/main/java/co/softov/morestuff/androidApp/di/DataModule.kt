@@ -61,9 +61,7 @@ val dataModule = module {
         ScheduleRepositoryImpl(
             database = get(),
             mapScheduleDb = makeScheduleDbMapper(),
-            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            mapLaterScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            mapTimeScheduleWithTitleDb = makeScheduleWithTitleDbMapper()
+            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper()
         )
     }
 

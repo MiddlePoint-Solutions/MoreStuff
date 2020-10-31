@@ -11,9 +11,6 @@ import co.softov.morestuff.androidApp.domain.model.ScheduleWithTitle
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
-import co.softov.morestuff.db.SelectActiveLaterSchedulesWithTaskTitle
-import co.softov.morestuff.db.SelectActiveSchedulesWithTaskTitle
-import co.softov.morestuff.db.SelectActiveSchedulesWithTaskTitleByTime
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -24,9 +21,7 @@ import timber.log.Timber
 class ScheduleRepositoryImpl(
     database: StuffDb,
     private val mapScheduleDb: ScheduleDbMapper,
-    private val mapScheduleWithTitleDb: ScheduleWithTitleDbMapper<SelectActiveSchedulesWithTaskTitle>,
-    private val mapLaterScheduleWithTitleDb: ScheduleWithTitleDbMapper<SelectActiveLaterSchedulesWithTaskTitle>,
-    private val mapTimeScheduleWithTitleDb: ScheduleWithTitleDbMapper<SelectActiveSchedulesWithTaskTitleByTime>
+    private val mapScheduleWithTitleDb: ScheduleWithTitleDbMapper
 ) : ScheduleRepository {
 
     private val scheduleQueries = database.scheduleQueries
@@ -70,38 +65,44 @@ class ScheduleRepositoryImpl(
 
     override suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         val time = TimeUtils.todayTimeStringPair
-        return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(time.first, time.second)
+        return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
+            time.first,
+            time.second,
+            mapper = mapScheduleWithTitleDb
+        )
             .asFlow()
             .mapToList()
-            .map {
-                mapList(it, mapTimeScheduleWithTitleDb)
-            }
+    }
+
+    override suspend fun getActiveScheduleWithTitle(scheduleId: Long): SimpleResult<ScheduleWithTitle> {
+        return scheduleQueries
+            .selectActiveScheduleWithTaskTitle(scheduleId, mapper = mapScheduleWithTitleDb)
+            .executeAsOneOrNull()
+            ?.let { Result.Success(it) }
+            ?: Result.Failure(ScheduleDoesNotExist)
     }
 
     override suspend fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
-        return scheduleQueries.selectActiveSchedulesWithTaskTitle()
+        return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
             .asFlow()
             .mapToList()
-            .map { mapList(it, mapScheduleWithTitleDb) }
     }
 
     override suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
-        return scheduleQueries.selectActiveLaterSchedulesWithTaskTitle()
+        return scheduleQueries.selectActiveLaterSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
             .asFlow()
             .mapToList()
-            .map {
-                mapList(it, mapLaterScheduleWithTitleDb)
-            }
     }
 
     override suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         val time = TimeUtils.tomorrowTimeStringPair
-        return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(time.first, time.second)
+        return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
+            time.first,
+            time.second,
+            mapper = mapScheduleWithTitleDb
+        )
             .asFlow()
             .mapToList()
-            .map {
-                mapList(it, mapTimeScheduleWithTitleDb)
-            }
     }
 
     override suspend fun getActiveScheduleForTask(taskId: Long): SimpleResult<Schedule> {

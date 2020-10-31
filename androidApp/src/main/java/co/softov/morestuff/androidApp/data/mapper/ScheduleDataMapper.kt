@@ -2,25 +2,21 @@ package co.softov.morestuff.androidApp.data.mapper
 
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.model.ScheduleWithTitle
-import co.softov.morestuff.db.SelectActiveLaterSchedulesWithTaskTitle
-import co.softov.morestuff.db.SelectActiveSchedulesWithTaskTitle
-import co.softov.morestuff.db.SelectActiveSchedulesWithTaskTitleByTime
 
 typealias ScheduleDbMapper = (co.softov.morestuff.db.Schedule) -> Schedule
-typealias ScheduleWithTitleDbMapper<T> = (T) -> ScheduleWithTitle
+
+typealias ScheduleWithTitleDbMapper = (
+    id: Long,
+    task_id: Long,
+    schedule_time: String?,
+    title: String
+) -> ScheduleWithTitle
 
 fun makeScheduleDbMapper(): ScheduleDbMapper = { schedule ->
     mapScheduleDb(schedule)
 }
 
-fun <T> makeScheduleWithTitleDbMapper(): ScheduleWithTitleDbMapper<T> = { schedule ->
-    when (schedule) {
-        is SelectActiveSchedulesWithTaskTitle -> mapScheduleWithTitle(schedule)
-        is SelectActiveLaterSchedulesWithTaskTitle -> mapScheduleWithTitle(schedule)
-        is SelectActiveSchedulesWithTaskTitleByTime -> mapScheduleWithTitle(schedule)
-        else -> throw IllegalArgumentException("Mapper $schedule does not exist")
-    }
-}
+fun makeScheduleWithTitleDbMapper(): ScheduleWithTitleDbMapper = ::mapScheduleWithTitle
 
 fun mapScheduleDb(input: co.softov.morestuff.db.Schedule): Schedule {
     return Schedule(
@@ -33,29 +29,16 @@ fun mapScheduleDb(input: co.softov.morestuff.db.Schedule): Schedule {
     )
 }
 
-fun mapScheduleWithTitle(input: SelectActiveSchedulesWithTaskTitle): ScheduleWithTitle {
+fun mapScheduleWithTitle(
+    id: Long,
+    task_id: Long,
+    schedule_time: String?,
+    title: String
+): ScheduleWithTitle {
     return ScheduleWithTitle(
-        scheduleId = input.id,
-        taskId = input.task_id,
-        taskTitle = input.title,
-        scheduleTime = input.schedule_time
-    )
-}
-
-fun mapScheduleWithTitle(input: SelectActiveLaterSchedulesWithTaskTitle): ScheduleWithTitle {
-    return ScheduleWithTitle(
-        scheduleId = input.id,
-        taskId = input.task_id,
-        taskTitle = input.title,
-        scheduleTime = input.schedule_time
-    )
-}
-
-fun mapScheduleWithTitle(input: SelectActiveSchedulesWithTaskTitleByTime): ScheduleWithTitle {
-    return ScheduleWithTitle(
-        scheduleId = input.id,
-        taskId = input.task_id,
-        taskTitle = input.title,
-        scheduleTime = input.schedule_time
+        scheduleId = id,
+        taskId = task_id,
+        taskTitle = title,
+        scheduleTime = schedule_time
     )
 }

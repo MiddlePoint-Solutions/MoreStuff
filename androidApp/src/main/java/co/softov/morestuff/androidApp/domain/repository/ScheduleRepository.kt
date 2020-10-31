@@ -16,6 +16,7 @@ interface ScheduleRepository {
     suspend fun getActiveSchedulesFlow() : Flow<List<Schedule>>
     suspend fun getActiveScheduleForTask(taskId: Long): SimpleResult<Schedule>
 
+    suspend fun getActiveScheduleWithTitle(scheduleId: Long): SimpleResult<ScheduleWithTitle>
     suspend fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>

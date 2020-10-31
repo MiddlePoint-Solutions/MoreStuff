@@ -1,6 +1,5 @@
 package co.softov.morestuff.androidApp.di
 
-import co.softov.morestuff.androidApp.app.presentation.fragment.FlowFragmentFactory
 import co.softov.morestuff.androidApp.presentation.content.ContentConductor
 import co.softov.morestuff.androidApp.presentation.content.ContentViewModel
 import co.softov.morestuff.androidApp.presentation.list.schedule.all.AllScheduleViewModel
@@ -23,44 +22,32 @@ val presentationModule = module {
     }
     viewModel {
         ActiveTasksViewModel(
-            getActiveTasks = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getActiveTasks = get()
         )
     }
     viewModel {
         CompleteTasksViewModel(
-            getCompleteTasks = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getCompleteTasks = get()
         )
     }
     viewModel {
         TodayScheduleViewModel(
-            getSchedulesWithTitle = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getSchedulesWithTitle = get()
         )
     }
     viewModel {
         TomorrowScheduleViewModel(
-            getSchedulesWithTitle = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getSchedulesWithTitle = get()
         )
     }
     viewModel {
         LaterScheduleViewModel(
-            getLaterSchedules = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getLaterSchedules = get()
         )
     }
     viewModel {
         AllScheduleViewModel(
-            getSchedulesWithTitle = get(),
-            rescheduleTask = get(),
-            setTaskComplete = get()
+            getSchedulesWithTitle = get()
         )
     }
 }

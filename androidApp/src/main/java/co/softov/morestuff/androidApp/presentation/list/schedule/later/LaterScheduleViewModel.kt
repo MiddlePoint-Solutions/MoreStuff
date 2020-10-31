@@ -14,12 +14,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class LaterScheduleViewModel(
-    private val getLaterSchedules: GetLaterSchedulesWithTitle,
-    rescheduleTask: RescheduleUseCase,
-    setTaskComplete: SetTaskCompleteUseCase
+    private val getLaterSchedules: GetLaterSchedulesWithTitle
 ) : BaseListViewModel<ScheduleListViewState, ScheduleListViewEvent>(
-    rescheduleTask,
-    setTaskComplete,
     ScheduleListViewState()
 ) {
 

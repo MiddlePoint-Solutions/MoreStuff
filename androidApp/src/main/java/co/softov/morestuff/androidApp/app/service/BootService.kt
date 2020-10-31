@@ -8,11 +8,12 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import co.softov.morestuff.android.R
+import co.softov.morestuff.androidApp.app.extensions.simpleName
 import kotlinx.coroutines.launch
 import co.softov.morestuff.androidApp.domain.usecase.schedule.BootCompleteScheduler
 import org.koin.android.ext.android.inject
 
-class BootService : BaseService(BootService::class.java.simpleName) {
+class BootService : BaseService(BootService.simpleName) {
 
     private val bootScheduler: BootCompleteScheduler by inject()
 

@@ -13,12 +13,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class TodayScheduleViewModel(
-    private val getSchedulesWithTitle: GetTodaySchedulesWithTitle,
-    rescheduleTask: RescheduleUseCase,
-    setTaskComplete: SetTaskCompleteUseCase
+    private val getSchedulesWithTitle: GetTodaySchedulesWithTitle
 ) : BaseListViewModel<ScheduleListViewState, ScheduleListViewEvent>(
-    rescheduleTask,
-    setTaskComplete,
     ScheduleListViewState()
 ) {
 

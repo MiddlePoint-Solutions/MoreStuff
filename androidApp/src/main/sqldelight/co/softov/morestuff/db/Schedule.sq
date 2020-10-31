@@ -36,6 +36,14 @@ SELECT *
 FROM schedule
 WHERE active = 1;
 
+selectActiveScheduleWithTaskTitle:
+SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+FROM schedule
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+WHERE schedule.active = 1
+AND schedule.id = ?
+ORDER BY schedule_time DESC;
+
 selectActiveSchedulesWithTaskTitle:
 SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
 FROM schedule

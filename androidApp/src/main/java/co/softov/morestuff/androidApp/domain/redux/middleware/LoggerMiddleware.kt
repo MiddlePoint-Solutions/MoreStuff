@@ -1,6 +1,7 @@
 package co.softov.morestuff.androidApp.domain.redux.middleware
 
 import co.softov.morestuff.android.BuildConfig
+import co.softov.morestuff.androidApp.app.extensions.simpleName
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import com.iiitech.operations.domain.redux.Dispatch
@@ -21,10 +22,19 @@ class LoggerMiddleware : Middleware<AppState> {
         if (BuildConfig.DEBUG) {
             Timber.d("store-middleware ---> in ${action.log}")
             val returnValue = next(state, action, dispatch)
-            Timber.d("store-middleware <--- out ${returnValue.log}")
+            Timber.d("store-middleware <--- out ${getOutMessage(action, returnValue)}")
             return returnValue
         }
 
         return next(state, action, dispatch)
     }
+
+    private fun getOutMessage(action: Action, returnValue: Action): String {
+        return if (action == returnValue) {
+            "${action.simpleName}(NO CHANGE)"
+        } else {
+            returnValue.log
+        }
+    }
+
 }

@@ -29,7 +29,13 @@ val domainModule = module {
             setTaskCompleteUseCase = get()
         )
     }
-    factory { ScheduleMiddleware(createScheduleUseCase = get()) }
+    factory {
+        ScheduleMiddleware(
+            createScheduleUseCase = get(),
+            cancelActiveScheduleUseCase = get(),
+            rescheduleUseCase = get()
+        )
+    }
     factory {
         MessageMiddleware(
             createTaskConfirmationMessage = get(),
@@ -44,8 +50,7 @@ val domainModule = module {
 
     factory<ExecuteSchedule> {
         ExecuteScheduleImpl(
-            getSchedule = get(),
-            getTask = get(),
+            getScheduleWithTitle = get(),
             messageRepository = get(),
             notifier = get(),
             setScheduleFulfilled = get()
@@ -98,15 +103,10 @@ val domainModule = module {
     factory<GetMessagesForTask> { GetMessagesForTaskImpl(messageRepository = get()) }
     factory<GetActiveTasks> { GetActiveTasksImpl(taskRepository = get()) }
     factory<GetCompletedTasks> { GetCompletedTasksImpl(taskRepository = get()) }
-    factory<GetSchedulesWithTitle> { GetSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
 
     factory<SetTaskCompleteUseCase> {
         SetTaskCompleteImpl(
-            taskRepository = get(),
-            cancelActiveTaskSchedule = get()
+            taskRepository = get()
         )
     }
 
@@ -118,11 +118,17 @@ val domainModule = module {
             createSchedule = get()
         )
     }
-    factory<CancelActiveScheduleForTask> {
-        CancelActiveScheduleForTaskImpl(
+    factory<CancelActiveScheduleUseCase> {
+        CancelActiveScheduleUseCaseImpl(
             getActiveSchedule = get(),
             setScheduleFulfilled = get(),
             scheduler = get()
         )
     }
+
+    factory<GetScheduleWithTitle> { GetScheduleWithTitleImpl(scheduleRepository = get()) }
+    factory<GetSchedulesWithTitle> { GetSchedulesWithTitleImpl(scheduleRepository = get()) }
+    factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
+    factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
+    factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
 }

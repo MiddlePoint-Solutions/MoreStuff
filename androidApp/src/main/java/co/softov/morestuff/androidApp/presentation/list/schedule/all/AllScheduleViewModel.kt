@@ -17,12 +17,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class AllScheduleViewModel(
-    private val getSchedulesWithTitle: GetSchedulesWithTitle,
-    rescheduleTask: RescheduleUseCase,
-    setTaskComplete: SetTaskCompleteUseCase
+    private val getSchedulesWithTitle: GetSchedulesWithTitle
 ) : BaseListViewModel<ScheduleListViewState, ScheduleListViewEvent>(
-    rescheduleTask,
-    setTaskComplete,
     ScheduleListViewState()
 ) {
 
