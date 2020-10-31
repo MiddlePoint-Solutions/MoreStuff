@@ -2,8 +2,8 @@ package co.softov.morestuff.androidApp.presentation.list.schedule.all
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetSchedulesWithTitle
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleTask
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskComplete
+import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.androidApp.presentation.list.BaseListViewModel
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent.UpdateSchedule
@@ -18,8 +18,8 @@ import timber.log.Timber
 
 class AllScheduleViewModel(
     private val getSchedulesWithTitle: GetSchedulesWithTitle,
-    rescheduleTask: RescheduleTask,
-    setTaskComplete: SetTaskComplete
+    rescheduleTask: RescheduleUseCase,
+    setTaskComplete: SetTaskCompleteUseCase
 ) : BaseListViewModel<ScheduleListViewState, ScheduleListViewEvent>(
     rescheduleTask,
     setTaskComplete,

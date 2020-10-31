@@ -2,7 +2,7 @@ package co.softov.morestuff.androidApp.domain.redux.middleware
 
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
-import co.softov.morestuff.androidApp.domain.redux.NoAction
+import co.softov.morestuff.androidApp.domain.redux.NoOp
 import co.softov.morestuff.androidApp.domain.redux.middleware.NavigationAction.*
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.Screen
@@ -44,7 +44,7 @@ class NavigationMiddleware(
             is NewRoot -> router.newRootScreen(action.screen)
             is NavigateTo -> router.navigateTo(action.screen)
             Back -> router.exit()
-            else -> NoAction
+            else -> NoOp
         }
         return next(state, action, dispatch)
     }

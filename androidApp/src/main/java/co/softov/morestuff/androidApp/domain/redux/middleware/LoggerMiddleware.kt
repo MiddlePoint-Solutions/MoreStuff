@@ -19,9 +19,9 @@ class LoggerMiddleware : Middleware<AppState> {
         scope: CoroutineScope
     ): Action {
         if (BuildConfig.DEBUG) {
-            Timber.d("store-middleware ---> in $action")
+            Timber.d("store-middleware ---> in ${action.log}")
             val returnValue = next(state, action, dispatch)
-            Timber.d("store-middleware <--- out $returnValue")
+            Timber.d("store-middleware <--- out ${returnValue.log}")
             return returnValue
         }
 

@@ -3,19 +3,20 @@ package co.softov.morestuff.androidApp.presentation.settings
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.core.view.iterator
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import co.softov.morestuff.android.BuildConfig
-
 import co.softov.morestuff.android.R
-import co.softov.morestuff.androidApp.app.extensions.getColorFromAttr
+import co.softov.morestuff.androidApp.app.presentation.extension.getColorFromAttr
+import com.github.terrakok.cicerone.Router
+import org.koin.android.ext.android.inject
+
 
 class MainSettings : PreferenceFragmentCompat() {
+
+    private val router: Router by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setHasOptionsMenu(true)
@@ -32,9 +33,9 @@ class MainSettings : PreferenceFragmentCompat() {
 
         findPreference<Preference>(getString(R.string.pref_key_app_theme))?.setOnPreferenceChangeListener { _, newValue ->
             when ((newValue as String).toInt()) {
-                MODE_NIGHT_NO -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_NO)
-                MODE_NIGHT_YES -> AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_YES)
-                MODE_NIGHT_FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(
+                MODE_NIGHT_NO -> setDefaultNightMode(MODE_NIGHT_NO)
+                MODE_NIGHT_YES -> setDefaultNightMode(MODE_NIGHT_YES)
+                MODE_NIGHT_FOLLOW_SYSTEM -> setDefaultNightMode(
                     MODE_NIGHT_FOLLOW_SYSTEM
                 )
             }
@@ -55,5 +56,10 @@ class MainSettings : PreferenceFragmentCompat() {
         super.onPrepareOptionsMenu(menu)
         menu.iterator().forEach { it.isVisible = false }
     }
+
+    fun onBackPressed() {
+        router.exit()
+    }
+
 }
 

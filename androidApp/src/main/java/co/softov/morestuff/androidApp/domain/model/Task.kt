@@ -4,5 +4,5 @@ data class Task(
     val id: Long,
     val title: String,
     val createTime: String,
-    val completeTime: String?
+    val completeTime: String? = null
 )

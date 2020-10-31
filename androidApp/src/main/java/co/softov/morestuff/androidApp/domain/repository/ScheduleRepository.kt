@@ -9,7 +9,7 @@ import co.softov.morestuff.androidApp.domain.model.ScheduleWithTitle
 
 interface ScheduleRepository {
 
-    suspend fun createSchedule(taskId: Long, scheduleTime: String?): Long
+    suspend fun createSchedule(taskId: Long, scheduleTime: String?): SimpleResult<Schedule>
     suspend fun getSchedule(scheduleId: Long): SimpleResult<Schedule>
     suspend fun getActiveSchedules(): SimpleResult<List<Schedule>>
     suspend fun setScheduleFulfilled(scheduleId: Long) : SimpleResult<Long>

@@ -18,7 +18,6 @@ val presentationModule = module {
     viewModel { (conductor: ContentConductor) ->
         ContentViewModel(
             conductor = conductor,
-            createNewTask = get(),
             getPagedMessages = get()
         )
     }

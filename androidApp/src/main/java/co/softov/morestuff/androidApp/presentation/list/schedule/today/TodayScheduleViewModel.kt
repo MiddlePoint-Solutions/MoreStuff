@@ -1,8 +1,8 @@
 package co.softov.morestuff.androidApp.presentation.list.schedule.today
 
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetTodaySchedulesWithTitle
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleTask
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskComplete
+import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.androidApp.presentation.list.BaseListViewModel
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent.UpdateSchedule
@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.onEach
 
 class TodayScheduleViewModel(
     private val getSchedulesWithTitle: GetTodaySchedulesWithTitle,
-    rescheduleTask: RescheduleTask,
-    setTaskComplete: SetTaskComplete
+    rescheduleTask: RescheduleUseCase,
+    setTaskComplete: SetTaskCompleteUseCase
 ) : BaseListViewModel<ScheduleListViewState, ScheduleListViewEvent>(
     rescheduleTask,
     setTaskComplete,

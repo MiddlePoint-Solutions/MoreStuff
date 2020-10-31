@@ -9,29 +9,27 @@ import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
-interface CreateTaskConfirmationMessage {
-    suspend operator fun invoke(params: ConfirmParams): SimpleResult<Boolean>
+interface CreateTaskConfirmationMessageUseCase {
+    suspend operator fun invoke(taskId: Long, priority: Priority): SimpleResult<Boolean>
 }
 
-data class ConfirmParams(val taskId: Long, val priority: Priority)
-
-class CreateConfirmationMessageImpl(
+class CreateTaskConfirmationMessageUseCaseImpl(
     private val messageRepository: MessageRepository
-) : CreateTaskConfirmationMessage {
+) : CreateTaskConfirmationMessageUseCase {
 
     private val formatter =
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
     private val timeFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.US)
 
-    override suspend fun invoke(params: ConfirmParams): SimpleResult<Boolean> {
+    override suspend fun invoke(taskId: Long, priority: Priority): SimpleResult<Boolean> {
         delay(1300)
-        val confirmTitle = when (params.priority) {
-            is Priority.Later -> createLaterConfirmationTitle(params.priority)
-            is Priority.Today -> createTodayConfirmationTitle(params.priority)
-            is Priority.Tomorrow -> createTomorrowConfirmationTitle(params.priority)
+        val confirmTitle = when (priority) {
+            is Priority.Later -> createLaterConfirmationTitle(priority)
+            is Priority.Today -> createTodayConfirmationTitle(priority)
+            is Priority.Tomorrow -> createTomorrowConfirmationTitle(priority)
         }
         messageRepository.createMessage(
-            params.taskId,
+            taskId,
             ContentType.CONFIRM_NEW_TASK.value,
             confirmTitle
         )

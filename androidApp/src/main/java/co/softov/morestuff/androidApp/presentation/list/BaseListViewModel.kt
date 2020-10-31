@@ -6,16 +6,14 @@ import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.androidApp.domain.enums.Priority
-import co.softov.morestuff.androidApp.domain.enums.TimeOption
 import co.softov.morestuff.androidApp.domain.enums.TimeOption.*
-import co.softov.morestuff.androidApp.domain.redux.AppStore
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleTask
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskComplete
+import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 
 abstract
 class BaseListViewModel<State : BaseViewState, Event : BaseViewEvent>(
-    private val rescheduleTask: RescheduleTask,
-    private val setTaskComplete: SetTaskComplete,
+    private val rescheduleTask: RescheduleUseCase,
+    private val setTaskComplete: SetTaskCompleteUseCase,
     initialState: State
 ) : BaseViewModel<State, Event>(initialState) {
 

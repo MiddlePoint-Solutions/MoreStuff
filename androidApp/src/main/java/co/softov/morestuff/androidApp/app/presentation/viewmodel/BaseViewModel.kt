@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.androidApp.app.presentation.extension.toLiveData
+import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.AppStore
 import com.github.terrakok.cicerone.Router
@@ -54,17 +55,21 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
         }
     }
 
-    fun sendEvent(event: ViewEvent) {
-        stateTimeTravelDebugger?.addEvent(event)
-        state = onReduceState(event)
-    }
-
     fun loadData() {
         onLoadData()
 
         store.state
             .onEach { onAppStateChange(it) }
             .launchIn(viewModelScope)
+    }
+
+    fun sendEvent(event: ViewEvent) {
+        stateTimeTravelDebugger?.addEvent(event)
+        state = onReduceState(event)
+    }
+
+    protected fun dispatchAppStoreAction(action: Action) {
+        store.dispatch(action)
     }
 
     protected open fun onLoadData() {}

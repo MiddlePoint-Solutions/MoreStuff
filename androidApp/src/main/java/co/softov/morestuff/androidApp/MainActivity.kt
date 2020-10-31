@@ -77,14 +77,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMainSettings() {
-//        supportFragmentManager
-//            .beginTransaction()
-//            .addToBackStack(null)
-//            .replace(
-//                R.id.frame_settings,
-//                MainSettings()
-//            )
-//            .commit()
+        router.navigateTo(Screens.Settings)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

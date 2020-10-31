@@ -5,12 +5,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.presentation.extension.setLaunchScreen
+import co.softov.morestuff.androidApp.presentation.settings.MainSettings
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
-import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.AppScreen
-import org.koin.android.ext.android.inject
 
 abstract class FlowFragment(
     private val navigatorHolder: NavigatorHolder
@@ -22,6 +21,9 @@ abstract class FlowFragment(
 
     private val currentFragment
         get() = childFragmentManager.findFragmentById(mainContainerId) as? BaseFragment
+
+    private val settingsFragment
+        get() = childFragmentManager.findFragmentById(mainContainerId) as? MainSettings
 
     private val navigator: Navigator by lazy {
         object : AppNavigator(requireActivity(), mainContainerId, childFragmentManager) {
@@ -46,7 +48,8 @@ abstract class FlowFragment(
     abstract fun getLaunchScreen(): AppScreen
 
     override fun onBackPressed() {
-        currentFragment?.onBackPressed() ?: super.onBackPressed()
+        currentFragment?.onBackPressed() ?: settingsFragment?.onBackPressed()
+        ?: super.onBackPressed()
     }
 
     override fun onResume() {

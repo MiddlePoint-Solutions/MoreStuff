@@ -2,7 +2,10 @@ package co.softov.morestuff.androidApp.app.presentation.extension
 
 import android.content.Context
 import android.content.Intent
+import android.util.TypedValue
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
@@ -20,3 +23,14 @@ inline fun <reified T : AppCompatActivity> Context.startActivity(
     intent.putExtras(bundleOf(*extras))
     startActivity(intent)
 }
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
+}
+

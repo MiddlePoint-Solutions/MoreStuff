@@ -10,10 +10,8 @@ import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
 import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.redux.AppState
-import co.softov.morestuff.androidApp.domain.redux.AppStore
+import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.CreateTaskAction
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
-import co.softov.morestuff.androidApp.domain.usecase.task.CreateTask
-import co.softov.morestuff.androidApp.domain.usecase.task.TaskParams
 import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.*
 import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.*
 import co.softov.morestuff.androidApp.presentation.dashboard.options.createTodayOptions
@@ -21,7 +19,6 @@ import kotlinx.coroutines.launch
 
 class ContentViewModel(
     private val getPagedMessages: GetPagedMessages,
-    private val createNewTask: CreateTask,
     private var conductor: ContentConductor?
 ) : BaseViewModel<ContentViewState, ContentViewEvent>(ContentViewState()) {
 
@@ -107,10 +104,7 @@ class ContentViewModel(
     }
 
     fun addNewTask(title: String) {
-        viewModelScope.launch {
-            val params = TaskParams(title, state.priority)
-            createNewTask(params)
-        }
+        dispatchAppStoreAction(CreateTaskAction(title, state.priority))
     }
 
     fun selectedTodayPriority() {

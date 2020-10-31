@@ -22,4 +22,8 @@ class ContentFlowFragment(holder: NavigatorHolder) : FlowFragment(holder) {
         (activity as MainActivity).setSupportActionBar(view.findViewById(R.id.my_toolbar))
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+    }
+
 }

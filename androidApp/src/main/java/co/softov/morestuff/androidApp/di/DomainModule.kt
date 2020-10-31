@@ -1,8 +1,7 @@
 package co.softov.morestuff.androidApp.di
 
 import co.softov.morestuff.androidApp.domain.redux.AppStore
-import co.softov.morestuff.androidApp.domain.redux.middleware.LoggerMiddleware
-import co.softov.morestuff.androidApp.domain.redux.middleware.NavigationMiddleware
+import co.softov.morestuff.androidApp.domain.redux.middleware.*
 import co.softov.morestuff.androidApp.domain.usecase.message.*
 import co.softov.morestuff.androidApp.domain.usecase.schedule.*
 import co.softov.morestuff.androidApp.domain.usecase.task.*
@@ -14,22 +13,33 @@ val domainModule = module {
     single {
         AppStore(
             logger = get(),
-            navigator = get()
+            navigator = get(),
+            taskMiddleware = get(),
+            messageMiddleware = get(),
+            scheduleMiddleware = get()
         )
     }
 
     // Redux middleware
     factory { LoggerMiddleware() }
     factory { NavigationMiddleware(router = get()) }
+    factory {
+        TaskMiddleware(
+            createTaskUseCase = get(),
+            setTaskCompleteUseCase = get()
+        )
+    }
+    factory { ScheduleMiddleware(createScheduleUseCase = get()) }
+    factory {
+        MessageMiddleware(
+            createTaskConfirmationMessage = get(),
+            createTaskMessageUseCase = get()
+        )
+    }
 
     // UseCase
-    factory<CreateTask> {
-        CreateNewTaskImpl(
-            taskRepository = get(),
-            createTaskMessage = get(),
-            createConfirmationMessage = get(),
-            createSchedule = get()
-        )
+    factory<CreateTaskUseCase> {
+        CreateNewTaskUseCaseImpl(taskRepository = get())
     }
 
     factory<ExecuteSchedule> {
@@ -48,14 +58,18 @@ val domainModule = module {
     factory<GetActiveSchedules> {
         GetActiveSchedulesImpl(scheduleRepository = get())
     }
-    factory<CreateTaskMessage> {
-        CreateTaskMessageImpl(messageRepository = get())
+    factory<CreateTaskMessageUseCase> {
+        CreateTaskMessageUseCaseImpl(messageRepository = get())
     }
-    factory<CreateTaskConfirmationMessage> {
-        CreateConfirmationMessageImpl(messageRepository = get())
+    factory<CreateTaskConfirmationMessageUseCase> {
+        CreateTaskConfirmationMessageUseCaseImpl(messageRepository = get())
     }
-    factory<CreateSchedule> {
-        CreateScheduleImpl(scheduleRepository = get(), timeManager = get(), scheduler = get())
+    factory<CreateScheduleUseCase> {
+        CreateScheduleUseCaseImpl(
+            scheduleRepository = get(),
+            timeManager = get(),
+            scheduler = get()
+        )
     }
     factory<GetMessage> {
         GetMessageImpl(messageRepository = get())
@@ -89,7 +103,7 @@ val domainModule = module {
     factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
 
-    factory<SetTaskComplete> {
+    factory<SetTaskCompleteUseCase> {
         SetTaskCompleteImpl(
             taskRepository = get(),
             cancelActiveTaskSchedule = get()
@@ -98,8 +112,8 @@ val domainModule = module {
 
     // Schedule use-cases
     factory<GetActiveSchedule> { GetActiveScheduleImpl(scheduleRepository = get()) }
-    factory<RescheduleTask> {
-        RescheduleTaskImpl(
+    factory<RescheduleUseCase> {
+        RescheduleUseCaseImpl(
             cancelActiveSchedule = get(),
             createSchedule = get()
         )

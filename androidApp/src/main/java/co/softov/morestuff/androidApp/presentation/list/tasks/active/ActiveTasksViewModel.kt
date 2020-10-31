@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleTask
+import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
 import co.softov.morestuff.androidApp.domain.usecase.task.GetActiveTasks
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskComplete
+import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.androidApp.presentation.list.BaseListViewModel
 import co.softov.morestuff.androidApp.presentation.list.tasks.TaskListViewEvent
 import co.softov.morestuff.androidApp.presentation.list.tasks.TaskListViewEvent.UpdateTasks
@@ -17,8 +17,8 @@ import co.softov.morestuff.androidApp.presentation.list.tasks.model.TaskListItem
 
 class ActiveTasksViewModel(
     private val getActiveTasks: GetActiveTasks,
-    rescheduleTask: RescheduleTask,
-    setTaskComplete: SetTaskComplete
+    rescheduleTask: RescheduleUseCase,
+    setTaskComplete: SetTaskCompleteUseCase
 ) : BaseListViewModel<TaskListViewState, TaskListViewEvent>(
     rescheduleTask,
     setTaskComplete,
