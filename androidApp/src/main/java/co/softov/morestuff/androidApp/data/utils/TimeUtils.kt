@@ -3,6 +3,8 @@ package co.softov.morestuff.androidApp.data.utils
 import kotlinx.datetime.*
 import kotlin.time.ExperimentalTime
 import kotlin.time.days
+import kotlin.time.hours
+import kotlin.time.minutes
 
 @OptIn(ExperimentalTime::class)
 object TimeUtils {
@@ -29,9 +31,9 @@ object TimeUtils {
             }
 
     fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime =
-        (currentUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
+        (currentUtcInstant + hour.hours + minute.minutes).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {
-                LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
+                LocalDateTime(year, month, dayOfMonth, this.hour, this.minute, 0, 0)
             }
 
     val todayTimeStringPair: Pair<String, String>

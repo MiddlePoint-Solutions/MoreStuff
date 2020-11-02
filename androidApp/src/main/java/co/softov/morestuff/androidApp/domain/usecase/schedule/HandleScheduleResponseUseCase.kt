@@ -3,27 +3,25 @@ package co.softov.morestuff.androidApp.domain.usecase.schedule
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
-import co.softov.morestuff.androidApp.domain.enums.TimeOption.*
+import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.service.Notifier
-import co.softov.morestuff.androidApp.domain.usecase.message.GetMessagesForTask
 import co.softov.morestuff.androidApp.domain.usecase.message.SetScheduleResponseMessage
 import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import timber.log.Timber
 
-interface HandleScheduleResponse {
+interface HandleScheduleResponseUseCase {
     suspend operator fun invoke(scheduleId: Long, replyType: ReplyType): SimpleResult<Boolean>
 }
 
-class HandleScheduleResponseImpl(
+class HandleScheduleResponseUseCaseImpl(
     private val getSchedule: GetSchedule,
     private val createSchedule: CreateScheduleUseCase,
     private val setScheduleResponseMessage: SetScheduleResponseMessage,
-    private val getTaskMessages: GetMessagesForTask,
     private val setTaskComplete: SetTaskCompleteUseCase,
     private val notifier: Notifier
-) : HandleScheduleResponse {
+) : HandleScheduleResponseUseCase {
 
     override suspend fun invoke(scheduleId: Long, replyType: ReplyType): SimpleResult<Boolean> {
         Timber.d("HandleScheduleResponse: $scheduleId, reply: $replyType")

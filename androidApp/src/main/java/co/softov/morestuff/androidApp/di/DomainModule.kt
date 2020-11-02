@@ -33,12 +33,13 @@ val domainModule = module {
         ScheduleMiddleware(
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
-            rescheduleUseCase = get()
+            rescheduleUseCase = get(),
+            handleScheduleResponseUseCase = get()
         )
     }
     factory {
         MessageMiddleware(
-            createTaskConfirmationMessage = get(),
+            createTaskConfirmationMessageUseCase = get(),
             createTaskMessageUseCase = get()
         )
     }
@@ -85,13 +86,12 @@ val domainModule = module {
     factory<SetScheduleFulfilled> {
         SetScheduleFulfilledImpl(scheduleRepository = get())
     }
-    factory<HandleScheduleResponse> {
-        HandleScheduleResponseImpl(
+    factory<HandleScheduleResponseUseCase> {
+        HandleScheduleResponseUseCaseImpl(
             notifier = get(),
             getSchedule = get(),
             createSchedule = get(),
             setScheduleResponseMessage = get(),
-            getTaskMessages = get(),
             setTaskComplete = get()
         )
     }

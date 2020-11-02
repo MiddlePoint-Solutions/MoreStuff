@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class MessageMiddleware(
     private val createTaskMessageUseCase: CreateTaskMessageUseCase,
-    private val createTaskConfirmationMessage: CreateTaskConfirmationMessageUseCase
+    private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -28,7 +28,7 @@ class MessageMiddleware(
         when (action) {
             is TaskCreatedAction -> scope.launch {
                 createTaskMessageUseCase(action.task)
-                createTaskConfirmationMessage(action.task.id, action.priority)
+                createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
             else -> NoOp
         }

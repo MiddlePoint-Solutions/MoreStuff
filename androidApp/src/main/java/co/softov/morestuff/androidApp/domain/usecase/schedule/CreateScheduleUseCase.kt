@@ -14,8 +14,8 @@ interface CreateScheduleUseCase {
 }
 
 class CreateScheduleUseCaseImpl(
-    private val timeManager: TimeManager,
     private val scheduleRepository: ScheduleRepository,
+    private val timeManager: TimeManager,
     private val scheduler: Scheduler
 ) : CreateScheduleUseCase {
     override suspend fun invoke(taskId: Long, priority: Priority): SimpleResult<Schedule> {
