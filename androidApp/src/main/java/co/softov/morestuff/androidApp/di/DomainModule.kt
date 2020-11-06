@@ -16,7 +16,8 @@ val domainModule = module {
             navigator = get(),
             taskMiddleware = get(),
             messageMiddleware = get(),
-            scheduleMiddleware = get()
+            scheduleMiddleware = get(),
+            responseMiddleware = get()
         )
     }
 
@@ -33,14 +34,18 @@ val domainModule = module {
         ScheduleMiddleware(
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
-            rescheduleUseCase = get(),
-            handleScheduleResponseUseCase = get()
+            rescheduleUseCase = get()
         )
     }
     factory {
         MessageMiddleware(
             createTaskConfirmationMessageUseCase = get(),
             createTaskMessageUseCase = get()
+        )
+    }
+    factory {
+        ResponseMiddleware(
+            handleScheduleResponseUseCase = get()
         )
     }
 

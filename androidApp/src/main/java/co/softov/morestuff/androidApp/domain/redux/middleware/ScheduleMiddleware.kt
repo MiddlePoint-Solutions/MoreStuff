@@ -22,14 +22,12 @@ import kotlinx.coroutines.launch
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
     data class RescheduleAction(val taskId: Long, val priority: Priority) : ScheduleAction()
-    data class ScheduleResponse(val scheduleId: Long, val replyType: ReplyType): ScheduleAction()
 }
 
 class ScheduleMiddleware(
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
-    private val rescheduleUseCase: RescheduleUseCase,
-    private val handleScheduleResponseUseCase: HandleScheduleResponseUseCase
+    private val rescheduleUseCase: RescheduleUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -56,11 +54,6 @@ class ScheduleMiddleware(
                     dispatch(ScheduleCreatedAction(it))
                 }
             }
-
-            is ScheduleResponse -> scope.launch {
-                handleScheduleResponseUseCase(action.scheduleId, action.replyType)
-            }
-
 
             else -> NoOp
         }

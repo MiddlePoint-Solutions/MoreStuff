@@ -2,7 +2,7 @@ package co.softov.morestuff.androidApp.app.service
 
 import android.content.Intent
 import co.softov.morestuff.androidApp.app.receiver.getReplyIntentExtras
-import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.ScheduleResponse
+import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleResponseAction
 import timber.log.Timber
 
 class NotificationService : BaseService(NotificationService::class.java.simpleName) {
@@ -11,7 +11,7 @@ class NotificationService : BaseService(NotificationService::class.java.simpleNa
         intent?.let {
             it.getReplyIntentExtras()?.also { reply ->
                 Timber.d("onHandleIntent: $reply")
-                dispatchStoreAction(ScheduleResponse(reply.scheduleId, reply.type))
+                dispatchStoreAction(ScheduleResponseAction(reply.scheduleId, reply.type))
             }
         }
     }
