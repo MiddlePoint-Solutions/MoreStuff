@@ -17,7 +17,7 @@ import co.softov.morestuff.androidApp.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.androidApp.data.service.NotifierImpl
 import co.softov.morestuff.androidApp.data.service.TimeManagerImpl
 import co.softov.morestuff.androidApp.domain.Debug
-import co.softov.morestuff.androidApp.domain.Scheduler
+import co.softov.morestuff.androidApp.domain.service.Scheduler
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 import co.softov.morestuff.androidApp.domain.repository.PreferenceRepository
 import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository

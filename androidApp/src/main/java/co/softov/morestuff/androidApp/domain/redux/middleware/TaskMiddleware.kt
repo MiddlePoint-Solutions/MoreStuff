@@ -2,10 +2,12 @@ package co.softov.morestuff.androidApp.domain.redux.middleware
 
 import co.softov.morestuff.androidApp.app.extensions.simpleName
 import co.softov.morestuff.androidApp.domain.enums.Priority
+import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.model.Task
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.NoOp
+import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.androidApp.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
@@ -23,12 +25,12 @@ sealed class TaskAction : Action.FeatureAction() {
             get() = "${this.simpleName}(title=$title, priority=${priority.simpleName})"
     }
 
-    data class TaskCreatedAction(val task: Task, val priority: Priority) : TaskAction() {
+    data class TaskCompleteAction(val taskId: Long) : TaskAction()
+
+    internal data class TaskCreatedAction(val task: Task, val priority: Priority) : TaskAction() {
         override val log: String
             get() = "${this.simpleName}(task=$task)"
     }
-
-    data class TaskCompleteAction(val taskId: Long) : TaskAction()
 }
 
 class TaskMiddleware(
@@ -50,9 +52,11 @@ class TaskMiddleware(
                     dispatch(TaskCreatedAction(task, action.priority))
                 }
             }
+
             is TaskCompleteAction -> scope.launch {
                 setTaskCompleteUseCase(action.taskId)
             }
+
             else -> NoOp
         }
         return next(state, action, dispatch)

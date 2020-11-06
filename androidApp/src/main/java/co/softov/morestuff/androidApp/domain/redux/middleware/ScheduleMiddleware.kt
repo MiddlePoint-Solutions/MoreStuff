@@ -1,35 +1,41 @@
 package co.softov.morestuff.androidApp.domain.redux.middleware
 
-import co.softov.morestuff.androidApp.domain.Scheduler
 import co.softov.morestuff.androidApp.domain.enums.Priority
+import co.softov.morestuff.androidApp.domain.enums.Priority.*
+import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.NoOp
+import co.softov.morestuff.androidApp.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
+import co.softov.morestuff.androidApp.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
+import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCompleteAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCreatedAction
-import co.softov.morestuff.androidApp.domain.usecase.schedule.*
+import co.softov.morestuff.androidApp.domain.service.Scheduler
+import co.softov.morestuff.androidApp.domain.usecase.schedule.CancelActiveScheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.schedule.CreateScheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.schedule.GetScheduleUseCase
+import co.softov.morestuff.androidApp.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import com.iiitech.operations.domain.redux.Dispatch
 import com.iiitech.operations.domain.redux.Middleware
 import com.iiitech.operations.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
     data class RescheduleAction(val taskId: Long, val priority: Priority) : ScheduleAction()
 
     internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
-    internal data class ScheduleCanceledAction(val schedule: Schedule) : ScheduleAction()
 }
 
 class ScheduleMiddleware(
     private val scheduler: Scheduler,
+    private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
-    private val rescheduleUseCase: RescheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase
 ) : Middleware<AppState> {
 
@@ -49,14 +55,22 @@ class ScheduleMiddleware(
             }
 
             is TaskCompleteAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId).map { schedule ->
-                    dispatch(ScheduleCanceledAction(schedule))
-                }
+                cancelActiveSchedule(action.taskId, dispatch)
             }
 
             is RescheduleAction -> scope.launch {
-                rescheduleUseCase(action.taskId, action.priority).map {
+                cancelActiveSchedule(action.taskId, dispatch)
+                createScheduleUseCase(action.taskId, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
+                }
+            }
+
+            is ScheduleReplyAction -> scope.launch {
+                when (action.replyType) {
+                    LATER -> dispatch(RescheduleAction(action.schedule.taskId, Later()))
+                    SNOOZE -> dispatch(RescheduleAction(action.schedule.taskId, Today()))
+                    TOMORROW -> dispatch(RescheduleAction(action.schedule.taskId, Tomorrow()))
+                    DONE -> dispatch(TaskCompleteAction(action.schedule.taskId))
                 }
             }
 
@@ -66,17 +80,24 @@ class ScheduleMiddleware(
                 }
             }
 
-            is ScheduleCanceledAction -> {
-                scheduler.cancelSchedule(action.schedule.id)
-            }
-
             is ExecuteScheduleAction -> scope.launch {
-                setScheduleFulfilledUseCase(action.scheduleId)
+                getScheduleUseCase(action.scheduleId).map { schedule ->
+                    if (schedule.active) {
+                        setScheduleFulfilledUseCase(schedule.id)
+                        dispatch(CreateScheduleMessageAction(schedule.id))
+                    }
+                }
             }
 
             else -> NoOp
         }
 
         return next(state, action, dispatch)
+    }
+
+    private suspend fun cancelActiveSchedule(taskId: Long, dispatch: Dispatch) {
+        cancelActiveScheduleUseCase(taskId).map { schedule ->
+            dispatch(RemoveScheduleNotificationAction(schedule.id))
+        }
     }
 }

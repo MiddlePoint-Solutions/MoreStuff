@@ -10,7 +10,8 @@ class AppStore(
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
-    responseMiddleware: ResponseMiddleware
+    responseMiddleware: ResponseMiddleware,
+    notificationMiddleware: NotificationMiddleware
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(AppState::reduceSignInState),
@@ -20,6 +21,7 @@ class AppStore(
         taskMiddleware,
         scheduleMiddleware,
         messageMiddleware,
-        responseMiddleware
+        responseMiddleware,
+        notificationMiddleware
     )
 )

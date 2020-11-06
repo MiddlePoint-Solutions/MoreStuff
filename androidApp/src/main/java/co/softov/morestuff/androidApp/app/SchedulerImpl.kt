@@ -7,7 +7,7 @@ import co.softov.morestuff.androidApp.app.receiver.ScheduleReceiver
 import co.softov.morestuff.androidApp.app.receiver.cancelReminderIntent
 import co.softov.morestuff.androidApp.app.receiver.createReminderIntent
 import co.softov.morestuff.androidApp.data.utils.toEpochMilliseconds
-import co.softov.morestuff.androidApp.domain.Scheduler
+import co.softov.morestuff.androidApp.domain.service.Scheduler
 import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import timber.log.Timber

@@ -1,24 +1,34 @@
 package co.softov.morestuff.androidApp.domain.redux.middleware
 
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
-import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
+import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.NoOp
-import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleResponseAction
-import co.softov.morestuff.androidApp.domain.usecase.schedule.HandleScheduleResponseUseCase
+import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
+import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
+import co.softov.morestuff.androidApp.domain.usecase.schedule.GetScheduleUseCase
 import com.iiitech.operations.domain.redux.Dispatch
 import com.iiitech.operations.domain.redux.Middleware
 import com.iiitech.operations.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class ResponseAction : Action.FeatureAction() {
-    data class ScheduleResponseAction(val scheduleId: Long, val replyType: ReplyType): ResponseAction()
+    data class UserResponseAction(
+        val scheduleId: Long,
+        val replyType: ReplyType
+    ) : ResponseAction()
+
+    internal data class ScheduleReplyAction(
+        val schedule: Schedule,
+        val replyType: ReplyType
+    ) : ResponseAction()
 }
 
 class ResponseMiddleware(
-    private val handleScheduleResponseUseCase: HandleScheduleResponseUseCase
+    private val getScheduleUseCase: GetScheduleUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -30,9 +40,15 @@ class ResponseMiddleware(
     ): Action {
         when (action) {
 
-            is ScheduleResponseAction -> scope.launch {
-                // TODO: handle different reply types here, deconstructing the use-case
-                handleScheduleResponseUseCase(action.scheduleId, action.replyType)
+            is UserResponseAction -> scope.launch {
+                getScheduleUseCase(action.scheduleId).fold(
+                    success = { schedule ->
+                        dispatch(ScheduleReplyAction(schedule, action.replyType))
+                    },
+                    failure = {
+                        Timber.e(it)
+                    }
+                )
             }
 
             else -> NoOp

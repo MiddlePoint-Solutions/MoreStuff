@@ -2,8 +2,6 @@ package co.softov.morestuff.androidApp.presentation.list.schedule.later
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetLaterSchedulesWithTitle
-import co.softov.morestuff.androidApp.domain.usecase.schedule.RescheduleUseCase
-import co.softov.morestuff.androidApp.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.androidApp.presentation.list.BaseListViewModel
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent
 import co.softov.morestuff.androidApp.presentation.list.schedule.ScheduleListViewEvent.UpdateSchedule

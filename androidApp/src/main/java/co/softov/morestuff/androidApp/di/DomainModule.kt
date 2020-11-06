@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val domainModule = module {
 
-    // Redux Store
+    // Store
     single {
         AppStore(
             logger = get(),
@@ -17,11 +17,12 @@ val domainModule = module {
             taskMiddleware = get(),
             messageMiddleware = get(),
             scheduleMiddleware = get(),
-            responseMiddleware = get()
+            responseMiddleware = get(),
+            notificationMiddleware = get()
         )
     }
 
-    // Redux middleware
+    // Middleware
     factory { LoggerMiddleware() }
     factory { NavigationMiddleware(router = get()) }
     factory {
@@ -32,26 +33,24 @@ val domainModule = module {
     }
     factory {
         ScheduleMiddleware(
+            scheduler = get(),
+            getScheduleUseCase = get(),
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
-            rescheduleUseCase = get(),
-            scheduler = get(),
             setScheduleFulfilledUseCase = get()
         )
     }
     factory {
         MessageMiddleware(
-            notifier = get(),
             createTaskConfirmationMessageUseCase = get(),
             createTaskMessageUseCase = get(),
-            createScheduleMessageUseCase = get()
+            createScheduleMessageUseCase = get(),
+            setScheduleResponseMessage = get()
         )
     }
-    factory {
-        ResponseMiddleware(
-            handleScheduleResponseUseCase = get()
-        )
-    }
+    factory { ResponseMiddleware(getScheduleUseCase = get()) }
+    factory { NotificationMiddleware(notifier = get()) }
+
 
     // UseCase
     factory<CreateTaskUseCase> {
@@ -78,16 +77,6 @@ val domainModule = module {
     factory<SetScheduleFulfilledUseCase> {
         SetScheduleFulfilledUseCaseImpl(scheduleRepository = get())
     }
-    factory<HandleScheduleResponseUseCase> {
-        HandleScheduleResponseUseCaseImpl(
-            notifier = get(),
-            getSchedule = get(),
-            createSchedule = get(),
-            setScheduleResponseMessage = get(),
-            setTaskComplete = get()
-        )
-    }
-
     factory<SetScheduleResponseMessage> { AddReminderReplyMessageImpl(messageRepository = get()) }
 
     // Tasks use-cases
@@ -111,12 +100,6 @@ val domainModule = module {
 
     // Schedule use-cases
     factory<GetActiveSchedule> { GetActiveScheduleImpl(scheduleRepository = get()) }
-    factory<RescheduleUseCase> {
-        RescheduleUseCaseImpl(
-            cancelActiveSchedule = get(),
-            createSchedule = get()
-        )
-    }
     factory<CancelActiveScheduleUseCase> {
         CancelActiveScheduleUseCaseImpl(
             getActiveSchedule = get(),

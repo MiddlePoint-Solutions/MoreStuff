@@ -1,6 +1,5 @@
 package co.softov.morestuff.androidApp.domain.usecase.schedule
 
-import co.softov.morestuff.androidApp.domain.Scheduler
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
