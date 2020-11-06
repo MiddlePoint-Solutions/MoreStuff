@@ -1,23 +1,22 @@
 package co.softov.morestuff.androidApp.domain.usecase.schedule
 
-import co.softov.morestuff.androidApp.domain.Scheduler
 import co.softov.morestuff.androidApp.domain.model.Result
+import co.softov.morestuff.androidApp.domain.model.Schedule
+import co.softov.morestuff.androidApp.domain.model.SimpleResult
 
 interface CancelActiveScheduleUseCase {
-    suspend operator fun invoke(taskId: Long)
+    suspend operator fun invoke(taskId: Long): SimpleResult<Schedule>
 }
 
 class CancelActiveScheduleUseCaseImpl(
     private val getActiveSchedule: GetActiveSchedule,
-    private val setScheduleFulfilled: SetScheduleFulfilled,
-    private val scheduler: Scheduler
+    private val setScheduleFulfilled: SetScheduleFulfilledUseCase
 ) : CancelActiveScheduleUseCase {
 
-    override suspend fun invoke(taskId: Long) {
-        when (val result = getActiveSchedule(taskId)) {
-            is Result.Success -> {
+    override suspend fun invoke(taskId: Long): SimpleResult<Schedule> {
+        return getActiveSchedule(taskId).also { result ->
+            if (result is Result.Success) {
                 val scheduleId = result.value.id
-                scheduler.cancelSchedule(scheduleId)
                 setScheduleFulfilled(scheduleId)
             }
         }

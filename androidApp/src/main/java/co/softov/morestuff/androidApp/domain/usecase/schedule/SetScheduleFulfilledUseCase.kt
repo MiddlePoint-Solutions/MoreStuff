@@ -3,13 +3,13 @@ package co.softov.morestuff.androidApp.domain.usecase.schedule
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
 
-interface SetScheduleFulfilled {
+interface SetScheduleFulfilledUseCase {
     suspend operator fun invoke(scheduleId: Long): SimpleResult<Long>
 }
 
-class SetScheduleFulfilledImpl(
+class SetScheduleFulfilledUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : SetScheduleFulfilled {
+) : SetScheduleFulfilledUseCase {
     override suspend fun invoke(scheduleId: Long): SimpleResult<Long> {
         return scheduleRepository.setScheduleFulfilled(scheduleId)
     }

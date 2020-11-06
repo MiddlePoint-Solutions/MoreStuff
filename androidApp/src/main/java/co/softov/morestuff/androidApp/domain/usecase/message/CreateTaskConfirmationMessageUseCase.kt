@@ -4,7 +4,6 @@ import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
-import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
@@ -14,7 +13,7 @@ interface CreateTaskConfirmationMessageUseCase {
 }
 
 class CreateTaskConfirmationMessageUseCaseImpl(
-    private val messageRepository: MessageRepository
+    private val createMessageUseCase: CreateMessageUseCase
 ) : CreateTaskConfirmationMessageUseCase {
 
     private val formatter =
@@ -28,10 +27,10 @@ class CreateTaskConfirmationMessageUseCaseImpl(
             is Priority.Today -> createTodayConfirmationTitle(priority)
             is Priority.Tomorrow -> createTomorrowConfirmationTitle(priority)
         }
-        messageRepository.createMessage(
+        createMessageUseCase(
             taskId,
-            ContentType.CONFIRM_NEW_TASK.value,
-            confirmTitle
+            confirmTitle,
+            ContentType.CONFIRM_NEW_TASK
         )
         return Result.Success(true)
     }

@@ -5,7 +5,6 @@ import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
 
-
 interface GetActiveSchedule {
     suspend operator fun invoke(taskId: Long): SimpleResult<Schedule>
 }

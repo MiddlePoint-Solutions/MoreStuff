@@ -34,13 +34,17 @@ val domainModule = module {
         ScheduleMiddleware(
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
-            rescheduleUseCase = get()
+            rescheduleUseCase = get(),
+            scheduler = get(),
+            setScheduleFulfilledUseCase = get()
         )
     }
     factory {
         MessageMiddleware(
+            notifier = get(),
             createTaskConfirmationMessageUseCase = get(),
-            createTaskMessageUseCase = get()
+            createTaskMessageUseCase = get(),
+            createScheduleMessageUseCase = get()
         )
     }
     factory {
@@ -54,42 +58,25 @@ val domainModule = module {
         CreateNewTaskUseCaseImpl(taskRepository = get())
     }
 
-    factory<ExecuteSchedule> {
-        ExecuteScheduleImpl(
-            getScheduleWithTitle = get(),
-            messageRepository = get(),
-            notifier = get(),
-            setScheduleFulfilled = get()
-        )
-    }
-
     factory<BootCompleteScheduler> {
         BootCompleteSchedulerImpl(scheduler = get(), getActiveSchedules = get())
     }
     factory<GetActiveSchedules> {
         GetActiveSchedulesImpl(scheduleRepository = get())
     }
-    factory<CreateTaskMessageUseCase> {
-        CreateTaskMessageUseCaseImpl(messageRepository = get())
-    }
-    factory<CreateTaskConfirmationMessageUseCase> {
-        CreateTaskConfirmationMessageUseCaseImpl(messageRepository = get())
-    }
+
     factory<CreateScheduleUseCase> {
         CreateScheduleUseCaseImpl(
             scheduleRepository = get(),
-            timeManager = get(),
-            scheduler = get()
+            timeManager = get()
         )
     }
-    factory<GetMessage> {
-        GetMessageImpl(messageRepository = get())
-    }
-    factory<GetSchedule> {
+
+    factory<GetScheduleUseCase> {
         GetScheduleImpl(scheduleRepository = get())
     }
-    factory<SetScheduleFulfilled> {
-        SetScheduleFulfilledImpl(scheduleRepository = get())
+    factory<SetScheduleFulfilledUseCase> {
+        SetScheduleFulfilledUseCaseImpl(scheduleRepository = get())
     }
     factory<HandleScheduleResponseUseCase> {
         HandleScheduleResponseUseCaseImpl(
@@ -104,7 +91,7 @@ val domainModule = module {
     factory<SetScheduleResponseMessage> { AddReminderReplyMessageImpl(messageRepository = get()) }
 
     // Tasks use-cases
-    factory<GetTask> { GetTaskImpl(taskRepository = get()) }
+    factory<GetTaskUseCase> { GetTaskUseCaseImpl(taskRepository = get()) }
     factory<GetMessagesForTask> { GetMessagesForTaskImpl(messageRepository = get()) }
     factory<GetActiveTasks> { GetActiveTasksImpl(taskRepository = get()) }
     factory<GetCompletedTasks> { GetCompletedTasksImpl(taskRepository = get()) }
@@ -112,6 +99,13 @@ val domainModule = module {
     factory<SetTaskCompleteUseCase> {
         SetTaskCompleteImpl(
             taskRepository = get()
+        )
+    }
+
+    factory<GetScheduleTaskUseCase> {
+        GetScheduleTaskUseCaseImpl(
+            getScheduleUseCase = get(),
+            getTaskUseCase = get()
         )
     }
 
@@ -126,8 +120,7 @@ val domainModule = module {
     factory<CancelActiveScheduleUseCase> {
         CancelActiveScheduleUseCaseImpl(
             getActiveSchedule = get(),
-            setScheduleFulfilled = get(),
-            scheduler = get()
+            setScheduleFulfilled = get()
         )
     }
 
@@ -136,4 +129,20 @@ val domainModule = module {
     factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
+
+    // Message use-cases
+    factory<CreateMessageUseCase> { CreateMessageUseCaseImpl(messageRepository = get()) }
+    factory<GetMessageUseCase> { GetMessageImpl(messageRepository = get()) }
+    factory<CreateTaskMessageUseCase> {
+        CreateTaskMessageUseCaseImpl(createMessageUseCase = get())
+    }
+    factory<CreateTaskConfirmationMessageUseCase> {
+        CreateTaskConfirmationMessageUseCaseImpl(createMessageUseCase = get())
+    }
+    factory<CreateScheduleMessageUseCase> {
+        CreateScheduleMessageUseCaseImpl(
+            createMessageUseCase = get(),
+            getScheduleTaskUseCase = get()
+        )
+    }
 }

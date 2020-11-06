@@ -16,7 +16,7 @@ interface HandleScheduleResponseUseCase {
 }
 
 class HandleScheduleResponseUseCaseImpl(
-    private val getSchedule: GetSchedule,
+    private val getSchedule: GetScheduleUseCase,
     private val createSchedule: CreateScheduleUseCase,
     private val setScheduleResponseMessage: SetScheduleResponseMessage,
     private val setTaskComplete: SetTaskCompleteUseCase,

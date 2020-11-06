@@ -4,13 +4,13 @@ import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 
-interface GetMessage {
+interface GetMessageUseCase {
     suspend operator fun invoke(messageId: Long): SimpleResult<Message>
 }
 
 class GetMessageImpl(
     private val messageRepository: MessageRepository
-) : GetMessage {
+) : GetMessageUseCase {
     override suspend fun invoke(messageId: Long): SimpleResult<Message> {
         return messageRepository.getMessage(messageId)
     }
