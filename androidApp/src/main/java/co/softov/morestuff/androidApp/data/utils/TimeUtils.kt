@@ -11,6 +11,8 @@ object TimeUtils {
 
     val currentUtcInstant: Instant get() = Clock.System.now()
 
+    val currentUtcMillis: Long get() = Clock.System.now().toEpochMilliseconds()
+
     val currentLocalDateTime: LocalDateTime
         get() = currentUtcInstant.toLocalDateTime(currentTimeZone)
 

@@ -8,7 +8,6 @@ import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.NoOp
 import co.softov.morestuff.androidApp.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.androidApp.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCompleteAction
@@ -55,11 +54,11 @@ class ScheduleMiddleware(
             }
 
             is TaskCompleteAction -> scope.launch {
-                cancelActiveSchedule(action.taskId, dispatch)
+                cancelActiveSchedule(action.taskId)
             }
 
             is RescheduleAction -> scope.launch {
-                cancelActiveSchedule(action.taskId, dispatch)
+                cancelActiveSchedule(action.taskId)
                 createScheduleUseCase(action.taskId, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
                 }
@@ -95,9 +94,9 @@ class ScheduleMiddleware(
         return next(state, action, dispatch)
     }
 
-    private suspend fun cancelActiveSchedule(taskId: Long, dispatch: Dispatch) {
+    private suspend fun cancelActiveSchedule(taskId: Long) {
         cancelActiveScheduleUseCase(taskId).map { schedule ->
-            dispatch(RemoveScheduleNotificationAction(schedule.id))
+            scheduler.cancelSchedule(schedule.id)
         }
     }
 }

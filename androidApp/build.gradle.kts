@@ -21,13 +21,13 @@ repositories {
 }
 
 android {
-    compileSdkVersion(29)
+    compileSdkVersion(30)
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         minSdkVersion(24)
-        targetSdkVersion(29)
+        targetSdkVersion(30)
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "0.2.0"
     }
     buildTypes {
         getByName("release") {
@@ -77,10 +77,11 @@ dependencies {
     implementation("androidx.core:core-ktx:1.5.0-alpha04")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.paging:paging-runtime-ktx:2.1.2")
+    implementation ("androidx.work:work-runtime-ktx:2.4.0")
 
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
 
     // Navigation
     implementation("com.github.terrakok:cicerone:6.1")

@@ -90,13 +90,11 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         closeKeyboard()
-        item?.let {
-            when (it.itemId) {
-                R.id.option_settings -> {
-                    showMainSettings()
-                }
+        when (item.itemId) {
+            R.id.option_settings -> {
+                showMainSettings()
             }
         }
         return false
