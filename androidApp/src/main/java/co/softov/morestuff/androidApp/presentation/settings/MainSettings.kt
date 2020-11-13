@@ -3,10 +3,12 @@ package co.softov.morestuff.androidApp.presentation.settings
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
+import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.core.view.iterator
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.presentation.extension.getColorFromAttr
@@ -28,6 +30,16 @@ class MainSettings : PreferenceFragmentCompat() {
         findPreference<Preference>("version")?.title = "Version: ${getVersion()}"
         findPreference<Preference>("debug_notification")?.setOnPreferenceClickListener {
             // NotifierImpl(requireContext()).showNotification("Debug notification")
+            true
+        }
+
+        findPreference<SwitchPreference>(
+            getString(R.string.pref_key_debug_keep_screen_on)
+        )?.setOnPreferenceChangeListener { _, newValue ->
+            when (newValue) {
+                true -> requireActivity().window.addFlags(FLAG_KEEP_SCREEN_ON)
+                else -> requireActivity().window.clearFlags(FLAG_KEEP_SCREEN_ON)
+            }
             true
         }
 

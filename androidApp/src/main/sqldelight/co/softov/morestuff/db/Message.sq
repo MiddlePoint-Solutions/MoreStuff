@@ -1,8 +1,7 @@
-import co.softov.morestuff.androidApp.domain.enums.ReplyType;
-
 CREATE TABLE message(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     task_id INTEGER NOT NULL,
+    schedule_id INTEGER NOT NULL,
     create_time TEXT NOT NULL,
     seen_time TEXT,
     content_type INTEGER AS Int NOT NULL,
@@ -35,8 +34,8 @@ WHERE task_id = ?
 ORDER BY id DESC LIMIT 1;
 
 insertMessage:
-INSERT INTO message(task_id, create_time, content_type, content)
-VALUES (?,?,?,?);
+INSERT INTO message(task_id, schedule_id, create_time, content_type, content)
+VALUES (?,?,?,?,?);
 
 updateTaskMessageReply:
 UPDATE message

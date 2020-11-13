@@ -40,9 +40,11 @@ class NotifierImpl(
         scheduleId: Long,
         message: Message
     ) {
-        val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_chat_24dp)
-            .setOnlyAlertOnce(true)
+        val builder =
+            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_chat_24dp)
+                .setOnlyAlertOnce(true)
+                .setOngoing(true)
 
         val style = NotificationCompat.MessagingStyle(appPerson)
             .addMessage(message.content, Calendar.getInstance().timeInMillis, appPerson)
@@ -68,10 +70,10 @@ class NotifierImpl(
         type: ReplyType
     ): Pair<String, PendingIntent> {
         val actionText = when (type) {
-            SNOOZE -> "1 Hour"
-            TOMORROW -> "Tomorrow"
-            LATER -> "Later"
-            DONE -> "Done"
+            SNOOZE -> context.getString(R.string.schedule_reply_snooze)
+            TOMORROW -> context.getString(R.string.schedule_reply_tomorrow)
+            LATER -> context.getString(R.string.schedule_reply_later)
+            DONE -> context.getString(R.string.schedule_reply_done)
         }
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }

@@ -14,6 +14,7 @@ class Debugger(context: Context) : Debug {
 
     private val keyDebugReminders = "debug_reminder"
     private val keyTodayDebugTime = "debug_reminder_today_offset"
+    private val keyKeepScreenOn = "debug_keep_screen_on"
 
     private var _debugReminders: Boolean = false
     private var _todayDebugTime: Int = 1 // Minute
@@ -34,6 +35,7 @@ class Debugger(context: Context) : Debug {
 
     init {
         prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
+        prefs.edit().putBoolean(keyKeepScreenOn, false).apply()
         _debugReminders = prefs.getBoolean(keyDebugReminders, false)
         _todayDebugTime = prefs.getInt(keyTodayDebugTime, 1)
     }

@@ -9,6 +9,7 @@ interface CreateMessageUseCase {
 
     suspend operator fun invoke(
         taskId: Long,
+        scheduleId: Long = 0,
         title: String,
         contentType: ContentType
     ): SimpleResult<Message>
@@ -21,10 +22,11 @@ class CreateMessageUseCaseImpl(
 
     override suspend fun invoke(
         taskId: Long,
+        scheduleId: Long,
         title: String,
         contentType: ContentType
     ): SimpleResult<Message> {
-        return messageRepository.createMessage(taskId, contentType.value, title)
+        return messageRepository.createMessage(taskId, scheduleId, contentType.value, title)
     }
 
 }

@@ -11,7 +11,12 @@ interface MessageRepository {
 
     suspend fun getMessagesForTask(taskId: Long): SimpleResult<List<Message>>
 
-    suspend fun createMessage(taskId: Long, contentType: Int, content: String): SimpleResult<Message>
+    suspend fun createMessage(
+        taskId: Long,
+        scheduleId: Long,
+        contentType: Int,
+        content: String
+    ): SimpleResult<Message>
 
     suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)
 }

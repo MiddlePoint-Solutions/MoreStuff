@@ -7,6 +7,7 @@
 
     <color name="bg_user_chat_item">#576fcc</color>
     <color name="bg_app_chat_item">#7a70a0</color>
+    <color name="bg_app_chat_sub_item">#615887</color>
 
 <!--  Options: 815bdb , 8157dd  -->
 

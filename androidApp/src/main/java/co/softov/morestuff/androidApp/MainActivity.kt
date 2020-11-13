@@ -16,6 +16,7 @@ import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.androidApp.app.presentation.fragment.FlowFragmentFactory
+import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.presentation.Screens
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
@@ -52,7 +53,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_container)
 
-        initViews()
         if (savedInstanceState == null) {
             router.newRootScreen(Screens.ContentFlow)
         }
@@ -70,10 +70,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         currentFragment?.onBackPressed() ?: super.onBackPressed()
-    }
-
-    private fun initViews() {
-        if (BuildConfig.DEBUG) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     private fun showMainSettings() {

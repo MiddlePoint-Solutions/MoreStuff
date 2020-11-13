@@ -47,7 +47,7 @@ class TaskMiddleware(
     ): Action {
         when (action) {
             is CreateTaskAction -> scope.launch {
-                val params = TaskParams(action.title, action.priority)
+                val params = TaskParams(action.title)
                 createTaskUseCase(params).map { task ->
                     dispatch(TaskCreatedAction(task, action.priority))
                 }

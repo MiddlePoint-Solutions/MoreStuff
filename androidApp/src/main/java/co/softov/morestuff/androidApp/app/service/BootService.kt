@@ -20,7 +20,6 @@ class BootService : BaseService(BootService.simpleName) {
     private lateinit var notificationManager: NotificationManager
 
     override fun onCreate() {
-        super.onCreate()
         notificationManager =
             application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:backgroundTint="@color/selector_priority_button"
-        android:text="@string/action_later"
+        android:text="@string/chat_action_later"
         tools:style="@style/PrioritySelectButton" />
 
 </FrameLayout>

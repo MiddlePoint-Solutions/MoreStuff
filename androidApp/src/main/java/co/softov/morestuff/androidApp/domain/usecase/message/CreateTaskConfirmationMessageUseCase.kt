@@ -29,8 +29,8 @@ class CreateTaskConfirmationMessageUseCaseImpl(
         }
         createMessageUseCase(
             taskId,
-            confirmTitle,
-            ContentType.CONFIRM_NEW_TASK
+            title = confirmTitle,
+            contentType = ContentType.CONFIRM_NEW_TASK
         )
         return Result.Success(true)
     }

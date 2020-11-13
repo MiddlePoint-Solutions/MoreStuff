@@ -18,7 +18,7 @@ class CreateScheduleMessageUseCaseImpl(
     override suspend fun invoke(scheduleId: Long): SimpleResult<Message> {
         return getScheduleTaskUseCase(scheduleId).fold(
             success = { task ->
-                createMessageUseCase(task.id, task.title, ContentType.TASK_REMINDER)
+                createMessageUseCase(task.id, scheduleId, task.title, ContentType.TASK_REMINDER)
             },
             failure = {
                 Result.Failure(it)

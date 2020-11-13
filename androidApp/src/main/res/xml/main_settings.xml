@@ -27,6 +27,12 @@
             app:defaultValue="false"
             />
 
+        <SwitchPreference
+            app:title="Keep device screen on"
+            app:key="@string/pref_key_debug_keep_screen_on"
+            app:defaultValue="false"
+            />
+
         <SeekBarPreference
             android:max="360"
             android:dependency="@string/pref_key_debug_reminder"

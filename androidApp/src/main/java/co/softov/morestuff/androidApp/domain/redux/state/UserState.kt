@@ -8,15 +8,12 @@ data class UserState(
     val currentPriority: Priority = Priority.Today()
 )
 
-sealed class AuthAction : Action.FeatureAction() {
-    object CheckUserSession : AuthAction()
-    object UserNotSingedIn : AuthAction()
-    data class SignIn(val phoneNumber: String) : AuthAction()
+sealed class UserAction : Action.FeatureAction() {
+
 }
 
 fun AppState.reduceSignInState(action: Action): AppState {
     return when (action) {
-        is AuthAction -> copy(signInState = signInState.reduce(action))
         else -> this
     }
 }

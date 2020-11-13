@@ -14,7 +14,7 @@ class CreateTaskMessageUseCaseImpl(
 ) : CreateTaskMessageUseCase {
 
     override suspend fun invoke(task: Task): SimpleResult<Boolean> {
-        createMessageUseCase(task.id, task.title, ContentType.USER_NEW_TASK)
+        createMessageUseCase(task.id, title = task.title, contentType = ContentType.USER_NEW_TASK)
         return Result.Success(true)
     }
 }

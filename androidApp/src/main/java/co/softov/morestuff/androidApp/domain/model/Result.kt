@@ -1,5 +1,7 @@
 package co.softov.morestuff.androidApp.domain.model
 
+import co.softov.morestuff.androidApp.domain.Failure
+
 sealed class Result<out T, out E> {
 
     data class Success<out T>(val value: T) : Result<T, Nothing>()
@@ -15,5 +17,3 @@ sealed class Result<out T, out E> {
         if (this is Success) success(value)
     }
 }
-
-typealias SimpleResult<T> = Result<T, Throwable>

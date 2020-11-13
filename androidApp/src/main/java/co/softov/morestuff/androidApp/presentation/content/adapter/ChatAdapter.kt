@@ -1,9 +1,9 @@
 package co.softov.morestuff.androidApp.presentation.content.adapter
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.core.view.isVisible
 import androidx.paging.AsyncPagedListDiffer
 import androidx.paging.PagedList
@@ -13,33 +13,32 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.databinding.AppChatConfirmationItemBinding
 import co.softov.morestuff.android.databinding.AppChatReminderItemBinding
 import co.softov.morestuff.android.databinding.UserChatItemBinding
+import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.androidApp.data.utils.toEpochMilliseconds
 import co.softov.morestuff.androidApp.domain.enums.ContentType
+import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.model.Message
+import co.softov.morestuff.androidApp.presentation.content.ChatResponseActions
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatAdapter(context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
-
-    private val layoutInflater: LayoutInflater = LayoutInflater.from(context)
+class ChatAdapter(
+    private val actions: ChatResponseActions
+) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val differ: AsyncPagedListDiffer<Message> =
         AsyncPagedListDiffer(this, messageDiffCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (ContentType.values()[viewType]) {
-
-            ContentType.USER_NEW_TASK -> {
-                UserViewHolder(
-                    layoutInflater.inflate(R.layout.user_chat_item, parent, false)
-                )
-            }
-
+            ContentType.USER_NEW_TASK -> UserViewHolder(
+                parent.inflateView(R.layout.user_chat_item)
+            )
             ContentType.CONFIRM_NEW_TASK -> AppTaskConfirmationViewHolder(
-                layoutInflater.inflate(R.layout.app_chat_confirmation_item, parent, false)
+                parent.inflateView(R.layout.app_chat_confirmation_item)
             )
             ContentType.TASK_REMINDER -> AppReminderViewHolder(
-                layoutInflater.inflate(R.layout.app_chat_reminder_item, parent, false)
+                parent.inflateView(R.layout.app_chat_reminder_item), actions
             )
         }
     }
@@ -63,6 +62,9 @@ class ChatAdapter(context: Context) : RecyclerView.Adapter<BaseViewHolder>() {
     fun submitList(data: PagedList<Message>) {
         differ.submitList(data)
     }
+
+    private fun ViewGroup.inflateView(@LayoutRes layoutId: Int) =
+        LayoutInflater.from(context).inflate(layoutId, this, false)
 }
 
 abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -84,14 +86,37 @@ class UserViewHolder(view: View) : BaseViewHolder(view) {
     }
 }
 
-class AppReminderViewHolder(view: View) : BaseViewHolder(view) {
+class AppReminderViewHolder(
+    view: View,
+    private val actions: ChatResponseActions
+) : BaseViewHolder(view) {
 
     override fun bind(item: Message) {
         AppChatReminderItemBinding.bind(itemView).apply {
             messageAppTaskTitle.text = item.content
             messageAppTaskTime.text = getStartTimeText(item.createTime)
-            layoutAppMessageReply.isVisible = item.replyType != null
-            textAppMessageReply.text = item.replyContent ?: ""
+            setReply(item)
+        }
+    }
+
+    private fun AppChatReminderItemBinding.setReply(item: Message) {
+
+        val showReplyActions = item.replyType == null
+        layoutAppMessageActions.isVisible = showReplyActions
+
+        textAppMessageReply.isVisible = showReplyActions.not()
+        textAppMessageReply.text = item.replyContent ?: ""
+
+        layoutAppMessageActionsSnooze.setOnDebouncedClickListener {
+            actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
+        }
+
+        layoutAppMessageActionsSnooze.setOnDebouncedClickListener {
+            actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
+        }
+
+        layoutAppMessageActionsSnooze.setOnDebouncedClickListener {
+            actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
         }
     }
 }

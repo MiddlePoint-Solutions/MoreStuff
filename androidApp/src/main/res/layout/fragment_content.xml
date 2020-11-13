@@ -34,7 +34,7 @@
                 style="@style/PrioritySelectButton"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:text="@string/action_today"
+                android:text="@string/chat_action_today"
                 android:textColor="?android:attr/textColorPrimary"
                 app:backgroundTint="@color/selector_priority_button"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -49,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:backgroundTint="@color/selector_priority_button"
-                android:text="@string/action_tomorrow"
+                android:text="@string/chat_action_tomorrow"
                 android:textColor="?android:attr/textColorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/buttonActionLater"
@@ -63,7 +63,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:backgroundTint="@color/selector_priority_button"
-                android:text="@string/action_later"
+                android:text="@string/chat_action_later"
                 android:textColor="?android:attr/textColorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -99,7 +99,7 @@
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/send_content_desc"
+                    android:contentDescription="@string/cd_send"
                     android:src="@drawable/ic_send_24dp"
                     android:visibility="gone" />
 
@@ -108,7 +108,7 @@
                     android:layout_width="45dp"
                     android:layout_height="match_parent"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/send_content_desc"
+                    android:contentDescription="@string/cd_send"
                     android:src="@drawable/ic_list_black_24dp"
                     app:tint="?attr/colorControlNormal" />
 

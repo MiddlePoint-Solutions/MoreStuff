@@ -15,6 +15,7 @@ fun mapMessageDb(input: MessageData): Message {
     return Message(
         id = input.id,
         taskId = input.task_id,
+        scheduleId = input.schedule_id,
         contentType = ContentType.withValue(input.content_type),
         createTime = input.create_time,
         seenTime = input.seen_time,

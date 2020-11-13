@@ -133,7 +133,10 @@ class ContentFragment : BaseFragment() {
     }
 
     private fun setupChatList() {
-        chatAdapter = ChatAdapter(requireContext())
+        val actions = ChatResponseActions { scheduleId, replyType ->
+            viewModel.scheduleResponse(scheduleId, replyType)
+        }
+        chatAdapter = ChatAdapter(actions)
         chatAdapter.setHasStableIds(true)
         chatAdapter.registerAdapterDataObserver(AdapterDataObserver())
 

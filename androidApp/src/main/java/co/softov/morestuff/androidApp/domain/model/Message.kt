@@ -5,7 +5,8 @@ import co.softov.morestuff.androidApp.domain.enums.ReplyType
 
 data class Message(
     val id: Long,
-    val taskId: Long,
+    val taskId: Long = 0,
+    val scheduleId: Long = 0,
     val contentType: ContentType,
     val createTime: String,
     val seenTime: String?,

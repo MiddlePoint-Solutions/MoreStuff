@@ -37,11 +37,13 @@ class MessageRepositoryImpl(
 
     override suspend fun createMessage(
         taskId: Long,
+        scheduleId: Long,
         contentType: Int,
         content: String
     ): SimpleResult<Message> {
         messageQueries.insertMessage(
             task_id = taskId,
+            schedule_id = scheduleId,
             create_time = TimeUtils.currentLocalDateTimeString,
             content_type = contentType,
             content = content

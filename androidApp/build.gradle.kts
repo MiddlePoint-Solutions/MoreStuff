@@ -26,7 +26,7 @@ android {
         applicationId = "co.softov.morestuff.android"
         minSdkVersion(24)
         targetSdkVersion(30)
-        versionCode = 1
+        versionCode = 2
         versionName = "0.2.0"
     }
     buildTypes {
@@ -94,14 +94,27 @@ dependencies {
     implementation("com.squareup.sqldelight:android-driver:1.4.4")
     implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.4.4")
     implementation("com.squareup.sqldelight:android-paging-extensions:1.4.4")
-    implementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
+    testImplementation ("com.squareup.sqldelight:sqlite-driver:1.4.4")
+
+    testImplementation("org.xerial:sqlite-jdbc:3.8.10.2") {
+        // Override the version of sqlite used by sqlite-driver to match Android API 24 (minSdkVersion)
+        version {
+            strictly("3.8.10.2")
+        }
+    }
 
     // Timber logging
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     // Koin Android
-    implementation("org.koin:koin-android:2.2.0-rc-3")
-    implementation("org.koin:koin-androidx-scope:2.2.0-rc-3")
-    implementation("org.koin:koin-androidx-viewmodel:2.2.0-rc-3")
-    implementation("org.koin:koin-androidx-ext:2.2.0-rc-3")
+    implementation("org.koin:koin-android:2.2.0-rc-4")
+    implementation("org.koin:koin-androidx-scope:2.2.0-rc-4")
+    implementation("org.koin:koin-androidx-viewmodel:2.2.0-rc-4")
+    implementation("org.koin:koin-androidx-ext:2.2.0-rc-4")
+    testImplementation ("org.koin:koin-test:2.2.0-rc-4")
+
+    // Testing
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+
 }
