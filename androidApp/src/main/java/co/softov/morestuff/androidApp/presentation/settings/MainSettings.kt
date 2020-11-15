@@ -12,6 +12,7 @@ import androidx.preference.SwitchPreference
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.presentation.extension.getColorFromAttr
+import co.softov.morestuff.androidApp.presentation.Screens
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
 
@@ -29,7 +30,12 @@ class MainSettings : PreferenceFragmentCompat() {
     private fun configurePreferences() {
         findPreference<Preference>("version")?.title = "Version: ${getVersion()}"
         findPreference<Preference>("debug_notification")?.setOnPreferenceClickListener {
-            // NotifierImpl(requireContext()).showNotification("Debug notification")
+//             NotifierImpl(requireContext()).showNotification("Debug notification")
+            true
+        }
+
+        findPreference<Preference>("debug_review")?.setOnPreferenceClickListener {
+            router.navigateTo(Screens.Review)
             true
         }
 

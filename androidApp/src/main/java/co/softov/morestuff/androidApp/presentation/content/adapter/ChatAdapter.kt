@@ -13,6 +13,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.databinding.AppChatConfirmationItemBinding
 import co.softov.morestuff.android.databinding.AppChatReminderItemBinding
 import co.softov.morestuff.android.databinding.UserChatItemBinding
+import co.softov.morestuff.androidApp.app.presentation.extension.inflateView
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.androidApp.data.utils.toEpochMilliseconds
 import co.softov.morestuff.androidApp.domain.enums.ContentType
@@ -62,9 +63,6 @@ class ChatAdapter(
     fun submitList(data: PagedList<Message>) {
         differ.submitList(data)
     }
-
-    private fun ViewGroup.inflateView(@LayoutRes layoutId: Int) =
-        LayoutInflater.from(context).inflate(layoutId, this, false)
 }
 
 abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

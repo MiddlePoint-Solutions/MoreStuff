@@ -2,9 +2,12 @@ package co.softov.morestuff.androidApp.app.presentation.extension
 
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Switch
 import android.widget.TextView
+import androidx.annotation.LayoutRes
 
 fun Bundle.restoreViewState(vararg views: View) {
     views.forEach { it.loadInstanceState(this) }
@@ -27,6 +30,9 @@ fun View.loadInstanceState(savedInstanceState: Bundle) {
         is Switch -> isChecked = savedInstanceState.getBoolean(resources.getResourceName(id))
     }
 }
+
+fun ViewGroup.inflateView(@LayoutRes layoutId: Int) =
+    LayoutInflater.from(context).inflate(layoutId, this, false)
 
 fun View.setOnDebouncedClickListener(action: () -> Unit) {
     val actionDebouncer =

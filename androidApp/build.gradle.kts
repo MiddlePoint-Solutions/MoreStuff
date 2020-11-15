@@ -86,6 +86,9 @@ dependencies {
     // Navigation
     implementation("com.github.terrakok:cicerone:6.4")
 
+    // UI
+    implementation ("com.yuyakaido.android:card-stack-view:2.3.4")
+
     // Firebase
     implementation("com.google.firebase:firebase-crashlytics:17.2.2")
     implementation("com.google.firebase:firebase-analytics:18.0.0")
