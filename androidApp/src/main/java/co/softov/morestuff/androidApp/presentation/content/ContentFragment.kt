@@ -3,8 +3,13 @@ package co.softov.morestuff.androidApp.presentation.content
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.core.view.isVisible
+import androidx.core.view.iterator
+import androidx.fragment.app.ListFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -16,10 +21,13 @@ import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedC
 import co.softov.morestuff.androidApp.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.androidApp.app.util.LifecycleValue
 import co.softov.morestuff.androidApp.domain.enums.Priority.*
+import co.softov.morestuff.androidApp.presentation.Screens
 import co.softov.morestuff.androidApp.presentation.content.adapter.ChatAdapter
 import co.softov.morestuff.androidApp.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.androidApp.presentation.dashboard.options.TimePickerFragment
 import co.softov.morestuff.androidApp.presentation.list.ListsFragment
+import com.github.terrakok.cicerone.Router
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
@@ -27,37 +35,41 @@ import java.util.*
 class ContentFragment : BaseFragment() {
 
     private val viewModel: ContentViewModel by viewModel {
-        parametersOf(object : ContentConductor {
-            override fun showTaskList() {
-
-                val listsFragment = ListsFragment()
-                listsFragment.show(parentFragmentManager, ListsFragment::class.java.simpleName)
-            }
-
-            override fun showTodayTimePicker() {
-                showTimePicker()
-            }
-
-            override fun showTomorrowTimePicker() {
-                val tomorrowTime =
-                    Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }.timeInMillis
-                showTimePicker(tomorrowTime)
-            }
-
-            override fun showDateTimePicker() {
-                DatePickerFragment { userTime ->
-                    showTimePicker(userTime)
-                }.show(parentFragmentManager, "DatePicker")
-            }
-
-            private fun showTimePicker(withTime: Long = 0) {
-                TimePickerFragment.createInstance(withTime) { time ->
-                    viewModel.userSetCustomTime(time)
-                }.show(parentFragmentManager, "TimePicker")
-            }
-        })
+        parametersOf(conductor)
     }
 
+    private val conductor = object : ContentConductor {
+        
+        override fun showTaskList() {
+            listFragment.show(parentFragmentManager, ListFragment::javaClass.name)
+        }
+
+        override fun showTodayTimePicker() {
+            showTimePicker()
+        }
+
+        override fun showTomorrowTimePicker() {
+            val tomorrowTime =
+                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }.timeInMillis
+            showTimePicker(tomorrowTime)
+        }
+
+        override fun showDateTimePicker() {
+            DatePickerFragment { userTime ->
+                showTimePicker(userTime)
+            }.show(parentFragmentManager, "DatePicker")
+        }
+
+        private fun showTimePicker(withTime: Long = 0) {
+            TimePickerFragment.createInstance(withTime) { time ->
+                viewModel.userSetCustomTime(time)
+            }.show(parentFragmentManager, "TimePicker")
+        }
+    }
+
+    private val listFragment: ListsFragment get() = ListsFragment()
+
+    private val router: Router by inject()
     private lateinit var layoutManager: StaggeredGridLayoutManager
     private var binding: FragmentContentBinding by LifecycleValue()
     private var chatAdapter: ChatAdapter by LifecycleValue()
@@ -68,6 +80,7 @@ class ContentFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentContentBinding.bind(view)
+        setHasOptionsMenu(true)
         initViews()
         viewModel.loadData()
         observe(viewModel.stateLiveData, ::onStateChange)
@@ -219,5 +232,27 @@ class ContentFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun showMainSettings() {
+        router.navigateTo(Screens.Settings, clearContainer = false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_main, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        menu.iterator().forEach { it.isVisible = true }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        closeKeyboard()
+        when (item.itemId) {
+            R.id.option_settings -> {
+                showMainSettings()
+            }
+        }
+        return false
     }
 }

@@ -44,7 +44,6 @@ class NotifierImpl(
             NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_chat_24dp)
                 .setOnlyAlertOnce(true)
-                .setOngoing(true)
 
         val style = NotificationCompat.MessagingStyle(appPerson)
             .addMessage(message.content, Calendar.getInstance().timeInMillis, appPerson)
@@ -60,7 +59,7 @@ class NotifierImpl(
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
             .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
-            .setDeleteIntent(later.second)
+            .setDeleteIntent(snooze.second)
 
         notificationManager.notify(scheduleId.toInt(), builder.build())
     }

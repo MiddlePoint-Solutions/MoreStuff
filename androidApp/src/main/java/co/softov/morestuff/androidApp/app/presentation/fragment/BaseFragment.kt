@@ -1,9 +1,11 @@
 package co.softov.morestuff.androidApp.app.presentation.fragment
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
 import timber.log.Timber
@@ -23,4 +25,13 @@ abstract class BaseFragment : Fragment() {
         }
 
     open fun onBackPressed() {}
+
+    protected fun closeKeyboard() {
+        requireView().let { v ->
+            val imm =
+                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(v.windowToken, 0)
+            v.clearFocus()
+        }
+    }
 }

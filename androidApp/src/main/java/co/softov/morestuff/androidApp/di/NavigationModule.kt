@@ -1,6 +1,5 @@
 package co.softov.morestuff.androidApp.di
 
-import co.softov.morestuff.androidApp.app.presentation.fragment.FlowFragmentFactory
 import com.github.terrakok.cicerone.Cicerone
 import org.koin.dsl.module
 
@@ -12,6 +11,5 @@ val navigationModule = module {
 
     single { cicerone.getNavigatorHolder() }
 
-    // Fragment Factory
-    single { FlowFragmentFactory(navigatorHolder = get()) }
 }
+

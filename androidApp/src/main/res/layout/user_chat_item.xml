@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:layout_margin="4dp"
-        android:background="@drawable/user_chat_item">
+        android:background="@drawable/chat_item_user">
 
         <TextView
             android:id="@+id/messageUserTaskTitle"

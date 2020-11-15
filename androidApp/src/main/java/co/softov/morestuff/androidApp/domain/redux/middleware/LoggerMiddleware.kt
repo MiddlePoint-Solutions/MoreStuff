@@ -1,7 +1,6 @@
 package co.softov.morestuff.androidApp.domain.redux.middleware
 
 import co.softov.morestuff.android.BuildConfig
-import co.softov.morestuff.androidApp.app.extensions.simpleName
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import com.iiitech.operations.domain.redux.Dispatch
@@ -31,7 +30,7 @@ class LoggerMiddleware : Middleware<AppState> {
 
     private fun getOutMessage(action: Action, returnValue: Action): String {
         return if (action == returnValue) {
-            "${action.simpleName}(NO CHANGE)"
+            "${action::class.java.simpleName}(NO CHANGE)"
         } else {
             returnValue.log
         }

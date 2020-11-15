@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginRight="45dp"
         android:layout_gravity="left"
-        android:background="@drawable/app_chat_item">
+        android:background="@drawable/chat_item_app">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/messageAppTaskTitle"
@@ -62,7 +62,7 @@
         android:layout_gravity="right"
         android:layout_marginTop="8dp"
         android:layout_marginLeft="45dp"
-        android:background="@drawable/user_chat_item"
+        android:background="@drawable/chat_item_user"
         android:visibility="gone"
         >
 

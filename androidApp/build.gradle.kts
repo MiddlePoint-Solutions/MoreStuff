@@ -67,7 +67,7 @@ dependencies {
     // Androidx
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.activity:activity-ktx:1.1.0")
+    implementation("androidx.activity:activity-ktx:1.2.0-beta01")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
@@ -84,7 +84,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
 
     // Navigation
-    implementation("com.github.terrakok:cicerone:6.1")
+    implementation("com.github.terrakok:cicerone:6.4")
 
     // Firebase
     implementation("com.google.firebase:firebase-crashlytics:17.2.2")

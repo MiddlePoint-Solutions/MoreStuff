@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import co.softov.morestuff.androidApp.domain.usecase.schedule.BootCompleteScheduler
 import org.koin.android.ext.android.inject
 
-class BootService : BaseService(BootService.simpleName) {
+class BootService : BaseService(BootService::class.java.simpleName) {
 
     private val bootScheduler: BootCompleteScheduler by inject()
 
