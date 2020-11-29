@@ -10,7 +10,7 @@
     tools:ignore="RtlHardcoded,RtlSymmetry">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/layout_task_list_item"
+        android:id="@+id/layoutMessageTaskTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
