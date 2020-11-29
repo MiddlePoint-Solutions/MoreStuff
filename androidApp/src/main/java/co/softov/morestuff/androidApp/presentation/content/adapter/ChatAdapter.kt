@@ -1,9 +1,7 @@
 package co.softov.morestuff.androidApp.presentation.content.adapter
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.core.view.isVisible
 import androidx.paging.AsyncPagedListDiffer
 import androidx.paging.PagedList
@@ -109,12 +107,12 @@ class AppReminderViewHolder(
             actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
         }
 
-        layoutAppMessageActionsSnooze.setOnDebouncedClickListener {
-            actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
+        layoutAppMessageActionsTomorrow.setOnDebouncedClickListener {
+            actions.scheduleResponse(item.scheduleId, ReplyType.TOMORROW)
         }
 
-        layoutAppMessageActionsSnooze.setOnDebouncedClickListener {
-            actions.scheduleResponse(item.scheduleId, ReplyType.SNOOZE)
+        layoutAppMessageActionsDone.setOnDebouncedClickListener {
+            actions.scheduleResponse(item.scheduleId, ReplyType.DONE)
         }
     }
 }

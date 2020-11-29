@@ -47,6 +47,7 @@
     <string name="cd_settings_show_task_lists" translatable="false">Show Task Lists</string>
     <string name="cd_application_settings">Application Settings</string>
     <string name="cd_send">Send</string>
+    <string name="review_item_title_text_color">#000000</string>
 
 
 </resources>

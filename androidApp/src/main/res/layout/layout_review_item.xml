@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="600dp"
     android:background="?attr/selectableItemBackground"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@android:color/holo_blue_dark"
+    app:cardBackgroundColor="@color/review_item_background_color"
     app:cardCornerRadius="8dp"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true">
@@ -16,6 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:text="@string/review_item_title_text_color"
         android:textSize="18sp"
         android:textStyle="bold"
         tools:text="Get more stuff done!" />

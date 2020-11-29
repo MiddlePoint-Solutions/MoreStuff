@@ -10,5 +10,6 @@
     <color name="bg_app_chat_sub_item">#6B6693</color>
 
     <color name="text_user_chat">#FFFFFF</color>
+    <color name="review_item_background_color">#FFFFFF</color>
 
 </resources>
