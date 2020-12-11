@@ -117,4 +117,14 @@ class ScheduleRepositoryImpl(
         scheduleQueries.updateScheduleActive(false, scheduleId)
         return Result.Success(scheduleId)
     }
+
+    override suspend fun countTodayTaskSchedules(
+        taskId: Long,
+        startTime: String,
+        endTime: String
+    ): SimpleResult<Int> {
+        val limit =
+            scheduleQueries.countTaskSchedulesByTime(taskId, startTime, endTime).executeAsOne()
+        return Result.Success(limit.toInt())
+    }
 }

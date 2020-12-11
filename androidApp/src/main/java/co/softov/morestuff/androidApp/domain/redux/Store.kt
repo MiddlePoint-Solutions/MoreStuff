@@ -63,9 +63,11 @@ open class SimpleStore<State>(
                     _store.value = (reduce(state.value, dispatchToMiddleWare(action)))
                 }.launchIn(this)
         }
+
+        dispatch(Init)
     }
 
-    override fun dispatch(action: Action) {
+    final override fun dispatch(action: Action) {
         launch(Dispatchers.Main.immediate) {
             actions.send(action)
         }

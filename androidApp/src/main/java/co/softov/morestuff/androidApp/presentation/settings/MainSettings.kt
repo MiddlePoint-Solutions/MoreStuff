@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.core.view.iterator
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
@@ -15,10 +16,12 @@ import co.softov.morestuff.androidApp.app.presentation.extension.getColorFromAtt
 import co.softov.morestuff.androidApp.presentation.Screens
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class MainSettings : PreferenceFragmentCompat() {
 
+    private val viewModel: SettingsViewModel by viewModel()
     private val router: Router by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -57,6 +60,11 @@ class MainSettings : PreferenceFragmentCompat() {
                     MODE_NIGHT_FOLLOW_SYSTEM
                 )
             }
+            true
+        }
+
+        findPreference<SeekBarPreference>(getString(R.string.pref_key_snooze_limit))?.setOnPreferenceChangeListener { _, newValue ->
+            viewModel.onSnoozeLimitChanged(newValue as Int)
             true
         }
     }

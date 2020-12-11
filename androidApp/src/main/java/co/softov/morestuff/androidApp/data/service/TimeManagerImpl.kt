@@ -12,6 +12,8 @@ class TimeManagerImpl(
     private val debug: Debug
 ) : TimeManager {
 
+    override fun getTodayTimeRange(): Pair<String, String> = TimeUtils.todayTimeStringPair
+
     override fun getPriorityTime(priority: Priority): String? {
         return when (priority) {
             is Priority.Today -> getTimeForToday(priority.option)

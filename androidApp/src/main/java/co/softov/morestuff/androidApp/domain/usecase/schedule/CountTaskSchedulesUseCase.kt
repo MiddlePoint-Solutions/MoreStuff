@@ -1,0 +1,21 @@
+package co.softov.morestuff.androidApp.domain.usecase.schedule
+
+import co.softov.morestuff.androidApp.domain.model.SimpleResult
+import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
+import co.softov.morestuff.androidApp.domain.service.TimeManager
+import timber.log.Timber
+
+interface CountTaskSchedulesUseCase {
+    suspend operator fun invoke(taskId: Long): SimpleResult<Int>
+}
+
+class CountTaskSchedulesUseCaseImpl(
+    private val scheduleRepository: ScheduleRepository,
+    private val timeManager: TimeManager
+) : CountTaskSchedulesUseCase {
+    override suspend fun invoke(taskId: Long): SimpleResult<Int> {
+        val timeRange = timeManager.getTodayTimeRange()
+        Timber.d("### Schedule time range, $timeRange ###")
+        return scheduleRepository.countTodayTaskSchedules(taskId, timeRange.first, timeRange.second)
+    }
+}

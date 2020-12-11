@@ -8,6 +8,7 @@ import co.softov.morestuff.androidApp.presentation.list.schedule.today.TodaySche
 import co.softov.morestuff.androidApp.presentation.list.schedule.tomorrow.TomorrowScheduleViewModel
 import co.softov.morestuff.androidApp.presentation.list.tasks.active.ActiveTasksViewModel
 import co.softov.morestuff.androidApp.presentation.list.tasks.complete.CompleteTasksViewModel
+import co.softov.morestuff.androidApp.presentation.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -50,4 +51,6 @@ val presentationModule = module {
             getSchedulesWithTitle = get()
         )
     }
+
+    viewModel { SettingsViewModel() }
 }

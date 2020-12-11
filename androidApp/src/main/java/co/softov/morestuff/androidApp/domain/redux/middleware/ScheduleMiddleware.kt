@@ -3,25 +3,19 @@ package co.softov.morestuff.androidApp.domain.redux.middleware
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.Priority.*
 import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
+import co.softov.morestuff.androidApp.domain.model.Result.*
 import co.softov.morestuff.androidApp.domain.model.Schedule
-import co.softov.morestuff.androidApp.domain.redux.Action
-import co.softov.morestuff.androidApp.domain.redux.AppState
-import co.softov.morestuff.androidApp.domain.redux.NoOp
+import co.softov.morestuff.androidApp.domain.redux.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCompleteAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCreatedAction
 import co.softov.morestuff.androidApp.domain.service.Scheduler
-import co.softov.morestuff.androidApp.domain.usecase.schedule.CancelActiveScheduleUseCase
-import co.softov.morestuff.androidApp.domain.usecase.schedule.CreateScheduleUseCase
-import co.softov.morestuff.androidApp.domain.usecase.schedule.GetScheduleUseCase
-import co.softov.morestuff.androidApp.domain.usecase.schedule.SetScheduleFulfilledUseCase
-import co.softov.morestuff.androidApp.domain.redux.Dispatch
-import co.softov.morestuff.androidApp.domain.redux.Middleware
-import co.softov.morestuff.androidApp.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.usecase.schedule.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
@@ -34,6 +28,7 @@ class ScheduleMiddleware(
     private val scheduler: Scheduler,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
+    private val countTaskSchedulesUseCase: CountTaskSchedulesUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase
 ) : Middleware<AppState> {
@@ -64,12 +59,18 @@ class ScheduleMiddleware(
                 }
             }
 
-            is ScheduleReplyAction -> scope.launch {
-                when (action.replyType) {
-                    LATER -> dispatch(RescheduleAction(action.schedule.taskId, Later()))
-                    SNOOZE -> dispatch(RescheduleAction(action.schedule.taskId, Today()))
-                    TOMORROW -> dispatch(RescheduleAction(action.schedule.taskId, Tomorrow()))
-                    DONE -> dispatch(TaskCompleteAction(action.schedule.taskId))
+            is ScheduleReplyAction -> {
+                val replyType = action.replyType
+                val schedule = action.schedule
+                when (replyType) {
+                    LATER -> dispatch(RescheduleAction(schedule.taskId, Later()))
+                    SNOOZE -> if (state.snoozeLimit > 0) {
+                        checkTodayScheduleReply(scope, schedule, state.snoozeLimit, dispatch)
+                    } else {
+                        dispatch(RescheduleAction(schedule.taskId, Today()))
+                    }
+                    TOMORROW -> dispatch(RescheduleAction(schedule.taskId, Tomorrow()))
+                    DONE -> dispatch(TaskCompleteAction(schedule.taskId))
                 }
             }
 
@@ -92,6 +93,25 @@ class ScheduleMiddleware(
         }
 
         return next(state, action, dispatch)
+    }
+
+    private fun checkTodayScheduleReply(
+        scope: CoroutineScope,
+        schedule: Schedule,
+        snoozeLimit: Int,
+        dispatch: Dispatch
+    ) {
+        scope.launch {
+            val timeOption =
+                when (val result = countTaskSchedulesUseCase(schedule.taskId)) {
+                    is Success -> {
+                        Timber.d("### Today Schedule count, taskId: ${schedule.taskId} = ${result.value} ###")
+                        if (result.value > snoozeLimit) Tomorrow() else Today()
+                    }
+                    else -> Today()
+                }
+            dispatch(RescheduleAction(schedule.taskId, timeOption))
+        }
     }
 
     private suspend fun cancelActiveSchedule(taskId: Long) {

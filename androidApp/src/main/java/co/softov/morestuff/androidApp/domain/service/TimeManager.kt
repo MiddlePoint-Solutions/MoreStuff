@@ -6,4 +6,6 @@ interface TimeManager {
 
     fun getPriorityTime(priority: Priority): String?
 
+    fun getTodayTimeRange(): Pair<String, String>
+
 }

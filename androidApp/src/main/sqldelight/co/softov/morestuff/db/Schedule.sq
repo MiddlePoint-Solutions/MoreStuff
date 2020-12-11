@@ -67,6 +67,12 @@ AND active = 1
 AND schedule_time IS NULL
 ORDER BY schedule.id DESC;
 
+countTaskSchedulesByTime:
+SELECT COUNT(*)
+FROM schedule
+WHERE task_id = ?
+AND schedule_time BETWEEN :start AND :end;
+
 insertSchedule:
 INSERT INTO schedule(task_id, create_time, schedule_time, timezone)
 VALUES (?,?,?,?);

@@ -3,25 +3,19 @@ package co.softov.morestuff.androidApp.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import co.softov.morestuff.androidApp.Constants
+import co.softov.morestuff.androidApp.data.Constants
 import co.softov.morestuff.androidApp.app.Debugger
 import co.softov.morestuff.androidApp.app.SchedulerImpl
 import co.softov.morestuff.androidApp.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.androidApp.data.mapper.makeScheduleDbMapper
 import co.softov.morestuff.androidApp.data.mapper.makeScheduleWithTitleDbMapper
 import co.softov.morestuff.androidApp.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.androidApp.data.repository.MessageRepositoryImpl
-import co.softov.morestuff.androidApp.data.repository.PreferenceRepositoryImpl
-import co.softov.morestuff.androidApp.data.repository.ScheduleRepositoryImpl
-import co.softov.morestuff.androidApp.data.repository.TaskRepositoryImpl
+import co.softov.morestuff.androidApp.data.repository.*
 import co.softov.morestuff.androidApp.data.service.NotifierImpl
 import co.softov.morestuff.androidApp.data.service.TimeManagerImpl
 import co.softov.morestuff.androidApp.domain.Debug
+import co.softov.morestuff.androidApp.domain.repository.*
 import co.softov.morestuff.androidApp.domain.service.Scheduler
-import co.softov.morestuff.androidApp.domain.repository.MessageRepository
-import co.softov.morestuff.androidApp.domain.repository.PreferenceRepository
-import co.softov.morestuff.androidApp.domain.repository.ScheduleRepository
-import co.softov.morestuff.androidApp.domain.repository.TaskRepository
 import co.softov.morestuff.androidApp.domain.service.Notifier
 import co.softov.morestuff.androidApp.domain.service.TimeManager
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
@@ -70,6 +64,12 @@ val dataModule = module {
             getSharedPreferences(
                 androidContext()
             )
+        )
+    }
+
+    single<UserRepository> {
+        UserRepositoryImpl(
+            prefs = getSharedPreferences(androidContext())
         )
     }
 

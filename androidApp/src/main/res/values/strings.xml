@@ -37,6 +37,7 @@
 
     <!--  Settings keys  -->
     <string name="pref_key_app_theme" translatable="false">app_theme</string>
+    <string name="pref_key_snooze_limit" translatable="false">snooze_limit</string>
 
     <!--  Debug Keys  -->
     <string name="pref_key_debug_reminder" translatable="false">debug_reminder</string>
@@ -48,6 +49,9 @@
     <string name="cd_application_settings">Application Settings</string>
     <string name="cd_send">Send</string>
     <string name="review_item_title_text_color">#000000</string>
+
+    <string name="settings_snooze_limit_title">Snooze Limit</string>
+    <string name="settings_snooze_limit_desc">How many times should a task be snoozed before it is moved to the next day (0 for no limit)</string>
 
 
 </resources>

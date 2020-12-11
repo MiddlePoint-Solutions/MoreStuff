@@ -11,6 +11,16 @@
             app:key="@string/pref_key_app_theme"
             app:title="Select Theme" />
 
+        <SeekBarPreference
+            android:defaultValue="3"
+            android:max="9"
+            app:adjustable="true"
+            app:key="@string/pref_key_snooze_limit"
+            app:min="0"
+            app:showSeekBarValue="true"
+            app:summary="@string/settings_snooze_limit_desc"
+            app:title="@string/settings_snooze_limit_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Development Tools">
@@ -21,9 +31,9 @@
             app:title="Notification" />
 
         <Preference
+            app:key="debug_review"
             app:selectable="true"
-            app:title="Review test"
-            app:key="debug_review"/>
+            app:title="Review test" />
 
         <SwitchPreference
             app:defaultValue="false"
@@ -38,12 +48,12 @@
 
         <SeekBarPreference
             android:dependency="@string/pref_key_debug_reminder"
-            android:max="360"
+            android:max="120"
             app:adjustable="true"
             app:defaultValue="60"
             app:key="@string/pref_key_debug_reminder_today_offset"
             app:min="1"
-            app:seekBarIncrement="3"
+            app:seekBarIncrement="5"
             app:showSeekBarValue="true"
             app:summary="Adjust time in minutes reminder"
             app:title="Today reminder delay" />

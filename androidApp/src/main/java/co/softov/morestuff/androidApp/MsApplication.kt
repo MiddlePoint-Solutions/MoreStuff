@@ -7,10 +7,7 @@ import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.EmptyApplicationLifecycleCallback
-import co.softov.morestuff.androidApp.di.dataModule
-import co.softov.morestuff.androidApp.di.domainModule
-import co.softov.morestuff.androidApp.di.navigationModule
-import co.softov.morestuff.androidApp.di.presentationModule
+import co.softov.morestuff.androidApp.di.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -41,7 +38,11 @@ class MsApplication : Application() {
             androidContext(this@MsApplication)
             modules(
                 listOf(
-                    domainModule,
+                    serviceModule,
+                    storeModule,
+                    taskUseCases,
+                    messageUseCases,
+                    scheduleUseCases,
                     dataModule,
                     presentationModule,
                     navigationModule

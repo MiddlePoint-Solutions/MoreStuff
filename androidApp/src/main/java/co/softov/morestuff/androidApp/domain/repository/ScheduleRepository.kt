@@ -12,8 +12,8 @@ interface ScheduleRepository {
     suspend fun createSchedule(taskId: Long, scheduleTime: String?): SimpleResult<Schedule>
     suspend fun getSchedule(scheduleId: Long): SimpleResult<Schedule>
     suspend fun getActiveSchedules(): SimpleResult<List<Schedule>>
-    suspend fun setScheduleFulfilled(scheduleId: Long) : SimpleResult<Long>
-    suspend fun getActiveSchedulesFlow() : Flow<List<Schedule>>
+    suspend fun setScheduleFulfilled(scheduleId: Long): SimpleResult<Long>
+    suspend fun getActiveSchedulesFlow(): Flow<List<Schedule>>
     suspend fun getActiveScheduleForTask(taskId: Long): SimpleResult<Schedule>
 
     suspend fun getActiveScheduleWithTitle(scheduleId: Long): SimpleResult<ScheduleWithTitle>
@@ -21,6 +21,12 @@ interface ScheduleRepository {
     suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    suspend fun countTodayTaskSchedules(
+        taskId: Long,
+        startTime: String,
+        endTime: String
+    ): SimpleResult<Int>
 }
 
-object ScheduleDoesNotExist: Failure.FeatureFailure()
+object ScheduleDoesNotExist : Failure.FeatureFailure()

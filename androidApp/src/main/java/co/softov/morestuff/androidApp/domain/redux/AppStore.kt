@@ -1,7 +1,8 @@
 package co.softov.morestuff.androidApp.domain.redux
 
 import co.softov.morestuff.androidApp.domain.redux.middleware.*
-import co.softov.morestuff.androidApp.domain.redux.state.reduceSignInState
+import co.softov.morestuff.androidApp.domain.redux.state.UserMiddleware
+import co.softov.morestuff.androidApp.domain.redux.state.reduceUserState
 
 class AppStore(
     logger: LoggerMiddleware,
@@ -10,17 +11,21 @@ class AppStore(
     messageMiddleware: MessageMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
     responseMiddleware: ResponseMiddleware,
-    notificationMiddleware: NotificationMiddleware
+    notificationMiddleware: NotificationMiddleware,
+    userMiddleware: UserMiddleware
 ) : SimpleStore<AppState>(
     AppState(),
-    listOf(AppState::reduceSignInState),
+    listOf(
+        AppState::reduceUserState
+    ),
     listOf(
         logger,
-        navigator,
+        userMiddleware,
         taskMiddleware,
         scheduleMiddleware,
         messageMiddleware,
         responseMiddleware,
-        notificationMiddleware
+        notificationMiddleware,
+        navigator
     )
 )
