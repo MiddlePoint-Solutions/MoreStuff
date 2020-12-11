@@ -30,7 +30,7 @@ class LoggerMiddleware : Middleware<AppState> {
 
     private fun getOutMessage(action: Action, returnValue: Action): String {
         return if (action == returnValue) {
-            "${action::class.java.simpleName}(NO CHANGE)"
+            "(No Change)"
         } else {
             returnValue.log
         }
