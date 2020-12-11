@@ -17,9 +17,9 @@ import co.softov.morestuff.androidApp.domain.usecase.schedule.CancelActiveSchedu
 import co.softov.morestuff.androidApp.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.androidApp.domain.usecase.schedule.SetScheduleFulfilledUseCase
-import com.iiitech.operations.domain.redux.Dispatch
-import com.iiitech.operations.domain.redux.Middleware
-import com.iiitech.operations.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.redux.Dispatch
+import co.softov.morestuff.androidApp.domain.redux.Middleware
+import co.softov.morestuff.androidApp.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

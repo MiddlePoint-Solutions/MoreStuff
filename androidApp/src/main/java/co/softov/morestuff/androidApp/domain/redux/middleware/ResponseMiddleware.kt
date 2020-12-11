@@ -8,9 +8,9 @@ import co.softov.morestuff.androidApp.domain.redux.NoOp
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.androidApp.domain.usecase.schedule.GetScheduleUseCase
-import com.iiitech.operations.domain.redux.Dispatch
-import com.iiitech.operations.domain.redux.Middleware
-import com.iiitech.operations.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.redux.Dispatch
+import co.softov.morestuff.androidApp.domain.redux.Middleware
+import co.softov.morestuff.androidApp.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber

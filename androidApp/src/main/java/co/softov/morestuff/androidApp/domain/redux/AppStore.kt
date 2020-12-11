@@ -2,7 +2,6 @@ package co.softov.morestuff.androidApp.domain.redux
 
 import co.softov.morestuff.androidApp.domain.redux.middleware.*
 import co.softov.morestuff.androidApp.domain.redux.state.reduceSignInState
-import com.iiitech.operations.domain.redux.SimpleStore
 
 class AppStore(
     logger: LoggerMiddleware,

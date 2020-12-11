@@ -3,9 +3,9 @@ package co.softov.morestuff.androidApp.domain.redux.middleware
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.androidApp.domain.redux.Action
 import co.softov.morestuff.androidApp.domain.redux.AppState
-import com.iiitech.operations.domain.redux.Dispatch
-import com.iiitech.operations.domain.redux.Middleware
-import com.iiitech.operations.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.redux.Dispatch
+import co.softov.morestuff.androidApp.domain.redux.Middleware
+import co.softov.morestuff.androidApp.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 

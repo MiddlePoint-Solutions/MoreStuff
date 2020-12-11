@@ -1,12 +1,9 @@
-package com.iiitech.operations.domain.redux
+package co.softov.morestuff.androidApp.domain.redux
 
-import co.softov.morestuff.androidApp.domain.redux.Action
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
 
 typealias Reducer<State> = (State, Action) -> State
 typealias Dispatch = (Action) -> Unit
@@ -49,12 +46,15 @@ open class SimpleStore<State>(
     startingState: State,
     private val reducers: List<Reducer<State>>,
     private val middleware: List<Middleware<State>>
-) : Store<State>, CoroutineScope by MainScope() {
+) : Store<State>, CoroutineScope {
 
     private val _store = MutableStateFlow(startingState)
     override val state: StateFlow<State> get() = _store
 
     private val actions = Channel<Action>()
+
+    override val coroutineContext: CoroutineContext
+        get() = SupervisorJob() + Dispatchers.IO
 
     init {
         launch {
@@ -66,7 +66,9 @@ open class SimpleStore<State>(
     }
 
     override fun dispatch(action: Action) {
-        launch { actions.send(action) }
+        launch(Dispatchers.Main.immediate) {
+            actions.send(action)
+        }
     }
 
     override fun reduce(current: State, action: Action): State {

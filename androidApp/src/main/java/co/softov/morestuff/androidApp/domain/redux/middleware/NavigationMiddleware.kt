@@ -6,9 +6,9 @@ import co.softov.morestuff.androidApp.domain.redux.NoOp
 import co.softov.morestuff.androidApp.domain.redux.middleware.NavigationAction.*
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.Screen
-import com.iiitech.operations.domain.redux.Dispatch
-import com.iiitech.operations.domain.redux.Middleware
-import com.iiitech.operations.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.redux.Dispatch
+import co.softov.morestuff.androidApp.domain.redux.Middleware
+import co.softov.morestuff.androidApp.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NavigationAction : Action.FeatureAction() {

@@ -8,9 +8,9 @@ import co.softov.morestuff.androidApp.domain.redux.middleware.NotificationAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.androidApp.domain.service.Notifier
-import com.iiitech.operations.domain.redux.Dispatch
-import com.iiitech.operations.domain.redux.Middleware
-import com.iiitech.operations.domain.redux.Next
+import co.softov.morestuff.androidApp.domain.redux.Dispatch
+import co.softov.morestuff.androidApp.domain.redux.Middleware
+import co.softov.morestuff.androidApp.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
