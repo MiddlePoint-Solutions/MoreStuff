@@ -10,6 +10,7 @@ import co.softov.morestuff.androidApp.domain.model.SimpleResult
 import co.softov.morestuff.androidApp.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.androidApp.domain.repository.MessageRepository
 import co.softov.morestuff.db.StuffDb
+import com.squareup.sqldelight.Transacter
 
 class MessageRepositoryImpl(
     database: StuffDb,
@@ -41,22 +42,17 @@ class MessageRepositoryImpl(
         contentType: Int,
         content: String
     ): SimpleResult<Message> {
-        messageQueries.insertMessage(
-            task_id = taskId,
-            schedule_id = scheduleId,
-            create_time = TimeUtils.currentLocalDateTimeString,
-            content_type = contentType,
-            content = content
-        )
-        return getLastCreatedMessageForTask(taskId)
-    }
-
-    private fun getLastCreatedMessageForTask(taskId: Long): SimpleResult<Message> {
-        return when (val message =
-            messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
-            null -> Failure(MessageDoesNotExist)
-            else -> Success(mapMessageDb(message))
+        val messageId: Long = messageQueries.transactionWithResult {
+            messageQueries.insertMessage(
+                task_id = taskId,
+                schedule_id = scheduleId,
+                create_time = TimeUtils.currentLocalDateTimeString,
+                content_type = contentType,
+                content = content
+            )
+            lastInsertId
         }
+        return getMessage(messageId)
     }
 
     override suspend fun addUserReplyMessage(
@@ -73,7 +69,15 @@ class MessageRepositoryImpl(
                     id = messageId.value
                 )
             }
-            is Failure -> TODO("Return error!")
+            is Failure -> Failure(MessageDoesNotExist)
+        }
+    }
+
+    private fun getLastCreatedMessageForTask(taskId: Long): SimpleResult<Message> {
+        return when (val message =
+            messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
+            null -> Failure(MessageDoesNotExist)
+            else -> Success(mapMessageDb(message))
         }
     }
 

@@ -25,21 +25,24 @@ class ScheduleRepositoryImpl(
 ) : ScheduleRepository {
 
     private val scheduleQueries = database.scheduleQueries
+    private val lastInsertId: Long get() = scheduleQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createSchedule(
         taskId: Long,
         scheduleTime: String?
     ): SimpleResult<Schedule> {
         Timber.d("createTaskReminderSchedule: $taskId for $scheduleTime")
-        val currentTime = TimeUtils.currentLocalDateTimeString
-        val timezone = TimeUtils.currentTimeZone.id
-        scheduleQueries.insertSchedule(
-            task_id = taskId,
-            create_time = currentTime,
-            schedule_time = scheduleTime,
-            timezone = timezone
-        )
-        val scheduleId = scheduleQueries.lastInsertRowId().executeAsOne()
+        val scheduleId: Long = scheduleQueries.transactionWithResult {
+            val currentTime = TimeUtils.currentLocalDateTimeString
+            val timezone = TimeUtils.currentTimeZone.id
+            scheduleQueries.insertSchedule(
+                task_id = taskId,
+                create_time = currentTime,
+                schedule_time = scheduleTime,
+                timezone = timezone
+            )
+            lastInsertId
+        }
         return getSchedule(scheduleId)
     }
 

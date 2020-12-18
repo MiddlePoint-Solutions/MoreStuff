@@ -20,13 +20,16 @@ class TaskRepositoryImpl(
 ) : TaskRepository {
 
     private val taskQueries = database.taskQueries
+    private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(title: String): SimpleResult<Task> {
         val currentTime = TimeUtils.currentLocalDateTimeString
-        taskQueries.insertTask(currentTime, title)
-        val taskId = taskQueries.lastInsertRowId().executeAsOne()
-        val task = Task(id = taskId, title = title, createTime = currentTime)
-        return Result.Success(task)
+        return taskQueries.transactionWithResult {
+            taskQueries.insertTask(currentTime, title)
+            val taskId = lastInsertId
+            val task = Task(id = taskId, title = title, createTime = currentTime)
+            Result.Success(task)
+        }
     }
 
     override suspend fun getTask(taskId: Long): SimpleResult<Task> {
