@@ -48,7 +48,15 @@ class MessageRepositoryImpl(
             content_type = contentType,
             content = content
         )
-        return getMessage(lastInsertId)
+        return getLastCreatedMessageForTask(taskId)
+    }
+
+    private fun getLastCreatedMessageForTask(taskId: Long): SimpleResult<Message> {
+        return when (val message =
+            messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
+            null -> Failure(MessageDoesNotExist)
+            else -> Success(mapMessageDb(message))
+        }
     }
 
     override suspend fun addUserReplyMessage(

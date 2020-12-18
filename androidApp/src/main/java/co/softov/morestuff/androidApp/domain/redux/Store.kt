@@ -68,7 +68,7 @@ open class SimpleStore<State>(
     }
 
     final override fun dispatch(action: Action) {
-        launch(Dispatchers.Main.immediate) {
+        launch(Dispatchers.Main) {
             actions.send(action)
         }
     }

@@ -78,7 +78,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.5.0-alpha05")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.paging:paging-runtime-ktx:2.1.2")
-    implementation("androidx.work:work-runtime-ktx:2.4.0")
+    implementation("androidx.work:work-runtime-ktx:2.5.0-beta02")
 
     implementation("com.google.android.material:material:1.2.1")
     implementation("androidx.appcompat:appcompat:1.2.0")

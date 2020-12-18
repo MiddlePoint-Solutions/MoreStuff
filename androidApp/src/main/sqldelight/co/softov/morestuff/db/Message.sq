@@ -27,6 +27,12 @@ SELECT *
 FROM message
 WHERE task_id = ?;
 
+selectCurrentTaskMessage:
+SELECT *
+FROM message
+WHERE task_id = ?
+ORDER BY id DESC LIMIT 1;
+
 selectCurrentTaskMessageId:
 SELECT id
 FROM message
