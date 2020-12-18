@@ -15,9 +15,11 @@ import co.softov.morestuff.androidApp.app.presentation.extension.inflateView
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.androidApp.data.utils.toEpochMilliseconds
 import co.softov.morestuff.androidApp.domain.enums.ContentType
+import co.softov.morestuff.androidApp.domain.enums.ContentType.*
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
 import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.presentation.content.ChatResponseActions
+import com.google.android.material.textview.MaterialTextView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -29,16 +31,22 @@ class ChatAdapter(
         AsyncPagedListDiffer(this, messageDiffCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        return when (ContentType.values()[viewType]) {
-            ContentType.USER_NEW_TASK -> UserViewHolder(
+        return when (ContentType.withValue(viewType)) {
+            USER_NEW_TASK -> UserViewHolder(
                 parent.inflateView(R.layout.user_chat_item)
             )
-            ContentType.CONFIRM_NEW_TASK -> AppTaskConfirmationViewHolder(
+            CONFIRM_NEW_TASK -> AppTaskConfirmationViewHolder(
                 parent.inflateView(R.layout.app_chat_confirmation_item)
             )
-            ContentType.TASK_REMINDER -> AppReminderViewHolder(
+            TASK_REMINDER -> AppReminderViewHolder(
                 parent.inflateView(R.layout.app_chat_reminder_item), actions
             )
+            else -> {
+                MaterialTextView(parent.context).run {
+                    text = context.getString(R.string.chat_item_invalid)
+                    InvalidViewHolder(this)
+                }
+            }
         }
     }
 
@@ -55,7 +63,7 @@ class ChatAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return differ.getItem(position)?.contentType?.ordinal ?: 0
+        return differ.getItem(position)?.contentType?.value ?: 0
     }
 
     fun submitList(data: PagedList<Message>) {
@@ -70,6 +78,13 @@ abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView
     protected fun getStartTimeText(time: String): String =
         SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT)
             .format(Date(time.toEpochMilliseconds))
+}
+
+class InvalidViewHolder(view: View) : BaseViewHolder(view) {
+
+    override fun bind(item: Message) {
+        // Ignore
+    }
 }
 
 class UserViewHolder(view: View) : BaseViewHolder(view) {

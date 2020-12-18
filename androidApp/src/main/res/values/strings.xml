@@ -52,6 +52,7 @@
 
     <string name="settings_snooze_limit_title">Snooze Limit</string>
     <string name="settings_snooze_limit_desc">How many times should a task be snoozed before it is moved to the next day (0 for no limit)</string>
+    <string name="chat_item_invalid">Invalid</string>
 
 
 </resources>
