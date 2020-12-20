@@ -62,9 +62,9 @@ class ContentFragment : BaseFragment() {
         }
 
         private fun showTimePicker(withTime: Long = 0) {
-            TimePickerFragment.createInstance(withTime) { time ->
+            /*TimePickerFragment.createInstance(withTime) { time ->
                 viewModel.userSetCustomTime(time)
-            }.show(parentFragmentManager, "TimePicker")
+            }.show(parentFragmentManager, "TimePicker")*/
         }
     }
 

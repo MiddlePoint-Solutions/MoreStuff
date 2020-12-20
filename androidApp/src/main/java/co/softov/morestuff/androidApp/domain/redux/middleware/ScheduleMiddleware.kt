@@ -19,7 +19,7 @@ import timber.log.Timber
 
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
-    data class RescheduleAction(val taskId: Long, val priority: Priority) : ScheduleAction()
+    data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
 
     internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
 }
@@ -52,7 +52,7 @@ class ScheduleMiddleware(
                 cancelActiveSchedule(action.taskId)
             }
 
-            is RescheduleAction -> scope.launch {
+            is RescheduleTaskAction -> scope.launch {
                 cancelActiveSchedule(action.taskId)
                 createScheduleUseCase(action.taskId, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
@@ -63,13 +63,13 @@ class ScheduleMiddleware(
                 val replyType = action.replyType
                 val schedule = action.schedule
                 when (replyType) {
-                    LATER -> dispatch(RescheduleAction(schedule.taskId, Later()))
+                    LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     SNOOZE -> if (state.snoozeLimit > 0) {
                         checkTodayScheduleReply(scope, schedule, state.snoozeLimit, dispatch)
                     } else {
-                        dispatch(RescheduleAction(schedule.taskId, Today()))
+                        dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
-                    TOMORROW -> dispatch(RescheduleAction(schedule.taskId, Tomorrow()))
+                    TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
                     DONE -> dispatch(TaskCompleteAction(schedule.taskId))
                 }
             }
@@ -110,7 +110,7 @@ class ScheduleMiddleware(
                     }
                     else -> Today()
                 }
-            dispatch(RescheduleAction(schedule.taskId, timeOption))
+            dispatch(RescheduleTaskAction(schedule.taskId, timeOption))
         }
     }
 

@@ -8,16 +8,12 @@ import androidx.paging.toLiveData
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
-import co.softov.morestuff.androidApp.domain.enums.TimeOption
-import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
-import co.softov.morestuff.androidApp.domain.model.Message
+import co.softov.morestuff.androidApp.domain.model.*
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.CreateTaskAction
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
 import co.softov.morestuff.androidApp.presentation.content.ContentViewEvent.*
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.*
-import co.softov.morestuff.androidApp.presentation.dashboard.options.createTodayOptions
 import kotlinx.coroutines.launch
 
 class ContentViewModel(
@@ -26,10 +22,6 @@ class ContentViewModel(
 ) : BaseViewModel<ContentViewState, ContentViewEvent>(ContentViewState()) {
 
     override var enableDebug = false
-
-    private val todayOptions = listOf(ONE_HOUR)
-    private val tomorrowOptions = listOf(MORNING)
-    private val laterOptions = listOf(SOME_DAY)
 
     private lateinit var messageLiveData: LiveData<PagedList<Message>>
     private val messagePageObserver: Observer<PagedList<Message>> = Observer {
@@ -61,13 +53,13 @@ class ContentViewModel(
 
     override fun onReduceState(event: ContentViewEvent): ContentViewState {
         return when (event) {
-            is Init -> state.copy(timeOptions = todayOptions.createTodayOptions())
+            is Init -> state // TODO: set user default priority?
             is ShowChatData -> state.copy(data = event.data)
             is ChangePriority -> {
                 val priorityItems = when (event.priority) {
-                    is Priority.Today -> Priority.Today(Default)
-                    is Priority.Tomorrow -> Priority.Tomorrow(Default)
-                    is Priority.Later -> Priority.Later(Default)
+                    is Priority.Today -> Priority.Today(TodayOption.Automatic)
+                    is Priority.Tomorrow -> Priority.Tomorrow(TomorrowOption.Automatic)
+                    is Priority.Later -> Priority.Later(LaterOption.Automatic)
                 }
 
                 state.copy(
@@ -75,35 +67,7 @@ class ContentViewModel(
                     currentTimeOptionId = 0
                 )
             }
-            is SetTimeOption -> state.copy(currentTimeOptionId = event.optionId)
-            is SetCustomTime -> {
-                val optionId = state.timeOptions.first { it.option == CUSTOM }.id
-                val optionsUpdate = state.timeOptions.map { optionItem ->
-                    if (optionItem.option == CUSTOM) {
-                        optionItem.copy(time = event.time)
-                    } else optionItem
-                }
-                state.copy(
-                    currentTimeOptionId = optionId,
-                    timeOptions = optionsUpdate
-                )
-            }
         }
-    }
-
-    fun userSelectedTimeOption(optionId: Long) {
-        when (state.timeOptions[optionId.toInt()].option) {
-            CUSTOM -> when (state.priority) {
-                is Priority.Later -> conductor?.showDateTimePicker()
-                is Priority.Today -> conductor?.showTodayTimePicker()
-                is Priority.Tomorrow -> conductor?.showTomorrowTimePicker()
-            }
-            else -> sendEvent(SetTimeOption(optionId))
-        }
-    }
-
-    fun userSetCustomTime(time: Long) {
-        sendEvent(SetCustomTime(time))
     }
 
     fun addNewTask(title: String) {
@@ -111,15 +75,15 @@ class ContentViewModel(
     }
 
     fun selectedTodayPriority() {
-        sendEvent(ChangePriority(Priority.Today(Default)))
+        sendEvent(ChangePriority(Priority.Today()))
     }
 
     fun selectedTomorrowPriority() {
-        sendEvent(ChangePriority(Priority.Tomorrow(Default)))
+        sendEvent(ChangePriority(Priority.Tomorrow()))
     }
 
     fun selectedLaterPriority() {
-        sendEvent(ChangePriority(Priority.Later(Default)))
+        sendEvent(ChangePriority(Priority.Later()))
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
