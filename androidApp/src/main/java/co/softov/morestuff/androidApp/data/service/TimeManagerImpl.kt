@@ -3,7 +3,8 @@ package co.softov.morestuff.androidApp.data.service
 import co.softov.morestuff.androidApp.data.utils.TimeUtils
 import co.softov.morestuff.androidApp.domain.Debug
 import co.softov.morestuff.androidApp.domain.enums.Priority
-import co.softov.morestuff.androidApp.domain.enums.TimeOption
+import co.softov.morestuff.androidApp.domain.model.TodayOption
+import co.softov.morestuff.androidApp.domain.model.TomorrowOption
 import co.softov.morestuff.androidApp.domain.service.TimeManager
 import kotlin.time.ExperimentalTime
 
@@ -22,8 +23,8 @@ class TimeManagerImpl(
         }
     }
 
-    private fun getTimeForToday(option: TimeOption): String = when (option) {
-        TimeOption.Default -> {
+    private fun getTimeForToday(option: TodayOption): String = when (option) {
+        TodayOption.Automatic -> {
             val currentTime = when (debug.debugReminders) {
                 true -> TimeUtils.todayLocalDateTimeByAdding(minute = debug.todayDebugTime)
                 else -> TimeUtils.todayLocalDateTimeByAdding(hour = 1)
@@ -33,8 +34,8 @@ class TimeManagerImpl(
         }
     }
 
-    private fun getTimeForTomorrow(option: TimeOption): String = when (option) {
-        TimeOption.Default -> {
+    private fun getTimeForTomorrow(option: TomorrowOption): String = when (option) {
+        TomorrowOption.Automatic -> {
             TimeUtils.tomorrowLocalDateTime(hour = 9).toString()
         }
     }

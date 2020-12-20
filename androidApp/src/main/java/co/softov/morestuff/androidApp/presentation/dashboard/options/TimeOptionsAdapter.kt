@@ -1,6 +1,7 @@
 package co.softov.morestuff.androidApp.presentation.dashboard.options
 
 import android.text.Html
+import android.text.Html.FROM_HTML_MODE_LEGACY
 import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
@@ -8,19 +9,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import co.softov.morestuff.android.R
 import co.softov.morestuff.androidApp.app.presentation.extension.setOnDebouncedClickListener
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.AFTER_NOON
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.CUSTOM
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.EVENING
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.MORNING
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.NIGHT
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.NOON
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.ONE_HOUR
-import co.softov.morestuff.androidApp.presentation.dashboard.options.TimeOption.SOME_DAY
+import com.google.android.material.button.MaterialButton
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.util.*
 
 class
 TimeOptionsAdapter(
@@ -61,24 +54,12 @@ TimeOptionsAdapter(
             }
         }
 
-        @Suppress("DEPRECATION")
+
         private fun OptionListItemViewModel.getOptionTitle(): Spanned {
             val res = itemView.resources
-            val (title: String, value: String) = when (option) {
-                ONE_HOUR -> res.getString(R.string.time_option_1_hour) to formatTime()
-                MORNING -> res.getString(R.string.time_option_morning) to formatTime()
-                NOON -> res.getString(R.string.time_option_noon) to formatTime()
-                AFTER_NOON -> res.getString(R.string.time_option_after_noon) to formatTime()
-                EVENING -> res.getString(R.string.time_option_evening) to formatTime()
-                NIGHT -> res.getString(R.string.time_option_night) to formatTime()
-                CUSTOM -> {
-                    val timeString = if (time != 0L) formatTime() else "Set"
-                    res.getString(R.string.time_option_custom) to timeString
-                }
-                SOME_DAY -> res.getString(R.string.time_option_later) to "Later"
-            }
 
-            return Html.fromHtml("${title}<br/><small>${value}</small>")
+            // TODO: Consider using this for displaying both title and time in the same button
+            return Html.fromHtml("${"Title"}<br/><small>${"00:00"}</small>", FROM_HTML_MODE_LEGACY)
         }
 
         private fun OptionListItemViewModel.formatTime() =

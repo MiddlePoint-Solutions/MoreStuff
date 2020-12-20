@@ -16,7 +16,7 @@ class CreateScheduleUseCaseImpl(
     private val timeManager: TimeManager
 ) : CreateScheduleUseCase {
     override suspend fun invoke(taskId: Long, priority: Priority): SimpleResult<Schedule> {
-        // TODO: this should be the only code that sets actual time for schedules!
+        // TODO: Plan automatic scheduling for clashing tasks (when time option is auto)
         val scheduleTime = timeManager.getPriorityTime(priority)
         Timber.d("### Scheduling, task $taskId = {${priority.javaClass.simpleName} -> $scheduleTime} ###")
         return scheduleRepository.createSchedule(taskId, scheduleTime)

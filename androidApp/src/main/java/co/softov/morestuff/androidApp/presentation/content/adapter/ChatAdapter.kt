@@ -7,21 +7,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.model.Message
-import co.softov.morestuff.androidApp.presentation.content.ChatResponseActions
 import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.ChatViewHolder
 import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.ChatViewHolderFactory
 
 class ChatAdapter(
-    actions: ChatResponseActions
+    private val factory: ChatViewHolderFactory
 ) : RecyclerView.Adapter<ChatViewHolder>() {
-
-    private val viewFactory = ChatViewHolderFactory(actions)
 
     private val differ: AsyncPagedListDiffer<Message> =
         AsyncPagedListDiffer(this, messageDiffCallback)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        return viewFactory.create(ContentType.withValue(viewType), parent)
+        return factory.create(ContentType.withValue(viewType), parent)
     }
 
     override fun getItemCount(): Int {

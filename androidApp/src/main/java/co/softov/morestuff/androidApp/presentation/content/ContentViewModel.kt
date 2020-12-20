@@ -8,10 +8,10 @@ import androidx.paging.toLiveData
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
+import co.softov.morestuff.androidApp.domain.enums.TimeOption
 import co.softov.morestuff.androidApp.domain.enums.TimeOption.Default
 import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.redux.AppState
-import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.CreateTaskAction
 import co.softov.morestuff.androidApp.domain.usecase.message.GetPagedMessages
@@ -124,6 +124,10 @@ class ContentViewModel(
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         dispatchAppStoreAction(UserResponseAction(scheduleId, replyType))
+    }
+
+    fun userSelectedTimeOption(taskId: Long, option: TimeOption) {
+
     }
 
     fun showTaskList() {

@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/transparent"
+    android:orientation="vertical"
     android:padding="4dp"
     tools:ignore="RtlHardcoded,RtlSymmetry">
 
@@ -13,12 +13,14 @@
         android:id="@+id/layoutMessageTaskTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="45dp"
         android:layout_gravity="left"
-        android:background="@drawable/chat_item_app">
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="45dp"
+        android:background="@drawable/chat_item_app"
+        android:elevation="2dp">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/messageAppTaskTitle"
+            android:id="@+id/chat_task_confirm_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -37,45 +39,30 @@
             tools:text="Task Title" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/messageAppTaskTime"
+            android:id="@+id/chat_item_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/messageAppTaskTitle"
+            android:layout_below="@+id/chat_task_confirm_title"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="2dp"
-            android:layout_toRightOf="@+id/messageAppTaskTitle"
+            android:layout_toRightOf="@+id/chat_task_confirm_title"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/messageAppTaskTitle"
+            app:layout_constraintTop_toBottomOf="@+id/chat_task_confirm_title"
             tools:text="00:00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
-        android:id="@+id/layoutAppMessageReply"
+        android:id="@+id/task_confirm_options_frame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="30dp"
-        android:padding="4dp"
-        android:layout_gravity="right"
-        android:layout_marginTop="8dp"
-        android:layout_marginLeft="45dp"
-        android:background="@drawable/chat_item_user"
-        android:visibility="gone"
-        >
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/textAppMessageReply"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
-            android:padding="4dp"
-            android:textSize="16sp"
-            android:textColor="@color/text_user_chat"
-            tools:text="Remind me in 1 hour" />
-
-    </FrameLayout>
+        android:layout_gravity="start|center_vertical"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/chat_item_app_sub_item"
+        android:minWidth="300dp" />
 
 </LinearLayout>

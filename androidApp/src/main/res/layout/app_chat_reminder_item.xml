@@ -20,7 +20,7 @@
         android:elevation="2dp">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/messageAppTaskTitle"
+            android:id="@+id/chat_schedule_reminder_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -39,18 +39,18 @@
             tools:text="Task Title" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/messageAppTaskTime"
+            android:id="@+id/chat_item_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/messageAppTaskTitle"
+            android:layout_below="@+id/chat_schedule_reminder_title"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="2dp"
-            android:layout_toRightOf="@+id/messageAppTaskTitle"
+            android:layout_toRightOf="@+id/chat_schedule_reminder_title"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/messageAppTaskTitle"
+            app:layout_constraintTop_toBottomOf="@+id/chat_schedule_reminder_title"
             tools:text="00:00" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,7 @@ import co.softov.morestuff.androidApp.app.util.LifecycleValue
 import co.softov.morestuff.androidApp.domain.enums.Priority.*
 import co.softov.morestuff.androidApp.presentation.Screens
 import co.softov.morestuff.androidApp.presentation.content.adapter.ChatAdapter
+import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.ChatViewHolderFactory
 import co.softov.morestuff.androidApp.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.androidApp.presentation.dashboard.options.TimePickerFragment
 import co.softov.morestuff.androidApp.presentation.list.ListsFragment
@@ -39,7 +40,7 @@ class ContentFragment : BaseFragment() {
     }
 
     private val conductor = object : ContentConductor {
-        
+
         override fun showTaskList() {
             listFragment.show(parentFragmentManager, ListFragment::javaClass.name)
         }
@@ -146,10 +147,14 @@ class ContentFragment : BaseFragment() {
     }
 
     private fun setupChatList() {
-        val actions = ChatResponseActions { scheduleId, replyType ->
-            viewModel.scheduleResponse(scheduleId, replyType)
-        }
-        chatAdapter = ChatAdapter(actions)
+        val actions = ChatActions(
+            confirmationAction = viewModel::userSelectedTimeOption,
+            scheduleAction = viewModel::scheduleResponse
+        )
+
+        val factory = ChatViewHolderFactory(actions)
+
+        chatAdapter = ChatAdapter(factory)
         chatAdapter.setHasStableIds(true)
         chatAdapter.registerAdapterDataObserver(AdapterDataObserver())
 
