@@ -32,8 +32,6 @@ class ScheduleWorker(
         val scheduleId = params.inputData.getLong(PARAM_SCHEDULE_ID, -1)
         if (scheduleId > 0) {
             Timber.d("Starting service for schedule: $scheduleId")
-//            store.dispatch(ScheduleAction.ExecuteScheduleAction(scheduleId))
-
             val alarmIntent = ScheduleReceiver.createReminderIntent(context, scheduleId)
             AlarmManagerCompat.setExactAndAllowWhileIdle(
                 alarmManager,
