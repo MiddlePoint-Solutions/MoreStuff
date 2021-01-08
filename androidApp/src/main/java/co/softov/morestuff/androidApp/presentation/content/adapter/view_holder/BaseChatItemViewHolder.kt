@@ -7,7 +7,7 @@ import co.softov.morestuff.androidApp.domain.model.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
-abstract class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+abstract class BaseChatItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     abstract fun bind(item: Message)
 

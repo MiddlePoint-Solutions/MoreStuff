@@ -7,17 +7,17 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import co.softov.morestuff.androidApp.domain.enums.ContentType
 import co.softov.morestuff.androidApp.domain.model.Message
-import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.ChatViewHolder
+import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.BaseChatItemViewHolder
 import co.softov.morestuff.androidApp.presentation.content.adapter.view_holder.ChatViewHolderFactory
 
 class ChatAdapter(
     private val factory: ChatViewHolderFactory
-) : RecyclerView.Adapter<ChatViewHolder>() {
+) : RecyclerView.Adapter<BaseChatItemViewHolder>() {
 
     private val differ: AsyncPagedListDiffer<Message> =
         AsyncPagedListDiffer(this, messageDiffCallback)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseChatItemViewHolder {
         return factory.create(ContentType.withValue(viewType), parent)
     }
 
@@ -25,7 +25,7 @@ class ChatAdapter(
         return differ.itemCount
     }
 
-    override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BaseChatItemViewHolder, position: Int) {
         differ.getItem(position)?.let { holder.bind(it) }
     }
 

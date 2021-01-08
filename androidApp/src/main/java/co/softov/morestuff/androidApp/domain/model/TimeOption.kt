@@ -1,16 +1,18 @@
 package co.softov.morestuff.androidApp.domain.model
 
-abstract class TimeOption
+abstract class PriorityOption
 
-sealed class TodayOption: TimeOption() {
+abstract class TimeOption : PriorityOption()
+
+sealed class TodayOption : TimeOption() {
     object Automatic : TodayOption()
 }
 
-sealed class TomorrowOption: TimeOption() {
+sealed class TomorrowOption : TimeOption() {
     object Automatic : TomorrowOption()
 }
 
-sealed class LaterOption: TimeOption() {
+sealed class LaterOption : TimeOption() {
     object Automatic : LaterOption()
 }
 

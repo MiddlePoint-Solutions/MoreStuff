@@ -90,7 +90,7 @@ class ContentViewModel(
         dispatchAppStoreAction(UserResponseAction(scheduleId, replyType))
     }
 
-    fun userSelectedTimeOption(taskId: Long, option: TimeOption) {
+    fun userSelectedPriorityOption(taskId: Long, option: PriorityOption) {
 
     }
 

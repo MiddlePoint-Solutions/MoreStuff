@@ -12,20 +12,20 @@ class ChatViewHolderFactory(
     private val actions: ChatActions
 ) {
 
-    fun create(type: ContentType, parent: ViewGroup): ChatViewHolder {
+    fun create(type: ContentType, parent: ViewGroup): BaseChatItemViewHolder {
         return when (type) {
-            USER_NEW_TASK -> UserViewHolder(
-                parent.inflateView(R.layout.user_chat_item)
+            USER_NEW_TASK -> ChatItemUserViewHolder(
+                parent.inflateView(R.layout.chat_item_user)
             )
-            CONFIRM_NEW_TASK -> TaskConfirmationViewHolder(
-                parent.inflateView(R.layout.chat_task_confirmation_item)
+            CONFIRM_NEW_TASK -> ChatItemConfirmationViewHolder(
+                parent.inflateView(R.layout.chat_item_confirmation)
             )
-            TASK_REMINDER -> ScheduleReminderViewHolder(
-                parent.inflateView(R.layout.app_chat_reminder_item), actions
+            TASK_REMINDER -> ChatItemReminderViewHolder(
+                parent.inflateView(R.layout.chat_item_reminder), actions
             )
             else -> MaterialTextView(parent.context).run {
                 text = context.getString(R.string.chat_item_invalid)
-                InvalidViewHolder(this)
+                ChatItemInvalidViewHolder(this)
             }
 
         }

@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/dashboard_compact"
         android:background="@color/colorPrimaryDark"
-        tools:listitem="@layout/user_chat_item" />
+        tools:listitem="@layout/chat_item_user" />
 
     <LinearLayout
         android:id="@+id/dashboard_compact"
