@@ -1,8 +1,7 @@
 package co.softov.morestuff.androidApp.presentation.content
 
+import co.softov.morestuff.androidApp.domain.enums.PriorityOption
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
-import co.softov.morestuff.androidApp.domain.model.PriorityOption
-import co.softov.morestuff.androidApp.domain.model.TimeOption
 
 
 class ChatActions(

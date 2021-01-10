@@ -7,8 +7,9 @@ import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.androidApp.domain.enums.Priority
+import co.softov.morestuff.androidApp.domain.enums.PriorityOption
 import co.softov.morestuff.androidApp.domain.enums.ReplyType
-import co.softov.morestuff.androidApp.domain.model.*
+import co.softov.morestuff.androidApp.domain.model.Message
 import co.softov.morestuff.androidApp.domain.redux.AppState
 import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.CreateTaskAction
@@ -57,9 +58,9 @@ class ContentViewModel(
             is ShowChatData -> state.copy(data = event.data)
             is ChangePriority -> {
                 val priorityItems = when (event.priority) {
-                    is Priority.Today -> Priority.Today(TodayOption.Automatic)
-                    is Priority.Tomorrow -> Priority.Tomorrow(TomorrowOption.Automatic)
-                    is Priority.Later -> Priority.Later(LaterOption.Automatic)
+                    is Priority.Today -> Priority.Today()
+                    is Priority.Tomorrow -> Priority.Tomorrow()
+                    is Priority.Later -> Priority.Later()
                 }
 
                 state.copy(

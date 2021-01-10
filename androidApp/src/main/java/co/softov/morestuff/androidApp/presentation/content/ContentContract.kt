@@ -6,11 +6,10 @@ import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.androidApp.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.model.Message
-import co.softov.morestuff.androidApp.domain.model.TodayOption
 
 data class ContentViewState(
     val data: PagedList<Message>? = null,
-    val priority: Priority = Priority.Today(TodayOption.Automatic),
+    val priority: Priority = Priority.Today(),
     val currentTimeOptionId: Long = 0
 ) : BaseViewState
 
