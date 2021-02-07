@@ -3,7 +3,7 @@ package co.softov.morestuff.androidApp.domain.redux.middleware
 import co.softov.morestuff.androidApp.domain.enums.Priority
 import co.softov.morestuff.androidApp.domain.enums.Priority.*
 import co.softov.morestuff.androidApp.domain.enums.ReplyType.*
-import co.softov.morestuff.androidApp.domain.model.Result.*
+import co.softov.morestuff.androidApp.domain.model.Result.Success
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.redux.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
@@ -11,7 +11,6 @@ import co.softov.morestuff.androidApp.domain.redux.middleware.ResponseAction.Sch
 import co.softov.morestuff.androidApp.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCompleteAction
 import co.softov.morestuff.androidApp.domain.redux.middleware.TaskAction.TaskCreatedAction
-import co.softov.morestuff.androidApp.domain.service.Scheduler
 import co.softov.morestuff.androidApp.domain.usecase.schedule.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -25,7 +24,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 }
 
 class ScheduleMiddleware(
-    private val scheduler: Scheduler,
+    private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val countTaskSchedulesUseCase: CountTaskSchedulesUseCase,
@@ -49,11 +48,11 @@ class ScheduleMiddleware(
             }
 
             is TaskCompleteAction -> scope.launch {
-                cancelActiveSchedule(action.taskId)
+                cancelActiveScheduleUseCase(action.taskId)
             }
 
             is RescheduleTaskAction -> scope.launch {
-                cancelActiveSchedule(action.taskId)
+                cancelActiveScheduleUseCase(action.taskId)
                 createScheduleUseCase(action.taskId, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
                 }
@@ -75,8 +74,10 @@ class ScheduleMiddleware(
             }
 
             is ScheduleCreatedAction -> {
-                action.schedule.apply {
-                    scheduleTime?.let { time -> scheduler.scheduleAtExact(id, time) }
+                scope.launch {
+                    action.schedule.scheduleTime?.let { time ->
+                        scheduleAtTimeUseCase(action.schedule.id, time)
+                    }
                 }
             }
 
@@ -111,12 +112,6 @@ class ScheduleMiddleware(
                     else -> Today()
                 }
             dispatch(RescheduleTaskAction(schedule.taskId, timeOption))
-        }
-    }
-
-    private suspend fun cancelActiveSchedule(taskId: Long) {
-        cancelActiveScheduleUseCase(taskId).map { schedule ->
-            scheduler.cancelSchedule(schedule.id)
         }
     }
 }

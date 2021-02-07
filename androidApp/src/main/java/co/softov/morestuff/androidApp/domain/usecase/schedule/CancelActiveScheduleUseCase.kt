@@ -3,12 +3,14 @@ package co.softov.morestuff.androidApp.domain.usecase.schedule
 import co.softov.morestuff.androidApp.domain.model.Result
 import co.softov.morestuff.androidApp.domain.model.Schedule
 import co.softov.morestuff.androidApp.domain.model.SimpleResult
+import co.softov.morestuff.androidApp.domain.service.Scheduler
 
 interface CancelActiveScheduleUseCase {
     suspend operator fun invoke(taskId: Long): SimpleResult<Schedule>
 }
 
 class CancelActiveScheduleUseCaseImpl(
+    private val scheduler: Scheduler,
     private val getActiveSchedule: GetActiveSchedule,
     private val setScheduleFulfilled: SetScheduleFulfilledUseCase
 ) : CancelActiveScheduleUseCase {
@@ -18,6 +20,7 @@ class CancelActiveScheduleUseCaseImpl(
             if (result is Result.Success) {
                 val scheduleId = result.value.id
                 setScheduleFulfilled(scheduleId)
+                scheduler.cancelSchedule(scheduleId)
             }
         }
     }

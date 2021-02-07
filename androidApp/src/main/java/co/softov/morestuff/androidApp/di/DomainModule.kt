@@ -42,7 +42,7 @@ val storeModule = module {
     }
     factory {
         ScheduleMiddleware(
-            scheduler = get(),
+            scheduleAtTimeUseCase = get(),
             getScheduleUseCase = get(),
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
@@ -91,6 +91,7 @@ val scheduleUseCases = module {
     factory<GetActiveSchedule> { GetActiveScheduleImpl(scheduleRepository = get()) }
     factory<CancelActiveScheduleUseCase> {
         CancelActiveScheduleUseCaseImpl(
+            scheduler = get(),
             getActiveSchedule = get(),
             setScheduleFulfilled = get()
         )
@@ -126,6 +127,10 @@ val scheduleUseCases = module {
             scheduleRepository = get(),
             timeManager = get()
         )
+    }
+
+    factory<ScheduleAtTimeUseCase> {
+        ScheduleAtTimeUseCaseImpl(scheduler = get())
     }
 }
 
