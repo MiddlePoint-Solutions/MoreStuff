@@ -1,0 +1,111 @@
+package co.softov.morestuff.android.presentation.content
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
+import androidx.paging.PagedList
+import androidx.paging.toLiveData
+import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
+import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
+import co.softov.morestuff.android.presentation.content.ContentViewEvent.*
+import kotlinx.coroutines.launch
+
+class ContentViewModel(
+    private val getPagedMessages: GetPagedMessages,
+    private var conductor: ContentConductor?
+) : BaseViewModel<ContentViewState, ContentViewEvent>(ContentViewState()) {
+
+    override var enableDebug = false
+
+    private lateinit var messageLiveData: LiveData<PagedList<Message>>
+    private val messagePageObserver: Observer<PagedList<Message>> = Observer {
+        sendEvent(ShowChatData(it))
+    }
+
+    override fun onLoadData() {
+        sendEvent(Init)
+        setupChatMessagesPaging()
+    }
+
+    private fun setupChatMessagesPaging() {
+        viewModelScope.launch {
+            getPagedMessages().map { messages ->
+                messageLiveData = messages.toLiveData(
+                    PagedList.Config.Builder().apply {
+                        setPageSize(10)
+                        setEnablePlaceholders(false)
+                    }.build()
+                )
+                messageLiveData.observeForever(messagePageObserver)
+            }
+        }
+    }
+
+    override fun onAppStateChange(state: AppState) {
+
+    }
+
+    override fun onReduceState(event: ContentViewEvent): ContentViewState {
+        return when (event) {
+            is Init -> state // TODO: set user default priority?
+            is ShowChatData -> state.copy(data = event.data)
+            is ChangePriority -> {
+                val priorityItems = when (event.priority) {
+                    is Priority.Today -> Priority.Today()
+                    is Priority.Tomorrow -> Priority.Tomorrow()
+                    is Priority.Later -> Priority.Later()
+                }
+
+                state.copy(
+                    priority = event.priority,
+                    currentTimeOptionId = 0
+                )
+            }
+        }
+    }
+
+    fun addNewTask(title: String) {
+        dispatchAppStoreAction(CreateTaskAction(title, state.priority))
+    }
+
+    fun selectedTodayPriority() {
+        sendEvent(ChangePriority(Priority.Today()))
+    }
+
+    fun selectedTomorrowPriority() {
+        sendEvent(ChangePriority(Priority.Tomorrow()))
+    }
+
+    fun selectedLaterPriority() {
+        sendEvent(ChangePriority(Priority.Later()))
+    }
+
+    fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
+        dispatchAppStoreAction(UserResponseAction(scheduleId, replyType))
+    }
+
+    fun userSelectedPriorityOption(taskId: Long, option: PriorityOption) {
+
+    }
+
+    fun showTaskList() {
+        conductor?.showTaskList()
+    }
+
+    fun onBackPressed() {
+        router.exit()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        conductor = null
+        messageLiveData.removeObserver(messagePageObserver)
+    }
+}

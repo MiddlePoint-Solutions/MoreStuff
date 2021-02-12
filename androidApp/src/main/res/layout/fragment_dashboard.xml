@@ -92,7 +92,7 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintStart_toStartOf="@+id/dashboard_task_title" />
 
-    <co.softov.morestuff.androidApp.app.ui.GridRecyclerView
+    <co.softov.morestuff.android.app.ui.GridRecyclerView
         android:id="@+id/recyclerview_dashboard_options"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -103,7 +103,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
-    </co.softov.morestuff.androidApp.app.ui.GridRecyclerView>
+    </co.softov.morestuff.android.app.ui.GridRecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/dashboardDoneButton"
