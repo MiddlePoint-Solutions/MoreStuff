@@ -3,9 +3,9 @@ package co.softov.morestuff.android.app
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import co.softov.morestuff.android.domain.Debug
+import co.softov.morestuff.android.domain.DevTools
 
-class Debugger(context: Context) : Debug {
+class DevToolsImpl(context: Context) : DevTools {
 
     private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 

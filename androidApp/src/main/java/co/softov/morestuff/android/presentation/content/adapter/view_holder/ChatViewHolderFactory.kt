@@ -27,7 +27,6 @@ class ChatViewHolderFactory(
                 text = context.getString(R.string.chat_item_invalid)
                 ChatItemInvalidViewHolder(this)
             }
-
         }
     }
 

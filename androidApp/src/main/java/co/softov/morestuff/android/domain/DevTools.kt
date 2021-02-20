@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain
 
-interface Debug {
+interface DevTools {
 
     val debugReminders: Boolean
     val todayDebugTime: Int

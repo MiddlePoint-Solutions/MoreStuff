@@ -5,9 +5,9 @@ import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.recyclerview.widget.DefaultItemAnimator
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.databinding.FragmentReviewBinding
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.app.util.LifecycleValue
+import co.softov.morestuff.android.databinding.FragmentReviewBinding
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import com.yuyakaido.android.cardstackview.*
 import timber.log.Timber
@@ -29,9 +29,9 @@ class ReviewFragment : BaseFragment(), CardStackListener {
     }
 
     private fun initialize() {
-        manager.setStackFrom(StackFrom.Top)
-        manager.setVisibleCount(3)
-        manager.setTranslationInterval(8.0f)
+        manager.setStackFrom(StackFrom.Bottom)
+        manager.setVisibleCount(2)
+        manager.setTranslationInterval(12f)
         manager.setScaleInterval(0.95f)
         manager.setSwipeThreshold(0.3f)
         manager.setMaxDegree(20.0f)
@@ -80,10 +80,17 @@ class ReviewFragment : BaseFragment(), CardStackListener {
 
 
     private fun createTestSchedules() = mutableListOf<ScheduleWithTitle>().apply {
-        add(ScheduleWithTitle(size.toLong(),size.toLong(),null, "Create review demo"))
-        add(ScheduleWithTitle(size.toLong(),size.toLong(),null, "Test review"))
-        add(ScheduleWithTitle(size.toLong(),size.toLong(),null, "Think about behaviour"))
-        add(ScheduleWithTitle(size.toLong(),size.toLong(),null, "Remember this is supposed to be playful"))
-        add(ScheduleWithTitle(size.toLong(),size.toLong(),null, "Create design"))
+        add(ScheduleWithTitle(size.toLong(), size.toLong(), null, "Create review demo"))
+        add(ScheduleWithTitle(size.toLong(), size.toLong(), null, "Test review"))
+        add(ScheduleWithTitle(size.toLong(), size.toLong(), null, "Think about behaviour"))
+        add(
+            ScheduleWithTitle(
+                size.toLong(),
+                size.toLong(),
+                null,
+                "Remember this is supposed to be playful"
+            )
+        )
+        add(ScheduleWithTitle(size.toLong(), size.toLong(), null, "Create design"))
     }
 }

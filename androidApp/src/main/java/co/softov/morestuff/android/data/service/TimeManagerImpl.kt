@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.data.utils.TimeUtils
-import co.softov.morestuff.android.domain.Debug
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.LaterOption
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.TodayOption
@@ -11,7 +11,7 @@ import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class TimeManagerImpl(
-    private val debug: Debug
+    private val debug: DevTools
 ) : TimeManager {
 
     override fun getTodayTimeRange(): Pair<String, String> = TimeUtils.todayTimeStringPair

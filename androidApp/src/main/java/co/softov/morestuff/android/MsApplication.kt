@@ -4,7 +4,7 @@ import android.app.Activity
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.preference.PreferenceManager
-import co.softov.morestuff.android.app.EmptyApplicationLifecycleCallback
+import co.softov.morestuff.android.app.util.EmptyApplicationLifecycleCallback
 import co.softov.morestuff.android.di.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.android.ext.koin.androidContext

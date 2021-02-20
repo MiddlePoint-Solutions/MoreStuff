@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.app
+package co.softov.morestuff.android.app.util
 
 import android.app.Activity
 import android.app.Application

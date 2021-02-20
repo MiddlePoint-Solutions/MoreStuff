@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.app
+package co.softov.morestuff.android.app.extensions
 
 import android.os.Build
 

@@ -9,7 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.isAtLeastVersion
+import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createReplyIntent
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds

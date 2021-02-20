@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.data.Constants
-import co.softov.morestuff.android.app.Debugger
+import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
@@ -13,7 +13,7 @@ import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
 import co.softov.morestuff.android.data.service.TimeManagerImpl
-import co.softov.morestuff.android.domain.Debug
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.*
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.service.Notifier
@@ -31,7 +31,7 @@ import org.koin.dsl.module
 val dataModule = module {
 
     // Debugging
-    single<Debug>(createdAtStart = true) { Debugger(androidApplication()) }
+    single<DevTools>(createdAtStart = true) { DevToolsImpl(androidApplication()) }
 
     // Database
     single { createDatabase(androidApplication()) }
