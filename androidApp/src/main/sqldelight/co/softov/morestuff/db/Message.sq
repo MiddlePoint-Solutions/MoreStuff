@@ -6,7 +6,7 @@ CREATE TABLE message(
     seen_time TEXT,
     content_type INTEGER AS Int NOT NULL,
     content TEXT NOT NULL,
-    reply_type INTEGER as Int,
+    reply_type INTEGER AS Int,
     reply_content TEXT,
     reply_time TEXT,
     FOREIGN KEY(task_id) REFERENCES task(id)

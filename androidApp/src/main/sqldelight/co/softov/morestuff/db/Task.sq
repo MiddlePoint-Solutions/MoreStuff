@@ -19,8 +19,8 @@ WHERE complete_time IS NULL;
 selectAllComplete:
 SELECT *
 FROM task
-WHERE complete_time IS NOT NULL
-ORDER BY complete_time DESC;
+WHERE complete_time != NULL
+ORDER BY task.complete_time DESC;
 
 selectTaskById:
 SELECT *

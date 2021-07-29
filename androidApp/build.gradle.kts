@@ -16,17 +16,15 @@ version = "1.0-SNAPSHOT"
 repositories {
     gradlePluginPortal()
     google()
-    jcenter()
     mavenCentral()
-    maven(url = "https://kotlin.bintray.com/kotlinx/")
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
-        minSdkVersion(24)
-        targetSdkVersion(30)
+        minSdk = 24
+        targetSdk = 30
         versionCode = 2
         versionName = "0.2.0"
     }
@@ -62,7 +60,7 @@ dependencies {
     implementation(project(":shared"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.4.20")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.20")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
 
     // Androidx
@@ -111,11 +109,11 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     // Koin Android
-    implementation("org.koin:koin-android:2.2.0-rc-4")
-    implementation("org.koin:koin-androidx-scope:2.2.0-rc-4")
-    implementation("org.koin:koin-androidx-viewmodel:2.2.0-rc-4")
-    implementation("org.koin:koin-androidx-ext:2.2.0-rc-4")
-    testImplementation("org.koin:koin-test:2.2.0-rc-4")
+    implementation("io.insert-koin:koin-android:2.2.3")
+    implementation("io.insert-koin:koin-androidx-scope:2.2.3")
+    implementation("io.insert-koin:koin-androidx-viewmodel:2.2.3")
+    implementation("io.insert-koin:koin-androidx-ext:2.2.3")
+    testImplementation("io.insert-koin:koin-test:2.2.3")
 
     // Testing
     testImplementation("junit:junit:4.13.1")

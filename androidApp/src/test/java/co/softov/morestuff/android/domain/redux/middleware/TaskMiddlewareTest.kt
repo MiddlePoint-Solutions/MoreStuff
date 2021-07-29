@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
-import co.softov.morestuff.android.di.domainModule
+import co.softov.morestuff.android.di.storeModule
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppState
@@ -30,7 +30,7 @@ class TaskMiddlewareTest : KoinTest {
         StuffDb.Schema.create(driver)
 
         modules(
-            domainModule,
+            storeModule,
             module {
                 single(override = true) { StuffDb(driver) }
                 single<TaskRepository> { TaskRepositoryImpl(get(), makeTaskDbMapper()) }

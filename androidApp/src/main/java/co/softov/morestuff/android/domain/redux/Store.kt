@@ -38,6 +38,7 @@ interface Store<State> {
      *
      * This is what views subscribe to.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<State>
 }
 
