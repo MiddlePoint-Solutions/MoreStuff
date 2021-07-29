@@ -61,7 +61,7 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.1.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
 
     // Androidx
     implementation("androidx.appcompat:appcompat:1.2.0")
