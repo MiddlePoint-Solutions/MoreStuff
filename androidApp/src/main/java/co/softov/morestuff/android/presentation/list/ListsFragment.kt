@@ -2,7 +2,6 @@ package co.softov.morestuff.android.presentation.list
 
 import android.app.Dialog
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.databinding.FragmentTasksPagerBinding
 import co.softov.morestuff.android.app.presentation.fragment.BaseBottomSheetDialogFragment
 import co.softov.morestuff.android.app.util.LifecycleValue
+import co.softov.morestuff.android.databinding.FragmentTasksPagerBinding
 import co.softov.morestuff.android.presentation.list.ListsFragment.Pages.*
 import co.softov.morestuff.android.presentation.list.schedule.all.AllScheduleFragment
 import co.softov.morestuff.android.presentation.list.schedule.later.LaterScheduleFragment
@@ -86,12 +85,12 @@ class ListsFragment : BaseBottomSheetDialogFragment() {
             return pages[position].title
         }
 
-        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-            super.setPrimaryItem(container, position, `object`)
+        override fun setPrimaryItem(container: ViewGroup, position: Int, item: Any) {
+            super.setPrimaryItem(container, position, item)
 
-            val currentFragment = `object` as BaseListFragment
+            val currentFragment = if (item is BaseListFragment) item else null
 
-            currentFragment.view?.let { view ->
+            currentFragment?.view?.let { view ->
                 for (i in 0 until count) {
                     (container.getChildAt(i) as? NestedScrollingChild)?.isNestedScrollingEnabled =
                         false

@@ -8,11 +8,9 @@ import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 
-@KoinApiExtension
 class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
 
     private val workManager = WorkManager.getInstance(context)

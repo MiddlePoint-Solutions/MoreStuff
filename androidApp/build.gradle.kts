@@ -1,3 +1,5 @@
+import Build_gradle.Versions.compose_version
+import Build_gradle.Versions.koin_version
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -42,6 +44,11 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.0.1"
     }
 }
 
@@ -56,6 +63,13 @@ sqldelight {
     }
 }
 
+object Versions {
+
+    const val compose_version = "1.0.1"
+    const val koin_version = "3.1.2"
+
+}
+
 dependencies {
     implementation(project(":shared"))
 
@@ -64,7 +78,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
 
     // Androidx
-    implementation("androidx.appcompat:appcompat:1.2.0")
+    implementation("androidx.appcompat:appcompat:1.3.0")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
     implementation("androidx.activity:activity-ktx:1.2.0-beta02")
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
@@ -88,6 +102,19 @@ dependencies {
     // UI
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
 
+    // Compose
+    implementation("androidx.compose.compiler:compiler:$compose_version")
+    implementation("androidx.compose.runtime:runtime:$compose_version")
+    implementation("androidx.compose.ui:ui:$compose_version")
+    implementation("androidx.compose.foundation:foundation:$compose_version")
+    implementation("androidx.compose.foundation:foundation-layout:$compose_version")
+    implementation("androidx.compose.material:material:$compose_version")
+    implementation("androidx.compose.ui:ui-tooling:$compose_version")
+    implementation("androidx.compose.animation:animation:$compose_version")
+
+    // Integration with ViewModels
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+
     // Firebase
     implementation("com.google.firebase:firebase-crashlytics:17.3.0")
     implementation("com.google.firebase:firebase-analytics:18.0.0")
@@ -109,11 +136,10 @@ dependencies {
     implementation("com.jakewharton.timber:timber:4.7.1")
 
     // Koin Android
-    implementation("io.insert-koin:koin-android:2.2.3")
-    implementation("io.insert-koin:koin-androidx-scope:2.2.3")
-    implementation("io.insert-koin:koin-androidx-viewmodel:2.2.3")
-    implementation("io.insert-koin:koin-androidx-ext:2.2.3")
-    testImplementation("io.insert-koin:koin-test:2.2.3")
+    implementation("io.insert-koin:koin-android:$koin_version")
+    implementation("io.insert-koin:koin-android-compat:$koin_version")
+    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
+    testImplementation("io.insert-koin:koin-test:$koin_version")
 
     // Testing
     testImplementation("junit:junit:4.13.1")

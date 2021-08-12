@@ -83,7 +83,7 @@ class ContentFragment : BaseFragment() {
         setHasOptionsMenu(true)
         initViews()
         viewModel.loadData()
-        observe(viewModel.stateLiveData, ::onStateChange)
+        observe(viewModel.uiState, ::onStateChange)
     }
 
     override fun onResume() {

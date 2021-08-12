@@ -16,7 +16,7 @@ class ActiveTasksFragment : BaseListFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        observe(viewModel.stateLiveData, ::onStateChange)
+        observe(viewModel.uiState, ::onStateChange)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

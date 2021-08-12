@@ -1,59 +1,107 @@
 package co.softov.morestuff.android.presentation.list.schedule.all
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import co.softov.morestuff.android.app.presentation.extension.observe
-import co.softov.morestuff.android.presentation.list.BaseListFragment
-import co.softov.morestuff.android.presentation.list.schedule.ScheduleListAdapter
-import co.softov.morestuff.android.presentation.list.schedule.ScheduleListViewState
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.fragment.app.Fragment
+import co.softov.morestuff.android.R
+import co.softov.morestuff.android.presentation.list.schedule.model.ScheduleListItemViewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 
-class AllScheduleFragment : BaseListFragment() {
+class AllScheduleFragment : Fragment() {
 
-    private val viewModel: AllScheduleViewModel by viewModel()
-    private val scheduleAdapter: ScheduleListAdapter = ScheduleListAdapter()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.loadData()
-    }
+                val viewModel = getViewModel<AllScheduleViewModel>()
+                val tasks by viewModel.uiState.collectAsState()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding.taskList.apply {
-            registerForContextMenu(this)
-            adapter = scheduleAdapter
+                MaterialTheme {
+                    LazyColumn(contentPadding = PaddingValues(8.dp)) {
+                        items(tasks.data) { task ->
+                            TaskViewHolder(task)
+                        }
+                    }
+                }
+            }
         }
-        observe(viewModel.stateLiveData, ::onStateChange)
     }
 
-    override fun onResume() {
-        super.onResume()
-        // registerForContextMenu(task_list)
-    }
 
-    override fun onPause() {
-        super.onPause()
-        // unregisterForContextMenu(task_list)
-    }
-
-    private fun onStateChange(state: ScheduleListViewState) {
-        scheduleAdapter.submitList(state.data)
-    }
-
-    override fun rescheduleTaskOneHour(taskId: Long) {
+    /*fun rescheduleTaskOneHour(taskId: Long) {
         viewModel.rescheduleTaskOneHour(taskId)
     }
 
-    override fun rescheduleTaskTomorrow(taskId: Long) {
+    fun rescheduleTaskTomorrow(taskId: Long) {
         viewModel.rescheduleTaskTomorrow(taskId)
     }
 
-    override fun rescheduleTaskLater(taskId: Long) {
+    fun rescheduleTaskLater(taskId: Long) {
         viewModel.rescheduleTaskLater(taskId)
     }
 
-    override fun rescheduleTaskComplete(taskId: Long) {
+    fun rescheduleTaskComplete(taskId: Long) {
         viewModel.rescheduleTaskComplete(taskId)
+    }*/
+}
+
+@Composable
+fun TaskViewHolder(task: ScheduleListItemViewModel) {
+    Column {
+        Text(
+            text = task.taskTitle,
+            color = Color.White,
+            style = MaterialTheme.typography.h6,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(
+            text = stringResource(
+                id = R.string.text_scheduled_time_placeholder,
+                task.scheduleTime
+            ),
+            color = Color.White,
+            fontSize = 12.sp
+        )
     }
+}
+
+@Preview
+@Composable
+fun PreviewTaskHolder() {
+    TaskViewHolder(
+        task = ScheduleListItemViewModel(
+            scheduleId = 0,
+            taskId = 0,
+            scheduleTime = "Today",
+            taskTitle = "Something to do!"
+        )
+    )
 }

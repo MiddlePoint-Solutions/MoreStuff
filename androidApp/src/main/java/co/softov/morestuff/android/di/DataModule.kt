@@ -24,10 +24,8 @@ import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.component.KoinApiExtension
 import org.koin.dsl.module
 
-@OptIn(KoinApiExtension::class)
 val dataModule = module {
 
     // Debugging

@@ -22,8 +22,7 @@ class AllScheduleViewModel(
 
     private val scheduleItemMapper = ScheduleListItemMapper()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun onLoadData() {
+    init {
         viewModelScope.launch {
             getSchedulesWithTitle()
                 .onEach {
@@ -31,8 +30,13 @@ class AllScheduleViewModel(
                 }.catch { e ->
                     Timber.e("AllScheduleViewModel, error: $e")
                 }
-                .launchIn(viewModelScope)
+                .launchIn(this)
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun onLoadData() {
+
     }
 
     override fun onReduceState(event: ScheduleListViewEvent): ScheduleListViewState {

@@ -10,13 +10,11 @@ import androidx.work.WorkerParameters
 import co.softov.morestuff.android.app.receiver.ScheduleReceiver
 import co.softov.morestuff.android.app.receiver.createReminderIntent
 import co.softov.morestuff.android.domain.redux.AppStore
-import org.koin.core.component.KoinApiExtension
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-@KoinApiExtension
 class ScheduleWorker(
     val context: Context,
     private val params: WorkerParameters
