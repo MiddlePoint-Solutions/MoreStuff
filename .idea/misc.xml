@@ -4,7 +4,11 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../layout/compose-model-1628783057710.xml" value="0.36486486486486486" />
+        <entry key="../../../../../layout/compose-model-1628884246589.xml" value="0.9649532710280374" />
+        <entry key="../../../../../layout/compose-model-1628885309348.xml" value="0.5" />
         <entry key="androidApp/src/main/res/layout/fragment_task_list.xml" value="0.3220108695652174" />
+        <entry key="androidApp/src/main/res/layout/task_list_item.xml" value="0.3220108695652174" />
+        <entry key="androidApp/src/main/res/layout/task_list_item_expandable.xml" value="0.3220108695652174" />
       </map>
     </option>
   </component>

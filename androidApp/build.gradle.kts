@@ -1,3 +1,4 @@
+import Build_gradle.Versions.accompanist_version
 import Build_gradle.Versions.compose_version
 import Build_gradle.Versions.koin_version
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -67,6 +68,7 @@ object Versions {
 
     const val compose_version = "1.0.1"
     const val koin_version = "3.1.2"
+    const val accompanist_version = "0.16.1"
 
 }
 
@@ -111,6 +113,10 @@ dependencies {
     implementation("androidx.compose.material:material:$compose_version")
     implementation("androidx.compose.ui:ui-tooling:$compose_version")
     implementation("androidx.compose.animation:animation:$compose_version")
+
+    implementation("com.google.accompanist:accompanist-insets:$accompanist_version")
+    implementation("com.google.accompanist:accompanist-insets-ui:$accompanist_version")
+
 
     // Integration with ViewModels
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")

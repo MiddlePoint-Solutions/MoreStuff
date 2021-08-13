@@ -2,6 +2,7 @@ package co.softov.morestuff.android.presentation.list.schedule.tomorrow
 
 import android.os.Bundle
 import android.view.View
+import androidx.recyclerview.widget.SimpleItemAnimator
 import co.softov.morestuff.android.app.presentation.extension.observe
 import co.softov.morestuff.android.presentation.list.BaseListFragment
 import co.softov.morestuff.android.presentation.list.schedule.ScheduleListAdapter
@@ -23,6 +24,7 @@ class TomorrowScheduleFragment : BaseListFragment() {
         binding.taskList.apply {
             registerForContextMenu(this)
             adapter = scheduleAdapter
+            (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         }
         viewModel.loadData()
     }
