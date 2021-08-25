@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.presentation.extension.launchWithDelay
 import co.softov.morestuff.android.databinding.FragmentContentBinding
 import co.softov.morestuff.android.app.presentation.extension.observe
 import co.softov.morestuff.android.app.presentation.extension.setOnDebouncedClickListener
@@ -84,6 +85,10 @@ class ContentFragment : BaseFragment() {
         initViews()
         viewModel.loadData()
         observe(viewModel.uiState, ::onStateChange)
+
+        launchWithDelay(5000) {
+            viewModel.addNewTask("Testing")
+        }
     }
 
     override fun onResume() {

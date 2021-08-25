@@ -3,23 +3,10 @@ package co.softov.morestuff.android.presentation.list.schedule
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.recyclerview.widget.DiffUtil
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.ComposeListAdapter
@@ -76,63 +63,6 @@ ScheduleListAdapter :
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
-@Composable
-fun TaskViewHolder(task: ScheduleListItemViewModel) {
-
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        elevation = 6.dp,
-        onClick = {
-            expanded = !expanded
-        },
-        modifier = Modifier.padding(8.dp)
-    ) {
-        Column {
-            Text(
-                text = task.taskTitle,
-                color = Color.Black,
-                style = MaterialTheme.typography.h6,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(4.dp)
-            )
-            Text(
-                text = stringResource(
-                    id = R.string.text_scheduled_time_placeholder,
-                    task.scheduleTime
-                ),
-                color = Color.Black,
-                fontSize = 12.sp,
-                modifier = Modifier.padding(4.dp)
-            )
-
-            AnimatedVisibility(visible = expanded) {
-                Text(
-                    text = "BOOOOOM!",
-                    color = Color.Black,
-                    style = MaterialTheme.typography.h6,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-
-}
-
-@Preview
-@Composable
-fun PreviewTaskHolder() {
-    TaskViewHolder(
-        task = ScheduleListItemViewModel(
-            scheduleId = 0,
-            taskId = 0,
-            scheduleTime = "Today",
-            taskTitle = "Something to do!"
-        )
-    )
 }
 
 class ScheduleDiffCallback : DiffUtil.ItemCallback<ScheduleListItemViewModel>() {
