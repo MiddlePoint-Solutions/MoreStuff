@@ -85,10 +85,6 @@ class ContentFragment : BaseFragment() {
         initViews()
         viewModel.loadData()
         observe(viewModel.uiState, ::onStateChange)
-
-        launchWithDelay(5000) {
-            viewModel.addNewTask("Testing")
-        }
     }
 
     override fun onResume() {

@@ -1,16 +1,18 @@
+
 buildscript {
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-        classpath("com.android.tools.build:gradle:7.0.1")
-        classpath("com.google.gms:google-services:4.3.10")
-        classpath("com.google.firebase:firebase-crashlytics-gradle:2.7.1")
-        classpath("com.squareup.sqldelight:gradle-plugin:1.5.0")
-        classpath("org.jetbrains.kotlin:kotlin-serialization:1.5.21")
-        classpath ("io.insert-koin:koin-gradle-plugin:2.2.3")
+        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.gradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.androidGradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.Google.googleServices)
+        classpath(co.softov.morestuff.buildsrc.Libs.Firebase.gradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.Sqldelight.gradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.serialization)
+        classpath(co.softov.morestuff.buildsrc.Libs.Koin.gradlePlugin)
     }
 }
 group = "co.softov.morestuff"

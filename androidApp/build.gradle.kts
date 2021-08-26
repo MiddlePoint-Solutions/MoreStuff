@@ -1,6 +1,4 @@
-import Build_gradle.Versions.accompanist_version
-import Build_gradle.Versions.compose_version
-import Build_gradle.Versions.koin_version
+import co.softov.morestuff.buildsrc.Libs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -64,72 +62,62 @@ sqldelight {
     }
 }
 
-object Versions {
-
-    const val compose_version = "1.0.1"
-    const val koin_version = "3.1.2"
-    const val accompanist_version = "0.16.1"
-
-}
-
 dependencies {
-    implementation(project(":shared"))
+    //implementation(project(":shared"))
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.20")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
+    implementation(Libs.Kotlin.stdlib)
+    implementation(Libs.Kotlin.reflect)
+    implementation(Libs.Kotlinx.datetime)
 
     // Androidx
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.activity:activity-ktx:1.2.0-beta02")
+    implementation(Libs.AndroidX.appcompat)
+    implementation(Libs.AndroidX.Fragment.fragmentKtx)
+    implementation(Libs.AndroidX.Activity.activityKtx)
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation(Libs.AndroidX.Lifecycle.runtimeKtx)
+    implementation(Libs.AndroidX.Lifecycle.extensions)
+    implementation(Libs.AndroidX.Lifecycle.viewModel)
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha05")
-    implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation("androidx.paging:paging-runtime-ktx:2.1.2")
-    implementation("androidx.work:work-runtime-ktx:2.5.0-beta02")
-
-    implementation("com.google.android.material:material:1.2.1")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
+    implementation(Libs.AndroidX.coreKtx)
+    implementation(Libs.AndroidX.preferenceKtx)
+    implementation(Libs.AndroidX.pagingKtx)
+    implementation(Libs.AndroidX.constraintLayout)
+    implementation(Libs.AndroidX.workKtx)
 
     // Navigation
     implementation("com.github.terrakok:cicerone:6.5")
 
     // UI
+    implementation(Libs.Google.material)
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
 
     // Compose
-    implementation("androidx.compose.compiler:compiler:$compose_version")
-    implementation("androidx.compose.runtime:runtime:$compose_version")
-    implementation("androidx.compose.ui:ui:$compose_version")
-    implementation("androidx.compose.foundation:foundation:$compose_version")
-    implementation("androidx.compose.foundation:foundation-layout:$compose_version")
-    implementation("androidx.compose.material:material:$compose_version")
-    implementation("androidx.compose.ui:ui-tooling:$compose_version")
-    implementation("androidx.compose.animation:animation:$compose_version")
+    implementation(Libs.AndroidX.Compose.compiler)
+    implementation(Libs.AndroidX.Compose.runtime)
+    implementation(Libs.AndroidX.Compose.ui)
+    implementation(Libs.AndroidX.Compose.foundation)
+    implementation(Libs.AndroidX.Compose.foundationLayout)
+    implementation(Libs.AndroidX.Compose.material)
+    implementation(Libs.AndroidX.Compose.materialIconsExtended)
+    implementation(Libs.AndroidX.Compose.tooling)
+    implementation(Libs.AndroidX.Compose.animation)
+    implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
 
-    implementation("com.google.accompanist:accompanist-insets:$accompanist_version")
-    implementation("com.google.accompanist:accompanist-insets-ui:$accompanist_version")
-
-
-    // Integration with ViewModels
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation(Libs.Accompanist.insets)
+    implementation(Libs.Accompanist.insetsUi)
+    implementation(Libs.Accompanist.pager)
 
     // Firebase
-    implementation("com.google.firebase:firebase-crashlytics:17.3.0")
-    implementation("com.google.firebase:firebase-analytics:18.0.0")
+    implementation(Libs.Firebase.crashlytics)
+    implementation(Libs.Firebase.analytics)
 
     // SQLDelight
-    implementation("com.squareup.sqldelight:android-driver:1.4.4")
-    implementation("com.squareup.sqldelight:coroutines-extensions-jvm:1.4.4")
-    implementation("com.squareup.sqldelight:android-paging-extensions:1.4.4")
-    testImplementation("com.squareup.sqldelight:sqlite-driver:1.4.4")
+    implementation(Libs.Sqldelight.androidDriver)
+    implementation(Libs.Sqldelight.coroutinesJvmExt)
+    implementation(Libs.Sqldelight.androidPagingExt)
+    testImplementation(Libs.Sqldelight.Test.sqlDriver)
 
     testImplementation("org.xerial:sqlite-jdbc:3.8.10.2") {
         // Override the version of sqlite used by sqlite-driver to match Android API 24 (minSdkVersion)
@@ -139,16 +127,17 @@ dependencies {
     }
 
     // Timber logging
-    implementation("com.jakewharton.timber:timber:4.7.1")
+    implementation(Libs.Log.timber)
 
     // Koin Android
-    implementation("io.insert-koin:koin-android:$koin_version")
-    implementation("io.insert-koin:koin-android-compat:$koin_version")
-    implementation("io.insert-koin:koin-androidx-compose:$koin_version")
-    testImplementation("io.insert-koin:koin-test:$koin_version")
+    implementation(Libs.Koin.android)
+    implementation(Libs.Koin.androidCompat)
+    implementation(Libs.Koin.androidxCompose)
+    testImplementation(Libs.Koin.test)
 
     // Testing
-    testImplementation("junit:junit:4.13.1")
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation(Libs.Test.junit)
+    testImplementation(Libs.Test.mokitoKtx)
 
+    coreLibraryDesugaring(Libs.jdkDesugar)
 }
