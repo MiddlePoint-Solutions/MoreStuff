@@ -108,6 +108,7 @@ dependencies {
     implementation(Libs.Accompanist.insets)
     implementation(Libs.Accompanist.insetsUi)
     implementation(Libs.Accompanist.pager)
+    implementation(Libs.Accompanist.pagerIndicators)
 
     // Firebase
     implementation(Libs.Firebase.crashlytics)

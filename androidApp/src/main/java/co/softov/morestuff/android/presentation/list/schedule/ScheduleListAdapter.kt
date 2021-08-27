@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.DiffUtil
 import co.softov.morestuff.android.R
@@ -43,7 +42,7 @@ ScheduleListAdapter :
         @Composable
         override fun ViewHolder(input: ScheduleListItemViewModel) {
             MaterialTheme {
-                TaskViewHolder(input)
+                TaskListItem(input)
             }
         }
 

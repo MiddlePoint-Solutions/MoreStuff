@@ -15,13 +15,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.presentation.list.schedule.model.ScheduleListItemViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun TaskViewHolder(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
+fun TaskListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         elevation = 6.dp,
@@ -60,7 +59,7 @@ fun TaskViewHolder(task: ScheduleListItemViewModel, modifier: Modifier = Modifie
 @Preview
 @Composable
 fun PreviewTaskHolder() {
-    TaskViewHolder(
+    TaskListItem(
         task = ScheduleListItemViewModel(
             scheduleId = 0,
             taskId = 0,
