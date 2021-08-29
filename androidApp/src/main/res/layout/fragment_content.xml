@@ -73,6 +73,13 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeChatInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/chat_input_text_height"
+            />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layoutChatInput"
             android:layout_width="match_parent"

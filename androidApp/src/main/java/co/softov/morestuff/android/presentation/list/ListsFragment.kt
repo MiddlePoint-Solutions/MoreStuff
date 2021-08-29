@@ -4,8 +4,7 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
+import co.softov.morestuff.android.presentation.compose.viewMigration
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -16,11 +15,8 @@ class ListsFragment : BottomSheetDialogFragment() {
 
         val height = getWindowHeight()
         val view = ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                MoreStuffTheme {
-                    ListsContent()
-                }
+            viewMigration {
+                ListsContent()
             }
         }
         dialog.setContentView(
