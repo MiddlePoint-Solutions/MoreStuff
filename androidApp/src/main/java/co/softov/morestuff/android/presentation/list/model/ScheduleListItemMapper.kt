@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list.schedule.model
+package co.softov.morestuff.android.presentation.list.model
 
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import java.text.SimpleDateFormat

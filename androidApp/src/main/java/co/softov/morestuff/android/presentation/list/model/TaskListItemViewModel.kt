@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list.tasks.model
+package co.softov.morestuff.android.presentation.list.model
 
 data class TaskListItemViewModel(
     val id: Long,

@@ -8,10 +8,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWith
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasks
-import co.softov.morestuff.android.presentation.list.schedule.model.ScheduleListItemMapper
-import co.softov.morestuff.android.presentation.list.schedule.model.ScheduleListItemViewModel
-import co.softov.morestuff.android.presentation.list.tasks.model.TaskListItemMapper
-import co.softov.morestuff.android.presentation.list.tasks.model.TaskListItemViewModel
+import co.softov.morestuff.android.presentation.list.model.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber

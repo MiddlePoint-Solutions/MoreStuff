@@ -14,9 +14,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import co.softov.morestuff.android.presentation.list.Page
+import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
+import co.softov.morestuff.android.presentation.list.model.Page
 import co.softov.morestuff.android.presentation.list.SchedulePageViewModel
-import co.softov.morestuff.android.presentation.list.schedule.ScheduleListItem
+import co.softov.morestuff.android.presentation.list.ScheduleListItem
 import co.softov.morestuff.android.presentation.list.schedule.TaskListItem
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf

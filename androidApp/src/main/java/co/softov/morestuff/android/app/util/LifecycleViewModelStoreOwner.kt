@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list.schedule.all
+package co.softov.morestuff.android.app.util
 
 import androidx.lifecycle.*
 
