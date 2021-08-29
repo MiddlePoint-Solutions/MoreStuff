@@ -6,13 +6,13 @@ import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetActiveTasks {
-    suspend operator fun invoke(): SimpleResult<Flow<List<Task>>>
+    suspend operator fun invoke(): Flow<List<Task>>
 }
 
 class GetActiveTasksImpl(
     private val taskRepository: TaskRepository
 ) : GetActiveTasks {
-    override suspend fun invoke(): SimpleResult<Flow<List<Task>>> {
+    override suspend fun invoke(): Flow<List<Task>> {
         return taskRepository.getActiveTasksFlow()
     }
 } 

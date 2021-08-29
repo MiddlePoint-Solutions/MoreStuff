@@ -1,72 +1,45 @@
 package co.softov.morestuff.android.presentation.list.schedule.all
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import co.softov.morestuff.android.presentation.list.Page
+import co.softov.morestuff.android.presentation.list.SchedulePageViewModel
+import co.softov.morestuff.android.presentation.list.schedule.ScheduleListItem
 import co.softov.morestuff.android.presentation.list.schedule.TaskListItem
-import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 import org.koin.androidx.compose.getViewModel
-
-class AllScheduleFragment : Fragment() {
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AllScheduleList()
-            }
-        }
-    }
-
-
-
-
-    /*fun rescheduleTaskOneHour(taskId: Long) {
-        viewModel.rescheduleTaskOneHour(taskId)
-    }
-
-    fun rescheduleTaskTomorrow(taskId: Long) {
-        viewModel.rescheduleTaskTomorrow(taskId)
-    }
-
-    fun rescheduleTaskLater(taskId: Long) {
-        viewModel.rescheduleTaskLater(taskId)
-    }
-
-    fun rescheduleTaskComplete(taskId: Long) {
-        viewModel.rescheduleTaskComplete(taskId)
-    }*/
-}
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun AllScheduleList() {
-    val viewModel = getViewModel<AllScheduleViewModel>()
-    val tasks by viewModel.uiState.collectAsState()
+fun ScheduleList(page: Page) {
+    // TODO: Remove LifecycleViewModelStoreOwner once Koin has a fix for multiple instances of the same ViewModel
+    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
+    CompositionLocalProvider(
+        LocalViewModelStoreOwner provides ViewModelStoreOwner {
+            LifecycleViewModelStoreOwner(lifecycleOwner = lifecycleOwner).viewModelStore
+        }
+    ) {
+        val viewModel: SchedulePageViewModel = getViewModel { parametersOf(page) }
+        val state by viewModel.state.collectAsState()
 
-    MoreStuffTheme {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(8.dp)
         ) {
-            items(tasks.data) { task ->
-                TaskListItem(task)
+            when {
+                state.schedules.isNotEmpty() -> items(state.schedules) { ScheduleListItem(it) }
+                state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
             }
         }
     }

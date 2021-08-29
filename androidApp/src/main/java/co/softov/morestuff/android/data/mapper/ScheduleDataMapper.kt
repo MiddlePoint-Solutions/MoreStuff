@@ -3,7 +3,8 @@ package co.softov.morestuff.android.data.mapper
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 
-typealias ScheduleDbMapper = (co.softov.morestuff.db.Schedule) -> Schedule
+typealias ScheduleData = co.softov.morestuff.db.Schedule
+typealias ScheduleDbMapper = (ScheduleData) -> Schedule
 
 typealias ScheduleWithTitleDbMapper = (
     id: Long,
@@ -18,7 +19,7 @@ fun makeScheduleDbMapper(): ScheduleDbMapper = { schedule ->
 
 fun makeScheduleWithTitleDbMapper(): ScheduleWithTitleDbMapper = ::mapScheduleWithTitle
 
-fun mapScheduleDb(input: co.softov.morestuff.db.Schedule): Schedule {
+fun mapScheduleDb(input: ScheduleData): Schedule {
     return Schedule(
         id = input.id,
         taskId = input.task_id,

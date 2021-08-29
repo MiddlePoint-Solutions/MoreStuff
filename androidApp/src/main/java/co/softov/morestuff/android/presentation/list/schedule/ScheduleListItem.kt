@@ -16,11 +16,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.presentation.list.tasks.model.TaskListItemViewModel
+import co.softov.morestuff.android.presentation.list.schedule.model.ScheduleListItemViewModel
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
+fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         elevation = 6.dp,
@@ -33,14 +33,14 @@ fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
     ) {
         Column {
             Text(
-                text = task.title,
+                text = task.taskTitle,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(4.dp)
             )
             Text(
                 text = stringResource(
-                    id = R.string.text_created_time_placeholder,
-                    task.createTime
+                    id = R.string.text_scheduled_time_placeholder,
+                    task.scheduleTime
                 ),
                 modifier = Modifier.padding(4.dp)
             )
@@ -58,13 +58,13 @@ fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun PreviewTaskItem() {
-    TaskListItem(
-        task = TaskListItemViewModel(
-            id = 0,
-            createTime = "Today",
-            completeTime = "",
-            title = "Something to do!"
+fun PreviewTaskHolder() {
+    ScheduleListItem(
+        task = ScheduleListItemViewModel(
+            scheduleId = 0,
+            taskId = 0,
+            scheduleTime = "Today",
+            taskTitle = "Something to do!"
         )
     )
 }

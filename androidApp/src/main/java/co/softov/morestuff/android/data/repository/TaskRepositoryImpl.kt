@@ -39,17 +39,12 @@ class TaskRepositoryImpl(
         }
     }
 
-    override suspend fun getActiveTasksFlow(): SimpleResult<Flow<List<Task>>> {
-        return Result.Success(taskQueries
-            .selectAllActive()
-            .asFlow()
-            .mapToList()
-            .map { mapList(it, mapTaskDb) })
+    override suspend fun getActiveTasksFlow(): Flow<List<Task>> {
+        return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskDb) }
     }
 
-    override suspend fun getCompleteTasksFlow(): SimpleResult<Flow<List<Task>>> {
-        return Result.Success(
-            taskQueries.selectAllComplete().asFlow().mapToList().map { mapList(it, mapTaskDb) })
+    override suspend fun getCompleteTasksFlow(): Flow<List<Task>> {
+        return taskQueries.selectAllComplete().asFlow().mapToList().map { mapList(it, mapTaskDb) }
     }
 
     override suspend fun setTaskComplete(taskId: Long): SimpleResult<Boolean> {

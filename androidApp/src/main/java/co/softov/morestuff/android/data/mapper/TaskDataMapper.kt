@@ -10,7 +10,7 @@ fun makeTaskDbMapper(): taskDbMapper = { task ->
     mapTaskDb(task)
 }
 
-fun mapTaskDb(input: co.softov.morestuff.db.Task): Task {
+fun mapTaskDb(input: TaskData): Task {
     return Task(
         id = input.id,
         createTime = input.create_time,

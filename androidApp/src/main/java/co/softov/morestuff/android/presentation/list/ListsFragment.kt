@@ -5,29 +5,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.fragment.BaseBottomSheetDialogFragment
-import co.softov.morestuff.android.presentation.list.schedule.all.AllScheduleList
+import co.softov.morestuff.android.presentation.list.schedule.all.ScheduleList
 import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.pagerTabIndicatorOffset
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.launch
 
@@ -60,7 +53,7 @@ class ListsFragment : BaseBottomSheetDialogFragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 MoreStuffTheme {
-                    ListsContent(pages)
+                    ListsContent()
                 }
             }
         }
@@ -74,67 +67,83 @@ class ListsFragment : BaseBottomSheetDialogFragment() {
 
 }
 
-private val pages = listOf(
-    Pages.PAGE_ACTIVE_SCHEDULES,
-    Pages.PAGE_ACTIVE_TODAY,
-    Pages.PAGE_ACTIVE_TOMORROW,
-    Pages.PAGE_ACTIVE_LATER,
-    Pages.PAGE_COMPLETE_TASKS,
-    Pages.PAGE_ACTIVE_TASKS
-)
+val pages = listOf(
+    PageType.PAGE_ACTIVE_SCHEDULES,
+    PageType.PAGE_ACTIVE_TODAY,
+    PageType.PAGE_ACTIVE_TOMORROW,
+    PageType.PAGE_ACTIVE_LATER,
+    PageType.PAGE_COMPLETE_TASKS,
+    PageType.PAGE_ACTIVE_TASKS
+).map { Page(it) }
 
+data class Page(val type: PageType)
 
-enum class Pages(val title: String) {
-    PAGE_ACTIVE_TASKS("Active"),
-    PAGE_COMPLETE_TASKS("Complete"),
-    PAGE_ACTIVE_SCHEDULES("Schedule"),
-    PAGE_ACTIVE_TODAY("Today"),
-    PAGE_ACTIVE_TOMORROW("Tomorrow"),
-    PAGE_ACTIVE_LATER("Later")
+val Page.title
+    @Composable get() = when (this.type) {
+        PageType.PAGE_ACTIVE_TASKS -> stringResource(id = R.string.page_title_active)
+        PageType.PAGE_COMPLETE_TASKS -> stringResource(id = R.string.page_title_complete)
+        PageType.PAGE_ACTIVE_SCHEDULES -> stringResource(id = R.string.page_title_schedule)
+        PageType.PAGE_ACTIVE_TODAY -> stringResource(id = R.string.page_title_today)
+        PageType.PAGE_ACTIVE_TOMORROW -> stringResource(id = R.string.page_title_tomorrow)
+        PageType.PAGE_ACTIVE_LATER -> stringResource(id = R.string.page_title_later)
+    }
+
+enum class PageType {
+    PAGE_ACTIVE_TASKS,
+    PAGE_COMPLETE_TASKS,
+    PAGE_ACTIVE_SCHEDULES,
+    PAGE_ACTIVE_TODAY,
+    PAGE_ACTIVE_TOMORROW,
+    PAGE_ACTIVE_LATER
 }
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ListsContent(
-    pages: List<Pages>,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(pageCount = pages.size)
-    val coroutineScope = rememberCoroutineScope()
-
     Column(modifier) {
-        ScrollableTabRow(
-            // Our selected tab is our current page
-            selectedTabIndex = pagerState.currentPage,
-            edgePadding = 24.dp,
-            divider = {},
-            indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-                )
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            pages.forEachIndexed { index, page ->
-                Tab(
-                    text = { Text(page.title) },
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        coroutineScope.launch {
-                            pagerState.scrollToPage(index)
-                        }
-                    }
-                )
-            }
-        }
+        TaskListTabs(pagerState, pages)
 
         HorizontalPager(state = pagerState) { page ->
             Surface(
                 contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
             ) {
-                AllScheduleList()
+                ScheduleList(page = pages[page])
             }
 
+        }
+    }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun TaskListTabs(
+    pagerState: PagerState,
+    pages: List<Page>
+) {
+    val coroutineScope = rememberCoroutineScope()
+    ScrollableTabRow(
+        // Our selected tab is our current page
+        selectedTabIndex = pagerState.currentPage,
+        edgePadding = 24.dp,
+        divider = {},
+        indicator = { tabPositions ->
+            TabRowDefaults.Indicator(
+                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
+            )
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        pages.forEachIndexed { index, page ->
+            Tab(
+                text = { Text(page.title) },
+                selected = pagerState.currentPage == index,
+                onClick = {
+                    coroutineScope.launch { pagerState.scrollToPage(index) }
+                }
+            )
         }
     }
 }
@@ -143,6 +152,6 @@ fun ListsContent(
 @Composable
 fun ListsContentPreview() {
     MoreStuffTheme {
-        ListsContent(pages = pages)
+        ListsContent()
     }
 }

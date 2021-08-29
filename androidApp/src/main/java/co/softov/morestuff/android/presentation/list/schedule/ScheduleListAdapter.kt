@@ -42,7 +42,7 @@ ScheduleListAdapter :
         @Composable
         override fun ViewHolder(input: ScheduleListItemViewModel) {
             MaterialTheme {
-                TaskListItem(input)
+                ScheduleListItem(input)
             }
         }
 
