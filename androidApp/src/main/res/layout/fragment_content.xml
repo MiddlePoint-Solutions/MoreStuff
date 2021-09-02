@@ -23,55 +23,12 @@
         android:elevation="2dp"
         android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composePriorityConfig"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/chat_input_actions_height"
-            android:background="@drawable/shape_corner_radius"
-            android:elevation="2dp">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonActionToday"
-                style="@style/PrioritySelectButton"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:text="@string/chat_action_today"
-                android:textColor="?android:attr/textColorPrimary"
-                app:backgroundTint="@color/selector_priority_button"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/buttonActionTomorrow"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonActionTomorrow"
-                style="@style/PrioritySelectButton"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:backgroundTint="@color/selector_priority_button"
-                android:text="@string/chat_action_tomorrow"
-                android:textColor="?android:attr/textColorPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/buttonActionLater"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toEndOf="@+id/buttonActionToday"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonActionLater"
-                style="@style/PrioritySelectButton"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:backgroundTint="@color/selector_priority_button"
-                android:text="@string/chat_action_later"
-                android:textColor="?android:attr/textColorPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toEndOf="@+id/buttonActionTomorrow"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/chat_input_actions_height"
+            />
 
         <androidx.compose.ui.platform.ComposeView
             android:id="@+id/composeChatInput"
@@ -80,68 +37,5 @@
             android:minHeight="@dimen/chat_input_text_height"
             />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutChatInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:minHeight="@dimen/chat_input_text_height"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <FrameLayout
-                android:id="@+id/frameInputButtons"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/buttonChatInputSend"
-                    android:layout_width="45dp"
-                    android:layout_height="match_parent"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_send"
-                    android:src="@drawable/ic_send_24dp"
-                    android:visibility="gone" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/buttonShowTaskList"
-                    android:layout_width="45dp"
-                    android:layout_height="match_parent"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/cd_send"
-                    android:src="@drawable/ic_list_black_24dp"
-                    app:tint="?attr/colorControlNormal" />
-
-            </FrameLayout>
-
-
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/editChatInput"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_toStartOf="@+id/frameInputButtons"
-                android:background="@null"
-                android:gravity="center_vertical"
-                android:hint="@string/chat_input_task_hint"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLines="4"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textColorHint="?android:attr/textColorHint"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/frameInputButtons"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </RelativeLayout>

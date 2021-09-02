@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.presentation.list.model.Page
 import co.softov.morestuff.android.presentation.list.model.PageType
 import co.softov.morestuff.android.presentation.list.model.title
-import co.softov.morestuff.android.presentation.list.schedule.all.ScheduleList
 import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch

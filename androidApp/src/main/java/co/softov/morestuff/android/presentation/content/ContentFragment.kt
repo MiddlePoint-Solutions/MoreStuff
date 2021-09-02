@@ -1,25 +1,35 @@
 package co.softov.morestuff.android.presentation.content
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.core.view.isVisible
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.iterator
 import androidx.fragment.app.ListFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.extension.observe
-import co.softov.morestuff.android.app.presentation.extension.setOnDebouncedClickListener
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.app.util.LifecycleValue
 import co.softov.morestuff.android.databinding.FragmentContentBinding
+import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.Priority.*
 import co.softov.morestuff.android.presentation.Screens
 import co.softov.morestuff.android.presentation.compose.viewMigration
@@ -27,6 +37,7 @@ import co.softov.morestuff.android.presentation.content.adapter.ChatAdapter
 import co.softov.morestuff.android.presentation.content.adapter.view_holder.ChatViewHolderFactory
 import co.softov.morestuff.android.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.android.presentation.list.ListsFragment
+import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -71,7 +82,6 @@ class ContentFragment : BaseFragment() {
     private val listFragment: ListsFragment get() = ListsFragment()
 
     private val router: Router by inject()
-    private lateinit var layoutManager: StaggeredGridLayoutManager
     private var binding: FragmentContentBinding by LifecycleValue()
     private var chatAdapter: ChatAdapter by LifecycleValue()
 
@@ -87,17 +97,6 @@ class ContentFragment : BaseFragment() {
         observe(viewModel.uiState, ::onStateChange)
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.editChatInput.showSoftInputOnFocus = true
-    }
-
-    override fun onPause() {
-        super.onPause()
-        binding.editChatInput.clearFocus()
-        binding.editChatInput.showSoftInputOnFocus = false
-    }
-
     override fun onBackPressed() {
         viewModel.onBackPressed()
     }
@@ -109,49 +108,29 @@ class ContentFragment : BaseFragment() {
     }
 
     private fun setupPriorities() {
+        binding.composePriorityConfig.viewMigration {
+            val state by viewModel.uiState.collectAsState()
 
-        layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-        layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
-
-        binding.apply {
-            buttonShowTaskList.setOnDebouncedClickListener {
-                viewModel.showTaskList()
-            }
-
-            buttonActionToday.setOnDebouncedClickListener {
-                viewModel.selectedTodayPriority()
-            }
-
-            buttonActionTomorrow.setOnDebouncedClickListener {
-                viewModel.selectedTomorrowPriority()
-            }
-
-            buttonActionLater.setOnDebouncedClickListener {
-                viewModel.selectedLaterPriority()
+            UserPriorityInput(
+                currentPriority = state.priority
+            ) {
+                when (it) {
+                    is Later -> viewModel.selectedLaterPriority()
+                    is Today -> viewModel.selectedTodayPriority()
+                    is Tomorrow -> viewModel.selectedTomorrowPriority()
+                }
             }
         }
     }
 
 
-    private fun setupChatInput() {
 
+    private fun setupChatInput() {
         binding.composeChatInput.viewMigration {
             UserTextInput(
-                listAction = {},
-                sendAction = {}
+                listAction = viewModel::showTaskList,
+                sendAction = viewModel::addNewTask
             )
-        }
-
-        binding.apply {
-            editChatInput.showSoftInputOnFocus = false
-            editChatInput.addTextChangedListener(ChatInputTextWatcher())
-
-            buttonChatInputSend.setOnDebouncedClickListener {
-                editChatInput.text?.let {
-                    viewModel.addNewTask(it.toString())
-                    editChatInput.text = null
-                }
-            }
         }
     }
 
@@ -184,26 +163,6 @@ class ContentFragment : BaseFragment() {
         state.data?.let {
             chatAdapter.submitList(it)
         }
-
-        binding.apply {
-            when (state.priority) {
-                is Later -> {
-                    buttonActionToday.isSelected = false
-                    buttonActionTomorrow.isSelected = false
-                    buttonActionLater.isSelected = true
-                }
-                is Today -> {
-                    buttonActionToday.isSelected = true
-                    buttonActionTomorrow.isSelected = false
-                    buttonActionLater.isSelected = false
-                }
-                is Tomorrow -> {
-                    buttonActionToday.isSelected = false
-                    buttonActionTomorrow.isSelected = true
-                    buttonActionLater.isSelected = false
-                }
-            }
-        }
     }
 
     inner class AdapterDataObserver : RecyclerView.AdapterDataObserver() {
@@ -216,35 +175,6 @@ class ContentFragment : BaseFragment() {
 
         private fun scrollToCurrentMessage() {
             binding.recyclerChatMessages.scrollToPosition(0)
-        }
-    }
-
-    inner class ChatInputTextWatcher : TextWatcher {
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            // Ignore
-        }
-
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            // Ignore
-        }
-
-        override fun afterTextChanged(text: Editable?) {
-            binding.apply {
-                when (text.isNullOrBlank()) {
-                    true ->
-                        if (buttonChatInputSend.isVisible) {
-                            buttonShowTaskList.isVisible = true
-                            buttonChatInputSend.isVisible = false
-                        }
-
-                    false -> {
-                        if (buttonShowTaskList.isVisible) {
-                            buttonShowTaskList.isVisible = false
-                            buttonChatInputSend.isVisible = true
-                        }
-                    }
-                }
-            }
         }
     }
 

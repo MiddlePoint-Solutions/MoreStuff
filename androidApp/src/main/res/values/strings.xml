@@ -60,6 +60,9 @@
     <string name="page_title_tomorrow">Tomorrow</string>
     <string name="page_title_later">Later</string>
     <string name="textfield_desc">Text Input</string>
+    <string name="priority_today">Today</string>
+    <string name="priority_tomorrow">Tomorrow</string>
+    <string name="priority_later">Later</string>
 
 
 </resources>
