@@ -7,12 +7,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.isVisible
 import androidx.core.view.iterator
 import androidx.fragment.app.ListFragment
@@ -33,7 +27,6 @@ import co.softov.morestuff.android.presentation.content.adapter.ChatAdapter
 import co.softov.morestuff.android.presentation.content.adapter.view_holder.ChatViewHolderFactory
 import co.softov.morestuff.android.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.android.presentation.list.ListsFragment
-import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -143,7 +136,10 @@ class ContentFragment : BaseFragment() {
     private fun setupChatInput() {
 
         binding.composeChatInput.viewMigration {
-            UserInput()
+            UserTextInput(
+                listAction = {},
+                sendAction = {}
+            )
         }
 
         binding.apply {
@@ -156,28 +152,6 @@ class ContentFragment : BaseFragment() {
                     editChatInput.text = null
                 }
             }
-        }
-    }
-
-    @Composable
-    private fun UserInput() {
-        // TODO: continue with user input
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TextField(
-                value = "",
-                onValueChange = {},
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-
-    @Preview
-    @Composable
-    private fun ChatInputPreview() {
-        MoreStuffTheme {
-            UserInput()
         }
     }
 

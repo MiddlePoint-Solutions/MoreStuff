@@ -34,6 +34,7 @@ fun MoreStuffTheme(
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
+        typography = MoreStuffTypography,
         content = content
     )
 }

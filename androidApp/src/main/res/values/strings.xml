@@ -59,6 +59,7 @@
     <string name="page_title_today">Today</string>
     <string name="page_title_tomorrow">Tomorrow</string>
     <string name="page_title_later">Later</string>
+    <string name="textfield_desc">Text Input</string>
 
 
 </resources>
