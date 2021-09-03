@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list
+package co.softov.morestuff.android.presentation.schedule_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWith
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasks
-import co.softov.morestuff.android.presentation.list.model.*
+import co.softov.morestuff.android.presentation.schedule_list.model.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber

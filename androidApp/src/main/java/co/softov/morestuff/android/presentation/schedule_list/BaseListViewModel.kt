@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list
+package co.softov.morestuff.android.presentation.schedule_list
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel

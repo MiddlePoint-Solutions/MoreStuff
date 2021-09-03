@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list.model
+package co.softov.morestuff.android.presentation.schedule_list.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list
+package co.softov.morestuff.android.presentation.schedule_list
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
-import co.softov.morestuff.android.presentation.list.model.Page
-import co.softov.morestuff.android.presentation.list.schedule.TaskListItem
+import co.softov.morestuff.android.presentation.schedule_list.model.Page
+import co.softov.morestuff.android.presentation.schedule_list.schedule.TaskListItem
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 

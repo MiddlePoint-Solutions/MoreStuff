@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list.model
+package co.softov.morestuff.android.presentation.schedule_list.model
 
 import co.softov.morestuff.android.domain.model.Task
 import kotlinx.datetime.toLocalDateTime

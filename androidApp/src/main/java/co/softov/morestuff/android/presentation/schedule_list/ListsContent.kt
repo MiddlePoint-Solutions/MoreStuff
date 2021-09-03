@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list
+package co.softov.morestuff.android.presentation.schedule_list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,9 +8,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.presentation.list.model.Page
-import co.softov.morestuff.android.presentation.list.model.PageType
-import co.softov.morestuff.android.presentation.list.model.title
+import co.softov.morestuff.android.presentation.schedule_list.model.Page
+import co.softov.morestuff.android.presentation.schedule_list.model.PageType
+import co.softov.morestuff.android.presentation.schedule_list.model.title
 import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch

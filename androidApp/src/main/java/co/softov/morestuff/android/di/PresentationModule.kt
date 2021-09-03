@@ -2,8 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.presentation.content.ContentConductor
 import co.softov.morestuff.android.presentation.content.ContentViewModel
-import co.softov.morestuff.android.presentation.list.model.Page
-import co.softov.morestuff.android.presentation.list.SchedulePageViewModel
+import co.softov.morestuff.android.presentation.schedule_list.model.Page
+import co.softov.morestuff.android.presentation.schedule_list.SchedulePageViewModel
 import co.softov.morestuff.android.presentation.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module

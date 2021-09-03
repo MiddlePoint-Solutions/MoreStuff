@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.list
+package co.softov.morestuff.android.presentation.schedule_list
 
 import android.app.Dialog
 import android.os.Bundle
