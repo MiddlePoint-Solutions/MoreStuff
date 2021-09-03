@@ -10,32 +10,16 @@
         android:id="@+id/recyclerChatMessages"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/dashboard_compact"
+        android:layout_above="@+id/composeUserInput"
         android:background="@color/colorPrimaryDark"
         tools:listitem="@layout/chat_item_user" />
 
-    <LinearLayout
-        android:id="@+id/dashboard_compact"
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/composeUserInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="@dimen/chat_input_actions_height"
         android:layout_alignParentBottom="true"
-        android:backgroundTint="@color/colorPrimary"
-        android:elevation="2dp"
-        android:orientation="vertical">
+        />
 
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/composePriorityConfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/chat_input_actions_height"
-            />
-
-        <androidx.compose.ui.platform.ComposeView
-            android:id="@+id/composeChatInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/chat_input_text_height"
-            />
-
-    </LinearLayout>
 </RelativeLayout>

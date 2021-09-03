@@ -27,14 +27,12 @@ import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
@@ -43,7 +41,6 @@ import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
 var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
-
 
 @Composable
 fun UserTextInput(
@@ -158,7 +155,7 @@ fun UserPriorityInput(
     val priorityButtons = listOf(Priority.Today(), Priority.Tomorrow(), Priority.Later())
 
     Surface(
-        elevation = 4.dp
+        elevation = 8.dp
     ) {
         Row {
             priorityButtons.forEach {
@@ -212,15 +209,27 @@ private fun PriorityButton(
     }
 }
 
+/*
+    PREVIEWS
+ */
+
 @Preview
 @Composable
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         UserPriorityInput(
             currentPriority = Priority.Today()
-        ) {
+        ) {}
+    }
+}
 
-        }
+@Preview
+@Composable
+fun UserPriorityInputPreview() {
+    MoreStuffTheme {
+        UserPriorityInput(
+            currentPriority = Priority.Today()
+        ) {}
     }
 }
 

@@ -8,6 +8,7 @@ import android.view.View
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CornerSize
@@ -103,34 +104,29 @@ class ContentFragment : BaseFragment() {
 
     private fun initViews() {
         setupChatList()
-        setupChatInput()
         setupPriorities()
     }
 
     private fun setupPriorities() {
-        binding.composePriorityConfig.viewMigration {
+        binding.composeUserInput.viewMigration {
             val state by viewModel.uiState.collectAsState()
 
-            UserPriorityInput(
-                currentPriority = state.priority
-            ) {
-                when (it) {
-                    is Later -> viewModel.selectedLaterPriority()
-                    is Today -> viewModel.selectedTodayPriority()
-                    is Tomorrow -> viewModel.selectedTomorrowPriority()
+            Column {
+                UserPriorityInput(
+                    currentPriority = state.priority
+                ) {
+                    when (it) {
+                        is Later -> viewModel.selectedLaterPriority()
+                        is Today -> viewModel.selectedTodayPriority()
+                        is Tomorrow -> viewModel.selectedTomorrowPriority()
+                    }
                 }
+
+                UserTextInput(
+                    listAction = viewModel::showTaskList,
+                    sendAction = viewModel::addNewTask
+                )
             }
-        }
-    }
-
-
-
-    private fun setupChatInput() {
-        binding.composeChatInput.viewMigration {
-            UserTextInput(
-                listAction = viewModel::showTaskList,
-                sendAction = viewModel::addNewTask
-            )
         }
     }
 
