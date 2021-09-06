@@ -79,8 +79,7 @@ val dataModule = module {
     // Platform specific use-cases
     factory<GetPagedMessages> {
         GetPagedMessagesImpl(
-            database = get(),
-            mapMessageDb = makeMessageDbMapper()
+            database = get()
         )
     }
 

@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -17,13 +18,19 @@ private val LightColors = lightColors(
     error = Red800
 )
 
+val Colors.userChatItem: Color
+    get() = Indigo400
+
+val Colors.appChatItem: Color
+    get() = Indigo200
+
 private val DarkColors = darkColors(
     primary = BlueGray600,
     primaryVariant = BlueGray900,
     onPrimary = Color.White,
     secondary = Orange500,
     secondaryVariant = Orange600,
-    onSecondary = Color.Black,
+    onSecondary = Color.White,
     error = Red200
 )
 

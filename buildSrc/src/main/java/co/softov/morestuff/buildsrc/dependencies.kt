@@ -42,11 +42,12 @@ object Libs {
     }
 
     object Sqldelight {
-        const val version = "1.5.0"
+        const val version = "1.5.1"
         const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$version"
         const val androidDriver = "com.squareup.sqldelight:android-driver:$version"
         const val coroutinesJvmExt = "com.squareup.sqldelight:coroutines-extensions-jvm:$version"
         const val androidPagingExt = "com.squareup.sqldelight:android-paging-extensions:$version"
+        const val androidPaging3Ext = "com.squareup.sqldelight:android-paging3-extensions:$version"
 
         object Test {
             const val sqlDriver = "com.squareup.sqldelight:sqlite-driver:$version"
@@ -86,7 +87,7 @@ object Libs {
     object AndroidX {
         const val appcompat = "androidx.appcompat:appcompat:1.3.0"
         const val palette = "androidx.palette:palette:1.0.0"
-        const val pagingKtx = "androidx.paging:paging-runtime-ktx:2.1.2"
+        const val pagingKtx = "androidx.paging:paging-runtime-ktx:3.0.1"
         const val preferenceKtx = "androidx.preference:preference-ktx:1.1.1"
         const val workKtx = "androidx.work:work-runtime-ktx:2.5.0-beta02"
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
@@ -115,7 +116,7 @@ object Libs {
 
         object Compose {
             const val snapshot = ""
-            const val version = "1.0.1"
+            const val version = "1.0.2"
 
             @get:JvmStatic
             val snapshotUrl: String
@@ -126,6 +127,7 @@ object Libs {
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
             const val layout = "androidx.compose.foundation:foundation-layout:$version"
+            const val paging = "androidx.paging:paging-compose:1.0.0-alpha12"
 
             const val ui = "androidx.compose.ui:ui:$version"
             const val animation = "androidx.compose.animation:animation:$version"

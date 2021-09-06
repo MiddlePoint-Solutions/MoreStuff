@@ -1,30 +1,29 @@
 package co.softov.morestuff.android.domain.usecase.message
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
+import co.softov.morestuff.android.data.mapper.MessageData
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Result
 import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.db.StuffDb
-import com.squareup.sqldelight.android.paging.QueryDataSourceFactory
+import com.squareup.sqldelight.android.paging3.QueryPagingSource
 
 interface GetPagedMessages {
-    suspend operator fun invoke(): SimpleResult<PagedMessagesResult>
+    operator fun invoke(): PagedMessagesResult
 }
 
-typealias PagedMessagesResult = DataSource.Factory<Int, Message>
+typealias PagedMessagesResult = PagingSource<Long, MessageData>
 
 class GetPagedMessagesImpl(
-    private val database: StuffDb,
-    private val mapMessageDb: MessageDbMapper
+    private val database: StuffDb
 ) : GetPagedMessages {
-    override suspend fun invoke(): SimpleResult<PagedMessagesResult> {
-        val result = QueryDataSourceFactory(
+    override fun invoke(): PagedMessagesResult {
+        return QueryPagingSource(
             queryProvider = database.messageQueries::pageMessages,
             countQuery = database.messageQueries.countMessages(),
             transacter = database.messageQueries
-        ).map { mapMessageDb(it) }
-        return Result.Success(result)
+        )
     }
 } 
 

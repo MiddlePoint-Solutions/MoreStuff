@@ -19,6 +19,7 @@ interface MessageRepository {
     ): SimpleResult<Message>
 
     suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)
+
 }
 
 object MessageDoesNotExist : Failure.FeatureFailure()

@@ -1,28 +1,33 @@
 package co.softov.morestuff.android.presentation.content
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.iterator
 import androidx.fragment.app.ListFragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.presentation.extension.observe
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.app.util.LifecycleValue
 import co.softov.morestuff.android.databinding.FragmentContentBinding
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.Priority.*
 import co.softov.morestuff.android.presentation.Screens
 import co.softov.morestuff.android.presentation.compose.viewMigration
 import co.softov.morestuff.android.presentation.content.adapter.ChatAdapter
-import co.softov.morestuff.android.presentation.content.adapter.view_holder.ChatViewHolderFactory
+import co.softov.morestuff.android.presentation.content.adapter.view_holder.AppChatItem
+import co.softov.morestuff.android.presentation.content.adapter.view_holder.UserChatItem
 import co.softov.morestuff.android.presentation.dashboard.options.DatePickerFragment
 import co.softov.morestuff.android.presentation.schedule_list.ListsFragment
 import com.github.terrakok.cicerone.Router
@@ -35,6 +40,13 @@ class ContentFragment : BaseFragment() {
 
     private val viewModel: ContentViewModel by viewModel {
         parametersOf(conductor)
+    }
+
+    val actions by lazy {
+        ChatActions(
+            confirmationAction = viewModel::userSelectedPriorityOption,
+            scheduleAction = viewModel::scheduleResponse
+        )
     }
 
     private val conductor = object : ContentConductor {
@@ -75,13 +87,37 @@ class ContentFragment : BaseFragment() {
     override val layoutResourceId: Int
         get() = R.layout.fragment_content
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(inflater.context).apply {
+            viewMigration {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+
+                    MessagesList(
+                        actions = actions,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    UserInput(
+                        modifier = Modifier.weight(1f)
+                    )
+
+                }
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentContentBinding.bind(view)
+//        binding = FragmentContentBinding.bind(view)
         setHasOptionsMenu(true)
-        initViews()
-        viewModel.loadData()
-        observe(viewModel.uiState, ::onStateChange)
+//        initViews()
     }
 
     override fun onBackPressed() {
@@ -95,24 +131,33 @@ class ContentFragment : BaseFragment() {
 
     private fun setupPriorities() {
         binding.composeUserInput.viewMigration {
-            val state by viewModel.uiState.collectAsState()
+            UserInput()
+        }
+    }
 
-            Column {
-                UserPriorityInput(
-                    currentPriority = state.priority
-                ) {
-                    when (it) {
-                        is Later -> viewModel.selectedLaterPriority()
-                        is Today -> viewModel.selectedTodayPriority()
-                        is Tomorrow -> viewModel.selectedTomorrowPriority()
-                    }
+    @Composable
+    private fun UserInput(
+        modifier: Modifier = Modifier
+    ) {
+        val state by viewModel.priorityState.collectAsState()
+
+        Column(
+            modifier = modifier
+        ) {
+            UserPriorityInput(
+                currentPriority = state
+            ) {
+                when (it) {
+                    is Later -> viewModel.selectedLaterPriority()
+                    is Today -> viewModel.selectedTodayPriority()
+                    is Tomorrow -> viewModel.selectedTomorrowPriority()
                 }
-
-                UserTextInput(
-                    listAction = viewModel::showTaskList,
-                    sendAction = viewModel::addNewTask
-                )
             }
+
+            UserTextInput(
+                listAction = viewModel::showTaskList,
+                sendAction = viewModel::addNewTask
+            )
         }
     }
 
@@ -122,7 +167,11 @@ class ContentFragment : BaseFragment() {
             scheduleAction = viewModel::scheduleResponse
         )
 
-        val factory = ChatViewHolderFactory(actions)
+        binding.composeChat.viewMigration {
+            MessagesList(actions)
+        }
+
+        /*val factory = ChatViewHolderFactory(actions)
 
         chatAdapter = ChatAdapter(factory)
         chatAdapter.setHasStableIds(true)
@@ -138,16 +187,37 @@ class ContentFragment : BaseFragment() {
             layoutManager.stackFromEnd = false
             layoutManager.reverseLayout = true
             recyclerChatMessages.layoutManager = layoutManager
+        }*/
+    }
+
+    @Composable
+    private fun MessagesList(
+        actions: ChatActions,
+        modifier: Modifier = Modifier
+    ) {
+        val pager = remember { viewModel.messagePager }
+
+        val lazyPagingItems = pager.collectAsLazyPagingItems()
+
+        LazyColumn(
+            modifier = modifier,
+            reverseLayout = true,
+            verticalArrangement = Arrangement.Top
+        ) {
+            items(
+                lazyPagingItems,
+                key = { item -> item.id }
+            ) { item ->
+                when (item?.contentType) {
+                    ContentType.USER_NEW_TASK -> UserChatItem(message = item)
+                    ContentType.CONFIRM_NEW_TASK,
+                    ContentType.TASK_REMINDER -> AppChatItem(message = item, actions = actions)
+                }
+            }
         }
     }
 
-    private fun onStateChange(state: ContentViewState) {
-        state.data?.let {
-            chatAdapter.submitList(it)
-        }
-    }
-
-    inner class AdapterDataObserver : RecyclerView.AdapterDataObserver() {
+    /*inner class AdapterDataObserver : RecyclerView.AdapterDataObserver() {
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
             if (positionStart == 0) {
@@ -158,7 +228,7 @@ class ContentFragment : BaseFragment() {
         private fun scrollToCurrentMessage() {
             binding.recyclerChatMessages.scrollToPosition(0)
         }
-    }
+    }*/
 
     private fun showMainSettings() {
         router.navigateTo(Screens.Settings, clearContainer = false)

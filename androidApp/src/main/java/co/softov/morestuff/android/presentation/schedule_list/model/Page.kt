@@ -13,8 +13,6 @@ enum class PageType {
     PAGE_ACTIVE_LATER
 }
 
-data class Page(val type: PageType)
-
 val PageType.title
     @Composable get() = when(this) {
         PageType.PAGE_ACTIVE_TASKS -> stringResource(id = R.string.page_title_active)
@@ -25,7 +23,7 @@ val PageType.title
         PageType.PAGE_ACTIVE_LATER -> stringResource(id = R.string.page_title_later)
     }
 
-val Page.title
+/*val Page.title
     @Composable get() = when (this.type) {
         PageType.PAGE_ACTIVE_TASKS -> stringResource(id = R.string.page_title_active)
         PageType.PAGE_COMPLETE_TASKS -> stringResource(id = R.string.page_title_complete)
@@ -33,5 +31,5 @@ val Page.title
         PageType.PAGE_ACTIVE_TODAY -> stringResource(id = R.string.page_title_today)
         PageType.PAGE_ACTIVE_TOMORROW -> stringResource(id = R.string.page_title_tomorrow)
         PageType.PAGE_ACTIVE_LATER -> stringResource(id = R.string.page_title_later)
-    }
+    }*/
 

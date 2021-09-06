@@ -9,9 +9,6 @@ import java.util.*
 
 abstract class BaseChatItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    abstract fun bind(item: Message)
+    abstract fun bind(message: Message)
 
-    protected fun getStartTimeText(time: String): String =
-        SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT)
-            .format(Date(time.toEpochMilliseconds))
 }

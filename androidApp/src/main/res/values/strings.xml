@@ -63,6 +63,7 @@
     <string name="priority_today">Today</string>
     <string name="priority_tomorrow">Tomorrow</string>
     <string name="priority_later">Later</string>
+    <string name="done">Done</string>
 
 
 </resources>

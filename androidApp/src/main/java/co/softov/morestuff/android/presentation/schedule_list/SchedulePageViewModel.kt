@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SchedulePageViewModel(
-    private val page: Page,
+    private val page: PageType,
     private val getSchedules: GetSchedulesWithTitle,
     private val getLaterSchedules: GetLaterSchedulesWithTitle,
     private val getTodaySchedules: GetTodaySchedulesWithTitle,
@@ -33,7 +33,7 @@ class SchedulePageViewModel(
     init {
         Timber.d("Page: $page")
         viewModelScope.launch {
-            when (page.type) {
+            when (page) {
                 PageType.PAGE_ACTIVE_SCHEDULES -> {
                     getSchedules()
                         .map { scheduleItemMapper.map(it) }

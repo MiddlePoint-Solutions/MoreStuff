@@ -104,6 +104,7 @@ dependencies {
     implementation(Libs.AndroidX.Compose.tooling)
     implementation(Libs.AndroidX.Compose.animation)
     implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
+    implementation(Libs.AndroidX.Compose.paging)
 
     implementation(Libs.Accompanist.insets)
     implementation(Libs.Accompanist.insetsUi)
@@ -118,6 +119,7 @@ dependencies {
     implementation(Libs.Sqldelight.androidDriver)
     implementation(Libs.Sqldelight.coroutinesJvmExt)
     implementation(Libs.Sqldelight.androidPagingExt)
+    implementation(Libs.Sqldelight.androidPaging3Ext)
     testImplementation(Libs.Sqldelight.Test.sqlDriver)
 
     testImplementation("org.xerial:sqlite-jdbc:3.8.10.2") {

@@ -8,7 +8,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.presentation.schedule_list.model.Page
 import co.softov.morestuff.android.presentation.schedule_list.model.PageType
 import co.softov.morestuff.android.presentation.schedule_list.model.title
 import co.softov.morestuff.android.presentation.theme.MoreStuffTheme
@@ -22,7 +21,7 @@ val pages = listOf(
     PageType.PAGE_ACTIVE_LATER,
     PageType.PAGE_COMPLETE_TASKS,
     PageType.PAGE_ACTIVE_TASKS
-).map { Page(it) }
+)
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -48,7 +47,7 @@ fun ListsContent(
 @Composable
 private fun ScheduleTabs(
     pagerState: PagerState,
-    pages: List<Page>
+    pages: List<PageType>
 ) {
     val coroutineScope = rememberCoroutineScope()
     ScrollableTabRow(

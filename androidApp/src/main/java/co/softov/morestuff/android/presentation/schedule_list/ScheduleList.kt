@@ -15,13 +15,13 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
-import co.softov.morestuff.android.presentation.schedule_list.model.Page
+import co.softov.morestuff.android.presentation.schedule_list.model.PageType
 import co.softov.morestuff.android.presentation.schedule_list.schedule.TaskListItem
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ScheduleList(page: Page) {
+fun ScheduleList(page: PageType) {
     // TODO: Remove LifecycleViewModelStoreOwner once Koin has a fix for multiple instances of the same ViewModel
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     CompositionLocalProvider(
