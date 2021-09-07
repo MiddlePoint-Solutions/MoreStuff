@@ -1,11 +1,11 @@
 package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
-import co.softov.morestuff.android.presentation.content.ContentConductor
-import co.softov.morestuff.android.presentation.content.ContentViewModel
-import co.softov.morestuff.android.presentation.schedule_list.SchedulePageViewModel
-import co.softov.morestuff.android.presentation.schedule_list.model.PageType
-import co.softov.morestuff.android.presentation.settings.SettingsViewModel
+import co.softov.morestuff.android.ui.main.ContentConductor
+import co.softov.morestuff.android.ui.main.ContentViewModel
+import co.softov.morestuff.android.ui.list.SchedulePageViewModel
+import co.softov.morestuff.android.ui.list.model.PageType
+import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

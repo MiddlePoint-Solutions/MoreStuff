@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
-import co.softov.morestuff.android.presentation.Screens
+import co.softov.morestuff.android.ui.Screens
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
@@ -24,8 +24,12 @@ class MainActivity : AppCompatActivity() {
         get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        WindowCompat.setDecorFitsSystemWindows(window, true)
         super.onCreate(savedInstanceState)
+
+        // Turn off the decor fitting system windows, which allows us to handle insets,
+        // including IME animations
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
