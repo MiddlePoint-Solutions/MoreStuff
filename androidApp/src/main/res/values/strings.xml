@@ -64,6 +64,7 @@
     <string name="priority_tomorrow">Tomorrow</string>
     <string name="priority_later">Later</string>
     <string name="done">Done</string>
+    <string name="new_messages">New Messages</string>
 
 
 </resources>

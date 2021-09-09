@@ -16,7 +16,8 @@ val presentationModule = module {
         ContentViewModel(
             conductor = conductor,
             messageMap = makeMessageDbMapper(),
-            getPagedMessages = get()
+            getPagedMessages = get(),
+            getMessages = get()
         )
     }
 

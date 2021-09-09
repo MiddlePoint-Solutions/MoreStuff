@@ -1,26 +1,30 @@
 package co.softov.morestuff.android.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import androidx.paging.map
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
+import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
 import com.github.terrakok.cicerone.Router
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class ContentViewModel(
     private val getPagedMessages: GetPagedMessages,
+    private val getMessages: GetMessages,
     private val messageMap: MessageDbMapper,
     private var conductor: ContentConductor?
 ) : ViewModel(), KoinComponent {
@@ -28,15 +32,26 @@ class ContentViewModel(
     private val store: AppStore by inject()
     private val router: Router by inject()
 
-    private val _priorityState = MutableStateFlow<Priority>(Priority.Today())
+    private val _messages = MutableStateFlow<List<Message>>(listOf())
+    val messages: StateFlow<List<Message>>
+        get() = _messages
 
+    private val _priorityState = MutableStateFlow<Priority>(Priority.Today())
     val priorityState: StateFlow<Priority>
         get() = _priorityState
 
-    val messagePager = Pager(PagingConfig(pageSize = 20)) {
+    val messagePager = Pager(PagingConfig(pageSize = 100)) {
         getPagedMessages()
     }.flow.map { messageData ->
         messageData.map { message -> messageMap(message) }
+    }.cachedIn(viewModelScope)
+
+    init {
+        viewModelScope.launch {
+            getMessages()
+                .onEach { _messages.value = it }
+                .launchIn(this)
+        }
     }
 
     /*fun onReduceState(event: ContentViewEvent): ContentViewState {

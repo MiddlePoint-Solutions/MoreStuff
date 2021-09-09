@@ -2,6 +2,7 @@ package co.softov.morestuff.android.data.repository
 
 
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
+import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Result.Failure
@@ -10,6 +11,10 @@ import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.db.StuffDb
+import com.squareup.sqldelight.runtime.coroutines.asFlow
+import com.squareup.sqldelight.runtime.coroutines.mapToList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class MessageRepositoryImpl(
     database: StuffDb,
@@ -18,6 +23,10 @@ class MessageRepositoryImpl(
 
     private val messageQueries = database.messageQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
+
+    override suspend fun getAllMessages(): Flow<List<Message>> {
+        return messageQueries.selectAll().asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
+    }
 
     override suspend fun getMessage(messageId: Long): SimpleResult<Message> {
         return when (val message =

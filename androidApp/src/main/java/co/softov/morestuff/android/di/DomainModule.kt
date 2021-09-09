@@ -134,6 +134,7 @@ val scheduleUseCases = module {
 }
 
 val messageUseCases = module {
+    factory<GetMessages> { GetMessagesImpl(messageRepository = get()) }
     factory<CreateMessageUseCase> { CreateMessageUseCaseImpl(messageRepository = get()) }
     factory<GetMessageUseCase> { GetMessageImpl(messageRepository = get()) }
     factory<CreateTaskMessageUseCase> {

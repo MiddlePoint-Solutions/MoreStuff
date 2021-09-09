@@ -9,7 +9,7 @@ object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
-        private const val version = "0.17.0"
+        private const val version = "0.18.0"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val insetsUi = "com.google.accompanist:accompanist-insets-ui:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"

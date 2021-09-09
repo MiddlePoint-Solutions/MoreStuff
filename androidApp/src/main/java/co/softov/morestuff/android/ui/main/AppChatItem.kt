@@ -17,57 +17,59 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.appChatItem
 
 @Composable
-fun AppChatItem(message: Message, actions: ChatActions) {
+fun AppChatItem(message: Message) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(end = 45.dp),
         horizontalArrangement = Arrangement.Start
     ) {
-        Column(
-            modifier = Modifier.padding(start = 10.dp, top = 4.dp, bottom = 4.dp)
+        Surface(
+            modifier = Modifier.padding(start = 10.dp, top = 4.dp, bottom = 4.dp),
+            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+            color = MaterialTheme.colors.appChatItem,
+            contentColor = contentColorFor(MaterialTheme.colors.primary)
         ) {
+            Text(modifier = Modifier.padding(8.dp), text = message.content)
+        }
+    }
+}
+
+@Composable
+fun TaskReminderItem(message: Message, actions: ChatActions) {
+    Column {
+        AppChatItem(message)
+
+        if (message.replyType == null) {
+            Row(modifier = Modifier.padding(start = 15.dp)) {
+                Button(onClick = {
+                    actions.scheduleAction(message.scheduleId, ReplyType.SNOOZE)
+                }) {
+                    Text(text = stringResource(id = R.string.chat_action_today))
+                }
+
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Button(onClick = {
+                    actions.scheduleAction(message.scheduleId, ReplyType.TOMORROW)
+                }) {
+                    Text(text = stringResource(id = R.string.chat_action_tomorrow))
+                }
+
+                Spacer(modifier = Modifier.padding(8.dp))
+
+                Button(onClick = {
+                    actions.scheduleAction(message.scheduleId, ReplyType.DONE)
+                }) {
+                    Text(text = stringResource(id = R.string.done))
+                }
+            }
+        } else if (message.replyContent.isNullOrBlank().not()) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                color = MaterialTheme.colors.appChatItem,
                 contentColor = contentColorFor(MaterialTheme.colors.primary)
             ) {
-                Text(modifier = Modifier.padding(8.dp), text = message.content)
-            }
-
-            if (message.contentType == ContentType.TASK_REMINDER) {
-                if (message.replyType == null) {
-                    Row(modifier = Modifier.padding(start = 15.dp)) {
-                        Button(onClick = {
-                            actions.scheduleAction(message.scheduleId, ReplyType.SNOOZE)
-                        }) {
-                            Text(text = stringResource(id = R.string.chat_action_today))
-                        }
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Button(onClick = {
-                            actions.scheduleAction(message.scheduleId, ReplyType.TOMORROW)
-                        }) {
-                            Text(text = stringResource(id = R.string.chat_action_tomorrow))
-                        }
-
-                        Spacer(modifier = Modifier.padding(8.dp))
-
-                        Button(onClick = {
-                            actions.scheduleAction(message.scheduleId, ReplyType.DONE)
-                        }) {
-                            Text(text = stringResource(id = R.string.done))
-                        }
-                    }
-                } else if (message.replyContent.isNullOrBlank().not()) {
-                    Surface(
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                        contentColor = contentColorFor(MaterialTheme.colors.primary)
-                    ) {
-                        Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
-                    }
-                }
+                Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
             }
         }
     }
@@ -76,17 +78,18 @@ fun AppChatItem(message: Message, actions: ChatActions) {
 @Preview
 @Composable
 fun AppChatItemPreview() {
-    val chatActions = ChatActions(confirmationAction = { _, _ -> }, scheduleAction = { _, _ -> })
+
     MoreStuffTheme(darkTheme = true) {
         AppChatItem(
-            message = MockData.Message.userNewTask.copy(contentType = ContentType.TASK_REMINDER),
-            chatActions
+            message = MockData.Message.userNewTask.copy(contentType = ContentType.TASK_REMINDER)
         )
     }
 }
 
 
 object MockData {
+
+    val chatActions = ChatActions(confirmationAction = { _, _ -> }, scheduleAction = { _, _ -> })
 
     object Message {
 
