@@ -115,6 +115,7 @@ dependencies {
     implementation(Libs.Accompanist.pagerIndicators)
 
     // Firebase
+    implementation(platform(Libs.Firebase.bom))
     implementation(Libs.Firebase.crashlytics)
     implementation(Libs.Firebase.analytics)
 

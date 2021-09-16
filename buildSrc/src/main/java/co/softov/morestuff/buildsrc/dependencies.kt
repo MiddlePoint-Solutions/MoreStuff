@@ -55,9 +55,10 @@ object Libs {
     }
 
     object Firebase {
+        const val bom = "com.google.firebase:firebase-bom:28.4.1"
         const val gradlePlugin = "com.google.firebase:firebase-crashlytics-gradle:2.7.1"
-        const val crashlytics = "com.google.firebase:firebase-crashlytics:17.3.0"
-        const val analytics = "com.google.firebase:firebase-analytics:18.0.0"
+        const val crashlytics = "com.google.firebase:firebase-crashlytics-ktx"
+        const val analytics = "com.google.firebase:firebase-analytics-ktx"
     }
 
     object Google {
