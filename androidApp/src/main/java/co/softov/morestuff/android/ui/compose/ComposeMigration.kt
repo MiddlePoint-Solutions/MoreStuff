@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.ViewWindowInsetObserver
 
 /**
@@ -24,11 +25,13 @@ fun ComposeView.viewMigration(content: @Composable () -> Unit) {
         .start(windowInsetsAnimationsEnabled = true)
 
     setContent {
-        CompositionLocalProvider(
-            LocalWindowInsets provides windowInsets,
-        ) {
-            MoreStuffTheme {
-                content()
+        ProvideWindowInsets(consumeWindowInsets = false) {
+            CompositionLocalProvider(
+                LocalWindowInsets provides windowInsets,
+            ) {
+                MoreStuffTheme {
+                    content()
+                }
             }
         }
     }

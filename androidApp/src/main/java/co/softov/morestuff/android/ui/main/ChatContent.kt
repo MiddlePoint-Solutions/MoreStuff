@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.main
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,6 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,31 +21,12 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.navigationBarsWithImePadding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
-
-fun LazyListState.disableScrolling(scope: CoroutineScope) {
-    scope.launch {
-        scroll(scrollPriority = MutatePriority.PreventUserInput) {
-            // Await indefinitely, blocking scrolls
-            awaitCancellation()
-        }
-    }
-}
-
-fun LazyListState.reenableScrolling(scope: CoroutineScope) {
-    scope.launch {
-        scroll(scrollPriority = MutatePriority.PreventUserInput) {
-            // Do nothing, just cancel the previous indefinite "scroll"
-        }
-    }
-}
 
 @Composable
 fun ChatContent(
@@ -63,7 +44,6 @@ fun ChatContent(
         confirmationAction = { _, _ -> }
     )
 
-//    val pagingItems = viewModel.messagePager.collectAsLazyPagingItems()
     val messageItems = viewModel.messages.collectAsState()
 
     Surface(Modifier.navigationBarsPadding(bottom = false)) {
@@ -104,14 +84,11 @@ private fun Messages(
     modifier: Modifier = Modifier,
     scrollState: LazyListState
 ) {
-    Timber.d("ScrollState: ${scrollState.firstVisibleItemIndex}, offset: ${scrollState.firstVisibleItemScrollOffset}")
 
     val scope = rememberCoroutineScope()
     val itemsCount = remember { mutableStateOf(0) }
-    val enableAutoScroll = (pagingItems.size > itemsCount.value) && scrollState.firstVisibleItemIndex == 0
+    val enableAutoScroll = isAutoScrollingEnabled(pagingItems.size, itemsCount.value, scrollState)
     itemsCount.value = pagingItems.size
-
-    Timber.d("enableAutoScroll: $enableAutoScroll")
 
     Box(modifier = modifier) {
         LazyColumn(
@@ -165,6 +142,12 @@ private fun Messages(
         )
     }
 }
+
+private fun isAutoScrollingEnabled(
+    pagingItemsCount: Int,
+    itemsCount: Int,
+    scrollState: LazyListState
+) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
 
 private enum class Visibility {
     VISIBLE,

@@ -54,24 +54,6 @@ class ContentViewModel(
         }
     }
 
-    /*fun onReduceState(event: ContentViewEvent): ContentViewState {
-        return when (event) {
-            is ShowChatData -> state.copy(data = event.data)
-            is ChangePriority -> {
-                val priorityItems = when (event.priority) {
-                    is Priority.Today -> Priority.Today()
-                    is Priority.Tomorrow -> Priority.Tomorrow()
-                    is Priority.Later -> Priority.Later()
-                }
-
-                state.copy(
-                    priority = event.priority,
-                    currentTimeOptionId = 0
-                )
-            }
-        }
-    }*/
-
     fun addNewTask(title: String) {
         store.dispatch(CreateTaskAction(title, priorityState.value))
     }
@@ -90,10 +72,6 @@ class ContentViewModel(
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
-    }
-
-    fun userSelectedPriorityOption(taskId: Long, option: PriorityOption) {
-
     }
 
     fun showTaskList() {

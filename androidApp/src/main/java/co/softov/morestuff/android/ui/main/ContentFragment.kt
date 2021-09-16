@@ -3,11 +3,11 @@ package co.softov.morestuff.android.ui.main
 import android.os.Bundle
 import android.view.*
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.view.iterator
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
+import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.compose.viewMigration
 import co.softov.morestuff.android.ui.dashboard.options.DatePickerFragment
 import co.softov.morestuff.android.ui.list.ListsFragment
@@ -63,15 +63,11 @@ class ContentFragment : BaseFragment() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             viewMigration {
-                ChatContent(conductor)
+                MoreStuffScaffold(showSettings = ::showMainSettings) {
+                    ChatContent(conductor)
+                }
             }
         }
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
     }
 
     override fun onBackPressed() {
@@ -81,24 +77,5 @@ class ContentFragment : BaseFragment() {
     private fun showMainSettings() {
         router.navigateTo(Screens.Settings, clearContainer = false)
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu_main, menu)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        menu.iterator().forEach { it.isVisible = true }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        closeKeyboard()
-        when (item.itemId) {
-            R.id.option_settings -> {
-                showMainSettings()
-            }
-        }
-        return false
-    }
 }
-
 

@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.my_toolbar))
 
         if (savedInstanceState == null) {
             router.newRootScreen(Screens.Content)

@@ -5,7 +5,7 @@ object Versions {
 }
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.1"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.2"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
@@ -95,12 +95,11 @@ object Libs {
         const val coreKtx = "androidx.core:core-ktx:1.6.0"
 
         object Activity {
-            const val activityKtx = "androidx.activity:activity-ktx:1.2.0-beta02"
-            const val activityCompose = "androidx.activity:activity-compose:1.3.1"
+            const val activityKtx = "androidx.activity:activity-ktx:1.3.1"
         }
 
         object Fragment {
-            const val fragmentKtx = "androidx.fragment:fragment-ktx:1.2.5"
+            const val fragmentKtx = "androidx.fragment:fragment-ktx:1.3.6"
         }
 
         object Constraint {
@@ -115,8 +114,8 @@ object Libs {
         }
 
         object Compose {
-            const val snapshot = ""
-            const val version = "1.0.2"
+            private const val snapshot = ""
+            private const val version = "1.0.2"
 
             @get:JvmStatic
             val snapshotUrl: String
@@ -126,15 +125,18 @@ object Libs {
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
-            const val layout = "androidx.compose.foundation:foundation-layout:$version"
             const val paging = "androidx.paging:paging-compose:1.0.0-alpha12"
 
             const val ui = "androidx.compose.ui:ui:$version"
+            const val viewBinding = "androidx.compose.ui:ui-viewbinding:$version"
             const val animation = "androidx.compose.animation:animation:$version"
             const val material = "androidx.compose.material:material:$version"
             const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$version"
 
             const val tooling = "androidx.compose.ui:ui-tooling:$version"
+
+            const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
+            const val activityCompose = "androidx.activity:activity-compose:1.3.1"
 
             object Lifecycle {
                 const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
