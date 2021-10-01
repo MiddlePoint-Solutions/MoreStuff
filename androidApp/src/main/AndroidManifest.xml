@@ -46,10 +46,6 @@
             android:exported="false" />
 
         <receiver
-            android:name=".app.receiver.ScheduleReceiver"
-            android:exported="false" />
-
-        <receiver
             android:name=".app.receiver.NotificationReceiver"
             android:exported="false" />
 

@@ -53,7 +53,7 @@ fun ChatContent(
         ) {
 
             Messages(
-                pagingItems = messageItems.value,
+                messages = messageItems.value,
                 actions = chatActions,
                 modifier = Modifier.weight(1f),
                 scrollState = scrollState
@@ -79,7 +79,7 @@ private val JumpToBottomThreshold = 56.dp
 
 @Composable
 private fun Messages(
-    pagingItems: List<Message>,
+    messages: List<Message>,
     actions: ChatActions,
     modifier: Modifier = Modifier,
     scrollState: LazyListState
@@ -87,8 +87,8 @@ private fun Messages(
 
     val scope = rememberCoroutineScope()
     val itemsCount = remember { mutableStateOf(0) }
-    val enableAutoScroll = isAutoScrollingEnabled(pagingItems.size, itemsCount.value, scrollState)
-    itemsCount.value = pagingItems.size
+    val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount.value, scrollState)
+    itemsCount.value = messages.size
 
     Box(modifier = modifier) {
         LazyColumn(
@@ -98,7 +98,7 @@ private fun Messages(
             contentPadding = PaddingValues(bottom = 8.dp)
         ) {
             items(
-                pagingItems,
+                items = messages,
                 key = { item -> item.id }
             ) { item ->
                 when (item.contentType) {

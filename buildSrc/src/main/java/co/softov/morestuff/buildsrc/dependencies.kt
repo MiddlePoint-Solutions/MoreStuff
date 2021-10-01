@@ -90,7 +90,8 @@ object Libs {
         const val palette = "androidx.palette:palette:1.0.0"
         const val pagingKtx = "androidx.paging:paging-runtime-ktx:3.0.1"
         const val preferenceKtx = "androidx.preference:preference-ktx:1.1.1"
-        const val workKtx = "androidx.work:work-runtime-ktx:2.5.0-beta02"
+
+        const val workKtx = "androidx.work:work-runtime-ktx:2.6.0"
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
 
         const val coreKtx = "androidx.core:core-ktx:1.6.0"

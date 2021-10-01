@@ -19,35 +19,6 @@ val random = Random(3112)
 val randomRequestCode: Int
     get() = ((System.currentTimeMillis() + random.nextInt()) / 1000).toInt()
 
-fun ScheduleReceiver.Companion.createReminderIntent(
-    context: Context,
-    scheduleId: Long
-): PendingIntent =
-    Intent(context, ScheduleReceiver::class.java)
-        .setAction(ACTION_CREATE_REMINDER_SCHEDULE)
-        .setScheduleIdExtra(scheduleId)
-        .let {
-            // Use schedule id for reminder intent so it can be referenced later.
-            PendingIntent.getBroadcast(context, scheduleId.toInt(), it, 0)
-        }
-
-fun ScheduleReceiver.Companion.cancelReminderIntent(
-    context: Context,
-    scheduleId: Long
-) =
-    Intent(context, ScheduleReceiver::class.java)
-        .setAction(ACTION_CREATE_REMINDER_SCHEDULE)
-        .setScheduleIdExtra(scheduleId)
-        .let {
-            // Use schedule id to cancel.
-            PendingIntent.getBroadcast(
-                context,
-                scheduleId.toInt(),
-                it,
-                PendingIntent.FLAG_UPDATE_CURRENT
-            )
-        }.cancel()
-
 fun NotificationReceiver.Companion.createReplyIntent(
     context: Context,
     scheduleId: Long,

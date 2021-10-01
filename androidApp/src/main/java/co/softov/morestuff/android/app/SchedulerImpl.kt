@@ -23,18 +23,17 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         val delayTimeMillis =
             scheduleTime.toEpochMilliseconds - TimeUtils.currentUtcInstant.toEpochMilliseconds()
 
-        val workConstraints =
-            Constraints.Builder().apply {
-                setTriggerContentMaxDelay(1, TimeUnit.SECONDS)
-            }.build()
+        val workConstraints = Constraints.Builder().apply {
+            setTriggerContentMaxDelay(1, TimeUnit.MINUTES)
+        }.build()
 
-        val work = OneTimeWorkRequestBuilder<ScheduleWorker>()
-            .setInitialDelay(delayTimeMillis, TimeUnit.MILLISECONDS)
-            .setConstraints(workConstraints)
-            .setInputData(data)
-            .addTag(getScheduleWorkTag(scheduleId))
-            .build()
-
+        val work = OneTimeWorkRequestBuilder<ScheduleWorker>().apply {
+            setInitialDelay(delayTimeMillis, TimeUnit.MILLISECONDS)
+            setConstraints(workConstraints)
+            setInputData(data)
+            addTag(getScheduleWorkTag(scheduleId))
+        }.build()
+        
         workManager.enqueue(work)
     }
 
