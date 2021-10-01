@@ -21,12 +21,12 @@ repositories {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 31
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         minSdk = 24
-        targetSdk = 30
-        versionCode = 2
+        targetSdk = 31
+        versionCode = 3
         versionName = "0.2.0"
     }
     buildTypes {
