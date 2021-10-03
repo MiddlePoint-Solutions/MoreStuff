@@ -16,14 +16,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.koin.dsl.module
 import org.koin.test.KoinTest
-import org.koin.test.KoinTestRule
 import org.koin.test.get
-import org.koin.test.mock.MockProviderRule
 import org.mockito.Mockito
 
 class TaskMiddlewareTest : KoinTest {
 
-    @get:Rule
+    /*@get:Rule
     val koinTestRule = KoinTestRule.create {
 
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
@@ -41,7 +39,7 @@ class TaskMiddlewareTest : KoinTest {
     @get:Rule
     val mockProvider = MockProviderRule.create { clazz ->
         Mockito.mock(clazz.java)
-    }
+    }*/
 
     private val title = "Test"
     private val testTask = Task(0, title, "")

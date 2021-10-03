@@ -21,11 +21,11 @@ repositories {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 30
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 30
         versionCode = 3
         versionName = "0.2.0"
     }
@@ -141,6 +141,7 @@ dependencies {
     implementation(Libs.Koin.androidCompat)
     implementation(Libs.Koin.androidxCompose)
     testImplementation(Libs.Koin.test)
+    testImplementation(Libs.Koin.testJunit)
 
     // Testing
     testImplementation(Libs.Test.junit)

@@ -1,9 +1,5 @@
 package co.softov.morestuff.buildsrc
 
-object Versions {
-    const val ktlint = "0.41.0"
-}
-
 object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.2"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
@@ -74,6 +70,7 @@ object Libs {
         const val androidxCompose = "io.insert-koin:koin-androidx-compose:$version"
 
         const val test = "io.insert-koin:koin-test:$version"
+        const val testJunit = "io.insert-koin:koin-test-junit5:$version"
     }
 
     object Test {

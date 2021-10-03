@@ -33,12 +33,7 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation("junit:junit:4.13.2")
-            }
-        }
-
+        val androidMain by getting
         val iosMain by getting
     }
 }
@@ -47,7 +42,7 @@ android {
     compileSdk = 30
 
     defaultConfig {
-        minSdk = 23
+        minSdk = 24
         targetSdk = 30
     }
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")

@@ -6,8 +6,8 @@ buildscript {
     }
 
     dependencies {
-        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.androidGradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.Google.googleServices)
         classpath(co.softov.morestuff.buildsrc.Libs.Firebase.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.Sqldelight.gradlePlugin)
