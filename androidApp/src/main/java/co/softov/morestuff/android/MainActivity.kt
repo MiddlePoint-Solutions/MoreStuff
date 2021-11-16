@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.AlertDialog
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
@@ -31,30 +30,31 @@ class MainActivity : AppCompatActivity() {
     private val currentFragment: BaseFragment?
         get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
 
-    @SuppressLint("BatteryLife")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val powerManager = getSystemService(PowerManager::class.java)
-        val ignoringOptimization = powerManager.isIgnoringBatteryOptimizations(packageName)
-        Timber.d("Ignoring Battery optimizations: $ignoringOptimization")
-        //TODO: request that the user adds MoreStuff to the ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS whitelist.
-
-        if (!ignoringOptimization) {
-            val intent = Intent()
-            intent.action = ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-            intent.data = Uri.parse("package:$packageName")
-            startActivity(intent)
-        }
+        showBatteryOptimizationRequest()
 
         // Turn off the decor fitting system windows, which allows us to handle insets,
         // including IME animations
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContentView(R.layout.activity_main)
+        router.newRootScreen(Screens.Content)
+    }
 
-        if (savedInstanceState == null) {
-            router.newRootScreen(Screens.Content)
+    @SuppressLint("BatteryLife")
+    private fun showBatteryOptimizationRequest() {
+        val powerManager = getSystemService(PowerManager::class.java)
+        val ignoringOptimization = powerManager.isIgnoringBatteryOptimizations(packageName)
+        Timber.d("Ignoring Battery optimizations: $ignoringOptimization")
+
+        //TODO: request that the user adds MoreStuff to the ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS whitelist.
+        if (!ignoringOptimization) {
+            val intent = Intent()
+            intent.action = ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
         }
     }
 

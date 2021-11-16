@@ -14,6 +14,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
+import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
 import com.github.terrakok.cicerone.Router
@@ -23,14 +24,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class ContentViewModel(
-    private val getPagedMessages: GetPagedMessages,
+    private val getActiveScheduleMessages: GetActiveScheduleMessages,
     private val getMessages: GetMessages,
-    private val messageMap: MessageDbMapper,
     private var conductor: ContentConductor?
 ) : ViewModel(), KoinComponent {
 
     private val store: AppStore by inject()
-    private val router: Router by inject()
 
     private val _messages = MutableStateFlow<List<Message>>(listOf())
     val messages: StateFlow<List<Message>>
@@ -40,15 +39,9 @@ class ContentViewModel(
     val priorityState: StateFlow<Priority>
         get() = _priorityState
 
-    val messagePager = Pager(PagingConfig(pageSize = 100)) {
-        getPagedMessages()
-    }.flow.map { messageData ->
-        messageData.map { message -> messageMap(message) }
-    }.cachedIn(viewModelScope)
-
     init {
         viewModelScope.launch {
-            getMessages()
+            getActiveScheduleMessages()
                 .onEach { _messages.value = it }
                 .launchIn(this)
         }
@@ -76,10 +69,6 @@ class ContentViewModel(
 
     fun showTaskList() {
         conductor?.showTaskList()
-    }
-
-    fun onBackPressed() {
-        router.exit()
     }
 
     override fun onCleared() {

@@ -2,8 +2,12 @@ package co.softov.morestuff.android
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.preference.PreferenceManager
+import co.softov.morestuff.android.app.receiver.TestReceiver
+import co.softov.morestuff.android.app.receiver.WakeupReceiver
 import co.softov.morestuff.android.app.util.EmptyApplicationLifecycleCallback
 import co.softov.morestuff.android.di.*
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -12,6 +16,7 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
 import timber.log.Timber.DebugTree
+
 
 class MsApplication : Application() {
 
@@ -22,11 +27,18 @@ class MsApplication : Application() {
         initTimber()
         initKoin()
         initFirebase()
+
+        // TODO: Use time tick?
+        /*val intentFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_TIME_TICK)
+        }
+        registerReceiver(TestReceiver(), intentFilter)*/
     }
 
     private fun initTimber() {
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
+            Timber.d("Timber Initialized")
         }
     }
 

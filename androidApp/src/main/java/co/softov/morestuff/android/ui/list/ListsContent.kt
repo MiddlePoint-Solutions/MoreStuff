@@ -28,11 +28,11 @@ val pages = listOf(
 fun ListsContent(
     modifier: Modifier = Modifier
 ) {
-    val pagerState = rememberPagerState(pageCount = pages.size)
+    val pagerState = rememberPagerState(initialPage = 0)
     Column(modifier) {
         ScheduleTabs(pagerState, pages)
 
-        HorizontalPager(state = pagerState) { page ->
+        HorizontalPager(state = pagerState, count = pages.size) { page ->
             Surface(
                 contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
             ) {

@@ -10,6 +10,8 @@ interface MessageRepository {
 
     suspend fun getAllMessages(): Flow<List<Message>>
 
+    suspend fun getActiveScheduleMessages(): Flow<List<Message>>
+
     suspend fun getMessage(messageId: Long): SimpleResult<Message>
 
     suspend fun getMessagesForTask(taskId: Long): SimpleResult<List<Message>>

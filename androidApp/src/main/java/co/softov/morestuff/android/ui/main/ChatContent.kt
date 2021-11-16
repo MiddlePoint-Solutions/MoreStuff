@@ -154,7 +154,6 @@ private enum class Visibility {
     GONE
 }
 
-
 /**
  * Shows a button that lets the user scroll to the bottom.
  */

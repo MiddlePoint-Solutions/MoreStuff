@@ -15,8 +15,7 @@ val presentationModule = module {
     viewModel { (conductor: ContentConductor) ->
         ContentViewModel(
             conductor = conductor,
-            messageMap = makeMessageDbMapper(),
-            getPagedMessages = get(),
+            getActiveScheduleMessages = get(),
             getMessages = get()
         )
     }

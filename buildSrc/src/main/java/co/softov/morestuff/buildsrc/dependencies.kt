@@ -1,11 +1,11 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.2"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.3"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
-        private const val version = "0.18.0"
+        private const val version = "0.20.0"
         const val insets = "com.google.accompanist:accompanist-insets:$version"
         const val insetsUi = "com.google.accompanist:accompanist-insets-ui:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
@@ -13,7 +13,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.5.21"
+        private const val version = "1.5.31"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -114,7 +114,7 @@ object Libs {
 
         object Compose {
             private const val snapshot = ""
-            private const val version = "1.0.2"
+            private const val version = "1.0.4"
 
             @get:JvmStatic
             val snapshotUrl: String
