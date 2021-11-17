@@ -28,8 +28,8 @@ class MessageRepositoryImpl(
         return messageQueries.selectAll().asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
     }
 
-    override suspend fun getActiveScheduleMessages(): Flow<List<Message>> {
-        return messageQueries.selectActiveScheduleMessages().asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
+    override suspend fun getActiveScheduleMessages(startTime: String): Flow<List<Message>> {
+        return messageQueries.selectActiveScheduleMessages(startTime).asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
     }
 
     override suspend fun getMessage(messageId: Long): SimpleResult<Message> {

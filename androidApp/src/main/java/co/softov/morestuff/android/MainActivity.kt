@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         val ignoringOptimization = powerManager.isIgnoringBatteryOptimizations(packageName)
         Timber.d("Ignoring Battery optimizations: $ignoringOptimization")
 
-        //TODO: request that the user adds MoreStuff to the ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS whitelist.
+        //TODO: request that the user adds MoreStuff to the whitelist.
         if (!ignoringOptimization) {
             val intent = Intent()
             intent.action = ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS

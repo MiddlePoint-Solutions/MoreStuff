@@ -10,7 +10,7 @@ interface MessageRepository {
 
     suspend fun getAllMessages(): Flow<List<Message>>
 
-    suspend fun getActiveScheduleMessages(): Flow<List<Message>>
+    suspend fun getActiveScheduleMessages(startTime: String): Flow<List<Message>>
 
     suspend fun getMessage(messageId: Long): SimpleResult<Message>
 

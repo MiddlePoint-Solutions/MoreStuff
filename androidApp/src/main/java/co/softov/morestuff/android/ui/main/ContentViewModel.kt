@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.paging.map
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
+import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
@@ -41,7 +42,7 @@ class ContentViewModel(
 
     init {
         viewModelScope.launch {
-            getActiveScheduleMessages()
+            getActiveScheduleMessages(TimeUtils.localDateTime1HourBack)
                 .onEach { _messages.value = it }
                 .launchIn(this)
         }

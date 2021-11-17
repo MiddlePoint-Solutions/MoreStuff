@@ -18,6 +18,11 @@ object TimeUtils {
 
     val currentLocalDateTimeString: String get() = currentLocalDateTime.toString()
 
+    val localDateTime1HourBack: String
+        get() = (currentUtcInstant - Duration.hours(1))
+            .toLocalDateTime(currentTimeZone)
+            .toString()
+
     fun tomorrowLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
         (currentUtcInstant + Duration.days(1)).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {

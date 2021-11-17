@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
 interface GetActiveScheduleMessages {
-    suspend operator fun invoke(): Flow<List<Message>>
+    suspend operator fun invoke(startTime: String): Flow<List<Message>>
 }
 
 class GetActiveScheduleMessagesImpl(
     private val messageRepository: MessageRepository
 ) : GetActiveScheduleMessages {
-    override suspend fun invoke(): Flow<List<Message>> {
-        return messageRepository.getActiveScheduleMessages()
+    override suspend fun invoke(startTime: String): Flow<List<Message>> {
+        return messageRepository.getActiveScheduleMessages(startTime)
     }
 }
