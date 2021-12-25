@@ -17,6 +17,7 @@ SELECT *
 FROM message
 ORDER BY datetime(create_time);
 
+-- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
 selectActiveScheduleMessages:
 SELECT *
 FROM message
