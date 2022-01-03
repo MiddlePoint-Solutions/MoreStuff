@@ -16,6 +16,7 @@ val presentationModule = module {
         ContentViewModel(
             conductor = conductor,
             getActiveScheduleMessages = get(),
+            getActiveTasks = get(),
             getMessages = get()
         )
     }

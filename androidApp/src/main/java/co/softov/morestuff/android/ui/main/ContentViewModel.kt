@@ -12,12 +12,14 @@ import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
 import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
 import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,15 +28,16 @@ import org.koin.core.component.inject
 
 class ContentViewModel(
     private val getActiveScheduleMessages: GetActiveScheduleMessages,
+    private val getActiveTasks: GetActiveTasks,
     private val getMessages: GetMessages,
     private var conductor: ContentConductor?
 ) : ViewModel(), KoinComponent {
 
     private val store: AppStore by inject()
 
-    private val _messages = MutableStateFlow<List<Message>>(listOf())
-    val messages: StateFlow<List<Message>>
-        get() = _messages
+    private val _tasks = MutableStateFlow<List<Task>>(listOf())
+    val tasks: StateFlow<List<Task>>
+        get() = _tasks
 
     private val _priorityState = MutableStateFlow<Priority>(Priority.Today())
     val priorityState: StateFlow<Priority>
@@ -42,8 +45,8 @@ class ContentViewModel(
 
     init {
         viewModelScope.launch {
-            getActiveScheduleMessages(TimeUtils.localDateTime1HourBack)
-                .onEach { _messages.value = it }
+            getActiveTasks()
+                .onEach { _tasks.value = it }
                 .launchIn(this)
         }
     }

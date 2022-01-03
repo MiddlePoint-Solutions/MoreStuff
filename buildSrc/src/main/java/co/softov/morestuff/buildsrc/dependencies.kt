@@ -1,7 +1,7 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.3"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.4"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
@@ -88,7 +88,7 @@ object Libs {
         const val pagingKtx = "androidx.paging:paging-runtime-ktx:3.0.1"
         const val preferenceKtx = "androidx.preference:preference-ktx:1.1.1"
 
-        const val workKtx = "androidx.work:work-runtime-ktx:2.6.0"
+        const val workKtx = "androidx.work:work-runtime-ktx:2.7.0"
         const val constraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
 
         const val coreKtx = "androidx.core:core-ktx:1.6.0"

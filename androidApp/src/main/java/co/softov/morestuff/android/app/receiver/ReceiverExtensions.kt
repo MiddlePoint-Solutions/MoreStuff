@@ -31,7 +31,7 @@ fun NotificationReceiver.Companion.createReplyIntent(
             val requestCode = randomRequestCode
             Timber.d("createReplyIntent, requestCode: $requestCode")
             // Use random request code for replying to reminder intent.
-            PendingIntent.getBroadcast(context, requestCode, it, 0)
+            PendingIntent.getBroadcast(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
 fun Intent.getScheduleIdExtra() = getLongExtra(KEY_SCHEDULE_ID, 0)

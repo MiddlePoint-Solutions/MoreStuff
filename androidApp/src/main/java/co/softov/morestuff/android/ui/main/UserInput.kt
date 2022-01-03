@@ -14,11 +14,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
@@ -41,6 +38,38 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
 var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
+
+@Composable
+fun UserInput(
+    viewModel: ContentViewModel,
+    modifier: Modifier = Modifier,
+    onMessageSent: (String) -> Unit,
+    resetScroll: () -> Unit
+) {
+    val state by viewModel.priorityState.collectAsState()
+
+    Column(
+        modifier = modifier
+    ) {
+        UserPriorityInput(
+            currentPriority = state
+        ) {
+            when (it) {
+                is Priority.Later -> viewModel.selectedLaterPriority()
+                is Priority.Today -> viewModel.selectedTodayPriority()
+                is Priority.Tomorrow -> viewModel.selectedTomorrowPriority()
+            }
+        }
+
+        UserTextInput(
+            listAction = viewModel::showTaskList,
+            sendAction = {
+                resetScroll()
+                onMessageSent(it)
+            }
+        )
+    }
+}
 
 @Composable
 fun UserTextInput(
