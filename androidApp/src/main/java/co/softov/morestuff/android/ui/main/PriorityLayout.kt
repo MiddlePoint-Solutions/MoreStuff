@@ -1,9 +1,10 @@
 package co.softov.morestuff.android.ui.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -64,6 +65,25 @@ fun PriorityTask(
 }
 
 @Composable
+fun PrioritySquare(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        textAlign = TextAlign.Center,
+        color = Color.White,
+        maxLines = 4,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier
+            .defaultMinSize(minHeight =  50.dp)
+            .padding(4.dp)
+            .background(Color.Red)
+            .border(width = 1.dp, color = Color.White)
+    )
+}
+
+@Composable
 fun PriorityLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
@@ -80,6 +100,7 @@ fun PriorityLayout(
         val minItemSize = (columnWidth * 0.55).toInt()
         val itemConstraints = constraints.copy(maxWidth = columnWidth, minWidth = minItemSize)
         val colHeights = IntArray(columns) { 0 } // track each column's height
+
         val placeables = measurables.map { measurable ->
             val column = shortestColumn(colHeights)
             val placeable = measurable.measure(itemConstraints)
@@ -108,7 +129,6 @@ fun PriorityLayout(
                 }
 
                 nextY = colY[column]
-
 
                 var hasPlace = placedItems.isEmpty()
                 while (!hasPlace) {
@@ -217,7 +237,8 @@ fun StaggeredVerticalGrid(
         }
         val columns = ceil(constraints.maxWidth / maxColumnWidth.toPx()).toInt()
         val columnWidth = constraints.maxWidth / columns
-        val itemConstraints = constraints.copy(maxWidth = columnWidth)
+        val minWidth = columnWidth / 2
+        val itemConstraints = constraints.copy(maxWidth = columnWidth, minWidth = columnWidth)
         val colHeights = IntArray(columns) { 0 } // track each column's height
         val placeables = measurables.map { measurable ->
             val column = shortestColumn(colHeights)

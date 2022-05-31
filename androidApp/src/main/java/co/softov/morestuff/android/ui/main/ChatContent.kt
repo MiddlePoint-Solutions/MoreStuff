@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.main
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -32,28 +31,36 @@ fun ChatContent(
         confirmationAction = { _, _ -> }
     )
 
-    val messageItems = viewModel.tasks.collectAsState()
+//    val messageItems = viewModel.tasks.collectAsState()
+    val messageItems = viewModel.messages.collectAsState()
 
     Surface(Modifier.navigationBarsPadding(bottom = false)) {
         Column(
             modifier = Modifier
-            .fillMaxSize()
+                .fillMaxSize()
         ) {
 
-            PriorityLayout(
-                modifier = Modifier.padding(4.dp),
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                messageItems.value.shuffled().forEach {
-                    PriorityTask(it.title)
-                }
-            }
+//                PriorityLayout() {
+//                    messageItems.value.shuffled().forEach {
+//                        PriorityTask(it.title)
+//                    }
+//                }
+//                StaggeredVerticalGrid(maxColumnWidth = 150.dp) {
+//                    messageItems.value.forEach {
+//                        PrioritySquare(it.title)
+//                    }
+//                }
 
-            /*Messages(
-                messages = messageItems.value,
-                actions = chatActions,
-                modifier = Modifier.weight(1f),
-                scrollState = scrollState
-            )*/
+                Messages(
+                    messages = messageItems.value,
+                    actions = chatActions,
+                    modifier = Modifier.weight(1f),
+                    scrollState = scrollState
+                )
+            }
 
             UserInput(
                 viewModel = viewModel,

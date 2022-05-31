@@ -47,7 +47,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.5"
+        kotlinCompilerExtensionVersion = "1.1.1"
     }
 }
 
@@ -63,7 +63,7 @@ sqldelight {
 }
 
 dependencies {
-    //implementation(project(":shared"))
+    implementation(project(":shared"))
 
     // Kotlin
     implementation(Libs.Kotlin.stdlib)

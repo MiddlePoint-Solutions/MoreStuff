@@ -1,7 +1,7 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.0.4"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
@@ -13,7 +13,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.5.31"
+        private const val version = "1.6.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -25,7 +25,7 @@ object Libs {
     }
 
     object Coroutines {
-        private const val version = "1.5.1"
+        private const val version = "1.6.10"
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -38,7 +38,7 @@ object Libs {
     }
 
     object Sqldelight {
-        const val version = "1.5.1"
+        const val version = "1.5.3"
         const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$version"
         const val androidDriver = "com.squareup.sqldelight:android-driver:$version"
         const val coroutinesJvmExt = "com.squareup.sqldelight:coroutines-extensions-jvm:$version"
@@ -63,7 +63,7 @@ object Libs {
     }
 
     object Koin {
-        const val version = "3.1.2"
+        private const val version = "3.2.0"
         const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:$version"
         const val android = "io.insert-koin:koin-android:$version"
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
@@ -114,7 +114,7 @@ object Libs {
 
         object Compose {
             private const val snapshot = ""
-            private const val version = "1.0.5"
+            private const val version = "1.1.1"
 
             @get:JvmStatic
             val snapshotUrl: String

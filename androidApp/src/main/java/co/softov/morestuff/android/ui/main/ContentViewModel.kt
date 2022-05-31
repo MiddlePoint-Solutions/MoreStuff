@@ -39,16 +39,27 @@ class ContentViewModel(
     val tasks: StateFlow<List<Task>>
         get() = _tasks
 
+    private val _messages = MutableStateFlow<List<Message>>(listOf())
+    val messages: StateFlow<List<Message>>
+        get() = _messages
+
     private val _priorityState = MutableStateFlow<Priority>(Priority.Today())
     val priorityState: StateFlow<Priority>
         get() = _priorityState
 
     init {
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             getActiveTasks()
                 .onEach { _tasks.value = it }
                 .launchIn(this)
+        }*/
+
+        viewModelScope.launch {
+            getMessages()
+                .onEach { _messages.value = it }
+                .launchIn(this)
         }
+
     }
 
     fun addNewTask(title: String) {
