@@ -25,7 +25,7 @@ kotlin {
                 //Logger
                 implementation("io.github.aakira:napier:1.5.0")
                 //Key-Value storage
-                implementation("com.russhwolf:multiplatform-settings:0.7.7")
+                implementation("com.russhwolf:multiplatform-settings:0.9")
             }
         }
 

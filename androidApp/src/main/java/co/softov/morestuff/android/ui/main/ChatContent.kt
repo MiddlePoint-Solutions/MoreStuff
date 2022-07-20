@@ -31,7 +31,6 @@ fun ChatContent(
         confirmationAction = { _, _ -> }
     )
 
-//    val messageItems = viewModel.tasks.collectAsState()
     val messageItems = viewModel.messages.collectAsState()
 
     Surface(Modifier.navigationBarsPadding(bottom = false)) {
@@ -39,7 +38,6 @@ fun ChatContent(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
             Column(
                 modifier = Modifier.weight(1f)
             ) {

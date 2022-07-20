@@ -87,7 +87,7 @@ dependencies {
     implementation(Libs.AndroidX.workKtx)
 
     // Navigation
-    implementation("com.github.terrakok:cicerone:6.5")
+    implementation("com.github.terrakok:cicerone:7.1")
 
     // UI
     implementation(Libs.Google.material)
