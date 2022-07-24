@@ -75,7 +75,7 @@ class ContentFragment : BaseFragment() {
     }
 
     private fun showMainSettings() {
-        router.navigateTo(Screens.Settings, clearContainer = false)
+        router.navigateTo(Screens.Settings)
     }
 }
 

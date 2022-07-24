@@ -13,7 +13,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.6.10"
+        private const val version = "1.7.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -21,11 +21,11 @@ object Libs {
     }
 
     object Kotlinx {
-        const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.2.1"
+        const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     }
 
     object Coroutines {
-        private const val version = "1.6.10"
+        private const val version = "1.7.0"
         const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
         const val test = "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version"
@@ -113,14 +113,9 @@ object Libs {
         }
 
         object Compose {
-            private const val snapshot = ""
-            private const val version = "1.1.1"
+            private const val version = "1.2.0-rc03"
 
-            @get:JvmStatic
-            val snapshotUrl: String
-                get() = "https://androidx.dev/snapshots/builds/$snapshot/artifacts/repository/"
-
-            const val compiler = "androidx.compose.compiler:compiler:$version"
+            const val compiler = "androidx.compose.compiler:compiler:1.2.0"
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
@@ -154,15 +149,5 @@ object Libs {
                 const val espressoCore = "androidx.test.espresso:espresso-core:3.2.0"
             }
         }
-    }
-
-    object Rome {
-        private const val version = "1.14.1"
-        const val rome = "com.rometools:rome:$version"
-        const val modules = "com.rometools:rome-modules:$version"
-    }
-
-    object Coil {
-        const val coilCompose = "io.coil-kt:coil-compose:1.3.0"
     }
 }

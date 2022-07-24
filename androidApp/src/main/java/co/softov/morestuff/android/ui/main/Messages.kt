@@ -64,7 +64,7 @@ fun Messages(
 
         if (enableAutoScroll) {
             scope.launch {
-                scrollState.scrollToItem(0)
+                scrollState.animateScrollToItem(0)
             }
         }
 
@@ -88,7 +88,7 @@ fun Messages(
             enabled = jumpToBottomButtonEnabled,
             onClicked = {
                 scope.launch {
-                    scrollState.animateScrollToItem(0)
+                    scrollState.scrollToItem(0)
                 }
             },
             modifier = Modifier.align(Alignment.BottomCenter)
