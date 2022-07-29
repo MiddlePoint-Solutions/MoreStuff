@@ -7,7 +7,7 @@ import androidx.lifecycle.*
  * different parameters.
  */
 class LifecycleViewModelStoreOwner(lifecycleOwner: LifecycleOwner?) : ViewModelStoreOwner,
-    LifecycleObserver {
+    DefaultLifecycleObserver {
 
     private val viewModelStore = ViewModelStore()
 
@@ -21,9 +21,8 @@ class LifecycleViewModelStoreOwner(lifecycleOwner: LifecycleOwner?) : ViewModelS
 
     override fun getViewModelStore(): ViewModelStore = viewModelStore
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun clear() {
+    override fun onDestroy(owner: LifecycleOwner) {
+        super.onDestroy(owner)
         viewModelStore.clear()
     }
-
 }
