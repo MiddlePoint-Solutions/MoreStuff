@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.list
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,7 +50,7 @@ fun ScheduleList(page: PageType) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
@@ -89,7 +88,7 @@ fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modif
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }

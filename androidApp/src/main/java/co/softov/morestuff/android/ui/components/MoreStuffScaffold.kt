@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.components
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
@@ -17,7 +18,7 @@ fun MoreStuffScaffold(
 ) {
     MoreStuffTheme {
         Scaffold(
-            modifier = Modifier.statusBarsPadding(),
+            modifier = Modifier.systemBarsPadding(),
             scaffoldState = scaffoldState,
             topBar = { MoreStuffTopBar(showSettings) },
             content = content

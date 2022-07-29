@@ -3,6 +3,8 @@ package co.softov.morestuff.android.ui.list
 import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import co.softov.morestuff.android.ui.compose.viewMigration
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -16,7 +18,7 @@ class ListsFragment : BottomSheetDialogFragment() {
         val height = getWindowHeight()
         val view = ComposeView(requireContext()).apply {
             viewMigration {
-                ListsContent()
+                ListsContent(modifier = Modifier.systemBarsPadding())
             }
         }
         dialog.setContentView(

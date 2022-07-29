@@ -1,13 +1,10 @@
 package co.softov.morestuff.android.data.utils
 
 import kotlinx.datetime.*
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 object TimeUtils {
 
     val currentUtcInstant: Instant get() = Clock.System.now()

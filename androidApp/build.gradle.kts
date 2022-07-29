@@ -109,7 +109,6 @@ dependencies {
     implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
     implementation(Libs.AndroidX.Compose.paging)
 
-    implementation(Libs.Accompanist.insets)
     implementation(Libs.Accompanist.insetsUi)
     implementation(Libs.Accompanist.pager)
     implementation(Libs.Accompanist.pagerIndicators)
