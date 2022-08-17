@@ -1,13 +1,12 @@
 package co.softov.morestuff.android.data.repository
 
 
+import arrow.core.Either
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.utils.TimeUtils
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Result.Failure
-import co.softov.morestuff.android.domain.model.Result.Success
-import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.db.StuffDb
@@ -25,23 +24,25 @@ class MessageRepositoryImpl(
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun getAllMessages(): Flow<List<Message>> {
-        return messageQueries.selectAll().asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
+        return messageQueries.selectAll().asFlow().mapToList()
+            .map { mapList(it, mapMessageDb).reversed() }
     }
 
     override suspend fun getActiveScheduleMessages(startTime: String): Flow<List<Message>> {
-        return messageQueries.selectActiveScheduleMessages(startTime).asFlow().mapToList().map { mapList(it, mapMessageDb).reversed() }
+        return messageQueries.selectActiveScheduleMessages(startTime).asFlow().mapToList()
+            .map { mapList(it, mapMessageDb).reversed() }
     }
 
-    override suspend fun getMessage(messageId: Long): SimpleResult<Message> {
+    override suspend fun getMessage(messageId: Long): Either<Failure,Message> {
         return when (val message =
             messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
-            null -> Failure(MessageDoesNotExist)
-            else -> Success(mapMessageDb(message))
+            null -> Either.Left(MessageDoesNotExist)
+            else -> Either.Right(mapMessageDb(message))
         }
     }
 
-    override suspend fun getMessagesForTask(taskId: Long): SimpleResult<List<Message>> {
-        return Success(
+    override suspend fun getMessagesForTask(taskId: Long): Either<Failure,List<Message>> {
+        return Either.Right(
             messageQueries.selectMessageByTaskId(taskId)
                 .executeAsList()
                 .map { mapMessageDb(it) }
@@ -53,7 +54,7 @@ class MessageRepositoryImpl(
         scheduleId: Long,
         contentType: Int,
         content: String
-    ): SimpleResult<Message> {
+    ): Either<Failure,Message> {
         val messageId: Long = messageQueries.transactionWithResult {
             messageQueries.insertMessage(
                 task_id = taskId,
@@ -72,8 +73,9 @@ class MessageRepositoryImpl(
         replyType: Int,
         replyContent: String
     ) {
+        // TODO: this logic should be moved into 2 use cases
         when (val messageId = getCurrentTaskMessageId(taskId)) {
-            is Success -> {
+            is Either.Right -> {
                 messageQueries.updateTaskMessageReply(
                     reply_type = replyType,
                     reply_content = replyContent,
@@ -81,21 +83,21 @@ class MessageRepositoryImpl(
                     id = messageId.value
                 )
             }
-            is Failure -> Failure(MessageDoesNotExist)
+            is Either.Left -> MessageDoesNotExist
         }
     }
 
-    private fun getLastCreatedMessageForTask(taskId: Long): SimpleResult<Message> {
+    private fun getLastCreatedMessageForTask(taskId: Long): Either<Failure,Message> {
         return when (val message =
             messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
-            null -> Failure(MessageDoesNotExist)
-            else -> Success(mapMessageDb(message))
+            null -> Either.Left(MessageDoesNotExist)
+            else -> Either.Right(mapMessageDb(message))
         }
     }
 
-    private fun getCurrentTaskMessageId(taskId: Long): SimpleResult<Long> {
+    private fun getCurrentTaskMessageId(taskId: Long): Either<Failure,Long> {
         val id = messageQueries.selectCurrentTaskMessageId(task_id = taskId).executeAsOneOrNull()
-        return id?.let { Success(it) } ?: Failure(MessageDoesNotExist)
+        return id?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
     }
 
 

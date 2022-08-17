@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.app.extensions.simpleName
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.Scope
 import co.softov.morestuff.android.domain.redux.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.NoOp
@@ -25,9 +25,9 @@ sealed class TaskAction : Action.FeatureAction() {
 
     data class TaskCompleteAction(val taskId: Long) : TaskAction()
 
-    internal data class TaskCreatedAction(val task: Task, val priority: Priority) : TaskAction() {
+    internal data class TaskCreatedAction(val scope: Scope, val priority: Priority) : TaskAction() {
         override val log: String
-            get() = "${this.simpleName}(task=$task)"
+            get() = "${this.simpleName}(task=$scope)"
     }
 }
 

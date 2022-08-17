@@ -1,22 +1,22 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import co.softov.morestuff.android.domain.model.Result
-import co.softov.morestuff.android.domain.model.SimpleResult
-import co.softov.morestuff.android.domain.model.Task
+import arrow.core.Either
+import co.softov.morestuff.android.domain.Failure
+import co.softov.morestuff.android.domain.model.Scope
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 
 interface GetScheduleTaskUseCase {
-    suspend operator fun invoke(scheduleId: Long): SimpleResult<Task>
+    suspend operator fun invoke(scheduleId: Long): Either<Failure,Scope>
 }
 
 class GetScheduleTaskUseCaseImpl(
     private val getScheduleUseCase: GetScheduleUseCase,
     private val getTaskUseCase: GetTaskUseCase
 ) : GetScheduleTaskUseCase {
-    override suspend fun invoke(scheduleId: Long): SimpleResult<Task> {
+    override suspend fun invoke(scheduleId: Long): Either<Failure,Scope> {
         return when (val result = getScheduleUseCase(scheduleId)) {
-            is Result.Success -> getTaskUseCase(result.value.taskId)
-            is Result.Failure -> result
+            is Either.Right -> getTaskUseCase(result.value.taskId)
+            is Either.Left -> result
         }
     }
 }

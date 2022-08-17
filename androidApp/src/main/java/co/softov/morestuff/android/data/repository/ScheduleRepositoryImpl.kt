@@ -1,14 +1,16 @@
 package co.softov.morestuff.android.data.repository
 
 
+import arrow.core.Either
+import arrow.core.Either.Left
+import arrow.core.Either.Right
 import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.utils.TimeUtils
-import co.softov.morestuff.android.domain.model.Result
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
-import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb
@@ -30,7 +32,7 @@ class ScheduleRepositoryImpl(
     override suspend fun createSchedule(
         taskId: Long,
         scheduleTime: String?
-    ): SimpleResult<Schedule> {
+    ): Either<Failure, Schedule> {
         Timber.d("createTaskReminderSchedule: $taskId for $scheduleTime")
         val scheduleId: Long = scheduleQueries.transactionWithResult {
             val currentTime = TimeUtils.currentLocalDateTimeString
@@ -46,16 +48,16 @@ class ScheduleRepositoryImpl(
         return getSchedule(scheduleId)
     }
 
-    override suspend fun getSchedule(scheduleId: Long): SimpleResult<Schedule> {
+    override suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule> {
         return when (val schedule =
             scheduleQueries.selectScheduleById(scheduleId).executeAsOneOrNull()) {
-            null -> Result.Failure(ScheduleDoesNotExist)
-            else -> Result.Success(mapScheduleDb(schedule))
+            null -> Left(ScheduleDoesNotExist)
+            else -> Right(mapScheduleDb(schedule))
         }
     }
 
-    override suspend fun getActiveSchedules(): SimpleResult<List<Schedule>> {
-        return Result.Success(scheduleQueries.selectActiveSchedules().executeAsList()
+    override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
+        return Right(scheduleQueries.selectActiveSchedules().executeAsList()
             .map { mapScheduleDb(it) })
     }
 
@@ -77,12 +79,12 @@ class ScheduleRepositoryImpl(
             .mapToList()
     }
 
-    override suspend fun getActiveScheduleWithTitle(scheduleId: Long): SimpleResult<ScheduleWithTitle> {
+    override suspend fun getActiveScheduleWithTitle(scheduleId: Long): Either<Failure, ScheduleWithTitle> {
         return scheduleQueries
             .selectActiveScheduleWithTaskTitle(scheduleId, mapper = mapScheduleWithTitleDb)
             .executeAsOneOrNull()
-            ?.let { Result.Success(it) }
-            ?: Result.Failure(ScheduleDoesNotExist)
+            ?.let { Right(it) }
+            ?: Left(ScheduleDoesNotExist)
     }
 
     override suspend fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
@@ -108,26 +110,26 @@ class ScheduleRepositoryImpl(
             .mapToList()
     }
 
-    override suspend fun getActiveScheduleForTask(taskId: Long): SimpleResult<Schedule> {
+    override suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule> {
         return when (val schedule =
             scheduleQueries.selectActiveScheduleByTaskId(taskId).executeAsOneOrNull()) {
-            null -> Result.Failure(ScheduleDoesNotExist)
-            else -> Result.Success(mapScheduleDb(schedule))
+            null -> Left(ScheduleDoesNotExist)
+            else -> Right(mapScheduleDb(schedule))
         }
     }
 
-    override suspend fun setScheduleFulfilled(scheduleId: Long): SimpleResult<Long> {
+    override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)
-        return Result.Success(scheduleId)
+        return Right(scheduleId)
     }
 
     override suspend fun countTodayTaskSchedules(
         taskId: Long,
         startTime: String,
         endTime: String
-    ): SimpleResult<Int> {
+    ): Either<Failure, Int> {
         val limit =
             scheduleQueries.countTaskSchedulesByTime(taskId, startTime, endTime).executeAsOne()
-        return Result.Success(limit.toInt())
+        return Right(limit.toInt())
     }
 }

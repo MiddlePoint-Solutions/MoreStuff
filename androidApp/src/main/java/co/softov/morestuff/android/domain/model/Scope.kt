@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.model
 
-data class Task(
+data class Scope(
     val id: Long,
     val title: String,
     val createTime: String,

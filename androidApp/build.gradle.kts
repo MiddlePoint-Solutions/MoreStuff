@@ -70,6 +70,10 @@ dependencies {
     implementation(Libs.Kotlin.reflect)
     implementation(Libs.Kotlinx.datetime)
 
+    // Arrow
+    implementation(platform(Libs.Arrow.bom))
+    implementation(Libs.Arrow.core)
+
     // Androidx
     implementation(Libs.AndroidX.appcompat)
     implementation(Libs.AndroidX.Fragment.fragmentKtx)

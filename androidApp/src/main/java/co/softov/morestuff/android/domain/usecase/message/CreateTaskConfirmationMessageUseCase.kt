@@ -1,15 +1,15 @@
 package co.softov.morestuff.android.domain.usecase.message
 
+import arrow.core.Either
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Result
-import co.softov.morestuff.android.domain.model.SimpleResult
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.*
 
 interface CreateTaskConfirmationMessageUseCase {
-    suspend operator fun invoke(taskId: Long, priority: Priority): SimpleResult<Boolean>
+    suspend operator fun invoke(taskId: Long, priority: Priority): Either<Failure,Boolean>
 }
 
 class CreateTaskConfirmationMessageUseCaseImpl(
@@ -20,7 +20,7 @@ class CreateTaskConfirmationMessageUseCaseImpl(
         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
     private val timeFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.US)
 
-    override suspend fun invoke(taskId: Long, priority: Priority): SimpleResult<Boolean> {
+    override suspend fun invoke(taskId: Long, priority: Priority): Either<Failure,Boolean> {
         delay(1300)
         val confirmTitle = when (priority) {
             is Priority.Later -> createLaterConfirmationTitle(priority)
@@ -32,7 +32,7 @@ class CreateTaskConfirmationMessageUseCaseImpl(
             title = confirmTitle,
             contentType = ContentType.CONFIRM_NEW_TASK
         )
-        return Result.Success(true)
+        return Either.Right(true)
     }
 
     private fun createTodayConfirmationTitle(

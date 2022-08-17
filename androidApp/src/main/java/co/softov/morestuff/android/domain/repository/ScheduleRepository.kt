@@ -1,22 +1,22 @@
 package co.softov.morestuff.android.domain.repository
 
 
+import arrow.core.Either
 import kotlinx.coroutines.flow.Flow
 import co.softov.morestuff.android.domain.Failure
-import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 
 interface ScheduleRepository {
 
-    suspend fun createSchedule(taskId: Long, scheduleTime: String?): SimpleResult<Schedule>
-    suspend fun getSchedule(scheduleId: Long): SimpleResult<Schedule>
-    suspend fun getActiveSchedules(): SimpleResult<List<Schedule>>
-    suspend fun setScheduleFulfilled(scheduleId: Long): SimpleResult<Long>
+    suspend fun createSchedule(taskId: Long, scheduleTime: String?): Either<Failure, Schedule>
+    suspend fun getSchedule(scheduleId: Long): Either<Failure,Schedule>
+    suspend fun getActiveSchedules(): Either<Failure,List<Schedule>>
+    suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure,Long>
     suspend fun getActiveSchedulesFlow(): Flow<List<Schedule>>
-    suspend fun getActiveScheduleForTask(taskId: Long): SimpleResult<Schedule>
+    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure,Schedule>
 
-    suspend fun getActiveScheduleWithTitle(scheduleId: Long): SimpleResult<ScheduleWithTitle>
+    suspend fun getActiveScheduleWithTitle(scheduleId: Long): Either<Failure,ScheduleWithTitle>
     suspend fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
@@ -26,7 +26,7 @@ interface ScheduleRepository {
         taskId: Long,
         startTime: String,
         endTime: String
-    ): SimpleResult<Int>
+    ): Either<Failure,Int>
 }
 
 object ScheduleDoesNotExist : Failure.FeatureFailure()

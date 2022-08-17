@@ -1,25 +1,16 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
-import co.softov.morestuff.android.di.storeModule
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.Scope
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
-import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.testActionDispatch
-import co.softov.morestuff.db.StuffDb
-import com.squareup.sqldelight.sqlite.driver.JdbcSqliteDriver
 import kotlinx.coroutines.runBlocking
-import org.junit.Rule
 import org.junit.Test
-import org.koin.dsl.module
 import org.koin.test.KoinTest
 import org.koin.test.get
-import org.mockito.Mockito
 
-class TaskMiddlewareTest : KoinTest {
+class ScopeMiddlewareTest : KoinTest {
 
     /*@get:Rule
     val koinTestRule = KoinTestRule.create {
@@ -42,7 +33,7 @@ class TaskMiddlewareTest : KoinTest {
     }*/
 
     private val title = "Test"
-    private val testTask = Task(0, title, "")
+    private val testScope = Scope(0, title, "")
 
     @Test
     fun `should inject my components`() {
@@ -60,7 +51,7 @@ class TaskMiddlewareTest : KoinTest {
 
             val priority = Priority.Today()
             val action = CreateTaskAction(title, priority)
-            val expected = TaskAction.TaskCreatedAction(testTask, priority)
+            val expected = TaskAction.TaskCreatedAction(testScope, priority)
             middleware.testActionDispatch(AppState(), action, expected)
         }
 

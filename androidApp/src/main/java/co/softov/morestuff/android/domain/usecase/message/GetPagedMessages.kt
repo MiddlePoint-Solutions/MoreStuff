@@ -2,10 +2,6 @@ package co.softov.morestuff.android.domain.usecase.message
 
 import androidx.paging.PagingSource
 import co.softov.morestuff.android.data.mapper.MessageData
-import co.softov.morestuff.android.data.mapper.MessageDbMapper
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Result
-import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.android.paging3.QueryPagingSource
 

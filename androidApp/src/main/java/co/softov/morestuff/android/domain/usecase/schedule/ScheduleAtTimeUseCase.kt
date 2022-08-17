@@ -1,20 +1,20 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
-import co.softov.morestuff.android.domain.model.SimpleResult
-import co.softov.morestuff.android.domain.model.SuccessResult
+import arrow.core.Either
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.service.Scheduler
 
 interface ScheduleAtTimeUseCase {
-    suspend operator fun invoke(scheduleId: Long, time: String): SimpleResult<Boolean>
+    suspend operator fun invoke(scheduleId: Long, time: String): Either<Failure, Boolean>
 }
 
 class ScheduleAtTimeUseCaseImpl(
     private val scheduler: Scheduler
 ) : ScheduleAtTimeUseCase {
 
-    override suspend fun invoke(scheduleId: Long, time: String): SimpleResult<Boolean> {
+    override suspend fun invoke(scheduleId: Long, time: String): Either<Failure, Boolean> {
         scheduler.scheduleAtExact(scheduleId, time)
-        return SuccessResult(true)
+        return Either.Right(true)
     }
 }
 

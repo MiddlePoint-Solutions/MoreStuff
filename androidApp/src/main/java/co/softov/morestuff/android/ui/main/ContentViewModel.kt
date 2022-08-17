@@ -2,25 +2,16 @@ package co.softov.morestuff.android.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.cachedIn
-import androidx.paging.map
-import co.softov.morestuff.android.data.mapper.MessageDbMapper
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.Scope
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
 import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
-import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
-import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -35,8 +26,8 @@ class ContentViewModel(
 
     private val store: AppStore by inject()
 
-    private val _tasks = MutableStateFlow<List<Task>>(listOf())
-    val tasks: StateFlow<List<Task>>
+    private val _tasks = MutableStateFlow<List<Scope>>(listOf())
+    val tasks: StateFlow<List<Scope>>
         get() = _tasks
 
     private val _messages = MutableStateFlow<List<Message>>(listOf())

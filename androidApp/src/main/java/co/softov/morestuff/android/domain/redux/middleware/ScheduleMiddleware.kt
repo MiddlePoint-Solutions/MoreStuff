@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import arrow.core.Either
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.Priority.*
 import co.softov.morestuff.android.domain.enums.ReplyType.*
-import co.softov.morestuff.android.domain.model.Result.Success
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
@@ -42,7 +42,7 @@ class ScheduleMiddleware(
         when (action) {
 
             is TaskCreatedAction -> scope.launch {
-                createScheduleUseCase(action.task.id, action.priority).map {
+                createScheduleUseCase(action.scope.id, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
                 }
             }
@@ -105,7 +105,7 @@ class ScheduleMiddleware(
         scope.launch {
             val timeOption =
                 when (val result = countTaskSchedulesUseCase(schedule.taskId)) {
-                    is Success -> {
+                    is Either.Right -> {
                         Timber.d("### Today Schedule count, taskId: ${schedule.taskId} = ${result.value} ###")
                         if (result.value > snoozeLimit) Tomorrow() else Today()
                     }

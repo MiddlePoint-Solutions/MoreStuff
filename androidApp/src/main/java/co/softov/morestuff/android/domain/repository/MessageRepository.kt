@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.domain.repository
 
 
+import arrow.core.Either
 import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.SimpleResult
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
@@ -12,16 +12,16 @@ interface MessageRepository {
 
     suspend fun getActiveScheduleMessages(startTime: String): Flow<List<Message>>
 
-    suspend fun getMessage(messageId: Long): SimpleResult<Message>
+    suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
-    suspend fun getMessagesForTask(taskId: Long): SimpleResult<List<Message>>
+    suspend fun getMessagesForTask(taskId: Long): Either<Failure,List<Message>>
 
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
         content: String
-    ): SimpleResult<Message>
+    ): Either<Failure,Message>
 
     suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)
 

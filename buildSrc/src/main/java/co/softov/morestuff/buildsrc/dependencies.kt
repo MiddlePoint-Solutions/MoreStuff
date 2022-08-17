@@ -19,6 +19,12 @@ object Libs {
         const val reflect = "org.jetbrains.kotlin:kotlin-reflect:$version"
     }
 
+    object Arrow {
+        private const val version = "1.1.2"
+        const val bom = "io.arrow-kt:arrow-stack:$version"
+        const val core = "io.arrow-kt:arrow-core"
+    }
+
     object Kotlinx {
         const val datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     }

@@ -1,15 +1,15 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
+import arrow.core.Either
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.scheduleLocalDateTime
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.model.Result
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.SimpleResult
 import timber.log.Timber
 
 interface BootCompleteScheduler {
-    suspend operator fun invoke(): SimpleResult<Boolean>
+    suspend operator fun invoke(): Either<Failure,Boolean>
 }
 
 class BootCompleteSchedulerImpl(
@@ -17,12 +17,12 @@ class BootCompleteSchedulerImpl(
     private val scheduler: Scheduler
 ) : BootCompleteScheduler {
 
-    override suspend fun invoke(): SimpleResult<Boolean> {
+    override suspend fun invoke(): Either<Failure,Boolean> {
         return when (val result = getActiveSchedules()) {
-            is Result.Failure -> result
-            is Result.Success -> {
+            is Either.Left -> result
+            is Either.Right -> {
                 reschedule(result.value.toMutableList())
-                Result.Success(true)
+                Either.Right(true)
             }
         }
     }

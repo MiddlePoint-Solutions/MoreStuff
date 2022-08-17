@@ -1,13 +1,13 @@
 package co.softov.morestuff.android.domain.usecase.message
 
+import arrow.core.Either
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Result
-import co.softov.morestuff.android.domain.model.SimpleResult
 import co.softov.morestuff.android.domain.usecase.task.GetScheduleTaskUseCase
 
 interface CreateScheduleMessageUseCase {
-    suspend operator fun invoke(scheduleId: Long): SimpleResult<Message>
+    suspend operator fun invoke(scheduleId: Long): Either<Failure,Message>
 }
 
 class CreateScheduleMessageUseCaseImpl(
@@ -15,13 +15,13 @@ class CreateScheduleMessageUseCaseImpl(
     private val createMessageUseCase: CreateMessageUseCase
 ) : CreateScheduleMessageUseCase {
 
-    override suspend fun invoke(scheduleId: Long): SimpleResult<Message> {
+    override suspend fun invoke(scheduleId: Long): Either<Failure,Message> {
         return getScheduleTaskUseCase(scheduleId).fold(
-            success = { task ->
+            ifRight = { task ->
                 createMessageUseCase(task.id, scheduleId, task.title, ContentType.TASK_REMINDER)
             },
-            failure = {
-                Result.Failure(it)
+            ifLeft = {
+                Either.Left(it)
             }
         )
     }

@@ -42,10 +42,10 @@ class ResponseMiddleware(
 
             is UserResponseAction -> scope.launch {
                 getScheduleUseCase(action.scheduleId).fold(
-                    success = { schedule ->
+                    ifRight = { schedule ->
                         dispatch(ScheduleReplyAction(schedule, action.replyType))
                     },
-                    failure = {
+                    ifLeft = {
                         Timber.e(it)
                     }
                 )

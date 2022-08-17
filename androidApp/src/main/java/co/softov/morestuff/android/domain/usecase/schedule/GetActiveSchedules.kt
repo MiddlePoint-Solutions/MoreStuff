@@ -1,19 +1,20 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 
-import co.softov.morestuff.android.domain.model.SimpleResult
+import arrow.core.Either
+import co.softov.morestuff.android.domain.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
 interface GetActiveSchedules {
-    suspend operator fun invoke(): SimpleResult<List<Schedule>>
+    suspend operator fun invoke(): Either<Failure, List<Schedule>>
 }
 
 class GetActiveSchedulesImpl(
     private val scheduleRepository: ScheduleRepository
 ) : GetActiveSchedules {
 
-    override suspend fun invoke(): SimpleResult<List<Schedule>> {
+    override suspend fun invoke(): Either<Failure,List<Schedule>> {
         return scheduleRepository.getActiveSchedules()
     }
 }

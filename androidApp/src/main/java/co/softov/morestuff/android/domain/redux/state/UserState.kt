@@ -3,7 +3,6 @@ package co.softov.morestuff.android.domain.redux.state
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.UserSettings
 import co.softov.morestuff.android.domain.redux.*
-import co.softov.morestuff.android.domain.redux.state.UserAction.*
 import co.softov.morestuff.android.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -15,23 +14,23 @@ data class UserState(
 
 sealed class UserAction : Action.FeatureAction() {
 
-    data class SetUserSettings(val settings: UserSettings) : UserAction()
-    data class ChangeSnoozeLimit(val limit: Int) : UserAction()
+    data class SetUserSettings(val settings: UserSettings) : DashboardAction()
+    data class ChangeSnoozeLimit(val limit: Int) : DashboardAction()
 
 }
 
 fun AppState.reduceUserState(action: Action): AppState {
     return when (action) {
         is Init,
-        is UserAction -> copy(userState = userState.reduce(action))
+        is DashboardAction -> copy(userState = userState.reduce(action))
         else -> this
     }
 }
 
 fun UserState.reduce(action: Action): UserState {
     return when (action) {
-        is ChangeSnoozeLimit -> copy(taskSnoozeLimit = action.limit)
-        is SetUserSettings -> copy(
+        is UserAction.ChangeSnoozeLimit -> copy(taskSnoozeLimit = action.limit)
+        is UserAction.SetUserSettings -> copy(
             taskSnoozeLimit = action.settings.snoozeLimit
         )
         else -> this
@@ -52,10 +51,10 @@ class UserMiddleware(
         when (action) {
             is Init -> scope.launch {
                 val settings = userRepository.getUserSettings()
-                dispatch(SetUserSettings(settings))
+                dispatch(UserAction.SetUserSettings(settings))
             }
 
-            is ChangeSnoozeLimit -> scope.launch {
+            is UserAction.ChangeSnoozeLimit -> scope.launch {
                 userRepository.setSnoozeLimit(action.limit)
             }
             else -> NoOp
