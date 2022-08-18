@@ -17,18 +17,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ContentViewModel(
-    private val getActiveScheduleMessages: GetActiveScheduleMessages,
-    private val getActiveTasks: GetActiveTasks,
+class MainViewModel(
     private val getMessages: GetMessages,
     private var conductor: ContentConductor?
 ) : ViewModel(), KoinComponent {
 
     private val store: AppStore by inject()
-
-    private val _tasks = MutableStateFlow<List<Scope>>(listOf())
-    val tasks: StateFlow<List<Scope>>
-        get() = _tasks
 
     private val _messages = MutableStateFlow<List<Message>>(listOf())
     val messages: StateFlow<List<Message>>
@@ -39,18 +33,11 @@ class ContentViewModel(
         get() = _priorityState
 
     init {
-        /*viewModelScope.launch {
-            getActiveTasks()
-                .onEach { _tasks.value = it }
-                .launchIn(this)
-        }*/
-
         viewModelScope.launch {
             getMessages()
                 .onEach { _messages.value = it }
                 .launchIn(this)
         }
-
     }
 
     fun addNewTask(title: String) {

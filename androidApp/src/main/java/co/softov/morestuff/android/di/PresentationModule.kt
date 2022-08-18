@@ -1,8 +1,7 @@
 package co.softov.morestuff.android.di
 
-import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.ui.main.ContentConductor
-import co.softov.morestuff.android.ui.main.ContentViewModel
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType
 import co.softov.morestuff.android.ui.settings.SettingsViewModel
@@ -13,10 +12,8 @@ val presentationModule = module {
 
     // ViewModel
     viewModel { (conductor: ContentConductor) ->
-        ContentViewModel(
+        MainViewModel(
             conductor = conductor,
-            getActiveScheduleMessages = get(),
-            getActiveTasks = get(),
             getMessages = get()
         )
     }

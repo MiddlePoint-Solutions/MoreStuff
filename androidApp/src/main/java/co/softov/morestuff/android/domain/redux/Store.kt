@@ -42,7 +42,6 @@ interface Store<State> {
     val state: StateFlow<State>
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 open class SimpleStore<State>(
     startingState: State,
     private val reducers: List<Reducer<State>>,

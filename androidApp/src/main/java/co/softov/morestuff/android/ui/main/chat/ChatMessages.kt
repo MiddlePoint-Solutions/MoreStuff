@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.main.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition

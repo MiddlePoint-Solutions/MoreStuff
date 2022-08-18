@@ -2,6 +2,7 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
+import co.softov.morestuff.android.domain.redux.state.DashboardMiddleware
 import co.softov.morestuff.android.domain.redux.state.UserMiddleware
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.schedule.*
@@ -25,7 +26,8 @@ val storeModule = module {
             scheduleMiddleware = get(),
             responseMiddleware = get(),
             notificationMiddleware = get(),
-            userMiddleware = get()
+            userMiddleware = get(),
+            dashboardMiddleware = get()
         )
     }
 
@@ -60,6 +62,7 @@ val storeModule = module {
     factory { ResponseMiddleware(getScheduleUseCase = get()) }
     factory { NotificationMiddleware(notifier = get()) }
     factory { UserMiddleware(userRepository = get()) }
+    factory { DashboardMiddleware() }
 }
 
 val taskUseCases = module {

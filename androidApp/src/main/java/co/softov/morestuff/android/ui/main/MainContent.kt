@@ -10,9 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.navigationBarsWithImePadding
+import co.softov.morestuff.android.ui.main.chat.ChatActions
+import co.softov.morestuff.android.ui.main.input.UserInput
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -24,7 +23,7 @@ fun ChatContent(
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val viewModel = getViewModel<ContentViewModel> {
+    val viewModel = getViewModel<MainViewModel> {
         parametersOf(conductor)
     }
 
@@ -43,17 +42,6 @@ fun ChatContent(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-//                PriorityLayout() {
-//                    messageItems.value.shuffled().forEach {
-//                        PriorityTask(it.title)
-//                    }
-//                }
-//                StaggeredVerticalGrid(maxColumnWidth = 150.dp) {
-//                    messageItems.value.forEach {
-//                        PrioritySquare(it.title)
-//                    }
-//                }
-
                 Messages(
                     messages = messageItems.value,
                     actions = chatActions,
@@ -63,6 +51,7 @@ fun ChatContent(
             }
 
             UserInput(
+                modifier = Modifier.imePadding(),
                 viewModel = viewModel,
                 onMessageSent = { content ->
                     viewModel.addNewTask(content)
@@ -72,7 +61,6 @@ fun ChatContent(
                         //scrollState.scrollToItem(index = 0)
                     }
                 },
-                modifier = Modifier.imePadding()
             )
         }
     }

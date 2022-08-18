@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.main.chat
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.main.chat.items.MockData
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 

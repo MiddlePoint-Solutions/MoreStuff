@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.main.chat.items
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
@@ -16,6 +16,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.main.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.appChatItem
 
@@ -100,26 +101,3 @@ fun AppChatItemPreview() {
 }
 
 
-object MockData {
-
-    val chatActions = ChatActions(confirmationAction = { _, _ -> }, scheduleAction = { _, _ -> })
-
-    object Message {
-
-        val userNewTask =
-            Message(
-                0,
-                0,
-                0,
-                ContentType.USER_NEW_TASK,
-                "The big bang",
-                null,
-                content = "Hello there!",
-                null,
-                null,
-                null
-            )
-
-    }
-
-}

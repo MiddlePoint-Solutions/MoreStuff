@@ -15,7 +15,7 @@ import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
 import java.util.*
 
-class ContentFragment : BaseFragment() {
+class MainFragment : BaseFragment() {
 
     private val conductor = object : ContentConductor {
 

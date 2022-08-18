@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.redux.state
 
-import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.UserSettings
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.repository.UserRepository
@@ -8,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 data class UserState(
-    val currentPriority: Priority = Priority.Today(),
     val taskSnoozeLimit: Int = 3
 )
 
@@ -22,7 +20,7 @@ sealed class UserAction : Action.FeatureAction() {
 fun AppState.reduceUserState(action: Action): AppState {
     return when (action) {
         is Init,
-        is DashboardAction -> copy(userState = userState.reduce(action))
+        is DashboardAction -> copy(user = user.reduce(action))
         else -> this
     }
 }
@@ -62,7 +60,6 @@ class UserMiddleware(
 
         return next(state, action, dispatch)
     }
-
 }
 
 
