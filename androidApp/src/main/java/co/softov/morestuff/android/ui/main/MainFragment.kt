@@ -17,7 +17,7 @@ import java.util.*
 
 class MainFragment : BaseFragment() {
 
-    private val conductor = object : ContentConductor {
+    private val conductor = object : MainConductor {
 
         override fun showTaskList() {
             listFragment.show(parentFragmentManager, ListFragment::javaClass.name)

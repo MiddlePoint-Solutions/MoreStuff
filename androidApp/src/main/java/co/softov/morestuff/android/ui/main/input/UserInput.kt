@@ -6,18 +6,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import androidx.compose.ui.tooling.preview.Preview
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.ui.main.MainViewModel
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.main.MainPresenter
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
 var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
 
 @Composable
 fun UserInput(
-    viewModel: MainViewModel,
+    viewModel: MainPresenter,
     modifier: Modifier = Modifier,
     onMessageSent: (String) -> Unit,
     resetScroll: () -> Unit

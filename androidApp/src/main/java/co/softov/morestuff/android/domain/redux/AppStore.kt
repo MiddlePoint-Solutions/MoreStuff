@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.domain.redux
 
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.domain.redux.state.DashboardMiddleware
+import co.softov.morestuff.android.domain.redux.state.PriorityMiddleware
 import co.softov.morestuff.android.domain.redux.state.UserMiddleware
-import co.softov.morestuff.android.domain.redux.state.reduceDashboardState
+import co.softov.morestuff.android.domain.redux.state.reducePriorityState
 import co.softov.morestuff.android.domain.redux.state.reduceUserState
 
 class AppStore(
@@ -15,12 +15,12 @@ class AppStore(
     responseMiddleware: ResponseMiddleware,
     notificationMiddleware: NotificationMiddleware,
     userMiddleware: UserMiddleware,
-    dashboardMiddleware: DashboardMiddleware,
+    priorityMiddleware: PriorityMiddleware,
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
         AppState::reduceUserState,
-        AppState::reduceDashboardState,
+        AppState::reducePriorityState,
     ),
     listOf(
         logger,
@@ -30,7 +30,7 @@ class AppStore(
         messageMiddleware,
         responseMiddleware,
         notificationMiddleware,
-        dashboardMiddleware,
+        priorityMiddleware,
         navigator
     )
 )

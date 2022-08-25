@@ -13,6 +13,7 @@ buildscript {
         classpath(co.softov.morestuff.buildsrc.Libs.Sqldelight.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.serialization)
         classpath(co.softov.morestuff.buildsrc.Libs.Koin.gradlePlugin)
+        classpath(co.softov.morestuff.buildsrc.Libs.moleculeGradlePlugin)
     }
 }
 group = "co.softov.morestuff"

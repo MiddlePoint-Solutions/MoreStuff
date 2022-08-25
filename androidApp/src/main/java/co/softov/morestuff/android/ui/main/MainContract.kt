@@ -4,7 +4,7 @@ import co.softov.morestuff.android.app.presentation.navigation.BaseConductor
 
 // TODO: stop using conductor pattern
 
-interface ContentConductor : BaseConductor {
+interface MainConductor : BaseConductor {
     fun showTaskList()
     fun showTodayTimePicker()
     fun showTomorrowTimePicker()

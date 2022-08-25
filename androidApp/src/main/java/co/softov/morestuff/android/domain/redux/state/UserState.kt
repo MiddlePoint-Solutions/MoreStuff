@@ -12,15 +12,15 @@ data class UserState(
 
 sealed class UserAction : Action.FeatureAction() {
 
-    data class SetUserSettings(val settings: UserSettings) : DashboardAction()
-    data class ChangeSnoozeLimit(val limit: Int) : DashboardAction()
+    data class SetUserSettings(val settings: UserSettings) : PriorityAction()
+    data class ChangeSnoozeLimit(val limit: Int) : PriorityAction()
 
 }
 
 fun AppState.reduceUserState(action: Action): AppState {
     return when (action) {
         is Init,
-        is DashboardAction -> copy(user = user.reduce(action))
+        is PriorityAction -> copy(user = user.reduce(action))
         else -> this
     }
 }

@@ -20,6 +20,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.main.chat.items.AppChatItem
+import co.softov.morestuff.android.ui.main.chat.items.TaskReminderItem
 import kotlinx.coroutines.launch
 
 private val JumpToBottomThreshold = 56.dp

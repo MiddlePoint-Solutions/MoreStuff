@@ -1,7 +1,8 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.1"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.2"
+    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.4.0"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
 
     object Accompanist {
@@ -12,7 +13,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.0"
+        private const val version = "1.7.10"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -118,13 +119,12 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "1.2.0-rc03"
+            private const val version = "1.3.0-beta01"
 
-            const val compiler = "androidx.compose.compiler:compiler:1.2.0"
             const val runtime = "androidx.compose.runtime:runtime:$version"
             const val foundation = "androidx.compose.foundation:foundation:$version"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
-            const val paging = "androidx.paging:paging-compose:1.0.0-alpha12"
+            const val paging = "androidx.paging:paging-compose:1.0.0-alpha16"
 
             const val ui = "androidx.compose.ui:ui:$version"
             const val viewBinding = "androidx.compose.ui:ui-viewbinding:$version"

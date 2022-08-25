@@ -5,21 +5,18 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Scope
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
-import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class MainViewModel(
+class MainPresenter(
     private val getMessages: GetMessages,
-    private var conductor: ContentConductor?
+    private var conductor: MainConductor?
 ) : ViewModel(), KoinComponent {
 
     private val store: AppStore by inject()

@@ -2,32 +2,33 @@ package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.redux.state.PriorityAction.SetPriority
 import kotlinx.coroutines.CoroutineScope
 
-data class DashboardState(
-    val currentPriority: Priority = Priority.Today(),
+data class PriorityState(
+    val current: Priority = Priority.Today(),
 )
 
-sealed class DashboardAction : Action.FeatureAction() {
-
+sealed class PriorityAction : Action.FeatureAction() {
+    data class SetPriority(val priority: Priority) : PriorityAction()
 }
 
-fun AppState.reduceDashboardState(action: Action): AppState {
+fun AppState.reducePriorityState(action: Action): AppState {
     return when (action) {
         is Init,
-        is DashboardAction -> copy(dashboard = dashboard.reduce(action))
+        is PriorityAction -> copy(priorityState = priorityState.reduce(action))
         else -> this
     }
 }
 
-fun DashboardState.reduce(action: Action): DashboardState {
+fun PriorityState.reduce(action: Action): PriorityState {
     return when (action) {
-
+        is SetPriority -> copy(current = action.priority)
         else -> this
     }
 }
 
-class DashboardMiddleware(
+class PriorityMiddleware(
 ) : Middleware<AppState> {
 
     override fun invoke(

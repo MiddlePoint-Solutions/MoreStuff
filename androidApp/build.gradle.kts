@@ -21,11 +21,11 @@ repositories {
 }
 
 android {
-    compileSdk = 32
+    compileSdk = 33
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 33
         versionCode = 3
         versionName = "0.2.0"
     }
@@ -47,7 +47,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = "1.3.0"
     }
 }
 
@@ -99,7 +99,6 @@ dependencies {
 
     // Compose
     implementation(Libs.AndroidX.Compose.activityCompose)
-    implementation(Libs.AndroidX.Compose.compiler)
     implementation(Libs.AndroidX.Compose.runtime)
     implementation(Libs.AndroidX.Compose.ui)
     implementation(Libs.AndroidX.Compose.viewBinding)

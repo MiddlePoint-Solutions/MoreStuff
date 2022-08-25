@@ -6,10 +6,10 @@ import co.softov.morestuff.android.domain.enums.LaterOption
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.TodayOption
 import co.softov.morestuff.android.domain.enums.TomorrowOption
+import co.softov.morestuff.android.domain.redux.NoOp
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 class TimeManagerImpl(
     private val debug: DevTools
 ) : TimeManager {
@@ -18,10 +18,9 @@ class TimeManagerImpl(
 
     override fun getPriorityTime(priority: Priority): String? {
 
-        return when (val option = priority.value) {
-            is TodayOption -> getTimeForToday(option)
-            is TomorrowOption -> getTimeForTomorrow(option)
-            is LaterOption -> null
+        return when (priority) {
+            is Priority.Today -> getTimeForToday(priority.option)
+            is Priority.Tomorrow -> getTimeForTomorrow(priority.option)
             else -> null
         }
     }
@@ -35,11 +34,13 @@ class TimeManagerImpl(
             }
             currentTime.toString()
         }
+        else -> "TODO"
     }
 
     private fun getTimeForTomorrow(option: TomorrowOption): String = when (option) {
         TomorrowOption.Automatic -> {
             TimeUtils.tomorrowLocalDateTime(hour = 9).toString()
         }
+        else -> "TODO"
     }
 }
