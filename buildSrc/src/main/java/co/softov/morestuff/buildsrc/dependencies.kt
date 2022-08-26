@@ -3,7 +3,7 @@ package co.softov.morestuff.buildsrc
 object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.2"
     const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.4.0"
-    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.1.5"
+    const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
     object Accompanist {
         private const val version = "0.25.0"

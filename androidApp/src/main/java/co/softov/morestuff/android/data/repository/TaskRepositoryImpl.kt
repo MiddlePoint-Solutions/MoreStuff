@@ -7,7 +7,7 @@ import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.mapper.taskDbMapper
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.Failure
-import co.softov.morestuff.android.domain.model.Scope
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.db.StuffDb
@@ -24,28 +24,28 @@ class TaskRepositoryImpl(
     private val taskQueries = database.taskQueries
     private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
-    override suspend fun createTask(title: String): Either<Failure,Scope> {
+    override suspend fun createTask(title: String): Either<Failure,Task> {
         val currentTime = TimeUtils.currentLocalDateTimeString
         return taskQueries.transactionWithResult {
             taskQueries.insertTask(currentTime, title)
             val taskId = lastInsertId
-            val scope = Scope(id = taskId, title = title, createTime = currentTime)
-            Right(scope)
+            val task = Task(id = taskId, title = title, createTime = currentTime)
+            Right(task)
         }
     }
 
-    override suspend fun getTask(taskId: Long): Either<Failure,Scope> {
+    override suspend fun getTask(taskId: Long): Either<Failure,Task> {
         return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
             null -> Left(TaskDoesNotExist)
             else -> Right(mapTaskDb(taskDb))
         }
     }
 
-    override suspend fun getActiveTasksFlow(): Flow<List<Scope>> {
+    override suspend fun getActiveTasksFlow(): Flow<List<Task>> {
         return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskDb) }
     }
 
-    override suspend fun getCompleteTasksFlow(): Flow<List<Scope>> {
+    override suspend fun getCompleteTasksFlow(): Flow<List<Task>> {
         return taskQueries.selectAllComplete().asFlow().mapToList().map { mapList(it, mapTaskDb) }
     }
 

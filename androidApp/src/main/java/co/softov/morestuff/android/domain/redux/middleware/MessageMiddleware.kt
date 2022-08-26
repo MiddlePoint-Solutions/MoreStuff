@@ -39,8 +39,8 @@ class MessageMiddleware(
 
         when (action) {
             is TaskCreatedAction -> scope.launch {
-                createTaskMessageUseCase(action.scope)
-                createTaskConfirmationMessageUseCase(action.scope.id, action.priority)
+                createTaskMessageUseCase(action.task)
+                createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 
             is ScheduleReplyAction -> scope.launch {

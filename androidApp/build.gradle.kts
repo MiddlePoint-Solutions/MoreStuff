@@ -9,6 +9,7 @@ plugins {
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
     id("koin")
+    id("app.cash.molecule")
 }
 
 group = "co.softov.morestuff"

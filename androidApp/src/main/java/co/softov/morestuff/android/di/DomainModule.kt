@@ -5,8 +5,11 @@ import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.domain.redux.state.PriorityMiddleware
 import co.softov.morestuff.android.domain.redux.state.UserMiddleware
 import co.softov.morestuff.android.domain.usecase.message.*
+import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.task.*
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val serviceModule = module {
@@ -17,19 +20,8 @@ val serviceModule = module {
 
 val storeModule = module {
     // Store
-    single {
-        AppStore(
-            logger = get(),
-            navigator = get(),
-            taskMiddleware = get(),
-            messageMiddleware = get(),
-            scheduleMiddleware = get(),
-            responseMiddleware = get(),
-            notificationMiddleware = get(),
-            userMiddleware = get(),
-            priorityMiddleware = get()
-        )
-    }
+
+    singleOf(::AppStore)
 
     // Middleware
 
@@ -65,7 +57,7 @@ val storeModule = module {
     factory { PriorityMiddleware() }
 }
 
-val taskUseCases = module {
+val TaskUseCases = module {
     factory<CreateTaskUseCase> {
         CreateNewTaskUseCaseImpl(taskRepository = get())
     }
@@ -153,4 +145,8 @@ val messageUseCases = module {
             getScheduleTaskUseCase = get()
         )
     }
+}
+
+val priorityUseCases = module {
+    factoryOf(::GetPriorityOptionsUseCase)
 }

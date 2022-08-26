@@ -1,22 +1,22 @@
 package co.softov.morestuff.android.domain.enums
 
 sealed interface Priority {
-    data class Today(val option: TodayOption = TodayOption.Automatic) : Priority
-    data class Tomorrow(val option: TomorrowOption = TomorrowOption.Automatic) : Priority
-    data class Later(val option: LaterOption = LaterOption.Automatic) : Priority
+    data class Today(val option: TodayOption = TodayOption.Auto) : Priority
+    data class Tomorrow(val option: TomorrowOption = TomorrowOption.Auto) : Priority
+    data class Later(val option: LaterOption = LaterOption.Auto) : Priority
 }
 
 sealed interface PriorityOption
 
 enum class TodayOption : PriorityOption {
-    Automatic, Specify, OneHour, Morning, Noon, Afternoon, Evening, Tonight,
+    Auto, Specify, OneHour, Morning, Noon, Afternoon, Evening, Tonight,
 }
 
 enum class TomorrowOption : PriorityOption {
-    Automatic, Specify, Morning,  Noon, Afternoon, Evening, Late,
+    Auto, Specify, Morning,  Noon, Afternoon, Evening, Late,
 }
 
 enum class LaterOption : PriorityOption {
-    Automatic, Custom, Weekend, Someday
+    Auto, Custom, Weekend, Someday
 }
 

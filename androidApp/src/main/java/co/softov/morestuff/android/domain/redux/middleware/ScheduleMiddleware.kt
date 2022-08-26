@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCompleteAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskComplete
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import kotlinx.coroutines.CoroutineScope
@@ -42,12 +42,12 @@ class ScheduleMiddleware(
         when (action) {
 
             is TaskCreatedAction -> scope.launch {
-                createScheduleUseCase(action.scope.id, action.priority).map {
+                createScheduleUseCase(action.task.id, action.priority).map {
                     dispatch(ScheduleCreatedAction(it))
                 }
             }
 
-            is TaskCompleteAction -> scope.launch {
+            is TaskComplete -> scope.launch {
                 cancelActiveScheduleUseCase(action.taskId)
             }
 
@@ -69,7 +69,7 @@ class ScheduleMiddleware(
                         dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
-                    DONE -> dispatch(TaskCompleteAction(schedule.taskId))
+                    DONE -> dispatch(TaskComplete(schedule.taskId))
                 }
             }
 

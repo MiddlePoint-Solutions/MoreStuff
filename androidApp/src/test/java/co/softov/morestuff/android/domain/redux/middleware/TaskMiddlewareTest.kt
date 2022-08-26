@@ -1,16 +1,16 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Scope
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
 import co.softov.morestuff.android.domain.testActionDispatch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.koin.test.KoinTest
 import org.koin.test.get
 
-class ScopeMiddlewareTest : KoinTest {
+class TaskMiddlewareTest : KoinTest {
 
     /*@get:Rule
     val koinTestRule = KoinTestRule.create {
@@ -33,7 +33,7 @@ class ScopeMiddlewareTest : KoinTest {
     }*/
 
     private val title = "Test"
-    private val testScope = Scope(0, title, "")
+    private val testTask = Task(0, title, "")
 
     @Test
     fun `should inject my components`() {
@@ -50,8 +50,8 @@ class ScopeMiddlewareTest : KoinTest {
             val middleware = get<TaskMiddleware>()
 
             val priority = Priority.Today()
-            val action = CreateTaskAction(title, priority)
-            val expected = TaskAction.TaskCreatedAction(testScope, priority)
+            val action = CreateTask(title)
+            val expected = TaskAction.TaskCreatedAction(testTask, priority)
             middleware.testActionDispatch(AppState(), action, expected)
         }
 

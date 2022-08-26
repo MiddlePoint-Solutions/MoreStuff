@@ -2,12 +2,8 @@ package co.softov.morestuff.android
 
 import android.app.Activity
 import android.app.Application
-import android.content.Intent
-import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.preference.PreferenceManager
-import co.softov.morestuff.android.app.receiver.TestReceiver
-import co.softov.morestuff.android.app.receiver.WakeupReceiver
 import co.softov.morestuff.android.app.util.EmptyApplicationLifecycleCallback
 import co.softov.morestuff.android.di.*
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -50,12 +46,13 @@ class MsApplication : Application() {
                 listOf(
                     serviceModule,
                     storeModule,
-                    taskUseCases,
+                    TaskUseCases,
                     messageUseCases,
                     scheduleUseCases,
+                    priorityUseCases,
                     dataModule,
                     presentationModule,
-                    navigationModule
+                    navigationModule,
                 )
             )
         }

@@ -1,12 +1,14 @@
 package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.state.PriorityAction.SetPriority
 import kotlinx.coroutines.CoroutineScope
 
 data class PriorityState(
     val current: Priority = Priority.Today(),
+    val options: List<PriorityOption> = listOf()
 )
 
 sealed class PriorityAction : Action.FeatureAction() {

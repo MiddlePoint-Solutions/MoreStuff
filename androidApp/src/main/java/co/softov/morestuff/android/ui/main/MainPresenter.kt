@@ -7,7 +7,8 @@ import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTaskAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
+import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -25,10 +26,6 @@ class MainPresenter(
     val messages: StateFlow<List<Message>>
         get() = _messages
 
-    private val _priorityState = MutableStateFlow<Priority>(Priority.Today())
-    val priorityState: StateFlow<Priority>
-        get() = _priorityState
-
     init {
         viewModelScope.launch {
             getMessages()
@@ -38,19 +35,11 @@ class MainPresenter(
     }
 
     fun addNewTask(title: String) {
-        store.dispatch(CreateTaskAction(title, priorityState.value))
+        store.dispatch(CreateTask(title))
     }
 
-    fun selectedTodayPriority() {
-        _priorityState.value = Priority.Today()
-    }
-
-    fun selectedTomorrowPriority() {
-        _priorityState.value = Priority.Tomorrow()
-    }
-
-    fun selectedLaterPriority() {
-        _priorityState.value = Priority.Later()
+    fun priorityChanged(priority: Priority) {
+        store.dispatch(PriorityAction.SetPriority(priority))
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {

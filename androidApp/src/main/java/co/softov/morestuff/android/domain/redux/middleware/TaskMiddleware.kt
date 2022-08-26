@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.app.extensions.simpleName
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Scope
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.NoOp
@@ -18,16 +18,16 @@ import kotlinx.coroutines.launch
 
 sealed class TaskAction : Action.FeatureAction() {
 
-    data class CreateTaskAction(val title: String, val priority: Priority) : TaskAction() {
+    data class CreateTask(val title: String) : TaskAction() {
         override val log: String
-            get() = "${this.simpleName}(title=$title, priority=${priority.simpleName})"
+            get() = "${this.simpleName}(title=$title)"
     }
 
-    data class TaskCompleteAction(val taskId: Long) : TaskAction()
+    data class TaskComplete(val taskId: Long) : TaskAction()
 
-    internal data class TaskCreatedAction(val scope: Scope, val priority: Priority) : TaskAction() {
+    internal data class TaskCreatedAction(val task: Task, val priority: Priority) : TaskAction() {
         override val log: String
-            get() = "${this.simpleName}(task=$scope)"
+            get() = "${this.simpleName}($task,$priority)"
     }
 }
 
@@ -44,14 +44,15 @@ class TaskMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is CreateTaskAction -> scope.launch {
+            is CreateTask -> scope.launch {
                 val params = TaskParams(action.title)
+                val priority = state.priorityState.current
                 createTaskUseCase(params).map { task ->
-                    dispatch(TaskCreatedAction(task, action.priority))
+                    dispatch(TaskCreatedAction(task, priority))
                 }
             }
 
-            is TaskCompleteAction -> scope.launch {
+            is TaskComplete -> scope.launch {
                 setTaskCompleteUseCase(action.taskId)
             }
 
