@@ -54,7 +54,8 @@ val storeModule = module {
     factory { ResponseMiddleware(getScheduleUseCase = get()) }
     factory { NotificationMiddleware(notifier = get()) }
     factory { UserMiddleware(userRepository = get()) }
-    factory { PriorityMiddleware() }
+    factoryOf( ::PriorityMiddleware)
+    factoryOf( ::ErrorMiddleware)
 }
 
 val TaskUseCases = module {

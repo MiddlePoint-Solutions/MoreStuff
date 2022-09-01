@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.redux.state.reduceUserState
 
 class AppStore(
     logger: LoggerMiddleware,
+    errorMiddleware: ErrorMiddleware,
     navigator: NavigationMiddleware,
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
@@ -24,6 +25,7 @@ class AppStore(
     ),
     listOf(
         logger,
+        errorMiddleware,
         userMiddleware,
         taskMiddleware,
         scheduleMiddleware,

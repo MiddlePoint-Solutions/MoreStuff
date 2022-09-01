@@ -3,7 +3,8 @@ package co.softov.morestuff.android.domain.repository
 
 import arrow.core.Either
 import kotlinx.coroutines.flow.Flow
-import co.softov.morestuff.android.domain.Failure
+import co.softov.morestuff.android.domain.model.Failure
+import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 
@@ -29,4 +30,4 @@ interface ScheduleRepository {
     ): Either<Failure,Int>
 }
 
-object ScheduleDoesNotExist : Failure.FeatureFailure()
+object ScheduleDoesNotExist : FeatureFailure

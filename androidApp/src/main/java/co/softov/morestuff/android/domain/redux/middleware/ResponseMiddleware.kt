@@ -46,7 +46,7 @@ class ResponseMiddleware(
                         dispatch(ScheduleReplyAction(schedule, action.replyType))
                     },
                     ifLeft = {
-                        Timber.e(it)
+                        Timber.e(it.toString())
                     }
                 )
             }

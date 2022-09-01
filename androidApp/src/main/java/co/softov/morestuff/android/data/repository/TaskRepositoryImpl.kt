@@ -6,7 +6,7 @@ import arrow.core.Either.Right
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.mapper.taskDbMapper
 import co.softov.morestuff.android.data.utils.TimeUtils
-import co.softov.morestuff.android.domain.Failure
+import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository

@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import arrow.core.Either
-import co.softov.morestuff.android.domain.Failure
+import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Task
 

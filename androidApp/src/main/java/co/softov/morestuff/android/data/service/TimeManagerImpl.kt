@@ -2,9 +2,10 @@ package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.DefaultOption
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.enums.TodayOption
-import co.softov.morestuff.android.domain.enums.TomorrowOption
+import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.enums.TimeOfDayOption
 import co.softov.morestuff.android.domain.service.TimeManager
 
 class TimeManagerImpl(
@@ -22,8 +23,8 @@ class TimeManagerImpl(
         }
     }
 
-    private fun getTimeForToday(option: TodayOption): String = when (option) {
-        TodayOption.Auto -> {
+    private fun getTimeForToday(option: PriorityOption): String = when (option) {
+        DefaultOption.Auto -> {
             val currentTime = when (debug.debugReminders) {
                 true -> TimeUtils.todayLocalDateTimeByAdding(minute = debug.todayDebugTime)
                 else -> TimeUtils.todayLocalDateTimeByAdding(hour = 1)
@@ -34,8 +35,8 @@ class TimeManagerImpl(
         else -> "TODO"
     }
 
-    private fun getTimeForTomorrow(option: TomorrowOption): String = when (option) {
-        TomorrowOption.Auto -> {
+    private fun getTimeForTomorrow(option: PriorityOption): String = when (option) {
+        DefaultOption.Auto -> {
             TimeUtils.tomorrowLocalDateTime(hour = 9).toString()
         }
         else -> "TODO"
