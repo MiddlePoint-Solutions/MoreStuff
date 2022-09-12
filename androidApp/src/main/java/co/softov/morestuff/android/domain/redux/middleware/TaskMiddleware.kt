@@ -11,7 +11,6 @@ import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Middleware
 import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

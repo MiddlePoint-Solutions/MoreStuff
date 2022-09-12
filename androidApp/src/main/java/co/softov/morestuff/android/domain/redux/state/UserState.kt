@@ -2,9 +2,6 @@ package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.model.UserSettings
 import co.softov.morestuff.android.domain.redux.*
-import co.softov.morestuff.android.domain.repository.UserRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 data class UserState(
     val taskSnoozeLimit: Int = 3
@@ -32,33 +29,6 @@ fun UserState.reduce(action: Action): UserState {
             taskSnoozeLimit = action.settings.snoozeLimit
         )
         else -> this
-    }
-}
-
-class UserMiddleware(
-    private val userRepository: UserRepository
-) : Middleware<AppState> {
-
-    override fun invoke(
-        state: AppState,
-        action: Action,
-        dispatch: Dispatch,
-        next: Next<AppState>,
-        scope: CoroutineScope
-    ): Action {
-        when (action) {
-            is Init -> scope.launch {
-                val settings = userRepository.getUserSettings()
-                dispatch(UserAction.SetUserSettings(settings))
-            }
-
-            is UserAction.ChangeSnoozeLimit -> scope.launch {
-                userRepository.setSnoozeLimit(action.limit)
-            }
-            else -> NoOp
-        }
-
-        return next(state, action, dispatch)
     }
 }
 

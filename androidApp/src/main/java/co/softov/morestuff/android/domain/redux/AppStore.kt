@@ -1,8 +1,8 @@
 package co.softov.morestuff.android.domain.redux
 
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.domain.redux.state.PriorityMiddleware
-import co.softov.morestuff.android.domain.redux.state.UserMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.PriorityMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.UserMiddleware
 import co.softov.morestuff.android.domain.redux.state.reducePriorityState
 import co.softov.morestuff.android.domain.redux.state.reduceUserState
 

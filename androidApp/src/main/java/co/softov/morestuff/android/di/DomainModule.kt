@@ -2,8 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.domain.redux.state.PriorityMiddleware
-import co.softov.morestuff.android.domain.redux.state.UserMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.PriorityMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.UserMiddleware
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.*

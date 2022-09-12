@@ -13,7 +13,6 @@ import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmation
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleResponseMessage
 import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Middleware
 import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

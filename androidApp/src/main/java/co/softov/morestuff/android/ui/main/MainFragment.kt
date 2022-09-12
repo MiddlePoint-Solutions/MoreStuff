@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
+import co.softov.morestuff.android.app.util.anyLog
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.compose.viewMigration
@@ -57,6 +58,7 @@ class MainFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        anyLog("onCreateView")
         return ComposeView(inflater.context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

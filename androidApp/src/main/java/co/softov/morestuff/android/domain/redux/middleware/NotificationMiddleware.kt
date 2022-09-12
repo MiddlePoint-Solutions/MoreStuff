@@ -9,7 +9,6 @@ import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.Re
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Middleware
 import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 

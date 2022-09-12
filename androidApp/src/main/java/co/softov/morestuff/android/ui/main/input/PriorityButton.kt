@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.sp
 fun PriorityButton(
     onSelected: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = "",
+    text: String,
     selected: Boolean = false
 ) {
 

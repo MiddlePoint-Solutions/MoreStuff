@@ -9,7 +9,6 @@ import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.Schedu
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Middleware
 import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

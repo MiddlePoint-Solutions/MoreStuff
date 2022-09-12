@@ -1,20 +1,25 @@
 package co.softov.morestuff.android.ui.main.input
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
-import app.cash.molecule.RecompositionClock
 import app.cash.molecule.RecompositionClock.ContextClock
 import app.cash.molecule.launchMolecule
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.presentation.PriorityModel
+import co.softov.morestuff.android.presentation.PriorityOptionsModel
+import co.softov.morestuff.android.presentation.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.PriorityPresenter
 import co.softov.morestuff.android.ui.main.MainPresenter
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
@@ -34,9 +39,19 @@ fun UserInput(
 
     val model by priorityModel.collectAsState()
 
+    val optionsModel: StateFlow<PriorityOptionsModel> = scope.launchMolecule(clock = ContextClock) {
+        PriorityOptionsPresenter()
+    }
+
     Column(
         modifier = modifier
+            .background(color = MaterialTheme.colors.primary)
     ) {
+
+        PriorityOptions(optionsFlow = optionsModel) {
+
+        }
+
         UserPriorityInput(
             currentPriority = when (model) {
                 is PriorityModel.Later -> Priority.Later()

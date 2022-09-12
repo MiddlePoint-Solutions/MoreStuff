@@ -7,7 +7,6 @@ import co.softov.morestuff.android.domain.redux.middleware.NavigationAction.*
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.Screen
 import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Middleware
 import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 

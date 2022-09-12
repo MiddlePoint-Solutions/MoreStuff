@@ -35,8 +35,6 @@ class MainActivity : AppCompatActivity() {
 
         showBatteryOptimizationRequest()
 
-        // Turn off the decor fitting system windows, which allows us to handle insets,
-        // including IME animations
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContentView(R.layout.activity_main)

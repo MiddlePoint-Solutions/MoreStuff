@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux
 
+import co.softov.morestuff.android.domain.redux.middleware.Middleware
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -8,16 +9,6 @@ import kotlin.coroutines.CoroutineContext
 typealias Reducer<State> = (State, Action) -> State
 typealias Dispatch = (Action) -> Unit
 typealias Next<State> = (State, Action, Dispatch) -> Action
-
-interface Middleware<State> {
-    operator fun invoke(
-        state: State,
-        action: Action,
-        dispatch: Dispatch,
-        next: Next<State>,
-        scope: CoroutineScope
-    ): Action
-}
 
 interface Store<State> {
     /**
@@ -38,7 +29,6 @@ interface Store<State> {
      *
      * This is what views subscribe to.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
     val state: StateFlow<State>
 }
 
