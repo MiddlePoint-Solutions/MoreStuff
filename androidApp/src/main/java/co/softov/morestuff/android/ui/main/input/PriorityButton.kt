@@ -11,6 +11,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -19,7 +20,8 @@ fun PriorityButton(
     onSelected: () -> Unit,
     modifier: Modifier = Modifier,
     text: String,
-    selected: Boolean = false
+    selected: Boolean = false,
+    shape: Shape = MaterialTheme.shapes.small.copy(all = CornerSize(0.dp)),
 ) {
 
     val backgroundColor by animateColorAsState(
@@ -40,7 +42,7 @@ fun PriorityButton(
 
     Button(
         modifier = modifier,
-        shape = MaterialTheme.shapes.small.copy(all = CornerSize(0.dp)),
+        shape =  shape,
         colors = ButtonDefaults.buttonColors(
             backgroundColor = backgroundColor,
             contentColor = textColor

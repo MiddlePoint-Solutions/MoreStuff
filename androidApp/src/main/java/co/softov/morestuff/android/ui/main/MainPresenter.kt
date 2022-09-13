@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -10,7 +11,10 @@ import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -40,6 +44,10 @@ class MainPresenter(
 
     fun priorityChanged(priority: Priority) {
         store.dispatch(PriorityAction.SetPriority(priority))
+    }
+
+    fun onPriorityOptionChanged(option: PriorityOption) {
+        store.dispatch(PriorityAction.SetCurrentPriorityOption(option))
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {

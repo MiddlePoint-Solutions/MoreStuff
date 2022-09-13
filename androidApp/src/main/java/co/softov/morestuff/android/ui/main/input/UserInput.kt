@@ -1,7 +1,10 @@
 package co.softov.morestuff.android.ui.main.input
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
+import androidx.compose.ui.unit.dp
 import app.cash.molecule.RecompositionClock.ContextClock
 import app.cash.molecule.launchMolecule
 import co.softov.morestuff.android.R
@@ -43,13 +47,20 @@ fun UserInput(
         PriorityOptionsPresenter()
     }
 
-    Column(
-        modifier = modifier
-            .background(color = MaterialTheme.colors.primary)
-    ) {
+    Column(modifier = modifier) {
 
-        PriorityOptions(optionsFlow = optionsModel) {
-
+        Box(
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colors.primary.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                )
+                .padding(5.dp)
+        ) {
+            PriorityOptions(
+                optionsFlow = optionsModel,
+                onOptionSelected = viewModel::onPriorityOptionChanged
+            )
         }
 
         UserPriorityInput(
@@ -57,10 +68,9 @@ fun UserInput(
                 is PriorityModel.Later -> Priority.Later()
                 is PriorityModel.Today -> Priority.Today()
                 is PriorityModel.Tomorrow -> Priority.Tomorrow()
-            }
-        ) {
-            viewModel.priorityChanged(it)
-        }
+            },
+            onPrioritySelected = viewModel::priorityChanged
+        )
 
         UserTextInput(
             listAction = viewModel::showTaskList,

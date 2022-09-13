@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsParams
@@ -19,7 +20,8 @@ class PriorityMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is PriorityAction.SetPriority -> getPriorityOptions(scope, action, dispatch)
+            is Init -> getPriorityOptions(scope, state.currentPriority, dispatch)
+            is PriorityAction.SetPriority -> getPriorityOptions(scope, action.priority, dispatch)
             else -> NoOp
         }
         return next(state, action, dispatch)
@@ -27,11 +29,11 @@ class PriorityMiddleware(
 
     private fun getPriorityOptions(
         scope: CoroutineScope,
-        action: PriorityAction.SetPriority,
+        priority: Priority,
         dispatch: Dispatch
     ) {
         scope.launch {
-            val params = GetPriorityOptionsParams(action.priority)
+            val params = GetPriorityOptionsParams(priority)
             getPriorityOptionsUseCase(params).fold(
                 ifLeft = {
                     dispatch(ErrorAction(it))

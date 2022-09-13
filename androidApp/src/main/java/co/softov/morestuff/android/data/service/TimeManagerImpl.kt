@@ -2,10 +2,7 @@ package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.DefaultOption
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.enums.PriorityOption
-import co.softov.morestuff.android.domain.enums.TimeOfDayOption
+import co.softov.morestuff.android.domain.enums.*
 import co.softov.morestuff.android.domain.service.TimeManager
 
 class TimeManagerImpl(
@@ -32,7 +29,13 @@ class TimeManagerImpl(
             }
             currentTime.toString()
         }
-        else -> "TODO"
+        DefaultOption.Specify -> TODO()
+        LaterOption.Weekend -> TODO()
+        LaterOption.Someday -> TODO()
+        TimeOfDayOption.Morning -> TODO()
+        TimeOfDayOption.Noon -> TODO()
+        TimeOfDayOption.Afternoon -> TODO()
+        TimeOfDayOption.Evening -> TODO()
     }
 
     private fun getTimeForTomorrow(option: PriorityOption): String = when (option) {

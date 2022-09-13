@@ -1,38 +1,40 @@
 package co.softov.morestuff.android.ui.main.input
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.DefaultOption
-import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.TimeOfDayOption
 import co.softov.morestuff.android.presentation.PriorityOptionsModel
 import kotlinx.coroutines.flow.StateFlow
-import kotlin.math.max
 
 
 @Composable
 fun PriorityOptions(
     modifier: Modifier = Modifier,
+    onOptionSelected: (PriorityOption) -> Unit,
     optionsFlow: StateFlow<PriorityOptionsModel>,
-    onPrioritySelected: (Priority) -> Unit
 ) {
-
-    val maxItemsInRow = 3
 
     val model by optionsFlow.collectAsState()
     val options = model.options
+    val selected = model.current
 
+    val maxItemsInRow = 3
     val firstRow: List<PriorityOption>
     val secondRow: MutableList<PriorityOption> = mutableListOf()
     if (options.size > maxItemsInRow) {
@@ -42,35 +44,42 @@ fun PriorityOptions(
         firstRow = options
     }
 
-
     Column(
         modifier = Modifier
-            .animateContentSize(animationSpec = tween())
+            .fillMaxWidth()
+            .animateContentSize(animationSpec = spring()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (secondRow.isNotEmpty()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
+                modifier = Modifier.animateContentSize(animationSpec = tween()),
+                horizontalArrangement = Arrangement.spacedBy(15.dp)
             ) {
-
                 secondRow.forEach {
-                    PriorityButton(onSelected = { /*TODO*/ }, text = it.toString())
+                    PriorityButton(
+                        onSelected = { onOptionSelected(it) },
+                        text = it.toString(),
+                        shape = MaterialTheme.shapes.small,
+                        selected = it == selected
+                    )
                 }
             }
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
+            modifier = Modifier.animateContentSize(animationSpec = tween()),
+            horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             firstRow.forEach {
-                PriorityButton(onSelected = { /*TODO*/ }, text = it.toString())
+                PriorityButton(
+                    onSelected = { onOptionSelected(it) },
+                    text = it.toString(),
+                    shape = MaterialTheme.shapes.small,
+                    selected = it == selected
+                )
             }
         }
     }
-
 }
 
 @Preview
@@ -99,53 +108,3 @@ fun PriorityOptionsPreview() {
 //    }
 }
 
-@Composable
-private fun StaggeredGrid(
-    modifier: Modifier = Modifier,
-    rows: Int = 2,
-    content: @Composable () -> Unit
-) {
-    Layout(
-        content = content,
-        modifier = modifier
-    ) { measurables, constraints ->
-        val rowWidths = IntArray(rows) { 0 } // Keep track of the width of each row
-        val rowHeights = IntArray(rows) { 0 } // Keep track of the height of each row
-
-        // Don't constrain child views further, measure them with given constraints
-        val placeables = measurables.mapIndexed { index, measurable ->
-            val placeable = measurable.measure(constraints)
-
-            // Track the width and max height of each row
-            val row = index % rows
-            rowWidths[row] += placeable.width
-            rowHeights[row] = max(rowHeights[row], placeable.height)
-
-            placeable
-        }
-
-        // Grid's width is the widest row
-        val width = rowWidths.maxOrNull()?.coerceIn(constraints.minWidth, constraints.maxWidth)
-            ?: constraints.minWidth
-        // Grid's height is the sum of each row
-        val height = rowHeights.sum().coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        // y co-ord of each row
-        val rowY = IntArray(rows) { 0 }
-        for (i in 1 until rows) {
-            rowY[i] = rowY[i - 1] + rowHeights[i - 1]
-        }
-        layout(width, height) {
-            // x co-ord we have placed up to, per row
-            val rowX = IntArray(rows) { 0 }
-            placeables.forEachIndexed { index, placeable ->
-                val row = index % rows
-                placeable.place(
-                    x = rowX[row],
-                    y = rowY[row]
-                )
-                rowX[row] += placeable.width
-            }
-        }
-    }
-}
