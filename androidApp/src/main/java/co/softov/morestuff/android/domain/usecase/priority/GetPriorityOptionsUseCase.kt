@@ -34,10 +34,10 @@ class GetPriorityOptionsUseCase :
                     when {
                         now < morning -> options.addAll(timeOptions)
                         now < noon -> options.addAll(
-                            timeOptions.filter { it == TimeOfDayOption.Morning }
+                            timeOptions.filterNot { it == TimeOfDayOption.Morning }
                         )
                         now < afternoon -> options.addAll(
-                            timeOptions.filter {
+                            timeOptions.filterNot {
                                 it == TimeOfDayOption.Morning || it == TimeOfDayOption.Noon
                             }
                         )

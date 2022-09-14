@@ -50,6 +50,20 @@ fun PriorityOptions(
             .animateContentSize(animationSpec = spring()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Row(
+            modifier = Modifier.animateContentSize(animationSpec = tween()),
+            horizontalArrangement = Arrangement.spacedBy(15.dp)
+        ) {
+            firstRow.forEach {
+                PriorityButton(
+                    onSelected = { onOptionSelected(it) },
+                    text = it.toString(),
+                    shape = MaterialTheme.shapes.small,
+                    selected = it == selected
+                )
+            }
+        }
+
         if (secondRow.isNotEmpty()) {
             Row(
                 modifier = Modifier.animateContentSize(animationSpec = tween()),
@@ -63,20 +77,6 @@ fun PriorityOptions(
                         selected = it == selected
                     )
                 }
-            }
-        }
-
-        Row(
-            modifier = Modifier.animateContentSize(animationSpec = tween()),
-            horizontalArrangement = Arrangement.spacedBy(15.dp)
-        ) {
-            firstRow.forEach {
-                PriorityButton(
-                    onSelected = { onOptionSelected(it) },
-                    text = it.toString(),
-                    shape = MaterialTheme.shapes.small,
-                    selected = it == selected
-                )
             }
         }
     }
