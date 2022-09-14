@@ -4,21 +4,31 @@ import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import co.softov.morestuff.android.ui.compose.viewMigration
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class ListsFragment : BottomSheetDialogFragment() {
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
 
         val height = getWindowHeight()
         val view = ComposeView(requireContext()).apply {
+
             viewMigration {
-                ListsContent(modifier = Modifier.systemBarsPadding())
+                val nestedScrollInterop = rememberNestedScrollInteropConnection()
+                ListsContent(
+                    modifier = Modifier
+                        .systemBarsPadding()
+                        .nestedScroll(nestedScrollInterop)
+                )
             }
         }
         dialog.setContentView(
