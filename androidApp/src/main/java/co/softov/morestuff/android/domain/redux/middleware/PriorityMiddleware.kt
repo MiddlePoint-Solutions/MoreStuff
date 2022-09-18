@@ -7,7 +7,6 @@ import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.currentPriority
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsParams

@@ -106,6 +106,7 @@ dependencies {
     implementation(Libs.AndroidX.Compose.foundation)
     implementation(Libs.AndroidX.Compose.foundationLayout)
     implementation(Libs.AndroidX.Compose.material)
+    implementation(Libs.AndroidX.Compose.material3)
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
     implementation(Libs.AndroidX.Compose.tooling)
     //implementation(Libs.AndroidX.Compose.navigation) issues with navigation version
@@ -116,6 +117,7 @@ dependencies {
     implementation(Libs.Accompanist.insetsUi)
     implementation(Libs.Accompanist.pager)
     implementation(Libs.Accompanist.pagerIndicators)
+    implementation(Libs.Accompanist.permissions)
 
     // Firebase
     implementation(platform(Libs.Firebase.bom))

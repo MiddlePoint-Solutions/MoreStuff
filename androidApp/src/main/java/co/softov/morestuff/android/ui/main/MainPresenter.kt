@@ -55,7 +55,7 @@ class MainPresenter(
         store.dispatch(UserResponseAction(scheduleId, replyType))
     }
 
-    fun applicationResumed() {
+    fun onResume() {
         store.dispatch(OnResumeAction)
     }
 
