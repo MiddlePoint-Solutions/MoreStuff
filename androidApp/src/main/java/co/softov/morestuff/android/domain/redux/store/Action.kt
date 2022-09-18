@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.redux
+package co.softov.morestuff.android.domain.redux.store
 
 sealed class Action {
 
@@ -8,6 +8,7 @@ sealed class Action {
     abstract class FeatureAction : Action()
 }
 
-object NoOp : Action.FeatureAction()
-object Init : Action.FeatureAction()
+object NoOp
+object InitAction : Action.FeatureAction()
+object OnResumeAction : Action.FeatureAction()
 data class Test(val message: String) : Action.FeatureAction()

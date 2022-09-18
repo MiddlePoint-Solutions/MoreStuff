@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import co.softov.morestuff.android.app.util.LifecycleEvents
 import co.softov.morestuff.android.ui.main.chat.ChatActions
 import co.softov.morestuff.android.ui.main.chat.Messages
 import co.softov.morestuff.android.ui.main.input.UserInput
@@ -27,6 +28,12 @@ fun ChatContent(
     val viewModel = getViewModel<MainPresenter> {
         parametersOf(conductor)
     }
+
+    LifecycleEvents(
+        onResume = {
+            viewModel.applicationResumed()
+        }
+    )
 
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,

@@ -7,6 +7,7 @@ import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
+import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
@@ -52,6 +53,10 @@ class MainPresenter(
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
+    }
+
+    fun applicationResumed() {
+        store.dispatch(OnResumeAction)
     }
 
     fun showTaskList() {

@@ -4,6 +4,8 @@ import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.PriorityOption
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.state.PriorityAction.*
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.InitAction
 
 data class PriorityState(
     val current: Priority = Priority.Today(),
@@ -22,7 +24,7 @@ sealed class PriorityAction : Action.FeatureAction() {
 
 fun AppState.reducePriorityState(action: Action): AppState {
     return when (action) {
-        is Init,
+        is InitAction,
         is PriorityAction -> copy(priorityState = priorityState.reduce(action))
         else -> this
     }

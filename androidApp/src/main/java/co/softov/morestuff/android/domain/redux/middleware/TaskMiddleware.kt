@@ -3,9 +3,9 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.app.extensions.simpleName
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.redux.Action
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.NoOp
+import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase

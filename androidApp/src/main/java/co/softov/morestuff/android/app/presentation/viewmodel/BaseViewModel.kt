@@ -3,7 +3,7 @@ package co.softov.morestuff.android.app.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.BuildConfig
-import co.softov.morestuff.android.domain.redux.Action
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.AppStore
 import com.github.terrakok.cicerone.Router

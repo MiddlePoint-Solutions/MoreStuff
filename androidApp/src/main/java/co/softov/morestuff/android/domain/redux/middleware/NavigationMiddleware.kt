@@ -1,8 +1,8 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.redux.Action
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.NoOp
+import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.middleware.NavigationAction.*
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.Screen

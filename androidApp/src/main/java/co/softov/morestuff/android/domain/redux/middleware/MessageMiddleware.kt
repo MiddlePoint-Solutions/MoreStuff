@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.redux.Action
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.NoOp
+import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.ScheduleReplyAction

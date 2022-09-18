@@ -2,6 +2,8 @@ package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.model.UserSettings
 import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.InitAction
 
 data class UserState(
     val taskSnoozeLimit: Int = 3
@@ -16,7 +18,7 @@ sealed class UserAction : Action.FeatureAction() {
 
 fun AppState.reduceUserState(action: Action): AppState {
     return when (action) {
-        is Init,
+        is InitAction,
         is PriorityAction -> copy(user = user.reduce(action))
         else -> this
     }

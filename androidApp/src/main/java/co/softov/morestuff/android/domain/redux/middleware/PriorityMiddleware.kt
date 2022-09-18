@@ -1,8 +1,15 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.currentPriority
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.InitAction
+import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsParams
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +27,7 @@ class PriorityMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is Init -> getPriorityOptions(scope, state.currentPriority, dispatch)
+            OnResumeAction -> getPriorityOptions(scope, state.currentPriority, dispatch)
             is PriorityAction.SetPriority -> getPriorityOptions(scope, action.priority, dispatch)
             else -> NoOp
         }

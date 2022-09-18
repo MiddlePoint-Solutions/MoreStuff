@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain
 
-import co.softov.morestuff.android.domain.redux.Action
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.middleware.Middleware
