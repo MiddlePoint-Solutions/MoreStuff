@@ -40,7 +40,7 @@ val storeModule = module {
             createScheduleUseCase = get(),
             cancelActiveScheduleUseCase = get(),
             setScheduleFulfilledUseCase = get(),
-            countTaskSchedulesUseCase = get()
+            getTaskScheduleCountUseCase = get()
         )
     }
     factory {
@@ -117,8 +117,8 @@ val scheduleUseCases = module {
     }
     factory<SetScheduleResponseMessage> { AddReminderReplyMessageImpl(messageRepository = get()) }
 
-    factory<CountTaskSchedulesUseCase> {
-        CountTaskSchedulesUseCaseImpl(
+    factory<GetTaskScheduleCountUseCase> {
+        GetTaskScheduleCountUseCaseImpl(
             scheduleRepository = get(),
             timeManager = get()
         )

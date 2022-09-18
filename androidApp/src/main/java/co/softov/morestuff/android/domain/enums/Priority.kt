@@ -9,7 +9,7 @@ sealed class Priority(open val option: PriorityOption) {
 sealed interface PriorityOption
 
 enum class DefaultOption : PriorityOption {
-    Auto, Specify
+    Auto, Custom
 }
 
 enum class TimeOfDayOption : PriorityOption {

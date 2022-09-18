@@ -35,7 +35,7 @@ class ScheduleRepositoryImpl(
     ): Either<Failure, Schedule> {
         Timber.d("createTaskReminderSchedule: $taskId for $scheduleTime")
         val scheduleId: Long = scheduleQueries.transactionWithResult {
-            val currentTime = TimeUtils.currentLocalDateTimeString
+            val currentTime = TimeUtils.nowLocalDateTimeString
             val timezone = TimeUtils.currentTimeZone.id
             scheduleQueries.insertSchedule(
                 task_id = taskId,

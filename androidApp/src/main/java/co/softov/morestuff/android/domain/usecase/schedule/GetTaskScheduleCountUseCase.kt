@@ -6,14 +6,14 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import timber.log.Timber
 
-interface CountTaskSchedulesUseCase {
+interface GetTaskScheduleCountUseCase {
     suspend operator fun invoke(taskId: Long): Either<Failure, Int>
 }
 
-class CountTaskSchedulesUseCaseImpl(
+class GetTaskScheduleCountUseCaseImpl(
     private val scheduleRepository: ScheduleRepository,
     private val timeManager: TimeManager
-) : CountTaskSchedulesUseCase {
+) : GetTaskScheduleCountUseCase {
     override suspend fun invoke(taskId: Long): Either<Failure,Int> {
         val timeRange = timeManager.getTodayTimeRange()
         Timber.d("### Schedule time range, $timeRange ###")

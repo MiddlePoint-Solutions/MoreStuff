@@ -28,7 +28,7 @@ class BootCompleteSchedulerImpl(
     }
 
     private fun reschedule(activeSchedules: MutableList<Schedule>) {
-        val currentTime = TimeUtils.currentLocalDateTime
+        val currentTime = TimeUtils.nowLocalDateTime
         Timber.d("BootComplete, Current time: $currentTime")
         Timber.d("BootComplete, active schedules: ${activeSchedules.size}")
 

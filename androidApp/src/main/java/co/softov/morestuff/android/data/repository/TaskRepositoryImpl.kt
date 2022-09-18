@@ -25,7 +25,7 @@ class TaskRepositoryImpl(
     private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(title: String): Either<Failure,Task> {
-        val currentTime = TimeUtils.currentLocalDateTimeString
+        val currentTime = TimeUtils.nowLocalDateTimeString
         return taskQueries.transactionWithResult {
             taskQueries.insertTask(currentTime, title)
             val taskId = lastInsertId
@@ -50,7 +50,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun setTaskComplete(taskId: Long): Either<Failure,Boolean> {
-        val time = TimeUtils.currentLocalDateTimeString
+        val time = TimeUtils.nowLocalDateTimeString
         taskQueries.updateTaskComplete(time, taskId)
         return Right(true)
     }

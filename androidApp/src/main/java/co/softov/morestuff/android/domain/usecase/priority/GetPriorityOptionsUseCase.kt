@@ -6,7 +6,6 @@ import co.softov.morestuff.android.domain.enums.*
 import co.softov.morestuff.android.domain.enums.DefaultOption.*
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.PriorityOptionsError
-import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
 data class GetPriorityOptionsParams(val priority: Priority)
@@ -25,7 +24,7 @@ class GetPriorityOptionsUseCase :
                 is Priority.Today -> {
                     val options = mutableListOf<PriorityOption>(Auto)
 
-                    val now = TimeUtils.currentLocalDateTime
+                    val now = TimeUtils.nowLocalDateTime
                     val morning = TimeUtils.todayLocalDateTime(8)
                     val noon = TimeUtils.todayLocalDateTime(12)
                     val afternoon = TimeUtils.todayLocalDateTime(18)
@@ -43,19 +42,19 @@ class GetPriorityOptionsUseCase :
                         )
                     }
 
-                    options.add(Specify)
+                    options.add(Custom)
                     PriorityOptionsResult(params.priority, options)
                 }
                 is Priority.Tomorrow -> {
                     val options = mutableListOf<PriorityOption>(Auto)
                     options.addAll(TimeOfDayOption.values())
-                    options.add(Specify)
+                    options.add(Custom)
                     PriorityOptionsResult(params.priority, options)
                 }
                 is Priority.Later -> {
                     val options = mutableListOf<PriorityOption>(Auto)
                     options.addAll(LaterOption.values())
-                    options.add(Specify)
+                    options.add(Custom)
                     PriorityOptionsResult(params.priority, options)
                 }
             }

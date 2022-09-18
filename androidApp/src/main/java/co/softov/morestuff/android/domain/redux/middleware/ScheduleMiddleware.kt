@@ -27,7 +27,7 @@ class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
-    private val countTaskSchedulesUseCase: CountTaskSchedulesUseCase,
+    private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase
 ) : Middleware<AppState> {
@@ -104,7 +104,7 @@ class ScheduleMiddleware(
     ) {
         scope.launch {
             val timeOption =
-                when (val result = countTaskSchedulesUseCase(schedule.taskId)) {
+                when (val result = getTaskScheduleCountUseCase(schedule.taskId)) {
                     is Either.Right -> {
                         Timber.d("### Today Schedule count, taskId: ${schedule.taskId} = ${result.value} ###")
                         if (result.value > snoozeLimit) Tomorrow() else Today()

@@ -1,46 +1,66 @@
 package co.softov.morestuff.android.data.utils
 
 import kotlinx.datetime.*
+import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 object TimeUtils {
 
-    val currentUtcInstant: Instant get() = Clock.System.now()
+    val nowUtcInstant: Instant get() = Clock.System.now()
 
-    val currentUtcMillis: Long get() = Clock.System.now().toEpochMilliseconds()
+    val nowUtcMillis: Long get() = Clock.System.now().toEpochMilliseconds()
 
-    val currentLocalDateTime: LocalDateTime
-        get() = currentUtcInstant.toLocalDateTime(currentTimeZone)
+    val nowLocalDateTime: LocalDateTime
+        get() = nowUtcInstant.toLocalDateTime(currentTimeZone)
 
     val currentTimeZone: TimeZone get() = TimeZone.currentSystemDefault()
 
-    val currentLocalDateTimeString: String get() = currentLocalDateTime.toString()
+    val nowLocalDateTimeString: String get() = nowLocalDateTime.toString()
 
     val localDateTime1HourBack: String
-        get() = (currentUtcInstant - 1.hours)
+        get() = (nowUtcInstant - 1.hours)
             .toLocalDateTime(currentTimeZone)
             .toString()
 
     fun tomorrowLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
-        (currentUtcInstant + 1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+        (nowUtcInstant + 1.days).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
             }
 
     fun todayLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
-        (currentUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
+        (nowUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
             }
 
     fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime =
-        (currentUtcInstant + hour.hours + minute.minutes).toLocalDateTime(
+        (nowUtcInstant + hour.hours + minute.minutes).toLocalDateTime(
             TimeZone.currentSystemDefault()
         ).run {
             LocalDateTime(year, month, dayOfMonth, this.hour, this.minute, 0, 0)
         }
+
+    fun weekendLocalDateTime(): LocalDateTime {
+        val daysUntilWeekend = when (nowLocalDateTime.dayOfWeek) {
+            DayOfWeek.MONDAY -> 5
+            DayOfWeek.TUESDAY -> 4
+            DayOfWeek.WEDNESDAY -> 3
+            DayOfWeek.THURSDAY -> 2
+            DayOfWeek.FRIDAY -> 1
+            DayOfWeek.SATURDAY -> 7
+            DayOfWeek.SUNDAY -> 6
+        }
+
+        return (nowLocalDateTime.toInstant(currentTimeZone) + daysUntilWeekend.days).toLocalDateTime(
+            currentTimeZone
+        ).run {
+            LocalDateTime(year, month, dayOfMonth, 10, 0, 0, 0)
+        }
+    }
+
 
     val todayTimeStringPair: Pair<String, String>
         get() = todayLocalDateTime(0, 0).toString() to todayLocalDateTime(23, 59).toString()

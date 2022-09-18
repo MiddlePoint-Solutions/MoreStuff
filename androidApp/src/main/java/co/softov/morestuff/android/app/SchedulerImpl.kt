@@ -21,7 +21,7 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         val data = ScheduleWorker.createWorkerData(scheduleId)
 
         val delayTimeMillis =
-            scheduleTime.toEpochMilliseconds - TimeUtils.currentUtcInstant.toEpochMilliseconds()
+            scheduleTime.toEpochMilliseconds - TimeUtils.nowUtcInstant.toEpochMilliseconds()
 
         val workConstraints = Constraints.Builder().apply {
             setTriggerContentMaxDelay(1, TimeUnit.MINUTES)
