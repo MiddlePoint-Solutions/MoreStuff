@@ -2,8 +2,8 @@ import co.softov.morestuff.buildsrc.Libs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.android.application")
     kotlin("android")
+    id("com.android.application")
     id("kotlin-parcelize")
     id("com.squareup.sqldelight")
     id("com.google.gms.google-services")
@@ -22,13 +22,14 @@ repositories {
 }
 
 android {
-    compileSdk = 33
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
+        compileSdk = 33
         minSdk = 24
         targetSdk = 33
         versionCode = 3
         versionName = "0.2.0"
+        versionNameSuffix = "-beta"
     }
     buildTypes {
         getByName("release") {
@@ -48,7 +49,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.0"
+        kotlinCompilerExtensionVersion = "1.3.2"
     }
 }
 
@@ -99,6 +100,7 @@ dependencies {
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
 
     // Compose
+    implementation(platform(Libs.AndroidX.Compose.bom))
     implementation(Libs.AndroidX.Compose.activityCompose)
     implementation(Libs.AndroidX.Compose.runtime)
     implementation(Libs.AndroidX.Compose.ui)

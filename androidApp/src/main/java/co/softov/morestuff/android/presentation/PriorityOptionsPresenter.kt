@@ -22,8 +22,6 @@ fun PriorityOptionsPresenter(store: AppStore = get()): PriorityOptionsModel {
                 options = store.priorityState.options
             )
         )
-
-
     }
 
     val optionFlow by remember {

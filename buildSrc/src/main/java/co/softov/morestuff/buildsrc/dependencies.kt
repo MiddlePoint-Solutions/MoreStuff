@@ -22,7 +22,7 @@ object Libs {
     }
 
     object Arrow {
-        private const val version = "1.1.2"
+        private const val version = "1.1.3"
         const val bom = "io.arrow-kt:arrow-stack:$version"
         const val core = "io.arrow-kt:arrow-core"
     }
@@ -120,22 +120,23 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "1.3.0-beta02"
+            private const val version = "2022.10.00"
+            const val bom = "androidx.compose:compose-bom:$version"
 
-            const val runtime = "androidx.compose.runtime:runtime:$version"
-            const val foundation = "androidx.compose.foundation:foundation:$version"
-            const val foundationLayout = "androidx.compose.foundation:foundation-layout:$version"
+            const val runtime = "androidx.compose.runtime:runtime"
+            const val foundation = "androidx.compose.foundation:foundation"
+            const val foundationLayout = "androidx.compose.foundation:foundation-layout"
             const val paging = "androidx.paging:paging-compose:1.0.0-alpha16"
 
-            const val ui = "androidx.compose.ui:ui:$version"
-            const val viewBinding = "androidx.compose.ui:ui-viewbinding:$version"
-            const val animation = "androidx.compose.animation:animation:$version"
-            const val material = "androidx.compose.material:material:$version"
-            const val material3 = "androidx.compose.material3:material3:1.0.0-beta02"
+            const val ui = "androidx.compose.ui:ui"
+            const val viewBinding = "androidx.compose.ui:ui-viewbinding"
+            const val animation = "androidx.compose.animation:animation"
+            const val material = "androidx.compose.material:material"
+            const val material3 = "androidx.compose.material3:material3"
 
-            const val materialIconsExtended = "androidx.compose.material:material-icons-extended:$version"
+            const val materialIconsExtended = "androidx.compose.material:material-icons-extended"
 
-            const val tooling = "androidx.compose.ui:ui-tooling:$version"
+            const val tooling = "androidx.compose.ui:ui-tooling"
 
             const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
             const val activityCompose = "androidx.activity:activity-compose:1.4.0"
