@@ -1,8 +1,8 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.2.2"
-    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.4.0"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.3.1"
+    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.6.0"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
     object Accompanist {
@@ -14,7 +14,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.10"
+        private const val version = "1.7.20"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -45,7 +45,7 @@ object Libs {
     }
 
     object Sqldelight {
-        const val version = "1.5.3"
+        const val version = "1.5.4"
         const val gradlePlugin = "com.squareup.sqldelight:gradle-plugin:$version"
         const val androidDriver = "com.squareup.sqldelight:android-driver:$version"
         const val coroutinesJvmExt = "com.squareup.sqldelight:coroutines-extensions-jvm:$version"

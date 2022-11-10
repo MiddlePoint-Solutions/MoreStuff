@@ -22,13 +22,16 @@ repositories {
 }
 
 android {
+
+    namespace = "co.softov.morestuff.android"
+
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         compileSdk = 33
         minSdk = 24
         targetSdk = 33
         versionCode = 3
-        versionName = "0.2.0"
+        versionName = "0.3.0"
         versionNameSuffix = "-beta"
     }
     buildTypes {
