@@ -15,8 +15,6 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
 
     private val workManager = WorkManager.getInstance(context)
 
-    private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
-
     override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
         val data = ScheduleWorker.createWorkerData(scheduleId)
 
@@ -33,12 +31,18 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
             setInputData(data)
             addTag(getScheduleWorkTag(scheduleId))
         }.build()
-        
+
         workManager.enqueue(work)
+    }
+
+    override fun scheduleSmartReminderWork() {
+        TODO("Not yet implemented")
     }
 
     override fun cancelSchedule(scheduleId: Long) {
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))
     }
+
+    private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
 }

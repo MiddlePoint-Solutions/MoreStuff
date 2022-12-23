@@ -4,15 +4,15 @@ import kotlinx.coroutines.flow.Flow
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
-interface GetSchedulesWithTitle {
-    suspend operator fun invoke(): Flow<List<ScheduleWithTitle>>
+interface GetSchedulesWithTitleList {
+    suspend operator fun invoke(): List<ScheduleWithTitle>
 }
 
-class GetSchedulesWithTitleImpl(
+class GetSchedulesWithTitleListImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetSchedulesWithTitle {
-    override suspend fun invoke(): Flow<List<ScheduleWithTitle>> {
-        return scheduleRepository.getActiveSchedulesWithTitleFlow()
+) : GetSchedulesWithTitleList {
+    override suspend fun invoke(): List<ScheduleWithTitle> {
+        return scheduleRepository.getActiveSchedulesWithTitle()
     }
 } 
 

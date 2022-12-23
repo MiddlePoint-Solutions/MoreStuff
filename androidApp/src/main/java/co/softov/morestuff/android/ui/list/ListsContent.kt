@@ -13,6 +13,7 @@ import co.softov.morestuff.android.ui.list.model.title
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 val pages = listOf(
     PageType.PAGE_ACTIVE_SCHEDULES,
@@ -28,6 +29,8 @@ val pages = listOf(
 fun ListsContent(
     modifier: Modifier = Modifier
 ) {
+
+    Timber.d("ListsContent")
     val pagerState = rememberPagerState(initialPage = 0)
     Column(modifier) {
         ScheduleTabs(pagerState, pages)

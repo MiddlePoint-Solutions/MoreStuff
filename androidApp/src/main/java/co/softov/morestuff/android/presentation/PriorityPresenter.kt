@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.redux.priorityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.get
+import timber.log.Timber
 
 sealed interface PriorityModel {
     data class Today(val current: PriorityOption) : PriorityModel
@@ -35,6 +36,8 @@ fun PriorityPresenter(store: AppStore = get()): PriorityModel {
     }.collectAsState(
         initial = model
     )
+
+    Timber.d("priorityFlow: $priorityFlow")
 
     model = priorityFlow
     return model

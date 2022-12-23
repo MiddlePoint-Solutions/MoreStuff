@@ -101,6 +101,7 @@ dependencies {
     // UI
     implementation(Libs.Google.material)
     implementation("com.yuyakaido.android:card-stack-view:2.3.4")
+    implementation("com.alexstyl.swipeablecard:swipeablecard:0.1.0")
 
     // Compose
     implementation(platform(Libs.AndroidX.Compose.bom))

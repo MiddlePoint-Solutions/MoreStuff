@@ -70,14 +70,14 @@ object Libs {
     }
 
     object Koin {
-        private const val version = "3.2.0"
-        const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:$version"
+        private const val version = "3.3.0"
+        const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:3.2.0"
         const val android = "io.insert-koin:koin-android:$version"
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
         const val androidxCompose = "io.insert-koin:koin-androidx-compose:$version"
 
-        const val test = "io.insert-koin:koin-test:$version"
-        const val testJunit = "io.insert-koin:koin-test-junit5:$version"
+        const val test = "io.insert-koin:koin-test:3.2.2"
+        const val testJunit = "io.insert-koin:koin-test-junit5:3.2.2"
     }
 
     object Test {
@@ -113,9 +113,9 @@ object Libs {
         }
 
         object Lifecycle {
-            private const val version = "2.2.0"
+            private const val version = "2.5.1"
             const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:$version"
+            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
         }
 

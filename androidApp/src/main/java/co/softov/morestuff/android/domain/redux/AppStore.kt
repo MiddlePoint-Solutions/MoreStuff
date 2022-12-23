@@ -4,6 +4,7 @@ import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.domain.redux.middleware.PriorityMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.UserMiddleware
 import co.softov.morestuff.android.domain.redux.state.reducePriorityState
+import co.softov.morestuff.android.domain.redux.state.reduceReviewState
 import co.softov.morestuff.android.domain.redux.state.reduceUserState
 
 class AppStore(
@@ -17,11 +18,13 @@ class AppStore(
     notificationMiddleware: NotificationMiddleware,
     userMiddleware: UserMiddleware,
     priorityMiddleware: PriorityMiddleware,
+    reviewMiddleware: ReviewMiddleware,
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
         AppState::reduceUserState,
         AppState::reducePriorityState,
+        AppState::reduceReviewState,
     ),
     listOf(
         logger,
@@ -33,6 +36,7 @@ class AppStore(
         responseMiddleware,
         notificationMiddleware,
         priorityMiddleware,
+        reviewMiddleware,
         navigator
     )
 )

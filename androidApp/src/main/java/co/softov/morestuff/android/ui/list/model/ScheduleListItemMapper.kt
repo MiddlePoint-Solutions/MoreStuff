@@ -5,8 +5,8 @@ import java.text.SimpleDateFormat
 
 class ScheduleListItemMapper {
 
-    val dateFormat =
-        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
+//    val dateFormat =
+//        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
 
     fun map(input: ScheduleWithTitle): ScheduleListItemViewModel {
 

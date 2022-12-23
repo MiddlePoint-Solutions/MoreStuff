@@ -8,11 +8,6 @@ import timber.log.Timber
 
 class ScheduleReceiver : BroadcastReceiver() {
 
-    companion object {
-        const val ACTION_CREATE_REMINDER_SCHEDULE =
-            "co.softov.morestuff.androidApp.ACTION_CREATE_REMINDER_SCHEDULE"
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("ScheduleReceiver, onReceive ${intent.action}")
         when (intent.action) {
@@ -21,9 +16,14 @@ class ScheduleReceiver : BroadcastReceiver() {
     }
 
     private fun startCreateScheduleService(context: Context, intent: Intent) {
-        Intent(context, ScheduleService::class.java).let {
-            it.putExtras(intent)
-            context.startService(it)
+        Intent(context, ScheduleService::class.java).apply {
+            putExtras(intent)
+            context.startService(this)
         }
+    }
+
+    companion object {
+        const val ACTION_CREATE_REMINDER_SCHEDULE =
+            "co.softov.morestuff.androidApp.ACTION_CREATE_REMINDER_SCHEDULE"
     }
 }

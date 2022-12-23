@@ -3,7 +3,7 @@ package co.softov.morestuff.android.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitle
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitle
+import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlow
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
@@ -15,7 +15,7 @@ import timber.log.Timber
 
 class SchedulePageViewModel(
     private val page: PageType,
-    private val getSchedules: GetSchedulesWithTitle,
+    private val getSchedules: GetSchedulesWithTitleFlow,
     private val getLaterSchedules: GetLaterSchedulesWithTitle,
     private val getTodaySchedules: GetTodaySchedulesWithTitle,
     private val getTomorrowSchedules: GetTomorrowSchedulesWithTitle,

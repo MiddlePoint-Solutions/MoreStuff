@@ -7,6 +7,7 @@ import timber.log.Timber
 
 class NotificationService : BaseService(NotificationService::class.java.simpleName) {
 
+    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
         intent?.let {
             it.getReplyIntentExtras()?.also { reply ->

@@ -21,6 +21,8 @@ interface Store<State> {
      */
     fun dispatch(action: Action)
 
+    suspend fun dispatchSuspend(action: Action)
+
     fun reduce(current: State, action: Action): State
 
     /**
@@ -63,6 +65,10 @@ open class SimpleStore<State>(
         launch(Dispatchers.Main) {
             actions.send(action)
         }
+    }
+
+    override suspend fun dispatchSuspend(action: Action) = withContext(Dispatchers.Main) {
+        actions.send(action)
     }
 
     override fun reduce(current: State, action: Action): State {

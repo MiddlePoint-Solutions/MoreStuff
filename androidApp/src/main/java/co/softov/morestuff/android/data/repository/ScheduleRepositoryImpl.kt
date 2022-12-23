@@ -61,6 +61,11 @@ class ScheduleRepositoryImpl(
             .map { mapScheduleDb(it) })
     }
 
+    override suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
+        return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
+            .executeAsList()
+    }
+
     override suspend fun getActiveSchedulesFlow(): Flow<List<Schedule>> {
         return scheduleQueries.selectActiveSchedules()
             .asFlow()
@@ -87,7 +92,7 @@ class ScheduleRepositoryImpl(
             ?: Left(ScheduleDoesNotExist)
     }
 
-    override suspend fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
+    override fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
             .asFlow()
             .mapToList()

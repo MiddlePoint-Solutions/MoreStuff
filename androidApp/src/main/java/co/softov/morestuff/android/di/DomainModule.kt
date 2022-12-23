@@ -2,14 +2,11 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.domain.redux.middleware.PriorityMiddleware
-import co.softov.morestuff.android.domain.redux.middleware.UserMiddleware
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.task.*
 import org.koin.core.module.dsl.factoryOf
-import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val serviceModule = module {
@@ -21,7 +18,21 @@ val serviceModule = module {
 val storeModule = module {
     // Store
 
-    singleOf(::AppStore)
+    single {
+        AppStore(
+            logger = get(),
+            errorMiddleware = get(),
+            navigator = get(),
+            taskMiddleware = get(),
+            messageMiddleware = get(),
+            scheduleMiddleware = get(),
+            responseMiddleware = get(),
+            notificationMiddleware = get(),
+            userMiddleware = get(),
+            priorityMiddleware = get(),
+            reviewMiddleware = get()
+        )
+    }
 
     // Middleware
 
@@ -54,8 +65,10 @@ val storeModule = module {
     factory { ResponseMiddleware(getScheduleUseCase = get()) }
     factory { NotificationMiddleware(notifier = get()) }
     factory { UserMiddleware(userRepository = get()) }
-    factoryOf( ::PriorityMiddleware)
-    factoryOf( ::ErrorMiddleware)
+    factoryOf(::PriorityMiddleware)
+    factoryOf(::ErrorMiddleware)
+    factoryOf(::ReviewMiddleware)
+
 }
 
 val TaskUseCases = module {
@@ -93,10 +106,11 @@ val scheduleUseCases = module {
     }
 
     factory<GetScheduleWithTitle> { GetScheduleWithTitleImpl(scheduleRepository = get()) }
-    factory<GetSchedulesWithTitle> { GetSchedulesWithTitleImpl(scheduleRepository = get()) }
+    factory<GetSchedulesWithTitleFlow> { GetSchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
+    factory<GetSchedulesWithTitleList> { GetSchedulesWithTitleListImpl(scheduleRepository = get()) }
 
     factory<GetActiveSchedules> {
         GetActiveSchedulesImpl(scheduleRepository = get())

@@ -25,7 +25,7 @@ class ScheduleWorker(
         val scheduleId = params.inputData.getLong(PARAM_SCHEDULE_ID, -1)
         if (scheduleId > 0) {
             Timber.d("Working on schedule: $scheduleId")
-            store.dispatch(ScheduleAction.ExecuteScheduleAction(scheduleId))
+            store.dispatchSuspend(ScheduleAction.ExecuteScheduleAction(scheduleId))
         } else {
             Timber.e("Invalid schedule id")
         }

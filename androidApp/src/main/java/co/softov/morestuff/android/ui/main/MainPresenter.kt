@@ -28,8 +28,7 @@ class MainPresenter(
     private val store: AppStore by inject()
 
     private val _messages = MutableStateFlow<List<Message>>(listOf())
-    val messages: StateFlow<List<Message>>
-        get() = _messages
+    val messages: StateFlow<List<Message>> get() = _messages
 
     init {
         viewModelScope.launch {

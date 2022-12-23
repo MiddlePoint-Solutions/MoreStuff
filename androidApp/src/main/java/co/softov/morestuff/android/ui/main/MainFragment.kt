@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.ui.main
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.R
@@ -21,7 +23,7 @@ class MainFragment : BaseFragment() {
     private val conductor = object : MainConductor {
 
         override fun showTaskList() {
-            listFragment.show(parentFragmentManager, ListFragment::javaClass.name)
+            ListsFragment().show(parentFragmentManager, ListFragment::javaClass.name)
         }
 
         override fun showTodayTimePicker() {
@@ -47,7 +49,6 @@ class MainFragment : BaseFragment() {
         }
     }
 
-    private val listFragment: ListsFragment get() = ListsFragment()
     private val router: Router by inject()
 
     override val layoutResourceId: Int
