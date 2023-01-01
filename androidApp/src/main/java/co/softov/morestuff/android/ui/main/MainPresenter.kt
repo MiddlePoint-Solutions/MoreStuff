@@ -8,8 +8,8 @@ import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +39,7 @@ class MainPresenter(
     }
 
     fun addNewTask(title: String) {
-        store.dispatch(CreateTask(title))
+        store.dispatch(TaskAction.CreateTask(title))
     }
 
     fun priorityChanged(priority: Priority) {

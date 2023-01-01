@@ -11,7 +11,7 @@ interface MessageRepository {
 
     suspend fun getAllMessages(): Flow<List<Message>>
 
-    suspend fun getActiveScheduleMessages(startTime: String): Flow<List<Message>>
+    suspend fun getActiveReminderMessages(): List<Message>
 
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 

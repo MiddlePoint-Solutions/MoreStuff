@@ -14,7 +14,7 @@ class AppStore(
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
-    responseMiddleware: ResponseMiddleware,
+    responseMiddleware: ReminderMiddleware,
     notificationMiddleware: NotificationMiddleware,
     userMiddleware: UserMiddleware,
     priorityMiddleware: PriorityMiddleware,

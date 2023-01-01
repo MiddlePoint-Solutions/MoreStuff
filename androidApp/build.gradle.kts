@@ -40,6 +40,7 @@ android {
         }
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -69,6 +70,8 @@ sqldelight {
 
 dependencies {
     implementation(project(":shared"))
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
     // Kotlin
     implementation(Libs.Kotlin.stdlib)

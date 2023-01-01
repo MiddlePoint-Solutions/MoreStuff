@@ -18,10 +18,10 @@ FROM message
 ORDER BY datetime(create_time);
 
 -- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
-selectActiveScheduleMessages:
+selectActiveReminderMessages:
 SELECT *
 FROM message
-WHERE (content_type = 200 AND reply_time IS NULL) OR create_time > :start OR reply_time > :start;
+WHERE (content_type = 200 AND reply_time IS NULL);
 
 selectMessageById:
 SELECT *

@@ -1,0 +1,68 @@
+package co.softov.morestuff.android.domain.redux.middleware
+
+import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.SmartReminderAction
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedules
+import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import timber.log.Timber
+
+sealed class ReminderAction : Action.FeatureAction() {
+
+    object SmartReminderAction : ReminderAction()
+
+    data class UserResponseAction(
+        val scheduleId: Long,
+        val replyType: ReplyType
+    ) : ReminderAction()
+
+}
+
+class ReminderMiddleware(
+    private val getScheduleUseCase: GetScheduleUseCase,
+    private val getActiveSchedules: GetActiveSchedules,
+) : Middleware<AppState> {
+
+    override fun invoke(
+        state: AppState,
+        action: Action,
+        dispatch: Dispatch,
+        next: Next<AppState>,
+        scope: CoroutineScope
+    ): Action {
+        when (action) {
+
+            is SmartReminderAction -> scope.launch {
+                getActiveSchedules().map {
+                    // TODO: check if the schedule is for today and has not been interacted for the last hour
+                    // Use Schedule time extensions to see if it is scheduled for today?
+                    // Maybe this we should be getting a list of the active notifications from the system?
+//                    it.filter { schedule -> }
+                }
+            }
+
+            is UserResponseAction -> scope.launch {
+                getScheduleUseCase(action.scheduleId).fold(
+                    ifRight = { schedule ->
+                        dispatch(ScheduleReplyAction(schedule, action.replyType))
+                    },
+                    ifLeft = {
+                        Timber.e(it.toString())
+                    }
+                )
+            }
+
+            else -> NoOp
+        }
+
+        return next(state, action, dispatch)
+    }
+}

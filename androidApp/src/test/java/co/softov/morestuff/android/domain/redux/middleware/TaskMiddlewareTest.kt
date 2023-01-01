@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateTask
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.CreateTask
 import co.softov.morestuff.android.domain.testActionDispatch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -51,7 +51,7 @@ class TaskMiddlewareTest : KoinTest {
 
             val priority = Priority.Today()
             val action = CreateTask(title)
-            val expected = TaskAction.TaskCreatedAction(testTask, priority)
+            val expected = ReminderAction.TaskCreatedAction(testTask, priority)
             middleware.testActionDispatch(AppState(), action, expected)
         }
 

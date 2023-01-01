@@ -3,14 +3,18 @@ package co.softov.morestuff.android.domain.redux.middleware
 import arrow.core.Either
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.Priority.*
+import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.ScheduleReplyAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskComplete
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
+import co.softov.morestuff.android.domain.redux.snoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.schedule.*
@@ -23,6 +27,11 @@ sealed class ScheduleAction : Action.FeatureAction() {
     data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
 
     internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
+
+    internal data class ScheduleReplyAction(
+        val schedule: Schedule,
+        val replyType: ReplyType
+    ) : ScheduleAction()
 }
 
 class ScheduleMiddleware(

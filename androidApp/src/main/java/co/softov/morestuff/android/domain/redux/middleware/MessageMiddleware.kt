@@ -1,24 +1,24 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.ScheduleReplyAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleResponseMessage
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class MessageAction: Action.FeatureAction() {
-    internal data class CreateScheduleMessageAction(val scheduleId: Long): MessageAction()
+sealed class MessageAction : Action.FeatureAction() {
+    internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
 }
 
 class MessageMiddleware(

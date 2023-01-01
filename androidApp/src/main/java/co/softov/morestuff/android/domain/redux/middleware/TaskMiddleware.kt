@@ -3,28 +3,29 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.app.extensions.simpleName
 import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
+import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class TaskAction : Action.FeatureAction() {
 
-    data class CreateTask(val title: String) : TaskAction() {
+    data class CreateTask(val title: String) : ReminderAction() {
         override val log: String
             get() = "${this.simpleName}(title=$title)"
     }
 
-    data class TaskComplete(val taskId: Long) : TaskAction()
+    data class TaskComplete(val taskId: Long) : ReminderAction()
 
-    internal data class TaskCreatedAction(val task: Task, val priority: Priority) : TaskAction() {
+    internal data class TaskCreatedAction(val task: Task, val priority: Priority) :
+        ReminderAction() {
         override val log: String
             get() = "${this.simpleName}($task,$priority)"
     }

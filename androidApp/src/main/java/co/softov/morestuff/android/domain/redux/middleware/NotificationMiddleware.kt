@@ -6,7 +6,7 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.ResponseAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next

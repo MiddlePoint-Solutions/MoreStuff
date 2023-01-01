@@ -62,9 +62,9 @@ val storeModule = module {
             setScheduleResponseMessage = get()
         )
     }
-    factory { ResponseMiddleware(getScheduleUseCase = get()) }
     factory { NotificationMiddleware(notifier = get()) }
     factory { UserMiddleware(userRepository = get()) }
+    factoryOf(::ReminderMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
     factoryOf(::ReviewMiddleware)
@@ -145,7 +145,7 @@ val scheduleUseCases = module {
 
 val messageUseCases = module {
     factory<GetMessages> { GetMessagesImpl(messageRepository = get()) }
-    factory<GetActiveScheduleMessages> { GetActiveScheduleMessagesImpl(messageRepository = get()) }
+    factory<GetActiveScheduleMessages> { GetActiveMessagesImpl(messageRepository = get()) }
     factory<CreateMessageUseCase> { CreateMessageUseCaseImpl(messageRepository = get()) }
     factory<GetMessageUseCase> { GetMessageImpl(messageRepository = get()) }
     factory<CreateTaskMessageUseCase> {

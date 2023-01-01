@@ -23,6 +23,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.main.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.main.chat.items.TaskReminderItem
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private val JumpToBottomThreshold = 56.dp
 
@@ -65,8 +66,10 @@ fun Messages(
         }
 
         if (enableAutoScroll) {
-            scope.launch {
-                scrollState.animateScrollToItem(0)
+            LaunchedEffect(key1 = itemsCount) {
+                scope.launch {
+                    scrollState.animateScrollToItem(0)
+                }
             }
         }
 
@@ -76,12 +79,15 @@ fun Messages(
             JumpToBottomThreshold.toPx()
         }
 
+        val isScrollingDown = !scrollState.isScrollingUp()
+        Timber.d("isScrollingDown: $isScrollingDown")
+
         // Show the button if the first visible item is not the first one or if the offset is
         // greater than the threshold.
         val jumpToBottomButtonEnabled by remember {
             derivedStateOf {
-                scrollState.firstVisibleItemIndex != 0 ||
-                        scrollState.firstVisibleItemScrollOffset > jumpThreshold
+                (scrollState.firstVisibleItemIndex != 0 ||
+                        scrollState.firstVisibleItemScrollOffset > jumpThreshold) && isScrollingDown
             }
         }
 
@@ -96,6 +102,24 @@ fun Messages(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
+}
+
+@Composable
+private fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset >= firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
 }
 
 private enum class Visibility {

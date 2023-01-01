@@ -4,6 +4,7 @@ package co.softov.morestuff.android.data.repository
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.right
 import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
@@ -57,8 +58,8 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
-        return Right(scheduleQueries.selectActiveSchedules().executeAsList()
-            .map { mapScheduleDb(it) })
+        return scheduleQueries.selectActiveSchedules().executeAsList()
+            .map { mapScheduleDb(it) }.right()
     }
 
     override suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
