@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -9,7 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedules
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -28,7 +29,7 @@ sealed class ReminderAction : Action.FeatureAction() {
 
 class ReminderMiddleware(
     private val getScheduleUseCase: GetScheduleUseCase,
-    private val getActiveSchedules: GetActiveSchedules,
+    private val getActiveSchedulesByPriority: GetActiveSchedulesByPriority,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -41,11 +42,11 @@ class ReminderMiddleware(
         when (action) {
 
             is SmartReminderAction -> scope.launch {
-                getActiveSchedules().map {
+                getActiveSchedulesByPriority(Priority.today).map {
                     // TODO: check if the schedule is for today and has not been interacted for the last hour
                     // Use Schedule time extensions to see if it is scheduled for today?
                     // Maybe this we should be getting a list of the active notifications from the system?
-//                    it.filter { schedule -> }
+
                 }
             }
 

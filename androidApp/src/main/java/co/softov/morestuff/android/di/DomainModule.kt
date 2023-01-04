@@ -116,6 +116,10 @@ val scheduleUseCases = module {
         GetActiveSchedulesImpl(scheduleRepository = get())
     }
 
+    factory<GetActiveSchedulesByPriority> {
+        GetActiveSchedulesByPriorityImpl(getActiveSchedules = get())
+    }
+
     factory<CreateScheduleUseCase> {
         CreateScheduleUseCaseImpl(
             scheduleRepository = get(),

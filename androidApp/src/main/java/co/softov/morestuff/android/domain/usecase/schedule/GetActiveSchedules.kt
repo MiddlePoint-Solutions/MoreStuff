@@ -7,14 +7,20 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
 interface GetActiveSchedules {
-    suspend operator fun invoke(): Either<Failure, List<Schedule>>
+    suspend operator fun invoke(
+        startTime: String? = null,
+        endTime: String? = null,
+    ): Either<Failure, List<Schedule>>
 }
 
 class GetActiveSchedulesImpl(
     private val scheduleRepository: ScheduleRepository
 ) : GetActiveSchedules {
 
-    override suspend fun invoke(): Either<Failure,List<Schedule>> {
-        return scheduleRepository.getActiveSchedules()
+    override suspend fun invoke(
+        startTime: String?,
+        endTime: String?
+    ): Either<Failure, List<Schedule>> {
+        return scheduleRepository.getActiveSchedules(startTime, endTime)
     }
 }

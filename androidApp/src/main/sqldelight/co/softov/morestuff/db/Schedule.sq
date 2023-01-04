@@ -34,7 +34,15 @@ LIMIT 1;
 selectActiveSchedules:
 SELECT *
 FROM schedule
-WHERE active = 1;
+WHERE active = 1
+ORDER BY schedule_time;
+
+selectActiveSchedulesFromStartToEndTime:
+SELECT *
+FROM schedule
+WHERE active = 1
+AND schedule_time BETWEEN :startTime AND :endTime
+ORDER BY schedule_time;
 
 selectActiveScheduleWithTaskTitle:
 SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title

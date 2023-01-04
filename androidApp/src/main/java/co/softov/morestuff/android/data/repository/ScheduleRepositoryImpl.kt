@@ -9,6 +9,7 @@ import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.utils.TimeUtils
+import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
@@ -57,10 +58,13 @@ class ScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
-        return scheduleQueries.selectActiveSchedules().executeAsList()
-            .map { mapScheduleDb(it) }.right()
-    }
+    override suspend fun getActiveSchedules(
+        startTime: String?,
+        endTime: String?
+    ): Either<Failure, List<Schedule>> = scheduleQueries
+        .selectActiveSchedulesFromStartToEndTime(startTime, endTime)
+        .executeAsList().map(mapScheduleDb)
+        .right()
 
     override suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
         return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)

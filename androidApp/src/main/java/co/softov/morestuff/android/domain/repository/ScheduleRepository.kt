@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.repository
 
 
 import arrow.core.Either
+import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Schedule
@@ -12,7 +13,12 @@ interface ScheduleRepository {
 
     suspend fun createSchedule(taskId: Long, scheduleTime: String?): Either<Failure, Schedule>
     suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule>
-    suspend fun getActiveSchedules(): Either<Failure, List<Schedule>>
+
+    suspend fun getActiveSchedules(
+        startTime: String? = null,
+        endTime: String? = null
+    ): Either<Failure, List<Schedule>>
+
     suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle>
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
     suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule>
