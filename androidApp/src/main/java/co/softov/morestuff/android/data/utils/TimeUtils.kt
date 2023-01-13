@@ -9,6 +9,7 @@ import kotlin.time.Duration.Companion.minutes
 object TimeUtils {
 
     val nowUtcInstant: Instant get() = Clock.System.now()
+    val nowUtcInstantString: String = nowUtcInstant.toString()
 
     val nowUtcMillis: Long get() = Clock.System.now().toEpochMilliseconds()
 

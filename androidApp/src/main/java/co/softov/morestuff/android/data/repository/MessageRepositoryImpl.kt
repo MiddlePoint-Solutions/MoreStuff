@@ -59,7 +59,7 @@ class MessageRepositoryImpl(
             messageQueries.insertMessage(
                 task_id = taskId,
                 schedule_id = scheduleId,
-                create_time = TimeUtils.nowLocalDateTimeString,
+                create_time = TimeUtils.nowUtcInstantString,
                 content_type = contentType,
                 content = content
             )
@@ -79,7 +79,7 @@ class MessageRepositoryImpl(
                 messageQueries.updateTaskMessageReply(
                     reply_type = replyType,
                     reply_content = replyContent,
-                    reply_time = TimeUtils.nowLocalDateTimeString,
+                    reply_time = TimeUtils.nowUtcInstantString,
                     id = messageId.value
                 )
             }
