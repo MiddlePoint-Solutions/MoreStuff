@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.SetScheduleResponseMessage
+import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -25,7 +25,7 @@ class MessageMiddleware(
     private val createTaskMessageUseCase: CreateTaskMessageUseCase,
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
-    private val setScheduleResponseMessage: SetScheduleResponseMessage
+    private val setScheduleResponseMessage: SetScheduleMessageResponse
 ) : Middleware<AppState> {
 
     override fun invoke(

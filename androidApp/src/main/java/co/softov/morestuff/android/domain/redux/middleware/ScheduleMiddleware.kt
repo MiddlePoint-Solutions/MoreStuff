@@ -10,7 +10,6 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskComplete
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
@@ -30,6 +29,11 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
     internal data class ScheduleReplyAction(
         val schedule: Schedule,
+        val replyType: ReplyType
+    ) : ScheduleAction()
+
+    internal data class SmartRescheduleAction(
+        val taskIds: List<Long>,
         val replyType: ReplyType
     ) : ScheduleAction()
 }
@@ -75,12 +79,27 @@ class ScheduleMiddleware(
                 when (replyType) {
                     LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     SNOOZE -> if (state.snoozeLimit > 0) {
-                        checkTodayScheduleReply(scope, schedule, state.snoozeLimit, dispatch)
+                        checkTaskSnoozeLimit(scope, schedule.taskId, state.snoozeLimit, dispatch)
                     } else {
                         dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
                     DONE -> dispatch(TaskComplete(schedule.taskId))
+                }
+            }
+
+            is SmartRescheduleAction -> {
+                when (action.replyType) {
+                    LATER -> TODO()
+                    SNOOZE -> action.taskIds.forEach { taskId ->
+                        if (state.snoozeLimit > 0) {
+                            checkTaskSnoozeLimit(scope, taskId, state.snoozeLimit, dispatch)
+                        } else {
+                            dispatch(RescheduleTaskAction(taskId, Today()))
+                        }
+                    }
+                    TOMORROW -> TODO()
+                    DONE -> TODO()
                 }
             }
 
@@ -107,22 +126,21 @@ class ScheduleMiddleware(
         return next(state, action, dispatch)
     }
 
-    private fun checkTodayScheduleReply(
+    private fun checkTaskSnoozeLimit(
         scope: CoroutineScope,
-        schedule: Schedule,
+        taskId: Long,
         snoozeLimit: Int,
         dispatch: Dispatch
     ) {
         scope.launch {
-            val timeOption =
-                when (val result = getTaskScheduleCountUseCase(schedule.taskId)) {
-                    is Either.Right -> {
-                        Timber.d("### Today Schedule count, taskId: ${schedule.taskId} = ${result.value} ###")
-                        if (result.value > snoozeLimit) Tomorrow() else Today()
-                    }
-                    else -> Today()
+            val timeOption = when (val result = getTaskScheduleCountUseCase(taskId)) {
+                is Either.Right -> {
+                    Timber.d("### Today Schedule count, taskId: $taskId = ${result.value} ###")
+                    if (result.value > snoozeLimit) Tomorrow() else Today()
                 }
-            dispatch(RescheduleTaskAction(schedule.taskId, timeOption))
+                else -> Today()
+            }
+            dispatch(RescheduleTaskAction(taskId, timeOption))
         }
     }
 }

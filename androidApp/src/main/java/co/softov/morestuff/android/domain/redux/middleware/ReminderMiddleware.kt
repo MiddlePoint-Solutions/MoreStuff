@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -10,10 +10,13 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
+import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.periodUntil
+import kotlinx.datetime.toInstant
 import timber.log.Timber
 
 sealed class ReminderAction : Action.FeatureAction() {
@@ -29,7 +32,7 @@ sealed class ReminderAction : Action.FeatureAction() {
 
 class ReminderMiddleware(
     private val getScheduleUseCase: GetScheduleUseCase,
-    private val getActiveSchedulesByPriority: GetActiveSchedulesByPriority,
+    private val getActiveScheduleMessages: GetActiveScheduleMessages
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -42,12 +45,19 @@ class ReminderMiddleware(
         when (action) {
 
             is SmartReminderAction -> scope.launch {
-                getActiveSchedulesByPriority(Priority.today).map {
-                    // TODO: check if the schedule is for today and has not been interacted for the last hour
-                    // Use Schedule time extensions to see if it is scheduled for today?
-                    // Maybe this we should be getting a list of the active notifications from the system?
-
+                val currentTime = TimeUtils.nowUtcInstant
+                val qualifiedForRescheduling = getActiveScheduleMessages().filter {
+                    val createdTime = it.createTime.toInstant()
+                    createdTime.periodUntil(currentTime, TimeZone.UTC).hours > 1
+                }.also {
+                    Timber.d("qualifiedForRescheduling: ${it.size}")
                 }
+
+                dispatch(
+                    ScheduleAction.SmartRescheduleAction(
+                        qualifiedForRescheduling.map { it.taskId }, ReplyType.SNOOZE
+                    )
+                )
             }
 
             is UserResponseAction -> scope.launch {

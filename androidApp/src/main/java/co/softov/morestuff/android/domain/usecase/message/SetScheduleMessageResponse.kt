@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.repository.MessageRepository
 
-interface SetScheduleResponseMessage {
+interface SetScheduleMessageResponse {
     suspend operator fun invoke(
         taskId: Long,
         title: String,
@@ -13,9 +13,9 @@ interface SetScheduleResponseMessage {
     ): Either<Failure, Boolean>
 }
 
-class AddReminderReplyMessageImpl(
+class SetScheduleMessageResponseImpl(
     private val messageRepository: MessageRepository
-) : SetScheduleResponseMessage {
+) : SetScheduleMessageResponse {
 
     override suspend fun invoke(
         taskId: Long,

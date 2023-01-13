@@ -14,6 +14,7 @@ class ScheduleAtTimeUseCaseImpl(
 
     override suspend fun invoke(scheduleId: Long, time: String): Either<Failure, Boolean> {
         scheduler.scheduleAtExact(scheduleId, time)
+        scheduler.scheduleSmartReminderWork()
         return Either.Right(true)
     }
 }

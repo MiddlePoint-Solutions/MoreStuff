@@ -1,10 +1,9 @@
 package co.softov.morestuff.android.app
 
 import android.content.Context
-import androidx.work.Constraints
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import co.softov.morestuff.android.app.work.ScheduleWorker
+import co.softov.morestuff.android.app.work.SmartReminderWorker
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -36,7 +35,15 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
     }
 
     override fun scheduleSmartReminderWork() {
-        TODO("Not yet implemented")
+        PeriodicWorkRequestBuilder<SmartReminderWorker>(
+            1, TimeUnit.HOURS, 15, TimeUnit.MINUTES
+        ).build().also {
+            workManager.enqueueUniquePeriodicWork(
+                "SmartReminder",
+                ExistingPeriodicWorkPolicy.KEEP,
+                it
+            )
+        }
     }
 
     override fun cancelSchedule(scheduleId: Long) {

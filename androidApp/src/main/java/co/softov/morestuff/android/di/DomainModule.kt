@@ -133,7 +133,7 @@ val scheduleUseCases = module {
     factory<SetScheduleFulfilledUseCase> {
         SetScheduleFulfilledUseCaseImpl(scheduleRepository = get())
     }
-    factory<SetScheduleResponseMessage> { AddReminderReplyMessageImpl(messageRepository = get()) }
+    factory<SetScheduleMessageResponse> { SetScheduleMessageResponseImpl(messageRepository = get()) }
 
     factory<GetTaskScheduleCountUseCase> {
         GetTaskScheduleCountUseCaseImpl(
