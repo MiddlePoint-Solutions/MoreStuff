@@ -44,21 +44,7 @@ class ReminderMiddleware(
     ): Action {
         when (action) {
 
-            is SmartReminderAction -> scope.launch {
-                val currentTime = TimeUtils.nowUtcInstant
-                val qualifiedForRescheduling = getActiveScheduleMessages().filter {
-                    val createdTime = it.createTime.toInstant()
-                    createdTime.periodUntil(currentTime, TimeZone.UTC).hours > 1
-                }.also {
-                    Timber.d("qualifiedForRescheduling: ${it.size}")
-                }
-
-                dispatch(
-                    ScheduleAction.SmartRescheduleAction(
-                        qualifiedForRescheduling.map { it.taskId }, ReplyType.SNOOZE
-                    )
-                )
-            }
+            is SmartReminderAction -> performSmartReminderAction(state, scope, dispatch)
 
             is UserResponseAction -> scope.launch {
                 getScheduleUseCase(action.scheduleId).fold(
@@ -75,5 +61,35 @@ class ReminderMiddleware(
         }
 
         return next(state, action, dispatch)
+    }
+
+    private fun performSmartReminderAction(
+        state: AppState,
+        scope: CoroutineScope,
+        dispatch: Dispatch
+    ) {
+        if (state.settingState.smartReminderEnabled) {
+            scope.launch {
+                val currentTime = TimeUtils.nowUtcInstant
+                val qualifiedForRescheduling = getActiveScheduleMessages().filter {
+                    // TODO: Remove try/catch before releasing. This is in place because previously
+                    //  createTime was not an instant and this is a workaround to reschedule older tasks
+                    try {
+                        val createdTime = it.createTime.toInstant()
+                        createdTime.periodUntil(currentTime, TimeZone.UTC).hours > 1
+                    } catch (ex: Exception) {
+                        false // TODO: `false` ignores the old active messages
+                    }
+                }.also {
+                    Timber.d("qualifiedForRescheduling: ${it.size}")
+                }
+
+                dispatch(
+                    ScheduleAction.SmartRescheduleAction(
+                        qualifiedForRescheduling.map { it.taskId }, ReplyType.SNOOZE
+                    )
+                )
+            }
+        }
     }
 }

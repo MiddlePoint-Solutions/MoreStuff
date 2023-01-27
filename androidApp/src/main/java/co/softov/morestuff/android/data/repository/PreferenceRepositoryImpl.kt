@@ -12,4 +12,8 @@ class PreferenceRepositoryImpl(
         val minutes = sharedPreferences.getInt("reminder_today_delay", 60).toLong()
         return TimeUnit.MINUTES.toMillis(minutes)
     }
+
+    override suspend fun isSmartReminderEnabled(): Boolean {
+        return sharedPreferences.getBoolean("reminder_today_delay", true)
+    }
 }

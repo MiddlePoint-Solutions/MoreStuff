@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateS
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskComplete
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
-import co.softov.morestuff.android.domain.redux.snoozeLimit
+import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.schedule.*
@@ -78,8 +78,8 @@ class ScheduleMiddleware(
                 val schedule = action.schedule
                 when (replyType) {
                     LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
-                    SNOOZE -> if (state.snoozeLimit > 0) {
-                        checkTaskSnoozeLimit(scope, schedule.taskId, state.snoozeLimit, dispatch)
+                    SNOOZE -> if (state.dailySnoozeLimit > 0) {
+                        checkTaskSnoozeLimit(scope, schedule.taskId, state.dailySnoozeLimit, dispatch)
                     } else {
                         dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
@@ -92,8 +92,8 @@ class ScheduleMiddleware(
                 when (action.replyType) {
                     LATER -> TODO()
                     SNOOZE -> action.taskIds.forEach { taskId ->
-                        if (state.snoozeLimit > 0) {
-                            checkTaskSnoozeLimit(scope, taskId, state.snoozeLimit, dispatch)
+                        if (state.dailySnoozeLimit > 0) {
+                            checkTaskSnoozeLimit(scope, taskId, state.dailySnoozeLimit, dispatch)
                         } else {
                             dispatch(RescheduleTaskAction(taskId, Today()))
                         }

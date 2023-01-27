@@ -43,6 +43,7 @@
     <string name="pref_key_debug_reminder" translatable="false">debug_reminder</string>
     <string name="pref_key_debug_reminder_today_offset" translatable="false">debug_reminder_today_offset</string>
     <string name="pref_key_debug_keep_screen_on" translatable="false">debug_keep_screen_on</string>
+    <string name="pref_key_smart_reminder_enabled" translatable="false">smart_reminder_enabled</string>
 
     <!--  Content Description  -->
     <string name="cd_settings_show_task_lists" translatable="false">Show Task Lists</string>

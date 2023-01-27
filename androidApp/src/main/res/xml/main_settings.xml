@@ -23,7 +23,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="Development Tools">
+    <PreferenceCategory app:title="Developer Settings">
 
         <Preference
             app:key="debug_notification"
@@ -57,6 +57,23 @@
             app:showSeekBarValue="true"
             app:summary="Adjust time in minutes reminder"
             app:title="Today reminder delay" />
+
+        <SwitchPreference
+            app:defaultValue="false"
+            app:key="@string/pref_key_smart_reminder_enabled"
+            app:summaryOff="Off"
+            app:summaryOn="On"
+            app:title="Smart Reminder" />
+
+        <PreferenceCategory app:title="Reset">
+
+            <Preference
+                app:key="debug_reset_pending_messages"
+                app:selectable="true"
+                app:summary="Clear all pending notification messages"
+                app:title="Reset All Notifications" />
+
+        </PreferenceCategory>
 
     </PreferenceCategory>
 

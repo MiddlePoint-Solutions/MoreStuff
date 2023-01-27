@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.redux.*
-import co.softov.morestuff.android.domain.redux.state.UserAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.repository.UserRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class UserMiddleware(
+class SettingsMiddleware(
     private val userRepository: UserRepository
 ) : Middleware<AppState> {
 
@@ -23,10 +23,10 @@ class UserMiddleware(
         when (action) {
             is InitAction -> scope.launch {
                 val settings = userRepository.getUserSettings()
-                dispatch(UserAction.SetUserSettings(settings))
+                dispatch(SettingAction.LoadSettings(settings))
             }
 
-            is UserAction.ChangeSnoozeLimit -> scope.launch {
+            is SettingAction.SetSnoozeLimit -> scope.launch {
                 userRepository.setSnoozeLimit(action.limit)
             }
             else -> NoOp
