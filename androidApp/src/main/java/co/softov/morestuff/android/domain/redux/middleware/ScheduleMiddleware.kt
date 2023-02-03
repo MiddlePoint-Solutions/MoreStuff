@@ -105,7 +105,7 @@ class ScheduleMiddleware(
 
             is ScheduleCreatedAction -> {
                 scope.launch {
-                    action.schedule.scheduleTime?.let { time ->
+                    action.schedule.scheduleTimeLocal?.let { time ->
                         scheduleAtTimeUseCase(action.schedule.id, time)
                     }
                 }

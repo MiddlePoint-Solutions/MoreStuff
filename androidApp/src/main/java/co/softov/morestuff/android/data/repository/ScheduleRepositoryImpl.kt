@@ -31,22 +31,20 @@ class ScheduleRepositoryImpl(
     private val lastInsertId: Long get() = scheduleQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createSchedule(
-        taskId: Long,
-        scheduleTime: String?
+        schedule: Schedule
     ): Either<Failure, Schedule> {
-        Timber.d("createTaskReminderSchedule: $taskId for $scheduleTime")
-        val scheduleId: Long = scheduleQueries.transactionWithResult {
-            val currentTime = TimeUtils.nowLocalDateTimeString
-            val timezone = TimeUtils.currentTimeZone.id
+        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleTimeLocal}")
+        val scheduleId = scheduleQueries.transactionWithResult {
             scheduleQueries.insertSchedule(
-                task_id = taskId,
-                create_time = currentTime,
-                schedule_time = scheduleTime,
-                timezone = timezone
+                task_id = schedule.taskId,
+                create_time = schedule.createTime,
+                schedule_time_local = schedule.scheduleTimeLocal,
+                schedule_time_utc = schedule.scheduleTimeUtc,
+                timezone = schedule.timezone
             )
             lastInsertId
         }
-        return getSchedule(scheduleId)
+        return schedule.copy(id = scheduleId).right()
     }
 
     override suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule> {

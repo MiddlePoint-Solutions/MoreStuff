@@ -24,7 +24,8 @@ fun mapScheduleDb(input: ScheduleData): Schedule {
         id = input.id,
         taskId = input.task_id,
         createTime = input.create_time,
-        scheduleTime = input.schedule_time,
+        scheduleTimeLocal = input.schedule_time_local,
+        scheduleTimeUtc = input.schedule_time_utc,
         timezone = input.timezone,
         active = input.active
     )

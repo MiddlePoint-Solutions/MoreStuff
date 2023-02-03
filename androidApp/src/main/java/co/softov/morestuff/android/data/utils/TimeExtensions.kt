@@ -12,9 +12,9 @@ val Task.completeLocalDateTime: LocalDateTime? get() = completeTime?.toLocalDate
 val Schedule.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()
 val Schedule.createTimeInstant: Instant get() = createTime.toInstant()
 
-val Schedule.scheduleLocalDateTime: LocalDateTime? get() = scheduleTime?.toLocalDateTime()
+val Schedule.scheduleLocalDateTime: LocalDateTime? get() = scheduleTimeLocal?.toLocalDateTime()
 val Schedule.scheduleTimeInstant: Instant?
-    get() = scheduleTime?.toLocalDateTime()?.toInstant(TimeZone.of(timezone))
+    get() = scheduleTimeLocal?.toLocalDateTime()?.toInstant(TimeZone.of(timezone))
 
 // LocalDateTime
 val LocalDateTime.currentTimeZoneInstant: Instant get() = this.toInstant(TimeZone.currentSystemDefault())

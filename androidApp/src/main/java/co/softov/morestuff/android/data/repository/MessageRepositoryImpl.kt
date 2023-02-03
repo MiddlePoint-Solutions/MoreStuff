@@ -59,7 +59,7 @@ class MessageRepositoryImpl(
             messageQueries.insertMessage(
                 task_id = taskId,
                 schedule_id = scheduleId,
-                create_time = TimeUtils.nowUtcInstantString,
+                create_time = TimeUtils.getCreateTime(),
                 content_type = contentType,
                 content = content
             )

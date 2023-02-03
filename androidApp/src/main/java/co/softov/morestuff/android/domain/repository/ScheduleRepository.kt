@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ScheduleRepository {
 
-    suspend fun createSchedule(taskId: Long, scheduleTime: String?): Either<Failure, Schedule>
+    suspend fun createSchedule(schedule: Schedule): Either<Failure, Schedule>
     suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule>
 
     suspend fun getActiveSchedules(

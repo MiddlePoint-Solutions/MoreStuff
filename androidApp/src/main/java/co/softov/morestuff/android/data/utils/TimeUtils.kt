@@ -20,6 +20,8 @@ object TimeUtils {
 
     val nowLocalDateTimeString: String get() = nowLocalDateTime.toString()
 
+    fun getCreateTime(): String = nowUtcInstant.toString()
+
     val localDateTime1HourBack: String
         get() = (nowUtcInstant - 1.hours)
             .toLocalDateTime(currentTimeZone)

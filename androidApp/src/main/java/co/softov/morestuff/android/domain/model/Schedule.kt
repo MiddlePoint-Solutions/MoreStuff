@@ -4,7 +4,8 @@ data class Schedule(
     val id: Long,
     val taskId: Long,
     val createTime: String,
-    val scheduleTime: String?,
+    val scheduleTimeLocal: String?,
+    val scheduleTimeUtc: String?,
     val timezone: String,
     val active: Boolean
 ) {

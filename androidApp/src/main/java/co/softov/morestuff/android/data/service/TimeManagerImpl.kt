@@ -31,7 +31,7 @@ class TimeManagerImpl(
 
     private fun getDefaultOptionTime(priority: Priority, option: DefaultOption): String? =
         when (option) {
-            DefaultOption.Custom, // TODO: implement custom
+            DefaultOption.Custom,
             DefaultOption.Auto -> when (priority) {
                 is Priority.Later -> null
                 is Priority.Today -> TimeUtils.todayLocalDateTimeByAdding(hour = 1).toString()

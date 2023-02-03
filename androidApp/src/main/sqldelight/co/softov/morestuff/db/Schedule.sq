@@ -2,7 +2,8 @@ CREATE TABLE schedule(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     task_id INTEGER NOT NULL,
     create_time TEXT NOT NULL,
-    schedule_time TEXT,
+    schedule_time_local TEXT,
+    schedule_time_utc TEXT,
     timezone TEXT NOT NULL,
     active INTEGER AS Boolean NOT NULL DEFAULT 1,
     FOREIGN KEY(task_id) REFERENCES task(id)
@@ -35,55 +36,55 @@ selectActiveSchedules:
 SELECT *
 FROM schedule
 WHERE active = 1
-ORDER BY schedule_time;
+ORDER BY schedule_time_local;
 
 selectActiveSchedulesFromStartToEndTime:
 SELECT *
 FROM schedule
 WHERE active = 1
-AND schedule_time BETWEEN :startTime AND :endTime
-ORDER BY schedule_time;
+AND schedule_time_local BETWEEN :startTime AND :endTime
+ORDER BY schedule_time_local;
 
 selectActiveScheduleWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
 WHERE schedule.active = 1
 AND schedule.id = ?
-ORDER BY schedule_time DESC;
+ORDER BY schedule_time_local DESC;
 
 selectActiveSchedulesWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
 WHERE schedule.active = 1
-ORDER BY schedule_time DESC;
+ORDER BY schedule_time_local DESC;
 
 selectActiveSchedulesWithTaskTitleByTime:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
 AND active = 1
-AND schedule_time BETWEEN :start AND :end
+AND schedule_time_local BETWEEN :start AND :end
 ORDER BY schedule.id DESC;
 
 selectActiveLaterSchedulesWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time, task.title
+SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
 AND active = 1
-AND schedule_time IS NULL
+AND schedule_time_local IS NULL
 ORDER BY schedule.id DESC;
 
 countTaskSchedulesByTime:
 SELECT COUNT(*)
 FROM schedule
 WHERE task_id = ?
-AND schedule_time BETWEEN :start AND :end;
+AND schedule_time_local BETWEEN :start AND :end;
 
 insertSchedule:
-INSERT INTO schedule(task_id, create_time, schedule_time, timezone)
-VALUES (?,?,?,?);
+INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone)
+VALUES (?,?,?,?,?);
 
 updateScheduleActive:
 UPDATE schedule

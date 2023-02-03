@@ -15,7 +15,6 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 class TaskRepositoryImpl(
     database: StuffDb,
@@ -26,7 +25,7 @@ class TaskRepositoryImpl(
     private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(title: String): Either<Failure, Task> {
-        val currentTime = TimeUtils.nowLocalDateTimeString
+        val currentTime = TimeUtils.getCreateTime()
         return taskQueries.transactionWithResult {
             taskQueries.insertTask(currentTime, title)
             val taskId = lastInsertId
@@ -48,16 +47,17 @@ class TaskRepositoryImpl(
 
     override suspend fun getCompleteTasksFlow(): Flow<List<Task>> {
         return taskQueries.selectAllComplete(mapper = { id, create_time, complete_time, title ->
-            Task(id,
+            Task(
+                id,
+                title,
                 create_time,
                 complete_time,
-                title)
+            )
         }).asFlow().mapToList()
     }
 
     override suspend fun setTaskComplete(taskId: Long): Either<Failure, Boolean> {
         val time = TimeUtils.nowLocalDateTimeString
-        Timber.d("Helloo $time")
         taskQueries.updateTaskComplete(time, taskId)
         return Right(true)
     }
