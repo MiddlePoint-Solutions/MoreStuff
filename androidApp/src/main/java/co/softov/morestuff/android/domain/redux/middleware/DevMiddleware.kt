@@ -1,9 +1,8 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.app.extensions.simpleName
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitAction
@@ -14,10 +13,11 @@ import kotlinx.coroutines.launch
 
 sealed class DevAction : Action.FeatureAction() {
     // TODO: Add clear all stale messages action + add settings option
+    object ClearStaleMessages: DevAction()
 }
 
 class DevMiddleware(
-    private val userRepository: UserRepository
+
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -28,13 +28,8 @@ class DevMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is InitAction -> scope.launch {
-                val settings = userRepository.getUserSettings()
-                dispatch(SettingAction.LoadSettings(settings))
-            }
+            is DevAction.ClearStaleMessages -> {
 
-            is SettingAction.SetSnoozeLimit -> scope.launch {
-                userRepository.setSnoozeLimit(action.limit)
             }
             else -> NoOp
         }

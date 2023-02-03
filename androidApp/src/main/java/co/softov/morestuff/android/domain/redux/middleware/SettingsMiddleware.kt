@@ -1,6 +1,9 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.redux.*
+import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitAction
@@ -22,7 +25,7 @@ class SettingsMiddleware(
     ): Action {
         when (action) {
             is InitAction -> scope.launch {
-                val settings = userRepository.getUserSettings()
+                val settings = userRepository.getUserSettings(AppSettings())
                 dispatch(SettingAction.LoadSettings(settings))
             }
 

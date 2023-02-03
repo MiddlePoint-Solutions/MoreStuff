@@ -50,6 +50,10 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))
     }
 
+    override fun cancelSmartReminder() {
+        workManager.cancelAllWorkByTag(SMART_REMINDER_WORK)
+    }
+
     private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
     companion object {
