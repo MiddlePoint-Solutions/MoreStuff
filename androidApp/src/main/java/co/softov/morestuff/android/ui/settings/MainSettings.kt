@@ -1,11 +1,10 @@
 package co.softov.morestuff.android.ui.settings
 
 import android.os.Bundle
-import android.view.Menu
+import android.view.KeyEvent
 import android.view.View
 import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import androidx.appcompat.app.AppCompatDelegate.*
-import androidx.core.view.iterator
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
@@ -13,7 +12,6 @@ import androidx.preference.SwitchPreference
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.extension.getColorFromAttr
-import co.softov.morestuff.android.ui.Screens
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -25,7 +23,6 @@ class MainSettings : PreferenceFragmentCompat() {
     private val router: Router by inject()
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setHasOptionsMenu(true)
         setPreferencesFromResource(R.xml.main_settings, rootKey)
         configurePreferences()
     }
@@ -62,6 +59,13 @@ class MainSettings : PreferenceFragmentCompat() {
             viewModel.onSnoozeLimitChanged(newValue as Int)
             true
         }
+
+        findPreference<SwitchPreference>(
+            getString(R.string.pref_key_smart_reminder_enabled)
+        )?.setOnPreferenceChangeListener { _, newValue ->
+            viewModel.smartReminderEnabled(newValue as Boolean)
+            true
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,11 +75,6 @@ class MainSettings : PreferenceFragmentCompat() {
 
     private fun getVersion(): String {
         return "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        menu.iterator().forEach { it.isVisible = false }
     }
 
     fun onBackPressed() {

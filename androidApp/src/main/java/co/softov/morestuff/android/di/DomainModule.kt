@@ -63,7 +63,7 @@ val storeModule = module {
         )
     }
     factory { NotificationMiddleware(notifier = get()) }
-    factory { UserMiddleware(userRepository = get()) }
+    factory { SettingsMiddleware(userRepository = get()) }
     factoryOf(::ReminderMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)

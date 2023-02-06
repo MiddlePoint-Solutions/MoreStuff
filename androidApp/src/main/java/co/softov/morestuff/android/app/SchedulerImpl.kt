@@ -34,14 +34,14 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         workManager.enqueue(work)
     }
 
-    override fun scheduleSmartReminderWork() {
+    override fun scheduleSmartReminder() {
         PeriodicWorkRequestBuilder<SmartReminderWorker>(
             1, TimeUnit.HOURS, 15, TimeUnit.MINUTES
-        ).build().also {
+        ).build().also { request ->
             workManager.enqueueUniquePeriodicWork(
-                "SmartReminder",
+                SMART_REMINDER_WORK,
                 ExistingPeriodicWorkPolicy.KEEP,
-                it
+                request
             )
         }
     }
@@ -50,6 +50,13 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))
     }
 
+    override fun cancelSmartReminder() {
+        workManager.cancelAllWorkByTag(SMART_REMINDER_WORK)
+    }
+
     private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
+    companion object {
+        private const val SMART_REMINDER_WORK = "SmartReminder"
+    }
 }
