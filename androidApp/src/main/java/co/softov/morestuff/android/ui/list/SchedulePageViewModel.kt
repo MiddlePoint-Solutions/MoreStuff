@@ -65,7 +65,7 @@ class SchedulePageViewModel(
                         .launchIn(this)
                 }
                 PageType.PAGE_COMPLETE_TASKS -> {
-                    getCompleteTasks()
+                    getCompleteTasks().onEach { Timber.d("ALEXXX: $it") }
                         .map { taskListItemMapper.map(it) }
                         .onEach { _state.value = SchedulePageViewState(tasks = it) }
                         .launchIn(this)

@@ -2,7 +2,6 @@ package co.softov.morestuff.android.domain.repository
 
 
 import arrow.core.Either
-import co.softov.morestuff.android.domain.enums.Priority
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Schedule

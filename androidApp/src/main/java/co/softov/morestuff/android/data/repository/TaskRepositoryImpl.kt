@@ -15,16 +15,17 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import timber.log.Timber
 
 class TaskRepositoryImpl(
     database: StuffDb,
-    private val mapTaskDb: taskDbMapper
+    private val mapTaskDb: taskDbMapper,
 ) : TaskRepository {
 
     private val taskQueries = database.taskQueries
     private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
-    override suspend fun createTask(title: String): Either<Failure,Task> {
+    override suspend fun createTask(title: String): Either<Failure, Task> {
         val currentTime = TimeUtils.nowLocalDateTimeString
         return taskQueries.transactionWithResult {
             taskQueries.insertTask(currentTime, title)
@@ -34,7 +35,7 @@ class TaskRepositoryImpl(
         }
     }
 
-    override suspend fun getTask(taskId: Long): Either<Failure,Task> {
+    override suspend fun getTask(taskId: Long): Either<Failure, Task> {
         return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
             null -> Left(TaskDoesNotExist)
             else -> Right(mapTaskDb(taskDb))
@@ -46,11 +47,17 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getCompleteTasksFlow(): Flow<List<Task>> {
-        return taskQueries.selectAllComplete().asFlow().mapToList().map { mapList(it, mapTaskDb) }
+        return taskQueries.selectAllComplete(mapper = { id, create_time, complete_time, title ->
+            Task(id,
+                create_time,
+                complete_time,
+                title)
+        }).asFlow().mapToList()
     }
 
-    override suspend fun setTaskComplete(taskId: Long): Either<Failure,Boolean> {
+    override suspend fun setTaskComplete(taskId: Long): Either<Failure, Boolean> {
         val time = TimeUtils.nowLocalDateTimeString
+        Timber.d("Helloo $time")
         taskQueries.updateTaskComplete(time, taskId)
         return Right(true)
     }

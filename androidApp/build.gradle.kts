@@ -28,7 +28,7 @@ android {
     defaultConfig {
         applicationId = "co.softov.morestuff.android"
         compileSdk = 33
-        minSdk = 24
+        minSdk = 25
         targetSdk = 33
         versionCode = 3
         versionName = "0.3.0"
@@ -55,7 +55,17 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.3.2"
     }
+    //Add Alex
+    testOptions {
+
+        unitTests.all {
+            it.useJUnitPlatform()
+            
+        }
+    }
+
 }
+
 
 tasks.withType<KotlinCompile>().all {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
@@ -70,6 +80,10 @@ sqldelight {
 
 dependencies {
     implementation(project(":shared"))
+    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation("com.google.firebase:firebase-inappmessaging-ktx:20.1.2")
+    implementation("androidx.wear.tiles:tiles-material:1.1.0-alpha04")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
@@ -145,6 +159,7 @@ dependencies {
         version {
             strictly("3.8.10.2")
         }
+
     }
 
     // Timber logging
@@ -160,6 +175,15 @@ dependencies {
     // Testing
     testImplementation(Libs.Test.junit)
     testImplementation(Libs.Test.mokitoKtx)
+    //Add Alex test dependency
+   // testImplementation ("io.kotest:kotest-framework-engine:5.5.1")
+   // testImplementation ("io.kotest:kotest-runner-junit5:$version")
+    //testImplementation ("io.kotest:kotest-property:$version")
+    testImplementation ("io.mockk:mockk:1.12.2")
+    testImplementation ("org.junit.jupiter:junit-jupiter:5.8.0-M1")
+    testImplementation ("org.junit.platform:junit-platform-commons:1.5.2")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
+
 
     coreLibraryDesugaring(Libs.jdkDesugar)
 }

@@ -13,7 +13,7 @@ class TaskListItemMapper {
         val createTime = input.createTime.toLocalDateTime().toString()
         val completeTime = when (input.completeTime) {
             null -> ""
-            else -> input.completeTime.toLocalDateTime().toString()
+            else -> ""//input.completeTime.toLocalDateTime().toString()
         }
 
         return TaskListItemViewModel(

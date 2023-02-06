@@ -43,3 +43,6 @@ android {
     }
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 }
+dependencies {
+    implementation("androidx.core:core-ktx:+")
+}

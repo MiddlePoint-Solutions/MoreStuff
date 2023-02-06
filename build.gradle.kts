@@ -1,5 +1,6 @@
 
 buildscript {
+    val kotlin_version by extra("1.8.0")
     repositories {
         google()
         mavenCentral()
@@ -14,6 +15,8 @@ buildscript {
         classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.serialization)
         classpath(co.softov.morestuff.buildsrc.Libs.Koin.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.moleculeGradlePlugin)
+        /*classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")*/
+        /*classpath("com.android.tools.build:gradle")*/
     }
 }
 group = "co.softov.morestuff"
