@@ -2,9 +2,8 @@ package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
 import arrow.core.right
-import co.softov.morestuff.android.data.utils.TimeUtils
-import co.softov.morestuff.android.domain.createSchedule
-import co.softov.morestuff.android.domain.createTask
+import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -24,8 +23,8 @@ class GetScheduleTaskUseCaseImplTest {
         )
         val scheduleId = 1L
         val taskId = 1L
-        val schedule = createSchedule()
-        val task = createTask()
+        val schedule = createScheduleForTest()
+        val task = createTaskForTest()
 
         coEvery { getScheduleUseCase(scheduleId) } returns schedule.right()
         coEvery { getTaskUseCase(taskId) } returns task.right()

@@ -1,9 +1,8 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.repository.TaskRepository
-import co.softov.morestuff.android.domain.createTask
+import co.softov.morestuff.android.domain.createTaskForTest
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -27,7 +26,7 @@ class CreateNewTaskUseCaseImplTestJU5{
     @Test
     fun `create new task use case`() = runBlocking {
         val taskParams = TaskParams("title")
-        val task = createTask()
+        val task = createTaskForTest()
 
         coEvery { taskRepository.createTask(taskParams.title) } returns Either.Right(task)
 

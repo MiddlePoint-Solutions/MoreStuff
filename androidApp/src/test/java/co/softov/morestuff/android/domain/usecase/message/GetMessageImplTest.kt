@@ -1,11 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import arrow.core.Either
-import arrow.core.right
-import co.softov.morestuff.android.domain.createMessage
-import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.createMessageForTest
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -21,7 +17,7 @@ class GetMessageImplTest{
     fun `messageRepository getMessage`() {
 
 
-        val message = createMessage()
+        val message = createMessageForTest()
         coEvery { messageRepository.getMessage(1L) } returns Either.Right(message)
 
         runBlocking{
