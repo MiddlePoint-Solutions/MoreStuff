@@ -47,20 +47,19 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         viewBinding = true
         compose = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = "1.4.0"
     }
-    //Add Alex
-    testOptions {
 
+    testOptions {
         unitTests.all {
             it.useJUnitPlatform()
-            
         }
     }
 

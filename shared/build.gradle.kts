@@ -42,7 +42,5 @@ android {
         targetSdk = 33
     }
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-}
-dependencies {
-    implementation("androidx.core:core-ktx:+")
+    namespace = "co.softov.morestuff.shared.android"
 }

@@ -1,12 +1,12 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.0"
-    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.6.0"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.1"
+    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.7.0"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
     object Accompanist {
-        private const val version = "0.26.3-beta"
+        private const val version = "0.29.1-alpha"
         const val insetsUi = "com.google.accompanist:accompanist-insets-ui:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
@@ -14,7 +14,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.7.20"
+        private const val version = "1.8.0"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -120,7 +120,7 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "2022.10.00"
+            private const val version = "2023.01.00"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"
