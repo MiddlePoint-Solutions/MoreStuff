@@ -1,33 +1,91 @@
 {
   "project_info": {
-    "project_number": "988666206226",
-    "project_id": "mp-morestuff",
-    "storage_bucket": "mp-morestuff.appspot.com"
+    "project_number": "895634462091",
+    "project_id": "morestuff-4t2",
+    "storage_bucket": "morestuff-4t2.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:988666206226:android:f3b91ec38e43eec774a0cb",
+        "mobilesdk_app_id": "1:895634462091:android:d3ac69ca5386c57b310b8e",
         "android_client_info": {
-          "package_name": "co.softov.morestuff.android"
+          "package_name": "io.middlepoint.morestuff"
         }
       },
       "oauth_client": [
         {
-          "client_id": "988666206226-b417f0tiec8lqkjhebdsm0bf3ls0904l.apps.googleusercontent.com",
+          "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCE9QNU_Pb5OU_lkZOJPErq6D3xrLO6yrU"
+          "current_key": "AIzaSyBrg6Yzai3tbJ-g1vyz_wClKMwfw-inc-g"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "988666206226-b417f0tiec8lqkjhebdsm0bf3ls0904l.apps.googleusercontent.com",
+              "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895634462091:android:1f742deb7c1bb78d310b8e",
+        "android_client_info": {
+          "package_name": "io.middlepoint.morestuff.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrg6Yzai3tbJ-g1vyz_wClKMwfw-inc-g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895634462091:android:b404aca1fbb99688310b8e",
+        "android_client_info": {
+          "package_name": "io.middlepoint.morestuff.staging"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrg6Yzai3tbJ-g1vyz_wClKMwfw-inc-g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "895634462091-kiqjtvdu4p7buj31lhbngkh92e08pcm5.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

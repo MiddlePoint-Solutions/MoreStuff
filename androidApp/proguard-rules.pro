@@ -1,0 +1,5 @@
+-keepattributes LineNumberTable,SourceFile
+-renamesourcefileattribute SourceFile
+
+-dontwarn kotlinx.serialization.KSerializer
+-dontwarn kotlinx.serialization.Serializable

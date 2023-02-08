@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import co.softov.morestuff.buildsrc.Libs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -12,8 +14,14 @@ plugins {
     id("app.cash.molecule")
 }
 
-group = "co.softov.morestuff"
-version = "1.0-SNAPSHOT"
+group = "io.middlepoint.morestuff"
+version = "1.0"
+
+object Env {
+    const val Dev = "debug"
+    const val Staging = "staging"
+    const val Release = "release"
+}
 
 repositories {
     gradlePluginPortal()
@@ -26,24 +34,44 @@ android {
     namespace = "co.softov.morestuff.android"
 
     defaultConfig {
-        applicationId = "co.softov.morestuff.android"
+        applicationId = "io.middlepoint.morestuff"
         compileSdk = 33
         minSdk = 25
         targetSdk = 33
         versionCode = 3
         versionName = "0.3.0"
-        versionNameSuffix = "-beta"
     }
+
     buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+
+        getByName(Env.Release) {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
+
+        getByName(Env.Dev) {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
+
+        create(Env.Staging) {
+            initWith(getByName("release"))
+            applicationIdSuffix = ".${Env.Staging}"
+            versionNameSuffix = "-${Env.Staging}"
+        }
+
     }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -81,7 +109,6 @@ dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
-    implementation("com.google.firebase:firebase-inappmessaging-ktx:20.1.2")
     implementation("androidx.wear.tiles:tiles-material:1.1.0-alpha04")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
@@ -175,13 +202,13 @@ dependencies {
     testImplementation(Libs.Test.junit)
     testImplementation(Libs.Test.mokitoKtx)
     //Add Alex test dependency
-   // testImplementation ("io.kotest:kotest-framework-engine:5.5.1")
-   // testImplementation ("io.kotest:kotest-runner-junit5:$version")
+    // testImplementation ("io.kotest:kotest-framework-engine:5.5.1")
+    // testImplementation ("io.kotest:kotest-runner-junit5:$version")
     //testImplementation ("io.kotest:kotest-property:$version")
-    testImplementation ("io.mockk:mockk:1.12.2")
-    testImplementation ("org.junit.jupiter:junit-jupiter:5.8.0-M1")
-    testImplementation ("org.junit.platform:junit-platform-commons:1.5.2")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
+    testImplementation("io.mockk:mockk:1.12.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
+    testImplementation("org.junit.platform:junit-platform-commons:1.5.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
 
 
     coreLibraryDesugaring(Libs.jdkDesugar)
