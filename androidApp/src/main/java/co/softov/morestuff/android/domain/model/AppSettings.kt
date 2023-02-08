@@ -18,7 +18,7 @@ sealed class Setting<T>(open val value: T) {
 }
 
 data class AppSettings(
-    val snoozeLimit: SnoozeLimit = SnoozeLimit(),
+    var snoozeLimit: SnoozeLimit = SnoozeLimit(),
     val smartReminderEnabled: SmartReminderEnabled = SmartReminderEnabled(),
 )
 
