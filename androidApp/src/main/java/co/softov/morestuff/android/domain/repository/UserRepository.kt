@@ -7,4 +7,5 @@ interface UserRepository {
     suspend fun setSnoozeLimit(limit: Int)
     suspend fun getUserSettings(default: AppSettings): AppSettings
 
+
 }

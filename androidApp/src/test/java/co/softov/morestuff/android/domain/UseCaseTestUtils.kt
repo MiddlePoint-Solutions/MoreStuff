@@ -34,11 +34,12 @@ fun createScheduleForTest(
     id: Long = 1,
     taskId: Long = 1,
     createTime: String = "",
-    scheduleTime: String = "",
+    scheduleTimeLocal: String = "",
+    scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
 ): Schedule {
-    return Schedule(id, taskId, createTime, scheduleTime, timeZone, active)
+    return Schedule(id, taskId, createTime, scheduleTimeLocal,scheduleTimeUtc, timeZone, active)
 }
 
 fun createScheduleWithTitleList ( amount: Long):List<ScheduleWithTitle>{
