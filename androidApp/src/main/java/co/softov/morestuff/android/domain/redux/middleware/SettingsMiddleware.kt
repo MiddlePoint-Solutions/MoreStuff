@@ -9,9 +9,10 @@ import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

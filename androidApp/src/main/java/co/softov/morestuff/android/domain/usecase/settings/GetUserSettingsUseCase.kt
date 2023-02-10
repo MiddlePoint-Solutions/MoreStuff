@@ -8,7 +8,7 @@ interface GetUserSettingsUseCase {
     suspend operator fun invoke(): AppSettings
 }
 
-class GetUserSettingsUseCaseUseCaseImpl(
+class GetUserSettingsUseCaseImpl(
     private val userRepository: UserRepository
 ) : GetUserSettingsUseCase {
     override suspend fun invoke(): AppSettings {
