@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.di
 
+import androidx.compose.ui.input.key.Key.Companion.D
 import co.softov.morestuff.android.domain.model.AppSettings
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
@@ -69,13 +70,9 @@ val storeModule = module {
         )
     }
     factory { NotificationMiddleware(notifier = get()) }
-    factory {
-        SettingsMiddleware(
-            getUserSettingsUseCase = get(),
-            saveUserSettings = get()
 
-        )
-    }
+
+    factoryOf(::SettingsMiddleware)
     factoryOf(::ReminderMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
@@ -108,8 +105,8 @@ val TaskUseCases = module {
 }
 
 val settingsUseCases = module {
-    factory<GetUserSettingsUseCase> { GetUserSettingsUseCaseUseCaseImpl(userRepository = get()) }
-    factory<SaveUserSettings> { SaveUserSettingsImpl(userRepository = get()) }
+    factoryOf(::GetUserSettingsUseCaseUseCaseImpl)
+    factoryOf(::SaveUserSettingsImpl)
 }
 
 val scheduleUseCases = module {
