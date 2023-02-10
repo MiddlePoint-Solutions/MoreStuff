@@ -10,9 +10,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class GetUserSettingsUseCaseImplTest {
+class GetUserSettingsUseCaseUseCaseImplTest {
     private val userRepository = mockk<UserRepository>()
-    private val getUserSettingsImpl = GetUserSettingsUseCaseImpl(userRepository)
+    private val getUserSettingsImpl = GetUserSettingsUseCaseUseCaseImpl(userRepository)
     private val appSettings = AppSettings()
     private val snoozeLimit = Setting.SnoozeLimit(2)
     private val smartReminderEnabled = Setting.SmartReminderEnabled(true)

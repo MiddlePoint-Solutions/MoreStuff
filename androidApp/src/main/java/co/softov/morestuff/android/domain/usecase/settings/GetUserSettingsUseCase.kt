@@ -4,13 +4,13 @@ import co.softov.morestuff.android.domain.model.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
 
 
-interface GetUserSettings {
+interface GetUserSettingsUseCase {
     suspend operator fun invoke(): AppSettings
 }
 
-class GetUserSettingsUseCaseImpl(
+class GetUserSettingsUseCaseUseCaseImpl(
     private val userRepository: UserRepository
-) : GetUserSettings {
+) : GetUserSettingsUseCase {
     override suspend fun invoke(): AppSettings {
         return userRepository.getUserSettings(AppSettings())
     }

@@ -1,10 +1,16 @@
 package co.softov.morestuff.android.di
 
+import co.softov.morestuff.android.domain.model.AppSettings
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
+import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.*
+import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
 import co.softov.morestuff.android.domain.usecase.task.*
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -63,7 +69,13 @@ val storeModule = module {
         )
     }
     factory { NotificationMiddleware(notifier = get()) }
-    factory { SettingsMiddleware(userRepository = get()) }
+    factory {
+        SettingsMiddleware(
+            getUserSettingsUseCase = get(),
+            saveUserSettings = get()
+
+        )
+    }
     factoryOf(::ReminderMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
@@ -93,6 +105,11 @@ val TaskUseCases = module {
             getTaskUseCase = get()
         )
     }
+}
+
+val settingsUseCases = module {
+    factory<GetUserSettingsUseCase> { GetUserSettingsUseCaseUseCaseImpl(userRepository = get()) }
+    factory<SaveUserSettings> { SaveUserSettingsImpl(userRepository = get()) }
 }
 
 val scheduleUseCases = module {
