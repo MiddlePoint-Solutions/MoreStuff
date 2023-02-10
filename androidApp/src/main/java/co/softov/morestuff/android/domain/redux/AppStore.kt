@@ -16,10 +16,12 @@ class AppStore(
     scheduleMiddleware: ScheduleMiddleware,
     responseMiddleware: ReminderMiddleware,
     notificationMiddleware: NotificationMiddleware,
-    userMiddleware: SettingsMiddleware,
+    settingsMiddleware: SettingsMiddleware,
     priorityMiddleware: PriorityMiddleware,
     reviewMiddleware: ReviewMiddleware,
-) : SimpleStore<AppState>(
+
+
+    ) : SimpleStore<AppState>(
     AppState(),
     listOf(
         AppState::reduceSettingState,
@@ -29,7 +31,7 @@ class AppStore(
     listOf(
         logger,
         errorMiddleware,
-        userMiddleware,
+        settingsMiddleware,
         taskMiddleware,
         scheduleMiddleware,
         messageMiddleware,

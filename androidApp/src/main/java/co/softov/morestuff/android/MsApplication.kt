@@ -56,6 +56,7 @@ class MsApplication : Application() {
                     dataModule,
                     presentationModule,
                     navigationModule,
+                    settingsUseCases,
                 )
             )
         }
