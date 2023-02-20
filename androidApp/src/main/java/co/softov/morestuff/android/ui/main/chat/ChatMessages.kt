@@ -57,6 +57,7 @@ fun Messages(
                 items = messages,
                 key = { item -> item.id }
             ) { item ->
+
                 when (item.contentType) {
                     ContentType.USER_NEW_TASK -> UserChatItem(message = item)
                     ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item)
@@ -80,7 +81,6 @@ fun Messages(
         }
 
         val isScrollingDown = !scrollState.isScrollingUp()
-        Timber.d("isScrollingDown: $isScrollingDown")
 
         // Show the button if the first visible item is not the first one or if the offset is
         // greater than the threshold.
@@ -92,7 +92,6 @@ fun Messages(
         }
 
         JumpToBottom(
-            // Only show if the scroller is not at the bottom
             enabled = jumpToBottomButtonEnabled,
             onClicked = {
                 scope.launch {
