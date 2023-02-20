@@ -19,7 +19,6 @@ version = "1.0"
 
 object Env {
     const val Dev = "debug"
-    const val Staging = "staging"
     const val Release = "release"
 }
 
@@ -56,12 +55,6 @@ android {
         getByName(Env.Dev) {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-        }
-
-        create(Env.Staging) {
-            initWith(getByName("release"))
-            applicationIdSuffix = ".${Env.Staging}"
-            versionNameSuffix = "-${Env.Staging}"
         }
 
     }
