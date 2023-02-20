@@ -3,7 +3,6 @@ package co.softov.morestuff.android.data.mapper
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -45,13 +44,6 @@ fun formatTime(timeString: String?): String? {
 }
 
 
-//NEW FORM
 
-/*fun formatTime(timeString: String?): String? {
-    return timeString?.let {
-        LocalDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME)
-            .format(DateTimeFormatter.ofPattern("HH:mm"))
-    }
-}*/
 
 

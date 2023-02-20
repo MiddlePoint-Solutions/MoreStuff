@@ -66,11 +66,6 @@ val dataModule = module {
         )
     }
 
-    /*single<UserRepository> {
-        UserRepositoryImpl(
-            prefs = getSharedPreferences(androidContext())
-        )
-    }*/
 
     single<UserRepository> {
         UserRepositoryImpl(

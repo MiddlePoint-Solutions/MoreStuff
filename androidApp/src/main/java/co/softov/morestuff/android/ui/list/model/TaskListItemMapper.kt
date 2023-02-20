@@ -1,15 +1,12 @@
 package co.softov.morestuff.android.ui.list.model
 
 import co.softov.morestuff.android.domain.model.Task
-import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class TaskListItemMapper {
 
-    private val dateFormat =
-        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
 
     fun map(input: Task): TaskListItemViewModel {
         val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault())
@@ -30,8 +27,6 @@ class TaskListItemMapper {
                 .format(formatter)
             null
         }
-
-
 
 
     return TaskListItemViewModel(
