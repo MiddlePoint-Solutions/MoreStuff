@@ -1,5 +1,8 @@
 name: Android CI
-on: [push]
+on:
+  push:
+    branches:
+      - version/
 
 jobs:
   test:
