@@ -1,11 +1,6 @@
 package co.softov.morestuff.android.domain.model
 
-import co.softov.morestuff.android.domain.model.Defaults.DEFAULT_SMART_REMINDER_ENABLED
-import co.softov.morestuff.android.domain.model.Defaults.DEFAULT_SNOOZE_LIMIT
-import co.softov.morestuff.android.domain.model.Setting.SmartReminderEnabled
-import co.softov.morestuff.android.domain.model.Setting.SnoozeLimit
-
-object Defaults {
+/*object Defaults {
     const val DEFAULT_SNOOZE_LIMIT = 3
     const val DEFAULT_SMART_REMINDER_ENABLED = false
 }
@@ -18,7 +13,35 @@ sealed class Setting<T>(open val value: T) {
 }
 
 data class AppSettings(
-    val snoozeLimit: SnoozeLimit = SnoozeLimit(),
-    val smartReminderEnabled: SmartReminderEnabled = SmartReminderEnabled(),
+    val snoozeLimit: Setting.SnoozeLimit = Setting.SnoozeLimit(),
+    val smartReminderEnabled: Setting.SmartReminderEnabled = Setting.SmartReminderEnabled(),
+)*/
+
+
+//NEW TESTING
+
+
+object Defaults {
+    const val DEFAULT_SNOOZE_LIMIT = 3
+    const val DEFAULT_SMART_REMINDER_ENABLED = false
+}
+data class AppSettings(
+
+    val snoozeLimit: Int = Defaults.DEFAULT_SNOOZE_LIMIT,
+    val smartReminderEnabled: Boolean = Defaults.DEFAULT_SMART_REMINDER_ENABLED
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
