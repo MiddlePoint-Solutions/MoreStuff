@@ -80,14 +80,12 @@ fun Messages(
             JumpToBottomThreshold.toPx()
         }
 
-        val isScrollingDown = !scrollState.isScrollingUp()
-
         // Show the button if the first visible item is not the first one or if the offset is
         // greater than the threshold.
         val jumpToBottomButtonEnabled by remember {
             derivedStateOf {
                 (scrollState.firstVisibleItemIndex != 0 ||
-                        scrollState.firstVisibleItemScrollOffset > jumpThreshold) && isScrollingDown
+                        scrollState.firstVisibleItemScrollOffset > jumpThreshold)
             }
         }
 
@@ -101,24 +99,6 @@ fun Messages(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }
-}
-
-@Composable
-private fun LazyListState.isScrollingUp(): Boolean {
-    var previousIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
-    var previousScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
-    return remember(this) {
-        derivedStateOf {
-            if (previousIndex != firstVisibleItemIndex) {
-                previousIndex > firstVisibleItemIndex
-            } else {
-                previousScrollOffset >= firstVisibleItemScrollOffset
-            }.also {
-                previousIndex = firstVisibleItemIndex
-                previousScrollOffset = firstVisibleItemScrollOffset
-            }
-        }
-    }.value
 }
 
 private enum class Visibility {
