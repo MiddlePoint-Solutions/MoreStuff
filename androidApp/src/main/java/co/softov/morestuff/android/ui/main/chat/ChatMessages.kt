@@ -6,10 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.runtime.*
@@ -22,8 +22,8 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.main.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.main.chat.items.TaskReminderItem
+import co.softov.morestuff.android.ui.main.chat.items.UserChatItem
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 private val JumpToBottomThreshold = 56.dp
 
@@ -140,8 +140,8 @@ fun JumpToBottom(
                 Text(text = stringResource(id = co.softov.morestuff.android.R.string.new_messages))
             },
             onClick = onClicked,
-            backgroundColor = MaterialTheme.colors.surface,
-            contentColor = MaterialTheme.colors.primary,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
             modifier = modifier
                 .offset(x = 0.dp, y = -bottomOffset)
                 .height(36.dp)

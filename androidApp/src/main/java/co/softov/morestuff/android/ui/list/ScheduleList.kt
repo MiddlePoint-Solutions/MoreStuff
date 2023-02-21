@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -30,35 +27,31 @@ import org.koin.core.parameter.parametersOf
 fun ScheduleList(page: PageType) {
     // TODO: Remove LifecycleViewModelStoreOwner once Koin has a fix for multiple instances of the same ViewModel
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    CompositionLocalProvider(
-        LocalViewModelStoreOwner provides ViewModelStoreOwner {
-            LifecycleViewModelStoreOwner(lifecycleOwner = lifecycleOwner).viewModelStore
-        }
-    ) {
-        val viewModel: SchedulePageViewModel = getViewModel { parametersOf(page) }
-        val state by viewModel.state.collectAsState()
+    val viewModel: SchedulePageViewModel = getViewModel(
+        viewModelStoreOwner = LifecycleViewModelStoreOwner(lifecycleOwner)
+    ) { parametersOf(page) }
+    val state by viewModel.state.collectAsState()
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp)
-        ) {
-            when {
-                state.schedules.isNotEmpty() -> items(state.schedules) { ScheduleListItem(it) }
-                state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
-            }
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(8.dp)
+    ) {
+        when {
+            state.schedules.isNotEmpty() -> items(state.schedules) { ScheduleListItem(it) }
+            state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        elevation = 6.dp,
         onClick = {
             expanded = !expanded
         },
+        elevation = CardDefaults.cardElevation(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -80,7 +73,7 @@ fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modif
             AnimatedVisibility(visible = expanded) {
                 Text(
                     text = "BOOOOOM!",
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
             }
@@ -88,15 +81,15 @@ fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modif
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        elevation = 6.dp,
         onClick = {
             expanded = !expanded
         },
+        elevation = CardDefaults.cardElevation(),
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -118,7 +111,7 @@ fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
             AnimatedVisibility(visible = expanded) {
                 Text(
                     text = "BOOOOOM!",
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
             }

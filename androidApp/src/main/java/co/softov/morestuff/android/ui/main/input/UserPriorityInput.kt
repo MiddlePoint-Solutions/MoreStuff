@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.main.input
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -28,7 +28,7 @@ fun UserPriorityInput(
     val priorityButtons = listOf(Priority.Today(), Priority.Tomorrow(), Priority.Later())
 
     Surface(
-        elevation = 8.dp
+        shadowElevation = 8.dp
     ) {
         Row {
             priorityButtons.forEach {

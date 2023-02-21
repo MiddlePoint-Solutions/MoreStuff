@@ -9,7 +9,7 @@ import androidx.lifecycle.*
 class LifecycleViewModelStoreOwner(lifecycleOwner: LifecycleOwner?) : ViewModelStoreOwner,
     DefaultLifecycleObserver {
 
-    private val viewModelStore = ViewModelStore()
+     override val viewModelStore = ViewModelStore()
 
     init {
         if (lifecycleOwner == null) {
@@ -18,8 +18,6 @@ class LifecycleViewModelStoreOwner(lifecycleOwner: LifecycleOwner?) : ViewModelS
             lifecycleOwner.lifecycle.addObserver(this)
         }
     }
-
-    override fun getViewModelStore(): ViewModelStore = viewModelStore
 
     override fun onDestroy(owner: LifecycleOwner) {
         super.onDestroy(owner)

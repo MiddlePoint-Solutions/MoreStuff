@@ -3,7 +3,7 @@ package co.softov.morestuff.android.ui.main.chat.items
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,11 +31,11 @@ fun AppChatItem(message: Message) {
         Surface(
             modifier = Modifier.padding(start = 10.dp, top = 4.dp, bottom = 4.dp),
             shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-            color = MaterialTheme.colors.appChatItem,
-            contentColor = contentColorFor(MaterialTheme.colors.primary)
+            color = MaterialTheme.colorScheme.appChatItem,
+            contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
-                Text(text = message.content, style = MaterialTheme.typography.body1)
+                Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
                 Text(
                     modifier = Modifier
                         .padding(top = 4.dp)
@@ -81,7 +81,7 @@ fun TaskReminderItem(message: Message, actions: ChatActions) {
         } else if (message.replyContent.isNullOrBlank().not()) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                contentColor = contentColorFor(MaterialTheme.colors.primary)
+                contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
             ) {
                 Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
             }

@@ -75,7 +75,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.0"
+        kotlinCompilerExtensionVersion = "1.4.2"
     }
 
     testOptions {
@@ -102,7 +102,6 @@ dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
-    implementation("androidx.wear.tiles:tiles-material:1.1.0-alpha04")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
@@ -147,14 +146,17 @@ dependencies {
     implementation(Libs.AndroidX.Compose.viewBinding)
     implementation(Libs.AndroidX.Compose.foundation)
     implementation(Libs.AndroidX.Compose.foundationLayout)
-    implementation(Libs.AndroidX.Compose.material)
     implementation(Libs.AndroidX.Compose.material3)
+    implementation(Libs.AndroidX.Compose.materialIcons)
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
     implementation(Libs.AndroidX.Compose.tooling)
-    //implementation(Libs.AndroidX.Compose.navigation) issues with navigation version
     implementation(Libs.AndroidX.Compose.animation)
     implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
     implementation(Libs.AndroidX.Compose.paging)
+
+    // Android Studio Preview support
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation(Libs.Accompanist.insetsUi)
     implementation(Libs.Accompanist.pager)
