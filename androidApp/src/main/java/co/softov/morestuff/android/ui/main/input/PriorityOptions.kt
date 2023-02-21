@@ -5,7 +5,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +22,7 @@ import co.softov.morestuff.android.presentation.PriorityOptionsModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityOptions(
     modifier: Modifier = Modifier,
@@ -76,10 +80,13 @@ fun PriorityOptions(
         }
 
         if (selected == DefaultOption.Custom) {
-            AndroidView(
-                factory = { CalendarView(it) },
-                modifier = Modifier.animateContentSize(animationSpec = tween()),
-            )
+//            AndroidView(
+//                factory = { CalendarView(it) },
+//                modifier = Modifier.animateContentSize(animationSpec = tween()),
+//            )
+            val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
+            DatePicker(state = datePickerState, modifier = Modifier.padding(16.dp))
+
         }
     }
 }
