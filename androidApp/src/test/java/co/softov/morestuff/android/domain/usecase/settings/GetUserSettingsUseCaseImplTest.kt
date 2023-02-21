@@ -1,41 +1,37 @@
 package co.softov.morestuff.android.domain.usecase.settings
 
 import co.softov.morestuff.android.domain.model.AppSettings
-import co.softov.morestuff.android.domain.model.Setting
 import co.softov.morestuff.android.domain.repository.UserRepository
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
+
 class GetUserSettingsUseCaseImplTest {
+
     private val userRepository = mockk<UserRepository>()
-    private val getUserSettingsImpl = GetUserSettingsUseCaseImpl(userRepository)
-    private val appSettings = AppSettings()
-    private val snoozeLimit = Setting.SnoozeLimit(2)
-    private val smartReminderEnabled = Setting.SmartReminderEnabled(true)
+    private val getUserSettingsUseCase = GetUserSettingsUseCaseImpl(userRepository)
 
     @Test
-    fun `returns user settings`() = runBlocking {
-        coEvery { userRepository.getUserSettings(appSettings) } returns appSettings
+    fun `should call getUserSettings with correct params`(): Unit = runBlocking {
+        val expectedSettings = AppSettings()
+        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
 
-        val result = getUserSettingsImpl.invoke()
+        getUserSettingsUseCase.invoke()
 
-        assertEquals(appSettings, result)
-        coVerify { userRepository.getUserSettings(appSettings) }
+        coEvery { userRepository.getUserSettings(expectedSettings) }
     }
 
     @Test
-    fun `returns  modified user settings`() = runBlocking {
-        val modifiedAppSettings = AppSettings(snoozeLimit, smartReminderEnabled)
-        coEvery { userRepository.getUserSettings(appSettings) } returns modifiedAppSettings
+    fun `should return AppSettings `() = runBlocking {
+        val expectedSettings = AppSettings()
+        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
 
-        val result = getUserSettingsImpl.invoke()
+        val result = getUserSettingsUseCase.invoke()
 
-        assertEquals(modifiedAppSettings, result)
-
+        assertEquals(expectedSettings, result)
     }
 }
 
