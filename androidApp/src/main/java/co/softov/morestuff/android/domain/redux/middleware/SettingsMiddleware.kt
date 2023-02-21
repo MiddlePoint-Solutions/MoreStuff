@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.model.AppSettings
-import co.softov.morestuff.android.domain.model.Setting
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
@@ -10,9 +9,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -36,7 +33,7 @@ class SettingsMiddleware(
             }
 
             is SettingAction.SetSnoozeLimit -> scope.launch {
-                val updatedSettings = AppSettings(Setting.SnoozeLimit(action.limit))
+                val updatedSettings = AppSettings(snoozeLimit = action.limit)
                 saveUserSettings(updatedSettings)
             }
             else -> NoOp
