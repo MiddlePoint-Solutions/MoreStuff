@@ -31,8 +31,8 @@ fun AppState.reduceSettingState(action: Action): AppState {
 fun AppSettingsState.reduce(action: Action): AppSettingsState {
     return when (action) {
         is LoadSettings -> copy(
-            dailySnoozeLimit = action.settings.snoozeLimit.value,
-            smartReminderEnabled = action.settings.smartReminderEnabled.value
+            dailySnoozeLimit = action.settings.snoozeLimit,
+            smartReminderEnabled = action.settings.smartReminderEnabled
         )
 
         is SetSnoozeLimit -> copy(dailySnoozeLimit = action.limit)
