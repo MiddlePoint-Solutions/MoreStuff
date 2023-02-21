@@ -4,10 +4,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -26,16 +26,16 @@ fun PriorityButton(
 
     val backgroundColor by animateColorAsState(
         targetValue = when (selected) {
-            true -> MaterialTheme.colors.secondaryVariant
-            else -> MaterialTheme.colors.primary
+            true -> MaterialTheme.colorScheme.secondaryContainer
+            else -> MaterialTheme.colorScheme.primary
         },
         animationSpec = tween(300, easing = FastOutSlowInEasing)
     )
 
     val textColor by animateColorAsState(
         targetValue = when (selected) {
-            true -> MaterialTheme.colors.onSecondary
-            else -> MaterialTheme.colors.onPrimary
+            true -> MaterialTheme.colorScheme.onSecondary
+            else -> MaterialTheme.colorScheme.onPrimary
         },
         animationSpec = tween(300, easing = FastOutSlowInEasing)
     )
@@ -44,7 +44,7 @@ fun PriorityButton(
         modifier = modifier,
         shape =  shape,
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = backgroundColor,
+            containerColor = backgroundColor,
             contentColor = textColor
         ),
         onClick = onSelected

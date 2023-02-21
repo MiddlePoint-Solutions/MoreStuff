@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,44 +41,46 @@ fun UserInput(
 
     val model by priorityModel.collectAsState()
 
-    val optionsModel: StateFlow<PriorityOptionsModel> = scope.launchMolecule(clock = ContextClock) {
+    val optionsModel by scope.launchMolecule(clock = ContextClock) {
         PriorityOptionsPresenter()
-    }
+    }.collectAsState()
 
-    Column(modifier = modifier) {
+    Surface(shadowElevation = 9.dp) {
+        Column(modifier = modifier) {
 
-        Box(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colors.primary.copy(alpha = 0.4f),
-                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                    )
+                    .padding(5.dp)
+            ) {
+                PriorityOptions(
+                    model = optionsModel,
+                    onOptionSelected = viewModel::onPriorityOptionChanged
                 )
-                .padding(5.dp)
-        ) {
-            PriorityOptions(
-                optionsFlow = optionsModel,
-                onOptionSelected = viewModel::onPriorityOptionChanged
+            }
+
+            UserPriorityInput(
+                currentPriority = when (model) {
+                    is PriorityModel.Later -> Priority.Later()
+                    is PriorityModel.Today -> Priority.Today()
+                    is PriorityModel.Tomorrow -> Priority.Tomorrow()
+                },
+                onPrioritySelected = viewModel::priorityChanged
+            )
+
+            PermissionRequester()
+
+            UserTextInput(
+                listAction = viewModel::showTaskList,
+                sendAction = {
+                    resetScroll()
+                    onMessageSent(it)
+                }
             )
         }
-
-        UserPriorityInput(
-            currentPriority = when (model) {
-                is PriorityModel.Later -> Priority.Later()
-                is PriorityModel.Today -> Priority.Today()
-                is PriorityModel.Tomorrow -> Priority.Tomorrow()
-            },
-            onPrioritySelected = viewModel::priorityChanged
-        )
-
-        PermissionRequester()
-
-        UserTextInput(
-            listAction = viewModel::showTaskList,
-            sendAction = {
-                resetScroll()
-                onMessageSent(it)
-            }
-        )
     }
 }
 

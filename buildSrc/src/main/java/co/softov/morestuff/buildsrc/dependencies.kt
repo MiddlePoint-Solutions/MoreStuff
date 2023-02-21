@@ -70,11 +70,11 @@ object Libs {
     }
 
     object Koin {
-        private const val version = "3.3.0"
+        private const val version = "3.3.3"
         const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:3.2.0"
         const val android = "io.insert-koin:koin-android:$version"
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
-        const val androidxCompose = "io.insert-koin:koin-androidx-compose:$version"
+        const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.2"
 
         const val test = "io.insert-koin:koin-test:3.2.2"
         const val testJunit = "io.insert-koin:koin-test-junit5:3.2.2"
@@ -131,18 +131,19 @@ object Libs {
             const val ui = "androidx.compose.ui:ui"
             const val viewBinding = "androidx.compose.ui:ui-viewbinding"
             const val animation = "androidx.compose.animation:animation"
-            const val material = "androidx.compose.material:material"
-            const val material3 = "androidx.compose.material3:material3"
+            const val material3 = "androidx.compose.material3:material3:1.1.0-alpha06"
 
+
+            const val materialIcons = "androidx.compose.material:material-icons-core"
             const val materialIconsExtended = "androidx.compose.material:material-icons-extended"
 
             const val tooling = "androidx.compose.ui:ui-tooling"
 
             const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
-            const val activityCompose = "androidx.activity:activity-compose:1.4.0"
+            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
 
             object Lifecycle {
-                const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07"
+                const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
             }
 
             object Test {

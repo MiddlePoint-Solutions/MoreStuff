@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.list
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -37,7 +37,7 @@ fun ListsContent(
 
         HorizontalPager(state = pagerState, count = pages.size) { page ->
             Surface(
-                contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primary)
+                contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
             ) {
                 ScheduleList(page = pages[page])
             }
@@ -58,11 +58,6 @@ private fun ScheduleTabs(
         selectedTabIndex = pagerState.currentPage,
         edgePadding = 24.dp,
         divider = {},
-        indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
-            )
-        },
         modifier = Modifier.fillMaxWidth()
     ) {
         pages.forEachIndexed { index, page ->
