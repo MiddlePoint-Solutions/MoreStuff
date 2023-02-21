@@ -2,6 +2,9 @@ package co.softov.morestuff.android.data.utils
 
 import kotlinx.datetime.*
 import java.time.DayOfWeek
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -71,6 +74,16 @@ object TimeUtils {
     val tomorrowTimeStringPair: Pair<String, String>
         get() = tomorrowLocalDateTime(0, 0).toString() to tomorrowLocalDateTime(23, 59).toString()
 
+    fun formatTime(timeString: String?, pattern: String): String? {
+        return timeString?.let {
+            val formatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.systemDefault())
+            val localDateTime = ZonedDateTime.parse(it, formatter)
+                .withZoneSameInstant(ZoneId.systemDefault())
+                .toLocalDateTime()
+            val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+            localDateTime.format(timeFormatter)
+        }
+    }
 }
 
 
