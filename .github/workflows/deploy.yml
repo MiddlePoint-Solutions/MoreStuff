@@ -49,13 +49,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: io.middlepoint.morestuff
-<<<<<<< HEAD
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
-          track: alpha
-          whatsNewDirectory: distribution/
-=======
           releaseFile: androidApp/build/outputs/bundle/release/androidApp-release.aab
           track: internal
           whatsNewDirectory: distribution/
           mappingFile: androidApp/build/outputs/mapping/release/mapping.txt
->>>>>>> 6563fbd (Add deploy workflow)
