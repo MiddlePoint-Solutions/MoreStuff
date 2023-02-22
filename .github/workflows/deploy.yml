@@ -51,4 +51,5 @@ jobs:
           packageName: io.middlepoint.morestuff
           releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
           track: internal
+          status: draft
           mappingFile: androidApp/build/outputs/mapping/release/mapping.txt
