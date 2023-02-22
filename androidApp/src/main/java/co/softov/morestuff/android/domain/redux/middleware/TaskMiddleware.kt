@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.app.extensions.simpleName
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch

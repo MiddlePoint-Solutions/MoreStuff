@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.service
 
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.Priority
 
 interface TimeManager {
 

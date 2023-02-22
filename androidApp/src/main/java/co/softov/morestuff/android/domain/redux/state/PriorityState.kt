@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.redux.state
 
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.state.PriorityAction.*
 import co.softov.morestuff.android.domain.redux.store.Action

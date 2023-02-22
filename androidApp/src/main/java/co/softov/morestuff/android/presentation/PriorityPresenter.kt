@@ -1,11 +1,10 @@
 package co.softov.morestuff.android.presentation
 
 import androidx.compose.runtime.*
-import co.softov.morestuff.android.domain.enums.*
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.AppStore
-import co.softov.morestuff.android.domain.redux.currentPriority
 import co.softov.morestuff.android.domain.redux.priorityState
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.get
 import timber.log.Timber
