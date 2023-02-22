@@ -1,8 +1,8 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
-import co.softov.morestuff.android.domain.enums.DefaultOption
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.DefaultOption
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 

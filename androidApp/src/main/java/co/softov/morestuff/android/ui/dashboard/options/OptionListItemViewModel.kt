@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.ui.dashboard.options
 
-import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.model.PriorityOption
 
 data class OptionListItemViewModel(
     val id: Long = 0,

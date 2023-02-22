@@ -1,18 +1,5 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
-import arrow.core.Either
-import co.softov.morestuff.android.domain.createScheduleForTest
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.domain.service.TimeManager
-import io.mockk.coEvery
-import io.mockk.coVerify
-import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
-
 /*
 class CreateScheduleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()

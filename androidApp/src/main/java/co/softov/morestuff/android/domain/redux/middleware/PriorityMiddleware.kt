@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next

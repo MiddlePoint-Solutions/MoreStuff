@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import app.cash.molecule.RecompositionClock.ContextClock
 import app.cash.molecule.launchMolecule
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.presentation.PriorityModel
-import co.softov.morestuff.android.presentation.PriorityOptionsModel
 import co.softov.morestuff.android.presentation.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.PriorityPresenter
 import co.softov.morestuff.android.ui.main.MainPresenter
@@ -52,7 +51,7 @@ fun UserInput(
                 modifier = Modifier
                     .background(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                        shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                     )
                     .padding(5.dp)
             ) {

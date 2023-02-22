@@ -1,23 +1,20 @@
 package co.softov.morestuff.android.ui.main.input
 
-import android.widget.CalendarView
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import co.softov.morestuff.android.domain.enums.DefaultOption
-import co.softov.morestuff.android.domain.enums.PriorityOption
-import co.softov.morestuff.android.domain.enums.TimeOfDayOption
+import co.softov.morestuff.android.domain.model.DefaultOption
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.Priority.*
+import co.softov.morestuff.android.domain.model.PriorityOption
+import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.presentation.PriorityOptionsModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
@@ -31,7 +28,7 @@ fun PriorityOptions(
 ) {
 
     val options = model.options
-    val selected = model.current
+    val current = model.current
 
     val maxItemsInRow = 3
     val firstRow: List<PriorityOption>
@@ -58,7 +55,7 @@ fun PriorityOptions(
                     onSelected = { onOptionSelected(it) },
                     text = it.toString(),
                     shape = MaterialTheme.shapes.small,
-                    selected = it == selected
+                    selected = it == current.option
                 )
             }
         }
@@ -73,20 +70,33 @@ fun PriorityOptions(
                         onSelected = { onOptionSelected(it) },
                         text = it.toString(),
                         shape = MaterialTheme.shapes.small,
-                        selected = it == selected
+                        selected = it == current.option
                     )
                 }
             }
         }
 
-        if (selected == DefaultOption.Custom) {
-//            AndroidView(
-//                factory = { CalendarView(it) },
-//                modifier = Modifier.animateContentSize(animationSpec = tween()),
-//            )
-            val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
-            DatePicker(state = datePickerState, modifier = Modifier.padding(16.dp))
 
+        if (current.option == DefaultOption.Custom) {
+            when (current) {
+                is Today -> {
+                    val timePickerState = rememberTimePickerState()
+                    TimePicker(state = timePickerState)
+                }
+                is Tomorrow -> {
+                    val timePickerState = rememberTimePickerState()
+                    TimePicker(state = timePickerState)
+                }
+                is Later -> {
+                    val datePickerState =
+                        rememberDatePickerState(initialDisplayMode = DisplayMode.Picker)
+                    DatePicker(
+                        state = datePickerState,
+                        modifier = Modifier.padding(16.dp),
+                        showModeToggle = false
+                    )
+                }
+            }
         }
     }
 }
@@ -95,7 +105,7 @@ fun PriorityOptions(
 @Composable
 fun PriorityOptionsPreviewDark() {
     val options = PriorityOptionsModel(
-        DefaultOption.Auto,
+        Today(),
         listOf(
             DefaultOption.Auto,
             DefaultOption.Custom,
@@ -115,7 +125,7 @@ fun PriorityOptionsPreviewDark() {
 @Composable
 fun PriorityOptionsPreview() {
     val options = PriorityOptionsModel(
-        DefaultOption.Auto,
+        Today(),
         listOf(
             DefaultOption.Auto,
             DefaultOption.Custom,

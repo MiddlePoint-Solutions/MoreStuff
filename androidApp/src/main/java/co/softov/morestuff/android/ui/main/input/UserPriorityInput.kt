@@ -4,19 +4,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.presentation.PriorityModel
-import co.softov.morestuff.android.presentation.PriorityPresenter
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun UserPriorityInput(

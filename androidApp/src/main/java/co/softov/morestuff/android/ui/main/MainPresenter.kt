@@ -2,8 +2,8 @@ package co.softov.morestuff.android.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.domain.enums.Priority
-import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.AppStore

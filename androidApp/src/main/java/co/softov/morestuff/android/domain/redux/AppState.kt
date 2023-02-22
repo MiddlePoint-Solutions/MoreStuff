@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.redux
 
-import co.softov.morestuff.android.domain.enums.Priority
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.state.PriorityState
 import co.softov.morestuff.android.domain.redux.state.ReviewState
 import co.softov.morestuff.android.domain.redux.state.AppSettingsState

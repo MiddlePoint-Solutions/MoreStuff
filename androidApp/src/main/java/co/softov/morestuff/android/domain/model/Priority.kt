@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.enums
+package co.softov.morestuff.android.domain.model
 
 sealed class Priority(open val option: PriorityOption) {
     data class Today(override val option: PriorityOption = DefaultOption.Auto) : Priority(option)

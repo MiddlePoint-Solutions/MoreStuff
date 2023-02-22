@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.ui.main.chat
 
-import co.softov.morestuff.android.domain.enums.PriorityOption
+import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 
 
