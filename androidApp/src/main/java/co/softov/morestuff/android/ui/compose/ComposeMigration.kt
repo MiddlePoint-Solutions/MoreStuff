@@ -11,7 +11,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
  */
 fun ComposeView.viewMigration(content: @Composable () -> Unit) {
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
     setContent {
         MoreStuffTheme {
             content()

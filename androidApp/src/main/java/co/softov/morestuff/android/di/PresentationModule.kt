@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.ui.main.MainConductor
-import co.softov.morestuff.android.ui.main.MainPresenter
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType
 import co.softov.morestuff.android.ui.review.ReviewViewModel
@@ -14,7 +14,7 @@ val presentationModule = module {
 
     // ViewModel
     viewModel { (conductor: MainConductor) ->
-        MainPresenter(
+        MainViewModel(
             conductor = conductor,
             getMessages = get()
         )

@@ -24,8 +24,10 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ScheduleList(page: PageType) {
-    // TODO: Remove LifecycleViewModelStoreOwner once Koin has a fix for multiple instances of the same ViewModel
+fun ScheduleList(
+    page: PageType,
+    itemAction: () -> Unit
+) {
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val viewModel: SchedulePageViewModel = getViewModel(
         viewModelStoreOwner = LifecycleViewModelStoreOwner(lifecycleOwner)
@@ -37,7 +39,9 @@ fun ScheduleList(page: PageType) {
         contentPadding = PaddingValues(8.dp)
     ) {
         when {
-            state.schedules.isNotEmpty() -> items(state.schedules) { ScheduleListItem(it) }
+            state.schedules.isNotEmpty() -> items(state.schedules) {
+                ScheduleListItem(it, itemAction = itemAction)
+            }
             state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
         }
     }
@@ -45,12 +49,14 @@ fun ScheduleList(page: PageType) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleListItem(task: ScheduleListItemViewModel, modifier: Modifier = Modifier) {
+fun ScheduleListItem(
+    task: ScheduleListItemViewModel,
+    modifier: Modifier = Modifier,
+    itemAction: () -> Unit,
+) {
     var expanded by remember { mutableStateOf(false) }
     Card(
-        onClick = {
-            expanded = !expanded
-        },
+        onClick = itemAction,
         elevation = CardDefaults.cardElevation(),
         modifier = Modifier
             .fillMaxWidth()
@@ -141,7 +147,10 @@ fun PreviewTaskHolder() {
             taskId = 0,
             scheduleTime = "Today",
             taskTitle = "Something to do!"
-        )
+        ),
+        itemAction = {
+
+        }
     )
 }
 

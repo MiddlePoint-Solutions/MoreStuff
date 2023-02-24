@@ -19,6 +19,6 @@ fun MoreStuffTopBar(
             IconButton(onClick = showSettings) {
                 Icon(Icons.Filled.Settings, contentDescription = "Settings")
             }
-        }
+        },
     )
 }

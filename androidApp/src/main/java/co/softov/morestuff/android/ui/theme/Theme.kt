@@ -26,7 +26,7 @@ private val DarkColors = darkColorScheme(
     secondary = Orange500,
     secondaryContainer = Orange600,
     onSecondary = Color.White,
-    error = Red200
+    error = Red200,
 )
 
 @Composable

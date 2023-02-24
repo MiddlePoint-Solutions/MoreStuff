@@ -12,11 +12,9 @@ import co.softov.morestuff.android.app.util.anyLog
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.compose.viewMigration
-import co.softov.morestuff.android.ui.dashboard.options.DatePickerFragment
 import co.softov.morestuff.android.ui.list.ListsFragment
 import com.github.terrakok.cicerone.Router
 import org.koin.android.ext.android.inject
-import java.util.*
 
 class MainFragment : BaseFragment() {
 
@@ -24,28 +22,6 @@ class MainFragment : BaseFragment() {
 
         override fun showTaskList() {
             ListsFragment().show(parentFragmentManager, ListFragment::javaClass.name)
-        }
-
-        override fun showTodayTimePicker() {
-            showTimePicker()
-        }
-
-        override fun showTomorrowTimePicker() {
-            val tomorrowTime =
-                Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }.timeInMillis
-            showTimePicker(tomorrowTime)
-        }
-
-        override fun showDateTimePicker() {
-            DatePickerFragment { userTime ->
-                showTimePicker(userTime)
-            }.show(parentFragmentManager, "DatePicker")
-        }
-
-        private fun showTimePicker(withTime: Long = 0) {
-            /*TimePickerFragment.createInstance(withTime) { time ->
-                viewModel.userSetCustomTime(time)
-            }.show(parentFragmentManager, "TimePicker")*/
         }
     }
 
@@ -67,7 +43,7 @@ class MainFragment : BaseFragment() {
             )
             viewMigration {
                 MoreStuffScaffold(showSettings = ::showMainSettings) {
-                    ChatContent(conductor)
+                    MainContent(conductor)
                 }
             }
         }

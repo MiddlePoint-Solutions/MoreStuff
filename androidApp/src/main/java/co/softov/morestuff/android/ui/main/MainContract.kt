@@ -6,8 +6,5 @@ import co.softov.morestuff.android.app.presentation.navigation.BaseConductor
 
 interface MainConductor : BaseConductor {
     fun showTaskList()
-    fun showTodayTimePicker()
-    fun showTomorrowTimePicker()
-    fun showDateTimePicker()
 }
 

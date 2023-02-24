@@ -44,3 +44,6 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     namespace = "co.softov.morestuff.shared.android"
 }
+dependencies {
+
+}
