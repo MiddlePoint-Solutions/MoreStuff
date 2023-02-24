@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.list
+package co.softov.morestuff.android.ui.chat
 
 import android.app.Dialog
 import android.os.Bundle
@@ -9,13 +9,22 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.fragment.app.ListFragment
-import co.softov.morestuff.android.ui.chat.TaskChatFragment
-import co.softov.morestuff.android.ui.compose.TestContent
 import co.softov.morestuff.android.ui.compose.viewMigration
+import co.softov.morestuff.android.ui.list.ListsFragment
+import co.softov.morestuff.android.ui.main.MainConductor
+import co.softov.morestuff.android.ui.main.MainContent
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class ListsFragment : BottomSheetDialogFragment() {
+class TaskChatFragment : BottomSheetDialogFragment() {
+
+    private val conductor = object : MainConductor {
+
+        override fun showTaskList() {
+            ListsFragment().show(parentFragmentManager, ListFragment::javaClass.name)
+        }
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState)
@@ -25,13 +34,12 @@ class ListsFragment : BottomSheetDialogFragment() {
 
             viewMigration {
                 val nestedScrollInterop = rememberNestedScrollInteropConnection()
-                ListsContent(
+                MainContent(
+                    conductor,
                     modifier = Modifier
                         .systemBarsPadding()
                         .nestedScroll(nestedScrollInterop)
-                ) {
-                    TaskChatFragment().show(parentFragmentManager, ListFragment::javaClass.name)
-                }
+                )
             }
         }
         dialog.setContentView(
@@ -41,7 +49,9 @@ class ListsFragment : BottomSheetDialogFragment() {
 
         val bottomSheetDialog = dialog as BottomSheetDialog
         bottomSheetDialog.behavior.isFitToContents = false
-        bottomSheetDialog.behavior.peekHeight = height / 2
+        bottomSheetDialog.behavior.isDraggable = false
+        bottomSheetDialog.behavior.isHideable = true
+        bottomSheetDialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         return dialog
     }
 

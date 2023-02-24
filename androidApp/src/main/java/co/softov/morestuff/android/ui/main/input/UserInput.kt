@@ -20,7 +20,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.presentation.PriorityModel
 import co.softov.morestuff.android.presentation.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.PriorityPresenter
-import co.softov.morestuff.android.ui.main.MainPresenter
+import co.softov.morestuff.android.ui.main.MainViewModel
 import kotlinx.coroutines.flow.StateFlow
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
@@ -28,7 +28,7 @@ var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
 
 @Composable
 fun UserInput(
-    viewModel: MainPresenter,
+    viewModel: MainViewModel,
     modifier: Modifier = Modifier,
     onMessageSent: (String) -> Unit,
     resetScroll: () -> Unit

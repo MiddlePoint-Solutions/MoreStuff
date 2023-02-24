@@ -6,10 +6,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
+import co.softov.morestuff.android.ui.components.MoreStuffScaffold
+import co.softov.morestuff.android.ui.compose.viewMigration
+import co.softov.morestuff.android.ui.list.ListsFragment
+import co.softov.morestuff.android.ui.main.MainConductor
+import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
@@ -24,11 +34,18 @@ class MainActivity : AppCompatActivity() {
     private val router: Router by inject()
 
     private val navigator: Navigator by lazy {
-        AppNavigator(this, R.id.main_content)
+        AppNavigator(this, android.R.id.content)
     }
 
     private val currentFragment: BaseFragment?
         get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
+
+    private val conductor = object : MainConductor {
+
+        override fun showTaskList() {
+            ListsFragment().show(supportFragmentManager, ListFragment::javaClass.name)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +54,13 @@ class MainActivity : AppCompatActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        setContentView(R.layout.activity_main)
-        router.newRootScreen(Screens.Content)
+        setContent {
+            MoreStuffTheme {
+                MoreStuffScaffold(showSettings = ::showMainSettings) {
+                    MainContent(conductor)
+                }
+            }
+        }
     }
 
     @SuppressLint("BatteryLife")
@@ -68,5 +90,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         currentFragment?.onBackPressed() ?: super.onBackPressed()
+    }
+
+    private fun showMainSettings() {
+        router.navigateTo(Screens.Settings)
     }
 }

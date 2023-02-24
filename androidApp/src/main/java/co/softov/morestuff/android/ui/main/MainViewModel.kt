@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class MainPresenter(
+class MainViewModel(
     private val getMessages: GetMessages,
     private var conductor: MainConductor?
 ) : ViewModel(), KoinComponent {

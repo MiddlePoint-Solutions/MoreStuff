@@ -19,13 +19,14 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ChatContent(
-    conductor: MainConductor
+fun MainContent(
+    conductor: MainConductor,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val viewModel = getViewModel<MainPresenter> {
+    val viewModel = getViewModel<MainViewModel> {
         parametersOf(conductor)
     }
 
@@ -40,7 +41,7 @@ fun ChatContent(
 
     val messageItems = viewModel.messages.collectAsState()
 
-    Surface(Modifier.systemBarsPadding()) {
+    Surface(modifier.systemBarsPadding()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

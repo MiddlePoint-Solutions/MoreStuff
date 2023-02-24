@@ -27,7 +27,8 @@ val pages = listOf(
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun ListsContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    itemAction: () -> Unit,
 ) {
 
     Timber.d("ListsContent")
@@ -39,7 +40,7 @@ fun ListsContent(
             Surface(
                 contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
             ) {
-                ScheduleList(page = pages[page])
+                ScheduleList(page = pages[page], itemAction)
             }
 
         }
@@ -76,6 +77,8 @@ private fun ScheduleTabs(
 @Composable
 fun ListsContentPreview() {
     MoreStuffTheme {
-        ListsContent()
+        ListsContent() {
+
+        }
     }
 }
