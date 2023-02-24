@@ -17,13 +17,14 @@ class BootReceiver : BroadcastReceiver() {
     }
 
     private fun startBootService(context: Context) {
-        Intent(context, BootService::class.java).let {
+        // TODO: BootService was causing crashes, should use work manager instead.
+        /*Intent(context, BootService::class.java).let {
             Timber.d("startBootService")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(it)
             } else {
                 context.startService(it)
             }
-        }
+        }*/
     }
 }
