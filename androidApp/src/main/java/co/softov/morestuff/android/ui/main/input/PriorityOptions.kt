@@ -47,7 +47,6 @@ fun PriorityOptions(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier.animateContentSize(animationSpec = tween()),
             horizontalArrangement = Arrangement.spacedBy(15.dp)
         ) {
             firstRow.forEach {
@@ -62,7 +61,6 @@ fun PriorityOptions(
 
         if (secondRow.isNotEmpty()) {
             Row(
-                modifier = Modifier.animateContentSize(animationSpec = tween()),
                 horizontalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 secondRow.forEach {

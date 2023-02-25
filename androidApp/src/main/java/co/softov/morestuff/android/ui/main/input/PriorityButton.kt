@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -41,7 +42,7 @@ fun PriorityButton(
     )
 
     Button(
-        modifier = modifier,
+        modifier = modifier.layoutId(text),
         shape =  shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,

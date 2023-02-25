@@ -42,9 +42,9 @@ fun Messages(
 ) {
 
     val scope = rememberCoroutineScope()
-    val itemsCount = remember { mutableStateOf(0) }
-    val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount.value, scrollState)
-    itemsCount.value = messages.size
+    var itemsCount by remember { mutableStateOf(0) }
+    val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount, scrollState)
+    itemsCount = messages.size
 
     Box(modifier = modifier) {
         LazyColumn(

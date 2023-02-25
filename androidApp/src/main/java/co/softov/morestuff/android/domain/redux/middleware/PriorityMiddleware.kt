@@ -26,8 +26,12 @@ class PriorityMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            OnResumeAction -> getPriorityOptions(scope, state.currentPriority, dispatch)
-            is PriorityAction.SetPriority -> getPriorityOptions(scope, action.priority, dispatch)
+            OnResumeAction -> {
+                getPriorityOptions(scope, state, state.currentPriority, dispatch)
+            }
+            is PriorityAction.SetPriority -> {
+                getPriorityOptions(scope, state, action.priority, dispatch)
+            }
             else -> NoOp
         }
         return next(state, action, dispatch)
@@ -35,15 +39,14 @@ class PriorityMiddleware(
 
     private fun getPriorityOptions(
         scope: CoroutineScope,
-        priority: Priority,
+        state: AppState,
+        nextPriority: Priority,
         dispatch: Dispatch
     ) {
         scope.launch {
-            val params = GetPriorityOptionsParams(priority)
+            val params = GetPriorityOptionsParams(state.currentPriority, nextPriority)
             getPriorityOptionsUseCase(params).fold(
-                ifLeft = {
-                    dispatch(ErrorAction(it))
-                },
+                ifLeft = { dispatch(ErrorAction(it)) },
                 ifRight = {
                     dispatch(
                         PriorityAction.SetPriorityOptions(
