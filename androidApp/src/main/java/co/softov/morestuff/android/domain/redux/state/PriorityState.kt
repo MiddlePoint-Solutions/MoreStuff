@@ -32,8 +32,8 @@ fun AppState.reducePriorityState(action: Action): AppState {
 
 fun PriorityState.reduce(action: Action): PriorityState {
     return when (action) {
-        is SetPriority -> copy(current = action.priority)
-        is SetPriorityOptions -> copy(options = action.options)
+//        is SetPriority -> copy(current = action.priority)
+        is SetPriorityOptions -> copy(current = action.priority, options = action.options)
         is SetCurrentPriorityOption -> reduceChangePriorityOption(current, action)
         else -> this
     }

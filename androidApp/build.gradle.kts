@@ -103,7 +103,6 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 
