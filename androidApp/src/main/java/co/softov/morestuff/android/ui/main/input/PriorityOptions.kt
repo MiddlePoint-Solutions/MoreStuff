@@ -76,7 +76,6 @@ fun PriorityOptions(
 
         val timePickerState = rememberTimePickerState()
 
-
         if (current.option == DefaultOption.Custom) {
             when (current) {
                 is Today -> {
@@ -86,13 +85,48 @@ fun PriorityOptions(
                     TimePicker(state = timePickerState)
                 }
                 is Later -> {
-                    val datePickerState =
-                        rememberDatePickerState(initialDisplayMode = DisplayMode.Picker)
-                    DatePicker(
-                        state = datePickerState,
-                        modifier = Modifier.padding(16.dp),
-                        showModeToggle = false
-                    )
+                    val datePickerState = rememberDatePickerState()
+                    val confirmEnabled = remember {
+                        derivedStateOf { datePickerState.selectedDateMillis != null }
+                    }
+
+
+
+                    var openDialog by remember { mutableStateOf(true) }
+                    if (openDialog) {
+                        DatePickerDialog(
+                            onDismissRequest = {
+                                // Dismiss the dialog when the user clicks outside the dialog or on the back
+                                // button. If you want to disable that functionality, simply use an empty
+                                // onDismissRequest.
+                                openDialog = false
+
+                            },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        openDialog = false
+                                    },
+                                    enabled = confirmEnabled.value
+                                ) {
+                                    Text("OK")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(
+                                    onClick = {
+                                        openDialog = false
+                                    }
+                                ) {
+                                    Text("Cancel")
+                                }
+                            }
+                        ) {
+//                            DatePicker(state = datePickerState)
+                            TimePicker(state = timePickerState)
+                        }
+                    }
+
                 }
             }
         }
