@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         showBatteryOptimizationRequest()
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {

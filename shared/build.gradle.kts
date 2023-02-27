@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 kotlin {
@@ -25,7 +26,15 @@ kotlin {
                 //Logger
                 implementation("io.github.aakira:napier:1.5.0")
                 //Key-Value storage
-                implementation("com.russhwolf:multiplatform-settings:0.9")
+                //implementation("com.russhwolf:multiplatform-settings:1.0.0")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
+                // Decompose
+                implementation("com.arkivanov.decompose:decompose:1.0.0")
+                implementation("com.arkivanov.essenty:lifecycle:1.0.0")
+                implementation("com.arkivanov.essenty:parcelable:1.0.0")
+                implementation("com.arkivanov.essenty:state-keeper:1.0.0")
+                implementation("com.arkivanov.essenty:instance-keeper:1.0.0")
+                implementation("com.arkivanov.essenty:back-handler:1.0.0")
             }
         }
 
