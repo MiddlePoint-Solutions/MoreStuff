@@ -11,6 +11,8 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
@@ -24,6 +26,7 @@ import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
 import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
+import com.github.terrakok.cicerone.androidx.FragmentScreen
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -33,9 +36,23 @@ class MainActivity : AppCompatActivity() {
     private val navigatorHolder: NavigatorHolder by inject()
     private val router: Router by inject()
 
-    private val navigator: Navigator by lazy {
-        AppNavigator(this, android.R.id.content)
+    private val navigator: Navigator = object : AppNavigator(this, android.R.id.content) {
+
+        override fun setupFragmentTransaction(
+            screen: FragmentScreen,
+            fragmentTransaction: FragmentTransaction,
+            currentFragment: Fragment?,
+            nextFragment: Fragment
+        ) {
+            if (screen == Screens.TaskChat) {
+                fragmentTransaction.setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_right
+                )
+            }
+        }
     }
+
 
     private val currentFragment: BaseFragment?
         get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment

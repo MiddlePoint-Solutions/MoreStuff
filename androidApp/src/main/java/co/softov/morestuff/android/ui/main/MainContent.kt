@@ -46,16 +46,13 @@ fun MainContent(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Messages(
-                    messages = messageItems.value,
-                    actions = chatActions,
-                    modifier = Modifier.weight(1f),
-                    scrollState = scrollState
-                )
-            }
+
+            Messages(
+                messages = messageItems.value,
+                actions = chatActions,
+                modifier = Modifier.weight(1f),
+                scrollState = scrollState
+            )
 
             UserInput(
                 modifier = Modifier.imePadding(),
