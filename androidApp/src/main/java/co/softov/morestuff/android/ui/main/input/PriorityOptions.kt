@@ -74,15 +74,15 @@ fun PriorityOptions(
             }
         }
 
+        val timePickerState = rememberTimePickerState()
+
 
         if (current.option == DefaultOption.Custom) {
             when (current) {
                 is Today -> {
-                    val timePickerState = rememberTimePickerState()
                     TimePicker(state = timePickerState)
                 }
                 is Tomorrow -> {
-                    val timePickerState = rememberTimePickerState()
                     TimePicker(state = timePickerState)
                 }
                 is Later -> {
