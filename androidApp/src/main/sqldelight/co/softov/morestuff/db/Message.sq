@@ -15,7 +15,7 @@ CREATE TABLE message(
 selectAll:
 SELECT *
 FROM message
-ORDER BY datetime(create_time);
+ORDER BY datetime(create_time) DESC;
 
 -- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
 selectActiveReminderMessages:
@@ -31,7 +31,8 @@ WHERE id = ?;
 selectMessageByTaskId:
 SELECT *
 FROM message
-WHERE task_id = ?;
+WHERE task_id = ?
+ORDER BY datetime(create_time) DESC;
 
 selectCurrentTaskMessage:
 SELECT *

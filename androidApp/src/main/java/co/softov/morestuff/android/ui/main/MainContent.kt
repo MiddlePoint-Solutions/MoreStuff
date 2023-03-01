@@ -11,9 +11,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
-import co.softov.morestuff.android.ui.main.chat.ChatActions
-import co.softov.morestuff.android.ui.main.chat.Messages
-import co.softov.morestuff.android.ui.main.input.UserInput
+import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.priority.PriorityInput
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -36,12 +37,11 @@ fun MainContent(
 
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
-        confirmationAction = { _, _ -> }
+        taskChatAction = viewModel::showTaskChat,
     )
 
     val messageItems = viewModel.messages.collectAsState()
-
-    Surface(modifier.systemBarsPadding()) {
+    Surface(modifier) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -53,6 +53,8 @@ fun MainContent(
                 modifier = Modifier.weight(1f),
                 scrollState = scrollState
             )
+
+            PriorityInput()
 
             UserInput(
                 modifier = Modifier.imePadding(),

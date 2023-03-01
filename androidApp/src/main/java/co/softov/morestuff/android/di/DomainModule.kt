@@ -38,7 +38,7 @@ val storeModule = module {
             reviewMiddleware = get(),
 
 
-        )
+            )
     }
 
     // Middleware
@@ -87,6 +87,8 @@ val TaskUseCases = module {
     }
 
     factory<GetTaskUseCase> { GetTaskUseCaseImpl(taskRepository = get()) }
+    factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
+
     factory<GetMessagesForTask> { GetMessagesForTaskImpl(messageRepository = get()) }
     factory<GetActiveTasks> { GetActiveTasksImpl(taskRepository = get()) }
     factory<GetCompletedTasks> { GetCompletedTasksImpl(taskRepository = get()) }
@@ -97,6 +99,8 @@ val TaskUseCases = module {
         )
     }
 
+    factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
+
     factory<GetScheduleTaskUseCase> {
         GetScheduleTaskUseCaseImpl(
             getScheduleUseCase = get(),
@@ -104,7 +108,6 @@ val TaskUseCases = module {
         )
     }
 }
-
 
 
 val scheduleUseCases = module {
@@ -160,7 +163,8 @@ val scheduleUseCases = module {
 }
 
 val messageUseCases = module {
-    factory<GetMessages> { GetMessagesImpl(messageRepository = get()) }
+    factoryOf(::GetMessagesImpl) bind GetMessages::class
+
     factory<GetActiveScheduleMessages> { GetActiveMessagesImpl(messageRepository = get()) }
     factory<CreateMessageUseCase> { CreateMessageUseCaseImpl(messageRepository = get()) }
     factory<GetMessageUseCase> { GetMessageImpl(messageRepository = get()) }
@@ -183,7 +187,6 @@ val priorityUseCases = module {
 }
 
 val settingsUseCases = module {
-
     factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
     factoryOf(::SaveUserSettingsImpl) bind SaveUserSettings::class
 }

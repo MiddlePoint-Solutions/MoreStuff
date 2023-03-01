@@ -1,32 +1,38 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.chat
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
-import co.softov.morestuff.android.ui.Screens
+import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import com.github.terrakok.cicerone.Router
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
-class MainViewModel(
+class TaskChatViewModel(
     private val store: AppStore,
     private val getMessages: GetMessages,
-    private var conductor: MainConductor?
+    private val getTaskFlowUseCase: GetTaskFlowUseCase,
+    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
+    private val taskId: Long,
 ) : ViewModel(), KoinComponent {
 
     private val router: Router by inject()
@@ -34,36 +40,43 @@ class MainViewModel(
     private val _messages = MutableStateFlow<List<Message>>(listOf())
     val messages: StateFlow<List<Message>> get() = _messages
 
+    val task: StateFlow<Task> =
+        getTaskFlowUseCase(taskId = taskId)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = Task.empty()
+            )
+
+    var taskTitle by mutableStateOf("")
+        private set
+
     init {
         viewModelScope.launch {
-            getMessages()
+            taskTitle = getTaskFlowUseCase(taskId = taskId).first().title
+            getMessages(taskId = taskId)
                 .onEach { _messages.value = it }
                 .launchIn(this)
         }
-    }
 
-    fun addNewTask(title: String) {
-        store.dispatch(TaskAction.CreateTask(title))
+
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
     }
 
-    fun onResume() {
-        store.dispatch(OnResumeAction)
+    fun updateTaskTitle(title: String) {
+        taskTitle = title
+        if (title.isNotEmpty()) {
+            viewModelScope.launch {
+                updateTaskTitleUseCase(taskId, title)
+            }
+        }
     }
 
-    fun showTaskList() {
-        conductor?.showTaskList()
+    fun onBackPressed() {
+        router.exit()
     }
 
-    fun showTaskChat(taskId: Long) {
-        router.navigateTo(Screens.taskChat(taskId))
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        conductor = null
-    }
 }

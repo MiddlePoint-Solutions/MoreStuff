@@ -5,14 +5,18 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
 interface GetMessages {
-    suspend operator fun invoke(): Flow<List<Message>>
+    suspend operator fun invoke(taskId: Long? = null): Flow<List<Message>>
 }
 
 class GetMessagesImpl(
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
+    private val getMessagesForTask: GetMessagesForTask,
 ) : GetMessages {
-    override suspend fun invoke(): Flow<List<Message>> {
-        return messageRepository.getAllMessages()
+    override suspend fun invoke(taskId: Long?): Flow<List<Message>> {
+        return when {
+            taskId != null -> getMessagesForTask(taskId)
+            else -> messageRepository.getAllMessages()
+        }
     }
 } 
 

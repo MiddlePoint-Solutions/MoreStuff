@@ -5,6 +5,7 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.createListOfMessages
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -16,11 +17,10 @@ class GetMessagesForTaskImplTest {
     @Test
     fun `messageRepository getMessagesForTask`() {
         val taskId = 1L
-        val messages = createListOfMessages(2)
-        coEvery { messageRepository.getMessagesForTask(taskId) } returns Either.Right(messages)
+        val messages = flowOf(createListOfMessages(2))
+        coEvery { messageRepository.getMessagesForTask(taskId) } returns messages
 
-        val result = runBlocking { getMessagesForTask.invoke(taskId) }
-        assertTrue(result.isRight())
-        assertEquals(Either.Right(messages), result)
+        val result = runBlocking { getMessagesForTask(taskId) }
+        assertEquals(messages , result)
     }
 }

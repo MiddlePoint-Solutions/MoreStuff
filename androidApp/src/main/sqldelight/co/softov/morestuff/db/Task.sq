@@ -35,5 +35,10 @@ UPDATE task
 SET complete_time = ?
 WHERE id = ?;
 
+updateTaskTitle:
+UPDATE task
+SET title = ?
+WHERE id = ?;
+
 lastInsertRowId:
 SELECT last_insert_rowid();

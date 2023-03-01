@@ -26,7 +26,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun ScheduleList(
     page: PageType,
-    itemAction: () -> Unit
+    itemAction: (taskId: Long) -> Unit
 ) {
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     val viewModel: SchedulePageViewModel = getViewModel(
@@ -40,7 +40,7 @@ fun ScheduleList(
     ) {
         when {
             state.schedules.isNotEmpty() -> items(state.schedules) {
-                ScheduleListItem(it, itemAction = itemAction)
+                ScheduleListItem(it, itemAction = { itemAction(it.taskId) })
             }
             state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
         }
@@ -54,7 +54,7 @@ fun ScheduleListItem(
     modifier: Modifier = Modifier,
     itemAction: () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    val expanded by remember { mutableStateOf(false) }
     Card(
         onClick = itemAction,
         elevation = CardDefaults.cardElevation(),

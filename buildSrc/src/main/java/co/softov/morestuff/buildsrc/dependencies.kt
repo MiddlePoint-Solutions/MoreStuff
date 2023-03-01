@@ -90,7 +90,7 @@ object Libs {
     }
 
     object AndroidX {
-        const val appcompat = "androidx.appcompat:appcompat:1.3.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.6.1"
         const val palette = "androidx.palette:palette:1.0.0"
         const val pagingKtx = "androidx.paging:paging-runtime-ktx:3.0.1"
         const val preferenceKtx = "androidx.preference:preference-ktx:1.1.1"
@@ -101,11 +101,11 @@ object Libs {
         const val coreKtx = "androidx.core:core-ktx:1.6.0"
 
         object Activity {
-            const val activityKtx = "androidx.activity:activity-ktx:1.3.1"
+            const val activityKtx = "androidx.activity:activity-ktx:1.6.1"
         }
 
         object Fragment {
-            const val fragmentKtx = "androidx.fragment:fragment-ktx:1.3.6"
+            const val fragmentKtx = "androidx.fragment:fragment-ktx:1.5.5"
         }
 
         object Constraint {

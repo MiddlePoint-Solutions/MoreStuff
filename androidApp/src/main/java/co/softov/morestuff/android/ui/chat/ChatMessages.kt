@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main.chat
+package co.softov.morestuff.android.ui.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
@@ -20,9 +20,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.ui.main.chat.items.AppChatItem
-import co.softov.morestuff.android.ui.main.chat.items.TaskReminderItem
-import co.softov.morestuff.android.ui.main.chat.items.UserChatItem
+import co.softov.morestuff.android.ui.chat.items.AppChatItem
+import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
+import co.softov.morestuff.android.ui.chat.items.UserChatItem
 import kotlinx.coroutines.launch
 
 private val JumpToBottomThreshold = 56.dp
@@ -49,7 +49,7 @@ fun Messages(
     Box(modifier = modifier) {
         LazyColumn(
             reverseLayout = true,
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             state = scrollState,
             contentPadding = PaddingValues(bottom = 8.dp)
         ) {
@@ -59,8 +59,8 @@ fun Messages(
             ) { item ->
 
                 when (item.contentType) {
-                    ContentType.USER_NEW_TASK -> UserChatItem(message = item)
-                    ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item)
+                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
+                    ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
                     ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
                 }
             }

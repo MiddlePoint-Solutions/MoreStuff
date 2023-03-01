@@ -1,5 +1,6 @@
-package co.softov.morestuff.android.ui.main.chat.items
+package co.softov.morestuff.android.ui.chat.items
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,15 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 
 @Composable
-fun UserChatItem(message: Message) {
+fun UserChatItem(message: Message, actions: ChatActions) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 45.dp),
+            .padding(start = 45.dp)
+            .clickable { actions.taskChatAction(message.taskId) },
         horizontalArrangement = Arrangement.End
     ) {
         Column(
@@ -43,6 +46,6 @@ fun UserChatItem(message: Message) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme(darkTheme = true) {
-        UserChatItem(message = MockData.Message.userNewTask)
+        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }
