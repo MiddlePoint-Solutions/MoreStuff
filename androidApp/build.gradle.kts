@@ -132,6 +132,10 @@ dependencies {
 
     // Navigation
     implementation("com.github.terrakok:cicerone:7.1")
+    implementation ("androidx.navigation:navigation-compose:2.5.0")
+
+    // Modal Drawer Layout
+    implementation ("androidx.drawerlayout:drawerlayout:1.1.1")
 
     // UI
     implementation(Libs.Google.material)

@@ -6,10 +6,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-import android.view.ViewGroup
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -17,7 +15,6 @@ import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
-import co.softov.morestuff.android.ui.compose.viewMigration
 import co.softov.morestuff.android.ui.list.ListsFragment
 import co.softov.morestuff.android.ui.main.MainConductor
 import co.softov.morestuff.android.ui.main.MainContent
