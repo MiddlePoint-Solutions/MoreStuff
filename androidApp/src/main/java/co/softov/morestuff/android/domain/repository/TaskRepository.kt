@@ -12,6 +12,8 @@ interface TaskRepository {
     suspend fun createTask(title: String): Either<Failure, Task>
     suspend fun getTask(taskId: Long): Either<Failure, Task>
     suspend fun setTaskComplete(taskId: Long): Either<Failure, Boolean>
+    suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
+    fun getTaskFlow(taskId: Long): Flow<Task>
     suspend fun getActiveTasksFlow(): Flow<List<Task>>
     suspend fun getCompleteTasksFlow(): Flow<List<Task>>
 }

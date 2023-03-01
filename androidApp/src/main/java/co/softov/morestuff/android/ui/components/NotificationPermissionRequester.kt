@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main.input
+package co.softov.morestuff.android.ui.components
 
 import android.Manifest
 import androidx.compose.foundation.layout.Column

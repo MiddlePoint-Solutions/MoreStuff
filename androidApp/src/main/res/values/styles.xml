@@ -10,8 +10,11 @@
         <item name="android:windowLightStatusBar" tools:targetApi="23">@bool/lightStatusBar</item>
 
         <item name="popupMenuStyle">@style/Widget.MaterialComponents.PopupMenu</item>
-        <item name="android:contextPopupMenuStyle" tools:targetApi="24">@style/Widget.MaterialComponents.PopupMenu.ContextMenu</item>
-        <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow</item>
+        <item name="android:contextPopupMenuStyle" tools:targetApi="24">
+            @style/Widget.MaterialComponents.PopupMenu.ContextMenu
+        </item>
+        <item name="actionOverflowMenuStyle">@style/Widget.MaterialComponents.PopupMenu.Overflow
+        </item>
 
     </style>
 
@@ -26,6 +29,27 @@
 
     <style name="AppTheme.PopupOverlay" parent="Theme.MaterialComponents.DayNight">
         <item name="android:colorBackground">@color/colorPrimary</item>
+    </style>
+
+    <!--  Bottom sheet dialog  -->
+
+    <style name="AlertBottomSheetDialogTheme" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimAmount">0.3</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="AlertBottomSheetDialogTheme.Dialog">
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.3</item>
+    </style>
+
+    <style name="AlertBottomSheetDialogTheme.Dialog.ManualEntry">
+        <item name="android:backgroundDimAmount">0.5</item>
     </style>
 
 </resources>
