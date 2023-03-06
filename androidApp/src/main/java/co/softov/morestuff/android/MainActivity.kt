@@ -8,6 +8,9 @@ import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -27,7 +30,6 @@ import com.github.terrakok.cicerone.androidx.FragmentScreen
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-
 class MainActivity : AppCompatActivity() {
 
     private val navigatorHolder: NavigatorHolder by inject()
@@ -39,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             screen: FragmentScreen,
             fragmentTransaction: FragmentTransaction,
             currentFragment: Fragment?,
-            nextFragment: Fragment
+            nextFragment: Fragment,
         ) {
             if (screen == Screens.TaskChat) {
                 fragmentTransaction.setCustomAnimations(
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -69,9 +72,20 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             MoreStuffTheme {
-                MoreStuffScaffold(showSettings = ::showMainSettings) {
-                    MainContent(conductor)
-                }
+                MoreStuffScaffold(
+                    drawerState = DrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed),
+                    scaffoldState = ScaffoldState(
+                        rememberDrawerState(initialValue = DrawerValue.Closed),
+                        snackbarHostState = SnackbarHostState()
+                    ),
+                    content = {
+                        MainContent(conductor)
+                    },
+                    scope = rememberCoroutineScope(),
+                    onItemClicked = {
+                        showMainSettings()
+                    },
+                )
             }
         }
     }

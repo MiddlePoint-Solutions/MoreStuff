@@ -1,9 +1,7 @@
 package co.softov.morestuff.android.ui.components
 
-import androidx.compose.material.ScaffoldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -14,24 +12,23 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreStuffTopBar(
-    showSettings: () -> Unit,
     scope: CoroutineScope,
-    scaffoldState: ScaffoldState,
-    ) {
+    drawerState: DrawerState,
+) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
             // RowScope here, so these icons will be placed horizontally
-            IconButton(onClick = showSettings) {
+            /*IconButton(onClick = showSettings) {
                 Icon(Icons.Filled.Settings, contentDescription = "Settings")
-            }
+            }*/
         },
         navigationIcon = {
             IconButton(onClick = {
                 scope.launch {
-                    scaffoldState.drawerState.open()
+                    drawerState.open()
                 }
-            }){
+            }) {
                 Icon(Icons.Filled.Menu, "")
             }
         }

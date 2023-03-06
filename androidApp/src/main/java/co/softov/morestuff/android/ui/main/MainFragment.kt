@@ -4,6 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.material.ScaffoldState
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.R
@@ -33,7 +39,7 @@ class MainFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         anyLog("onCreateView")
         return ComposeView(inflater.context).apply {
@@ -42,9 +48,18 @@ class MainFragment : BaseFragment() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             viewMigration {
-                MoreStuffScaffold(showSettings = ::showMainSettings) {
-                    MainContent(conductor)
-                }
+                MoreStuffScaffold(
+                    drawerState = DrawerState(initialValue = DrawerValue.Closed),
+                    scaffoldState = ScaffoldState(
+                        rememberDrawerState(initialValue = androidx.compose.material.DrawerValue.Closed),
+                        snackbarHostState = SnackbarHostState()
+                    ),
+                    content = {
+                        MainContent(conductor)
+                    },
+                    scope = rememberCoroutineScope(),
+                    onItemClicked = {},
+                )
             }
         }
     }
