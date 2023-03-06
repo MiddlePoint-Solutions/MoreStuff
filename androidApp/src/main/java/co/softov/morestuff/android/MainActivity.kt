@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.material.*
+import androidx.compose.material.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -80,9 +83,15 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MoreStuffTheme {
                 MoreStuffScaffold(
+                    drawerState = DrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed),
+                    scaffoldState = ScaffoldState(
+                        rememberDrawerState(initialValue = DrawerValue.Closed),
+                        snackbarHostState = SnackbarHostState()
+                    ),
                     content = {
                         MainContent(conductor)
                     },
+                    scope = rememberCoroutineScope(),
                     onItemClicked = {
                         showMainSettings()
                     },
