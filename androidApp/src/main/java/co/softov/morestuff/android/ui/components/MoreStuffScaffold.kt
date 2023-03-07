@@ -27,9 +27,6 @@ fun MoreStuffScaffold(
     scope: CoroutineScope = rememberCoroutineScope(),
     onItemClicked: (String) -> Unit,
     ) {
-    val title = remember { mutableStateOf("Settings") }
-    val navController = rememberNavController()
-
         ModalNavigationDrawer(
             drawerState = drawerState,
             gesturesEnabled = drawerState.isOpen,
