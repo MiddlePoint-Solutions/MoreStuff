@@ -9,7 +9,6 @@ import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
-import androidx.compose.material3.DrawerState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
@@ -72,11 +71,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MoreStuffTheme {
                 MoreStuffScaffold(
-                    drawerState = DrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed),
-                    scaffoldState = ScaffoldState(
-                        rememberDrawerState(initialValue = DrawerValue.Closed),
-                        snackbarHostState = SnackbarHostState()
-                    ),
                     content = {
                         MainContent(conductor)
                     },
