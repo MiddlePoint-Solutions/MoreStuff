@@ -17,12 +17,6 @@ fun MoreStuffTopBar(
 ) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
-        actions = {
-            // RowScope here, so these icons will be placed horizontally
-            /*IconButton(onClick = showSettings) {
-                Icon(Icons.Filled.Settings, contentDescription = "Settings")
-            }*/
-        },
         navigationIcon = {
             IconButton(onClick = {
                 scope.launch {

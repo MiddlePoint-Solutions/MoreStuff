@@ -1,5 +1,7 @@
 package co.softov.morestuff.android.ui.components
 
+
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.*
@@ -14,9 +16,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import co.softov.morestuff.android.ui.Drawer.DrawerLayout
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.CoroutineScope
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun MoreStuffScaffold(
     drawerState: DrawerState = rememberDrawerState(initialValue = androidx.compose.material3.DrawerValue.Closed),
@@ -27,7 +29,7 @@ fun MoreStuffScaffold(
     ) {
     val title = remember { mutableStateOf("Settings") }
     val navController = rememberNavController()
-    MoreStuffTheme {
+
         ModalNavigationDrawer(
             drawerState = drawerState,
             gesturesEnabled = drawerState.isOpen,
@@ -52,5 +54,4 @@ fun MoreStuffScaffold(
                 )
             }
         )
-    }
 }

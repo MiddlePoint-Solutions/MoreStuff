@@ -132,7 +132,6 @@ dependencies {
 
     // Navigation
     implementation("com.github.terrakok:cicerone:7.1")
-    implementation ("androidx.navigation:navigation-compose:2.5.0")
 
     // Modal Drawer Layout
     implementation ("androidx.drawerlayout:drawerlayout:1.1.1")
@@ -157,6 +156,12 @@ dependencies {
     implementation(Libs.AndroidX.Compose.animation)
     implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
     implementation(Libs.AndroidX.Compose.paging)
+
+    // Alorma Compose Settings
+    implementation ("com.github.alorma:compose-settings-ui-m3:0.22.0")
+    implementation ("com.github.alorma:compose-settings-storage-preferences:0.22.0")
+    implementation ("com.github.alorma:compose-settings-storage-datastore:0.22.0")
+    implementation ("com.github.alorma:compose-settings-storage-datastore-proto:0.22.0")
 
     // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")
