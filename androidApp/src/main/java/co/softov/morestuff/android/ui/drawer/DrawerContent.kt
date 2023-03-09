@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.Drawer
+package co.softov.morestuff.android.ui.drawer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

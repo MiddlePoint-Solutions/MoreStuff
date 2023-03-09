@@ -74,7 +74,6 @@ class MainActivity : AppCompatActivity() {
                     content = {
                         MainContent(conductor)
                     },
-                    scope = rememberCoroutineScope(),
                     onItemClicked = {
                         showMainSettings()
                     },
