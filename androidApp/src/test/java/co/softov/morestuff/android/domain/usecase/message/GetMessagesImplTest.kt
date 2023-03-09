@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test
 
 class GetMessagesImplTest{
      private val messageRepository: MessageRepository = mockk()
-     private val getMessages = GetMessagesImpl(messageRepository)
+     private val getMessagesForTask: GetMessagesForTask = mockk()
+     private val getMessages = GetMessagesImpl(messageRepository, getMessagesForTask)
 
      @Test
      fun `messageRepository getAllMessages`() {

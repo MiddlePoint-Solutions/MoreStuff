@@ -66,6 +66,7 @@
     <string name="priority_later">Later</string>
     <string name="done">Done</string>
     <string name="new_messages">Scroll Down</string>
+    <string name="cd_navigate_pack">Navigate Back</string>
 
 
 </resources>

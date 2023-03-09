@@ -15,7 +15,7 @@ interface MessageRepository {
 
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
-    suspend fun getMessagesForTask(taskId: Long): Either<Failure, List<Message>>
+    suspend fun getMessagesForTask(taskId: Long): Flow<List<Message>>
 
     suspend fun createMessage(
         taskId: Long,

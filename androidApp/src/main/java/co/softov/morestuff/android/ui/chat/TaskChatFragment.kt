@@ -1,34 +1,45 @@
 package co.softov.morestuff.android.ui.chat
 
+import android.os.Bundle
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.compose.BaseComposeFragment
-import co.softov.morestuff.android.ui.list.ListsFragment
-import co.softov.morestuff.android.ui.main.MainConductor
-import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.edit.EditFragment
 
 class TaskChatFragment : BaseComposeFragment() {
 
-    private val conductor = object : MainConductor {
-
-        override fun showTaskList() {
-            ListsFragment().show(parentFragmentManager, ListFragment::javaClass.name)
-        }
-    }
-
     @Composable
-    override fun ScreenContent() {
+    override fun ScreenContent(
+        args: Bundle?,
+        showKeyboard: () -> Unit,
+        hideKeyboard: () -> Unit,
+        dismissDialog: () -> Unit
+    ) {
+        val taskId = args?.getLong(EXTRA_TASK_ID) ?: 0L
         val nestedScrollInterop = rememberNestedScrollInteropConnection()
-        MainContent(
-            conductor,
+        TaskChatContent(
+            taskId,
             modifier = Modifier
                 .systemBarsPadding()
                 .nestedScroll(nestedScrollInterop)
         )
+    }
+
+    companion object {
+
+        private const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
+
+        fun newInstance(taskId: Long): TaskChatFragment {
+            val args = Bundle()
+            args.putLong(EXTRA_TASK_ID, taskId)
+            val fragment = TaskChatFragment()
+            fragment.arguments = args
+            return fragment
+        }
+
     }
 
 }
