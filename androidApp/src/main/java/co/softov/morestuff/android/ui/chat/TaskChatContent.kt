@@ -1,9 +1,8 @@
 package co.softov.morestuff.android.ui.chat
 
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.OnBackPressedDispatcher
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicTextField
@@ -11,14 +10,10 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -26,18 +21,12 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.util.anyLog
-import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.ui.compose.BackPressHandler
-import co.softov.morestuff.android.ui.compose.LocalBackPressedDispatcher
-import co.softov.morestuff.android.ui.edit.EditTaskTitleAlertDialog
-import co.softov.morestuff.android.ui.edit.EditTaskTitleBottomSheet
+import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +35,6 @@ fun TaskChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
@@ -56,17 +44,16 @@ fun TaskChatContent(
         scheduleAction = viewModel::scheduleResponse,
     )
 
-    var openDialog by remember { mutableStateOf(false) }
-
     val messageItems by viewModel.messages.collectAsState()
     val task by viewModel.task.collectAsState()
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var showConfirm by remember { mutableStateOf(true) }
+
     Scaffold(
         modifier = modifier,
         topBar = {
             TaskChatTopBar(
-                title = viewModel.taskTitle,
+                titleProvider = { viewModel.taskTitle },
                 backNavigationAction = viewModel::onBackPressed,
                 editTitleAction = viewModel::updateTaskTitle,
             )
@@ -85,7 +72,25 @@ fun TaskChatContent(
                         scrollState = scrollState
                     )
 
-                    PriorityInput(modifier)
+                    AnimatedVisibility(
+                        visible = showConfirm,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        CompositionLocalProvider(
+                            LocalMinimumInteractiveComponentEnforcement provides false,
+                        ) {
+                            PriorityButton(
+                                onSelected = { showConfirm = false },
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "Confirm".uppercase(),
+                            )
+                        }
+                    }
+
+                    // TODO: hoist state out and pass onSelected
+                    PriorityInput()
+
                 }
             }
         }
@@ -95,10 +100,12 @@ fun TaskChatContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun TaskChatTopBar(
-    title: String,
+    titleProvider: () -> String,
     backNavigationAction: () -> Unit,
     editTitleAction: (String) -> Unit,
 ) {
+
+    val focusManager = LocalFocusManager.current
 
     Column {
         TopAppBar(
@@ -112,10 +119,10 @@ private fun TaskChatTopBar(
                 }
             }
         )
-        val focusManager = LocalFocusManager.current
+
         Surface {
             BasicTextField(
-                value = title,
+                value = titleProvider(),
                 onValueChange = {
                     editTitleAction(it)
                 },
@@ -144,9 +151,19 @@ private fun TaskChatTopBar(
 private fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskChatTopBar(
-            title = "Edit task title in task chat",
+            titleProvider = { "Edit task title in task chat" },
             backNavigationAction = { },
             editTitleAction = { },
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TaskChatPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        TaskChatContent(
+            taskId = 1
         )
     }
 }

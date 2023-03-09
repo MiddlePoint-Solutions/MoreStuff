@@ -1,13 +1,10 @@
-package co.softov.morestuff.android.ui.main.input
+package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -41,7 +38,7 @@ fun PriorityButton(
         animationSpec = tween(300, easing = FastOutSlowInEasing)
     )
 
-    Button(
+    TextButton(
         modifier = modifier.layoutId(text),
         shape =  shape,
         colors = ButtonDefaults.buttonColors(

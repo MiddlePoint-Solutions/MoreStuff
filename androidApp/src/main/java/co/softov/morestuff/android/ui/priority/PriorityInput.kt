@@ -21,7 +21,6 @@ import co.softov.morestuff.android.presentation.PriorityOptionsModel
 import co.softov.morestuff.android.presentation.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.PriorityPresenter
 import co.softov.morestuff.android.ui.main.input.PriorityOptions
-import co.softov.morestuff.android.ui.main.input.UserPriorityInput
 import org.koin.androidx.compose.get
 
 @Composable
