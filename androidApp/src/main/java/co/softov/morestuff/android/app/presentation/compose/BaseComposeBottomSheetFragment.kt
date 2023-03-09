@@ -3,11 +3,14 @@ package co.softov.morestuff.android.app.presentation.compose
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
+import co.softov.morestuff.android.app.extensions.hideKeyboard
+import co.softov.morestuff.android.app.extensions.showKeyboard
 import co.softov.morestuff.android.ui.compose.viewMigration
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -20,7 +23,12 @@ abstract class BaseComposeBottomSheetFragment : BottomSheetDialogFragment(), Com
 
         val view = ComposeView(requireContext()).apply {
             viewMigration {
-                ScreenContent()
+                ScreenContent(
+                    arguments,
+                    showKeyboard = { dialog.showKeyboard() },
+                    hideKeyboard = { dialog.hideKeyboard() },
+                    dismissDialog = { dismiss() }
+                )
             }
         }
 
@@ -36,7 +44,12 @@ abstract class BaseComposeBottomSheetFragment : BottomSheetDialogFragment(), Com
     }
 
     @Composable
-    abstract override fun ScreenContent()
+    abstract override fun ScreenContent(
+        args: Bundle?,
+        showKeyboard: () -> Unit,
+        hideKeyboard: () -> Unit,
+        dismissDialog: () -> Unit,
+    )
 
     open fun setBottomSheetBehavior(behavior: BottomSheetBehavior<FrameLayout>) {
         behavior.isFitToContents = true
@@ -49,12 +62,4 @@ abstract class BaseComposeBottomSheetFragment : BottomSheetDialogFragment(), Com
         return displayMetrics.heightPixels
     }
 
-    protected fun closeKeyboard() {
-        requireView().let { v ->
-            val imm =
-                requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.hideSoftInputFromWindow(v.windowToken, 0)
-            v.clearFocus()
-        }
-    }
 }

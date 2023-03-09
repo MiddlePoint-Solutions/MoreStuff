@@ -3,6 +3,7 @@ package co.softov.morestuff.android.data.repository
 import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
+import arrow.core.right
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.mapper.taskDbMapper
 import co.softov.morestuff.android.data.utils.TimeUtils
@@ -13,6 +14,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -41,6 +43,10 @@ class TaskRepositoryImpl(
         }
     }
 
+    override fun getTaskFlow(taskId: Long): Flow<Task> {
+        return taskQueries.selectTaskById(id = taskId).asFlow().mapToOne().map { mapTaskDb(it) }
+    }
+
     override suspend fun getActiveTasksFlow(): Flow<List<Task>> {
         return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskDb) }
     }
@@ -59,6 +65,11 @@ class TaskRepositoryImpl(
     override suspend fun setTaskComplete(taskId: Long): Either<Failure, Boolean> {
         val time = TimeUtils.nowLocalDateTimeString
         taskQueries.updateTaskComplete(time, taskId)
+        return Right(true)
+    }
+
+    override suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean> {
+        taskQueries.updateTaskTitle(title, taskId)
         return Right(true)
     }
 }

@@ -10,6 +10,7 @@ object Screens {
 
     val Settings = FragmentScreen("Settings") { MainSettings() }
 
-    val TaskChat = FragmentScreen("TaskChat") { TaskChatFragment() }
+    fun taskChat(taskId: Long) =
+        FragmentScreen("TaskChat-$taskId") { TaskChatFragment.newInstance(taskId) }
 
 }

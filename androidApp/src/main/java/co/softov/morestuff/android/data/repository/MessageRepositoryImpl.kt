@@ -25,7 +25,7 @@ class MessageRepositoryImpl(
 
     override suspend fun getAllMessages(): Flow<List<Message>> {
         return messageQueries.selectAll().asFlow().mapToList()
-            .map { mapList(it, mapMessageDb).reversed() }
+            .map { mapList(it, mapMessageDb) }
     }
 
     override suspend fun getActiveReminderMessages(): List<Message> {
@@ -41,12 +41,9 @@ class MessageRepositoryImpl(
         }
     }
 
-    override suspend fun getMessagesForTask(taskId: Long): Either<Failure, List<Message>> {
-        return Either.Right(
-            messageQueries.selectMessageByTaskId(taskId)
-                .executeAsList()
-                .map { mapMessageDb(it) }
-        )
+    override suspend fun getMessagesForTask(taskId: Long): Flow<List<Message>> {
+        return messageQueries.selectMessageByTaskId(taskId)
+            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 
     override suspend fun createMessage(

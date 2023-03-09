@@ -1,5 +1,6 @@
-package co.softov.morestuff.android.ui.main.chat.items
+package co.softov.morestuff.android.ui.chat.items
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,16 +17,20 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.ui.main.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.appChatItem
 
 @Composable
-fun AppChatItem(message: Message) {
+fun AppChatItem(
+    message: Message,
+    chatActions: ChatActions,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 45.dp),
+            .padding(end = 45.dp)
+            .clickable { chatActions.taskChatAction(message.taskId) },
         horizontalArrangement = Arrangement.Start
     ) {
         Surface(
@@ -52,7 +57,7 @@ fun AppChatItem(message: Message) {
 @Composable
 fun TaskReminderItem(message: Message, actions: ChatActions) {
     Column {
-        AppChatItem(message)
+        AppChatItem(message, actions)
 
         if (message.replyType == null) {
             Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
@@ -95,7 +100,8 @@ fun AppChatItemPreview() {
 
     MoreStuffTheme(darkTheme = true) {
         AppChatItem(
-            message = MockData.Message.userNewTask.copy(contentType = ContentType.TASK_REMINDER)
+            message = MockData.Message.userNewTask.copy(contentType = ContentType.TASK_REMINDER),
+            chatActions = ChatActions()
         )
     }
 }

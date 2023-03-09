@@ -6,16 +6,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.material.*
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.Screens
+import co.softov.morestuff.android.ui.chat.TaskChatFragment
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.list.ListsFragment
 import co.softov.morestuff.android.ui.main.MainConductor
@@ -40,10 +44,12 @@ class MainActivity : AppCompatActivity() {
             screen: FragmentScreen,
             fragmentTransaction: FragmentTransaction,
             currentFragment: Fragment?,
-            nextFragment: Fragment,
+            nextFragment: Fragment
         ) {
-            if (screen == Screens.TaskChat) {
+            if (nextFragment is TaskChatFragment) {
                 fragmentTransaction.setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_right,
                     R.anim.slide_in_right,
                     R.anim.slide_out_right
                 )
@@ -56,7 +62,6 @@ class MainActivity : AppCompatActivity() {
         get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
 
     private val conductor = object : MainConductor {
-
         override fun showTaskList() {
             ListsFragment().show(supportFragmentManager, ListFragment::javaClass.name)
         }
@@ -67,6 +72,10 @@ class MainActivity : AppCompatActivity() {
 
         showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        onBackPressedDispatcher.addCallback(this) {
+            router.exit()
+        }
 
         setContent {
             MoreStuffTheme {
@@ -105,10 +114,6 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         navigatorHolder.removeNavigator()
         super.onPause()
-    }
-
-    override fun onBackPressed() {
-        currentFragment?.onBackPressed() ?: super.onBackPressed()
     }
 
     private fun showMainSettings() {

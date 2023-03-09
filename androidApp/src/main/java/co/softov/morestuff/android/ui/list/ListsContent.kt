@@ -28,21 +28,17 @@ val pages = listOf(
 @Composable
 fun ListsContent(
     modifier: Modifier = Modifier,
-    itemAction: () -> Unit,
+    itemAction: (taskId: Long) -> Unit = {},
 ) {
-
-    Timber.d("ListsContent")
     val pagerState = rememberPagerState(initialPage = 0)
     Column(modifier) {
         ScheduleTabs(pagerState, pages)
-
         HorizontalPager(state = pagerState, count = pages.size) { page ->
             Surface(
                 contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
             ) {
                 ScheduleList(page = pages[page], itemAction)
             }
-
         }
     }
 }
