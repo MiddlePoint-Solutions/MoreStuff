@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
                     },
                     scope = rememberCoroutineScope(),
                     onItemClicked = {
-                        showMainSettings()
+                        showSettingsScreen()
                     },
                 )
             }
@@ -127,5 +127,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun showMainSettings() {
         router.navigateTo(Screens.Settings)
+    }
+
+    private fun showSettingsScreen(){
+        router.navigateTo((Screens.ComposeSettings))
     }
 }
