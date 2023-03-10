@@ -19,8 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import app.cash.molecule.RecompositionClock
+import app.cash.molecule.launchMolecule
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
+import co.softov.morestuff.android.presentation.presenter.PriorityPresenter
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -35,10 +38,19 @@ fun TaskChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
+
+    val priority by scope.launchMolecule(clock = RecompositionClock.ContextClock) {
+        PriorityPresenter()
+    }.collectAsState()
+
+    val priorityOptions by scope.launchMolecule(clock = RecompositionClock.ContextClock) {
+        PriorityOptionsPresenter()
+    }.collectAsState()
 
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
@@ -88,8 +100,7 @@ fun TaskChatContent(
                         }
                     }
 
-                    // TODO: hoist state out and pass onSelected
-                    PriorityInput()
+                    PriorityInput(priority, priorityOptions)
 
                 }
             }

@@ -1,17 +1,11 @@
-package co.softov.morestuff.android.presentation
+package co.softov.morestuff.android.presentation.presenter
 
 import androidx.compose.runtime.*
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.priorityState
+import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.get
-
-data class PriorityOptionsModel(
-    val current: Priority,
-    val options: List<PriorityOption>
-)
 
 @Composable
 fun PriorityOptionsPresenter(store: AppStore = get()): PriorityOptionsModel {

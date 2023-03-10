@@ -100,18 +100,14 @@ val TaskUseCases = module {
     }
 
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
-
-    factory<GetScheduleTaskUseCase> {
-        GetScheduleTaskUseCaseImpl(
-            getScheduleUseCase = get(),
-            getTaskUseCase = get()
-        )
-    }
+    factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
 }
 
 
 val scheduleUseCases = module {
     factory<GetActiveSchedule> { GetActiveScheduleImpl(scheduleRepository = get()) }
+    factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
+
     factory<CancelActiveScheduleUseCase> {
         CancelActiveScheduleUseCaseImpl(
             scheduler = get(),
@@ -177,7 +173,7 @@ val messageUseCases = module {
     factory<CreateScheduleMessageUseCase> {
         CreateScheduleMessageUseCaseImpl(
             createMessageUseCase = get(),
-            getScheduleTaskUseCase = get()
+            getTaskForScheduleUseCase = get()
         )
     }
 }

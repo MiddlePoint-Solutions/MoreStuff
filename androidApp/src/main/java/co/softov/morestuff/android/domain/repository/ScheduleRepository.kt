@@ -29,6 +29,8 @@ interface ScheduleRepository {
     suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
     suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
+    fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>>
+
     suspend fun countTodayTaskSchedules(
         taskId: Long,
         startTime: String,

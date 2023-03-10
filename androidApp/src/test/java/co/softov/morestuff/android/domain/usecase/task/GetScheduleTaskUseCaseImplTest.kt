@@ -17,7 +17,7 @@ class GetScheduleTaskUseCaseImplTest {
      fun `invoke should return task when schedule is found`() {
         val getScheduleUseCase: GetScheduleUseCase = mockk()
         val getTaskUseCase: GetTaskUseCase = mockk()
-        val getScheduleTaskUseCaseImpl = GetScheduleTaskUseCaseImpl(
+        val getScheduleTaskUseCaseImpl = GetTaskForScheduleUseCaseImpl(
             getScheduleUseCase,
             getTaskUseCase
         )

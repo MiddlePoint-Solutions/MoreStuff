@@ -1,25 +1,14 @@
-package co.softov.morestuff.android.presentation
+package co.softov.morestuff.android.presentation.presenter
 
 import androidx.compose.runtime.*
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.priorityState
+import co.softov.morestuff.android.presentation.model.PriorityModel
+import co.softov.morestuff.android.presentation.model.mapToModel
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.get
 import timber.log.Timber
-
-sealed interface PriorityModel {
-    data class Today(val current: PriorityOption) : PriorityModel
-    data class Tomorrow(val current: PriorityOption) : PriorityModel
-    data class Later(val current: PriorityOption) : PriorityModel
-}
-
-fun Priority.mapToModel() = when (this) {
-    is Priority.Later -> PriorityModel.Later(option)
-    is Priority.Today -> PriorityModel.Today(option)
-    is Priority.Tomorrow -> PriorityModel.Tomorrow(option)
-}
 
 // TODO: Test this implementation (How many times does it get recomposed?)
 @Composable

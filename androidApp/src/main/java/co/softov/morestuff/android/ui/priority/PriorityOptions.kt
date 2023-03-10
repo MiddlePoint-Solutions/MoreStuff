@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.Priority.*
 import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
-import co.softov.morestuff.android.presentation.PriorityOptionsModel
+import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 

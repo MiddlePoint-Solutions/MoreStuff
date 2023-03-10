@@ -5,6 +5,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
+import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
@@ -17,8 +18,11 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import com.squareup.sqldelight.runtime.coroutines.mapToOneOrDefault
+import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
 
 class ScheduleRepositoryImpl(
@@ -124,6 +128,15 @@ class ScheduleRepositoryImpl(
             else -> Right(mapScheduleDb(schedule))
         }
     }
+
+    override fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>> =
+        scheduleQueries.selectActiveScheduleByTaskId(taskId)
+            .asFlow()
+            .map { schedule ->
+                schedule.executeAsOneOrNull()?.let {
+                    Right(mapScheduleDb(it))
+                } ?: Left(ScheduleDoesNotExist)
+            }
 
     override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)
