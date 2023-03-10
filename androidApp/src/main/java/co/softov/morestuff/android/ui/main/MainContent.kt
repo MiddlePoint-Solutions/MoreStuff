@@ -67,7 +67,10 @@ fun MainContent(
             )
 
             PriorityInput(
-                priority, priorityOptions
+                priority = priority,
+                priorityOptions = priorityOptions,
+                onPriorityChange = viewModel::priorityChanged,
+                onPriorityOptionChange = viewModel::onPriorityOptionChanged
             )
 
             UserInput(

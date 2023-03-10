@@ -50,6 +50,14 @@ class MainViewModel(
         store.dispatch(UserResponseAction(scheduleId, replyType))
     }
 
+    fun priorityChanged(priority: Priority) {
+        store.dispatch(PriorityAction.SetPriority(priority))
+    }
+
+    fun onPriorityOptionChanged(option: PriorityOption) {
+        store.dispatch(PriorityAction.SetCurrentPriorityOption(option))
+    }
+
     fun onResume() {
         store.dispatch(OnResumeAction)
     }

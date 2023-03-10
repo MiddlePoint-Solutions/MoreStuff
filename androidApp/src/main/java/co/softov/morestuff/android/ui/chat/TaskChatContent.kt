@@ -100,7 +100,12 @@ fun TaskChatContent(
                         }
                     }
 
-                    PriorityInput(priority, priorityOptions)
+                    PriorityInput(
+                        priority = priority,
+                        onPriorityChange = {},
+                        priorityOptions = priorityOptions,
+                        onPriorityOptionChange = {}
+                    )
 
                 }
             }

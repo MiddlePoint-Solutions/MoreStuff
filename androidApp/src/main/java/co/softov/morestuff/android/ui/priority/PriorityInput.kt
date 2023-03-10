@@ -20,13 +20,14 @@ import org.koin.androidx.compose.get
 fun PriorityInput(
     priority: PriorityModel,
     priorityOptions: PriorityOptionsModel,
+    onPriorityChange: (Priority) -> Unit,
+    onPriorityOptionChange: (PriorityOption) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PriorityViewModel = get()
 ) {
     Column(modifier = modifier) {
         UserPriorityOptionsInput(
-            priorityOptions,
-            viewModel::onPriorityOptionChanged
+            optionsModel = priorityOptions,
+            onOptionSelected = onPriorityOptionChange,
         )
 
         UserPriorityInput(
@@ -35,7 +36,7 @@ fun PriorityInput(
                 is PriorityModel.Today -> Priority.Today()
                 is PriorityModel.Tomorrow -> Priority.Tomorrow()
             },
-            onPrioritySelected = viewModel::priorityChanged
+            onPrioritySelected = onPriorityChange
         )
     }
 }
