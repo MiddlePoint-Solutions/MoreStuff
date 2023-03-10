@@ -23,7 +23,7 @@ class MessageRepositoryImpl(
     private val messageQueries = database.messageQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
-    override suspend fun getAllMessages(): Flow<List<Message>> {
+    override fun getAllMessages(): Flow<List<Message>> {
         return messageQueries.selectAll().asFlow().mapToList()
             .map { mapList(it, mapMessageDb) }
     }
@@ -41,7 +41,7 @@ class MessageRepositoryImpl(
         }
     }
 
-    override suspend fun getMessagesForTask(taskId: Long): Flow<List<Message>> {
+    override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }

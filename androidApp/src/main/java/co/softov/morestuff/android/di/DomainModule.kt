@@ -89,7 +89,7 @@ val TaskUseCases = module {
     factory<GetTaskUseCase> { GetTaskUseCaseImpl(taskRepository = get()) }
     factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
 
-    factory<GetMessagesForTask> { GetMessagesForTaskImpl(messageRepository = get()) }
+    factory<GetTaskMessagesFlowUseCase> { GetTaskMessagesFlowUseCaseImpl(messageRepository = get()) }
     factory<GetActiveTasks> { GetActiveTasksImpl(taskRepository = get()) }
     factory<GetCompletedTasks> { GetCompletedTasksImpl(taskRepository = get()) }
 
