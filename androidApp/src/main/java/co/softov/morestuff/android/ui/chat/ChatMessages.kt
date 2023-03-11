@@ -53,7 +53,7 @@ fun Messages(
                 .fillMaxWidth()
                 .wrapContentHeight(),
             state = scrollState,
-            contentPadding = PaddingValues(bottom = 20.dp)
+            contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
         ) {
             items(
                 items = messages,

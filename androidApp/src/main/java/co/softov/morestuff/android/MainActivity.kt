@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.ListFragment
 import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
+import co.softov.morestuff.android.ui.ScreenKey
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.chat.TaskChatFragment
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
@@ -41,22 +42,28 @@ class MainActivity : AppCompatActivity() {
             screen: FragmentScreen,
             fragmentTransaction: FragmentTransaction,
             currentFragment: Fragment?,
-            nextFragment: Fragment,
+            nextFragment: Fragment
         ) {
-            if (nextFragment is TaskChatFragment) {
-                fragmentTransaction.setCustomAnimations(
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_right,
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_right
-                )
+            when {
+                screen.screenKey.contains(ScreenKey.LAUNCHED_TASK_CHAT) -> {
+                    fragmentTransaction.setCustomAnimations(
+                        0,
+                        R.anim.slide_out_right,
+                        0,
+                        R.anim.slide_out_right
+                    )
+                }
+                screen.screenKey.contains(ScreenKey.TASK_CHAT) -> {
+                    fragmentTransaction.setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_right,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_right
+                    )
+                }
             }
         }
     }
-
-
-    private val currentFragment: BaseFragment?
-        get() = supportFragmentManager.findFragmentById(R.id.container) as? BaseFragment
 
     private val conductor = object : MainConductor {
         override fun showTaskList() {
@@ -74,6 +81,12 @@ class MainActivity : AppCompatActivity() {
             router.exit()
         }
 
+        intent.getLongExtra(EXTRA_TASK_ID, 0).let {
+            if (it > 0) {
+                router.navigateTo(Screens.launchedTaskChat(it))
+                intent.putExtra(EXTRA_TASK_ID, 0)
+            }
+        }
 
         setContent {
             MoreStuffTheme {
@@ -122,4 +135,10 @@ class MainActivity : AppCompatActivity() {
         router.navigateTo((Screens.ComposeSettings))
     }
 
+
+    companion object {
+
+        const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
+
+    }
 }
