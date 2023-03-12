@@ -10,6 +10,7 @@ import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -76,6 +77,10 @@ class TaskChatViewModel(
                 updateTaskTitleUseCase(taskId, title)
             }
         }
+    }
+
+    fun setTaskComplete(complete: Boolean) {
+        store.dispatch(TaskAction.SetTaskComplete(taskId = taskId, complete))
     }
 
     fun onBackPressed() {

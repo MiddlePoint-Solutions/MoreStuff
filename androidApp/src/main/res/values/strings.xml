@@ -68,6 +68,7 @@
     <string name="new_messages">Scroll Down</string>
     <string name="cd_navigate_back">Navigate Back</string>
     <string name="cd_schedule_icon">Schedule Icon</string>
+    <string name="cd_task_complete">Task Complete</string>
 
 
 </resources>

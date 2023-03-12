@@ -15,6 +15,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,6 +36,7 @@ import app.cash.molecule.RecompositionClock
 import app.cash.molecule.launchMolecule
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.DefaultOption
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.presentation.model.PriorityModel
 import co.softov.morestuff.android.presentation.model.mapToModel
 import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
@@ -81,10 +85,12 @@ fun TaskChatContent(
         modifier = modifier,
         topBar = {
             TaskChatTopBar(
+                task = task,
                 titleProvider = { viewModel.taskTitle },
                 backNavigationAction = viewModel::onBackPressed,
                 editTitleAction = viewModel::updateTaskTitle,
-                editScheduleAction = { openBottomSheet = true }
+                editScheduleAction = { openBottomSheet = true },
+                taskCompleteAction = viewModel::setTaskComplete
             )
         },
         content = {
@@ -117,10 +123,12 @@ fun TaskChatContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun TaskChatTopBar(
+    task: Task,
     titleProvider: () -> String,
     backNavigationAction: () -> Unit,
     editTitleAction: (String) -> Unit,
     editScheduleAction: () -> Unit,
+    taskCompleteAction: (Boolean) -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -134,6 +142,27 @@ private fun TaskChatTopBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xff2B3438)
                 ),
+                actions = {
+                    when (task.isComplete) {
+                        true -> {
+                            IconButton(onClick = { taskCompleteAction(false) }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Replay,
+                                    contentDescription = stringResource(R.string.cd_task_complete)
+                                )
+                            }
+                        }
+                        false -> {
+                            IconButton(onClick = { taskCompleteAction(true) }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Done,
+                                    contentDescription = stringResource(R.string.cd_task_complete)
+                                )
+                            }
+                        }
+                    }
+
+                },
                 navigationIcon = {
                     IconButton(onClick = { backNavigationAction() }) {
                         Icon(
@@ -161,6 +190,7 @@ private fun TaskChatTopBar(
                         },
                         modifier = Modifier
                             .fillMaxWidth(),
+                        readOnly = task.isComplete,
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
                             autoCorrect = false,
@@ -170,7 +200,13 @@ private fun TaskChatTopBar(
                             focusManager.clearFocus()
                         },
                         maxLines = 4,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textDecoration = when (task.isComplete) {
+                                true -> TextDecoration.LineThrough
+                                false -> null
+                            }
+                        ),
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                     )
 
@@ -201,10 +237,12 @@ private fun TaskChatTopBar(
 private fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskChatTopBar(
+            task = Task.empty(),
             titleProvider = { "Edit task title in task chat" },
             backNavigationAction = { },
             editTitleAction = { },
             editScheduleAction = { },
+            taskCompleteAction = {}
         )
     }
 }
