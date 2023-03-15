@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.settings
 
 import android.app.Activity
-import android.util.Log
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
@@ -9,12 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,12 +20,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
+import co.softov.morestuff.android.app.DevToolsImpl
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
-import com.alorma.compose.settings.storage.base.rememberFloatSettingState
+import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
+import com.alorma.compose.settings.storage.preferences.rememberPreferenceFloatSettingState
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
+import com.russhwolf.settings.Settings
 
 @Preview
 @Composable
@@ -92,18 +93,19 @@ fun SelectTheme() {
     val themeOptions = listOf("Light", "Dark", "System")
     MoreStuffTheme {
         Row {
-            SettingsList(enabled = enabledState.value, title = {
-                androidx.compose.material3.Text(
-                    text = "Select Theme",
-                    fontSize = 18.sp
-                )
-            }, items = themeOptions, onItemSelected = { index, _ ->
-                when (index) {
-                    0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                }
-            })
+            SettingsList(
+                enabled = enabledState.value, title = {
+                    androidx.compose.material3.Text(
+                        text = "Select Theme",
+                        fontSize = 18.sp
+                    )
+                }, items = themeOptions, onItemSelected = { index, _ ->
+                    when (index) {
+                        0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    }
+                })
         }
     }
 }
@@ -111,14 +113,21 @@ fun SelectTheme() {
 
 @Composable
 fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
-    val settingSnoozeLimit = rememberFloatSettingState(0f)
-    val enabledState = rememberBooleanSettingState(true)
+    val settingSnoozeLimit = rememberPreferenceFloatSettingState(
+        key = "snooze_limit_key",
+        defaultValue = 0F
+    )
+    val enabledState = rememberPreferenceBooleanSettingState(
+        key = "enabled_state_key",
+        defaultValue = true
+    )
     MoreStuffTheme {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            SettingsSlider(enabled = enabledState.value,
+            SettingsSlider(
+                enabled = enabledState.value,
                 state = settingSnoozeLimit,
                 title = {
                     androidx.compose.material3.Text(
@@ -131,7 +140,6 @@ fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
                 modifier = Modifier.weight(1f),
                 onValueChange = { newValue ->
                     viewModel.onSnoozeLimitChanged(newValue.toInt())
-                    settingSnoozeLimit.value = newValue
                 }
             )
         }
@@ -200,7 +208,7 @@ fun ReviewTest() {
 
 @Composable
 fun KeepDeviceScreenOn() {
-    val memoryStorage = rememberBooleanSettingState(defaultValue = false)
+    val memoryStorage = rememberPreferenceBooleanSettingState("keep_screen_on", false)
     val enabledState = rememberBooleanSettingState(true)
     val context = LocalContext.current
     MoreStuffTheme {
@@ -225,6 +233,7 @@ fun KeepDeviceScreenOn() {
                         false ->
                             (context as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
+                    memoryStorage.value = newValue
                 }
             )
         }
@@ -234,8 +243,9 @@ fun KeepDeviceScreenOn() {
 
 @Composable
 fun ReminderDebugging() {
-    val switchState = remember { mutableStateOf(false) }
-    val reminderDelayState = remember { mutableStateOf(60f) }
+    val switchState = rememberPreferenceBooleanSettingState("switch_state", false)
+    val reminderDelayState = rememberPreferenceFloatSettingState("reminder_delay", 60f)
+    val getPriorityTimeUseCase = GetPriorityTimeUseCaseImpl(debug = DevToolsImpl(settings = Settings()))
     MoreStuffTheme {
         Column {
             SettingsSwitch(
@@ -249,7 +259,7 @@ fun ReminderDebugging() {
                         textAlign = TextAlign.Left
                     )
                 },
-                onCheckedChange = { isChecked -> switchState.value = isChecked }
+                state = switchState
             )
 
             if (switchState.value) {
@@ -259,31 +269,25 @@ fun ReminderDebugging() {
                 ) {
                     Column {
                         androidx.compose.material3.Text(
-                            text = "Today reminder delay",
+                            text = "Today reminder delay ${reminderDelayState.value.toInt()}",
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
-                        androidx.compose.material3.Text(
-                            text = reminderDelayState.value.toInt().toString(),
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
+                        SettingsSlider(
+                            enabled = switchState.value,
+                            state = reminderDelayState,
+                            title = {},
+                            steps = 119,
+                            valueRange = 1F..120F,
+                            modifier = Modifier.weight(1f),
+                            onValueChange = { newValue ->
+                                getPriorityTimeUseCase(Priority.today, newValue.toInt())
+                            }
                         )
                     }
 
                 }
-                Slider(
-                    value = reminderDelayState.value,
-                    onValueChange = { reminderDelayState.value = it },
-                    valueRange = 1f..120f,
-                    steps = 119,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                    colors = androidx.compose.material.SliderDefaults.colors(
-                        thumbColor = Color.Black,
-                        activeTrackColor = Color.LightGray,
-                        inactiveTrackColor = Color.Gray,
-                    ),
-                    enabled = switchState.value
-                )
+
             }
         }
     }
@@ -291,14 +295,15 @@ fun ReminderDebugging() {
 
 @Composable
 fun SmartReminder(viewModel: SettingsViewModel) {
-    val memoryStorage = rememberBooleanSettingState(defaultValue = false)
-    val enabledState = rememberBooleanSettingState(true)
+    val memoryStorage =
+        rememberPreferenceBooleanSettingState("smart_reminder_memory_storage", false)
+    val enabledState = rememberPreferenceBooleanSettingState("smart_reminder_enabled", true)
     MoreStuffTheme {
         Column(
             horizontalAlignment = Alignment.Start,
         ) {
             SettingsSwitch(
-                enabled = enabledState.value,
+                enabled = enabledState.defaultValue,
                 state = memoryStorage,
                 modifier = Modifier.padding(end = 16.dp),
                 title = {
@@ -313,8 +318,7 @@ fun SmartReminder(viewModel: SettingsViewModel) {
                     viewModel.smartReminderEnabled(newValue)
                     memoryStorage.value = newValue
                 },
-
-                )
+            )
         }
     }
 }

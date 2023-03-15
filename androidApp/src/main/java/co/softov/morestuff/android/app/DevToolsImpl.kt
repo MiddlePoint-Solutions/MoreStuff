@@ -1,13 +1,10 @@
 package co.softov.morestuff.android.app
 
-import android.content.Context
 import android.content.SharedPreferences
-import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.domain.DevTools
+import com.russhwolf.settings.Settings
 
-class DevToolsImpl(context: Context) : DevTools {
-
-    private val prefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+class DevToolsImpl(settings: Settings) : DevTools {
 
     private val keyDebugReminders = "debug_reminder"
     private val keyTodayDebugTime = "debug_reminder_today_offset"
@@ -19,8 +16,8 @@ class DevToolsImpl(context: Context) : DevTools {
     private val preferenceChangeListener =
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             when (key) {
-                "debug_reminder" -> _debugReminders = sharedPreferences.getBoolean(key, false)
-                "debug_reminder_today_offset" -> _todayDebugTime = sharedPreferences.getInt(key, 1)
+                keyDebugReminders -> _debugReminders = settings.getBoolean(keyDebugReminders, false)
+                keyTodayDebugTime -> _todayDebugTime = settings.getInt(keyTodayDebugTime, 1)
             }
         }
 
@@ -31,9 +28,9 @@ class DevToolsImpl(context: Context) : DevTools {
         get() = _todayDebugTime
 
     init {
-        prefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-        prefs.edit().putBoolean(keyKeepScreenOn, false).apply()
-        _debugReminders = prefs.getBoolean(keyDebugReminders, false)
-        _todayDebugTime = prefs.getInt(keyTodayDebugTime, 1)
+        settings.putBoolean(preferenceChangeListener.toString(), value = false)
+        settings.putBoolean(keyKeepScreenOn, value = false)
+        _debugReminders = settings.getBoolean(keyDebugReminders, false)
+        _todayDebugTime = settings.getInt(keyTodayDebugTime, 1)
     }
 }
