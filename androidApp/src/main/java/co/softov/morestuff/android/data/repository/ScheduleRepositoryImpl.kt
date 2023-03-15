@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
-import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
@@ -18,11 +17,8 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import com.squareup.sqldelight.runtime.coroutines.mapToOneOrDefault
-import com.squareup.sqldelight.runtime.coroutines.mapToOneOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import timber.log.Timber
 
 class ScheduleRepositoryImpl(
@@ -37,13 +33,13 @@ class ScheduleRepositoryImpl(
     override suspend fun createSchedule(
         schedule: Schedule
     ): Either<Failure, Schedule> {
-        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleTimeLocal}")
+        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleLocalTime}")
         val scheduleId = scheduleQueries.transactionWithResult {
             scheduleQueries.insertSchedule(
                 task_id = schedule.taskId,
                 create_time = schedule.createTime,
-                schedule_time_local = schedule.scheduleTimeLocal,
-                schedule_time_utc = schedule.scheduleTimeUtc,
+                schedule_time_local = schedule.scheduleLocalTime,
+                schedule_time_utc = schedule.scheduleUtcTime,
                 timezone = schedule.timezone
             )
             lastInsertId

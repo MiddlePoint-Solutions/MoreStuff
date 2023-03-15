@@ -4,6 +4,7 @@ import arrow.core.Either
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
+import kotlinx.datetime.toLocalDateTime
 
 interface MapScheduleToPriorityUseCase :
     BaseUseCase<Failure, Schedule, Priority>
@@ -11,10 +12,10 @@ interface MapScheduleToPriorityUseCase :
 class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
 
     override suspend fun invoke(params: Schedule): Either<Failure, Priority> {
-        val priority = params.scheduleTimeUtc?.let {
+        val priority = params.scheduleLocalTime?.let {
+            val scheduleTime = it.toLocalDateTime()
             when {
                 TimeUtils.isToday(it) -> {
-                    val scheduleTime = TimeUtils.utcStringToLocalDateTime(it)
                     val morning = TimeUtils.todayLocalDateTime(8)
                     val noon = TimeUtils.todayLocalDateTime(12)
                     val afternoon = TimeUtils.todayLocalDateTime(18)
@@ -29,15 +30,14 @@ class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
                     Priority.today.copy(option = option)
                 }
                 TimeUtils.isTomorrow(it) -> {
-                    val scheduleTime = TimeUtils.utcStringToLocalDateTime(it)
                     val morning = TimeUtils.tomorrowLocalDateTime(8)
                     val noon = TimeUtils.tomorrowLocalDateTime(12)
                     val afternoon = TimeUtils.tomorrowLocalDateTime(18)
 
                     val option = when {
-                        scheduleTime > morning && scheduleTime < noon -> TimeOfDayOption.Morning
-                        scheduleTime > noon && scheduleTime < afternoon -> TimeOfDayOption.Afternoon
-                        scheduleTime > afternoon -> TimeOfDayOption.Evening
+                        scheduleTime >= morning && scheduleTime < noon -> TimeOfDayOption.Morning
+                        scheduleTime >= noon && scheduleTime < afternoon -> TimeOfDayOption.Afternoon
+                        scheduleTime >= afternoon -> TimeOfDayOption.Evening
                         else -> DefaultOption.Auto
                     }
 

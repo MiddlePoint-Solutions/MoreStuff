@@ -201,7 +201,7 @@ private fun TaskChatTopBar(
 
                         PriorityButton(
                             onSelected = editScheduleAction,
-                            text = schedule?.scheduleTimeLocal
+                            text = schedule?.scheduleLocalTime
                                 ?: stringResource(R.string.task_chat_schedule_reminder),
                             shape = RoundedCornerShape(percent = 50),
                             enabled = !task.isComplete

@@ -10,6 +10,7 @@ import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCase
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterAll
@@ -17,7 +18,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.koin.core.context.startKoin
-import org.koin.mp.KoinPlatformTools
+import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 
@@ -35,7 +36,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
 
         @AfterAll
         fun cleanup() {
-            KoinPlatformTools.defaultContext().stopKoin()
+            stopKoin()
         }
 
     }
@@ -49,20 +50,44 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             val taskId = 1L
             val params = GetSchedulePriorityParams(taskId)
             val schedule = Schedule.empty().copy(
-                scheduleTimeUtc = TimeUtils.todayUtcString(9)
+                scheduleLocalTime = TimeUtils.todayLocalDateTimeString(9)
             )
 
             val useCase = GetSchedulePriorityUseCaseImpl(
                 getActiveSchedule = getActiveSchedule,
                 mapScheduleToPriority = get(),
                 getPriorityOptionsUseCase = get(),
-                getUpcomingPriorityUseCase = get()
+                getUpcomingPriorityUseCase = getUpcomingPriorityUseCase
             )
 
             coEvery { getActiveSchedule(taskId) } returns Either.Right(schedule)
+            coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).getOrHandle { throw (Throwable(it.toString())) }
             assertEquals(Priority.today.copy(option = TimeOfDayOption.Morning), result.priority)
+        }
+
+    @Test
+    fun `should return Tomorrow morning priority when scheduled for tomorrow morning`() =
+        runBlocking {
+            val taskId = 1L
+            val params = GetSchedulePriorityParams(taskId)
+            val schedule = Schedule.empty().copy(
+                scheduleLocalTime = TimeUtils.tomorrowLocalDateTimeString(8)
+            )
+
+            val useCase = GetSchedulePriorityUseCaseImpl(
+                getActiveSchedule = getActiveSchedule,
+                mapScheduleToPriority = get(),
+                getPriorityOptionsUseCase = get(),
+                getUpcomingPriorityUseCase = getUpcomingPriorityUseCase
+            )
+
+            coEvery { getActiveSchedule(taskId) } returns Either.Right(schedule)
+            coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
+
+            val result = useCase(params).getOrHandle { throw (Throwable(it.toString())) }
+            assertEquals(Priority.tomorrow.copy(option = TimeOfDayOption.Morning), result.priority)
         }
 
     @Test
@@ -87,6 +112,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             val result = useCase(params).getOrHandle { throw (Throwable(it.toString())) }
             assertEquals(Priority.today.copy(option = TimeOfDayOption.Afternoon), result.priority)
         }
+
 
 }
 

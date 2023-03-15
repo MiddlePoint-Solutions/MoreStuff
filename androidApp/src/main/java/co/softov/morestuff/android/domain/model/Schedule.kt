@@ -4,8 +4,8 @@ data class Schedule(
     val id: Long,
     val taskId: Long,
     val createTime: String,
-    val scheduleTimeLocal: String?,
-    val scheduleTimeUtc: String?,
+    val scheduleLocalTime: String?,
+    val scheduleUtcTime: String?,
     val timezone: String,
     val active: Boolean
 ) {
@@ -16,8 +16,8 @@ data class Schedule(
             id = 0,
             taskId = 1,
             createTime = "",
-            scheduleTimeLocal = null,
-            scheduleTimeUtc = null,
+            scheduleLocalTime = null,
+            scheduleUtcTime = null,
             timezone = "",
             active = false,
         )
