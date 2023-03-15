@@ -280,8 +280,8 @@ fun ReminderDebugging() {
                             steps = 119,
                             valueRange = 1F..120F,
                             modifier = Modifier.weight(1f),
-                            onValueChange = { newValue ->
-                                getPriorityTimeUseCase(Priority.today, newValue.toInt())
+                            onValueChange = {
+                                getPriorityTimeUseCase(Priority.today)
                             }
                         )
                     }

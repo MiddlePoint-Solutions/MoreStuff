@@ -13,9 +13,9 @@ interface GetPriorityTimeUseCase {
 }
 
 class GetPriorityTimeUseCaseImpl(
-    private val debug: DevTools
+    private val debug: DevTools,
 ) : GetPriorityTimeUseCase {
-     operator fun invoke(priority: Priority, minutes: Int): String? {
+     override operator fun invoke(priority: Priority): String? {
         return when (debug.debugReminders) {
             true -> TimeUtils.todayLocalDateTimeByAdding(minute = debug.todayDebugTime).toString()
             else -> when (val option = priority.option) {
@@ -38,7 +38,8 @@ class GetPriorityTimeUseCaseImpl(
     private fun getDefaultOptionTime(priority: Priority, option: DefaultOption): String? =
         when (option) {
             DefaultOption.Custom,
-            DefaultOption.Auto -> when (priority) {
+            DefaultOption.Auto,
+            -> when (priority) {
                 is Priority.Later -> null
                 is Priority.Today -> TimeUtils.todayLocalDateTimeByAdding(hour = 1).toString()
                 is Priority.Tomorrow -> TimeUtils.tomorrowLocalDateTime(hour = 9).toString()
@@ -57,8 +58,4 @@ class GetPriorityTimeUseCaseImpl(
             is Priority.Tomorrow -> TimeUtils.tomorrowLocalDateTime(hour, minutes).toString()
             is Priority.Later -> null
         }
-
-    override fun invoke(priority: Priority): String? {
-        TODO("Not yet implemented")
-    }
 }

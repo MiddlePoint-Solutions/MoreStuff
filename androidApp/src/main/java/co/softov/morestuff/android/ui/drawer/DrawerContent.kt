@@ -16,18 +16,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 
 @Composable
 fun DrawerLayout(
-    onItemClicked: (String) -> Unit,
+    onSettingsClicked: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader()
-        DrawerSettings("Settings") { onItemClicked(Screens.ComposeSettings.toString()) }
+        DrawerSettings("Settings", onSettingsClicked = onSettingsClicked)
     }
 }
 
@@ -49,14 +48,14 @@ fun DrawerHeader() {
 }
 
 @Composable
-private fun DrawerSettings(text: String, onItemClicked: () -> Unit) {
+private fun DrawerSettings(text: String, onSettingsClicked: () -> Unit) {
     Row(
         modifier = Modifier
             .height(56.dp)
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
             .clip(CircleShape)
-            .clickable(onClick = onItemClicked),
+            .clickable(onClick = onSettingsClicked),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

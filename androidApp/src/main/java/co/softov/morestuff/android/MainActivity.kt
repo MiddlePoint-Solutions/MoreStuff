@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                     content = {
                         MainContent(conductor)
                     },
-                    onItemClicked = {
+                    onSettingsClicked = {
                         showSettingsScreen()
                     },
                 )

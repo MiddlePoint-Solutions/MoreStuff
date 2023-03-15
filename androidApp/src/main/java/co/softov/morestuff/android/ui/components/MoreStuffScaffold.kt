@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.drawerlayout.widget.DrawerLayout
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoreStuffScaffold(
     content: @Composable (PaddingValues) -> Unit,
-    onItemClicked: (String) -> Unit,
+    onSettingsClicked: () -> Unit,
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
@@ -39,7 +38,7 @@ fun MoreStuffScaffold(
             drawerContent = {
                 ModalDrawerSheet {
                     DrawerLayout {
-                        onItemClicked(it)
+                        onSettingsClicked()
                         scope.launch {
                             drawerState.close()
                         }
