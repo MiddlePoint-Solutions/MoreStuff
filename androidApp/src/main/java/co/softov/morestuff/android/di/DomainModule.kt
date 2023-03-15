@@ -3,7 +3,7 @@ package co.softov.morestuff.android.di
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.domain.usecase.message.*
-import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
+import co.softov.morestuff.android.domain.usecase.priority.*
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
@@ -13,6 +13,20 @@ import co.softov.morestuff.android.domain.usecase.task.*
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
+
+val domainModules get() = buildList {
+    add(serviceModule) // TODO: is this still being used?
+    add(storeModule)
+    addAll(useCaseModules)
+}
+
+val useCaseModules get() = buildList {
+    add(taskUseCases)
+    add(scheduleUseCases)
+    add(priorityUseCases)
+    add(messageUseCases)
+    add(settingsUseCases)
+}
 
 val serviceModule = module {
     factory<BootCompleteScheduler> {
@@ -81,7 +95,7 @@ val storeModule = module {
 
 }
 
-val TaskUseCases = module {
+val taskUseCases = module {
     factory<CreateTaskUseCase> {
         CreateNewTaskUseCaseImpl(taskRepository = get())
     }
@@ -105,7 +119,7 @@ val TaskUseCases = module {
 
 
 val scheduleUseCases = module {
-    factory<GetActiveSchedule> { GetActiveScheduleImpl(scheduleRepository = get()) }
+    factory<GetActiveScheduleUseCase> { GetActiveScheduleUseCaseImpl(scheduleRepository = get()) }
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
 
     factory<CancelActiveScheduleUseCase> {
@@ -180,6 +194,9 @@ val messageUseCases = module {
 
 val priorityUseCases = module {
     factoryOf(::GetPriorityOptionsUseCase)
+    factoryOf(::GetSchedulePriorityUseCaseImpl) bind GetSchedulePriorityUseCase::class
+    factoryOf(::MapScheduleToPriorityUseCaseImpl) bind MapScheduleToPriorityUseCase::class
+    factoryOf(::GetUpcomingPriorityUseCaseImpl) bind GetUpcomingPriorityUseCase::class
 }
 
 val settingsUseCases = module {

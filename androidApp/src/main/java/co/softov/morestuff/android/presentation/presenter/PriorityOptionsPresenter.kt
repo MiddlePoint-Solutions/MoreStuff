@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.map
 import org.koin.androidx.compose.get
 
 @Composable
-fun PriorityOptionsPresenter(store: AppStore = get()): PriorityOptionsModel {
+fun PriorityOptionsPresenter(
+    store: AppStore = get()
+): PriorityOptionsModel {
 
     var model: PriorityOptionsModel by remember {
         mutableStateOf(

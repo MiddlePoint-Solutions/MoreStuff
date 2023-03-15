@@ -24,7 +24,8 @@ class MessageRepositoryImpl(
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
-        return messageQueries.selectAll().asFlow().mapToList()
+//        return messageQueries.selectAll().asFlow().mapToList()
+        return messageQueries.selectMasterMessages().asFlow().mapToList()
             .map { mapList(it, mapMessageDb) }
     }
 

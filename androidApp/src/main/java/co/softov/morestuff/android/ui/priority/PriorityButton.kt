@@ -24,6 +24,7 @@ fun PriorityButton(
     text: String,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    enabled: Boolean = true,
     fontSize: TextUnit = 13.sp,
     shape: Shape = MaterialTheme.shapes.small.copy(all = CornerSize(0.dp)),
 ) {
@@ -31,6 +32,7 @@ fun PriorityButton(
         onSelected = onSelected,
         modifier = modifier.layoutId(text),
         selected = selected,
+        enabled = enabled,
         shape = shape,
     ) {
         Text(text = text, softWrap = false, fontSize = fontSize)
@@ -42,6 +44,7 @@ fun PriorityButton(
     onSelected: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    enabled: Boolean = true,
     shape: Shape = MaterialTheme.shapes.small.copy(all = CornerSize(0.dp)),
     content: @Composable () -> Unit
 ) {
@@ -69,7 +72,8 @@ fun PriorityButton(
             containerColor = backgroundColor,
             contentColor = textColor
         ),
-        onClick = onSelected
+        onClick = onSelected,
+        enabled = enabled,
     ) {
         content()
     }

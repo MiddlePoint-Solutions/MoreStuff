@@ -5,14 +5,8 @@ import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.model.DefaultOption.*
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
-import timber.log.Timber
 
 data class GetPriorityOptionsParams(val current: Priority, val next: Priority)
-
-data class PriorityOptionsResult(
-    val priority: Priority,
-    val options: List<PriorityOption>,
-)
 
 class GetPriorityOptionsUseCase :
     BaseUseCase<Failure, GetPriorityOptionsParams, PriorityOptionsResult> {

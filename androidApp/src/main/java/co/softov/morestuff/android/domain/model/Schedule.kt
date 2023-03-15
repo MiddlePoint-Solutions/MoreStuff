@@ -11,5 +11,15 @@ data class Schedule(
 ) {
     companion object {
         const val LATER_TASK = 0L
+
+        fun empty() = Schedule(
+            id = 0,
+            taskId = 1,
+            createTime = "",
+            scheduleTimeLocal = null,
+            scheduleTimeUtc = null,
+            timezone = "",
+            active = false,
+        )
     }
 }

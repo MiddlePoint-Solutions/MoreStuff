@@ -30,13 +30,37 @@ object TimeUtils {
             .toLocalDateTime(currentTimeZone)
             .toString()
 
-    fun tomorrowLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
+    fun utcStringToLocalDateTime(time: String): LocalDateTime {
+        return time.toInstant().toLocalDateTime(currentTimeZone)
+    }
+
+    fun isToday(timeUtc: String): Boolean {
+        return stringToInstant(timeUtc).toLocalDateTime(currentTimeZone).date == nowLocalDateTime.date
+    }
+
+    fun isTomorrow(timeUtc: String): Boolean {
+        return stringToInstant(timeUtc).toLocalDateTime(currentTimeZone).date == tomorrowLocalDateTime().date
+    }
+
+    fun isLater(timeUtc: String): Boolean {
+        return stringToInstant(timeUtc).toLocalDateTime(currentTimeZone).date.toEpochDays() > tomorrowLocalDateTime().date.toEpochDays()
+    }
+
+    private fun stringToInstant(timeUtc: String): Instant = timeUtc.toInstant()
+
+    fun todayUtcString(hour: Int = 0, minute: Int = 0): String =
+        todayLocalDateTime(hour, minute).toInstant(currentTimeZone).toString()
+
+    fun tomorrowUtcString(hour: Int = 0, minute: Int = 0): String =
+        tomorrowLocalDateTime(hour, minute).toInstant(currentTimeZone).toString()
+
+    fun tomorrowLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime =
         (nowUtcInstant + 1.days).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
             }
 
-    fun todayLocalDateTime(hour: Int, minute: Int = 0): LocalDateTime =
+    fun todayLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime =
         (nowUtcInstant).toLocalDateTime(TimeZone.currentSystemDefault())
             .run {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
