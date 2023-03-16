@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.di.useCaseModules
+import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
@@ -65,6 +66,29 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
 
             val result = useCase(params).getOrHandle { throw (Throwable(it.toString())) }
             assertEquals(Priority.today.copy(option = TimeOfDayOption.Morning), result.priority)
+        }
+
+    @Test
+    fun `should return Today auto priority when scheduled for today out of range`() =
+        runBlocking {
+            val taskId = 1L
+            val params = GetSchedulePriorityParams(taskId)
+            val schedule = Schedule.empty().copy(
+                scheduleLocalTime = TimeUtils.todayLocalDateTimeString(21)
+            )
+
+            val useCase = GetSchedulePriorityUseCaseImpl(
+                getActiveSchedule = getActiveSchedule,
+                mapScheduleToPriority = get(),
+                getPriorityOptionsUseCase = get(),
+                getUpcomingPriorityUseCase = getUpcomingPriorityUseCase
+            )
+
+            coEvery { getActiveSchedule(taskId) } returns Either.Right(schedule)
+            coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
+
+            val result = useCase(params).getOrHandle { throw (Throwable(it.toString())) }
+            assertEquals(Priority.today.copy(option = DefaultOption.Auto), result.priority)
         }
 
     @Test

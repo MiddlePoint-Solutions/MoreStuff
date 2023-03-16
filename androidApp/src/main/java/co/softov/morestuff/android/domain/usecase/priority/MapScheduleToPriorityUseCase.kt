@@ -19,11 +19,12 @@ class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
                     val morning = TimeUtils.todayLocalDateTime(8)
                     val noon = TimeUtils.todayLocalDateTime(12)
                     val afternoon = TimeUtils.todayLocalDateTime(18)
+                    val night = TimeUtils.todayLocalDateTime(18)
 
                     val option = when {
-                        scheduleTime > morning && scheduleTime < noon -> TimeOfDayOption.Morning
-                        scheduleTime > noon && scheduleTime < afternoon -> TimeOfDayOption.Afternoon
-                        scheduleTime > afternoon -> TimeOfDayOption.Evening
+                        scheduleTime >= morning && scheduleTime < noon -> TimeOfDayOption.Morning
+                        scheduleTime >= noon && scheduleTime < afternoon -> TimeOfDayOption.Afternoon
+                        scheduleTime >= afternoon && scheduleTime < night -> TimeOfDayOption.Evening
                         else -> DefaultOption.Auto
                     }
 
@@ -33,11 +34,12 @@ class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
                     val morning = TimeUtils.tomorrowLocalDateTime(8)
                     val noon = TimeUtils.tomorrowLocalDateTime(12)
                     val afternoon = TimeUtils.tomorrowLocalDateTime(18)
+                    val night = TimeUtils.tomorrowLocalDateTime(21)
 
                     val option = when {
                         scheduleTime >= morning && scheduleTime < noon -> TimeOfDayOption.Morning
                         scheduleTime >= noon && scheduleTime < afternoon -> TimeOfDayOption.Afternoon
-                        scheduleTime >= afternoon -> TimeOfDayOption.Evening
+                        scheduleTime >= afternoon && scheduleTime < night -> TimeOfDayOption.Evening
                         else -> DefaultOption.Auto
                     }
 
