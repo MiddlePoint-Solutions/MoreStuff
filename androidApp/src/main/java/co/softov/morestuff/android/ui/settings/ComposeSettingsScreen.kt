@@ -11,6 +11,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,9 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
-import co.softov.morestuff.android.app.DevToolsImpl
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
@@ -30,12 +29,14 @@ import com.alorma.compose.settings.storage.preferences.rememberPreferenceFloatSe
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
-import com.russhwolf.settings.Settings
+import org.koin.androidx.compose.get
+
 
 @Preview
 @Composable
 fun SettingsScreen() {
     val scrollState = rememberScrollState()
+    val devTools: DevTools = get()
     MoreStuffTheme {
         Column(
             modifier = Modifier
@@ -56,8 +57,8 @@ fun SettingsScreen() {
             DeveloperSettings()
             Notification()
             ReviewTest()
-            KeepDeviceScreenOn()
-            ReminderDebugging()
+            KeepDeviceScreenOn(devTools = devTools)
+            ReminderDebugging(devTools = devTools)
             SmartReminder(viewModel = SettingsViewModel())
             Divider(
                 color = Color.Gray,
@@ -207,10 +208,13 @@ fun ReviewTest() {
 
 
 @Composable
-fun KeepDeviceScreenOn() {
+fun KeepDeviceScreenOn(devTools: DevTools) {
     val memoryStorage = rememberPreferenceBooleanSettingState("keep_screen_on", false)
     val enabledState = rememberBooleanSettingState(true)
     val context = LocalContext.current
+    LaunchedEffect(memoryStorage.value) {
+        devTools.keepScreenOn = memoryStorage.value
+    }
     MoreStuffTheme {
         Column(
             horizontalAlignment = Alignment.Start
@@ -234,6 +238,7 @@ fun KeepDeviceScreenOn() {
                             (context as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     }
                     memoryStorage.value = newValue
+                    devTools.keepScreenOn = newValue
                 }
             )
         }
@@ -242,10 +247,15 @@ fun KeepDeviceScreenOn() {
 
 
 @Composable
-fun ReminderDebugging() {
+fun ReminderDebugging(devTools: DevTools) {
     val switchState = rememberPreferenceBooleanSettingState("switch_state", false)
     val reminderDelayState = rememberPreferenceFloatSettingState("reminder_delay", 60f)
-    val getPriorityTimeUseCase = GetPriorityTimeUseCaseImpl(debug = DevToolsImpl(settings = Settings()))
+    LaunchedEffect(switchState.value) {
+        devTools.debugReminders = switchState.value
+    }
+    LaunchedEffect(reminderDelayState.value) {
+        devTools.todayDebugTime = reminderDelayState.value.toInt()
+    }
     MoreStuffTheme {
         Column {
             SettingsSwitch(
@@ -259,7 +269,10 @@ fun ReminderDebugging() {
                         textAlign = TextAlign.Left
                     )
                 },
-                state = switchState
+                state = switchState,
+                onCheckedChange = { isChecked ->
+                    devTools.debugReminders = isChecked
+                }
             )
 
             if (switchState.value) {
@@ -280,8 +293,8 @@ fun ReminderDebugging() {
                             steps = 119,
                             valueRange = 1F..120F,
                             modifier = Modifier.weight(1f),
-                            onValueChange = {
-                                getPriorityTimeUseCase(Priority.today)
+                            onValueChange = { newValue ->
+                                devTools.todayDebugTime = newValue.toInt()
                             }
                         )
                     }
