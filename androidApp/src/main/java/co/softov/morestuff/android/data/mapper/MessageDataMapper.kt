@@ -13,7 +13,7 @@ fun makeMessageDbMapper(): MessageDbMapper = { message ->
 }
 
 fun mapMessageDb(input: MessageData): Message {
-    val createTime = formatTime(input.create_time,"HH:mm")
+    val createTime = formatTime(input.create_time,"dd/MM/yyyy HH:mm")
     val seenTime = formatTime(input.seen_time,"HH:mm")
     val replyTime = formatTime(input.reply_time,"HH:mm")
     return Message(

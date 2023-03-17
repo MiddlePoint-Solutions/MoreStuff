@@ -2,35 +2,42 @@ package co.softov.morestuff.android.ui.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private val JumpToBottomThreshold = 56.dp
 
 private fun isAutoScrollingEnabled(
     pagingItemsCount: Int,
     itemsCount: Int,
-    scrollState: LazyListState
+    scrollState: LazyListState,
 ) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
 
 @Composable
@@ -38,7 +45,7 @@ fun Messages(
     messages: List<Message>,
     actions: ChatActions,
     modifier: Modifier = Modifier,
-    scrollState: LazyListState
+    scrollState: LazyListState,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -53,15 +60,57 @@ fun Messages(
             state = scrollState,
             contentPadding = PaddingValues(bottom = 8.dp)
         ) {
-            items(
+            itemsIndexed(
                 items = messages,
-                key = { item -> item.id }
-            ) { item ->
+                key = { _, item -> item.id }
+            ) { index, item ->
+                val nextMessage = if (index < messages.size - 1) messages[index + 1] else null
+                val currentMessageDateTime = LocalDateTime.parse(
+                    item.createTime,
+                    DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                )
+                val nextMessageDateTime = nextMessage?.let {
+                    LocalDateTime.parse(
+                        it.createTime,
+                        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                    )
+                }
 
-                when (item.contentType) {
-                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
-                    ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
-                    ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
+                val isLastMessageOfDay =
+                    isLastMessageOfDay(currentMessageDateTime, nextMessageDateTime)
+
+                Column {
+                    if (isLastMessageOfDay) {
+                        Row(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = currentMessageDateTime.toLocalDate()
+                                    .format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                                modifier = Modifier
+                                    .background(
+                                        color = Color.Gray.copy(alpha = 0.5f),
+                                        shape = RoundedCornerShape(50)
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                fontSize = 17.sp,
+                                color = Color.White,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                    when (item.contentType) {
+                        ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
+                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
+                        ContentType.TASK_REMINDER -> TaskReminderItem(
+                            message = item,
+                            actions = actions
+                        )
+                    }
+
                 }
             }
         }
@@ -113,7 +162,7 @@ private enum class Visibility {
 fun JumpToBottom(
     enabled: Boolean,
     onClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Show Jump to Bottom button
     val transition = updateTransition(
@@ -149,3 +198,9 @@ fun JumpToBottom(
     }
 }
 
+private fun isLastMessageOfDay(
+    currentMessageDateTime: LocalDateTime,
+    nextMessageDateTime: LocalDateTime?,
+): Boolean {
+    return nextMessageDateTime == null || currentMessageDateTime.toLocalDate() != nextMessageDateTime.toLocalDate()
+}

@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain
 
+import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.TimeUtils.nowLocalDateTimeString
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
@@ -34,9 +35,9 @@ fun createScheduleForTest(
     id: Long = 1,
     taskId: Long = 1,
     createTime: String = "",
-    scheduleTimeLocal: String = "",
-    scheduleTimeUtc: String = "",
-    timeZone: String = "",
+    scheduleTimeLocal: String = TimeUtils.getCreateTime(),
+    scheduleTimeUtc: String? = null,
+    timeZone: String = TimeUtils.currentTimeZone.id,
     active: Boolean = true,
 ): Schedule {
     return Schedule(id, taskId, createTime, scheduleTimeLocal,scheduleTimeUtc, timeZone, active)
