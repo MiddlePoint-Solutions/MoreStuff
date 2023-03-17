@@ -50,9 +50,5 @@ class DevToolsImpl(private val observableSettings: ObservableSettings) : DevTool
             _keepScreenOn = value
         }
 
-    fun clearListeners() {
-        debugRemindersListener.deactivate()
-        todayDebugTimeListener.deactivate()
-    }
 }
 
