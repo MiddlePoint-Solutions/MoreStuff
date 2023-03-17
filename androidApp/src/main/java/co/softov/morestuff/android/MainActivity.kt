@@ -9,9 +9,6 @@ import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.padding
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.material.*
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
@@ -44,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             screen: FragmentScreen,
             fragmentTransaction: FragmentTransaction,
             currentFragment: Fragment?,
-            nextFragment: Fragment
+            nextFragment: Fragment,
         ) {
             if (nextFragment is TaskChatFragment) {
                 fragmentTransaction.setCustomAnimations(
@@ -77,14 +74,15 @@ class MainActivity : AppCompatActivity() {
             router.exit()
         }
 
+
         setContent {
             MoreStuffTheme {
                 MoreStuffScaffold(
                     content = {
                         MainContent(conductor)
                     },
-                    onItemClicked = {
-                        showMainSettings()
+                    onSettingsClicked = {
+                        showSettingsScreen()
                     },
                 )
             }
@@ -119,4 +117,9 @@ class MainActivity : AppCompatActivity() {
     private fun showMainSettings() {
         router.navigateTo(Screens.Settings)
     }
+
+    private fun showSettingsScreen() {
+        router.navigateTo((Screens.ComposeSettings))
+    }
+
 }
