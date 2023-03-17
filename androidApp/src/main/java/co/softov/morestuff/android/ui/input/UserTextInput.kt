@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.main.input.ListIcon
 import co.softov.morestuff.android.ui.main.input.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -34,7 +35,7 @@ import timber.log.Timber
 @Composable
 fun UserTextInput(
     sendAction: (String) -> Unit,
-    listAction: () -> Unit
+    listAction: () -> Unit,
 ) {
 
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -69,6 +70,7 @@ fun UserTextInput(
                     onValueChange = { value = it },
                     enabled = true,
                     modifier = Modifier
+                        .clearFocusOnKeyboardDismiss()
                         .fillMaxWidth()
                         .align(Alignment.CenterVertically)
                         .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)

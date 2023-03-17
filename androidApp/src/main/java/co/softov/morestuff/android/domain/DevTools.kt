@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain
 
 interface DevTools {
 
-    val debugReminders: Boolean
-    val todayDebugTime: Int
-
+    var debugReminders: Boolean
+    var todayDebugTime: Int
+    var keepScreenOn: Boolean
 }

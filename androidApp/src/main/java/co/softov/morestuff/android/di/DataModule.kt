@@ -30,7 +30,10 @@ import org.koin.dsl.module
 val dataModule = module {
 
     // Debugging
-    single<DevTools>(createdAtStart = true) { DevToolsImpl(androidApplication()) }
+    single<ObservableSettings> {
+        SharedPreferencesSettings(getSharedPreferences(androidContext()))
+    }
+    single<DevTools>(createdAtStart = true) { DevToolsImpl(get()) }
 
     // Database
     single { createDatabase(androidApplication()) }
