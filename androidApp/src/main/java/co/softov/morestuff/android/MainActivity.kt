@@ -14,10 +14,8 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.ListFragment
-import co.softov.morestuff.android.app.presentation.fragment.BaseFragment
 import co.softov.morestuff.android.ui.ScreenKey
 import co.softov.morestuff.android.ui.Screens
-import co.softov.morestuff.android.ui.chat.TaskChatFragment
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.list.ListsFragment
 import co.softov.morestuff.android.ui.main.MainConductor

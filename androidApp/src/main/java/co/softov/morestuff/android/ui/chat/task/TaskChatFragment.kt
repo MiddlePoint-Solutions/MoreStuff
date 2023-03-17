@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.chat
+package co.softov.morestuff.android.ui.chat.task
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import co.softov.morestuff.android.app.presentation.compose.BaseComposeFragment
-import co.softov.morestuff.android.ui.edit.EditFragment
 
 class TaskChatFragment : BaseComposeFragment() {
 

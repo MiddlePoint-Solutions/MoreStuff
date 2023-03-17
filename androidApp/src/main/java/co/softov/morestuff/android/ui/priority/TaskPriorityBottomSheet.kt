@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -11,42 +12,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import app.cash.molecule.RecompositionClock
-import app.cash.molecule.launchMolecule
-import co.softov.morestuff.android.domain.model.DefaultOption
-import co.softov.morestuff.android.presentation.model.PriorityModel
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.PriorityOption
+import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
 import co.softov.morestuff.android.presentation.model.mapToModel
-import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
-import org.koin.androidx.compose.getViewModel
-import org.koin.core.parameter.parametersOf
+import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskPriorityBottomSheet(
-    taskId: Long,
-    openBottomSheet: Boolean,
+    model: TaskPriorityModel,
+    openBottomSheet: Boolean = false,
     bottomSheetState: SheetState = rememberSheetState(skipHalfExpanded = false),
-    dismissAction: () -> Unit,
+    priorityChangeAction: (Priority) -> Unit = {},
+    priorityOptionChangeAction: (PriorityOption) -> Unit = {},
+    confirmationAction: () -> Unit = {},
+    dismissAction: () -> Unit = {},
 ) {
-
-    val scope = rememberCoroutineScope()
-
-    val viewModel = getViewModel<TaskPriorityViewModel> {
-        parametersOf(taskId)
-    }
-
-//    var priority: PriorityModel by remember { mutableStateOf(PriorityModel.Today(DefaultOption.Auto)) }
-//
-//    val priorityOptions by scope.launchMolecule(clock = RecompositionClock.ContextClock) {
-//        PriorityOptionsPresenter()
-//    }.collectAsState()
-
-    val priorityOptions by viewModel.priorityOptions.collectAsState()
-
-    var showConfirm by remember { mutableStateOf(true) }
-
     if (openBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = dismissAction,
@@ -59,7 +41,7 @@ fun TaskPriorityBottomSheet(
         ) {
 
             AnimatedVisibility(
-                visible = showConfirm,
+                visible = model.showConfirmation,
                 enter = expandVertically(
                     animationSpec = spring()
                 ),
@@ -71,13 +53,7 @@ fun TaskPriorityBottomSheet(
                     LocalMinimumInteractiveComponentEnforcement provides false,
                 ) {
                     PriorityButton(
-                        onSelected = {
-                            scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-                                if (!bottomSheetState.isVisible) {
-                                    dismissAction()
-                                }
-                            }
-                        },
+                        onSelected = confirmationAction,
                         modifier = Modifier
                             .height(60.dp)
                             .fillMaxWidth(),
@@ -88,13 +64,10 @@ fun TaskPriorityBottomSheet(
             }
 
             PriorityInput(
-                priority = priorityOptions.current.mapToModel(),
-                onPriorityChange = {
-                    viewModel.priorityChanged(it)
-                    showConfirm = true
-                },
-                priorityOptions = priorityOptions,
-                onPriorityOptionChange = { showConfirm = true }
+                priority = model.priorityModel.current.mapToModel(),
+                onPriorityChange = priorityChangeAction,
+                priorityOptions = model.priorityModel,
+                onPriorityOptionChange = priorityOptionChangeAction
             )
         }
     }

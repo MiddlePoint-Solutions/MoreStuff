@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.di
 
-import co.softov.morestuff.android.ui.chat.TaskChatViewModel
+import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType

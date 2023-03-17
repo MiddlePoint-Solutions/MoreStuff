@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.chat
+package co.softov.morestuff.android.ui.chat.task
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
@@ -26,8 +26,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.PriorityButton
+import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
@@ -47,14 +50,25 @@ fun TaskChatContent(
         parametersOf(taskId)
     }
 
+    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
+        parametersOf(taskId)
+    }
+
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
     )
 
     val messages by viewModel.messages.collectAsState()
+    val taskPriorityModel by priorityViewModel.model.collectAsState()
 
     var openBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberSheetState()
+
+    val bottomSheetDismissAction: () -> Unit = {
+        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+            openBottomSheet = false
+        }
+    }
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -69,7 +83,10 @@ fun TaskChatContent(
         topBar = {
             TaskChatTopBar(
                 taskId = taskId,
-                editScheduleAction = { openBottomSheet = true },
+                editScheduleAction = {
+                    priorityViewModel.reset()
+                    openBottomSheet = true
+                },
             )
         },
         content = {
@@ -90,12 +107,17 @@ fun TaskChatContent(
     )
 
     TaskPriorityBottomSheet(
-        taskId,
-        openBottomSheet,
-        bottomSheetState,
-        dismissAction = {
-            openBottomSheet = false
-        })
+        model = taskPriorityModel,
+        openBottomSheet = openBottomSheet,
+        bottomSheetState = bottomSheetState,
+        priorityChangeAction = priorityViewModel::priorityChanged,
+        priorityOptionChangeAction = priorityViewModel::onPriorityOptionChanged,
+        confirmationAction = {
+            priorityViewModel.updateTaskSchedule()
+            bottomSheetDismissAction()
+        },
+        dismissAction = bottomSheetDismissAction
+    )
 }
 
 @Composable
@@ -105,6 +127,7 @@ private fun TaskChatTopBar(
     editScheduleAction: () -> Unit,
 ) {
 
+    // TODO: hoist state out of toolbar
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }

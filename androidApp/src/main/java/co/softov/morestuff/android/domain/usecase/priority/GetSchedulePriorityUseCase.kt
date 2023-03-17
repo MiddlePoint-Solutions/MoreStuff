@@ -10,42 +10,48 @@ import co.softov.morestuff.android.domain.model.PriorityOptionsResult
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.BaseFlowUseCase
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCase
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.toInstant
 
 interface GetSchedulePriorityUseCase :
-    BaseUseCase<Failure, GetSchedulePriorityParams, PriorityOptionsResult>
+    BaseFlowUseCase<Failure, GetSchedulePriorityParams, PriorityOptionsResult>
 
 data class GetSchedulePriorityParams(
     val taskId: Long
 )
 
 class GetSchedulePriorityUseCaseImpl(
-    private val getActiveSchedule: GetActiveScheduleUseCase,
+    private val getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     private val mapScheduleToPriority: MapScheduleToPriorityUseCase,
     private val getPriorityOptionsUseCase: GetPriorityOptionsUseCase,
     private val getUpcomingPriorityUseCase: GetUpcomingPriorityUseCase,
 ) : GetSchedulePriorityUseCase {
-    override suspend fun invoke(
+    override fun invoke(
         params: GetSchedulePriorityParams
-    ): Either<Failure, PriorityOptionsResult> {
-        return getActiveSchedule(params.taskId).fold(
-            ifLeft = {
-                getUpcomingPriorityUseCase(GetUpcomingPriorityParams())
-                    .flatMap { priority ->
-                        val priorityParams = GetPriorityOptionsParams(priority, priority)
-                        getPriorityOptionsUseCase(priorityParams)
-                    }
-            },
-            ifRight = {
-                mapScheduleToPriority(it)
-                    .flatMap { priority ->
-                        val priorityParams = GetPriorityOptionsParams(priority, priority)
-                        getPriorityOptionsUseCase(priorityParams)
-                    }
-            }
-        )
+    ): Flow<Either<Failure, PriorityOptionsResult>> {
+        return getActiveScheduleFlow(params.taskId).map {
+            it.fold(
+                ifLeft = {
+                    getUpcomingPriorityUseCase(GetUpcomingPriorityParams())
+                        .flatMap { priority ->
+                            val priorityParams = GetPriorityOptionsParams(priority, priority)
+                            getPriorityOptionsUseCase(priorityParams)
+                        }
+                },
+                ifRight = { schedule ->
+                    mapScheduleToPriority(schedule)
+                        .flatMap { priority ->
+                            val priorityParams = GetPriorityOptionsParams(priority, priority)
+                            getPriorityOptionsUseCase(priorityParams)
+                        }
+                }
+            )
+        }
     }
 
 }

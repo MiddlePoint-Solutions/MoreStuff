@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.chat
+package co.softov.morestuff.android.ui.chat.task
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

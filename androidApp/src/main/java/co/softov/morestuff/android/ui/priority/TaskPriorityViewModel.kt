@@ -2,21 +2,18 @@ package co.softov.morestuff.android.ui.priority
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.domain.model.PriorityOptionsResult
 import co.softov.morestuff.android.domain.redux.AppStore
-import co.softov.morestuff.android.domain.redux.state.PriorityAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsParams
 import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetSchedulePriorityParams
 import co.softov.morestuff.android.domain.usecase.priority.GetSchedulePriorityUseCase
 import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import co.softov.morestuff.android.presentation.model.toModel
+import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 
@@ -27,43 +24,79 @@ class TaskPriorityViewModel(
     private val taskId: Long,
 ) : ViewModel(), KoinComponent {
 
-    private val _priorityOptions = MutableStateFlow(
-        PriorityOptionsModel(
-            current = Priority.today,
-            options = listOf()
-        )
-    )
-    val priorityOptions: StateFlow<PriorityOptionsModel> get() = _priorityOptions
+    private val _model = MutableStateFlow(TaskPriorityModel())
+    val model: StateFlow<TaskPriorityModel> get() = _model
+
+    private lateinit var currentPriorityCopy: PriorityOptionsModel
 
     init {
-        viewModelScope.launch {
-            getSchedulePriorityUseCase(
-                GetSchedulePriorityParams(taskId)
-            ).map {
-                mapPriorityOptionsResult(it)
-            }
-        }
+        reset()
     }
 
-    private fun mapPriorityOptionsResult(it: PriorityOptionsResult) {
-        _priorityOptions.value = PriorityOptionsModel(
-            current = it.priority,
-            options = it.options
-        )
+    fun reset() {
+        viewModelScope.launch {
+            _model.updateAndGet { current ->
+                val priorityModel = getSchedulePriorityUseCase(GetSchedulePriorityParams(taskId))
+                    .first()
+                    .fold(
+                        ifLeft = { current.priorityModel },
+                        ifRight = { it.toModel() }
+                    )
+
+                current.copy(
+                    priorityModel = priorityModel,
+                    showConfirmation = false
+                )
+            }
+            currentPriorityCopy = model.value.priorityModel
+        }
     }
 
     fun priorityChanged(priority: Priority) {
         viewModelScope.launch {
             val params = GetPriorityOptionsParams(
-                priorityOptions.value.current,
+                model.value.priorityModel.current,
                 priority
             )
-            getPriorityOptionsUseCase(params).map { mapPriorityOptionsResult(it) }
+            getPriorityOptionsUseCase(params).map { result ->
+                val update = PriorityOptionsModel(
+                    current = result.priority,
+                    options = result.options
+                )
+                _model.update {
+                    it.copy(
+                        priorityModel = update,
+                        showConfirmation = currentPriorityCopy != update
+                    )
+                }
+            }
         }
     }
 
     fun onPriorityOptionChanged(option: PriorityOption) {
-        store.dispatch(PriorityAction.SetCurrentPriorityOption(option))
+        _model.update {
+            val change = when (val current = it.priorityModel.current) {
+                is Priority.Later -> current.copy(option)
+                is Priority.Today -> current.copy(option)
+                is Priority.Tomorrow -> current.copy(option)
+            }
+
+            it.copy(
+                priorityModel = it.priorityModel.copy(current = change),
+                showConfirmation = currentPriorityCopy.current != change
+            )
+        }
+    }
+
+    fun updateTaskSchedule() {
+        if (currentPriorityCopy != model.value.priorityModel) {
+            store.dispatch(
+                ScheduleAction.RescheduleTaskAction(
+                    taskId = taskId,
+                    priority = model.value.priorityModel.current
+                )
+            )
+        }
     }
 
 }
