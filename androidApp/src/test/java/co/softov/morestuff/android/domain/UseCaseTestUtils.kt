@@ -4,10 +4,8 @@ import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.TimeUtils.nowLocalDateTimeString
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.ScheduleWithTitle
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.*
+import java.time.LocalDateTime
 
 
 fun createListOfTasks(amount: Long): List<Task> {
@@ -95,4 +93,19 @@ fun createMessageForTest(
         replyContent,
         replyTime
     )
+}
+
+fun expectedTodayOptionsSize(): Int {
+    val now = LocalDateTime.now()
+    val morning = now.toLocalDate().atTime(8, 0)
+    val noon = now.toLocalDate().atTime(12, 0)
+    val afternoon = now.toLocalDate().atTime(18, 0)
+    val timeOptions = TimeOfDayOption.values().size
+
+    return when {
+        now < morning -> timeOptions + 2
+        now < noon -> timeOptions - 1 + 2
+        now < afternoon -> timeOptions - 2 + 2
+        else -> 2
+    }
 }
