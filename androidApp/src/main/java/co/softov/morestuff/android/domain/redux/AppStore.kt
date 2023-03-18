@@ -19,9 +19,7 @@ class AppStore(
     settingsMiddleware: SettingsMiddleware,
     priorityMiddleware: PriorityMiddleware,
     reviewMiddleware: ReviewMiddleware,
-
-
-    ) : SimpleStore<AppState>(
+) : SimpleStore<AppState>(
     AppState(),
     listOf(
         AppState::reduceSettingState,

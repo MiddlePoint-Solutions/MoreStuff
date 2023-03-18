@@ -1,13 +1,13 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
@@ -37,19 +37,22 @@ class MessageMiddleware(
     ): Action {
 
         when (action) {
-            is TaskCreatedAction -> scope.launch {
+            is TaskAction.TaskCreatedAction -> scope.launch {
                 createTaskMessageUseCase(action.task)
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 
-            is ScheduleReplyAction -> scope.launch {
-                val title = when (action.replyType) {
-                    ReplyType.LATER -> "Later"
-                    ReplyType.SNOOZE -> "Snooze"
-                    ReplyType.TOMORROW -> "Tomorrow"
-                    ReplyType.DONE -> "Done"
+            is ScheduleAction.RescheduleTaskAction -> scope.launch {
+                val (title, replyType) = when (action.priority) {
+                    is Priority.Later -> "Later" to ReplyType.LATER
+                    is Priority.Today -> "Snooze" to ReplyType.SNOOZE
+                    is Priority.Tomorrow -> "Tomorrow" to ReplyType.TOMORROW
                 }
-                setScheduleResponseMessage(action.schedule.taskId, title, action.replyType)
+                setScheduleResponseMessage(action.taskId, title, replyType)
+            }
+
+            is TaskAction.SetTaskComplete -> scope.launch {
+                setScheduleResponseMessage(action.taskId, "Done", ReplyType.DONE)
             }
 
             is CreateScheduleMessageAction -> scope.launch {
@@ -57,6 +60,7 @@ class MessageMiddleware(
                     dispatch(CreateScheduleNotificationAction(action.scheduleId, message))
                 }
             }
+
             else -> NoOp
         }
 
