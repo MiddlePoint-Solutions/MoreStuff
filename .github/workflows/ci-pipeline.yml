@@ -1,8 +1,8 @@
-name: Android CI
+name: Master
 on:
   push:
     branches:
-      - 'version/**'
+      - 'master'
 
 jobs:
   test:
