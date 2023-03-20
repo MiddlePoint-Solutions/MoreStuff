@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui
 
 import co.softov.morestuff.android.ui.ScreenKey.LAUNCHED_TASK_CHAT
 import co.softov.morestuff.android.ui.ScreenKey.TASK_CHAT
-import co.softov.morestuff.android.ui.chat.TaskChatFragment
+import co.softov.morestuff.android.ui.chat.task.TaskChatFragment
 import co.softov.morestuff.android.ui.settings.MainSettings
 import co.softov.morestuff.android.ui.settings.SettingsFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
