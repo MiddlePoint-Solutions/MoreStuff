@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.createMessageForTest
 import co.softov.morestuff.android.domain.createScheduleForTest
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.usecase.task.GetScheduleTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetTaskForScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -18,7 +18,7 @@ class CreateScheduleMessageUseCaseImplTest{
 
     @Test
     fun`should return message when schedule is created`(){
-        val getScheduleTaskUseCase: GetScheduleTaskUseCase = mockk()
+        val getScheduleTaskUseCase: GetTaskForScheduleUseCase = mockk()
         val createMessageUseCase: CreateMessageUseCase = mockk()
         val createScheduleMessageUseCaseImpl = CreateScheduleMessageUseCaseImpl(
             getScheduleTaskUseCase,

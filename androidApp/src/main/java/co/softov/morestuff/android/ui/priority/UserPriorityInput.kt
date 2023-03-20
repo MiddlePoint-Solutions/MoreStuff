@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main.input
+package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height

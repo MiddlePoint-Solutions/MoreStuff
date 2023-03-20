@@ -33,13 +33,13 @@ class ScheduleRepositoryImpl(
     override suspend fun createSchedule(
         schedule: Schedule
     ): Either<Failure, Schedule> {
-        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleTimeLocal}")
+        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleLocalTime}")
         val scheduleId = scheduleQueries.transactionWithResult {
             scheduleQueries.insertSchedule(
                 task_id = schedule.taskId,
                 create_time = schedule.createTime,
-                schedule_time_local = schedule.scheduleTimeLocal,
-                schedule_time_utc = schedule.scheduleTimeUtc,
+                schedule_time_local = schedule.scheduleLocalTime,
+                schedule_time_utc = schedule.scheduleUtcTime,
                 timezone = schedule.timezone
             )
             lastInsertId
@@ -124,6 +124,15 @@ class ScheduleRepositoryImpl(
             else -> Right(mapScheduleDb(schedule))
         }
     }
+
+    override fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>> =
+        scheduleQueries.selectActiveScheduleByTaskId(taskId)
+            .asFlow()
+            .map { schedule ->
+                schedule.executeAsOneOrNull()?.let {
+                    Right(mapScheduleDb(it))
+                } ?: Left(ScheduleDoesNotExist)
+            }
 
     override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)

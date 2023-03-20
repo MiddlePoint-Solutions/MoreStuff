@@ -79,7 +79,7 @@ ORDER BY schedule.id DESC;
 countTaskSchedulesByTime:
 SELECT COUNT(*)
 FROM schedule
-WHERE task_id = ?
+WHERE task_id = :task_id
 AND schedule_time_local BETWEEN :start AND :end;
 
 insertSchedule:

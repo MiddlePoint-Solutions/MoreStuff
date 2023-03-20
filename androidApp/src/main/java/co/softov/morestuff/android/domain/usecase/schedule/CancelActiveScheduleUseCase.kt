@@ -11,7 +11,7 @@ interface CancelActiveScheduleUseCase {
 
 class CancelActiveScheduleUseCaseImpl(
     private val scheduler: Scheduler,
-    private val getActiveSchedule: GetActiveSchedule,
+    private val getActiveSchedule: GetActiveScheduleUseCase,
     private val setScheduleFulfilled: SetScheduleFulfilledUseCase
 ) : CancelActiveScheduleUseCase {
 

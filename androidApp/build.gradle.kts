@@ -101,6 +101,7 @@ sqldelight {
 dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-ktx:1.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
 
     // Kotlin
@@ -201,12 +202,7 @@ dependencies {
     testImplementation(Libs.Koin.testJunit)
 
     // Testing
-    testImplementation(Libs.Test.junit)
-    testImplementation(Libs.Test.mokitoKtx)
-    //Add Alex test dependency
-    // testImplementation ("io.kotest:kotest-framework-engine:5.5.1")
-    // testImplementation ("io.kotest:kotest-runner-junit5:$version")
-    //testImplementation ("io.kotest:kotest-property:$version")
+//    testImplementation(Libs.Test.junit)
     testImplementation("io.mockk:mockk:1.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
     testImplementation("org.junit.platform:junit-platform-commons:1.5.2")

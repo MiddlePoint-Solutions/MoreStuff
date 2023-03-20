@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface SetTaskCompleteUseCase {
-    suspend operator fun invoke(taskId: Long): Either<Failure, Boolean>
+    suspend operator fun invoke(taskId: Long, complete: Boolean): Either<Failure, Boolean>
 }
 
 class SetTaskCompleteImpl(
     private val taskRepository: TaskRepository
 ) : SetTaskCompleteUseCase {
-    override suspend fun invoke(taskId: Long): Either<Failure, Boolean> {
-        return taskRepository.setTaskComplete(taskId)
+    override suspend fun invoke(taskId: Long, complete: Boolean): Either<Failure, Boolean> {
+        return taskRepository.updateTaskComplete(taskId, complete)
     }
 }

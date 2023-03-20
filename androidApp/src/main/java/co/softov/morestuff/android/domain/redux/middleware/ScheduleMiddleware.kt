@@ -11,7 +11,7 @@ import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskComplete
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.SetTaskComplete
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
 import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
@@ -62,7 +62,7 @@ class ScheduleMiddleware(
                 }
             }
 
-            is TaskComplete -> scope.launch {
+            is SetTaskComplete -> scope.launch {
                 cancelActiveScheduleUseCase(action.taskId)
             }
 
@@ -79,12 +79,17 @@ class ScheduleMiddleware(
                 when (replyType) {
                     LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     SNOOZE -> if (state.dailySnoozeLimit > 0) {
-                        checkTaskSnoozeLimit(scope, schedule.taskId, state.dailySnoozeLimit, dispatch)
+                        checkTaskSnoozeLimit(
+                            scope,
+                            schedule.taskId,
+                            state.dailySnoozeLimit,
+                            dispatch
+                        )
                     } else {
                         dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
-                    DONE -> dispatch(TaskComplete(schedule.taskId))
+                    DONE -> dispatch(SetTaskComplete(schedule.taskId, true))
                 }
             }
 
@@ -105,7 +110,7 @@ class ScheduleMiddleware(
 
             is ScheduleCreatedAction -> {
                 scope.launch {
-                    action.schedule.scheduleTimeLocal?.let { time ->
+                    action.schedule.scheduleLocalTime?.let { time ->
                         scheduleAtTimeUseCase(action.schedule.id, time)
                     }
                 }

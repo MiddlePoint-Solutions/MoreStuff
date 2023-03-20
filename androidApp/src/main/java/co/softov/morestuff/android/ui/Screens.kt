@@ -1,6 +1,8 @@
 package co.softov.morestuff.android.ui
 
-import co.softov.morestuff.android.ui.chat.TaskChatFragment
+import co.softov.morestuff.android.ui.ScreenKey.LAUNCHED_TASK_CHAT
+import co.softov.morestuff.android.ui.ScreenKey.TASK_CHAT
+import co.softov.morestuff.android.ui.chat.task.TaskChatFragment
 import co.softov.morestuff.android.ui.settings.MainSettings
 import co.softov.morestuff.android.ui.settings.SettingsFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
@@ -12,7 +14,17 @@ object Screens {
     val Settings = FragmentScreen("Settings") { MainSettings() }
 
     fun taskChat(taskId: Long) =
-        FragmentScreen("TaskChat-$taskId") { TaskChatFragment.newInstance(taskId) }
+        FragmentScreen("$TASK_CHAT$taskId") { TaskChatFragment.newInstance(taskId) }
+
+    fun launchedTaskChat(taskId: Long) =
+        FragmentScreen("$LAUNCHED_TASK_CHAT$taskId") { TaskChatFragment.newInstance(taskId) }
 
     val ComposeSettings = FragmentScreen("ComposeSettings"){ SettingsFragment() }
+}
+
+object ScreenKey {
+
+    const val TASK_CHAT = "TASK_CHAT-"
+    const val LAUNCHED_TASK_CHAT = "LAUNCHED_TASK_CHAT-"
+
 }

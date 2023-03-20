@@ -22,7 +22,7 @@ sealed class TaskAction : Action.FeatureAction() {
             get() = "${this.simpleName}(title=$title)"
     }
 
-    data class TaskComplete(val taskId: Long) : ReminderAction()
+    data class SetTaskComplete(val taskId: Long, val complete: Boolean) : ReminderAction()
 
     internal data class TaskCreatedAction(val task: Task, val priority: Priority) :
         ReminderAction() {
@@ -52,8 +52,8 @@ class TaskMiddleware(
                 }
             }
 
-            is TaskComplete -> scope.launch {
-                setTaskCompleteUseCase(action.taskId)
+            is SetTaskComplete -> scope.launch {
+                setTaskCompleteUseCase(action.taskId, action.complete)
             }
 
             else -> NoOp

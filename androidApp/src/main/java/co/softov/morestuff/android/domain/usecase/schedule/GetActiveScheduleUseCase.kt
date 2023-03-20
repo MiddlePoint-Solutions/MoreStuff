@@ -6,13 +6,13 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
-interface GetActiveSchedule {
+interface GetActiveScheduleUseCase {
     suspend operator fun invoke(taskId: Long): Either<Failure, Schedule>
 }
 
-class GetActiveScheduleImpl(
+class GetActiveScheduleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetActiveSchedule {
+) : GetActiveScheduleUseCase {
     override suspend fun invoke(taskId: Long): Either<Failure, Schedule> {
         return scheduleRepository.getActiveScheduleForTask(taskId)
     }

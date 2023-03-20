@@ -5,19 +5,24 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
+import co.softov.morestuff.android.MainActivity
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createReplyIntent
+import co.softov.morestuff.android.app.receiver.randomRequestCode
+import co.softov.morestuff.android.app.receiver.setReplayIntentExtras
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.Notifier
+import timber.log.Timber
 import java.util.*
 
 class NotifierImpl(
@@ -59,6 +64,7 @@ class NotifierImpl(
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
             .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
+            .setContentIntent(createContentIntent(message.taskId))
             .setDeleteIntent(snooze.second)
 
         notificationManager.notify(scheduleId.toInt(), builder.build())
@@ -76,6 +82,19 @@ class NotifierImpl(
         }
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
+
+    private fun createContentIntent(
+        taskId: Long
+    ): PendingIntent =
+        Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(MainActivity.EXTRA_TASK_ID, taskId)
+        }.let {
+            val requestCode = randomRequestCode
+            Timber.d("createContentIntent, requestCode: $requestCode")
+            // Use random request code for replying to reminder intent.
+            PendingIntent.getActivity(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
+        }
 
     override fun showReminderNotificationReply(
         scheduleId: Long,
