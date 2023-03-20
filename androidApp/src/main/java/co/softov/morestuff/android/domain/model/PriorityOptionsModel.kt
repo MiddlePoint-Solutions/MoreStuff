@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.model
 
-data class PriorityOptionsResult(
+data class PriorityOptionsModel(
     val priority: Priority,
     val options: List<PriorityOption>,
 )

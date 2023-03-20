@@ -67,7 +67,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.today.copy(option = TimeOfDayOption.Morning), result.priority)
+            assertEquals(Priority.today.copy(option = TimeOfDayOption.Morning), result.model.priority)
         }
 
     @Test
@@ -90,7 +90,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.tomorrow.copy(option = TimeOfDayOption.Morning), result.priority)
+            assertEquals(Priority.tomorrow.copy(option = TimeOfDayOption.Morning), result.model.priority)
         }
 
     @Test
@@ -117,7 +117,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             )
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.today.copy(option = TimeOfDayOption.Afternoon), result.priority)
+            assertEquals(Priority.today.copy(option = TimeOfDayOption.Afternoon), result.model.priority)
         }
 
     @Test
@@ -140,7 +140,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.today.copy(option = DefaultOption.Auto), result.priority)
+            assertEquals(Priority.today.copy(option = DefaultOption.Auto), result.model.priority)
         }
 
 

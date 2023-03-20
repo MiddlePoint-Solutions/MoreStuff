@@ -14,8 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
-import co.softov.morestuff.android.presentation.model.mapToModel
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,9 +62,8 @@ fun TaskPriorityBottomSheet(
             }
 
             PriorityInput(
-                priority = model.priorityModel.current.mapToModel(),
+                model = model.priorityModel,
                 onPriorityChange = priorityChangeAction,
-                priorityOptions = model.priorityModel,
                 onPriorityOptionChange = priorityOptionChangeAction
             )
         }

@@ -11,30 +11,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.presentation.model.PriorityModel
-import co.softov.morestuff.android.presentation.model.PriorityOptionsModel
+import co.softov.morestuff.android.domain.model.PriorityOptionsModel
 import co.softov.morestuff.android.ui.main.input.PriorityOptions
-import org.koin.androidx.compose.get
 
 @Composable
 fun PriorityInput(
-    priority: PriorityModel,
-    priorityOptions: PriorityOptionsModel,
+    model: PriorityOptionsModel,
     onPriorityChange: (Priority) -> Unit,
     onPriorityOptionChange: (PriorityOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
         UserPriorityOptionsInput(
-            optionsModel = priorityOptions,
+            model = model,
             onOptionSelected = onPriorityOptionChange,
         )
 
         UserPriorityInput(
-            currentPriority = when (priority) {
-                is PriorityModel.Later -> Priority.Later()
-                is PriorityModel.Today -> Priority.Today()
-                is PriorityModel.Tomorrow -> Priority.Tomorrow()
+            currentPriority = when (model.priority) {
+                is Priority.Later -> Priority.Later()
+                is Priority.Today -> Priority.Today()
+                is Priority.Tomorrow -> Priority.Tomorrow()
             },
             onPrioritySelected = onPriorityChange
         )
@@ -43,7 +40,7 @@ fun PriorityInput(
 
 @Composable
 fun UserPriorityOptionsInput(
-    optionsModel: PriorityOptionsModel,
+    model: PriorityOptionsModel,
     onOptionSelected: (PriorityOption) -> Unit = {}
 ) {
     Box(
@@ -55,7 +52,7 @@ fun UserPriorityOptionsInput(
             .padding(5.dp)
     ) {
         PriorityOptions(
-            model = optionsModel,
+            model = model,
             onOptionSelected = onOptionSelected
         )
     }

@@ -9,13 +9,13 @@ import co.softov.morestuff.android.domain.usecase.BaseUseCase
 data class GetPriorityOptionsParams(val current: Priority, val next: Priority)
 
 class GetPriorityOptionsUseCase :
-    BaseUseCase<Failure, GetPriorityOptionsParams, PriorityOptionsResult> {
+    BaseUseCase<Failure, GetPriorityOptionsParams, PriorityOptionsModel> {
 
-    override suspend fun invoke(params: GetPriorityOptionsParams): Either<Failure, PriorityOptionsResult> =
+    override suspend fun invoke(params: GetPriorityOptionsParams): Either<Failure, PriorityOptionsModel> =
         Either.catch {
             val options = getPriorityOptions(params)
             val priority = setNextPriorityOption(options, params.next, params.current)
-            PriorityOptionsResult(priority, options)
+            PriorityOptionsModel(priority, options)
         }.mapLeft {
             PriorityOptionsError(it.message)
         }
