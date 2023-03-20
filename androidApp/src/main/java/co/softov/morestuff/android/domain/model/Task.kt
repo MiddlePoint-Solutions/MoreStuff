@@ -7,10 +7,7 @@ data class Task(
     val completeTime: String? = null
 ) {
 
-
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
-    }
+    val isComplete: Boolean get() = completeTime != null
 
     companion object {
         fun empty() = Task(

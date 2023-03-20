@@ -46,18 +46,12 @@ class MsApplication : Application() {
             androidLogger()
             androidContext(this@MsApplication)
             modules(
-                listOf(
-                    serviceModule,
-                    storeModule,
-                    TaskUseCases,
-                    messageUseCases,
-                    scheduleUseCases,
-                    priorityUseCases,
-                    dataModule,
-                    presentationModule,
-                    navigationModule,
-                    settingsUseCases,
-                )
+                modules = buildList {
+                    addAll(domainModules)
+                    add(dataModule)
+                    add(presentationModule)
+                    add(navigationModule)
+                }
             )
         }
     }

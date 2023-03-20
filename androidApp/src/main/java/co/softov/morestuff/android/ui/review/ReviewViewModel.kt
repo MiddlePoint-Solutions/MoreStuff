@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
-import co.softov.morestuff.android.presentation.ReviewModel
+import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

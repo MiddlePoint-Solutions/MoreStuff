@@ -1,18 +1,14 @@
 package co.softov.morestuff.android.ui.edit
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,44 +18,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import timber.log.Timber
-
-/*
- TODO: currently there is an issue with the keyboard appearing behind the bottom sheet
-  See -> https://issuetracker.google.com/issues/268380384
-  For now use EditFragment
-*/
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
-@Composable
-fun EditTaskTitleBottomSheet(
-    openBottomSheet: Boolean,
-    dismissAction: () -> Unit,
-) {
-
-    val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberSheetState(skipHalfExpanded = false)
-    if (openBottomSheet) {
-
-        ModalBottomSheet(
-            onDismissRequest = dismissAction,
-            sheetState = bottomSheetState,
-        ) {
-            EditTaskTitle(
-                dismissAction = { /* Change task title */ },
-                title = "Implement task title editing",
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -144,6 +109,6 @@ fun EditTaskTitle(
 @Composable
 fun EditTaskTitlePreview() {
     MoreStuffTheme(darkTheme = true) {
-        EditTaskTitleBottomSheet(true, {})
+//        EditTaskTitleBottomSheet(true, {})
     }
 }

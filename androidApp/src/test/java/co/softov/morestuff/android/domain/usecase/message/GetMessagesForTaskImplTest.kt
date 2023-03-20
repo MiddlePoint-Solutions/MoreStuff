@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.usecase.message
 
-import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.createListOfMessages
 import io.mockk.coEvery
@@ -12,13 +11,13 @@ import org.junit.jupiter.api.Test
 
 class GetMessagesForTaskImplTest {
     private val messageRepository: MessageRepository = mockk()
-    private val getMessagesForTask = GetMessagesForTaskImpl(messageRepository)
+    private val getMessagesForTask = GetTaskMessagesFlowUseCaseImpl(messageRepository)
 
     @Test
     fun `messageRepository getMessagesForTask`() {
         val taskId = 1L
         val messages = flowOf(createListOfMessages(2))
-        coEvery { messageRepository.getMessagesForTask(taskId) } returns messages
+        coEvery { messageRepository.getTaskMessagesFlow(taskId) } returns messages
 
         val result = runBlocking { getMessagesForTask(taskId) }
         assertEquals(messages , result)

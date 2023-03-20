@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation
+package co.softov.morestuff.android.presentation.presenter
 
 import androidx.compose.runtime.*
 import co.softov.morestuff.android.domain.redux.AppStore

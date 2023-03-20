@@ -38,7 +38,7 @@ class BootCompleteSchedulerImpl(
 
         Timber.d("BootComplete, rescheduling future tasks: ${futureSchedules.size}")
         futureSchedules.forEach { schedule ->
-            schedule.scheduleTimeLocal?.let { time ->
+            schedule.scheduleLocalTime?.let { time ->
                 scheduler.scheduleAtExact(schedule.id, time)
             }
         }

@@ -16,11 +16,11 @@ class SetTaskCompleteImplTest {
         val taskRepository: TaskRepository = mockk()
         val setTaskCompleteUseCase = SetTaskCompleteImpl(taskRepository)
 
-        coEvery { taskRepository.setTaskComplete(taskId) } returns Either.Right(true)
+        coEvery { taskRepository.updateTaskComplete(taskId, true) } returns Either.Right(true)
 
         runBlocking {
-            val result = setTaskCompleteUseCase(taskId)
-            coVerify { taskRepository.setTaskComplete(taskId) }
+            val result = setTaskCompleteUseCase(taskId, true)
+            coVerify { taskRepository.updateTaskComplete(taskId, true) }
             assertTrue(result is Either.Right)
             result.map { assertTrue(it) }
         }

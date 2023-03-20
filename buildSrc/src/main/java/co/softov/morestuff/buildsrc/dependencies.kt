@@ -76,13 +76,12 @@ object Libs {
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
         const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.2"
 
-        const val test = "io.insert-koin:koin-test:3.2.2"
-        const val testJunit = "io.insert-koin:koin-test-junit5:3.2.2"
+        const val test = "io.insert-koin:koin-test:$version"
+        const val testJunit = "io.insert-koin:koin-test-junit5:$version"
     }
 
     object Test {
         const val junit = "junit:junit:4.13.1"
-        const val mokitoKtx = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
     }
 
     object Log {

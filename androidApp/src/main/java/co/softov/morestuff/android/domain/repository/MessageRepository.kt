@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
 
-    suspend fun getAllMessages(): Flow<List<Message>>
+    fun getAllMessages(): Flow<List<Message>>
 
     suspend fun getActiveReminderMessages(): List<Message>
 
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
-    suspend fun getMessagesForTask(taskId: Long): Flow<List<Message>>
+    fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>>
 
     suspend fun createMessage(
         taskId: Long,

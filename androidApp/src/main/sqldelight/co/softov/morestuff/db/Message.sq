@@ -17,6 +17,12 @@ SELECT *
 FROM message
 ORDER BY datetime(create_time) DESC;
 
+selectMasterMessages:
+SELECT *
+FROM message
+WHERE (content_type = 100 OR content_type = 101 OR (content_type = 200 AND reply_content IS NULL))
+ORDER BY datetime(create_time) DESC;
+
 -- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
 selectActiveReminderMessages:
 SELECT *
