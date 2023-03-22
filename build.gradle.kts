@@ -1,3 +1,4 @@
+import java.net.URI
 
 buildscript {
     repositories {
@@ -23,6 +24,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
     }
 }
 

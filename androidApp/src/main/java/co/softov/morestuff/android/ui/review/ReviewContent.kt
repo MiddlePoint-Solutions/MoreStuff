@@ -2,116 +2,182 @@
 
 package co.softov.morestuff.android.ui.review
 
-import android.util.Log
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
-import com.alexstyl.swipeablecard.Direction
-import com.alexstyl.swipeablecard.ExperimentalSwipeableCardApi
-import com.alexstyl.swipeablecard.rememberSwipeableCardState
-import com.alexstyl.swipeablecard.swipableCard
+
+import co.softov.morestuff.android.ui.review.swipeable.Direction
+import co.softov.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
+import co.softov.morestuff.android.ui.review.swipeable.swipableCard
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
+import timber.log.Timber
 
 @Composable
+@OptIn(ExperimentalSwipeableCardApi::class)
 fun ReviewContent(
     modifier: Modifier = Modifier,
     viewModel: ReviewViewModel = getViewModel()
 ) {
 
     val model by viewModel.model.collectAsState()
+    val scope = rememberCoroutineScope()
 
-    Box(modifier = modifier) {
-        val states = model.items
-            .map { it to rememberSwipeableCardState() }
-        var hint by remember {
-            mutableStateOf("Swipe a card or press a button below")
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xfff68084),
+                        Color(0xffa6c0fe),
+                    )
+                )
+            )
+            .systemBarsPadding()
+    ) {
+        Box {
+            val states = model.items.map { it to rememberSwipeableCardState() }
+            var hint by remember {
+                mutableStateOf("Swipe a card or press a button below")
+            }
 
-        Hint(hint)
+            Hint(hint)
 
-        Box(
-            modifier
-                .padding(24.dp)
-                .fillMaxSize()
-                .aspectRatio(1f)
-                .align(Alignment.Center)
-        ) {
-            states.forEach { (schedule, state) ->
-                if (state.swipedDirection == null) {
-                    ProfileCard(
-                        modifier = modifier
-                            .fillMaxSize()
-                            .swipableCard(
-                                state = state,
-                                blockedDirections = listOf(Direction.Down),
-                                onSwiped = {
-                                    // swipes are handled by the LaunchedEffect
-                                    // so that we track button clicks & swipes
-                                    // from the same place
-                                },
-                                onSwipeCancel = {
-                                    Log.d("Swipeable-Card", "Cancelled swipe")
-                                    hint = "You canceled the swipe"
+            Box(
+                modifier
+                    .padding(24.dp)
+                    .fillMaxSize()
+                    .aspectRatio(1f)
+                    .align(Alignment.Center)
+            ) {
+                states.forEach { (schedule, state) ->
+                    if (state.swipedDirection == null) {
+                        TaskCard(
+                            modifier = modifier
+                                .layoutId(schedule.taskId)
+                                .fillMaxSize()
+                                .swipableCard(
+                                    state = state,
+                                    blockedDirections = listOf(),
+                                    onSwiped = {
+                                        // swipes are handled by the LaunchedEffect
+                                        // so that we track button clicks & swipes
+                                        // from the same place
+                                    },
+                                    onSwipeCancel = {
+                                        hint = "You canceled the swipe"
+                                    }
+                                ),
+                            schedule = schedule
+                        )
+                    }
+                    LaunchedEffect(schedule, state.swipedDirection) {
+                        if (state.swipedDirection != null) {
+                            hint = "You swiped ${stringFrom(state.swipedDirection!!)}"
+                        }
+                    }
+                }
+            }
+            Column(
+                Modifier
+                    .align(Alignment.BottomCenter)
+            ) {
+
+                CircleButton(
+                    onClick = {
+                        scope.launch {
+                            states.reversed().run {
+                                firstOrNull {
+                                    it.second.offset.value == Offset(0f, 0f)
+                                }?.let { last ->
+                                    val index = indexOf(last)
+                                    Timber.d("Undo task: ${getOrNull(index - 1)?.first?.taskTitle}")
+                                    getOrNull(index - 1)?.second?.undo()
                                 }
-                            ),
-                        schedule = schedule
+                            }
+                        }
+                    },
+                    icon = Icons.Rounded.Undo
+                )
+
+                Row(
+                    Modifier
+                        .padding(horizontal = 24.dp, vertical = 32.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    CircleButton(
+                        onClick = {
+                            scope.launch {
+                                val last = states.reversed()
+                                    .firstOrNull {
+                                        it.second.offset.value == Offset(0f, 0f)
+                                    }?.second
+                                last?.swipe(Direction.Left)
+                            }
+                        },
+                        icon = Icons.Rounded.ThumbDown
+                    )
+                    CircleButton(
+                        onClick = {
+                            scope.launch {
+                                val last = states.reversed()
+                                    .firstOrNull {
+                                        it.second.offset.value == Offset(0f, 0f)
+                                    }?.second
+                                last?.swipe(Direction.Down)
+                            }
+                        },
+                        icon = Icons.Rounded.Close
+                    )
+                    CircleButton(
+                        onClick = {
+                            scope.launch {
+                                val last = states.reversed()
+                                    .firstOrNull {
+                                        it.second.offset.value == Offset(0f, 0f)
+                                    }?.second
+                                last?.swipe(Direction.Up)
+                            }
+                        },
+                        icon = Icons.Rounded.Done
+                    )
+                    CircleButton(
+                        onClick = {
+                            scope.launch {
+                                val last = states.reversed()
+                                    .firstOrNull {
+                                        it.second.offset.value == Offset(0f, 0f)
+                                    }?.second
+
+                                last?.swipe(Direction.Right)
+                            }
+                        },
+                        icon = Icons.Rounded.ThumbUp
                     )
                 }
-//                LaunchedEffect(profile, state.swipedDirection) {
-//                    if (state.swipedDirection != null) {
-//                        hint = "You swiped ${stringFrom(state.swipedDirection!!)}"
-//                    }
-//                }
             }
-        }
-        Row(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(horizontal = 24.dp, vertical = 32.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-//            CircleButton(
-//                onClick = {
-//                    scope.launch {
-//                        val last = states.reversed()
-//                            .firstOrNull {
-//                                it.second.offset.value == Offset(0f, 0f)
-//                            }?.second
-//                        last?.swipe(Direction.Left)
-//                    }
-//                },
-//                icon = Icons.Rounded.Close
-//            )
-//            CircleButton(
-//                onClick = {
-//                    scope.launch {
-//                        val last = states.reversed()
-//                            .firstOrNull {
-//                                it.second.offset.value == Offset(0f, 0f)
-//                            }?.second
-//
-//                        last?.swipe(Direction.Right)
-//                    }
-//                },
-//                icon = Icons.Rounded.Favorite
-//            )
         }
     }
 }
@@ -137,12 +203,28 @@ private fun CircleButton(
 }
 
 @Composable
-private fun ProfileCard(
+private fun TaskCard(
     modifier: Modifier,
     schedule: ScheduleListItemViewModel,
 ) {
-    Card(modifier) {
-        Box {
+    Card(
+        modifier, elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            rememberRandomColor(),
+                            rememberRandomColor(),
+                        )
+                    )
+                )
+        ) {
+            Scrim(Modifier.align(Alignment.BottomCenter))
             Column(Modifier.align(Alignment.Center)) {
                 Text(
                     text = schedule.taskTitle,
@@ -192,25 +274,3 @@ fun Scrim(modifier: Modifier = Modifier) {
             .fillMaxWidth()
     )
 }
-
-data class MatchProfile(
-    val name: String,
-    @DrawableRes val drawableResId: Int,
-)
-
-val profiles = listOf(
-    MatchProfile("Erlich Bachman", R.drawable.ic_launcher_round),
-    MatchProfile("Richard Hendricks", R.drawable.ic_launcher_round),
-    MatchProfile("Laurie Bream", R.drawable.ic_launcher_round),
-    MatchProfile("Russ Hanneman", R.drawable.ic_launcher_round),
-    MatchProfile("Dinesh Chugtai", R.drawable.ic_launcher_round),
-    MatchProfile("Monica Hall", R.drawable.ic_launcher_round),
-    MatchProfile("Bertram Gilfoyle", R.drawable.ic_launcher_round),
-
-    MatchProfile("Peter Gregory", R.drawable.ic_launcher_round),
-    MatchProfile("Jared Dunn", R.drawable.ic_launcher_round),
-    MatchProfile("Nelson Bighetti", R.drawable.ic_launcher_round),
-    MatchProfile("Gavin Belson", R.drawable.ic_launcher_round),
-    MatchProfile("Jian Yang", R.drawable.ic_launcher_round),
-    MatchProfile("Jack Barker", R.drawable.ic_launcher_round),
-)

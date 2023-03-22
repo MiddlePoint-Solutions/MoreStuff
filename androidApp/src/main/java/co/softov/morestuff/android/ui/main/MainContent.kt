@@ -74,7 +74,7 @@ fun MainContent(
 
             UserInput(
                 modifier = Modifier.imePadding(),
-                viewModel = viewModel,
+                showTaskListAction = viewModel::showTaskList,
                 onMessageSent = { content ->
                     viewModel.addNewTask(content)
                 },

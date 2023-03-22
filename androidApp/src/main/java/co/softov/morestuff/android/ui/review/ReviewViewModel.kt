@@ -6,6 +6,7 @@ import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
+import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -20,7 +21,7 @@ class ReviewViewModel : ViewModel(), KoinComponent {
     private val store: AppStore by inject()
     private val mapper = ScheduleListItemMapper()
 
-    private var _model: MutableStateFlow<ReviewModel> = MutableStateFlow(ReviewModel())
+    private var _model: MutableStateFlow<ReviewModel> = MutableStateFlow(ReviewModel(listOf()))
     val model: StateFlow<ReviewModel> get() = _model
 
     init {

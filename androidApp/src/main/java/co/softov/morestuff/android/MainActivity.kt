@@ -125,10 +125,6 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun showMainSettings() {
-        router.navigateTo(Screens.Settings)
-    }
-
     private fun showSettingsScreen() {
         router.navigateTo((Screens.ComposeSettings))
     }

@@ -5,6 +5,4 @@ data class ScheduleListItemViewModel(
     val taskId: Long,
     val scheduleTime: String,
     val taskTitle: String
-) {
-    var expanded: Boolean = false
-}
+)

@@ -51,7 +51,6 @@ fun MoreStuffScaffold(
                     modifier = Modifier.systemBarsPadding(),
                     topBar = {
                         MoreStuffTopBar(
-                            scope = scope,
                             drawerState = drawerState,
                         )
                     },

@@ -15,7 +15,7 @@ var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
 
 @Composable
 fun UserInput(
-    viewModel: MainViewModel,
+    showTaskListAction: () -> Unit,
     modifier: Modifier = Modifier,
     onMessageSent: (String) -> Unit,
     resetScroll: () -> Unit
@@ -24,7 +24,7 @@ fun UserInput(
         Column(modifier = modifier) {
             PermissionRequester()
             UserTextInput(
-                listAction = viewModel::showTaskList,
+                listAction = showTaskListAction,
                 sendAction = {
                     resetScroll()
                     onMessageSent(it)
