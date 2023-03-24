@@ -6,6 +6,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -21,11 +23,14 @@ import kotlin.math.abs
 @ExperimentalSwipeableCardApi
 fun Modifier.swipableCard(
     state: SwipeableCardState,
-    onSwiped: (Direction) -> Unit,
+    onSwiped: (Direction) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
     blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
 ) = pointerInput(Unit) {
     coroutineScope {
+
+        val velocityTracker = VelocityTracker()
+
         detectDragGestures(
             onDragCancel = {
                 launch {
@@ -34,6 +39,7 @@ fun Modifier.swipableCard(
                 }
             },
             onDrag = { change, dragAmount ->
+                velocityTracker.addPointerInputChange(change)
                 launch {
                     val original = state.offset.targetValue
                     val summed = original + dragAmount
@@ -48,31 +54,37 @@ fun Modifier.swipableCard(
             onDragEnd = {
                 launch {
                     val coercedOffset = state.offset.targetValue
-                        .coerceIn(blockedDirections,
+                        .coerceIn(
+                            blockedDirections,
                             maxHeight = state.maxHeight,
-                            maxWidth = state.maxWidth)
+                            maxWidth = state.maxWidth
+                        )
 
                     if (hasNotTravelledEnough(state, coercedOffset)) {
                         state.reset()
                         onSwipeCancel()
                     } else {
+
+                        val velocity = velocityTracker.calculateVelocity()
+
+
                         val horizontalTravel = abs(state.offset.targetValue.x)
                         val verticalTravel = abs(state.offset.targetValue.y)
 
                         if (horizontalTravel > verticalTravel) {
                             if (state.offset.targetValue.x > 0) {
-                                state.swipe(Direction.Right)
+                                state.fling(Direction.Right, velocity)
                                 onSwiped(Direction.Right)
                             } else {
-                                state.swipe(Direction.Left)
+                                state.fling(Direction.Left, velocity)
                                 onSwiped(Direction.Left)
                             }
                         } else {
                             if (state.offset.targetValue.y < 0) {
-                                state.swipe(Direction.Up)
+                                state.fling(Direction.Up, velocity)
                                 onSwiped(Direction.Up)
                             } else {
-                                state.swipe(Direction.Down)
+                                state.fling(Direction.Down, velocity)
                                 onSwiped(Direction.Down)
                             }
                         }
@@ -81,11 +93,13 @@ fun Modifier.swipableCard(
             }
         )
     }
-}.graphicsLayer {
-    translationX = state.offset.value.x
-    translationY = state.offset.value.y
-    rotationZ = (state.offset.value.x / 60).coerceIn(-40f, 40f)
 }
+    .graphicsLayer {
+        translationX = state.offset.value.x
+        translationY = state.offset.value.y
+        rotationZ = (state.offset.value.x / 60).coerceIn(-40f, 40f)
+        rotationY = state.flip.value
+    }
 
 private fun Offset.coerceIn(
     blockedDirections: List<Direction>,
@@ -105,11 +119,12 @@ private fun Offset.coerceIn(
                 maxWidth
             }
         ),
-        y = y.coerceIn(if (blockedDirections.contains(Direction.Up)) {
-            0f
-        } else {
-            -maxHeight
-        },
+        y = y.coerceIn(
+            if (blockedDirections.contains(Direction.Up)) {
+                0f
+            } else {
+                -maxHeight
+            },
             if (blockedDirections.contains(Direction.Down)) {
                 0f
             } else {

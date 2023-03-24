@@ -2,9 +2,14 @@
 
 package co.softov.morestuff.android.ui.review
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -16,28 +21,29 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.app.util.rememberRandomColor
+import co.softov.morestuff.android.presentation.presenter.PriorityRound
+import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
-
+import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.review.swipeable.Direction
-import co.softov.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
-import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
-import co.softov.morestuff.android.ui.review.swipeable.swipableCard
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import timber.log.Timber
 
 @Composable
-@OptIn(ExperimentalSwipeableCardApi::class)
 fun ReviewContent(
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = getViewModel()
+    viewModel: PriorityReviewViewModel = getViewModel()
 ) {
 
     val model by viewModel.model.collectAsState()
@@ -56,52 +62,110 @@ fun ReviewContent(
             )
             .systemBarsPadding()
     ) {
-        Box {
-            val states = model.items.map { it to rememberSwipeableCardState() }
+        Box(
+            modifier = Modifier
+        ) {
+
             var hint by remember {
                 mutableStateOf("Swipe a card or press a button below")
             }
 
             Hint(hint)
 
-            Box(
-                modifier
-                    .padding(24.dp)
-                    .fillMaxSize()
-                    .aspectRatio(1f)
-                    .align(Alignment.Center)
-            ) {
-                states.forEach { (schedule, state) ->
-                    if (state.swipedDirection == null) {
-                        TaskCard(
+            val states = model.items.map { it to rememberSwipeableCardState(model.number) }
+            val visibleState = remember(model.number) { MutableTransitionState(false) }
+            val transition = updateTransition(visibleState, "Visible state")
+
+            when (model.round) {
+                PriorityRound.Initial -> {
+                    TaskPrioritySwipe(
+                        modifier = modifier.align(Alignment.Center),
+                        states = states,
+                        onSwiped = viewModel::onTaskSwiped,
+                    )
+                }
+                PriorityRound.Next -> {
+
+                    val screenWidth = with(LocalDensity.current) {
+                        LocalConfiguration.current.screenWidthDp.dp.toPx()
+                    }
+
+                    val xPosition by transition.animateFloat(label = "xPosition") {
+                        if (it) 0f else screenWidth
+                    }
+
+                    Box(modifier = Modifier.graphicsLayer {
+                        translationX = xPosition
+                    }) {
+                        TaskPrioritySwipe(
                             modifier = modifier
-                                .layoutId(schedule.taskId)
-                                .fillMaxSize()
-                                .swipableCard(
-                                    state = state,
-                                    blockedDirections = listOf(),
-                                    onSwiped = {
-                                        // swipes are handled by the LaunchedEffect
-                                        // so that we track button clicks & swipes
-                                        // from the same place
-                                    },
-                                    onSwipeCancel = {
-                                        hint = "You canceled the swipe"
-                                    }
-                                ),
-                            schedule = schedule
+                                .align(Alignment.Center)
+                                .layoutId("${model.round}-${model.number}"),
+                            states = states,
+                            onSwiped = viewModel::onTaskSwiped,
                         )
                     }
-                    LaunchedEffect(schedule, state.swipedDirection) {
-                        if (state.swipedDirection != null) {
-                            hint = "You swiped ${stringFrom(state.swipedDirection!!)}"
+
+                    LaunchedEffect(key1 = model.number) {
+                        visibleState.targetState = true
+                    }
+                }
+                PriorityRound.Final -> {
+
+                    val screenWidth = with(LocalDensity.current) {
+                        LocalConfiguration.current.screenWidthDp.dp.toPx()
+                    }
+
+                    val xPosition by transition.animateFloat(label = "xPosition") {
+                        if (it) 0f else screenWidth
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxSize()
+                            .aspectRatio(1f)
+                            .graphicsLayer {
+                                translationX = xPosition
+                            }
+                    ) {
+
+                        when {
+                            states.isEmpty() -> {
+                                Text(
+                                    "Wooops, nothing to work on? add a new task",
+                                    modifier.align(Alignment.Center)
+                                )
+                            }
+                            states.size == 1 -> {
+                                // TODO: disable swiping
+                                TaskPrioritySwipe(
+                                    modifier = modifier,
+                                    states = states,
+                                    onSwiped = viewModel::onTaskSwiped,
+                                )
+                            }
+                            else -> {
+                                LazyColumn(
+                                    contentPadding = PaddingValues(8.dp)
+                                ) {
+                                    items(model.items) {
+                                        ScheduleListItem(it)
+                                    }
+                                }
+                            }
                         }
+
+                    }
+                    LaunchedEffect(key1 = model.number) {
+                        visibleState.targetState = true
                     }
                 }
             }
+
+
             Column(
-                Modifier
-                    .align(Alignment.BottomCenter)
+                Modifier.align(Alignment.BottomCenter)
             ) {
 
                 CircleButton(
@@ -183,6 +247,44 @@ fun ReviewContent(
 }
 
 @Composable
+@OptIn(ExperimentalSwipeableCardApi::class)
+private fun TaskPrioritySwipe(
+    modifier: Modifier,
+    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
+    onSwiped: (schedule: ScheduleListItemViewModel, direction: Direction, isLast: Boolean) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    Box(
+        modifier
+            .padding(24.dp)
+            .fillMaxSize()
+            .aspectRatio(1f)
+    ) {
+        states.forEachIndexed { index, (schedule, state) ->
+            if (state.swipedDirection == null) {
+                TaskCard(
+                    modifier = modifier
+                        .layoutId(schedule.taskId)
+                        .fillMaxSize()
+                        .padding(top = (5 * index).dp)
+                        .swipableCard(
+                            state = state,
+                            blockedDirections = listOf(),
+                        )
+                        .clickable { scope.launch { state.flip() } },
+                    schedule = schedule
+                )
+            }
+            LaunchedEffect(schedule, state.swipedDirection) {
+                state.swipedDirection?.let {
+                    onSwiped(schedule, it, states.first().first == schedule)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun CircleButton(
     onClick: () -> Unit,
     icon: ImageVector,
@@ -255,6 +357,25 @@ private fun Hint(text: String) {
         )
     }
 }
+
+@Composable
+private fun Debug(text: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(horizontal = 24.dp, vertical = 32.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = text,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 
 private fun stringFrom(direction: Direction): String {
     return when (direction) {
