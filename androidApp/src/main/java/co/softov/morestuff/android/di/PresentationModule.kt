@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
+import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType
@@ -13,7 +14,9 @@ import org.koin.dsl.module
 
 val presentationModule = module {
 
+
     viewModelOf(::MainViewModel)
+    viewModelOf(::DrawerViewModel)
 
     viewModel { SettingsViewModel() }
 

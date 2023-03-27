@@ -5,28 +5,49 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun DrawerLayout(
-    onSettingsClicked: () -> Unit,
+    closeDrawer: () -> Unit,
+    viewModel: DrawerViewModel = getViewModel()
 ) {
-    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         DrawerHeader()
-        DrawerSettings("Settings", onSettingsClicked = onSettingsClicked)
+        DrawerItem(
+            stringResource(R.string.settings),
+            onSettingsClicked = {
+                viewModel.showSettings()
+                closeDrawer()
+            }
+        )
+        DrawerItem(
+            stringResource(R.string.priority_review),
+            onSettingsClicked = {
+                viewModel.showPriorityReview()
+                closeDrawer()
+            }
+        )
     }
 }
 
@@ -42,13 +63,12 @@ fun DrawerHeader() {
             text = "More Stuff",
             fontSize = 30.sp,
             color = MaterialTheme.colorScheme.onSurface
-
         )
     }
 }
 
 @Composable
-private fun DrawerSettings(text: String, onSettingsClicked: () -> Unit) {
+private fun DrawerItem(text: String, onSettingsClicked: () -> Unit) {
     Row(
         modifier = Modifier
             .height(56.dp)
@@ -62,13 +82,14 @@ private fun DrawerSettings(text: String, onSettingsClicked: () -> Unit) {
             Icons.Filled.Settings,
             contentDescription = "Settings",
             modifier = Modifier
-                .padding(start = 16.dp).size(26.dp),
+                .padding(start = 16.dp)
+                .size(26.dp),
             tint = MaterialTheme.colorScheme.onSurface
         )
         Modifier
             .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
             .size(24.dp)
-        androidx.compose.material3.Text(
+        Text(
             text,
             fontSize = 26.sp,
             color = MaterialTheme.colorScheme.onSurface,
@@ -81,10 +102,8 @@ private fun DrawerSettings(text: String, onSettingsClicked: () -> Unit) {
 @Preview
 fun DrawerPreview() {
     MoreStuffTheme {
-        androidx.compose.material3.Surface {
-            Column {
-                DrawerLayout {}
-            }
+        Surface {
+            DrawerLayout(closeDrawer = {})
         }
     }
 }
@@ -93,10 +112,8 @@ fun DrawerPreview() {
 @Preview
 fun DrawerPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
-        androidx.compose.material3.Surface {
-            Column {
-                DrawerLayout {}
-            }
+        Surface {
+            DrawerLayout(closeDrawer = {})
         }
     }
 }

@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalSwipeableCardApi::class)
-
 package co.softov.morestuff.android.ui.review
 
 import androidx.compose.animation.*
@@ -21,7 +19,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -30,8 +27,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -42,6 +37,8 @@ import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.review.swipeable.Direction
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import timber.log.Timber
@@ -51,10 +48,6 @@ fun ReviewContent(
     modifier: Modifier = Modifier,
     viewModel: PriorityReviewViewModel = getViewModel()
 ) {
-
-    val model by viewModel.model.collectAsState()
-    val scope = rememberCoroutineScope()
-
     Surface {
         Box(
             modifier = Modifier
@@ -69,15 +62,29 @@ fun ReviewContent(
                 )
                 .systemBarsPadding()
         ) {
-            Box(
-                modifier = Modifier
-            ) {
 
-                var hint by remember {
-                    mutableStateOf("Swipe a card or press a button below")
-                }
+            val model by viewModel.model.collectAsState()
+            val scope = rememberCoroutineScope()
+
+            var hint by remember { mutableStateOf("Round ${model.number} - ${model.round}") }
+            hint = "Round ${model.number} - ${model.round}"
+
+            Column {
+                Text(
+                    text = "Priority Review",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    textAlign = TextAlign.Center
+                )
 
                 Hint(hint)
+            }
+
+            Box {
 
                 val states = model.items.map { it to rememberSwipeableCardState(model.number) }
                 val visibleState = remember(model.number) { MutableTransitionState(false) }
@@ -88,8 +95,33 @@ fun ReviewContent(
                         TaskPrioritySwipe(
                             modifier = modifier.align(Alignment.Center),
                             states = states,
-                            onSwiped = viewModel::onTaskSwiped,
+                            onSwiped = { schedule, direction, isLast ->
+                                scope.launch {
+                                    if (isLast) {
+                                        visibleState.targetState = false
+                                        delay(100)
+                                    }
+                                }.invokeOnCompletion {
+                                    viewModel.onTaskSwiped(schedule, direction, isLast)
+                                }
+                            },
                         )
+
+                        AnimatedVisibility(
+                            visibleState = visibleState,
+                            modifier = modifier.align(Alignment.BottomCenter),
+                            enter = slideInVertically { it * 2 },
+                            exit = slideOutVertically { it * 2 }
+                        ) {
+                            PriorityControls(
+                                states,
+                                modifier.align(Alignment.BottomCenter)
+                            )
+                        }
+
+                        LaunchedEffect(key1 = model.number) {
+                            visibleState.targetState = true
+                        }
                     }
                     PriorityRound.Next -> {
 
@@ -109,7 +141,28 @@ fun ReviewContent(
                                     .align(Alignment.Center)
                                     .layoutId("${model.round}-${model.number}"),
                                 states = states,
-                                onSwiped = viewModel::onTaskSwiped,
+                                onSwiped = { schedule, direction, isLast ->
+                                    scope.launch {
+                                        if (isLast) {
+                                            visibleState.targetState = false
+                                            delay(100)
+                                        }
+                                    }.invokeOnCompletion {
+                                        viewModel.onTaskSwiped(schedule, direction, isLast)
+                                    }
+                                },
+                            )
+                        }
+
+                        AnimatedVisibility(
+                            visibleState = visibleState,
+                            modifier = modifier.align(Alignment.BottomCenter),
+                            enter = slideInVertically { it * 2 },
+                            exit = slideOutVertically { it * 2 }
+                        ) {
+                            PriorityControls(
+                                states,
+                                modifier.align(Alignment.BottomCenter)
                             )
                         }
 
@@ -169,87 +222,97 @@ fun ReviewContent(
                         }
                     }
                 }
-
-
-                Column(
-                    Modifier.align(Alignment.BottomCenter)
-                ) {
-
-                    CircleButton(
-                        onClick = {
-                            scope.launch {
-                                states.reversed().run {
-                                    firstOrNull {
-                                        it.second.offset.value == Offset(0f, 0f)
-                                    }?.let { last ->
-                                        val index = indexOf(last)
-                                        Timber.d("Undo task: ${getOrNull(index - 1)?.first?.taskTitle}")
-                                        getOrNull(index - 1)?.second?.undo()
-                                    }
-                                }
-                            }
-                        },
-                        icon = Icons.Rounded.Undo
-                    )
-
-                    Row(
-                        Modifier
-                            .padding(horizontal = 24.dp, vertical = 32.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        CircleButton(
-                            onClick = {
-                                scope.launch {
-                                    val last = states.reversed()
-                                        .firstOrNull {
-                                            it.second.offset.value == Offset(0f, 0f)
-                                        }?.second
-                                    last?.swipe(Direction.Left)
-                                }
-                            },
-                            icon = Icons.Rounded.ThumbDown
-                        )
-                        CircleButton(
-                            onClick = {
-                                scope.launch {
-                                    val last = states.reversed()
-                                        .firstOrNull {
-                                            it.second.offset.value == Offset(0f, 0f)
-                                        }?.second
-                                    last?.swipe(Direction.Down)
-                                }
-                            },
-                            icon = Icons.Rounded.Close
-                        )
-                        CircleButton(
-                            onClick = {
-                                scope.launch {
-                                    val last = states.reversed()
-                                        .firstOrNull {
-                                            it.second.offset.value == Offset(0f, 0f)
-                                        }?.second
-                                    last?.swipe(Direction.Up)
-                                }
-                            },
-                            icon = Icons.Rounded.Done
-                        )
-                        CircleButton(
-                            onClick = {
-                                scope.launch {
-                                    val last = states.reversed()
-                                        .firstOrNull {
-                                            it.second.offset.value == Offset(0f, 0f)
-                                        }?.second
-
-                                    last?.swipe(Direction.Right)
-                                }
-                            },
-                            icon = Icons.Rounded.ThumbUp
-                        )
-                    }
-                }
             }
+        }
+    }
+}
+
+@Composable
+private fun PriorityControls(
+    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
+    modifier: Modifier = Modifier,
+) {
+
+    val scope = rememberCoroutineScope()
+
+    Column(
+        modifier = modifier
+    ) {
+
+        Box(Modifier.align(Alignment.CenterHorizontally)) {
+            CircleButton(
+                onClick = {
+                    scope.launch {
+                        states.reversed().run {
+                            firstOrNull {
+                                it.second.offset.value == Offset(0f, 0f)
+                            }?.let { last ->
+                                val index = indexOf(last)
+                                Timber.d("Undo task: ${getOrNull(index - 1)?.first?.taskTitle}")
+                                getOrNull(index - 1)?.second?.undo()
+                            }
+                        }
+                    }
+                },
+                icon = Icons.Rounded.Undo
+            )
+        }
+
+        Row(
+            Modifier
+                .padding(horizontal = 24.dp, vertical = 32.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            CircleButton(
+                onClick = {
+                    scope.launch {
+                        val last = states.reversed()
+                            .firstOrNull {
+                                it.second.offset.value == Offset(0f, 0f)
+                            }?.second
+                        last?.swipe(Direction.Left)
+                    }
+                },
+                icon = Icons.Rounded.ThumbDown
+            )
+            CircleButton(
+                onClick = {
+                    scope.launch {
+                        val last = states.reversed()
+                            .firstOrNull {
+                                it.second.offset.value == Offset(0f, 0f)
+                            }?.second
+                        last?.swipe(Direction.Down)
+                    }
+                },
+                icon = Icons.Rounded.Close
+            )
+            CircleButton(
+                onClick = {
+                    scope.launch {
+                        val last = states.reversed()
+                            .firstOrNull {
+                                it.second.offset.value == Offset(0f, 0f)
+                            }?.second
+                        last?.swipe(Direction.Up)
+                    }
+                },
+                icon = Icons.Rounded.Done
+            )
+            CircleButton(
+                onClick = {
+                    scope.launch {
+                        val last = states.reversed()
+                            .firstOrNull {
+                                it.second.offset.value == Offset(0f, 0f)
+                            }?.second
+
+                        last?.swipe(Direction.Right)
+                    }
+                },
+                icon = Icons.Rounded.ThumbUp
+            )
         }
     }
 }
@@ -280,12 +343,14 @@ private fun TaskPrioritySwipe(
                     modifier = modifier
                         .layoutId(schedule.taskId)
                         .fillMaxSize()
-                        .padding(top = (5 * index).dp)
                         .swipableCard(
                             state = state,
                             blockedDirections = listOf(),
                         )
-                        .clickable { scope.launch { state.flip() } },
+                        .graphicsLayer {
+                            translationY = (5 * index).dp.toPx()
+                        }
+                        .clickable { /*TODO: Expand (TBD)*/ },
                     schedule = schedule
                 )
             }
@@ -325,7 +390,7 @@ private fun TaskCard(
 ) {
     Card(
         modifier, elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
+            defaultElevation = 8.dp
         )
     ) {
         Box(
@@ -340,11 +405,11 @@ private fun TaskCard(
                     )
                 )
         ) {
-            Scrim(Modifier.align(Alignment.BottomCenter))
             Column(Modifier.align(Alignment.Center)) {
                 Text(
                     text = schedule.taskTitle,
                     color = MaterialTheme.colorScheme.onPrimary,
+                    textAlign = TextAlign.Center,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(10.dp)

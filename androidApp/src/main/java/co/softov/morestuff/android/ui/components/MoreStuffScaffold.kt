@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
@@ -16,47 +17,40 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoreStuffScaffold(
     content: @Composable (PaddingValues) -> Unit,
-    onSettingsClicked: () -> Unit,
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
 
-
+    val closeDrawer: () -> Unit = remember {
+        { scope.launch { drawerState.close() } }
+    }
 
     BackHandler(enabled = drawerState.isOpen) {
         if (drawerState.isOpen) {
-            scope.launch {
-                drawerState.close()
-            }
+            closeDrawer()
         }
     }
 
-    MoreStuffTheme {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = drawerState.isOpen,
-            drawerContent = {
-                ModalDrawerSheet {
-                    DrawerLayout {
-                        onSettingsClicked()
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }
-                }
-            },
-            content = {
-
-                Scaffold(
-                    modifier = Modifier.systemBarsPadding(),
-                    topBar = {
-                        MoreStuffTopBar(
-                            drawerState = drawerState,
-                        )
-                    },
-                    content = content,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerLayout(
+                    closeDrawer = closeDrawer
                 )
             }
-        )
-    }
+        },
+        content = {
+            Scaffold(
+                modifier = Modifier.systemBarsPadding(),
+                topBar = {
+                    MoreStuffTopBar(
+                        drawerState = drawerState,
+                    )
+                },
+                content = content,
+            )
+        }
+    )
 }

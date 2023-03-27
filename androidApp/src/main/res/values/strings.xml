@@ -70,6 +70,8 @@
     <string name="cd_schedule_icon">Schedule Icon</string>
     <string name="cd_task_complete">Task Complete</string>
     <string name="task_chat_schedule_reminder">Set reminder</string>
+    <string name="settings">Settings</string>
+    <string name="priority_review">Priority Review</string>
 
 
 </resources>

@@ -91,10 +91,7 @@ class MainActivity : AppCompatActivity() {
                 MoreStuffScaffold(
                     content = {
                         MainContent(conductor)
-                    },
-                    onSettingsClicked = {
-                        showSettingsScreen()
-                    },
+                    }
                 )
             }
         }
