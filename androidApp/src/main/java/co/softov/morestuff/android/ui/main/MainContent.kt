@@ -25,15 +25,12 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MainContent(
-    conductor: MainConductor,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val viewModel = getViewModel<MainViewModel> {
-        parametersOf(conductor)
-    }
+    val viewModel: MainViewModel = getViewModel()
 
     LifecycleEventsObserver(
         onResume = { viewModel.onResume() }

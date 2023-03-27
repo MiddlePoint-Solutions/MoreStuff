@@ -11,63 +11,26 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.fragment.app.ListFragment
-import co.softov.morestuff.android.ui.ScreenKey
+import co.softov.morestuff.android.app.navigation.AppRouter
+import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
-import co.softov.morestuff.android.ui.list.ListsFragment
-import co.softov.morestuff.android.ui.main.MainConductor
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
-import com.github.terrakok.cicerone.Router
-import com.github.terrakok.cicerone.androidx.AppNavigator
-import com.github.terrakok.cicerone.androidx.FragmentScreen
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+
 
 class MainActivity : AppCompatActivity() {
 
     private val navigatorHolder: NavigatorHolder by inject()
-    private val router: Router by inject()
-
-    private val navigator: Navigator = object : AppNavigator(this, android.R.id.content) {
-
-        override fun setupFragmentTransaction(
-            screen: FragmentScreen,
-            fragmentTransaction: FragmentTransaction,
-            currentFragment: Fragment?,
-            nextFragment: Fragment
-        ) {
-            when {
-                screen.screenKey.contains(ScreenKey.LAUNCHED_TASK_CHAT) -> {
-                    fragmentTransaction.setCustomAnimations(
-                        0,
-                        R.anim.slide_out_right,
-                        0,
-                        R.anim.slide_out_right
-                    )
-                }
-                screen.screenKey.contains(ScreenKey.TASK_CHAT) -> {
-                    fragmentTransaction.setCustomAnimations(
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_right,
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_right
-                    )
-                }
-            }
-        }
+    private val appNavigator: Navigator by lazy {
+        MoreStuffNavigator(this, android.R.id.content)
     }
 
-    private val conductor = object : MainConductor {
-        override fun showTaskList() {
-            ListsFragment().show(supportFragmentManager, ListFragment::javaClass.name)
-        }
-    }
+    private val router: AppRouter by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             MoreStuffTheme {
                 MoreStuffScaffold(
                     content = {
-                        MainContent(conductor)
+                        MainContent()
                     }
                 )
             }
@@ -114,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResumeFragments() {
         super.onResumeFragments()
-        navigatorHolder.setNavigator(navigator)
+        navigatorHolder.setNavigator(appNavigator)
     }
 
     override fun onPause() {

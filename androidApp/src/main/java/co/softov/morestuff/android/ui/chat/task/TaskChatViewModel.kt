@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
+import co.softov.morestuff.android.app.navigation.AppRouter
+import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -22,15 +24,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class TaskChatViewModel(
-    private val store: AppStore,
     getMessages: GetMessages,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
-) : ViewModel(), KoinComponent {
-
-    private val router: Router by inject()
+) : NoStateViewModel() {
 
     val messages: StateFlow<List<Message>> =
         getMessages(taskId = taskId)
