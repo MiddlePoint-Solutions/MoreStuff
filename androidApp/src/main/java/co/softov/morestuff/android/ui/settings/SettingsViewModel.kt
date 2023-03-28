@@ -16,4 +16,7 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
     fun smartReminderEnabled(enable: Boolean) {
         dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
     }
+    fun onBackPressed() {
+        router.exit()
+    }
 }

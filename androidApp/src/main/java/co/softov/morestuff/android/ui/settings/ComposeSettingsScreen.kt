@@ -9,7 +9,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -38,54 +40,71 @@ fun SettingsScreen() {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
     MoreStuffTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(scrollState)
-                .padding(start = 16.dp)
-        ) {
-            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-            Options()
-            SelectTheme()
-            SelectSnoozeLimit(viewModel = SettingsViewModel())
-            Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            DeveloperSettings()
-            Notification()
-            ReviewTest()
-            KeepDeviceScreenOn(devTools = devTools)
-            ReminderDebugging(devTools = devTools)
-            SmartReminder(viewModel = SettingsViewModel())
-            Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Reset()
-            Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
-            )
-            About()
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .verticalScroll(scrollState)
+            ) {
+                Spacer(modifier = Modifier.height(85.dp))
+                SelectTheme()
+                SelectSnoozeLimit(viewModel = SettingsViewModel())
+                Divider(
+                    color = Color.Gray,
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                DeveloperSettings()
+                Notification()
+                ReviewTest()
+                KeepDeviceScreenOn(devTools = devTools)
+                ReminderDebugging(devTools = devTools)
+                SmartReminder(viewModel = SettingsViewModel())
+                Divider(
+                    color = Color.Gray,
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Reset()
+                Divider(
+                    color = Color.Gray,
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                About()
+            }
+            SettingsTopBar(viewModel = SettingsViewModel())
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Options() {
-    Row(
-        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-    ) {
-        androidx.compose.material3.Text(
-            text = "Options", fontSize = 23.sp, color = MaterialTheme.colorScheme.onSurface
-        )
-    }
+fun SettingsTopBar(viewModel: SettingsViewModel) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Settings",
+                fontSize = 25.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 105.dp)
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xff2B3438)
+        ),
+        navigationIcon = {
+            IconButton(onClick = viewModel::onBackPressed) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+    )
 }
 
 @Composable
