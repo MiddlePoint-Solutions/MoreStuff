@@ -37,15 +37,15 @@ fun DrawerLayout(
         DrawerItem(
             stringResource(R.string.settings),
             onSettingsClicked = {
-                viewModel.showSettings()
                 closeDrawer()
+                viewModel.showSettings()
             }
         )
         DrawerItem(
             stringResource(R.string.priority_review),
             onSettingsClicked = {
-                viewModel.showPriorityReview()
                 closeDrawer()
+                viewModel.showPriorityReview()
             }
         )
     }

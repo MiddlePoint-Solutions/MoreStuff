@@ -1,9 +1,7 @@
 package co.softov.morestuff.android.ui.review.swipeable
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
@@ -84,6 +82,9 @@ class SwipeableCardState(
         isSwiped = true
         val endX = maxWidth * 1.1f
         val endY = maxHeight
+
+
+
         when (direction) {
             Direction.Left -> offset.animateTo(
                 offset(x = -endX),
@@ -93,7 +94,7 @@ class SwipeableCardState(
             Direction.Right -> offset.animateTo(
                 offset(x = endX),
                 initialVelocity = offset(x = velocity.x),
-                animationSpec = tween(250)
+                animationSpec = spring()
             )
             Direction.Up -> offset.animateTo(
                 offset(y = -endY),
@@ -109,7 +110,7 @@ class SwipeableCardState(
         swipedDirection = direction
     }
 
-    suspend fun swipe(direction: Direction, animationSpec: AnimationSpec<Offset> = tween(400)) {
+    suspend fun swipe(direction: Direction, animationSpec: AnimationSpec<Offset> = tween(300)) {
         isSwiped = true
         val endX = maxWidth * 1.5f
         val endY = maxHeight

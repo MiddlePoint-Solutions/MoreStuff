@@ -8,8 +8,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
+import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 
 /**
@@ -26,29 +28,35 @@ fun Modifier.swipableCard(
     onSwiped: (Direction) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
     blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
-) = pointerInput(Unit) {
+) = pointerInput(state) {
     coroutineScope {
-
         val velocityTracker = VelocityTracker()
-
         detectDragGestures(
+            onDragStart = {
+                Timber.d("DRAG: START(${it.x}, ${it.y})")
+            },
             onDragCancel = {
+                Timber.d("DRAG: CANCEL")
                 launch {
                     state.reset()
                     onSwipeCancel()
                 }
             },
             onDrag = { change, dragAmount ->
-                velocityTracker.addPointerInputChange(change)
-                launch {
-                    val original = state.offset.targetValue
-                    val summed = original + dragAmount
-                    val newValue = Offset(
-                        x = summed.x.coerceIn(-state.maxWidth, state.maxWidth),
-                        y = summed.y.coerceIn(-state.maxHeight, state.maxHeight)
-                    )
-                    if (change.positionChange() != Offset.Zero) change.consume()
-                    state.drag(newValue.x, newValue.y)
+                if (state.isSwiped) {
+                    change.consume()
+                } else {
+                    velocityTracker.addPointerInputChange(change)
+                    launch {
+                        val original = state.offset.targetValue
+                        val summed = original + dragAmount
+                        val newValue = Offset(
+                            x = summed.x.coerceIn(-state.maxWidth, state.maxWidth),
+                            y = summed.y.coerceIn(-state.maxHeight, state.maxHeight)
+                        )
+                        if (change.positionChange() != Offset.Zero) change.consume()
+                        state.drag(newValue.x, newValue.y)
+                    }
                 }
             },
             onDragEnd = {
@@ -60,13 +68,15 @@ fun Modifier.swipableCard(
                             maxWidth = state.maxWidth
                         )
 
-                    if (hasNotTravelledEnough(state, coercedOffset)) {
+                    val velocity = velocityTracker.calculateVelocity()
+                    Timber.d("DRAG: END(${coercedOffset.x}, ${coercedOffset.y}), VELOCITY(${velocity.x},${velocity.y})")
+
+                    val velocitySwipe = isVelocitySwipe(velocity)
+
+                    if (hasNotTravelledEnough(state, coercedOffset) && !velocitySwipe) {
                         state.reset()
                         onSwipeCancel()
                     } else {
-
-                        val velocity = velocityTracker.calculateVelocity()
-
                         val horizontalTravel = abs(state.offset.targetValue.x)
                         val verticalTravel = abs(state.offset.targetValue.y)
 
@@ -99,6 +109,12 @@ fun Modifier.swipableCard(
         rotationZ = (state.offset.value.x / 60).coerceIn(-40f, 40f)
         rotationY = state.flip.value
     }
+
+private fun isVelocitySwipe(velocity: Velocity): Boolean {
+    val vX = abs(velocity.x)
+    val vY = abs(velocity.y)
+    return vX > 5000 || vY > 5000
+}
 
 private fun Offset.coerceIn(
     blockedDirections: List<Direction>,

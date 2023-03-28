@@ -78,4 +78,8 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
 
     fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(block = block)
+
+    fun navigateBack() {
+        router.exit()
+    }
 }

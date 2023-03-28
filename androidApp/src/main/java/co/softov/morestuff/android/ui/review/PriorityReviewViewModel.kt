@@ -1,24 +1,20 @@
 package co.softov.morestuff.android.ui.review
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.domain.redux.AppStore
+import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.Direction
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
 import timber.log.Timber
 
 class PriorityReviewViewModel(
-    private val store: AppStore,
     private val getSchedulesWithTitle: GetSchedulesWithTitleUseCase
-) : ViewModel(), KoinComponent {
+) : NoStateViewModel() {
 
     private val mapper = ScheduleListItemMapper()
 
@@ -28,10 +24,18 @@ class PriorityReviewViewModel(
     private val priorityTasks = mutableListOf<ScheduleListItemViewModel>()
 
     init {
+        setInitialState()
+    }
+
+    private fun setInitialState(round: PriorityRound = PriorityRound.Initial) {
         viewModelScope.launch {
             val schedules = getSchedulesWithTitle().map(mapper::map).shuffled()
-            _model.value = PriorityReviewModel(items = schedules)
+            _model.value = PriorityReviewModel(items = schedules, round = round)
         }
+    }
+
+    fun reset() {
+        setInitialState(round = PriorityRound.Next)
     }
 
     fun onTaskSwiped(
