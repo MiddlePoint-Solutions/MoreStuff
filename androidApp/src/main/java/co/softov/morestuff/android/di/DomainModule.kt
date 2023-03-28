@@ -2,6 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
+import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.priority.*
 import co.softov.morestuff.android.domain.usecase.schedule.*
@@ -10,27 +12,36 @@ import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCas
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
 import co.softov.morestuff.android.domain.usecase.task.*
+import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
+import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
-val domainModules get() = buildList {
-    add(serviceModule) // TODO: is this still being used?
-    add(storeModule)
-    addAll(useCaseModules)
-}
+val domainModules
+    get() = buildList {
+        add(serviceModule) // TODO: is this still being used?
+        add(storeModule)
+        addAll(useCaseModules)
+        add(timeManagerModule)
+    }
 
-val useCaseModules get() = buildList {
-    add(taskUseCases)
-    add(scheduleUseCases)
-    add(priorityUseCases)
-    add(messageUseCases)
-    add(settingsUseCases)
-}
+val useCaseModules
+    get() = buildList {
+        add(taskUseCases)
+        add(scheduleUseCases)
+        add(priorityUseCases)
+        add(messageUseCases)
+        add(settingsUseCases)
+    }
 
 val serviceModule = module {
     factory<BootCompleteScheduler> {
-        BootCompleteSchedulerImpl(scheduler = get(), getActiveSchedules = get())
+        BootCompleteSchedulerImpl(
+            scheduler = get(),
+            getActiveSchedules = get(),
+            timeManager = get()
+        )
     }
 }
 
@@ -148,6 +159,7 @@ val scheduleUseCases = module {
     factory<CreateScheduleUseCase> {
         CreateScheduleUseCaseImpl(
             scheduleRepository = get(),
+            getPriorityTimeUseCase = get(),
             timeManager = get()
         )
     }
@@ -163,7 +175,7 @@ val scheduleUseCases = module {
     factory<GetTaskScheduleCountUseCase> {
         GetTaskScheduleCountUseCaseImpl(
             scheduleRepository = get(),
-            timeManager = get()
+            getPriorityTimeUseCase = get()
         )
     }
 
@@ -193,6 +205,12 @@ val messageUseCases = module {
 }
 
 val priorityUseCases = module {
+    factory<GetPriorityTimeUseCase> {
+        GetPriorityTimeUseCaseImpl(
+            debug = get(),
+            timeManager = get()
+        )
+    }
     factoryOf(::GetPriorityOptionsUseCase)
     factoryOf(::GetSchedulePriorityUseCaseImpl) bind GetSchedulePriorityUseCase::class
     factoryOf(::MapScheduleToPriorityUseCaseImpl) bind MapScheduleToPriorityUseCase::class
@@ -204,4 +222,7 @@ val settingsUseCases = module {
     factoryOf(::SaveUserSettingsImpl) bind SaveUserSettings::class
 }
 
+val timeManagerModule = module {
+    single<TimeManager> { TimeManagerImpl() }
+}
 

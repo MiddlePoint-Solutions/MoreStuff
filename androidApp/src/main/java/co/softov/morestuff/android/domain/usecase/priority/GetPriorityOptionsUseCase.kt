@@ -1,14 +1,14 @@
 package co.softov.morestuff.android.domain.usecase.priority
 
 import arrow.core.Either
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.model.DefaultOption.*
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
 data class GetPriorityOptionsParams(val current: Priority, val next: Priority)
 
-class GetPriorityOptionsUseCase :
+class GetPriorityOptionsUseCase(private val timeManager: TimeManager) :
     BaseUseCase<Failure, GetPriorityOptionsParams, PriorityOptionsModel> {
 
     override suspend fun invoke(params: GetPriorityOptionsParams): Either<Failure, PriorityOptionsModel> =
@@ -53,7 +53,7 @@ class GetPriorityOptionsUseCase :
     private fun getCurrentTimeOption(
         options: List<PriorityOption>,
         current: Priority,
-        defaultOption: PriorityOption
+        defaultOption: PriorityOption,
     ): PriorityOption = if (options.contains(current.option)) {
         current.option
     } else defaultOption
@@ -65,10 +65,10 @@ class GetPriorityOptionsUseCase :
     }
 
     private fun getTodayTimeOptions() = buildList<PriorityOption> {
-        val now = TimeUtils.nowLocalDateTime
-        val morning = TimeUtils.todayLocalDateTime(8)
-        val noon = TimeUtils.todayLocalDateTime(12)
-        val afternoon = TimeUtils.todayLocalDateTime(18)
+        val now = timeManager.nowLocalDateTime
+        val morning = timeManager.todayLocalDateTime(8)
+        val noon = timeManager.todayLocalDateTime(12)
+        val afternoon = timeManager.todayLocalDateTime(18)
         val timeOptions = TimeOfDayOption.values()
 
         add(Auto)

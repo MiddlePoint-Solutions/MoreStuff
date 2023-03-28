@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.work.*
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.SmartReminderWorker
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
+import co.softov.morestuff.android.domain.service.TimeManager
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 
-class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
+class SchedulerImpl(context: Context, private val timeManager: TimeManager) : Scheduler,
+    KoinComponent {
 
     private val workManager = WorkManager.getInstance(context)
 
@@ -18,7 +19,7 @@ class SchedulerImpl(context: Context) : Scheduler, KoinComponent {
         val data = ScheduleWorker.createWorkerData(scheduleId)
 
         val delayTimeMillis =
-            scheduleTime.toEpochMilliseconds - TimeUtils.nowUtcInstant.toEpochMilliseconds()
+            scheduleTime.toEpochMilliseconds - timeManager.nowUtcInstant.toEpochMilliseconds()
 
         val workConstraints = Constraints.Builder().apply {
             setTriggerContentMaxDelay(1, TimeUnit.MINUTES)

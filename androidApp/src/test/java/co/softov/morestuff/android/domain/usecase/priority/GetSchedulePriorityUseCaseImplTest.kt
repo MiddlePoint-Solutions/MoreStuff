@@ -2,13 +2,13 @@ package co.softov.morestuff.android.domain.usecase.priority
 
 import arrow.core.Either
 import arrow.core.getOrHandle
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.di.useCaseModules
 import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
+import co.softov.morestuff.android.domain.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -46,6 +46,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
 
     private val getActiveScheduleFlowUseCase: GetActiveScheduleFlowUseCase = mockk()
     private val getUpcomingPriorityUseCase: GetUpcomingPriorityUseCase = mockk()
+    private val timeManager = TimeManagerImpl()
 
     @Test
     fun `should return Today morning priority when scheduled for today morning`() =
@@ -53,7 +54,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             val taskId = 1L
             val params = GetSchedulePriorityParams(taskId)
             val schedule = Schedule.empty().copy(
-                scheduleLocalTime = TimeUtils.todayLocalDateTimeString(9)
+                scheduleLocalTime = timeManager.todayLocalDateTimeString(9)
             )
 
             val useCase = GetSchedulePriorityUseCaseImpl(
@@ -67,7 +68,10 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.today.copy(option = TimeOfDayOption.Morning), result.model.priority)
+            assertEquals(
+                Priority.today.copy(option = TimeOfDayOption.Morning),
+                result.model.priority
+            )
         }
 
     @Test
@@ -76,7 +80,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             val taskId = 1L
             val params = GetSchedulePriorityParams(taskId)
             val schedule = Schedule.empty().copy(
-                scheduleLocalTime = TimeUtils.tomorrowLocalDateTimeString(8)
+                scheduleLocalTime = timeManager.tomorrowLocalDateTimeString(8)
             )
 
             val useCase = GetSchedulePriorityUseCaseImpl(
@@ -90,7 +94,10 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             coVerify(inverse = true) { getUpcomingPriorityUseCase(GetUpcomingPriorityParams()) }
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.tomorrow.copy(option = TimeOfDayOption.Morning), result.model.priority)
+            assertEquals(
+                Priority.tomorrow.copy(option = TimeOfDayOption.Morning),
+                result.model.priority
+            )
         }
 
     @Test
@@ -117,7 +124,10 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             )
 
             val result = useCase(params).first().getOrHandle { throw (Throwable(it.toString())) }
-            assertEquals(Priority.today.copy(option = TimeOfDayOption.Afternoon), result.model.priority)
+            assertEquals(
+                Priority.today.copy(option = TimeOfDayOption.Afternoon),
+                result.model.priority
+            )
         }
 
     @Test
@@ -126,7 +136,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
             val taskId = 1L
             val params = GetSchedulePriorityParams(taskId)
             val schedule = Schedule.empty().copy(
-                scheduleLocalTime = TimeUtils.todayLocalDateTimeString(21)
+                scheduleLocalTime = timeManager.todayLocalDateTimeString(21)
             )
 
             val useCase = GetSchedulePriorityUseCaseImpl(

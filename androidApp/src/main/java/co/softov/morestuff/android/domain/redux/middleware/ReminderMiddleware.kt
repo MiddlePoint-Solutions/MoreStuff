@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -10,6 +9,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -25,14 +25,15 @@ sealed class ReminderAction : Action.FeatureAction() {
 
     data class UserResponseAction(
         val scheduleId: Long,
-        val replyType: ReplyType
+        val replyType: ReplyType,
     ) : ReminderAction()
 
 }
 
 class ReminderMiddleware(
     private val getScheduleUseCase: GetScheduleUseCase,
-    private val getActiveScheduleMessages: GetActiveScheduleMessages
+    private val getActiveScheduleMessages: GetActiveScheduleMessages,
+    private val timeManager: TimeManager,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -40,7 +41,7 @@ class ReminderMiddleware(
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
 
@@ -66,11 +67,11 @@ class ReminderMiddleware(
     private fun performSmartReminderAction(
         state: AppState,
         scope: CoroutineScope,
-        dispatch: Dispatch
+        dispatch: Dispatch,
     ) {
         if (state.settingState.smartReminderEnabled) {
             scope.launch {
-                val currentTime = TimeUtils.nowUtcInstant
+                val currentTime = timeManager.nowUtcInstant
                 val qualifiedForRescheduling = getActiveScheduleMessages().filter {
                     // TODO: Remove try/catch before releasing. This is in place because previously
                     //  createTime was not an instant and this is a workaround to reschedule older tasks

@@ -5,11 +5,11 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.mapper.taskDbMapper
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -20,13 +20,14 @@ import kotlinx.coroutines.flow.map
 class TaskRepositoryImpl(
     database: StuffDb,
     private val mapTaskDb: taskDbMapper,
+    private val timeManager: TimeManager,
 ) : TaskRepository {
 
     private val taskQueries = database.taskQueries
     private val lastInsertId: Long get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(title: String): Either<Failure, Task> {
-        val currentTime = TimeUtils.getCreateTime()
+        val currentTime = timeManager.getCreateTime()
         return taskQueries.transactionWithResult {
             taskQueries.insertTask(currentTime, title)
             val taskId = lastInsertId
@@ -63,10 +64,10 @@ class TaskRepositoryImpl(
 
     override suspend fun updateTaskComplete(
         taskId: Long,
-        complete: Boolean
+        complete: Boolean,
     ): Either<Failure, Boolean> {
         val time = when (complete) {
-            true -> TimeUtils.nowLocalDateTimeString
+            true -> timeManager.nowLocalDateTimeString
             false -> null
         }
         taskQueries.updateTaskComplete(time, taskId)
