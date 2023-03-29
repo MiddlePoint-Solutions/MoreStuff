@@ -8,12 +8,12 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
 interface GetUpcomingPriorityUseCase : BaseUseCase<Failure, GetUpcomingPriorityParams, Priority> {
-    val timeManager: TimeManager
+
 }
 
 data class GetUpcomingPriorityParams(val utcTime: String? = null)
 
-class GetUpcomingPriorityUseCaseImpl(override val timeManager: TimeManager) :
+class GetUpcomingPriorityUseCaseImpl( val timeManager: TimeManager) :
     GetUpcomingPriorityUseCase {
 
     override suspend fun invoke(params: GetUpcomingPriorityParams): Either<Failure, Priority> {

@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -12,15 +13,15 @@ import org.junit.jupiter.api.Test
 
 class GetTaskScheduleCountUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getPriorityTimeUseCase = mockk<GetPriorityTimeUseCase>()
+    private val timeManager = mockk<TimeManager>()
     private val getTaskScheduleCountUseCaseImpl =
-        GetTaskScheduleCountUseCaseImpl(scheduleRepository, getPriorityTimeUseCase)
+        GetTaskScheduleCountUseCaseImpl(scheduleRepository, timeManager)
     private val taskId = 1L
     private val timeRange = Pair("", "")
 
     @Test
     fun `returns count of task schedules`() = runBlocking {
-        coEvery { getPriorityTimeUseCase.getTodayTimeRange() } returns timeRange
+        coEvery { timeManager.getTodayTimeRange() } returns timeRange
         coEvery {
             scheduleRepository.countTodayTaskSchedules(
                 taskId,
@@ -31,7 +32,7 @@ class GetTaskScheduleCountUseCaseImplTest {
         val result = getTaskScheduleCountUseCaseImpl.invoke(taskId)
 
         assertEquals(Either.Right(2), result)
-        coVerify { getPriorityTimeUseCase.getTodayTimeRange() }
+        coVerify { timeManager.getTodayTimeRange() }
         coVerify {
             scheduleRepository.countTodayTaskSchedules(
                 taskId,

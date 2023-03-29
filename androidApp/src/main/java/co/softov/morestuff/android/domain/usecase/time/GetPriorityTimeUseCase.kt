@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.service.TimeManager
 
 interface GetPriorityTimeUseCase {
     operator fun invoke(priority: Priority): String?
-    fun getTodayTimeRange(): Pair<String, String>
+
 }
 
 class GetPriorityTimeUseCaseImpl(
@@ -60,5 +60,5 @@ class GetPriorityTimeUseCaseImpl(
             is Priority.Tomorrow -> timeManager.tomorrowLocalDateTime(hour, minutes).toString()
             is Priority.Later -> null
         }
-    override fun getTodayTimeRange(): Pair<String, String> = timeManager.todayTimeStringPair
+
 }

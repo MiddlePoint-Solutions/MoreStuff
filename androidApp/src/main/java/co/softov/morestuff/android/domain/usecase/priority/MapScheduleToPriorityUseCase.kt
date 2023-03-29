@@ -8,10 +8,10 @@ import kotlinx.datetime.toLocalDateTime
 
 interface MapScheduleToPriorityUseCase :
     BaseUseCase<Failure, Schedule, Priority> {
-    val timeManager: TimeManager
+
 }
 
-class MapScheduleToPriorityUseCaseImpl(override val timeManager: TimeManager) :
+class MapScheduleToPriorityUseCaseImpl( val timeManager: TimeManager) :
     MapScheduleToPriorityUseCase {
 
     override suspend fun invoke(params: Schedule): Either<Failure, Priority> {

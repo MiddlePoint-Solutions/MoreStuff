@@ -14,13 +14,13 @@ class TimeManagerImplTest {
     private val timeManager = TimeManagerImpl()
 
     @Test
-    fun `getCreateTime`() {
+    fun `getCreateTime should return the current UTC instant as a string`() {
         val createTime = timeManager.getCreateTime()
         assertNotNull(createTime)
     }
 
     @Test
-    fun `utcStringToLocalDateTime`() {
+    fun `utcStringToLocalDateTime should convert UTC string to LocalDateTime`() {
         val utcTime = "2023-03-27T12:00:00.000Z"
         val utcZoneId = ZoneId.of("UTC")
         val zonedDateTime = ZonedDateTime.parse(utcTime).withZoneSameInstant(utcZoneId)
@@ -34,76 +34,64 @@ class TimeManagerImplTest {
     }
 
     @Test
-    fun `isToday `() {
-        val localTime = LocalDateTime.now().toString()
-        val result = timeManager.isToday(localTime)
+    fun `isToday should return true if the input date is today `() {
+        val localTime = timeManager.nowLocalDateTime
+        val result = timeManager.isToday(localTime.toString())
         assertTrue(result)
     }
 
     @Test
-    fun `isTomorrow `() {
-        val localTime = LocalDateTime.now().plusDays(1).toString()
-        val result = timeManager.isTomorrow(localTime)
+    fun `isTomorrow should return true if the input date is tomorrow `() {
+        val localTime = timeManager.tomorrowLocalDateTime()
+        val result = timeManager.isTomorrow(localTime.toString())
         assertTrue(result)
     }
 
     @Test
-    fun `isLater `() {
+    fun `isLater should return true if the input date is later than tomorrow`() {
         val localTime = LocalDateTime.now().plusDays(2).toString()
         val result = timeManager.isLater(localTime)
         assertTrue(result)
     }
 
     @Test
-    fun `todayUtcString`() {
-        val hour = 12
-        val minute = 30
-        val utcString = timeManager.todayUtcString(hour, minute)
+    fun `todayUtcString should return the UTC string for today`() {
+        val utcString = timeManager.todayUtcString()
         assertNotNull(utcString)
     }
 
     @Test
-    fun `tomorrowUtcString`() {
-        val hour = 12
-        val minute = 30
-        val utcString = timeManager.tomorrowUtcString(hour, minute)
+    fun `tomorrowUtcString should return the UTC string for tomorrow`() {
+        val utcString = timeManager.tomorrowUtcString()
         assertNotNull(utcString)
     }
 
     @Test
-    fun `tomorrowLocalDateTimeString`() {
-        val hour = 12
-        val minute = 30
-        val localDateTimeString = timeManager.tomorrowLocalDateTimeString(hour, minute)
+    fun `tomorrowLocalDateTimeString should return a string`() {
+        val localDateTimeString = timeManager.tomorrowLocalDateTimeString()
         assertNotNull(localDateTimeString)
     }
 
     @Test
-    fun `tomorrowLocalDateTime`() {
-        val hour = 12
-        val minute = 30
-        val localDateTime = timeManager.tomorrowLocalDateTime(hour, minute)
+    fun `tomorrowLocalDateTime should return LocalDateTime`() {
+        val localDateTime = timeManager.tomorrowLocalDateTime()
         assertNotNull(localDateTime)
     }
 
     @Test
-    fun `todayLocalDateTimeString`() {
-        val hour = 12
-        val minute = 30
-        val localDateTimeString = timeManager.todayLocalDateTimeString(hour, minute)
+    fun `todayLocalDateTimeString should return a string`() {
+        val localDateTimeString = timeManager.todayLocalDateTimeString()
         assertNotNull(localDateTimeString)
     }
 
     @Test
-    fun `todayLocalDateTime`() {
-        val hour = 12
-        val minute = 30
-        val localDateTime = timeManager.todayLocalDateTime(hour, minute)
+    fun `todayLocalDateTime should return LocalDateTime`() {
+        val localDateTime = timeManager.todayLocalDateTime()
         assertNotNull(localDateTime)
     }
 
     @Test
-    fun `todayLocalDateTimeByAdding`() {
+    fun `todayLocalDateTimeByAdding should return LocalDateTime with added hours and minutes`() {
         val hour = 2
         val minute = 30
         val localDateTime = timeManager.todayLocalDateTimeByAdding(hour, minute)
@@ -114,7 +102,7 @@ class TimeManagerImplTest {
     }
 
     @Test
-    fun testWeekendLocalDateTime() {
+    fun `weekendLocalDateTime should return LocalDateTime for the upcoming weekend`() {
         val timeManager = TimeManagerImpl()
         val weekendDateTime = timeManager.weekendLocalDateTime()
         assertEquals(DayOfWeek.SATURDAY, weekendDateTime.dayOfWeek)

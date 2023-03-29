@@ -175,7 +175,7 @@ val scheduleUseCases = module {
     factory<GetTaskScheduleCountUseCase> {
         GetTaskScheduleCountUseCaseImpl(
             scheduleRepository = get(),
-            getPriorityTimeUseCase = get()
+            timeManager = get()
         )
     }
 

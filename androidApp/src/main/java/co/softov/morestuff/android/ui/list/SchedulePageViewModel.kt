@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.domain.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlow
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitle
@@ -22,12 +22,11 @@ class SchedulePageViewModel(
     private val getTomorrowSchedules: GetTomorrowSchedulesWithTitle,
     private val getActiveTasks: GetActiveTasks,
     private val getCompleteTasks: GetCompletedTasks,
+    private val timeManager: TimeManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SchedulePageViewState())
-
     val state: StateFlow<SchedulePageViewState>
         get() = _state
-    private val timeManager by lazy { TimeManagerImpl() }
     private val scheduleItemMapper by lazy { ScheduleListItemMapper() }
     private val taskListItemMapper by lazy { TaskListItemMapper(timeManager) }
 
