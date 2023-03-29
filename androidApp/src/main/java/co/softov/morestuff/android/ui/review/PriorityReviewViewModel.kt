@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.usecase.priority.GetSchedulesForPriorityReviewUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
@@ -13,7 +14,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PriorityReviewViewModel(
-    private val getSchedulesWithTitle: GetSchedulesWithTitleUseCase
+    private val getSchedulesForPriorityReviewUseCase: GetSchedulesForPriorityReviewUseCase
 ) : NoStateViewModel() {
 
     private val mapper = ScheduleListItemMapper()
@@ -29,7 +30,7 @@ class PriorityReviewViewModel(
 
     private fun setInitialState(round: PriorityRound = PriorityRound.Initial) {
         viewModelScope.launch {
-            val schedules = getSchedulesWithTitle().map(mapper::map).shuffled()
+            val schedules = getSchedulesForPriorityReviewUseCase().map(mapper::map).shuffled()
             _model.value = PriorityReviewModel(items = schedules, round = round)
         }
     }

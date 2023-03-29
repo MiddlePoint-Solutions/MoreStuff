@@ -64,7 +64,7 @@ selectActiveSchedulesWithTaskTitleByTime:
 SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-AND active = 1
+WHERE active = 1
 AND schedule_time_local BETWEEN :start AND :end
 ORDER BY schedule.id DESC;
 
@@ -72,9 +72,24 @@ selectActiveLaterSchedulesWithTaskTitle:
 SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
 FROM schedule
 INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-AND active = 1
+WHERE active = 1
 AND schedule_time_local IS NULL
 ORDER BY schedule.id DESC;
+
+selectActiveSchedulesWithStaleReminders:
+SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
+FROM schedule
+INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
+WHERE schedule.active = 1
+AND date(schedule_time_local) <= date(:end)
+OR (
+    SELECT message.schedule_id
+    FROM message
+    WHERE schedule.id = message.schedule_id
+    AND message.content_type = 200
+    AND message.reply_time IS NULL
+)
+ORDER BY schedule_time_local DESC;
 
 countTaskSchedulesByTime:
 SELECT COUNT(*)

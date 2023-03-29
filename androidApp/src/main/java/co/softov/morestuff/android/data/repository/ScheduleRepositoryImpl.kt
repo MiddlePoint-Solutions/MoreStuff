@@ -135,6 +135,14 @@ class ScheduleRepositoryImpl(
                 } ?: Left(ScheduleDoesNotExist)
             }
 
+    override suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle> {
+        val time = TimeUtils.todayTimeStringPair
+        return scheduleQueries.selectActiveSchedulesWithStaleReminders(
+            end = time.second,
+            mapper = mapScheduleWithTitleDb
+        ).executeAsList()
+    }
+
     override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)
         return Right(scheduleId)

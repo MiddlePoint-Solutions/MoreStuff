@@ -182,6 +182,8 @@ val scheduleUseCases = module {
     factory<ScheduleAtTimeUseCase> {
         ScheduleAtTimeUseCaseImpl(scheduler = get())
     }
+
+    factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
 }
 
 val messageUseCases = module {
