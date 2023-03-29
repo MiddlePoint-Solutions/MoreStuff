@@ -75,6 +75,7 @@ class SwipeableCardState(
     }
 
     suspend fun undo() {
+        Timber.d("undo")
         reset(tween(200))
     }
 

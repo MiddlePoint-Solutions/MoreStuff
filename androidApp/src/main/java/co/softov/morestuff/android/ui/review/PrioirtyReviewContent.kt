@@ -84,9 +84,9 @@ fun ReviewContent(
 
                 val undoAction: () -> Unit = {
                     scope.launch {
-                        states.reversed().run {
+                        states.run {
                             firstVisibleOrNull()?.let { first ->
-                                getOrNull(indexOf(first) - 1)?.let {
+                                getOrNull(indexOf(first) + 1)?.let {
                                     it.second.undo()
                                     viewModel.undoTask(it.first)
                                 }
