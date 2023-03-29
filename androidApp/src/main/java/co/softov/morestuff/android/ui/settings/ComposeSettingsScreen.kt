@@ -38,7 +38,6 @@ import org.koin.androidx.compose.get
 fun SettingsScreen() {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
-
     Box(modifier = Modifier.fillMaxSize()) {
         Row(modifier = Modifier.fillMaxSize()) {
             SettingsTopBar(viewModel = SettingsViewModel())
