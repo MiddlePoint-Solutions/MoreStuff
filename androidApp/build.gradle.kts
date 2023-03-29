@@ -52,7 +52,7 @@ android {
             )
         }
 
-        getByName(Env.Dev) {
+        debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
         }
@@ -157,7 +157,6 @@ dependencies {
 
     // UI
     implementation(Libs.Google.material)
-    implementation("com.yuyakaido.android:card-stack-view:2.3.4")
     // TODO: import when available
 //    implementation("com.alexstyl.swipeablecard:swipeablecard:0.2.0")
 
@@ -180,8 +179,6 @@ dependencies {
     // Alorma Compose Settings
     implementation("com.github.alorma:compose-settings-ui-m3:0.22.0")
     implementation("com.github.alorma:compose-settings-storage-preferences:0.22.0")
-    implementation("com.github.alorma:compose-settings-storage-datastore:0.22.0")
-    implementation("com.github.alorma:compose-settings-storage-datastore-proto:0.22.0")
 
     // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")
