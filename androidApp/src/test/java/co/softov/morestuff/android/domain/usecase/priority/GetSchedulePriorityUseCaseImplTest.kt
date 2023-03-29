@@ -8,7 +8,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
-import co.softov.morestuff.android.domain.service.TimeManagerImpl
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify

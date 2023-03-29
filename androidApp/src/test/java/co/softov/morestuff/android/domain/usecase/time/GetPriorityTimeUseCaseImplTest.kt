@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.LaterOption
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking

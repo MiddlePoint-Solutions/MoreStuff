@@ -3,7 +3,7 @@ package co.softov.morestuff.android.data.mapper
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 
 typealias MessageData = co.softov.morestuff.db.Message
 typealias MessageDbMapper = (MessageData) -> Message
@@ -13,9 +13,9 @@ fun makeMessageDbMapper(timeManager: TimeManager): MessageDbMapper = { message -
 }
 
 fun mapMessageDb(input: MessageData, timeManager: TimeManager): Message {
-    val createTime = timeManager.formatTime(input.create_time, "HH:mm")
-    val seenTime = timeManager.formatTime(input.seen_time, "HH:mm")
-    val replyTime = timeManager.formatTime(input.reply_time, "HH:mm")
+    val createTime = timeManager.formatTimeOnly(input.create_time)
+    val seenTime = timeManager.formatTimeOnly(input.seen_time)
+    val replyTime = timeManager.formatTimeOnly(input.reply_time)
     return Message(
         id = input.id,
         taskId = input.task_id,

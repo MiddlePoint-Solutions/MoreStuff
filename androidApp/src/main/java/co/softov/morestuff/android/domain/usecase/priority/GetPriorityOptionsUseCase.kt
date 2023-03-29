@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.usecase.priority
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.*
 import co.softov.morestuff.android.domain.model.DefaultOption.*
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
 data class GetPriorityOptionsParams(val current: Priority, val next: Priority)

@@ -6,7 +6,7 @@ import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.SmartReminderWorker
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 

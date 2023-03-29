@@ -1,5 +1,7 @@
 package co.softov.morestuff.android.domain.service
 
+import co.softov.morestuff.android.data.service.TimeManagerImpl
+import kotlinx.datetime.toJavaLocalDateTime
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
@@ -49,8 +51,8 @@ class TimeManagerImplTest {
 
     @Test
     fun `isLater should return true if the input date is later than tomorrow`() {
-        val localTime = LocalDateTime.now().plusDays(2).toString()
-        val result = timeManager.isLater(localTime)
+        val localTime = timeManager.tomorrowLocalDateTime().toJavaLocalDateTime().plusDays(1)
+        val result = timeManager.isLater(localTime.toString())
         assertTrue(result)
     }
 

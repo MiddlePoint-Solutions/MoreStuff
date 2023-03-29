@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.service
+package co.softov.morestuff.android.data.service
 
 import kotlinx.datetime.*
 import java.time.DayOfWeek
@@ -33,7 +33,7 @@ interface TimeManager {
     fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime
     fun weekendLocalDateTime(): LocalDateTime
     fun formatTime(timeString: String?, pattern: String): String?
-    fun formatTimeInHhMm(timeString: String?): String?
+    fun formatTimeOnly(timeString: String?): String?
     fun getTodayTimeRange(): Pair<String, String>
 
 }
@@ -142,9 +142,10 @@ class TimeManagerImpl : TimeManager {
             localDateTime.format(timeFormatter)
         }
     }
-    override fun getTodayTimeRange(): Pair<String, String> = todayTimeStringPair
-    override fun formatTimeInHhMm(timeString: String?): String? {
+    override fun formatTimeOnly(timeString: String?): String? {
         return formatTime(timeString, "HH:mm")
     }
+    override fun getTodayTimeRange(): Pair<String, String> = todayTimeStringPair
+
 
 }

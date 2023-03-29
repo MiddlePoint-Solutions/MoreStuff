@@ -6,7 +6,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.service.TimeManagerImpl
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import kotlinx.datetime.*
 
 val timeManager = TimeManagerImpl()

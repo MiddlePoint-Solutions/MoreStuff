@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime

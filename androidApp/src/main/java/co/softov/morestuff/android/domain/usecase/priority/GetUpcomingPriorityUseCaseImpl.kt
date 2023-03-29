@@ -4,7 +4,7 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
 interface GetUpcomingPriorityUseCase : BaseUseCase<Failure, GetUpcomingPriorityParams, Priority> {

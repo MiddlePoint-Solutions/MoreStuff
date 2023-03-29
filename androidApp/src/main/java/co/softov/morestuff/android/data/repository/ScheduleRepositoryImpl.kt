@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList

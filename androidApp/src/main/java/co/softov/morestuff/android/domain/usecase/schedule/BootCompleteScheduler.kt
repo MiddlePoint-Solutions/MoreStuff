@@ -5,7 +5,7 @@ import co.softov.morestuff.android.data.utils.scheduleLocalDateTime
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import timber.log.Timber
 
 interface BootCompleteScheduler {

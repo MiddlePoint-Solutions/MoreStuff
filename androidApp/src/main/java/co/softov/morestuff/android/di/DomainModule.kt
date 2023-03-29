@@ -2,8 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.service.TimeManagerImpl
+import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.priority.*
 import co.softov.morestuff.android.domain.usecase.schedule.*

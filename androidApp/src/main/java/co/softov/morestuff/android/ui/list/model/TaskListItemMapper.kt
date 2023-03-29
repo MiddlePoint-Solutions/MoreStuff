@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.ui.list.model
 
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.data.service.TimeManager
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
