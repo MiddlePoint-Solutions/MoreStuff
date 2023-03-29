@@ -38,6 +38,10 @@ class PriorityReviewViewModel(
         setInitialState(round = PriorityRound.Next)
     }
 
+    fun undoTask(schedule: ScheduleListItemViewModel) {
+        priorityTasks.remove(schedule)
+    }
+
     fun onTaskSwiped(
         schedule: ScheduleListItemViewModel,
         direction: Direction,

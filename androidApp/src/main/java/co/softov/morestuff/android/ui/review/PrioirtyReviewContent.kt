@@ -80,6 +80,43 @@ fun ReviewContent(
 
                 val states = model.items.map { it to rememberSwipeableCardState(model.number) }
 
+                val undoAction: () -> Unit = {
+                    scope.launch {
+                        states.reversed().run {
+                            firstVisibleOrNull()?.let { first ->
+                                getOrNull(indexOf(first) - 1)?.let {
+                                    it.second.undo()
+                                    viewModel.undoTask(it.first)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val negativeAction: () -> Unit = {
+                    scope.launch {
+                        states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                    }
+                }
+
+                val positiveAction: () -> Unit = {
+                    scope.launch {
+                        states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                    }
+                }
+
+                val doneAction: () -> Unit = {
+                    scope.launch {
+                        states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                    }
+                }
+
+                val laterAction: () -> Unit = {
+                    scope.launch {
+                        states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                    }
+                }
+
                 when (model.round) {
 
                     PriorityRound.Initial -> {
@@ -107,8 +144,12 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
-                                states,
-                                modifier.align(Alignment.BottomCenter)
+                                modifier = modifier.align(Alignment.BottomCenter),
+                                negativeAction = negativeAction,
+                                positiveAction = positiveAction,
+                                doneAction = doneAction,
+                                laterAction = laterAction,
+                                undoAction = undoAction,
                             )
                         }
                     }
@@ -152,8 +193,12 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
-                                states,
-                                modifier.align(Alignment.BottomCenter)
+                                modifier = modifier.align(Alignment.BottomCenter),
+                                negativeAction = negativeAction,
+                                positiveAction = positiveAction,
+                                doneAction = doneAction,
+                                laterAction = laterAction,
+                                undoAction = undoAction,
                             )
                         }
                     }
@@ -212,7 +257,6 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewFinalControls(
-                                states = states,
                                 modifier = modifier.align(Alignment.BottomCenter),
                                 resetAction = viewModel::reset,
                                 finishAction = viewModel::navigateBack
@@ -224,6 +268,15 @@ fun ReviewContent(
         }
     }
 }
+
+private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleOrNull() =
+    reversed()
+        .firstOrNull {
+            it.second.offset.value == Offset(0f, 0f)
+        }
+
+private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleStateOrNull() =
+    firstVisibleOrNull()?.second
 
 @Composable
 private fun SlideAnimation(
@@ -278,7 +331,6 @@ private fun PriorityReviewTopBar(
 
 @Composable
 private fun ReviewFinalControls(
-    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
     resetAction: () -> Unit = {},
     finishAction: () -> Unit = {}
@@ -311,31 +363,20 @@ private fun ReviewFinalControls(
 
 @Composable
 private fun ReviewSwipeControls(
-    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
+    positiveAction: () -> Unit = {},
+    negativeAction: () -> Unit = {},
+    doneAction: () -> Unit = {},
+    laterAction: () -> Unit = {},
+    undoAction: () -> Unit = {},
 ) {
-
-    val scope = rememberCoroutineScope()
-
     Column(
         modifier = modifier
     ) {
 
         Box(Modifier.align(Alignment.CenterHorizontally)) {
             CircleButton(
-                onClick = {
-                    scope.launch {
-                        states.reversed().run {
-                            firstOrNull {
-                                it.second.offset.value == Offset(0f, 0f)
-                            }?.let { last ->
-                                val index = indexOf(last)
-                                Timber.d("Undo task: ${getOrNull(index - 1)?.first?.taskTitle}")
-                                getOrNull(index - 1)?.second?.undo()
-                            }
-                        }
-                    }
-                },
+                onClick = undoAction,
                 icon = Icons.Rounded.Undo
             )
         }
@@ -347,52 +388,19 @@ private fun ReviewSwipeControls(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             CircleButton(
-                onClick = {
-                    scope.launch {
-                        val last = states.reversed()
-                            .firstOrNull {
-                                it.second.offset.value == Offset(0f, 0f)
-                            }?.second
-                        last?.swipe(Direction.Left)
-                    }
-                },
+                onClick = negativeAction,
                 icon = Icons.Rounded.ThumbDown
             )
             CircleButton(
-                onClick = {
-                    scope.launch {
-                        val last = states.reversed()
-                            .firstOrNull {
-                                it.second.offset.value == Offset(0f, 0f)
-                            }?.second
-                        last?.swipe(Direction.Down)
-                    }
-                },
+                onClick = laterAction,
                 icon = Icons.Rounded.Close
             )
             CircleButton(
-                onClick = {
-                    scope.launch {
-                        val last = states.reversed()
-                            .firstOrNull {
-                                it.second.offset.value == Offset(0f, 0f)
-                            }?.second
-                        last?.swipe(Direction.Up)
-                    }
-                },
+                onClick = doneAction,
                 icon = Icons.Rounded.Done
             )
             CircleButton(
-                onClick = {
-                    scope.launch {
-                        val last = states.reversed()
-                            .firstOrNull {
-                                it.second.offset.value == Offset(0f, 0f)
-                            }?.second
-
-                        last?.swipe(Direction.Right)
-                    }
-                },
+                onClick = positiveAction,
                 icon = Icons.Rounded.ThumbUp
             )
         }
