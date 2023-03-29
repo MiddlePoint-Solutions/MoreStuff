@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
@@ -40,6 +41,7 @@ import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.review.swipeable.Direction
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -336,7 +338,10 @@ private fun ReviewFinalControls(
     finishAction: () -> Unit = {}
 ) {
     Column(
-        modifier = modifier.padding(bottom = 32.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         Box(Modifier.align(Alignment.CenterHorizontally)) {
@@ -350,7 +355,7 @@ private fun ReviewFinalControls(
 
         PriorityButton(
             onSelected = finishAction,
-            text = "Finish".uppercase(),
+            text = stringResource(R.string.finish).uppercase(),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(16.dp),
@@ -473,11 +478,12 @@ private fun CircleButton(
 
 @Composable
 private fun TaskCard(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     schedule: ScheduleListItemViewModel,
 ) {
     Card(
-        modifier, elevation = CardDefaults.cardElevation(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp
         )
     ) {
@@ -525,40 +531,30 @@ private fun Hint(text: String) {
     }
 }
 
+
+@Preview
 @Composable
-private fun Debug(text: String) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .padding(horizontal = 24.dp, vertical = 32.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = text,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center
+fun TaskCardPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        TaskCard(
+            modifier = Modifier.aspectRatio(1f),
+            schedule = ScheduleListItemViewModel(taskTitle = "Hellooooo there")
         )
     }
 }
 
-
-private fun stringFrom(direction: Direction): String {
-    return when (direction) {
-        Direction.Left -> "Left 👈"
-        Direction.Right -> "Right 👉"
-        Direction.Up -> "Up 👆"
-        Direction.Down -> "Down 👇"
+@Preview
+@Composable
+fun ReviewSwipeControlsPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        ReviewSwipeControls()
     }
 }
 
+@Preview
 @Composable
-fun Scrim(modifier: Modifier = Modifier) {
-    Box(
-        modifier
-            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black)))
-            .height(180.dp)
-            .fillMaxWidth()
-    )
+fun ReviewFinalControlsPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        ReviewFinalControls()
+    }
 }
