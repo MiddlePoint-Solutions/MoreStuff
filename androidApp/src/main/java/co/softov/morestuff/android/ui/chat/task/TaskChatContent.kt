@@ -26,16 +26,21 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.PriorityButton
+import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,7 +136,10 @@ private fun TaskChatTopBar(
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
-
+    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
+        parametersOf(taskId)
+    }
+    val priority by priorityViewModel.model.collectAsState()
     val task by viewModel.task.collectAsState()
     val schedule by viewModel.schedule.collectAsState()
 
@@ -224,8 +232,7 @@ private fun TaskChatTopBar(
 
                         PriorityButton(
                             onSelected = editScheduleAction,
-                            text = schedule?.scheduleLocalTime
-                                ?: stringResource(R.string.task_chat_schedule_reminder),
+                            text = FormatPriorityButtonText(schedule,priority.priorityModel.priority),
                             shape = RoundedCornerShape(percent = 50),
                             enabled = !task.isComplete
                         )
@@ -254,5 +261,34 @@ private fun TaskChatPreview() {
         TaskChatContent(
             taskId = 1
         )
+    }
+}
+
+@Composable
+private fun FormatPriorityButtonText(schedule: Schedule?, priority: Priority): String {
+    val defaultText = stringResource(R.string.task_chat_schedule_reminder)
+    if (schedule == null) {
+        return defaultText
+    }
+
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    val scheduleTime = LocalDateTime.parse(schedule.scheduleUtcTime, formatter)
+
+    return when (priority) {
+        is Priority.Today -> {
+            val formattedTime = scheduleTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+            "Today $formattedTime"
+        }
+        is Priority.Tomorrow -> {
+            val formattedTime = scheduleTime.format(DateTimeFormatter.ofPattern("HH:mm"))
+            "Tomorrow $formattedTime"
+        }
+        is Priority.Later -> {
+            val dayOfWeek =
+                scheduleTime.dayOfWeek.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault())
+            val month = scheduleTime.month.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault())
+            val dayOfMonth = scheduleTime.dayOfMonth
+            "$dayOfWeek, $month $dayOfMonth"
+        }
     }
 }
