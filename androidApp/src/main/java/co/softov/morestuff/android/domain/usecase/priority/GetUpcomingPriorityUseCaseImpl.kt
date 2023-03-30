@@ -1,22 +1,25 @@
 package co.softov.morestuff.android.domain.usecase.priority
 
 import arrow.core.Either
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 
-interface GetUpcomingPriorityUseCase : BaseUseCase<Failure, GetUpcomingPriorityParams, Priority>
+interface GetUpcomingPriorityUseCase : BaseUseCase<Failure, GetUpcomingPriorityParams, Priority> {
+
+}
 
 data class GetUpcomingPriorityParams(val utcTime: String? = null)
 
-class GetUpcomingPriorityUseCaseImpl : GetUpcomingPriorityUseCase {
+class GetUpcomingPriorityUseCaseImpl( val timeManager: TimeManager) :
+    GetUpcomingPriorityUseCase {
 
     override suspend fun invoke(params: GetUpcomingPriorityParams): Either<Failure, Priority> {
         val localTime = when (params.utcTime) {
-            null -> TimeUtils.nowLocalDateTime
-            else -> TimeUtils.utcStringToLocalDateTime(params.utcTime)
+            null -> timeManager.nowLocalDateTime
+            else -> timeManager.utcStringToLocalDateTime(params.utcTime)
         }
 
         //  TODO: consider using a sealed class to represent the time.

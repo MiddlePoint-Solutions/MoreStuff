@@ -1,23 +1,25 @@
 package co.softov.morestuff.android.domain.usecase.time
 
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.LaterOption
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
+import co.softov.morestuff.android.data.service.TimeManager
 
 
 interface GetPriorityTimeUseCase {
     operator fun invoke(priority: Priority): String?
+
 }
 
 class GetPriorityTimeUseCaseImpl(
     private val debug: DevTools,
+    private val timeManager: TimeManager,
 ) : GetPriorityTimeUseCase {
-     override operator fun invoke(priority: Priority): String? {
+    override operator fun invoke(priority: Priority): String? {
         return when (debug.debugReminders) {
-            true -> TimeUtils.todayLocalDateTimeByAdding(minute = debug.todayDebugTime).toString()
+            true -> timeManager.todayLocalDateTimeByAdding(minute = debug.todayDebugTime).toString()
             else -> when (val option = priority.option) {
                 is TimeOfDayOption -> getTimeForOption(priority, option)
                 is DefaultOption -> getDefaultOptionTime(priority, option)
@@ -41,21 +43,22 @@ class GetPriorityTimeUseCaseImpl(
             DefaultOption.Auto,
             -> when (priority) {
                 is Priority.Later -> null
-                is Priority.Today -> TimeUtils.todayLocalDateTimeByAdding(hour = 1).toString()
-                is Priority.Tomorrow -> TimeUtils.tomorrowLocalDateTime(hour = 9).toString()
+                is Priority.Today -> timeManager.todayLocalDateTimeByAdding(hour = 1).toString()
+                is Priority.Tomorrow -> timeManager.tomorrowLocalDateTime(hour = 9).toString()
             }
         }
 
     private fun getLaterOptionTime(option: LaterOption): String? =
         when (option) {
-            LaterOption.Weekend -> TimeUtils.weekendLocalDateTime().toString()
+            LaterOption.Weekend -> timeManager.weekendLocalDateTime().toString()
             LaterOption.Someday -> null
         }
 
     private fun timeForPriority(priority: Priority, hour: Int, minutes: Int = 0) =
         when (priority) {
-            is Priority.Today -> TimeUtils.todayLocalDateTime(hour, minutes).toString()
-            is Priority.Tomorrow -> TimeUtils.tomorrowLocalDateTime(hour, minutes).toString()
+            is Priority.Today -> timeManager.todayLocalDateTime(hour, minutes).toString()
+            is Priority.Tomorrow -> timeManager.tomorrowLocalDateTime(hour, minutes).toString()
             is Priority.Later -> null
         }
+
 }

@@ -12,12 +12,10 @@ import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
-import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.*
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesImpl
 import co.softov.morestuff.db.StuffDb
@@ -42,14 +40,16 @@ val dataModule = module {
     single<TaskRepository> {
         TaskRepositoryImpl(
             database = get(),
-            mapTaskDb = makeTaskDbMapper()
+            mapTaskDb = makeTaskDbMapper(),
+            timeManager = get()
         )
     }
 
     single<MessageRepository> {
         MessageRepositoryImpl(
             database = get(),
-            mapMessageDb = makeMessageDbMapper()
+            mapMessageDb = makeMessageDbMapper(timeManager = get()),
+            timeManager = get()
         )
     }
 
@@ -57,7 +57,8 @@ val dataModule = module {
         ScheduleRepositoryImpl(
             database = get(),
             mapScheduleDb = makeScheduleDbMapper(),
-            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper()
+            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
+            timeManager = get()
         )
     }
 
@@ -77,11 +78,10 @@ val dataModule = module {
     }
 
 
-
     // Services
-    single<Scheduler> { SchedulerImpl(androidContext()) }
+    single<Scheduler> { SchedulerImpl(androidContext(), timeManager = get()) }
     single<Notifier> { NotifierImpl(androidContext()) }
-    factory<TimeManager> { TimeManagerImpl(debug = get()) }
+
 
     // Platform specific use-cases
     factory<GetPagedMessages> {
@@ -99,7 +99,6 @@ internal fun getSharedPreferences(context: Context): SharedPreferences {
 internal fun getSettings(context: Context): Settings {
     return SharedPreferencesSettings(getSharedPreferences(context))
 }
-
 
 
 internal fun createDatabase(context: Context): StuffDb {

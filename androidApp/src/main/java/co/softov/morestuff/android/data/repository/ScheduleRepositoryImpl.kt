@@ -8,12 +8,12 @@ import arrow.core.right
 import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -24,14 +24,15 @@ import timber.log.Timber
 class ScheduleRepositoryImpl(
     database: StuffDb,
     private val mapScheduleDb: ScheduleDbMapper,
-    private val mapScheduleWithTitleDb: ScheduleWithTitleDbMapper
+    private val mapScheduleWithTitleDb: ScheduleWithTitleDbMapper,
+    private val timeManager: TimeManager,
 ) : ScheduleRepository {
 
     private val scheduleQueries = database.scheduleQueries
     private val lastInsertId: Long get() = scheduleQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createSchedule(
-        schedule: Schedule
+        schedule: Schedule,
     ): Either<Failure, Schedule> {
         Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleLocalTime}")
         val scheduleId = scheduleQueries.transactionWithResult {
@@ -57,7 +58,7 @@ class ScheduleRepositoryImpl(
 
     override suspend fun getActiveSchedules(
         startTime: String?,
-        endTime: String?
+        endTime: String?,
     ): Either<Failure, List<Schedule>> = scheduleQueries
         .selectActiveSchedulesFromStartToEndTime(startTime, endTime)
         .executeAsList().map(mapScheduleDb)
@@ -76,7 +77,7 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
-        val time = TimeUtils.todayTimeStringPair
+        val time = timeManager.todayTimeStringPair
         return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
             time.first,
             time.second,
@@ -107,7 +108,7 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
-        val time = TimeUtils.tomorrowTimeStringPair
+        val time = timeManager.tomorrowTimeStringPair
         return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
             time.first,
             time.second,
@@ -142,7 +143,7 @@ class ScheduleRepositoryImpl(
     override suspend fun countTodayTaskSchedules(
         taskId: Long,
         startTime: String,
-        endTime: String
+        endTime: String,
     ): Either<Failure, Int> {
         val limit =
             scheduleQueries.countTaskSchedulesByTime(taskId, startTime, endTime).executeAsOne()

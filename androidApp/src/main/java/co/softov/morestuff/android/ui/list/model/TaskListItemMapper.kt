@@ -1,15 +1,16 @@
 package co.softov.morestuff.android.ui.list.model
 
-import co.softov.morestuff.android.data.utils.TimeUtils.formatTime
 import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.data.service.TimeManager
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class TaskListItemMapper {
+class TaskListItemMapper(private val timeManager: TimeManager) {
 
     fun map(input: Task): TaskListItemViewModel {
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault())
+        val formatter: DateTimeFormatter =
+            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").withZone(ZoneId.systemDefault())
         val inputDateTime = ZonedDateTime.now().toString()
 
         val createTime: String
@@ -21,7 +22,10 @@ class TaskListItemMapper {
                 .format(formatter)
             completeTimeFormatted
         } else {
-            val zonedDateTime = ZonedDateTime.parse(inputDateTime, DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.systemDefault()))
+            val zonedDateTime = ZonedDateTime.parse(
+                inputDateTime,
+                DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.systemDefault())
+            )
             createTime = zonedDateTime.withZoneSameInstant(ZoneId.systemDefault())
                 .toLocalDateTime()
                 .format(formatter)
@@ -29,17 +33,18 @@ class TaskListItemMapper {
         }
 
 
-    return TaskListItemViewModel(
+        return TaskListItemViewModel(
             id = input.id,
             createTime = createTime,
-            completeTime = completeTime?:"",
+            completeTime = completeTime ?: "",
             title = input.title
         )
     }
 
-   private fun markCompleteTime(timeString: String?): String? {
-       return formatTime(timeString,"dd/MM/yyyy HH:mm" )
-   }
+    private fun markCompleteTime(timeString: String?): String? {
+        return timeManager.formatTime(timeString, "dd/MM/yyyy HH:mm")
+    }
+
     fun map(input: List<Task>): List<TaskListItemViewModel> {
         return input.map { map(it) }
     }
