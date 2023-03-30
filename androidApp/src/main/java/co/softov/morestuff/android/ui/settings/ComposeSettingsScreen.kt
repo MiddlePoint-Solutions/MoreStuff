@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -24,10 +24,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
 import com.alorma.compose.settings.storage.preferences.rememberPreferenceFloatSettingState
 import com.alorma.compose.settings.ui.SettingsList
+import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.get
@@ -43,7 +45,7 @@ fun SettingsScreen(
     val devTools: DevTools = get()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(navigateBack = { viewModel.navigateBack() })
+        SettingsTopBar(navigateBackSettings = { viewModel.navigateBackSettings() })
 
         Column(
             modifier = Modifier
@@ -60,7 +62,7 @@ fun SettingsScreen(
             )
             DeveloperSettings()
             Notification()
-            ReviewTest()
+            ReviewTest(onClick = viewModel::showReviewTest)
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
             SmartReminder(onSmartReminder = {viewModel.smartReminderEnabled(it) })
@@ -83,7 +85,7 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopBar(navigateBack: () -> Unit) {
+fun SettingsTopBar(navigateBackSettings: () -> Unit) {
     TopAppBar(
         title = {
             Text(
@@ -97,7 +99,7 @@ fun SettingsTopBar(navigateBack: () -> Unit) {
             containerColor = Color(0xff2B3438)
         ),
         navigationIcon = {
-            IconButton(onClick = navigateBack) {
+            IconButton(onClick = navigateBackSettings) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
@@ -115,7 +117,7 @@ fun SelectTheme() {
     Row {
         SettingsList(
             enabled = enabledState.value, title = {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Select Theme",
                     fontSize = 18.sp
                 )
@@ -148,7 +150,7 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
             enabled = enabledState.value,
             state = settingSnoozeLimit,
             title = {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
                     fontSize = 18.sp
                 )
@@ -163,13 +165,12 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     }
 }
 
-
 @Composable
 fun DeveloperSettings() {
     Row(
         modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = "Developer Settings",
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onSurface
@@ -183,7 +184,7 @@ fun Notification() {
     Row(
         modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = "Notification",
             fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
@@ -200,24 +201,12 @@ fun Notification() {
 
 
 @Composable
-fun ReviewTest() {
-    //val onClick = { TODO() }
-
-    Row(
-        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-    ) {
-        androidx.compose.material3.Text(
-            text = "Review Test",
-            fontSize = 18.sp,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-
-    Box(
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .fillMaxWidth()
-        //.clickable(onClick = onClick)
+fun ReviewTest(
+    onClick: () -> Unit
+) {
+    SettingsMenuLink(
+        title = { Text(text = "Review Priority Test") },
+        onClick = onClick,
     )
 }
 
@@ -239,7 +228,7 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
             state = memoryStorage,
             modifier = Modifier.padding(end = 16.dp),
             title = {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Keep device screen on",
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -276,7 +265,7 @@ fun ReminderDebugging(devTools: DevTools) {
             enabled = true,
             modifier = Modifier.padding(end = 16.dp),
             title = {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Reminder Debugging",
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -295,7 +284,7 @@ fun ReminderDebugging(devTools: DevTools) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Today reminder delay ${reminderDelayState.value.toInt()}",
                         fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -313,11 +302,12 @@ fun ReminderDebugging(devTools: DevTools) {
                     )
                 }
 
-            }
+                }
 
+            }
         }
     }
-}
+
 
 
 @Composable
@@ -428,7 +418,8 @@ fun About() {
         }
 
         Box(
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .padding(top = 16.dp)
                 .fillMaxWidth()
             //.clickable(onClick = { TODO() })
         ) {
@@ -449,5 +440,13 @@ fun About() {
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        SettingsScreen()
     }
 }
