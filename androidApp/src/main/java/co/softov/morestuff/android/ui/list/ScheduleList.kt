@@ -52,7 +52,7 @@ fun ScheduleList(
 fun ScheduleListItem(
     task: ScheduleListItemViewModel,
     modifier: Modifier = Modifier,
-    itemAction: () -> Unit,
+    itemAction: () -> Unit = {},
 ) {
     val expanded by remember { mutableStateOf(false) }
     Card(

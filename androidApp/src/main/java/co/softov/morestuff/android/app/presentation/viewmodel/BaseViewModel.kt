@@ -3,6 +3,7 @@ package co.softov.morestuff.android.app.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.BuildConfig
+import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -23,8 +24,8 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     initialState: ViewState
 ) : ViewModel(), KoinComponent {
 
-    private val store: AppStore by inject()
-    protected val router: Router by inject()
+    protected val store: AppStore by inject()
+    protected val router: AppRouter by inject()
 
     private val _uiState = MutableStateFlow(initialState)
     val uiState: StateFlow<ViewState> = _uiState
@@ -73,8 +74,12 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
 
     protected open fun onAppStateChange(state: AppState) {}
 
-    protected abstract fun onReduceState(event: ViewEvent): ViewState
+    protected open fun onReduceState(event: ViewEvent): ViewState = state
 
     fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(block = block)
+
+    fun navigateBack() {
+        router.exit()
+    }
 }

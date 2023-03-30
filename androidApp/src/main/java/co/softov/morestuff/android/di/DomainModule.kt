@@ -146,7 +146,7 @@ val scheduleUseCases = module {
     factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
     factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetSchedulesWithTitleList> { GetSchedulesWithTitleListImpl(scheduleRepository = get()) }
+    factory<GetSchedulesWithTitleUseCase> { GetSchedulesWithTitleListImpl(scheduleRepository = get()) }
 
     factory<GetActiveSchedules> {
         GetActiveSchedulesImpl(scheduleRepository = get())
@@ -182,6 +182,8 @@ val scheduleUseCases = module {
     factory<ScheduleAtTimeUseCase> {
         ScheduleAtTimeUseCaseImpl(scheduler = get())
     }
+
+    factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
 }
 
 val messageUseCases = module {

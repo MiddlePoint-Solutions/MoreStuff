@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.store.NoOp
@@ -29,7 +30,7 @@ sealed class NavigationAction : Action.FeatureAction() {
 }
 
 class NavigationMiddleware(
-    private val router: Router
+    private val router: AppRouter
 ) : Middleware<AppState> {
 
     override fun invoke(

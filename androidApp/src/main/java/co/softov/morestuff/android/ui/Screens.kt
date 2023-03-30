@@ -3,15 +3,13 @@ package co.softov.morestuff.android.ui
 import co.softov.morestuff.android.ui.ScreenKey.LAUNCHED_TASK_CHAT
 import co.softov.morestuff.android.ui.ScreenKey.TASK_CHAT
 import co.softov.morestuff.android.ui.chat.task.TaskChatFragment
-import co.softov.morestuff.android.ui.settings.MainSettings
+import co.softov.morestuff.android.ui.list.ListsFragment
+import co.softov.morestuff.android.app.navigation.BottomSheetFragmentScreen
+import co.softov.morestuff.android.ui.review.ReviewFragment
 import co.softov.morestuff.android.ui.settings.SettingsFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
 object Screens {
-
-    //val Content = FragmentScreen("Content") { MainFragment() }
-
-    val Settings = FragmentScreen("Settings") { MainSettings() }
 
     fun taskChat(taskId: Long) =
         FragmentScreen("$TASK_CHAT$taskId") { TaskChatFragment.newInstance(taskId) }
@@ -19,7 +17,12 @@ object Screens {
     fun launchedTaskChat(taskId: Long) =
         FragmentScreen("$LAUNCHED_TASK_CHAT$taskId") { TaskChatFragment.newInstance(taskId) }
 
-    val ComposeSettings = FragmentScreen("ComposeSettings"){ SettingsFragment() }
+    val ComposeSettings = FragmentScreen("ComposeSettings") { SettingsFragment() }
+
+    val priorityReview = FragmentScreen("ReviewPriority") { ReviewFragment() }
+
+    val taskLists = BottomSheetFragmentScreen("TaskLists") { ListsFragment() }
+
 }
 
 object ScreenKey {

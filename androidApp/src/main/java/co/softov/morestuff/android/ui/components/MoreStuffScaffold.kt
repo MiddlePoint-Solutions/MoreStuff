@@ -6,58 +6,57 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
+import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun MoreStuffScaffold(
     content: @Composable (PaddingValues) -> Unit,
-    onSettingsClicked: () -> Unit,
+    viewModel: DrawerViewModel = getViewModel(),
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
 
-
+    val closeDrawer: () -> Unit = remember {
+        { scope.launch { drawerState.close() } }
+    }
 
     BackHandler(enabled = drawerState.isOpen) {
         if (drawerState.isOpen) {
-            scope.launch {
-                drawerState.close()
-            }
+            closeDrawer()
         }
     }
 
-    MoreStuffTheme {
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = drawerState.isOpen,
-            drawerContent = {
-                ModalDrawerSheet {
-                    DrawerLayout {
-                        onSettingsClicked()
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }
-                }
-            },
-            content = {
-
-                Scaffold(
-                    modifier = Modifier.systemBarsPadding(),
-                    topBar = {
-                        MoreStuffTopBar(
-                            scope = scope,
-                            drawerState = drawerState,
-                        )
-                    },
-                    content = content,
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerLayout(
+                    closeDrawer = closeDrawer,
+                    showSettings = viewModel::showSettings,
+                    showPriorityReview = viewModel::showPriorityReview
                 )
             }
-        )
-    }
+        },
+        content = {
+            Scaffold(
+                modifier = Modifier.systemBarsPadding(),
+                topBar = {
+                    MoreStuffTopBar(
+                        openDrawer = { scope.launch { drawerState.open() } },
+                        showPriorityReview = viewModel::showPriorityReview
+                    )
+                },
+                content = content,
+            )
+        }
+    )
 }

@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -27,9 +27,11 @@ import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
 import com.alorma.compose.settings.storage.preferences.rememberPreferenceFloatSettingState
 import com.alorma.compose.settings.ui.SettingsList
+import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 
 @Preview
@@ -37,6 +39,9 @@ import org.koin.androidx.compose.get
 fun SettingsScreen() {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
+
+    val viewModel = getViewModel<SettingsViewModel>()
+
     MoreStuffTheme {
         Column(
             modifier = Modifier
@@ -48,7 +53,7 @@ fun SettingsScreen() {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
             Options()
             SelectTheme()
-            SelectSnoozeLimit(viewModel = SettingsViewModel())
+            SelectSnoozeLimit(viewModel = viewModel)
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -56,10 +61,10 @@ fun SettingsScreen() {
             )
             DeveloperSettings()
             Notification()
-            ReviewTest()
+            ReviewTest(onClick = viewModel::showReviewTest)
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(viewModel = SettingsViewModel())
+            SmartReminder(viewModel = viewModel)
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -82,7 +87,7 @@ fun Options() {
     Row(
         modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = "Options", fontSize = 23.sp, color = MaterialTheme.colorScheme.onSurface
         )
     }
@@ -96,7 +101,7 @@ fun SelectTheme() {
         Row {
             SettingsList(
                 enabled = enabledState.value, title = {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Select Theme",
                         fontSize = 18.sp
                     )
@@ -131,12 +136,12 @@ fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
                 enabled = enabledState.value,
                 state = settingSnoozeLimit,
                 title = {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
                         fontSize = 18.sp
                     )
                 },
-                steps = 9,
+                steps = 10,
                 valueRange = 0F..10F,
                 modifier = Modifier.weight(1f),
                 onValueChange = { newValue ->
@@ -152,7 +157,7 @@ fun DeveloperSettings() {
     Row(
         modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = "Developer Settings",
             fontSize = 20.sp,
             color = MaterialTheme.colorScheme.onSurface
@@ -167,7 +172,7 @@ fun Notification() {
         Row(
             modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = "Notification",
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -184,26 +189,13 @@ fun Notification() {
 }
 
 @Composable
-fun ReviewTest() {
-    //val onClick = { TODO() }
-    MoreStuffTheme {
-        Row(
-            modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-        ) {
-            androidx.compose.material3.Text(
-                text = "Review Test",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-            //.clickable(onClick = onClick)
-        )
-    }
+fun ReviewTest(
+    onClick: () -> Unit
+) {
+    SettingsMenuLink(
+        title = { Text(text = "Review Priority Test") },
+        onClick = onClick,
+    )
 }
 
 
@@ -224,7 +216,7 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
                 state = memoryStorage,
                 modifier = Modifier.padding(end = 16.dp),
                 title = {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Keep device screen on",
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -262,7 +254,7 @@ fun ReminderDebugging(devTools: DevTools) {
                 enabled = true,
                 modifier = Modifier.padding(end = 16.dp),
                 title = {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = "Reminder Debugging",
                         fontSize = 18.sp,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -277,11 +269,13 @@ fun ReminderDebugging(devTools: DevTools) {
 
             if (switchState.value) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        androidx.compose.material3.Text(
+                        Text(
                             text = "Today reminder delay ${reminderDelayState.value.toInt()}",
                             fontSize = 16.sp,
                             color = MaterialTheme.colorScheme.onSurface,
@@ -353,7 +347,8 @@ fun Reset() {
             }
 
             Box(
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier
+                    .padding(top = 8.dp)
                     .fillMaxWidth()
                 //.clickable(onClick = onClick)
             ) {
@@ -415,7 +410,8 @@ fun About() {
         }
 
         Box(
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .padding(top = 16.dp)
                 .fillMaxWidth()
             //.clickable(onClick = { TODO() })
         ) {
@@ -436,5 +432,13 @@ fun About() {
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SettingsPreview() {
+    MoreStuffTheme(darkTheme = true) {
+        SettingsScreen()
     }
 }
