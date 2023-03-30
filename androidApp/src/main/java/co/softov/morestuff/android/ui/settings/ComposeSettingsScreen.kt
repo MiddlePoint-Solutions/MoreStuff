@@ -52,7 +52,7 @@ fun SettingsScreen(
                 .verticalScroll(scrollState)
         ) {
             SelectTheme()
-            SelectSnoozeLimit(onSnoozeLimitChanged = { viewModel.onSnoozeLimitChanged(10) })
+            SelectSnoozeLimit(onSnoozeLimitChanged = {viewModel.onSnoozeLimitChanged(it) })
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -63,7 +63,7 @@ fun SettingsScreen(
             ReviewTest()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(onSmartReminder = { viewModel.smartReminderEnabled(false) })
+            SmartReminder(onSmartReminder = {viewModel.smartReminderEnabled(it) })
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -162,6 +162,7 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
         )
     }
 }
+
 
 @Composable
 fun DeveloperSettings() {
