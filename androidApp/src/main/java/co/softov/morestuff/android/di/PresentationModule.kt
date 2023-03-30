@@ -25,7 +25,8 @@ val presentationModule = module {
             getActiveTasks = get(),
             getCompleteTasks = get(),
             getTodaySchedules = get(),
-            getTomorrowSchedules = get()
+            getTomorrowSchedules = get(),
+            timeManager = get()
         )
     }
 

@@ -1,25 +1,28 @@
 package co.softov.morestuff.android.domain.usecase.priority
 
 import arrow.core.Either
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.*
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.BaseUseCase
 import kotlinx.datetime.toLocalDateTime
 
 interface MapScheduleToPriorityUseCase :
-    BaseUseCase<Failure, Schedule, Priority>
+    BaseUseCase<Failure, Schedule, Priority> {
 
-class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
+}
+
+class MapScheduleToPriorityUseCaseImpl( val timeManager: TimeManager) :
+    MapScheduleToPriorityUseCase {
 
     override suspend fun invoke(params: Schedule): Either<Failure, Priority> {
         val priority = params.scheduleLocalTime?.let {
             val scheduleTime = it.toLocalDateTime()
             when {
-                TimeUtils.isToday(it) -> {
-                    val morning = TimeUtils.todayLocalDateTime(8)
-                    val noon = TimeUtils.todayLocalDateTime(12)
-                    val afternoon = TimeUtils.todayLocalDateTime(18)
-                    val night = TimeUtils.todayLocalDateTime(18)
+                timeManager.isToday(it) -> {
+                    val morning = timeManager.todayLocalDateTime(8)
+                    val noon = timeManager.todayLocalDateTime(12)
+                    val afternoon = timeManager.todayLocalDateTime(18)
+                    val night = timeManager.todayLocalDateTime(18)
 
                     val option = when {
                         scheduleTime >= morning && scheduleTime < noon -> TimeOfDayOption.Morning
@@ -30,11 +33,11 @@ class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
 
                     Priority.today.copy(option = option)
                 }
-                TimeUtils.isTomorrow(it) -> {
-                    val morning = TimeUtils.tomorrowLocalDateTime(8)
-                    val noon = TimeUtils.tomorrowLocalDateTime(12)
-                    val afternoon = TimeUtils.tomorrowLocalDateTime(18)
-                    val night = TimeUtils.tomorrowLocalDateTime(21)
+                timeManager.isTomorrow(it) -> {
+                    val morning = timeManager.tomorrowLocalDateTime(8)
+                    val noon = timeManager.tomorrowLocalDateTime(12)
+                    val afternoon = timeManager.tomorrowLocalDateTime(18)
+                    val night = timeManager.tomorrowLocalDateTime(21)
 
                     val option = when {
                         scheduleTime >= morning && scheduleTime < noon -> TimeOfDayOption.Morning
@@ -45,7 +48,7 @@ class MapScheduleToPriorityUseCaseImpl : MapScheduleToPriorityUseCase {
 
                     Priority.tomorrow.copy(option = option)
                 }
-                TimeUtils.isLater(it) -> {
+                timeManager.isLater(it) -> {
                     Priority.later
                 }
                 else -> Priority.today

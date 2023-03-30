@@ -4,11 +4,11 @@ package co.softov.morestuff.android.data.repository
 import arrow.core.Either
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
-import co.softov.morestuff.android.data.utils.TimeUtils
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.map
 
 class MessageRepositoryImpl(
     database: StuffDb,
-    private val mapMessageDb: MessageDbMapper
+    private val mapMessageDb: MessageDbMapper,
+    private val timeManager: TimeManager,
 ) : MessageRepository {
 
     private val messageQueries = database.messageQueries
@@ -51,13 +52,13 @@ class MessageRepositoryImpl(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
-        content: String
+        content: String,
     ): Either<Failure, Message> {
         val messageId: Long = messageQueries.transactionWithResult {
             messageQueries.insertMessage(
                 task_id = taskId,
                 schedule_id = scheduleId,
-                create_time = TimeUtils.getCreateTime(),
+                create_time = timeManager.getCreateTime(),
                 content_type = contentType,
                 content = content
             )
@@ -69,7 +70,7 @@ class MessageRepositoryImpl(
     override suspend fun addUserReplyMessage(
         taskId: Long,
         replyType: Int,
-        replyContent: String
+        replyContent: String,
     ) {
         // TODO: this logic should be moved into 2 use cases
         when (val messageId = getCurrentTaskMessageId(taskId)) {
@@ -77,7 +78,7 @@ class MessageRepositoryImpl(
                 messageQueries.updateTaskMessageReply(
                     reply_type = replyType,
                     reply_content = replyContent,
-                    reply_time = TimeUtils.nowUtcInstantString,
+                    reply_time = timeManager.nowUtcInstantString,
                     id = messageId.value
                 )
             }

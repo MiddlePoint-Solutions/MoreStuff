@@ -11,20 +11,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 
-/*class SaveUserSettingsImplTest {
-    private val userRepository = mockk<UserRepository>(relaxed = true)
-    private val saveUserSettingsImpl = SaveUserSettingsImpl(userRepository)
-
-    @Test
-    fun `saves user settings`() = runBlocking {
-        val snoozeLimit = Setting.SnoozeLimit(3)
-        val settings = AppSettings(snoozeLimit = snoozeLimit)
-
-        saveUserSettingsImpl.invoke(settings)
-
-        coVerify { userRepository.setSnoozeLimit(snoozeLimit.value) }
-    }
-}*/
 class SaveUserSettingsImplTest {
 
     private val userRepository = mockk<UserRepository>()
