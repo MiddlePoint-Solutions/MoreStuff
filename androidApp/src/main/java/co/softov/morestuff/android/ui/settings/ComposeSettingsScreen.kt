@@ -37,7 +37,7 @@ import org.koin.androidx.compose.getViewModel
 @Preview
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = getViewModel()
+    viewModel: SettingsViewModel = getViewModel(),
 ) {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
@@ -52,7 +52,7 @@ fun SettingsScreen(
                 .verticalScroll(scrollState)
         ) {
             SelectTheme()
-            SelectSnoozeLimit(viewModel = viewModel)
+            SelectSnoozeLimit(onSnoozeLimitChanged = { viewModel.onSnoozeLimitChanged(10) })
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -63,7 +63,7 @@ fun SettingsScreen(
             ReviewTest()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(viewModel = viewModel)
+            SmartReminder(onSmartReminder = { viewModel.smartReminderEnabled(false) })
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -131,7 +131,7 @@ fun SelectTheme() {
 
 
 @Composable
-fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
+fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     val settingSnoozeLimit = rememberPreferenceFloatSettingState(
         key = "snooze_limit_key",
         defaultValue = 0F
@@ -157,7 +157,7 @@ fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
             valueRange = 0F..10F,
             modifier = Modifier.weight(1f),
             onValueChange = { newValue ->
-                viewModel.onSnoozeLimitChanged(newValue.toInt())
+                onSnoozeLimitChanged(newValue.toInt())
             }
         )
     }
@@ -320,7 +320,7 @@ fun ReminderDebugging(devTools: DevTools) {
 
 
 @Composable
-fun SmartReminder(viewModel: SettingsViewModel) {
+fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
         rememberPreferenceBooleanSettingState("smart_reminder_memory_storage", false)
     val enabledState = rememberPreferenceBooleanSettingState("smart_reminder_enabled", true)
@@ -341,7 +341,7 @@ fun SmartReminder(viewModel: SettingsViewModel) {
                 )
             },
             onCheckedChange = { newValue ->
-                viewModel.smartReminderEnabled(newValue)
+                onSmartReminder(newValue)
                 memoryStorage.value = newValue
             },
         )
