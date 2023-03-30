@@ -31,26 +31,28 @@ import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.get
+import org.koin.androidx.compose.getViewModel
 
 
 @Preview
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    viewModel: SettingsViewModel = getViewModel()
+) {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
-    Box(modifier = Modifier.fillMaxSize()) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            SettingsTopBar(viewModel = SettingsViewModel())
-        }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        SettingsTopBar(viewModel = viewModel)
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(scrollState)
         ) {
-            Spacer(modifier = Modifier.height(85.dp))
             SelectTheme()
-            SelectSnoozeLimit(viewModel = SettingsViewModel())
+            SelectSnoozeLimit(viewModel = viewModel)
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -61,7 +63,7 @@ fun SettingsScreen() {
             ReviewTest()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(viewModel = SettingsViewModel())
+            SmartReminder(viewModel = viewModel)
             Divider(
                 color = Color.Gray,
                 thickness = 1.dp,
@@ -75,7 +77,6 @@ fun SettingsScreen() {
             )
             About()
         }
-        SettingsTopBar(viewModel = SettingsViewModel())
     }
 }
 
