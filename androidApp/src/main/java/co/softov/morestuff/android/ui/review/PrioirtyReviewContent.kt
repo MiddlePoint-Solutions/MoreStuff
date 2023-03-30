@@ -45,7 +45,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import timber.log.Timber
 
 @Composable
 fun ReviewContent(
@@ -67,11 +66,11 @@ fun ReviewContent(
                 .systemBarsPadding()
         ) {
 
-            val model by viewModel.model.collectAsState()
+            val model by viewModel.uiModel.collectAsState()
             val scope = rememberCoroutineScope()
 
-            var hint by remember { mutableStateOf("Round ${model.number} - ${model.round}") }
-            hint = "Round ${model.number} - ${model.round}"
+            var hint by remember { mutableStateOf("Round ${model.roundNumber} - ${model.round}") }
+            hint = "Round ${model.roundNumber} - ${model.round}"
 
             Column {
                 PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
@@ -80,7 +79,7 @@ fun ReviewContent(
 
             Box {
 
-                val states = model.items.map { it to rememberSwipeableCardState(model.number) }
+                val states = model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
                 val undoAction: () -> Unit = {
                     scope.launch {
@@ -123,7 +122,7 @@ fun ReviewContent(
 
                     PriorityRound.Initial -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
 
                         TaskPrioritySwipe(
                             modifier = modifier.align(Alignment.Center),
@@ -142,7 +141,7 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
@@ -157,7 +156,7 @@ fun ReviewContent(
                     }
                     PriorityRound.Next -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -174,7 +173,7 @@ fun ReviewContent(
                             TaskPrioritySwipe(
                                 modifier = modifier
                                     .align(Alignment.Center)
-                                    .layoutId("${model.round}-${model.number}"),
+                                    .layoutId("${model.round}-${model.roundNumber}"),
                                 states = states,
                                 onSwiped = { schedule, direction, isLast ->
                                     scope.launch {
@@ -191,7 +190,7 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
@@ -206,7 +205,7 @@ fun ReviewContent(
                     }
                     PriorityRound.Final -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -245,7 +244,7 @@ fun ReviewContent(
                                     LazyColumn(
                                         contentPadding = PaddingValues(8.dp)
                                     ) {
-                                        items(model.items) {
+                                        items(model.roundItems) {
                                             ScheduleListItem(it)
                                         }
                                     }
@@ -255,7 +254,7 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewFinalControls(
