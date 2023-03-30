@@ -43,7 +43,7 @@ fun SettingsScreen(
     val devTools: DevTools = get()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(viewModel = viewModel)
+        SettingsTopBar(navigateBack = { viewModel.navigateBack() })
 
         Column(
             modifier = Modifier
@@ -83,7 +83,7 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopBar(viewModel: SettingsViewModel) {
+fun SettingsTopBar(navigateBack: () -> Unit) {
     TopAppBar(
         title = {
             Text(
@@ -97,7 +97,7 @@ fun SettingsTopBar(viewModel: SettingsViewModel) {
             containerColor = Color(0xff2B3438)
         ),
         navigationIcon = {
-            IconButton(onClick = viewModel::onBackPressed) {
+            IconButton(onClick = navigateBack) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
