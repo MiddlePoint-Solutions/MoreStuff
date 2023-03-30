@@ -120,7 +120,7 @@ fun ReviewContent(
 
                 when (model.round) {
 
-                    PriorityRound.Initial -> {
+                    PriorityRound.Today -> {
 
                         val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
 
@@ -154,7 +154,7 @@ fun ReviewContent(
                             )
                         }
                     }
-                    PriorityRound.Next -> {
+                    PriorityRound.Now -> {
 
                         val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
                         val transition = updateTransition(visibleState, "Visible state")

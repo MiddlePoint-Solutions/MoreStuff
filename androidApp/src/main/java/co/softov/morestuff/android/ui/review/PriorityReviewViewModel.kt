@@ -10,7 +10,6 @@ import co.softov.morestuff.android.presentation.presenter.PriorityRound
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.Direction
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class PriorityReviewViewModel(
@@ -38,7 +37,7 @@ class PriorityReviewViewModel(
 
         is SetupNextRound -> {
             val nextRound = when {
-                state.highPriority.size >= NEXT_ROUND_MINIMUM -> PriorityRound.Next
+                state.highPriority.size >= NEXT_ROUND_MINIMUM -> PriorityRound.Now
                 else -> PriorityRound.Final
             }
             state.copy(
@@ -61,7 +60,7 @@ class PriorityReviewViewModel(
         )
     }
 
-    private fun setInitialState(round: PriorityRound = PriorityRound.Initial) {
+    private fun setInitialState(round: PriorityRound = PriorityRound.Today) {
         viewModelScope.launch {
             val schedules = getSchedulesForPriorityReviewUseCase().map(mapper::map).shuffled()
             sendEvent(SetupInitialRound(round, schedules))
@@ -69,7 +68,7 @@ class PriorityReviewViewModel(
     }
 
     fun reset() {
-        setInitialState(round = PriorityRound.Next)
+        setInitialState(round = PriorityRound.Now)
     }
 
     fun undoTask(schedule: ScheduleListItemViewModel) {

@@ -5,11 +5,11 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 
 enum class PriorityRound {
-    Initial, Next, Final
+    Today, Now, Final
 }
 
 data class PriorityReviewModel(
-    val round: PriorityRound = PriorityRound.Initial,
+    val round: PriorityRound = PriorityRound.Today,
     val roundNumber: Int = 0,
     val roundItems: List<ScheduleListItemViewModel> = listOf(),
     val highPriority: List<ScheduleListItemViewModel> = listOf(),
