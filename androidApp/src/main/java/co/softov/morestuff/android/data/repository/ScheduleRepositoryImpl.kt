@@ -34,7 +34,6 @@ class ScheduleRepositoryImpl(
     override suspend fun createSchedule(
         schedule: Schedule,
     ): Either<Failure, Schedule> {
-        Timber.d("createTaskReminderSchedule: ${schedule.taskId} for ${schedule.scheduleLocalTime}")
         val scheduleId = scheduleQueries.transactionWithResult {
             scheduleQueries.insertSchedule(
                 task_id = schedule.taskId,
@@ -134,6 +133,14 @@ class ScheduleRepositoryImpl(
                     Right(mapScheduleDb(it))
                 } ?: Left(ScheduleDoesNotExist)
             }
+
+    override suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle> {
+        val time = timeManager.todayTimeStringPair
+        return scheduleQueries.selectActiveSchedulesWithStaleReminders(
+            end = time.second,
+            mapper = mapScheduleWithTitleDb
+        ).executeAsList()
+    }
 
     override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)

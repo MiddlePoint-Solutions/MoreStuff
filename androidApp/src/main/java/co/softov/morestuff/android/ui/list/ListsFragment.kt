@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.presentation.compose.BaseComposeBottomSheetFragment
 import co.softov.morestuff.android.ui.Screens
 import com.github.terrakok.cicerone.Router
@@ -15,7 +16,7 @@ import org.koin.android.ext.android.inject
 
 class ListsFragment : BaseComposeBottomSheetFragment() {
 
-    private val router: Router by inject()
+    private val router: AppRouter by inject()
 
     @Composable
     override fun ScreenContent(

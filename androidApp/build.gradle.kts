@@ -37,8 +37,8 @@ android {
         compileSdk = 33
         minSdk = 25
         targetSdk = 33
-        versionCode = 5
-        versionName = "0.3.2"
+        versionCode = 6
+        versionName = "0.3.3"
     }
 
     buildTypes {
@@ -52,7 +52,7 @@ android {
             )
         }
 
-        getByName(Env.Dev) {
+        debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
         }
@@ -63,6 +63,7 @@ android {
         isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
     }
 
     kotlinOptions {
@@ -75,7 +76,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.2"
+        kotlinCompilerExtensionVersion = "1.4.4"
     }
 
     testOptions {
@@ -83,12 +84,31 @@ android {
             it.useJUnitPlatform()
         }
     }
-
 }
 
 
-tasks.withType<KotlinCompile>().all {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+
+        // Generate reports with:
+        // ./gradlew assembleRelease -Pmyapp.enableComposeCompilerReports=true
+
+        if (project.findProperty("myapp.enableComposeCompilerReports") == "true") {
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+            )
+            freeCompilerArgs = freeCompilerArgs + listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" +
+                        project.buildDir.absolutePath + "/compose_metrics"
+            )
+        }
+    }
+
+
 }
 
 sqldelight {
@@ -133,12 +153,12 @@ dependencies {
     implementation("com.github.terrakok:cicerone:7.1")
 
     // Modal Drawer Layout
-    implementation ("androidx.drawerlayout:drawerlayout:1.1.1")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.1")
 
     // UI
     implementation(Libs.Google.material)
-    implementation("com.yuyakaido.android:card-stack-view:2.3.4")
-    implementation("com.alexstyl.swipeablecard:swipeablecard:0.1.0")
+    // TODO: import when available
+//    implementation("com.alexstyl.swipeablecard:swipeablecard:0.2.0")
 
     // Compose
     implementation(platform(Libs.AndroidX.Compose.bom))
@@ -157,10 +177,8 @@ dependencies {
     implementation(Libs.AndroidX.Compose.paging)
 
     // Alorma Compose Settings
-    implementation ("com.github.alorma:compose-settings-ui-m3:0.22.0")
-    implementation ("com.github.alorma:compose-settings-storage-preferences:0.22.0")
-    implementation ("com.github.alorma:compose-settings-storage-datastore:0.22.0")
-    implementation ("com.github.alorma:compose-settings-storage-datastore-proto:0.22.0")
+    implementation("com.github.alorma:compose-settings-ui-m3:0.22.0")
+    implementation("com.github.alorma:compose-settings-storage-preferences:0.22.0")
 
     // Android Studio Preview support
     implementation("androidx.compose.ui:ui-tooling-preview")

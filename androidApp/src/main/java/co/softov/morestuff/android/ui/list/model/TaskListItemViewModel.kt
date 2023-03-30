@@ -5,6 +5,4 @@ data class TaskListItemViewModel(
     val createTime: String,
     val completeTime: String,
     val title: String
-) {
-    var expanded: Boolean = false
-}
+)

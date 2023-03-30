@@ -17,9 +17,4 @@ class SettingsFragment : BaseComposeFragment() {
         SettingsScreen()
     }
 
-    companion object {
-        fun newInstance(): SettingsFragment {
-            return SettingsFragment()
-        }
-    }
 }

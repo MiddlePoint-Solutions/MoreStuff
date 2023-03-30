@@ -1,7 +1,7 @@
 package co.softov.morestuff.buildsrc
 
 object Libs {
-    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.1"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.2"
     const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.7.0"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
@@ -119,7 +119,7 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "2023.01.00"
+            private const val version = "2023.03.00"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"

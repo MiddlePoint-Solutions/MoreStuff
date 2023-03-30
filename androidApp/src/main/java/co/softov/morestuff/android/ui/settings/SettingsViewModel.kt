@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.ui.Screens
 
 class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
@@ -15,5 +16,9 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
 
     fun smartReminderEnabled(enable: Boolean) {
         dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
+    }
+
+    fun showReviewTest() {
+        router.navigateTo(Screens.priorityReview)
     }
 }

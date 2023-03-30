@@ -7,14 +7,14 @@ import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.redux.store.Test
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleList
+import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ReviewMiddleware(
-    private val getSchedulesWithTitleList: GetSchedulesWithTitleList
+    private val getSchedulesWithTitle: GetSchedulesWithTitleUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -27,7 +27,7 @@ class ReviewMiddleware(
         when (action) {
             is ReviewAction.InitReview -> {
                 scope.launch {
-                    dispatch(ReviewAction.SetSchedulesForReview(getSchedulesWithTitleList()))
+                    dispatch(ReviewAction.SetSchedulesForReview(getSchedulesWithTitle()))
                 }
             }
 

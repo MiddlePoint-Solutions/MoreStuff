@@ -31,6 +31,8 @@ interface ScheduleRepository {
 
     fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>>
 
+    suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle>
+
     suspend fun countTodayTaskSchedules(
         taskId: Long,
         startTime: String,
