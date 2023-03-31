@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,8 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
+import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
 import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
@@ -69,17 +72,15 @@ fun ReviewContent(
             val model by viewModel.uiModel.collectAsState()
             val scope = rememberCoroutineScope()
 
-            var hint by remember { mutableStateOf("Round ${model.roundNumber} - ${model.round}") }
-            hint = "Round ${model.roundNumber} - ${model.round}"
-
             Column {
                 PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
-                Hint(hint)
+                RoundInfo(model)
             }
 
             Box {
 
-                val states = model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
+                val states =
+                    model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
                 val undoAction: () -> Unit = {
                     scope.launch {
@@ -122,7 +123,8 @@ fun ReviewContent(
 
                     PriorityRound.Today -> {
 
-                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState =
+                            remember(model.roundNumber) { MutableTransitionState(false) }
 
                         TaskPrioritySwipe(
                             modifier = modifier.align(Alignment.Center),
@@ -156,7 +158,8 @@ fun ReviewContent(
                     }
                     PriorityRound.Now -> {
 
-                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState =
+                            remember(model.roundNumber) { MutableTransitionState(false) }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -205,7 +208,8 @@ fun ReviewContent(
                     }
                     PriorityRound.Final -> {
 
-                        val visibleState = remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState =
+                            remember(model.roundNumber) { MutableTransitionState(false) }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -513,20 +517,74 @@ private fun TaskCard(
 }
 
 @Composable
-private fun Hint(text: String) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .padding(horizontal = 24.dp, vertical = 32.dp)
-            .fillMaxWidth()
+private fun RoundInfo(
+    model: PriorityReviewModel,
+    modifier: Modifier = Modifier
+) {
+
+    val info by remember(model.roundNumber) {
+        mutableStateOf("Round ${model.roundNumber} - ${model.round}")
+    }
+    val instructions by remember(model.round) {
+        when (model.round) {
+            PriorityRound.Today -> "<-- Tomorrow    Today -->"
+            PriorityRound.Now -> "<-- Next    Now -->"
+            PriorityRound.Final -> ""
+        }.let {
+            mutableStateOf(it)
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .padding(vertical = 16.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = text,
+            text = info,
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
             fontSize = 22.sp,
             textAlign = TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = instructions,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+
+        if (BuildConfig.DEBUG) {
+
+            val total by remember {
+                mutableStateOf("Total: ${model.roundItems.size}")
+            }
+
+            Text(
+                text = total,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+
+            val debug = with(model) {
+                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size}  High: ${highPriority.size}  Low: ${lowPriority.size}  Done: ${done.size}  Later: ${later.size}"
+            }
+
+            Text(
+                text = debug,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 

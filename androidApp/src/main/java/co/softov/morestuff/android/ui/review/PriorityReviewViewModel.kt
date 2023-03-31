@@ -7,6 +7,7 @@ import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
+import co.softov.morestuff.android.presentation.presenter.PriorityRound.*
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.Direction
@@ -28,23 +29,41 @@ class PriorityReviewViewModel(
 
     override fun onReduceState(event: PriorityReviewViewEvent) = when (event) {
         is SetupInitialRound -> {
-            state.copy(
+            PriorityReviewModel(
                 round = event.round,
-                roundNumber = state.roundNumber + 1,
+                roundNumber = 1,
                 roundItems = event.items
             )
         }
 
         is SetupNextRound -> {
             val nextRound = when {
-                state.highPriority.size >= NEXT_ROUND_MINIMUM -> PriorityRound.Now
-                else -> PriorityRound.Final
+                state.highPriority.size >= NEXT_ROUND_MINIMUM -> Now
+                else -> Final
             }
+
+            val tomorrow = when {
+                nextRound == Now && state.round == Today -> state.lowPriority
+                else -> state.tomorrow
+            }
+
+            val lowPriority = when {
+                nextRound == Now && state.round == Today -> listOf()
+                else -> state.lowPriority
+            }
+
+            val highPriority = when (nextRound) {
+                Final -> state.highPriority
+                else -> listOf()
+            }
+
             state.copy(
                 round = nextRound,
                 roundNumber = state.roundNumber + 1,
                 roundItems = state.highPriority,
-                highPriority = listOf()
+                highPriority = highPriority,
+                lowPriority = lowPriority,
+                tomorrow = tomorrow
             )
         }
 
@@ -60,7 +79,7 @@ class PriorityReviewViewModel(
         )
     }
 
-    private fun setInitialState(round: PriorityRound = PriorityRound.Today) {
+    private fun setInitialState(round: PriorityRound = Today) {
         viewModelScope.launch {
             val schedules = getSchedulesForPriorityReviewUseCase().map(mapper::map).shuffled()
             sendEvent(SetupInitialRound(round, schedules))
@@ -68,7 +87,7 @@ class PriorityReviewViewModel(
     }
 
     fun reset() {
-        setInitialState(round = PriorityRound.Now)
+        setInitialState()
     }
 
     fun undoTask(schedule: ScheduleListItemViewModel) {

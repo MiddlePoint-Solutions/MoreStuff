@@ -16,6 +16,7 @@ data class PriorityReviewModel(
     val lowPriority: List<ScheduleListItemViewModel> = listOf(),
     val done: List<ScheduleListItemViewModel> = listOf(),
     val later: List<ScheduleListItemViewModel> = listOf(),
+    val tomorrow: List<ScheduleListItemViewModel> = listOf(),
 ) : BaseViewState
 
 sealed class PriorityReviewViewEvent : BaseViewEvent {
