@@ -237,12 +237,17 @@ fun ReviewContent(
                                     )
                                 }
                                 states.size == 1 -> {
-                                    // TODO: disable swiping
-                                    TaskPrioritySwipe(
-                                        modifier = modifier,
-                                        states = states,
-                                        onSwiped = viewModel::onTaskSwiped,
-                                    )
+                                    Box(
+                                        modifier
+                                            .padding(24.dp)
+                                            .fillMaxSize()
+                                            .aspectRatio(1f)
+                                    ) {
+                                        TaskCard(
+                                            modifier = modifier.fillMaxSize(),
+                                            schedule = states.first().first
+                                        )
+                                    }
                                 }
                                 else -> {
                                     LazyColumn(
