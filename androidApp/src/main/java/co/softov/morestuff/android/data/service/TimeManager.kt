@@ -2,9 +2,6 @@ package co.softov.morestuff.android.data.service
 
 import kotlinx.datetime.*
 import java.time.DayOfWeek
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -32,8 +29,6 @@ interface TimeManager {
     fun todayLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime
     fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime
     fun weekendLocalDateTime(): LocalDateTime
-    fun formatTime(timeString: String?, pattern: String): String?
-    fun formatTimeOnly(timeString: String?): String?
     fun getTodayTimeRange(): Pair<String, String>
 
 }
@@ -132,19 +127,6 @@ class TimeManagerImpl : TimeManager {
         }
     }
 
-    override fun formatTime(timeString: String?, pattern: String): String? {
-        return timeString?.let {
-            val formatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneId.systemDefault())
-            val localDateTime = ZonedDateTime.parse(it, formatter)
-                .withZoneSameInstant(ZoneId.systemDefault())
-                .toLocalDateTime()
-            val timeFormatter = DateTimeFormatter.ofPattern(pattern)
-            localDateTime.format(timeFormatter)
-        }
-    }
-    override fun formatTimeOnly(timeString: String?): String? {
-        return formatTime(timeString, "HH:mm")
-    }
     override fun getTodayTimeRange(): Pair<String, String> = todayTimeStringPair
 
 
