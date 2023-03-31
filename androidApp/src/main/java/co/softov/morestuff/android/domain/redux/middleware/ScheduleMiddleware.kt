@@ -44,7 +44,8 @@ class ScheduleMiddleware(
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
-    private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase
+    private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
+    private val rescheduleTaskUseCase: RescheduleTaskUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -67,9 +68,11 @@ class ScheduleMiddleware(
             }
 
             is RescheduleTaskAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId)
-                createScheduleUseCase(action.taskId, action.priority).map {
-                    dispatch(ScheduleCreatedAction(it))
+                with(action) {
+                    val params = RescheduleTaskUseCaseParams(taskId, priority)
+                    rescheduleTaskUseCase(params).map {
+                        dispatch(ScheduleCreatedAction(it))
+                    }
                 }
             }
 

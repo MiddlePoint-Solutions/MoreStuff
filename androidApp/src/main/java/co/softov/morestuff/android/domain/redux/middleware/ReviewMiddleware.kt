@@ -13,9 +13,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class ReviewMiddleware(
-    private val getSchedulesWithTitle: GetSchedulesWithTitleUseCase
-) : Middleware<AppState> {
+class ReviewMiddleware : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
@@ -25,22 +23,11 @@ class ReviewMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is ReviewAction.InitReview -> {
-                scope.launch {
-                    dispatch(ReviewAction.SetSchedulesForReview(getSchedulesWithTitle()))
-                }
+
+            is ReviewAction.ScheduleReviewResults -> {
+                // TODO: write use-case that will create schedules for each task according to its priority
             }
 
-            is ReviewAction.SetSchedulesForReview -> {
-                scope.launch {
-                    delay(5000)
-                    dispatch(Test("${state.reviewState}"))
-
-                }
-            }
-            is Test -> {
-                Timber.d("ReviewState: ${state.reviewState}")
-            }
             else -> NoOp
         }
 

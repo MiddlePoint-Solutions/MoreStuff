@@ -21,7 +21,6 @@ class CreateScheduleUseCaseImpl(
     private val timeManager: TimeManager,
 ) : CreateScheduleUseCase {
     override suspend fun invoke(taskId: Long, priority: Priority): Either<Failure, Schedule> {
-        // TODO: This should change after merging the GetPriorityTimeUseCase changes
         val localTime = getPriorityTimeUseCase(priority)
         val utcTime =
             localTime?.toLocalDateTime()?.toInstant(timeManager.currentTimeZone)?.toString()

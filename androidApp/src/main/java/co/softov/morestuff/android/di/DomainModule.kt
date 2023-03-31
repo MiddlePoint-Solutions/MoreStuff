@@ -110,6 +110,7 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
+    factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
 }
 
 val messageUseCases = module {

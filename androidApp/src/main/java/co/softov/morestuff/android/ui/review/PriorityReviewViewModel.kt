@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.domain.usecase.priority.GetSchedulesForPriorityReviewUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewViewEvent
@@ -38,7 +39,7 @@ class PriorityReviewViewModel(
 
         is SetupNextRound -> {
             val nextRound = when {
-                state.highPriority.size >= NEXT_ROUND_MINIMUM -> Now
+                state.highPriority.size > FINAL_ROUND_MINIMUM -> Now
                 else -> Final
             }
 
@@ -94,6 +95,18 @@ class PriorityReviewViewModel(
         sendEvent(Undo(schedule))
     }
 
+    fun confirmResults() {
+        dispatchAppStoreAction(
+            ReviewAction.ScheduleReviewResults(
+                tomorrow = state.tomorrow.map { it.taskId },
+                now = state.highPriority.map { it.taskId },
+                next = state.lowPriority.map { it.taskId },
+                done = state.done.map { it.taskId },
+                later = state.later.map { it.taskId },
+            )
+        )
+    }
+
     fun onTaskSwiped(
         schedule: ScheduleListItemViewModel,
         direction: Direction,
@@ -113,7 +126,7 @@ class PriorityReviewViewModel(
     }
 
     companion object {
-        const val NEXT_ROUND_MINIMUM = 3
+        const val FINAL_ROUND_MINIMUM = 1
     }
 
 }

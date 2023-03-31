@@ -363,7 +363,7 @@ private fun ReviewFinalControls(
 
         PriorityButton(
             onSelected = finishAction,
-            text = stringResource(R.string.finish).uppercase(),
+            text = stringResource(R.string.start).uppercase(),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(16.dp),
