@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
@@ -28,11 +31,13 @@ import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 import org.koin.android.ext.android.inject
 import timber.log.Timber
+import android.Manifest
 
 class MainActivity : AppCompatActivity() {
 
     private val navigatorHolder: NavigatorHolder by inject()
     private val router: Router by inject()
+    private val voiceToText by lazy { VoiceToTextParser(application) }
 
     private val navigator: Navigator = object : AppNavigator(this, android.R.id.content) {
 
@@ -87,10 +92,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
+            var canRecord by remember { mutableStateOf(false) }
+            val state by voiceToText.state.collectAsState()
+            val onRecordClick = {
+                if (!state.isSpeaking) {
+                    voiceToText.startListening("en")
+                } else {
+                    voiceToText.stopListening()
+                }
+            }
+            val recordAudioLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission(),
+                onResult = { isGranted ->
+                    canRecord = isGranted
+                }
+            )
+
+            LaunchedEffect(key1 = recordAudioLauncher) {
+                // Lanza la solicitud de permiso
+                recordAudioLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            }
             MoreStuffTheme {
                 MoreStuffScaffold(
                     content = {
-                        MainContent(conductor)
+                        MainContent(conductor, canRecord = true, state = state, onRecordClick = onRecordClick)
                     },
                     onSettingsClicked = {
                         showSettingsScreen()

@@ -12,6 +12,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import app.cash.molecule.RecompositionClock
 import app.cash.molecule.launchMolecule
+import co.softov.morestuff.android.VoiceToTextParserState
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.presenter.PriorityPresenter
@@ -27,6 +28,9 @@ import org.koin.core.parameter.parametersOf
 fun MainContent(
     conductor: MainConductor,
     modifier: Modifier = Modifier,
+    canRecord: Boolean,
+    state: VoiceToTextParserState,
+    onRecordClick: () -> Unit
 ) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -83,6 +87,9 @@ fun MainContent(
                         //scrollState.scrollToItem(index = 0)
                     }
                 },
+                canRecord = canRecord,
+                state = state,
+                onRecordClick = onRecordClick
             )
         }
     }

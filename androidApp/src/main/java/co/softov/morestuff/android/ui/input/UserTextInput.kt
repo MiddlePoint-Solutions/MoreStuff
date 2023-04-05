@@ -1,17 +1,19 @@
 package co.softov.morestuff.android.ui.input
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -26,52 +28,49 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.VoiceToTextParserState
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.main.input.ListIcon
 import co.softov.morestuff.android.ui.main.input.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import timber.log.Timber
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun UserTextInput(
     sendAction: (String) -> Unit,
     listAction: () -> Unit,
+    canRecord: Boolean,
+    state: VoiceToTextParserState,
+    onRecordClick: () -> Unit,
 ) {
 
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue())
+        mutableStateOf(TextFieldValue(state.spokenText))
+    }
+    LaunchedEffect(state.spokenText) {
+        value = TextFieldValue(state.spokenText)
     }
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
 
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .animateContentSize()
+        modifier = Modifier.fillMaxWidth().animateContentSize()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primary)
+            modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary)
                 .semantics {
                     contentDescription = a11ylabel
-                },
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom
+                }, horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.Bottom
         ) {
             Row(
-                modifier = Modifier
-                    .defaultMinSize(minHeight = 46.dp)
-                    .weight(0.88f)
+                modifier = Modifier.defaultMinSize(minHeight = 46.dp).weight(0.88f)
                     .align(Alignment.CenterVertically)
             ) {
-                BasicTextField(
-                    value = value,
+                BasicTextField(value = value,
                     onValueChange = { value = it },
                     enabled = true,
-                    modifier = Modifier
-                        .clearFocusOnKeyboardDismiss()
-                        .fillMaxWidth()
+                    modifier = Modifier.clearFocusOnKeyboardDismiss().fillMaxWidth()
                         .align(Alignment.CenterVertically)
                         .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)
                         .onFocusChanged {
@@ -94,14 +93,32 @@ fun UserTextInput(
                             }
                             innerTextField()
                         }
-                    }
-                )
+                    })
             }
 
             Box(
-                modifier = Modifier
-                    .weight(0.12f)
-                    .height(IntrinsicSize.Min)
+                modifier = Modifier.weight(0.12f).height(IntrinsicSize.Min)
+            ) {
+                if (canRecord) {
+                    IconButton(onClick = onRecordClick) {
+                        AnimatedContent(targetState = state.isSpeaking) { isSpeaking ->
+                            if (isSpeaking) {
+                                Icon(
+                                    imageVector = Icons.Filled.Stop,
+                                    contentDescription = "",
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Filled.Mic,
+                                    contentDescription = "",
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier.weight(0.12f).height(IntrinsicSize.Min)
             ) {
                 when {
                     value.text.isBlank() -> ListIcon(listAction)
@@ -121,7 +138,11 @@ private fun ChatInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         UserTextInput(
             sendAction = {},
-            listAction = {}
+            listAction = {},
+            canRecord = true,
+            state = VoiceToTextParserState(),
+            onRecordClick = {}
+
         )
     }
 }
@@ -132,7 +153,10 @@ private fun ChatInputPreview() {
     MoreStuffTheme {
         UserTextInput(
             sendAction = {},
-            listAction = {}
+            listAction = {},
+            canRecord = true,
+            state = VoiceToTextParserState(),
+            onRecordClick = {}
         )
     }
 }
