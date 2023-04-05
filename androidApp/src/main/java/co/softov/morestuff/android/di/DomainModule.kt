@@ -15,6 +15,7 @@ import co.softov.morestuff.android.domain.usecase.task.*
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -36,13 +37,7 @@ val useCaseModules
     }
 
 val serviceModule = module {
-    factory<BootCompleteScheduler> {
-        BootCompleteSchedulerImpl(
-            scheduler = get(),
-            getActiveSchedules = get(),
-            timeManager = get()
-        )
-    }
+    factoryOf(::BootCompleteSchedulerImpl) bind BootCompleteScheduler::class
 }
 
 val storeModule = module {
@@ -61,43 +56,17 @@ val storeModule = module {
             settingsMiddleware = get(),
             priorityMiddleware = get(),
             reviewMiddleware = get(),
-
-
             )
     }
 
     // Middleware
 
-    factory { LoggerMiddleware() }
-    factory { NavigationMiddleware(router = get()) }
-    factory {
-        TaskMiddleware(
-            createTaskUseCase = get(),
-            setTaskCompleteUseCase = get()
-        )
-    }
-    factory {
-        ScheduleMiddleware(
-            scheduleAtTimeUseCase = get(),
-            getScheduleUseCase = get(),
-            createScheduleUseCase = get(),
-            cancelActiveScheduleUseCase = get(),
-            setScheduleFulfilledUseCase = get(),
-            getTaskScheduleCountUseCase = get()
-        )
-    }
-    factory {
-        MessageMiddleware(
-            createTaskConfirmationMessageUseCase = get(),
-            createTaskMessageUseCase = get(),
-            createScheduleMessageUseCase = get(),
-            setScheduleResponseMessage = get()
-        )
-    }
-    factory { NotificationMiddleware(notifier = get()) }
-
-
-
+    factoryOf(::LoggerMiddleware)
+    factoryOf(::NavigationMiddleware)
+    factoryOf(::TaskMiddleware)
+    factoryOf(::ScheduleMiddleware)
+    factoryOf(::MessageMiddleware)
+    factoryOf(::NotificationMiddleware)
     factoryOf(::SettingsMiddleware)
     factoryOf(::ReminderMiddleware)
     factoryOf(::PriorityMiddleware)
@@ -107,112 +76,51 @@ val storeModule = module {
 }
 
 val taskUseCases = module {
-    factory<CreateTaskUseCase> {
-        CreateNewTaskUseCaseImpl(taskRepository = get())
-    }
-
-    factory<GetTaskUseCase> { GetTaskUseCaseImpl(taskRepository = get()) }
+    factoryOf(::CreateNewTaskUseCaseImpl) bind CreateTaskUseCase::class
+    factoryOf(::GetTaskUseCaseImpl) bind GetTaskUseCase::class
     factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
-
-    factory<GetTaskMessagesFlowUseCase> { GetTaskMessagesFlowUseCaseImpl(messageRepository = get()) }
-    factory<GetActiveTasks> { GetActiveTasksImpl(taskRepository = get()) }
-    factory<GetCompletedTasks> { GetCompletedTasksImpl(taskRepository = get()) }
-
-    factory<SetTaskCompleteUseCase> {
-        SetTaskCompleteImpl(
-            taskRepository = get()
-        )
-    }
-
+    factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
+    factoryOf(::GetActiveTasksImpl) bind GetActiveTasks::class
+    factoryOf(::GetCompletedTasksImpl) bind GetCompletedTasks::class
+    factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
 }
 
 
 val scheduleUseCases = module {
-    factory<GetActiveScheduleUseCase> { GetActiveScheduleUseCaseImpl(scheduleRepository = get()) }
+    factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
-
-    factory<CancelActiveScheduleUseCase> {
-        CancelActiveScheduleUseCaseImpl(
-            scheduler = get(),
-            getActiveSchedule = get(),
-            setScheduleFulfilled = get()
-        )
-    }
-
-    factory<GetScheduleWithTitle> { GetScheduleWithTitleImpl(scheduleRepository = get()) }
-    factory<GetSchedulesWithTitleFlow> { GetSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetLaterSchedulesWithTitle> { GetLaterSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetTodaySchedulesWithTitle> { GetTodaySchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetTomorrowSchedulesWithTitle> { GetTomorrowSchedulesWithTitleImpl(scheduleRepository = get()) }
-    factory<GetSchedulesWithTitleUseCase> { GetSchedulesWithTitleListImpl(scheduleRepository = get()) }
-
-    factory<GetActiveSchedules> {
-        GetActiveSchedulesImpl(scheduleRepository = get())
-    }
-
-    factory<GetActiveSchedulesByPriority> {
-        GetActiveSchedulesByPriorityImpl(getActiveSchedules = get())
-    }
-
-    factory<CreateScheduleUseCase> {
-        CreateScheduleUseCaseImpl(
-            scheduleRepository = get(),
-            getPriorityTimeUseCase = get(),
-            timeManager = get()
-        )
-    }
-
-    factory<GetScheduleUseCase> {
-        GetScheduleImpl(scheduleRepository = get())
-    }
-    factory<SetScheduleFulfilledUseCase> {
-        SetScheduleFulfilledUseCaseImpl(scheduleRepository = get())
-    }
-    factory<SetScheduleMessageResponse> { SetScheduleMessageResponseImpl(messageRepository = get()) }
-
-    factory<GetTaskScheduleCountUseCase> {
-        GetTaskScheduleCountUseCaseImpl(
-            scheduleRepository = get(),
-            timeManager = get()
-        )
-    }
-
-    factory<ScheduleAtTimeUseCase> {
-        ScheduleAtTimeUseCaseImpl(scheduler = get())
-    }
-
+    factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
+    factoryOf(::GetScheduleWithTitleImpl) bind GetScheduleWithTitle::class
+    factoryOf(::GetSchedulesWithTitleImpl) bind GetSchedulesWithTitleFlow::class
+    factoryOf(::GetLaterSchedulesWithTitleImpl) bind GetLaterSchedulesWithTitle::class
+    factoryOf(::GetTodaySchedulesWithTitleImpl) bind GetTodaySchedulesWithTitle::class
+    factoryOf(::GetTomorrowSchedulesWithTitleImpl) bind GetTomorrowSchedulesWithTitle::class
+    factoryOf(::GetSchedulesWithTitleListImpl) bind GetSchedulesWithTitleUseCase::class
+    factoryOf(::GetActiveSchedulesImpl) bind GetActiveSchedules::class
+    factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
+    factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
+    factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
+    factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
+    factoryOf(::SetScheduleMessageResponseImpl) bind SetScheduleMessageResponse::class
+    factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
+    factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
 }
 
 val messageUseCases = module {
     factoryOf(::GetMessagesImpl) bind GetMessages::class
-
-    factory<GetActiveScheduleMessages> { GetActiveMessagesImpl(messageRepository = get()) }
-    factory<CreateMessageUseCase> { CreateMessageUseCaseImpl(messageRepository = get()) }
-    factory<GetMessageUseCase> { GetMessageImpl(messageRepository = get()) }
-    factory<CreateTaskMessageUseCase> {
-        CreateTaskMessageUseCaseImpl(createMessageUseCase = get())
-    }
-    factory<CreateTaskConfirmationMessageUseCase> {
-        CreateTaskConfirmationMessageUseCaseImpl(createMessageUseCase = get())
-    }
-    factory<CreateScheduleMessageUseCase> {
-        CreateScheduleMessageUseCaseImpl(
-            createMessageUseCase = get(),
-            getTaskForScheduleUseCase = get()
-        )
-    }
+    factoryOf(::GetActiveMessagesImpl) bind GetActiveScheduleMessages::class
+    factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
+    factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
+    factoryOf(::CreateTaskMessageUseCaseImpl) bind CreateTaskMessageUseCase::class
+    factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
+    factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
 }
 
 val priorityUseCases = module {
-    factory<GetPriorityTimeUseCase> {
-        GetPriorityTimeUseCaseImpl(
-            debug = get(),
-            timeManager = get()
-        )
-    }
+    factoryOf(::GetPriorityTimeUseCaseImpl) bind GetPriorityTimeUseCase::class
     factoryOf(::GetPriorityOptionsUseCase)
     factoryOf(::GetSchedulePriorityUseCaseImpl) bind GetSchedulePriorityUseCase::class
     factoryOf(::MapScheduleToPriorityUseCaseImpl) bind MapScheduleToPriorityUseCase::class
@@ -225,6 +133,5 @@ val settingsUseCases = module {
 }
 
 val timeManagerModule = module {
-    single<TimeManager> { TimeManagerImpl() }
+    singleOf(::TimeManagerImpl) bind TimeManager::class
 }
-
