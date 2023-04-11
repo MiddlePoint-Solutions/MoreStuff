@@ -18,6 +18,10 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
         dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
     }
 
+    fun navigateBackSettings() {
+        router.exit()
+    }
+
     fun showReviewTest() {
         router.navigateTo(Screens.priorityReview)
     }

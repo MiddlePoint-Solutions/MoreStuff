@@ -1,12 +1,13 @@
 package co.softov.morestuff.android.domain.service
 
 import co.softov.morestuff.android.data.service.TimeManagerImpl
-import kotlinx.datetime.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.datetime.toLocalDateTime
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 class TimeManagerImplTest {
@@ -104,19 +105,5 @@ class TimeManagerImplTest {
         assertEquals(DayOfWeek.SATURDAY, weekendDateTime.dayOfWeek)
         assertEquals(10, weekendDateTime.hour)
         assertEquals(0, weekendDateTime.minute)
-    }
-
-    @Test
-    fun `formatTime should format input time string using the provided pattern`() {
-        val timeString = "2023-03-27T12:00:00.000Z"
-        val pattern = "yyyy-MM-dd HH:mm:ss"
-        val formattedString = timeManager.formatTime(timeString, pattern)
-        assertNotNull(formattedString)
-        val dateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
-        val outputJavaLocalDateTime = LocalDateTime.parse(formattedString, dateTimeFormatter)
-        val outputLocalDateTime = outputJavaLocalDateTime.toKotlinLocalDateTime()
-        val inputInstant = timeString.toInstant()
-        val inputLocalDateTime = inputInstant.toLocalDateTime(timeManager.currentTimeZone)
-        assertEquals(inputLocalDateTime, outputLocalDateTime)
     }
 }

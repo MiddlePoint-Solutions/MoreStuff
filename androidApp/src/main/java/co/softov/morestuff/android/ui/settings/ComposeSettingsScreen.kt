@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -36,45 +37,36 @@ import org.koin.androidx.compose.getViewModel
 
 @Preview
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(
+    viewModel: SettingsViewModel = getViewModel(),
+) {
     val scrollState = rememberScrollState()
     val devTools: DevTools = get()
 
-    val viewModel = getViewModel<SettingsViewModel>()
+    Column(modifier = Modifier.fillMaxSize()) {
+        SettingsTopBar(navigateBackSettings = { viewModel.navigateBackSettings() })
 
-    MoreStuffTheme {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(scrollState)
-                .padding(start = 16.dp)
         ) {
-            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
-            Options()
             SelectTheme()
-            SelectSnoozeLimit(viewModel = viewModel)
+            SelectSnoozeLimit(onSnoozeLimitChanged = { viewModel.onSnoozeLimitChanged(it) })
             Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
+                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             DeveloperSettings()
             Notification()
             ReviewTest(onClick = viewModel::showReviewTest)
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(viewModel = viewModel)
+            SmartReminder(onSmartReminder = { viewModel.smartReminderEnabled(it) })
             Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
+                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             Reset()
             Divider(
-                color = Color.Gray,
-                thickness = 1.dp,
-                modifier = Modifier.fillMaxWidth()
+                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             About()
         }
@@ -82,73 +74,77 @@ fun SettingsScreen() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Options() {
-    Row(
-        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Options", fontSize = 23.sp, color = MaterialTheme.colorScheme.onSurface
-        )
-    }
+fun SettingsTopBar(navigateBackSettings: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Settings",
+                fontSize = 25.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(start = 105.dp)
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xff2B3438)
+        ),
+        navigationIcon = {
+            IconButton(onClick = navigateBackSettings) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        },
+    )
 }
 
 @Composable
 fun SelectTheme() {
     val enabledState = rememberBooleanSettingState(true)
     val themeOptions = listOf("Light", "Dark", "System")
-    MoreStuffTheme {
-        Row {
-            SettingsList(
-                enabled = enabledState.value, title = {
-                    Text(
-                        text = "Select Theme",
-                        fontSize = 18.sp
-                    )
-                }, items = themeOptions, onItemSelected = { index, _ ->
-                    when (index) {
-                        0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                        1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                        2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                    }
-                })
-        }
+    Row {
+        SettingsList(enabled = enabledState.value, title = {
+            Text(
+                text = "Select Theme", fontSize = 18.sp
+            )
+        }, items = themeOptions, onItemSelected = { index, _ ->
+            when (index) {
+                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+        })
     }
 }
 
 
 @Composable
-fun SelectSnoozeLimit(viewModel: SettingsViewModel) {
+fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     val settingSnoozeLimit = rememberPreferenceFloatSettingState(
-        key = "snooze_limit_key",
-        defaultValue = 0F
+        key = "snooze_limit_key", defaultValue = 0F
     )
     val enabledState = rememberPreferenceBooleanSettingState(
-        key = "enabled_state_key",
-        defaultValue = true
+        key = "enabled_state_key", defaultValue = true
     )
-    MoreStuffTheme {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            SettingsSlider(
-                enabled = enabledState.value,
-                state = settingSnoozeLimit,
-                title = {
-                    Text(
-                        text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
-                        fontSize = 18.sp
-                    )
-                },
-                steps = 10,
-                valueRange = 0F..10F,
-                modifier = Modifier.weight(1f),
-                onValueChange = { newValue ->
-                    viewModel.onSnoozeLimitChanged(newValue.toInt())
-                }
-            )
-        }
+    Row(
+        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
+    ) {
+        SettingsSlider(enabled = enabledState.value,
+            state = settingSnoozeLimit,
+            title = {
+                Text(
+                    text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}", fontSize = 18.sp
+                )
+            },
+            steps = 9,
+            valueRange = 0F..10F,
+            modifier = Modifier.weight(1f),
+            onValueChange = { newValue ->
+                onSnoozeLimitChanged(newValue.toInt())
+            })
     }
 }
 
@@ -168,29 +164,25 @@ fun DeveloperSettings() {
 @Composable
 fun Notification() {
     //val onClick = { TODO() }
-    MoreStuffTheme {
-        Row(
-            modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Notification",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-            //.clickable(onClick = onClick)
+    Row(
+        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Notification",
+            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.onSurface,
         )
     }
+
+    Box(
+        modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+        //.clickable(onClick = onClick)
+    )
 }
 
 @Composable
 fun ReviewTest(
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     SettingsMenuLink(
         title = { Text(text = "Review Priority Test") },
@@ -207,33 +199,27 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
     LaunchedEffect(memoryStorage.value) {
         devTools.keepScreenOn = memoryStorage.value
     }
-    MoreStuffTheme {
-        Column(
-            horizontalAlignment = Alignment.Start
-        ) {
-            SettingsSwitch(
-                enabled = enabledState.value,
-                state = memoryStorage,
-                modifier = Modifier.padding(end = 16.dp),
-                title = {
-                    Text(
-                        text = "Keep device screen on",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                },
-                onCheckedChange = { newValue ->
-                    when (newValue) {
-                        true ->
-                            (context as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                        false ->
-                            (context as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    }
-                    memoryStorage.value = newValue
-                    devTools.keepScreenOn = newValue
+    Column(
+        horizontalAlignment = Alignment.Start
+    ) {
+        SettingsSwitch(enabled = enabledState.value,
+            state = memoryStorage,
+            modifier = Modifier.padding(end = 16.dp),
+            title = {
+                Text(
+                    text = "Keep device screen on",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            },
+            onCheckedChange = { newValue ->
+                when (newValue) {
+                    true -> (context as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    false -> (context as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
-            )
-        }
+                memoryStorage.value = newValue
+                devTools.keepScreenOn = newValue
+            })
     }
 }
 
@@ -248,130 +234,105 @@ fun ReminderDebugging(devTools: DevTools) {
     LaunchedEffect(reminderDelayState.value) {
         devTools.todayDebugTime = reminderDelayState.value.toInt()
     }
-    MoreStuffTheme {
-        Column {
-            SettingsSwitch(
-                enabled = true,
-                modifier = Modifier.padding(end = 16.dp),
-                title = {
-                    Text(
-                        text = "Reminder Debugging",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Left
-                    )
-                },
-                state = switchState,
-                onCheckedChange = { isChecked ->
-                    devTools.debugReminders = isChecked
-                }
+    Column {
+        SettingsSwitch(enabled = true, modifier = Modifier.padding(end = 16.dp), title = {
+            Text(
+                text = "Reminder Debugging",
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Left
             )
-
-            if (switchState.value) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text(
-                            text = "Today reminder delay ${reminderDelayState.value.toInt()}",
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        SettingsSlider(
-                            enabled = switchState.value,
-                            state = reminderDelayState,
-                            title = {},
-                            steps = 119,
-                            valueRange = 1F..120F,
-                            modifier = Modifier.weight(1f),
-                            onValueChange = { newValue ->
-                                devTools.todayDebugTime = newValue.toInt()
-                            }
-                        )
-                    }
-
+        }, state = switchState, onCheckedChange = { isChecked ->
+            devTools.debugReminders = isChecked
+        })
+        if (switchState.value) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Today reminder delay ${reminderDelayState.value.toInt()}",
+                        fontSize = 16.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    SettingsSlider(enabled = switchState.value,
+                        state = reminderDelayState,
+                        title = {},
+                        steps = 119,
+                        valueRange = 1F..120F,
+                        modifier = Modifier.weight(1f),
+                        onValueChange = { newValue ->
+                            devTools.todayDebugTime = newValue.toInt()
+                        })
                 }
-
             }
         }
     }
 }
 
 @Composable
-fun SmartReminder(viewModel: SettingsViewModel) {
+fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
         rememberPreferenceBooleanSettingState("smart_reminder_memory_storage", false)
     val enabledState = rememberPreferenceBooleanSettingState("smart_reminder_enabled", true)
-    MoreStuffTheme {
-        Column(
-            horizontalAlignment = Alignment.Start,
-        ) {
-            SettingsSwitch(
-                enabled = enabledState.defaultValue,
-                state = memoryStorage,
-                modifier = Modifier.padding(end = 16.dp),
-                title = {
-                    Text(
-                        text = "Smart Reminder",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Left
-                    )
-                },
-                onCheckedChange = { newValue ->
-                    viewModel.smartReminderEnabled(newValue)
-                    memoryStorage.value = newValue
-                },
-            )
-        }
+
+    Column(
+        horizontalAlignment = Alignment.Start,
+    ) {
+        SettingsSwitch(
+            enabled = enabledState.defaultValue,
+            state = memoryStorage,
+            modifier = Modifier.padding(end = 16.dp),
+            title = {
+                Text(
+                    text = "Smart Reminder",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            onCheckedChange = { newValue ->
+                onSmartReminder(newValue)
+                memoryStorage.value = newValue
+            },
+        )
     }
 }
 
 @Composable
 fun Reset() {
     //val onClick = { TODO() }
-    MoreStuffTheme {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+    Column(modifier = Modifier.padding(16.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Reset",
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Box(
+            modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+            //.clickable(onClick = onClick)
+        ) {
+            Column(
+                verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Reset",
-                    fontSize = 20.sp,
+                    text = "Reset All Notifications",
+                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
+                    textAlign = TextAlign.Left
                 )
-            }
-
-            Box(
-                modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth()
-                //.clickable(onClick = onClick)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
-                ) {
-
-                    Text(
-                        text = "Reset All Notifications",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Left
-
-                    )
-
-                    Text(
-                        text = "Clear all pending notification messages",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Left
-
-                    )
-                }
+                Text(
+                    text = "Clear all pending notification messages",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
             }
         }
     }
@@ -410,9 +371,7 @@ fun About() {
         }
 
         Box(
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .fillMaxWidth()
+            modifier = Modifier.padding(top = 16.dp).fillMaxWidth()
             //.clickable(onClick = { TODO() })
         ) {
             Column(

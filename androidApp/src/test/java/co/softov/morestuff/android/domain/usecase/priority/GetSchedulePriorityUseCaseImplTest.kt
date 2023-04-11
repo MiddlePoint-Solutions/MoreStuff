@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.di.timeManagerModule
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -33,7 +34,7 @@ internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
         @JvmStatic
         fun setup() {
             startKoin {
-                modules(useCaseModules)
+                modules(useCaseModules + timeManagerModule)
             }
         }
 
