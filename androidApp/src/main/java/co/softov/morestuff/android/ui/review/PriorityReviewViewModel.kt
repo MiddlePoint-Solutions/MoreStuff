@@ -37,30 +37,44 @@ class PriorityReviewViewModel(
             )
         }
 
-        is SetupNextRound -> {
-            val (nextRound, roundItems) = when (state.round) {
-                Today -> {
-                    if (state.today.size > FINAL_ROUND_MINIMUM) {
-                        Now to state.today
-                    } else {
-                        Final to state.today
-                    }
+        is SetupNextRound -> when (state.round) {
+            Today -> {
+                val (nextRound, roundItems) = if (state.today.size > FINAL_ROUND_MINIMUM) {
+                    Now to state.today
+                } else {
+                    Final to state.today
                 }
-                Now -> {
-                    if (state.now.size > FINAL_ROUND_MINIMUM) {
-                        Now to state.now
-                    } else {
-                        Final to state.now
-                    }
-                }
-                else -> Final to state.now
+                state.copy(
+                    round = nextRound,
+                    roundNumber = state.roundNumber + 1,
+                    roundItems = roundItems,
+                )
             }
-
-            state.copy(
-                round = nextRound,
-                roundNumber = state.roundNumber + 1,
-                roundItems = roundItems
-            )
+            Now -> {
+                if (state.now.size > FINAL_ROUND_MINIMUM) {
+                    state.copy(
+                        round = Now,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.now,
+                        now = listOf()
+                    )
+                } else {
+                    state.copy(
+                        round = Final,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.now,
+                        now = listOf()
+                    )
+                }
+            }
+            else -> {
+                state.copy(
+                    round = Final,
+                    roundNumber = state.roundNumber + 1,
+                    roundItems = state.now,
+                    now = listOf()
+                )
+            }
         }
 
         is OnHighPriority -> state.apply {

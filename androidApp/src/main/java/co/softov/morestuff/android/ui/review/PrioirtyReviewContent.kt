@@ -4,8 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -81,40 +80,50 @@ fun ReviewContent(
                 val states =
                     model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
-                val undoAction: () -> Unit = {
-                    scope.launch {
-                        states.run {
-                            firstVisibleOrNull()?.let { first ->
-                                getOrNull(indexOf(first) + 1)?.let {
-                                    it.second.undo()
-                                    viewModel.undoTask(it.first)
+                val undoAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.run {
+                                firstVisibleOrNull()?.let { first ->
+                                    getOrNull(indexOf(first) + 1)?.let {
+                                        it.second.undo()
+                                        viewModel.undoTask(it.first)
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                val negativeAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                val negativeAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                        }
                     }
                 }
 
-                val positiveAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                val positiveAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                        }
                     }
                 }
 
-                val doneAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                val doneAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                        }
                     }
                 }
 
-                val laterAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                val laterAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                        }
                     }
                 }
 
@@ -122,8 +131,9 @@ fun ReviewContent(
 
                     PriorityRound.Today -> {
 
-                        val visibleState =
-                            remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
 
                         TaskPrioritySwipe(
                             modifier = modifier.align(Alignment.Center),
@@ -157,8 +167,9 @@ fun ReviewContent(
                     }
                     PriorityRound.Now -> {
 
-                        val visibleState =
-                            remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -207,8 +218,9 @@ fun ReviewContent(
                     }
                     PriorityRound.Final -> {
 
-                        val visibleState =
-                            remember(model.roundNumber) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -426,30 +438,32 @@ private fun TaskPrioritySwipe(
     states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
     onSwiped: (schedule: ScheduleListItemViewModel, direction: Direction, isLast: Boolean) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
-    // TODO: this could possibly be used to remove the current gesture
-    //  https://stackoverflow.com/questions/73488235/jetpack-compose-detect-drag-gesture-and-detect-interaction-source
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsDraggedAsState()
 
     Box(
         modifier
             .padding(24.dp)
             .fillMaxSize()
-            .aspectRatio(1f)
     ) {
         states.forEachIndexed { index, (schedule, state) ->
             if (state.swipedDirection == null) {
+
+                val selectedState = remember(schedule.taskId) { MutableTransitionState(false) }
+                val selectedTransition = updateTransition(selectedState, "Selected Transition")
+                val ratio by selectedTransition.animateFloat(label = "AspectRatio") {
+                    if (it) 0.8f else 1f
+                }
+
                 TaskCard(
                     modifier = modifier
+                        .layoutId(schedule.taskId)
                         .fillMaxSize()
-                        .swipableCard(
-                            state = state,
-                            blockedDirections = listOf(),
-                        )
+                        .aspectRatio(ratio)
+                        .swipableCard(state = state)
                         .graphicsLayer {
                             translationY = -(5 * index).dp.toPx()
+                        }
+                        .clickable {
+                            selectedState.targetState = !selectedState.currentState
                         },
                     schedule = schedule
                 )
