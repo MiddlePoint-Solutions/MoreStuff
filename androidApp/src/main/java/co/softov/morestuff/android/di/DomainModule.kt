@@ -49,6 +49,7 @@ val storeModule = module {
     single {
         AppStore(
             logger = get(),
+            devMiddleware = get(),
             errorMiddleware = get(),
             navigator = get(),
             taskMiddleware = get(),
@@ -59,7 +60,7 @@ val storeModule = module {
             settingsMiddleware = get(),
             priorityMiddleware = get(),
             reviewMiddleware = get(),
-            )
+        )
     }
 
     // Middleware
@@ -75,6 +76,7 @@ val storeModule = module {
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
     factoryOf(::ReviewMiddleware)
+    factoryOf(::DevMiddleware)
 
 }
 
@@ -121,6 +123,7 @@ val messageUseCases = module {
     factoryOf(::CreateTaskMessageUseCaseImpl) bind CreateTaskMessageUseCase::class
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
+    factoryOf(::ClearActivePendingMessagesImpl) bind ClearActiveReminderMessages::class
 }
 
 val priorityUseCases = module {
