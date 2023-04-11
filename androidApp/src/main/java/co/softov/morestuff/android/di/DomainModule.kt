@@ -138,3 +138,7 @@ val settingsUseCases = module {
 val timeManagerModule = module {
     singleOf(::TimeManagerImpl) bind TimeManager::class
 }
+
+val timeFormatterModule = module {
+    singleOf(::TimeFormatterImpl) bind TimeFormatter::class
+}
