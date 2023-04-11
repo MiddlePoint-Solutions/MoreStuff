@@ -1,12 +1,12 @@
 package co.softov.morestuff.android.ui.list.model
 
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-class TaskListItemMapper(private val timeManager: TimeManager) {
+class TaskListItemMapper(private val timeFormatter: TimeFormatter) {
 
     fun map(input: Task): TaskListItemViewModel {
         val formatter: DateTimeFormatter =
@@ -42,7 +42,7 @@ class TaskListItemMapper(private val timeManager: TimeManager) {
     }
 
     private fun markCompleteTime(timeString: String?): String? {
-        return timeManager.formatTime(timeString, "dd/MM/yyyy HH:mm")
+        return timeFormatter.formatTime(timeString, "dd/MM/yyyy HH:mm")
     }
 
     fun map(input: List<Task>): List<TaskListItemViewModel> {

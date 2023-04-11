@@ -14,6 +14,8 @@ import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
 import co.softov.morestuff.android.domain.usecase.task.*
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -24,6 +26,7 @@ val domainModules
         add(storeModule)
         addAll(useCaseModules)
         add(timeManagerModule)
+        add(timeFormatterModule)
     }
 
 val useCaseModules
@@ -228,3 +231,6 @@ val timeManagerModule = module {
     single<TimeManager> { TimeManagerImpl() }
 }
 
+val timeFormatterModule = module {
+    single<TimeFormatter> { TimeFormatterImpl() }
+}
