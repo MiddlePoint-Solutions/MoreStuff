@@ -25,6 +25,9 @@ import com.russhwolf.settings.*
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val dataModule = module {
@@ -33,8 +36,7 @@ val dataModule = module {
     single<ObservableSettings> {
         SharedPreferencesSettings(getSharedPreferences(androidContext()))
     }
-    single<DevTools>(createdAtStart = true) { DevToolsImpl(get()) }
-
+    singleOf(::DevToolsImpl) bind DevTools::class
     // Database
     single { createDatabase(androidApplication()) }
 
@@ -81,20 +83,13 @@ val dataModule = module {
             settings = getSettings(androidContext()),
         )
     }
-
-
     // Services
-    single<Scheduler> { SchedulerImpl(androidContext(), timeManager = get()) }
-    single<Notifier> { NotifierImpl(androidContext()) }
+    singleOf(::SchedulerImpl) bind Scheduler::class
+    singleOf(::NotifierImpl) bind Notifier::class
 
 
     // Platform specific use-cases
-    factory<GetPagedMessages> {
-        GetPagedMessagesImpl(
-            database = get()
-        )
-    }
-
+    factoryOf(::GetPagedMessagesImpl) bind GetPagedMessages::class
 }
 
 internal fun getSharedPreferences(context: Context): SharedPreferences {
