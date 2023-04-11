@@ -1,17 +1,13 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.redux.store.Test
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class ReviewMiddleware : Middleware<AppState> {
 
@@ -25,7 +21,12 @@ class ReviewMiddleware : Middleware<AppState> {
         when (action) {
 
             is ReviewAction.ScheduleReviewResults -> {
-                // TODO: write use-case that will create schedules for each task according to its priority
+                with(action) {
+                    dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.tomorrow))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.next, Priority.today))
+                    dispatch(ScheduleAction.RescheduleTasksAction(later, Priority.later))
+                    dispatch(TaskAction.CompleteTasksAction(done, true))
+                }
             }
 
             else -> NoOp

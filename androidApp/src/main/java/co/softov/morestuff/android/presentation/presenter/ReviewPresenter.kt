@@ -12,10 +12,11 @@ data class PriorityReviewModel(
     val round: PriorityRound = PriorityRound.Today,
     val roundNumber: Int = 0,
     val roundItems: List<ScheduleListItemViewModel> = listOf(),
-    val highPriority: List<ScheduleListItemViewModel> = listOf(),
-    val lowPriority: List<ScheduleListItemViewModel> = listOf(),
+    val now: List<ScheduleListItemViewModel> = listOf(),
+    val snooze: List<ScheduleListItemViewModel> = listOf(),
     val done: List<ScheduleListItemViewModel> = listOf(),
     val later: List<ScheduleListItemViewModel> = listOf(),
+    val today: List<ScheduleListItemViewModel> = listOf(),
     val tomorrow: List<ScheduleListItemViewModel> = listOf(),
 ) : BaseViewState
 

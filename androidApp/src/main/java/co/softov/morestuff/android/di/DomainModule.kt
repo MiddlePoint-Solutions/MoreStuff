@@ -85,7 +85,7 @@ val taskUseCases = module {
     factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
     factoryOf(::GetActiveTasksImpl) bind GetActiveTasks::class
     factoryOf(::GetCompletedTasksImpl) bind GetCompletedTasks::class
-    factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
+    factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
 }

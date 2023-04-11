@@ -38,45 +38,54 @@ class PriorityReviewViewModel(
         }
 
         is SetupNextRound -> {
-            val nextRound = when {
-                state.highPriority.size > FINAL_ROUND_MINIMUM -> Now
-                else -> Final
-            }
-
-            val tomorrow = when {
-                nextRound == Now && state.round == Today -> state.lowPriority
-                else -> state.tomorrow
-            }
-
-            val lowPriority = when {
-                nextRound == Now && state.round == Today -> listOf()
-                else -> state.lowPriority
-            }
-
-            val highPriority = when (nextRound) {
-                Final -> state.highPriority
-                else -> listOf()
+            val (nextRound, roundItems) = when (state.round) {
+                Today -> {
+                    if (state.today.size > FINAL_ROUND_MINIMUM) {
+                        Now to state.today
+                    } else {
+                        Final to state.today
+                    }
+                }
+                Now -> {
+                    if (state.now.size > FINAL_ROUND_MINIMUM) {
+                        Now to state.now
+                    } else {
+                        Final to state.now
+                    }
+                }
+                else -> Final to state.now
             }
 
             state.copy(
                 round = nextRound,
                 roundNumber = state.roundNumber + 1,
-                roundItems = state.highPriority,
-                highPriority = highPriority,
-                lowPriority = lowPriority,
-                tomorrow = tomorrow
+                roundItems = roundItems
             )
         }
 
-        is OnHighPriority -> state.copy(highPriority = state.highPriority + event.item)
-        is OnLowPriority -> state.copy(lowPriority = state.lowPriority + event.item)
+        is OnHighPriority -> state.apply {
+            return if (round == Today) {
+                copy(today = today + event.item)
+            } else {
+                copy(now = now + event.item)
+            }
+        }
+        is OnLowPriority -> state.apply {
+            return if (round == Today) {
+                copy(tomorrow = tomorrow + event.item)
+            } else {
+                copy(snooze = snooze + event.item)
+            }
+        }
         is OnDone -> state.copy(done = state.done + event.item)
         is OnLater -> state.copy(later = state.later + event.item)
         is Undo -> state.copy(
-            highPriority = state.highPriority - event.item,
-            lowPriority = state.lowPriority - event.item,
+            now = state.now - event.item,
+            snooze = state.snooze - event.item,
             done = state.done - event.item,
             later = state.later - event.item,
+            today = state.today - event.item,
+            tomorrow = state.tomorrow - event.item,
         )
     }
 
@@ -99,12 +108,13 @@ class PriorityReviewViewModel(
         dispatchAppStoreAction(
             ReviewAction.ScheduleReviewResults(
                 tomorrow = state.tomorrow.map { it.taskId },
-                now = state.highPriority.map { it.taskId },
-                next = state.lowPriority.map { it.taskId },
+                now = state.now.map { it.taskId },
+                next = state.snooze.map { it.taskId },
                 done = state.done.map { it.taskId },
                 later = state.later.map { it.taskId },
             )
         )
+        navigateBack()
     }
 
     fun onTaskSwiped(

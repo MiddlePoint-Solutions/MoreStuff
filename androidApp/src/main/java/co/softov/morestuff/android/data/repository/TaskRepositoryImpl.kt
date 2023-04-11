@@ -62,17 +62,23 @@ class TaskRepositoryImpl(
         }).asFlow().mapToList()
     }
 
-    override suspend fun updateTaskComplete(
-        taskId: Long,
+    override suspend fun updateTasksComplete(
+        taskIds: List<Long>,
         complete: Boolean,
     ): Either<Failure, Boolean> {
         val time = when (complete) {
             true -> timeManager.nowLocalDateTimeString
             false -> null
         }
-        taskQueries.updateTaskComplete(time, taskId)
-        return Right(true)
+
+        return taskQueries.transactionWithResult {
+            taskIds.forEach {
+                taskQueries.updateTaskComplete(time, it)
+            }
+            Right(true)
+        }
     }
+
 
     override suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean> {
         taskQueries.updateTaskTitle(title, taskId)

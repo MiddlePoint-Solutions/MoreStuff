@@ -11,8 +11,6 @@ import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.SetTaskComplete
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
 import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
@@ -24,6 +22,11 @@ import timber.log.Timber
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
     data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
+
+    data class RescheduleTasksAction(
+        val taskIds: List<Long>,
+        val priority: Priority
+    ) : ScheduleAction()
 
     internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
 
@@ -57,14 +60,26 @@ class ScheduleMiddleware(
     ): Action {
         when (action) {
 
-            is TaskCreatedAction -> scope.launch {
-                createScheduleUseCase(action.task.id, action.priority).map {
-                    dispatch(ScheduleCreatedAction(it))
+            is TaskAction.TaskCreatedAction -> scope.launch {
+                with(action) {
+                    createScheduleUseCase(task.id, priority).map {
+                        dispatch(ScheduleCreatedAction(it))
+                    }
                 }
             }
 
-            is SetTaskComplete -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId)
+            is TaskAction.CompleteTaskAction -> scope.launch {
+                if (action.complete) {
+                    cancelActiveScheduleUseCase(action.taskId)
+                }
+            }
+
+            is TaskAction.CompleteTasksAction -> scope.launch {
+                if (action.complete) {
+                    action.taskIds.forEach {
+                        cancelActiveScheduleUseCase(it)
+                    }
+                }
             }
 
             is RescheduleTaskAction -> scope.launch {
@@ -72,6 +87,17 @@ class ScheduleMiddleware(
                     val params = RescheduleTaskUseCaseParams(taskId, priority)
                     rescheduleTaskUseCase(params).map {
                         dispatch(ScheduleCreatedAction(it))
+                    }
+                }
+            }
+
+            is RescheduleTasksAction -> scope.launch {
+                with(action) {
+                    action.taskIds.forEach {
+                        val params = RescheduleTaskUseCaseParams(it, priority)
+                        rescheduleTaskUseCase(params).map { schedule ->
+                            dispatch(ScheduleCreatedAction(schedule))
+                        }
                     }
                 }
             }
@@ -92,7 +118,7 @@ class ScheduleMiddleware(
                         dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
-                    DONE -> dispatch(SetTaskComplete(schedule.taskId, true))
+                    DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }
             }
 

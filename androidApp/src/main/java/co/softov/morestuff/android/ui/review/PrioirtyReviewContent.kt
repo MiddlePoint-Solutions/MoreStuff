@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -269,7 +268,7 @@ fun ReviewContent(
                             ReviewFinalControls(
                                 modifier = modifier.align(Alignment.BottomCenter),
                                 resetAction = viewModel::reset,
-                                finishAction = viewModel::navigateBack
+                                finishAction = viewModel::confirmResults
                             )
                         }
                     }
@@ -579,7 +578,7 @@ private fun RoundInfo(
             )
 
             val debug = with(model) {
-                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size}  High: ${highPriority.size}  Low: ${lowPriority.size}  Done: ${done.size}  Later: ${later.size}"
+                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size}  Today: ${today.size}  Now: ${now.size}  Low: ${snooze.size}  Done: ${done.size}  Later: ${later.size}"
             }
 
             Text(
