@@ -27,7 +27,7 @@ fun Modifier.swipableCard(
     state: SwipeableCardState,
     onSwiped: (Direction) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
-    blockedDirections: List<Direction> = listOf(Direction.Up, Direction.Down),
+    blockedDirections: List<Direction> = listOf(),
 ) = pointerInput(state) {
     coroutineScope {
         val velocityTracker = VelocityTracker()

@@ -49,6 +49,7 @@ val storeModule = module {
     single {
         AppStore(
             logger = get(),
+            devMiddleware = get(),
             errorMiddleware = get(),
             navigator = get(),
             taskMiddleware = get(),
@@ -59,7 +60,7 @@ val storeModule = module {
             settingsMiddleware = get(),
             priorityMiddleware = get(),
             reviewMiddleware = get(),
-            )
+        )
     }
 
     // Middleware
@@ -75,6 +76,7 @@ val storeModule = module {
     factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
     factoryOf(::ReviewMiddleware)
+    factoryOf(::DevMiddleware)
 
 }
 
@@ -85,7 +87,7 @@ val taskUseCases = module {
     factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
     factoryOf(::GetActiveTasksImpl) bind GetActiveTasks::class
     factoryOf(::GetCompletedTasksImpl) bind GetCompletedTasks::class
-    factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
+    factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
 }
@@ -110,6 +112,7 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
+    factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
 }
 
 val messageUseCases = module {
@@ -120,6 +123,7 @@ val messageUseCases = module {
     factoryOf(::CreateTaskMessageUseCaseImpl) bind CreateTaskMessageUseCase::class
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
+    factoryOf(::ClearActivePendingMessagesImpl) bind ClearActiveReminderMessages::class
 }
 
 val priorityUseCases = module {

@@ -1,46 +1,134 @@
 package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.domain.usecase.priority.GetSchedulesForPriorityReviewUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
+import co.softov.morestuff.android.presentation.presenter.PriorityReviewViewEvent
+import co.softov.morestuff.android.presentation.presenter.PriorityReviewViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
+import co.softov.morestuff.android.presentation.presenter.PriorityRound.*
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.Direction
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class PriorityReviewViewModel(
     private val getSchedulesForPriorityReviewUseCase: GetSchedulesForPriorityReviewUseCase
-) : NoStateViewModel() {
+) : BaseViewModel<PriorityReviewModel, PriorityReviewViewEvent>(PriorityReviewModel()) {
 
     private val mapper = ScheduleListItemMapper()
 
-    private var _model = MutableStateFlow(PriorityReviewModel())
-    val model: StateFlow<PriorityReviewModel> get() = _model
-
-    private val priorityTasks = mutableListOf<ScheduleListItemViewModel>()
-
     init {
+        loadData()
+    }
+
+    override fun onLoadData() {
         setInitialState()
     }
 
-    private fun setInitialState(round: PriorityRound = PriorityRound.Initial) {
+    override fun onReduceState(event: PriorityReviewViewEvent) = when (event) {
+        is SetupInitialRound -> {
+            PriorityReviewModel(
+                round = event.round,
+                roundNumber = 1,
+                roundItems = event.items
+            )
+        }
+
+        is SetupNextRound -> when (state.round) {
+            Today -> {
+                val (nextRound, roundItems) = if (state.today.size > FINAL_ROUND_MINIMUM) {
+                    Now to state.today
+                } else {
+                    Final to state.today
+                }
+                state.copy(
+                    round = nextRound,
+                    roundNumber = state.roundNumber + 1,
+                    roundItems = roundItems,
+                )
+            }
+            Now -> {
+                if (state.now.size > FINAL_ROUND_MINIMUM) {
+                    state.copy(
+                        round = Now,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.now,
+                        now = listOf()
+                    )
+                } else {
+                    state.copy(
+                        round = Final,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.now,
+                        now = listOf()
+                    )
+                }
+            }
+            else -> {
+                state.copy(
+                    round = Final,
+                    roundNumber = state.roundNumber + 1,
+                    roundItems = state.now,
+                    now = listOf()
+                )
+            }
+        }
+
+        is OnHighPriority -> state.apply {
+            return if (round == Today) {
+                copy(today = today + event.item)
+            } else {
+                copy(now = now + event.item)
+            }
+        }
+        is OnLowPriority -> state.apply {
+            return if (round == Today) {
+                copy(tomorrow = tomorrow + event.item)
+            } else {
+                copy(snooze = snooze + event.item)
+            }
+        }
+        is OnDone -> state.copy(done = state.done + event.item)
+        is OnLater -> state.copy(later = state.later + event.item)
+        is Undo -> state.copy(
+            now = state.now - event.item,
+            snooze = state.snooze - event.item,
+            done = state.done - event.item,
+            later = state.later - event.item,
+            today = state.today - event.item,
+            tomorrow = state.tomorrow - event.item,
+        )
+    }
+
+    private fun setInitialState(round: PriorityRound = Today) {
         viewModelScope.launch {
             val schedules = getSchedulesForPriorityReviewUseCase().map(mapper::map).shuffled()
-            _model.value = PriorityReviewModel(items = schedules, round = round)
+            sendEvent(SetupInitialRound(round, schedules))
         }
     }
 
     fun reset() {
-        setInitialState(round = PriorityRound.Next)
+        setInitialState()
     }
 
     fun undoTask(schedule: ScheduleListItemViewModel) {
-        priorityTasks.remove(schedule)
+        sendEvent(Undo(schedule))
+    }
+
+    fun confirmResults() {
+        dispatchAppStoreAction(
+            ReviewAction.ScheduleReviewResults(
+                tomorrow = state.tomorrow.map { it.taskId },
+                now = state.now.map { it.taskId },
+                next = state.snooze.map { it.taskId },
+                done = state.done.map { it.taskId },
+                later = state.later.map { it.taskId },
+            )
+        )
+        navigateBack()
     }
 
     fun onTaskSwiped(
@@ -48,42 +136,21 @@ class PriorityReviewViewModel(
         direction: Direction,
         isLast: Boolean
     ) {
-        Timber.d("Schedule: ${schedule.taskTitle}, swiped: $direction, isLast: $isLast")
-        when (direction) {
-            Direction.Left -> {}
-            Direction.Right -> priorityTasks.add(schedule)
-            Direction.Up -> {}
-            Direction.Down -> {}
+        val event = when (direction) {
+            Direction.Left -> OnLowPriority(schedule)
+            Direction.Right -> OnHighPriority(schedule)
+            Direction.Up -> OnDone(schedule)
+            Direction.Down -> OnLater(schedule)
         }
+        sendEvent(event)
 
         if (isLast) {
-            val nextRound = when {
-                priorityTasks.size >= NEXT_ROUND_MINIMUM -> PriorityRound.Next
-                priorityTasks.size > 0 -> PriorityRound.Final
-                else -> PriorityRound.Final // TODO: suggest random task?
-            }
-            setupNextRound(nextRound)
-        }
-    }
-
-    private fun setupNextRound(round: PriorityRound) {
-        viewModelScope.launch {
-            _model.update {
-                it.copy(
-                    number = it.number + 1,
-                    round = round,
-                    items = priorityTasks.toMutableList().shuffled()
-                ).also { next ->
-                    Timber.d("round: ${next.round}, number: ${next.number}")
-                }
-            }
-        }.invokeOnCompletion {
-            priorityTasks.clear()
+            sendEvent(SetupNextRound)
         }
     }
 
     companion object {
-        const val NEXT_ROUND_MINIMUM = 3
+        const val FINAL_ROUND_MINIMUM = 1
     }
 
 }

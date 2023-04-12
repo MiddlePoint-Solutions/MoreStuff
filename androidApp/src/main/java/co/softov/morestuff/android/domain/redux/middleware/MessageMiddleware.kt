@@ -2,12 +2,12 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.replyWithTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
@@ -43,15 +43,18 @@ class MessageMiddleware(
             }
 
             is ScheduleAction.RescheduleTaskAction -> scope.launch {
-                val (title, replyType) = when (action.priority) {
-                    is Priority.Later -> "Later" to ReplyType.LATER
-                    is Priority.Today -> "Snooze" to ReplyType.SNOOZE
-                    is Priority.Tomorrow -> "Tomorrow" to ReplyType.TOMORROW
-                }
+                val (title, replyType) = action.priority.replyWithTitle
                 setScheduleResponseMessage(action.taskId, title, replyType)
             }
 
-            is TaskAction.SetTaskComplete -> scope.launch {
+            is ScheduleAction.RescheduleTasksAction -> scope.launch {
+                val (title, replyType) = action.priority.replyWithTitle
+                action.taskIds.forEach {
+                    setScheduleResponseMessage(it, title, replyType)
+                }
+            }
+
+            is TaskAction.CompleteTaskAction -> scope.launch {
                 setScheduleResponseMessage(action.taskId, "Done", ReplyType.DONE)
             }
 

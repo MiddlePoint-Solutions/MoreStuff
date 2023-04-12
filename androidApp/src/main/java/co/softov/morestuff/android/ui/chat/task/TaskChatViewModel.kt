@@ -3,25 +3,19 @@ package co.softov.morestuff.android.ui.chat.task
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
-import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.*
-import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessages
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 class TaskChatViewModel(
     getMessages: GetMessages,
@@ -79,7 +73,7 @@ class TaskChatViewModel(
     }
 
     fun setTaskComplete(complete: Boolean) {
-        store.dispatch(TaskAction.SetTaskComplete(taskId = taskId, complete))
+        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
     }
 
     fun onBackPressed() {

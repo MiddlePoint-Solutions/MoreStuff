@@ -26,6 +26,8 @@ interface MessageRepository {
 
     suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)
 
+    suspend fun clearActiveReminderMessages()
+
 }
 
 object MessageDoesNotExist : FeatureFailure

@@ -61,6 +61,10 @@ UPDATE message
 SET reply_type = ?, reply_content = ?, reply_time = ?
 WHERE id = ?;
 
+deleteActiveReminderMessages:
+DELETE FROM message
+WHERE content_type = 200 AND (content_type = 200 AND reply_time IS NULL);
+
 countMessages:
 SELECT count(*) FROM message;
 

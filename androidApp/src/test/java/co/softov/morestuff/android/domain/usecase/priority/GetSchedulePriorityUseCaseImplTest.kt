@@ -2,14 +2,13 @@ package co.softov.morestuff.android.domain.usecase.priority
 
 import arrow.core.Either
 import arrow.core.getOrHandle
-import co.softov.morestuff.android.di.useCaseModules
 import co.softov.morestuff.android.domain.model.DefaultOption
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.TimeOfDayOption
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.data.service.TimeManagerImpl
-import co.softov.morestuff.android.di.timeManagerModule
+import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,33 +16,12 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
 import org.koin.test.KoinTest
 import org.koin.test.get
 
-internal class GetSchedulePriorityUseCaseImplTest : KoinTest {
-
-    companion object {
-
-        @BeforeAll
-        @JvmStatic
-        fun setup() {
-            startKoin {
-                modules(useCaseModules + timeManagerModule)
-            }
-        }
-
-        @AfterAll
-        fun cleanup() {
-            stopKoin()
-        }
-
-    }
+internal class GetSchedulePriorityUseCaseImplTest : DomainKoinTest {
 
     private val getActiveScheduleFlowUseCase: GetActiveScheduleFlowUseCase = mockk()
     private val getUpcomingPriorityUseCase: GetUpcomingPriorityUseCase = mockk()
