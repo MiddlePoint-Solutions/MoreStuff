@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter
 interface TimeFormatter {
     fun formatTime(timeString: String?, pattern: String): String?
     fun formatTimeOnly(timeString: String?): String?
+    fun formatTimeDayAndMonth(timeString: String?): String?
 }
 
 
@@ -26,5 +27,9 @@ class TimeFormatterImpl : TimeFormatter {
 
     override fun formatTimeOnly(timeString: String?): String? {
         return formatTime(timeString, "HH:mm")
+    }
+
+    override fun formatTimeDayAndMonth(timeString: String?): String? {
+        return formatTime(timeString, "EEEE, MMMM d")
     }
 }
