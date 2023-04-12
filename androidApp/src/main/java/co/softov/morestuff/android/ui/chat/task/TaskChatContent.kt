@@ -29,6 +29,8 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
@@ -39,10 +41,8 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
-import kotlinx.datetime.TimeZone
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -247,27 +247,29 @@ private fun ScheduleButton(
     priority: TaskPriorityModel,
     editScheduleAction: () -> Unit,
     task: Task,
+    timeFormatter: TimeFormatter = TimeFormatterImpl(),
+    todayPriority: String = stringResource(R.string.time_option_today),
+    tomorrowPriority: String = stringResource(R.string.time_option_tomorrow),
 ) {
 
     val title = when {
         schedule == null -> {
             stringResource(R.string.task_chat_schedule_reminder)
         }
-        schedule.scheduleUtcTime == null -> { "Later" }
+        schedule.scheduleUtcTime == null -> {
+            stringResource(R.string.time_option_later)
+        }
         else -> {
-            val instant = schedule.scheduleUtcTime.let { Instant.parse(it) }
-            val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-
-            fun formatTime(localDateTime: LocalDateTime): String =
-                localDateTime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime)
 
             when (priority.priorityModel.priority) {
-                is Priority.Today -> "${stringResource(R.string.time_option_today)} ${formatTime(localDateTime)}"
-                is Priority.Tomorrow -> "${stringResource(R.string.time_option_tomorrow)} ${formatTime(localDateTime)}"
-                is Priority.Later -> formatDayAndMonth(localDateTime)
+                is Priority.Today -> "$todayPriority $formattedTime"
+                is Priority.Tomorrow -> "$tomorrowPriority $formattedTime"
+                is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
             }
         }
-    }
+    }.orEmpty()
+
 
     PriorityButton(
         onSelected = editScheduleAction,
@@ -296,13 +298,4 @@ private fun TaskChatPreview() {
             taskId = 1
         )
     }
-}
-
-fun formatDayAndMonth(localDateTime: LocalDateTime): String {
-    val dayOfWeek = localDateTime.dayOfWeek.name.lowercase(Locale.getDefault())
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-    val month = localDateTime.month.name.lowercase(Locale.getDefault())
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-    val dayOfMonth = localDateTime.dayOfMonth
-    return "$dayOfWeek, $month $dayOfMonth"
 }
