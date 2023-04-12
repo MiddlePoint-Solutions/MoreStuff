@@ -26,6 +26,7 @@
     <string name="time_option_custom">Custom</string>
     <string name="time_option_later">Later</string>
     <string name="time_option_tomorrow">Tomorrow</string>
+    <string name="time_option_today">Today</string>
 
     <string name="option_complete">Complete</string>
 

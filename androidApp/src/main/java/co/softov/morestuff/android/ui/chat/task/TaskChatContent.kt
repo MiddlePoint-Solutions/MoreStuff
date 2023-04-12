@@ -262,8 +262,8 @@ private fun ScheduleButton(
                 localDateTime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm"))
 
             when (priority.priorityModel.priority) {
-                is Priority.Today -> "Today ${formatTime(localDateTime)}"
-                is Priority.Tomorrow -> "Tomorrow ${formatTime(localDateTime)}"
+                is Priority.Today -> "${stringResource(R.string.time_option_today)} ${formatTime(localDateTime)}"
+                is Priority.Tomorrow -> "${stringResource(R.string.time_option_tomorrow)} ${formatTime(localDateTime)}"
                 is Priority.Later -> formatDayAndMonth(localDateTime)
             }
         }
