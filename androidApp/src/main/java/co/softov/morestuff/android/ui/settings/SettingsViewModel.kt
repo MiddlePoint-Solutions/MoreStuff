@@ -1,8 +1,12 @@
 package co.softov.morestuff.android.ui.settings
 
+import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.ui.Screens
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
@@ -24,5 +28,9 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
 
     fun clearPendingMessages() {
         dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
+    }
+
+    fun testReviewActivity() {
+        router.navigateTo(Screens.notificationActivity)
     }
 }

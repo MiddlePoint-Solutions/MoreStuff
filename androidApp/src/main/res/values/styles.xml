@@ -41,6 +41,8 @@
         <item name="android:backgroundDimAmount">0.3</item>
         <item name="android:windowFrame">@null</item>
         <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="AlertBottomSheetDialogTheme.Dialog">

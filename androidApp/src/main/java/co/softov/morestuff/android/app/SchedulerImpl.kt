@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.app
 
-import android.content.Context
+import android.app.AlarmManager
 import androidx.work.*
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.SmartReminderWorker
@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 
 class SchedulerImpl(
     private val workManager: WorkManager,
+    private val alarmManager: AlarmManager,
     private val timeManager: TimeManager
 ) : Scheduler, KoinComponent {
 
@@ -48,7 +49,7 @@ class SchedulerImpl(
     }
 
     override fun scheduleMorningReview() {
-        TODO("Not yet implemented")
+        TODO("Implement alarmManager exact scheduling")
     }
 
     override fun cancelSchedule(scheduleId: Long) {
@@ -63,5 +64,6 @@ class SchedulerImpl(
 
     companion object {
         private const val SMART_REMINDER_WORK = "SmartReminder"
+        private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }

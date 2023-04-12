@@ -11,9 +11,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,7 +61,8 @@ fun SettingsScreen(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             DeveloperSettings(
-                clearPendingMessages = viewModel::clearPendingMessages
+                clearPendingMessages = viewModel::clearPendingMessages,
+                testReviewActivity = viewModel::testReviewActivity
             )
             Notification()
             KeepDeviceScreenOn(devTools = devTools)
@@ -154,7 +157,8 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
 
 @Composable
 fun DeveloperSettings(
-    clearPendingMessages: () -> Unit
+    clearPendingMessages: () -> Unit,
+    testReviewActivity: () -> Unit,
 ) {
     Column {
         Row(
@@ -177,6 +181,19 @@ fun DeveloperSettings(
             title = { Text(text = "Clear All Message replies") },
             subtitle = { Text(text = "This will clear all pending message replies") },
             onClick = clearPendingMessages,
+        )
+
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        SettingsMenuLink(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.NotificationAdd,
+                    contentDescription = "Show priority review notification"
+                )
+            },
+            title = { Text(text = "Test priority review notification") },
+            onClick = testReviewActivity,
         )
     }
 }
