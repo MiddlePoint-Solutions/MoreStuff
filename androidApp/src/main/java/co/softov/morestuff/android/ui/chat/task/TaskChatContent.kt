@@ -28,8 +28,10 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
@@ -231,19 +233,48 @@ private fun TaskChatTopBar(
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        FormatPriorityButtonText(schedule, priority.priorityModel.priority)?.let {
-                            PriorityButton(
-                                onSelected = editScheduleAction,
-                                text = it,
-                                shape = RoundedCornerShape(percent = 50),
-                                enabled = !task.isComplete
-                            )
-                        }
+                        ScheduleButton(schedule, priority, editScheduleAction, task)
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun ScheduleButton(
+    schedule: Schedule?,
+    priority: TaskPriorityModel,
+    editScheduleAction: () -> Unit,
+    task: Task,
+) {
+
+    val title = when {
+        schedule == null -> {
+            stringResource(R.string.task_chat_schedule_reminder)
+        }
+        schedule.scheduleUtcTime == null -> { "Later" }
+        else -> {
+            val instant = schedule.scheduleUtcTime.let { Instant.parse(it) }
+            val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+            fun formatTime(localDateTime: LocalDateTime): String =
+                localDateTime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+
+            when (priority.priorityModel.priority) {
+                is Priority.Today -> "Today ${formatTime(localDateTime)}"
+                is Priority.Tomorrow -> "Tomorrow ${formatTime(localDateTime)}"
+                is Priority.Later -> formatDayAndMonth(localDateTime)
+            }
+        }
+    }
+
+    PriorityButton(
+        onSelected = editScheduleAction,
+        text = title,
+        shape = RoundedCornerShape(percent = 50),
+        enabled = !task.isComplete
+    )
 }
 
 @Preview
@@ -264,58 +295,6 @@ private fun TaskChatPreview() {
         TaskChatContent(
             taskId = 1
         )
-    }
-}
-
-/* TODO: THIS CODE IS WITH KOTLINX DATE TIME AND JAVA TIME
-*@Composable
-private fun FormatPriorityButtonText(schedule: Schedule?, priority: Priority): String {
-    val defaultText = stringResource(R.string.task_chat_schedule_reminder)
-    if (schedule == null) {
-        return defaultText
-    }
-
-    val instant = schedule.scheduleUtcTime?.let { Instant.parse(it) }
-    val localDateTime = instant?.toLocalDateTime(TimeZone.currentSystemDefault())
-
-    return when (priority) {
-        is Priority.Today -> {
-            val formattedTime = localDateTime?.toJavaLocalDateTime()?.format(DateTimeFormatter.ofPattern("HH:mm"))
-            "Today $formattedTime"
-        }
-        is Priority.Tomorrow -> {
-            val formattedTime = localDateTime?.toJavaLocalDateTime()?.format(DateTimeFormatter.ofPattern("HH:mm"))
-            "Tomorrow $formattedTime"
-        }
-        is Priority.Later -> {
-            val dayOfWeek = localDateTime?.dayOfWeek?.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault())
-            val month = localDateTime?.month?.getDisplayName(java.time.format.TextStyle.FULL, Locale.getDefault())
-            val dayOfMonth = localDateTime?.dayOfMonth
-            "$dayOfWeek, $month $dayOfMonth"
-        }
-    }
-}*/
-
-
-
-// TODO: THIS CODE IS WHIT KOTLINX DATE TIME
-@Composable
-private fun FormatPriorityButtonText(schedule: Schedule?, priority: Priority): String? {
-    val defaultText = stringResource(R.string.task_chat_schedule_reminder)
-    if (schedule == null) {
-        return defaultText
-    }
-
-    val instant = schedule.scheduleUtcTime?.let { Instant.parse(it) }
-    val localDateTime = instant?.toLocalDateTime(TimeZone.currentSystemDefault())
-
-    fun formatTime(localDateTime: LocalDateTime): String =
-        localDateTime.toJavaLocalDateTime().format(DateTimeFormatter.ofPattern("HH:mm"))
-
-    return when (priority) {
-        is Priority.Today -> "Today ${localDateTime?.let { formatTime(it) }}"
-        is Priority.Tomorrow -> "Tomorrow ${localDateTime?.let { formatTime(it) }}"
-        is Priority.Later -> localDateTime?.let { formatDayAndMonth(it) }
     }
 }
 
