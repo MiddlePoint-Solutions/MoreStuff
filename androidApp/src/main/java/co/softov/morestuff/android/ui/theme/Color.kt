@@ -16,7 +16,8 @@ val Orange600 = Color(0xfffb8c00)
 val Red200 = Color(0xfff297a2)
 val Red800 = Color(0xffd00036)
 
-
+val BlueDark = Color(0xFFB3E5FC)
+val BlueLight = Color(0xFF303F9F)
 
 
 

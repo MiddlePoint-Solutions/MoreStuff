@@ -1,9 +1,14 @@
 package co.softov.morestuff.android.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+
+
 
 private val LightColors = lightColorScheme(
     primary = Color.White,
@@ -37,6 +42,25 @@ fun MoreStuffTheme(
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = Typography(),
-        content = content
-    )
+    ) {
+        CustomSelectionColor(darkTheme) {
+            content()
+        }
+    }
+}
+
+
+@Composable
+fun CustomSelectionColor(darkTheme: Boolean, content: @Composable () -> Unit) {
+    val customSelectionColor = if (!darkTheme) {
+        BlueDark
+    } else {
+        BlueLight
+    }
+    CompositionLocalProvider(LocalTextSelectionColors provides TextSelectionColors(
+        handleColor = customSelectionColor,
+        backgroundColor = customSelectionColor.copy(alpha = 0.5f)
+    )) {
+        content()
+    }
 }
