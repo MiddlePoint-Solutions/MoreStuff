@@ -10,10 +10,10 @@ import co.softov.morestuff.android.data.service.TimeManager
 import org.koin.core.component.KoinComponent
 import java.util.concurrent.TimeUnit
 
-class SchedulerImpl(context: Context, private val timeManager: TimeManager) : Scheduler,
-    KoinComponent {
-
-    private val workManager = WorkManager.getInstance(context)
+class SchedulerImpl(
+    private val workManager: WorkManager,
+    private val timeManager: TimeManager
+) : Scheduler, KoinComponent {
 
     override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
         val data = ScheduleWorker.createWorkerData(scheduleId)
@@ -45,6 +45,10 @@ class SchedulerImpl(context: Context, private val timeManager: TimeManager) : Sc
                 request
             )
         }
+    }
+
+    override fun scheduleMorningReview() {
+        TODO("Not yet implemented")
     }
 
     override fun cancelSchedule(scheduleId: Long) {

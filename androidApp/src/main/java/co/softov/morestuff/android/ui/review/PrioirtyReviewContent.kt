@@ -4,8 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -33,8 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
+import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
 import co.softov.morestuff.android.presentation.presenter.PriorityRound
 import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
@@ -45,7 +46,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import timber.log.Timber
 
 @Composable
 fun ReviewContent(
@@ -67,63 +67,73 @@ fun ReviewContent(
                 .systemBarsPadding()
         ) {
 
-            val model by viewModel.model.collectAsState()
+            val model by viewModel.uiModel.collectAsState()
             val scope = rememberCoroutineScope()
-
-            var hint by remember { mutableStateOf("Round ${model.number} - ${model.round}") }
-            hint = "Round ${model.number} - ${model.round}"
 
             Column {
                 PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
-                Hint(hint)
+                RoundInfo(model)
             }
 
             Box {
 
-                val states = model.items.map { it to rememberSwipeableCardState(model.number) }
+                val states =
+                    model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
-                val undoAction: () -> Unit = {
-                    scope.launch {
-                        states.run {
-                            firstVisibleOrNull()?.let { first ->
-                                getOrNull(indexOf(first) + 1)?.let {
-                                    it.second.undo()
-                                    viewModel.undoTask(it.first)
+                val undoAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.run {
+                                firstVisibleOrNull()?.let { first ->
+                                    getOrNull(indexOf(first) + 1)?.let {
+                                        it.second.undo()
+                                        viewModel.undoTask(it.first)
+                                    }
                                 }
                             }
                         }
                     }
                 }
 
-                val negativeAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                val negativeAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                        }
                     }
                 }
 
-                val positiveAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                val positiveAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                        }
                     }
                 }
 
-                val doneAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                val doneAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                        }
                     }
                 }
 
-                val laterAction: () -> Unit = {
-                    scope.launch {
-                        states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                val laterAction: () -> Unit = remember(Unit) {
+                    {
+                        scope.launch {
+                            states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                        }
                     }
                 }
 
                 when (model.round) {
 
-                    PriorityRound.Initial -> {
+                    PriorityRound.Today -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
 
                         TaskPrioritySwipe(
                             modifier = modifier.align(Alignment.Center),
@@ -142,7 +152,7 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
@@ -155,9 +165,11 @@ fun ReviewContent(
                             )
                         }
                     }
-                    PriorityRound.Next -> {
+                    PriorityRound.Now -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -174,7 +186,7 @@ fun ReviewContent(
                             TaskPrioritySwipe(
                                 modifier = modifier
                                     .align(Alignment.Center)
-                                    .layoutId("${model.round}-${model.number}"),
+                                    .layoutId("${model.round}-${model.roundNumber}"),
                                 states = states,
                                 onSwiped = { schedule, direction, isLast ->
                                     scope.launch {
@@ -191,7 +203,7 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
@@ -206,7 +218,9 @@ fun ReviewContent(
                     }
                     PriorityRound.Final -> {
 
-                        val visibleState = remember(model.number) { MutableTransitionState(false) }
+                        val visibleState = remember(model.roundNumber) {
+                            MutableTransitionState(false)
+                        }
                         val transition = updateTransition(visibleState, "Visible state")
 
                         val screenWidth = with(LocalDensity.current) {
@@ -234,18 +248,23 @@ fun ReviewContent(
                                     )
                                 }
                                 states.size == 1 -> {
-                                    // TODO: disable swiping
-                                    TaskPrioritySwipe(
-                                        modifier = modifier,
-                                        states = states,
-                                        onSwiped = viewModel::onTaskSwiped,
-                                    )
+                                    Box(
+                                        modifier
+                                            .padding(24.dp)
+                                            .fillMaxSize()
+                                            .aspectRatio(1f)
+                                    ) {
+                                        TaskCard(
+                                            modifier = modifier.fillMaxSize(),
+                                            schedule = states.first().first
+                                        )
+                                    }
                                 }
                                 else -> {
                                     LazyColumn(
                                         contentPadding = PaddingValues(8.dp)
                                     ) {
-                                        items(model.items) {
+                                        items(model.roundItems) {
                                             ScheduleListItem(it)
                                         }
                                     }
@@ -255,13 +274,13 @@ fun ReviewContent(
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.number,
+                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewFinalControls(
                                 modifier = modifier.align(Alignment.BottomCenter),
                                 resetAction = viewModel::reset,
-                                finishAction = viewModel::navigateBack
+                                finishAction = viewModel::confirmResults
                             )
                         }
                     }
@@ -355,7 +374,7 @@ private fun ReviewFinalControls(
 
         PriorityButton(
             onSelected = finishAction,
-            text = stringResource(R.string.finish).uppercase(),
+            text = stringResource(R.string.start).uppercase(),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(16.dp),
@@ -419,30 +438,32 @@ private fun TaskPrioritySwipe(
     states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
     onSwiped: (schedule: ScheduleListItemViewModel, direction: Direction, isLast: Boolean) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
-
-    // TODO: this could possibly be used to remove the current gesture
-    //  https://stackoverflow.com/questions/73488235/jetpack-compose-detect-drag-gesture-and-detect-interaction-source
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsDraggedAsState()
 
     Box(
         modifier
             .padding(24.dp)
             .fillMaxSize()
-            .aspectRatio(1f)
     ) {
         states.forEachIndexed { index, (schedule, state) ->
             if (state.swipedDirection == null) {
+
+                val selectedState = remember(schedule.taskId) { MutableTransitionState(false) }
+                val selectedTransition = updateTransition(selectedState, "Selected Transition")
+                val ratio by selectedTransition.animateFloat(label = "AspectRatio") {
+                    if (it) 0.8f else 1f
+                }
+
                 TaskCard(
                     modifier = modifier
+                        .layoutId(schedule.taskId)
                         .fillMaxSize()
-                        .swipableCard(
-                            state = state,
-                            blockedDirections = listOf(),
-                        )
+                        .aspectRatio(ratio)
+                        .swipableCard(state = state)
                         .graphicsLayer {
                             translationY = -(5 * index).dp.toPx()
+                        }
+                        .clickable {
+                            selectedState.targetState = !selectedState.currentState
                         },
                     schedule = schedule
                 )
@@ -514,20 +535,74 @@ private fun TaskCard(
 }
 
 @Composable
-private fun Hint(text: String) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .padding(horizontal = 24.dp, vertical = 32.dp)
-            .fillMaxWidth()
+private fun RoundInfo(
+    model: PriorityReviewModel,
+    modifier: Modifier = Modifier
+) {
+
+    val info by remember(model.roundNumber) {
+        mutableStateOf("Round ${model.roundNumber} - ${model.round}")
+    }
+    val instructions by remember(model.round) {
+        when (model.round) {
+            PriorityRound.Today -> "<-- Tomorrow    Today -->"
+            PriorityRound.Now -> "<-- Next    Now -->"
+            PriorityRound.Final -> ""
+        }.let {
+            mutableStateOf(it)
+        }
+    }
+
+    Column(
+        modifier = modifier
+            .padding(vertical = 16.dp)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = text,
+            text = info,
             color = MaterialTheme.colorScheme.onPrimary,
             fontWeight = FontWeight.Bold,
             fontSize = 22.sp,
             textAlign = TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = instructions,
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center
+        )
+
+        if (BuildConfig.DEBUG) {
+
+            val total by remember {
+                mutableStateOf("Total: ${model.roundItems.size}")
+            }
+
+            Text(
+                text = total,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+
+            val debug = with(model) {
+                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size}  Today: ${today.size}  Now: ${now.size}  Low: ${snooze.size}  Done: ${done.size}  Later: ${later.size}"
+            }
+
+            Text(
+                text = debug,
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center
+            )
+        }
     }
 }
 

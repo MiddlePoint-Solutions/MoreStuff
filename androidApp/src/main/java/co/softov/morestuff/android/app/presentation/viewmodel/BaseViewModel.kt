@@ -7,13 +7,9 @@ import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.AppStore
-import com.github.terrakok.cicerone.Router
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -27,8 +23,8 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     protected val store: AppStore by inject()
     protected val router: AppRouter by inject()
 
-    private val _uiState = MutableStateFlow(initialState)
-    val uiState: StateFlow<ViewState> = _uiState
+    private val _uiModel = MutableStateFlow(initialState)
+    val uiModel: StateFlow<ViewState> = _uiModel
 
     protected open var enableDebug = false
     private val stateTimeTravelDebugger: StateTimeTravelDebugger? by lazy {
@@ -41,8 +37,7 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     // Delegate will handle state event deduplication
     // (multiple states of the same type holding the same data will not be dispatched multiple times to LiveData stream)
     protected var state by Delegates.observable(initialState) { _, old, new ->
-        _uiState.value = new
-
+        _uiModel.update { new }
         viewModelScope.launch(Dispatchers.Default) {
             if (new != old) {
                 stateTimeTravelDebugger?.apply {

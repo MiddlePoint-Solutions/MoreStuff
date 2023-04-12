@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.redux.state.reduceSettingState
 
 class AppStore(
     logger: LoggerMiddleware,
+    devMiddleware: DevMiddleware,
     errorMiddleware: ErrorMiddleware,
     navigator: NavigationMiddleware,
     taskMiddleware: TaskMiddleware,
@@ -28,6 +29,7 @@ class AppStore(
     ),
     listOf(
         logger,
+        devMiddleware,
         errorMiddleware,
         settingsMiddleware,
         taskMiddleware,

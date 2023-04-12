@@ -10,22 +10,25 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
+import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class TaskAction : Action.FeatureAction() {
 
-    data class CreateTask(val title: String) : ReminderAction() {
+    data class CreateTask(val title: String) : TaskAction() {
         override val log: String
             get() = "${this.simpleName}(title=$title)"
     }
 
-    data class SetTaskComplete(val taskId: Long, val complete: Boolean) : ReminderAction()
+    data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
+    data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
-    internal data class TaskCreatedAction(val task: Task, val priority: Priority) :
-        ReminderAction() {
+    internal data class TaskCreatedAction(
+        val task: Task,
+        val priority: Priority
+    ) : TaskAction() {
         override val log: String
             get() = "${this.simpleName}($task,$priority)"
     }
@@ -33,7 +36,7 @@ sealed class TaskAction : Action.FeatureAction() {
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
-    private val setTaskCompleteUseCase: SetTaskCompleteUseCase
+    private val setTaskCompleteUseCase: SetTasksCompleteUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -52,8 +55,16 @@ class TaskMiddleware(
                 }
             }
 
-            is SetTaskComplete -> scope.launch {
-                setTaskCompleteUseCase(action.taskId, action.complete)
+            is CompleteTaskAction -> scope.launch {
+                with(action) {
+                    setTaskCompleteUseCase(listOf(taskId), complete)
+                }
+            }
+
+            is CompleteTasksAction -> scope.launch {
+                with(action) {
+                    setTaskCompleteUseCase(taskIds, complete)
+                }
             }
 
             else -> NoOp

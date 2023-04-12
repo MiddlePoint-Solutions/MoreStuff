@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,23 +45,26 @@ fun SettingsScreen(
     val devTools: DevTools = get()
 
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(navigateBackSettings = { viewModel.navigateBackSettings() })
+        SettingsTopBar(navigateBackSettings = viewModel::navigateBackSettings)
 
         Column(
-            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(scrollState)
         ) {
             SelectTheme()
-            SelectSnoozeLimit(onSnoozeLimitChanged = { viewModel.onSnoozeLimitChanged(it) })
+            SelectSnoozeLimit(onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
-            DeveloperSettings()
+            DeveloperSettings(
+                clearPendingMessages = viewModel::clearPendingMessages
+            )
             Notification()
-            ReviewTest(onClick = viewModel::showReviewTest)
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(onSmartReminder = { viewModel.smartReminderEnabled(it) })
+            SmartReminder(onSmartReminder = viewModel::smartReminderEnabled)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
@@ -149,14 +153,30 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
 }
 
 @Composable
-fun DeveloperSettings() {
-    Row(
-        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Developer Settings",
-            fontSize = 20.sp,
-            color = MaterialTheme.colorScheme.onSurface
+fun DeveloperSettings(
+    clearPendingMessages: () -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Developer Settings",
+                fontSize = 20.sp,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        SettingsMenuLink(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.ClearAll,
+                    contentDescription = "Clear All Message replies"
+                )
+            },
+            title = { Text(text = "Clear All Message replies") },
+            subtitle = { Text(text = "This will clear all pending message replies") },
+            onClick = clearPendingMessages,
         )
     }
 }
@@ -175,21 +195,12 @@ fun Notification() {
     }
 
     Box(
-        modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+        modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth()
         //.clickable(onClick = onClick)
     )
 }
-
-@Composable
-fun ReviewTest(
-    onClick: () -> Unit,
-) {
-    SettingsMenuLink(
-        title = { Text(text = "Review Priority Test") },
-        onClick = onClick,
-    )
-}
-
 
 @Composable
 fun KeepDeviceScreenOn(devTools: DevTools) {
@@ -247,7 +258,9 @@ fun ReminderDebugging(devTools: DevTools) {
         })
         if (switchState.value) {
             Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
@@ -315,7 +328,9 @@ fun Reset() {
             )
         }
         Box(
-            modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
             //.clickable(onClick = onClick)
         ) {
             Column(
@@ -371,7 +386,9 @@ fun About() {
         }
 
         Box(
-            modifier = Modifier.padding(top = 16.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth()
             //.clickable(onClick = { TODO() })
         ) {
             Column(

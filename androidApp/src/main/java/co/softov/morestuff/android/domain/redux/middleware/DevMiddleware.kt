@@ -3,21 +3,18 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.repository.UserRepository
+import co.softov.morestuff.android.domain.usecase.message.ClearActiveReminderMessages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class DevAction : Action.FeatureAction() {
-    // TODO: Add clear all stale messages action + add settings option
-    object ClearStaleMessages: DevAction()
+    object ClearActiveReminderMessages : DevAction()
 }
 
 class DevMiddleware(
-
+    private val clearActiveReminderMessages: ClearActiveReminderMessages
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -28,8 +25,8 @@ class DevMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is DevAction.ClearStaleMessages -> {
-
+            is DevAction.ClearActiveReminderMessages -> scope.launch {
+                clearActiveReminderMessages()
             }
             else -> NoOp
         }
