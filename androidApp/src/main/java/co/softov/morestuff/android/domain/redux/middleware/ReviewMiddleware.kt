@@ -24,6 +24,7 @@ class ReviewMiddleware : Middleware<AppState> {
                 with(action) {
                     dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.tomorrow))
                     dispatch(ScheduleAction.RescheduleTasksAction(this.next, Priority.today))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.now, Priority.today))
                     dispatch(ScheduleAction.RescheduleTasksAction(later, Priority.later))
                     dispatch(TaskAction.CompleteTasksAction(done, true))
                 }
