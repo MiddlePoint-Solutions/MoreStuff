@@ -39,16 +39,20 @@ class PriorityReviewViewModel(
 
         is SetupNextRound -> when (state.round) {
             Today -> {
-                val (nextRound, roundItems) = if (state.today.size > FINAL_ROUND_MINIMUM) {
-                    Now to state.today
+                if (state.today.size > FINAL_ROUND_MINIMUM) {
+                    state.copy(
+                        round = Now,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.today,
+                    )
                 } else {
-                    Final to state.today
+                    state.copy(
+                        round = Final,
+                        roundNumber = state.roundNumber + 1,
+                        roundItems = state.today,
+                        now = state.today
+                    )
                 }
-                state.copy(
-                    round = nextRound,
-                    roundNumber = state.roundNumber + 1,
-                    roundItems = roundItems,
-                )
             }
             Now -> {
                 if (state.now.size > FINAL_ROUND_MINIMUM) {
@@ -63,7 +67,7 @@ class PriorityReviewViewModel(
                         round = Final,
                         roundNumber = state.roundNumber + 1,
                         roundItems = state.now,
-                        now = listOf()
+                        now = state.now
                     )
                 }
             }
@@ -72,7 +76,6 @@ class PriorityReviewViewModel(
                     round = Final,
                     roundNumber = state.roundNumber + 1,
                     roundItems = state.now,
-                    now = listOf()
                 )
             }
         }
