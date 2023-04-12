@@ -6,5 +6,6 @@ interface Scheduler {
     fun scheduleSmartReminder()
     fun cancelSchedule(scheduleId: Long)
     fun cancelSmartReminder()
+    fun scheduleMorningReview()
 
 }

@@ -3,6 +3,7 @@ package co.softov.morestuff.android.di
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
+import androidx.work.WorkManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
@@ -36,6 +37,9 @@ val dataModule = module {
     single<ObservableSettings> {
         SharedPreferencesSettings(getSharedPreferences(androidContext()))
     }
+
+    single { WorkManager.getInstance(androidContext()) }
+
     singleOf(::DevToolsImpl) bind DevTools::class
     // Database
     single { createDatabase(androidApplication()) }
@@ -83,10 +87,10 @@ val dataModule = module {
             settings = getSettings(androidContext()),
         )
     }
+
     // Services
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
-
 
     // Platform specific use-cases
     factoryOf(::GetPagedMessagesImpl) bind GetPagedMessages::class
