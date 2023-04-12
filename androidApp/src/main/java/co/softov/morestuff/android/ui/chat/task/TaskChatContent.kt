@@ -30,7 +30,6 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
@@ -41,6 +40,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import kotlinx.datetime.*
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
@@ -247,11 +247,8 @@ private fun ScheduleButton(
     priority: TaskPriorityModel,
     editScheduleAction: () -> Unit,
     task: Task,
-    timeFormatter: TimeFormatter = TimeFormatterImpl(),
-    todayPriority: String = stringResource(R.string.time_option_today),
-    tomorrowPriority: String = stringResource(R.string.time_option_tomorrow),
+    timeFormatter: TimeFormatter = get(),
 ) {
-
     val title = when {
         schedule == null -> {
             stringResource(R.string.task_chat_schedule_reminder)
@@ -260,16 +257,15 @@ private fun ScheduleButton(
             stringResource(R.string.time_option_later)
         }
         else -> {
-            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime)
+            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
 
             when (priority.priorityModel.priority) {
-                is Priority.Today -> "$todayPriority $formattedTime"
-                is Priority.Tomorrow -> "$tomorrowPriority $formattedTime"
+                is Priority.Today -> stringResource(id = R.string.time_option_today, formattedTime)
+                is Priority.Tomorrow -> stringResource(id = R.string.time_option_tomorrow, formattedTime)
                 is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
             }
         }
     }.orEmpty()
-
 
     PriorityButton(
         onSelected = editScheduleAction,
