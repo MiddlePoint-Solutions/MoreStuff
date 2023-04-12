@@ -53,9 +53,9 @@ fun MoreStuffTheme(
 @Composable
 fun CustomSelectionColor(darkTheme: Boolean, content: @Composable () -> Unit) {
     val customSelectionColor = if (!darkTheme) {
-        Color(0xFFB3E5FC)
+        BlueDark
     } else {
-        Color(0xFF303F9F)
+        BlueLight
     }
     CompositionLocalProvider(LocalTextSelectionColors provides TextSelectionColors(
         handleColor = customSelectionColor,
