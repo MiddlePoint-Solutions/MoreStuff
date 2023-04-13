@@ -40,5 +40,27 @@ internal class TimeFormatterImplTest{
         val formattedString = timeFormatter.formatTimeOnly(timeString)
         assertEquals(expectedFormattedString, formattedString)
     }
+    @Test
+    fun `formatTimeDayAndMonth should format input time string to EEEE, MMMM d format`() {
+        val timeString = "2023-03-27T12:00:00.000Z"
+        val expectedFormattedString = ZonedDateTime.parse(timeString)
+            .withZoneSameInstant(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofPattern("EEEE, MMMM d"))
+
+        val formattedString = timeFormatter.formatTimeDayAndMonth(timeString)
+        assertEquals(expectedFormattedString, formattedString)
+    }
+
+    @Test
+    fun `formatToDateTime should format input time string to dd MM yyyy HH mm format`() {
+        val timeString = "2023-03-27T12:00:00.000Z"
+        val expectedFormattedString = ZonedDateTime.parse(timeString)
+            .withZoneSameInstant(ZoneId.systemDefault())
+            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+
+        val formattedString = timeFormatter.formatToDateTime(timeString)
+        assertEquals(expectedFormattedString, formattedString)
+    }
+
 
 }
