@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.settings
 import android.app.Activity
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -36,18 +37,39 @@ import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import org.koin.compose.rememberKoinInject
 
 
 @Preview
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = getViewModel(),
+    viewModel: SettingsViewModel = koinViewModel(),
+    devTools: DevTools = rememberKoinInject()
 ) {
-    val scrollState = rememberScrollState()
-    val devTools: DevTools = get()
+    SettingsContent(
+        onBack = viewModel::navigateBackSettings,
+        onSnoozeLimit = viewModel::onSnoozeLimitChanged,
+        onClearActiveMessages = viewModel::clearPendingMessages,
+        onTestReviewActivity = viewModel::testReviewActivity,
+        onSmartReminder = viewModel::smartReminderEnabled,
+        devTools = devTools // TODO: This is better moved into the settings ViewModel
+    )
+}
 
+@Composable
+private fun SettingsContent(
+    scrollState: ScrollState = rememberScrollState(),
+    onBack: () -> Unit,
+    onSnoozeLimit: (Int) -> Unit,
+    onClearActiveMessages: () -> Unit,
+    onTestReviewActivity: () -> Unit,
+    onSmartReminder: (Boolean) -> Unit,
+    devTools: DevTools
+) {
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(navigateBackSettings = viewModel::navigateBackSettings)
+        SettingsTopBar(navigateBackSettings = onBack)
 
         Column(
             modifier = Modifier
@@ -56,22 +78,18 @@ fun SettingsScreen(
                 .verticalScroll(scrollState)
         ) {
             SelectTheme()
-            SelectSnoozeLimit(onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged)
+            SelectSnoozeLimit(onSnoozeLimitChanged = onSnoozeLimit)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             DeveloperSettings(
-                clearPendingMessages = viewModel::clearPendingMessages,
-                testReviewActivity = viewModel::testReviewActivity
+                clearPendingMessages = onClearActiveMessages,
+                testReviewActivity = onTestReviewActivity,
             )
             Notification()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(onSmartReminder = viewModel::smartReminderEnabled)
-            Divider(
-                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
-            )
-            Reset()
+            SmartReminder(onSmartReminder = onSmartReminder)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )

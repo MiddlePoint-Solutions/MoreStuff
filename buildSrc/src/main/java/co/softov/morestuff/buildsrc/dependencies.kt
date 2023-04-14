@@ -70,11 +70,11 @@ object Libs {
     }
 
     object Koin {
-        private const val version = "3.3.3"
+        private const val version = "3.4.0"
         const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:3.2.0"
         const val android = "io.insert-koin:koin-android:$version"
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
-        const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.2"
+        const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.3"
 
         const val test = "io.insert-koin:koin-test:$version"
         const val testJunit = "io.insert-koin:koin-test-junit5:$version"
