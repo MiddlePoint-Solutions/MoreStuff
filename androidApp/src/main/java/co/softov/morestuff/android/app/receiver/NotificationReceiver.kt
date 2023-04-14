@@ -17,8 +17,6 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
             "co.softov.morestuff.androidApp.ACTION_NOTIFICATION_REVIEW"
     }
 
-    private val notifier = get<Notifier>()
-
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_NOTIFICATION_REPLY -> startNotificationService(context, intent)
@@ -27,7 +25,7 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
     }
 
     private fun showReviewActivity() {
-        notifier.showReviewNotification()
+        // TODO: show the review for time of day
     }
 
     private fun startNotificationService(context: Context, intent: Intent) {

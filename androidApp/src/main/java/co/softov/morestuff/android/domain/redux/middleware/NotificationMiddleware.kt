@@ -1,26 +1,32 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderOverloadNotification
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowScheduleNotificationAction
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
-    internal data class CreateScheduleNotificationAction(
+    internal data class ShowScheduleNotificationAction(
         val scheduleId: Long,
         val message: Message
     ) : NotificationAction()
 
-    internal data class RemoveScheduleNotificationAction(val scheduleId: Long) :
-        NotificationAction()
+    internal data class ShowReminderOverloadNotification(
+        val taskCount: Int
+    ) : NotificationAction()
+
+    internal data class RemoveScheduleNotificationAction(
+        val scheduleId: Long
+    ) : NotificationAction()
 }
 
 class NotificationMiddleware(
@@ -36,15 +42,20 @@ class NotificationMiddleware(
     ): Action {
         when (action) {
 
-            is CreateScheduleNotificationAction -> {
+            is ShowScheduleNotificationAction -> {
                 notifier.showScheduleNotification(action.scheduleId, action.message)
             }
 
-            is UserResponseAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+            is ShowReminderOverloadNotification -> {
+                notifier.cancelReminderNotifications()
+                notifier.showReviewNotification(ReviewNotification.Overload(action.taskCount))
             }
 
             is RemoveScheduleNotificationAction -> {
+                notifier.userInteractedWithNotification(action.scheduleId)
+            }
+
+            is ReminderAction.UserResponseAction -> {
                 notifier.userInteractedWithNotification(action.scheduleId)
             }
 

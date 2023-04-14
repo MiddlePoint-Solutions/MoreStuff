@@ -20,6 +20,7 @@ import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.Notifier
 import timber.log.Timber
@@ -175,17 +176,24 @@ class NotifierImpl(
         notificationManager.cancel(scheduleId.toInt())
     }
 
-    override fun showReviewNotification() {
+    override fun showReviewNotification(type: ReviewNotification) {
+        val (title, message) = when (type) {
+            ReviewNotification.Morning -> "Review Tasks" to "Set priorities :D"
+            ReviewNotification.Afternoon -> "Review Tasks" to "Set priorities :D"
+            ReviewNotification.Evening -> "Review Tasks" to "Set priorities :D"
+            is ReviewNotification.Overload -> "Review Tasks" to "Review ${type.tasks} pending tasks"
+        }
+
         val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
             .setSmallIcon(R.drawable.priority_48px)
             .setOnlyAlertOnce(true)
             .setAutoCancel(true)
-            .setContentTitle("Review Tasks")
-            .setContentText("Set priorities :D")
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setContentIntent(createReviewContentIntent())
-
+        
         notificationManager.notify(REVIEW_NOTIFICATION_ID, builder.build())
     }
 
