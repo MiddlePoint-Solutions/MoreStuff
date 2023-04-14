@@ -1,14 +1,13 @@
 package co.softov.morestuff.android.ui.settings
 
-import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.ui.Screens
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import co.softov.morestuff.android.domain.service.Scheduler
 
-class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
+class SettingsViewModel(
+    private val scheduler: Scheduler
+) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
     override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
         return state
@@ -31,6 +30,7 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
     }
 
     fun testReviewActivity() {
-        router.navigateTo(Screens.notificationActivity)
+//        router.navigateTo(Screens.notificationActivity)
+        scheduler.scheduleMorningReview()
     }
 }

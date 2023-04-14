@@ -39,9 +39,6 @@ val dataModule = module {
         SharedPreferencesSettings(getSharedPreferences(androidContext()))
     }
 
-    single { WorkManager.getInstance(androidContext()) }
-    single { androidContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager }
-
     singleOf(::DevToolsImpl) bind DevTools::class
     // Database
     single { createDatabase(androidApplication()) }

@@ -10,12 +10,12 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.Person
 import co.softov.morestuff.android.MainActivity
+import co.softov.morestuff.android.NotificationActivity
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createReplyIntent
 import co.softov.morestuff.android.app.receiver.randomRequestCode
-import co.softov.morestuff.android.app.receiver.setReplayIntentExtras
 import co.softov.morestuff.android.data.utils.toEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
@@ -29,14 +29,17 @@ class NotifierImpl(
     private val context: Context
 ) : Notifier {
 
-    private val notificationManager: NotificationManager =
+    private val notificationManager: NotificationManager by lazy {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
 
     private val appPerson: Person
     private val userPerson: Person
 
     init {
         createNotificationChannel()
+        createReviewChannel()
+
         appPerson = Person.Builder().setBot(true).setImportant(true).setName("Mr.Stuff").build()
         userPerson = Person.Builder().setName("Me").build()
     }
@@ -46,7 +49,7 @@ class NotifierImpl(
         message: Message
     ) {
         val builder =
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
+            NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_chat_24dp)
                 .setOnlyAlertOnce(true)
 
@@ -64,7 +67,7 @@ class NotifierImpl(
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
             .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
-            .setContentIntent(createContentIntent(message.taskId))
+            .setContentIntent(createReminderContentIntent(message.taskId))
             .setDeleteIntent(snooze.second)
 
         notificationManager.notify(scheduleId.toInt(), builder.build())
@@ -83,7 +86,7 @@ class NotifierImpl(
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
 
-    private fun createContentIntent(
+    private fun createReminderContentIntent(
         taskId: Long
     ): PendingIntent =
         Intent(context, MainActivity::class.java).apply {
@@ -96,6 +99,14 @@ class NotifierImpl(
             PendingIntent.getActivity(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
+    private fun createReviewContentIntent(): PendingIntent =
+        Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(MainActivity.EXTRA_PRIORITY_REVIEW, true)
+        }.let {
+            PendingIntent.getActivity(context, randomRequestCode, it, PendingIntent.FLAG_IMMUTABLE)
+        }
+
     override fun showReminderNotificationReply(
         scheduleId: Long,
         messages: List<Message>
@@ -104,7 +115,7 @@ class NotifierImpl(
         val notification: Notification =
             NotificationCompat.Builder(
                 context,
-                NOTIFICATION_CHANNEL_ID
+                REMINDERS_CHANNEL_ID
             )
                 .setStyle(messageStyle)
                 .setSmallIcon(R.drawable.ic_chat_24dp)
@@ -169,16 +180,59 @@ class NotifierImpl(
         notificationManager.cancel(scheduleId.toInt())
     }
 
-    companion object {
-        private const val NOTIFICATION_CHANNEL_ID = "ReminderNotifications"
+    override fun showReviewNotification() {
+        val builder =
+            NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
+                .setSmallIcon(R.drawable.priority_48px)
+                .setOnlyAlertOnce(true)
+                .setAutoCancel(true)
+                .setContentTitle("Review Tasks")
+                .setContentText("Set priorities :D")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_REMINDER)
+                .setContentIntent(createReviewContentIntent())
+
+        notificationManager.notify(REVIEW_NOTIFICATION_ID, builder.build())
     }
+
+    companion object {
+        private const val REMINDERS_CHANNEL_ID = "ReminderNotifications"
+        private const val REVIEW_CHANNEL_ID = "ReviewNotifications"
+
+        private const val REVIEW_NOTIFICATION_ID = 424242
+    }
+
+    private fun createReviewIntent(
+        context: Context,
+    ): PendingIntent =
+        Intent(context, NotificationActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
+        }.let {
+            PendingIntent.getActivity(
+                context, REVIEW_NOTIFICATION_ID, it, PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
     private fun createNotificationChannel() {
         if (isAtLeastVersion(Build.VERSION_CODES.O)) {
             val name = "Reminder Notifications"
             val descriptionText = "Notifications for your reminders"
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(REMINDERS_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun createReviewChannel() {
+        if (isAtLeastVersion(Build.VERSION_CODES.O)) {
+            val name = "Review Notifications"
+            val descriptionText = "Notifications for reviewing your tasks"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(REVIEW_CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
             notificationManager.createNotificationChannel(channel)

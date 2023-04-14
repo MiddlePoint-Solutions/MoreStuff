@@ -34,6 +34,16 @@ fun NotificationReceiver.Companion.createReplyIntent(
             PendingIntent.getBroadcast(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
+fun NotificationReceiver.Companion.createReviewIntent(
+    context: Context,
+): PendingIntent =
+    Intent(context, NotificationReceiver::class.java)
+        .setAction(ACTION_NOTIFICATION_REVIEW)
+        .let {
+            val requestCode = randomRequestCode
+            PendingIntent.getBroadcast(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
+        }
+
 fun Intent.getScheduleIdExtra() = getLongExtra(KEY_SCHEDULE_ID, 0)
 fun Intent.setScheduleIdExtra(scheduleId: Long) = putExtra(KEY_SCHEDULE_ID, scheduleId)
 

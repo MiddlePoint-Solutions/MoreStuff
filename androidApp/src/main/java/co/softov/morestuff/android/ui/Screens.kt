@@ -28,7 +28,9 @@ object Screens {
 
     val notificationActivity = ActivityScreen {
         Intent(it, NotificationActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            flags = Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
         }
     }
 

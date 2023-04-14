@@ -42,12 +42,7 @@ class MainActivity : AppCompatActivity() {
             router.exit()
         }
 
-        intent.getLongExtra(EXTRA_TASK_ID, 0).let {
-            if (it > 0) {
-                router.navigateTo(Screens.launchedTaskChat(it))
-                intent.putExtra(EXTRA_TASK_ID, 0)
-            }
-        }
+        handleLaunchIntent()
 
         setContent {
             MoreStuffTheme {
@@ -56,6 +51,21 @@ class MainActivity : AppCompatActivity() {
                         MainContent()
                     }
                 )
+            }
+        }
+    }
+
+    private fun handleLaunchIntent() {
+        intent.getLongExtra(EXTRA_TASK_ID, 0).let {
+            if (it > 0) {
+                router.navigateTo(Screens.launchedTaskChat(it))
+                intent.putExtra(EXTRA_TASK_ID, 0)
+            }
+        }
+        intent.getBooleanExtra(EXTRA_PRIORITY_REVIEW, false).let {
+            if (it) {
+                router.navigateTo(Screens.priorityReview)
+                intent.putExtra(EXTRA_PRIORITY_REVIEW, false)
             }
         }
     }
@@ -93,6 +103,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
 
         const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
+        const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
 
     }
 }
