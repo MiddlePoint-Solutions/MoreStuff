@@ -8,5 +8,6 @@ interface Notifier {
     fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>)
     fun userInteractedWithNotification(scheduleId: Long)
     fun showReviewNotification()
+    fun cancelReminderNotifications()
 
 }

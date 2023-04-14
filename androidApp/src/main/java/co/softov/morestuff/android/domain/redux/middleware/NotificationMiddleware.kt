@@ -10,6 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
@@ -18,7 +19,8 @@ sealed class NotificationAction : Action.FeatureAction() {
         val message: Message
     ) : NotificationAction()
 
-    internal data class RemoveScheduleNotificationAction(val scheduleId: Long) : NotificationAction()
+    internal data class RemoveScheduleNotificationAction(val scheduleId: Long) :
+        NotificationAction()
 }
 
 class NotificationMiddleware(
@@ -44,6 +46,10 @@ class NotificationMiddleware(
 
             is RemoveScheduleNotificationAction -> {
                 notifier.userInteractedWithNotification(action.scheduleId)
+            }
+
+            is ReviewAction.ScheduleReviewResults -> {
+                notifier.cancelReminderNotifications()
             }
 
             else -> NoOp

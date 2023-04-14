@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import kotlinx.coroutines.CoroutineScope
 
-class ReviewMiddleware : Middleware<AppState> {
+class ReviewMiddleware: Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
