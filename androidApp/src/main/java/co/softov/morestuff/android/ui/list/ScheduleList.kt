@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.list
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,9 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.ui.list.model.PageType
@@ -42,7 +39,7 @@ fun ScheduleList(
             state.schedules.isNotEmpty() -> items(state.schedules) {
                 ScheduleListItem(it, itemAction = { itemAction(it.taskId) })
             }
-            state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it) }
+            state.tasks.isNotEmpty() -> items(state.tasks) { TaskListItem(it, itemAction = { itemAction(it.id) } ) }
         }
     }
 }
@@ -54,7 +51,6 @@ fun ScheduleListItem(
     modifier: Modifier = Modifier,
     itemAction: () -> Unit = {},
 ) {
-    val expanded by remember { mutableStateOf(false) }
     Card(
         onClick = itemAction,
         elevation = CardDefaults.cardElevation(),
@@ -75,26 +71,15 @@ fun ScheduleListItem(
                 ),
                 modifier = Modifier.padding(4.dp)
             )
-
-            AnimatedVisibility(visible = expanded) {
-                Text(
-                    text = "BOOOOOM!",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
-    var expanded by remember { mutableStateOf(false) }
+fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier,  itemAction: () -> Unit = {}) {
     Card(
-        onClick = {
-            expanded = !expanded
-        },
+        onClick = itemAction,
         elevation = CardDefaults.cardElevation(),
         modifier = Modifier
             .fillMaxWidth()
@@ -104,23 +89,8 @@ fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier) {
             Text(
                 text = task.title,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(4.dp)
+                modifier = Modifier.padding(17.dp)
             )
-            Text(
-                text = stringResource(
-                    id = R.string.text_created_time_placeholder,
-                    task.createTime
-                ),
-                modifier = Modifier.padding(4.dp)
-            )
-
-            AnimatedVisibility(visible = expanded) {
-                Text(
-                    text = "BOOOOOM!",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
