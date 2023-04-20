@@ -3,16 +3,21 @@ package co.softov.morestuff.android
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
+import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
+import co.softov.morestuff.android.app.receiver.setReviewIntentExtras
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.main.MainContent
@@ -62,13 +67,23 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra(EXTRA_TASK_ID, 0)
             }
         }
-        intent.getBooleanExtra(EXTRA_PRIORITY_REVIEW, false).let {
-            if (it) {
-                router.navigateTo(Screens.priorityReview)
-                intent.putExtra(EXTRA_PRIORITY_REVIEW, false)
-            }
+        intent.getParcelableExtraCompat(
+            EXTRA_PRIORITY_REVIEW,
+            ReviewNotification::class.java
+        )?.let {
+            router.navigateTo(Screens.priorityReview)
+            intent.setReviewIntentExtras(null)
         }
+
     }
+
+    fun <T> Intent.getParcelableExtraCompat(name: String?, clazz: Class<T>) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(name, clazz)
+        } else {
+            intent.getParcelableExtra(name)
+        }
+
 
     @SuppressLint("BatteryLife")
     private fun showBatteryOptimizationRequest() {

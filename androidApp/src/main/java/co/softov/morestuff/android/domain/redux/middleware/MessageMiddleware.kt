@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowScheduleNotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.*
@@ -24,6 +24,7 @@ class MessageMiddleware(
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponse,
     private val countActiveReminderMessages: CountActiveReminderMessages,
+    private val getActiveScheduleMessages: GetActiveScheduleMessages,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -37,12 +38,12 @@ class MessageMiddleware(
         when (action) {
             is CreateScheduleMessageAction -> scope.launch {
                 createScheduleMessageUseCase(action.scheduleId).map { message ->
-                    val remindersCount = countActiveReminderMessages()
-                    if (remindersCount > Defaults.DEFAULT_REMINDER_OVERLOAD_LIMIT) {
-                        dispatch(NotificationAction.ShowReminderOverloadNotification(remindersCount))
-                    } else {
-                        dispatch(ShowScheduleNotificationAction(action.scheduleId, message))
-                    }
+                    dispatch(ShowReminderNotificationAction(message))
+                    // TODO: show task overload notification?
+//                    val activeMessages = getActiveScheduleMessages()
+//                    if (activeMessages.size > Defaults.REMINDER_GROUP_LIMIT) {
+//                        dispatch(NotificationAction.ShowReminderNotificationsAction(activeMessages))
+//                    }
                 }
             }
 

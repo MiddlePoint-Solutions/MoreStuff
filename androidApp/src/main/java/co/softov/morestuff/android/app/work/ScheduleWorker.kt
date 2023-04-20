@@ -31,7 +31,7 @@ class ScheduleWorker(
     }
 
     companion object {
-        const val PARAM_SCHEDULE_ID = "scheduleId"
+        private const val PARAM_SCHEDULE_ID = "scheduleId"
 
         fun createWorkerData(scheduleId: Long): Data =
             Data.Builder()

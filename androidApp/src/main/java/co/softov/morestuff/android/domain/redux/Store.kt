@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux
 
 import co.softov.morestuff.android.domain.redux.middleware.Middleware
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitAction
+import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -58,7 +58,7 @@ open class SimpleStore<State>(
                 }.launchIn(this)
         }
 
-        dispatch(InitAction)
+        dispatch(InitStoreAction)
     }
 
     final override fun dispatch(action: Action) {

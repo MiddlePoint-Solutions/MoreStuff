@@ -19,7 +19,7 @@ class ScheduleAtTimeUseCaseImplTest{
         coEvery { scheduler.scheduleAtExact(scheduleId, time) } just Runs
         coEvery { scheduler.scheduleSmartReminder() } just Runs
 
-        val result = scheduleAtTimeUseCaseImpl.invoke(scheduleId, time)
+        val result = scheduleAtTimeUseCaseImpl.invoke()
 
         assertEquals(Either.Right(true), result)
         coVerify { scheduler.scheduleAtExact(scheduleId, time) }

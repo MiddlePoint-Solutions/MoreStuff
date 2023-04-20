@@ -9,15 +9,19 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationsAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderOverloadNotification
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowScheduleNotificationAction
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
-    internal data class ShowScheduleNotificationAction(
-        val scheduleId: Long,
+    internal data class ShowReminderNotificationAction(
         val message: Message
+    ) : NotificationAction()
+
+    internal data class ShowReminderNotificationsAction(
+        val messages: List<Message>
     ) : NotificationAction()
 
     internal data class ShowReminderOverloadNotification(
@@ -42,8 +46,12 @@ class NotificationMiddleware(
     ): Action {
         when (action) {
 
-            is ShowScheduleNotificationAction -> {
-                notifier.showScheduleNotification(action.scheduleId, action.message)
+            is ShowReminderNotificationAction -> {
+                notifier.showReminderNotification(action.message)
+            }
+
+            is ShowReminderNotificationsAction -> {
+                notifier.showReminderNotifications(action.messages)
             }
 
             is ShowReminderOverloadNotification -> {

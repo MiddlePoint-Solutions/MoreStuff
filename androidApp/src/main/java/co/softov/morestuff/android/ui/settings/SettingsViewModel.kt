@@ -1,12 +1,14 @@
 package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
 
 class SettingsViewModel(
-    private val scheduler: Scheduler
+    private val notifier: Notifier
 ) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
     override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
@@ -30,7 +32,6 @@ class SettingsViewModel(
     }
 
     fun testReviewActivity() {
-//        router.navigateTo(Screens.notificationActivity)
-        scheduler.scheduleMorningReview()
+        notifier.showReviewNotification(ReviewNotification.Overload(99))
     }
 }

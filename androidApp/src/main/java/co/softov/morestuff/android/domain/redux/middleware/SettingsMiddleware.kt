@@ -5,15 +5,18 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitAction
+import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
+    private val checkFirstTimeUseCase: CheckFirstTimeUseCase,
     private val getUserSettingsUseCase: GetUserSettingsUseCase,
     private val saveUserSettings: SaveUserSettings
 
@@ -27,9 +30,10 @@ class SettingsMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is InitAction -> scope.launch {
+            is InitStoreAction -> scope.launch {
+                val firstTime = checkFirstTimeUseCase()
                 val settings = getUserSettingsUseCase()
-                dispatch(SettingAction.LoadSettings(settings))
+                dispatch(InitSettings(firstTime, settings))
             }
 
             is SettingAction.SetSnoozeLimit -> scope.launch {

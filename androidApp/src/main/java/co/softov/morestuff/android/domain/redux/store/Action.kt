@@ -9,6 +9,6 @@ sealed class Action {
 }
 
 object NoOp
-object InitAction : Action.FeatureAction()
+object InitStoreAction : Action.FeatureAction()
 object OnResumeAction : Action.FeatureAction()
 data class Test(val message: String) : Action.FeatureAction()
