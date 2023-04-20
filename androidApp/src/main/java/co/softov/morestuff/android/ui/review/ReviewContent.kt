@@ -94,7 +94,7 @@ fun ReviewContent(
                     }
                 }
 
-                val negativeAction: () -> Unit = remember(Unit) {
+                val negativeAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
@@ -102,7 +102,7 @@ fun ReviewContent(
                     }
                 }
 
-                val positiveAction: () -> Unit = remember(Unit) {
+                val positiveAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
@@ -110,7 +110,7 @@ fun ReviewContent(
                     }
                 }
 
-                val doneAction: () -> Unit = remember(Unit) {
+                val doneAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
@@ -118,7 +118,7 @@ fun ReviewContent(
                     }
                 }
 
-                val laterAction: () -> Unit = remember(Unit) {
+                val laterAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
@@ -164,57 +164,7 @@ fun ReviewContent(
                             )
                         }
                     }
-//                    ReviewRound.Sort -> {
-//
-//                        val visibleState = remember(model.roundNumber) {
-//                            MutableTransitionState(false)
-//                        }
-//                        val transition = updateTransition(visibleState, "Visible state")
-//
-//                        val screenWidth = with(LocalDensity.current) {
-//                            LocalConfiguration.current.screenWidthDp.dp.toPx()
-//                        }
-//
-//                        val xPosition by transition.animateFloat(label = "xPosition") {
-//                            if (it) 0f else screenWidth
-//                        }
-//
-//                        Box(modifier = Modifier.graphicsLayer {
-//                            translationX = xPosition
-//                        }) {
-//                            TaskPrioritySwipe(
-//                                modifier = modifier
-//                                    .align(Alignment.Center)
-//                                    .layoutId("${model.round}-${model.roundNumber}"),
-//                                states = states,
-//                                onSwiped = { schedule, direction, isLast ->
-//                                    scope.launch {
-//                                        if (isLast) {
-//                                            visibleState.targetState = false
-//                                            delay(100)
-//                                        }
-//                                    }.invokeOnCompletion {
-//                                        viewModel.onTaskSwiped(schedule, direction, isLast)
-//                                    }
-//                                },
-//                            )
-//                        }
-//
-//                        SlideAnimation(
-//                            visibleState = visibleState,
-//                            key1 = model.roundNumber,
-//                            modifier = modifier.align(Alignment.BottomCenter),
-//                        ) {
-//                            ReviewSwipeControls(
-//                                modifier = modifier.align(Alignment.BottomCenter),
-//                                negativeAction = negativeAction,
-//                                positiveAction = positiveAction,
-//                                doneAction = doneAction,
-//                                laterAction = laterAction,
-//                                undoAction = undoAction,
-//                            )
-//                        }
-//                    }
+
                     ReviewRound.Final -> {
 
                         val visibleState = remember(model.roundNumber) {
