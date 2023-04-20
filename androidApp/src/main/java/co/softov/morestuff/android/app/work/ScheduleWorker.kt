@@ -12,14 +12,11 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 class ScheduleWorker(
-    val context: Context,
+    context: Context,
     private val params: WorkerParameters
 ) : CoroutineWorker(context, params), KoinComponent {
 
     private val store: AppStore by inject()
-
-    private val alarmManager: AlarmManager =
-        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
     override suspend fun doWork(): Result {
         val scheduleId = params.inputData.getLong(PARAM_SCHEDULE_ID, -1)
@@ -34,7 +31,7 @@ class ScheduleWorker(
     }
 
     companion object {
-        const val PARAM_SCHEDULE_ID = "scheduleId"
+        private const val PARAM_SCHEDULE_ID = "scheduleId"
 
         fun createWorkerData(scheduleId: Long): Data =
             Data.Builder()

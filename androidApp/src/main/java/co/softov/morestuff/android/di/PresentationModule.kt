@@ -17,8 +17,7 @@ val presentationModule = module {
 
     viewModelOf(::MainViewModel)
     viewModelOf(::DrawerViewModel)
-
-    viewModel { SettingsViewModel() }
+    viewModelOf(::SettingsViewModel)
 
     viewModel { (page: PageType) ->
         SchedulePageViewModel(

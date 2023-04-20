@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.di
 
+import android.app.AlarmManager
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
@@ -37,8 +38,6 @@ val dataModule = module {
     single<ObservableSettings> {
         SharedPreferencesSettings(getSharedPreferences(androidContext()))
     }
-
-    single { WorkManager.getInstance(androidContext()) }
 
     singleOf(::DevToolsImpl) bind DevTools::class
     // Database

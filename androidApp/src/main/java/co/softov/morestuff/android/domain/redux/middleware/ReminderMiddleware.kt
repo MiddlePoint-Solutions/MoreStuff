@@ -10,6 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.Schedu
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.redux.smartReminderEnabled
 import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -69,7 +70,7 @@ class ReminderMiddleware(
         scope: CoroutineScope,
         dispatch: Dispatch,
     ) {
-        if (state.settingState.smartReminderEnabled) {
+        if (state.smartReminderEnabled) {
             scope.launch {
                 val currentTime = timeManager.nowUtcInstant
                 val qualifiedForRescheduling = getActiveScheduleMessages().filter {

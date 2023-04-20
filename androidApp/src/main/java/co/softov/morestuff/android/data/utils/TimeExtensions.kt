@@ -21,4 +21,4 @@ val LocalDateTime.currentTimeZoneInstant: Instant get() = this.toInstant(TimeZon
 fun LocalDateTime.asCurrentTimeIn(tz: TimeZone): Instant = this.toInstant(tz)
 
 // String
-val String.toEpochMilliseconds: Long get() = this.toLocalDateTime().currentTimeZoneInstant.toEpochMilliseconds()
+val String.inEpochMilliseconds: Long get() = this.toLocalDateTime().currentTimeZoneInstant.toEpochMilliseconds()

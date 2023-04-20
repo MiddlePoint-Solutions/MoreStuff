@@ -3,16 +3,21 @@ package co.softov.morestuff.android
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
+import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
+import co.softov.morestuff.android.app.receiver.setReviewIntentExtras
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.components.MoreStuffScaffold
 import co.softov.morestuff.android.ui.main.MainContent
@@ -42,12 +47,7 @@ class MainActivity : AppCompatActivity() {
             router.exit()
         }
 
-        intent.getLongExtra(EXTRA_TASK_ID, 0).let {
-            if (it > 0) {
-                router.navigateTo(Screens.launchedTaskChat(it))
-                intent.putExtra(EXTRA_TASK_ID, 0)
-            }
-        }
+        handleLaunchIntent()
 
         setContent {
             MoreStuffTheme {
@@ -59,6 +59,31 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun handleLaunchIntent() {
+        intent.getLongExtra(EXTRA_TASK_ID, 0).let {
+            if (it > 0) {
+                router.navigateTo(Screens.launchedTaskChat(it))
+                intent.putExtra(EXTRA_TASK_ID, 0)
+            }
+        }
+        intent.getParcelableExtraCompat(
+            EXTRA_PRIORITY_REVIEW,
+            ReviewNotification::class.java
+        )?.let {
+            router.navigateTo(Screens.priorityReview)
+            intent.setReviewIntentExtras(null)
+        }
+
+    }
+
+    fun <T> Intent.getParcelableExtraCompat(name: String?, clazz: Class<T>) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(name, clazz)
+        } else {
+            intent.getParcelableExtra(name)
+        }
+
 
     @SuppressLint("BatteryLife")
     private fun showBatteryOptimizationRequest() {
@@ -93,6 +118,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
 
         const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
+        const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
 
     }
 }

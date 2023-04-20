@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.settings
 import android.app.Activity
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,9 +12,11 @@ import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,18 +37,38 @@ import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
-
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import org.koin.compose.rememberKoinInject
 
 @Preview
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = getViewModel(),
+    viewModel: SettingsViewModel = koinViewModel(),
+    devTools: DevTools = rememberKoinInject()
 ) {
-    val scrollState = rememberScrollState()
-    val devTools: DevTools = get()
+    SettingsContent(
+        onBack = viewModel::navigateBackSettings,
+        onSnoozeLimit = viewModel::onSnoozeLimitChanged,
+        onClearActiveMessages = viewModel::clearPendingMessages,
+        onTestReviewActivity = viewModel::testReviewActivity,
+        onSmartReminder = viewModel::smartReminderEnabled,
+        devTools = devTools // TODO: This is better moved into the settings ViewModel
+    )
+}
 
+@Composable
+private fun SettingsContent(
+    scrollState: ScrollState = rememberScrollState(),
+    onBack: () -> Unit,
+    onSnoozeLimit: (Int) -> Unit,
+    onClearActiveMessages: () -> Unit,
+    onTestReviewActivity: () -> Unit,
+    onSmartReminder: (Boolean) -> Unit,
+    devTools: DevTools
+) {
     Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(navigateBackSettings = viewModel::navigateBackSettings)
+        SettingsTopBar(navigateBackSettings = onBack)
 
         Column(
             modifier = Modifier
@@ -54,21 +77,18 @@ fun SettingsScreen(
                 .verticalScroll(scrollState)
         ) {
             SelectTheme()
-            SelectSnoozeLimit(onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged)
+            SelectSnoozeLimit(onSnoozeLimitChanged = onSnoozeLimit)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             DeveloperSettings(
-                clearPendingMessages = viewModel::clearPendingMessages
+                clearPendingMessages = onClearActiveMessages,
+                testReviewActivity = onTestReviewActivity,
             )
             Notification()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
-            SmartReminder(onSmartReminder = viewModel::smartReminderEnabled)
-            Divider(
-                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
-            )
-            Reset()
+            SmartReminder(onSmartReminder = onSmartReminder)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
@@ -154,7 +174,8 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
 
 @Composable
 fun DeveloperSettings(
-    clearPendingMessages: () -> Unit
+    clearPendingMessages: () -> Unit,
+    testReviewActivity: () -> Unit,
 ) {
     Column {
         Row(
@@ -177,6 +198,19 @@ fun DeveloperSettings(
             title = { Text(text = "Clear All Message replies") },
             subtitle = { Text(text = "This will clear all pending message replies") },
             onClick = clearPendingMessages,
+        )
+
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        SettingsMenuLink(
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.NotificationAdd,
+                    contentDescription = "Show priority review notification"
+                )
+            },
+            title = { Text(text = "Test priority review notification") },
+            onClick = testReviewActivity,
         )
     }
 }

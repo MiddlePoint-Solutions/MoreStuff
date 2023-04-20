@@ -13,7 +13,9 @@ data class AppState(
     val reviewState: ReviewState = ReviewState()
 )
 
-val AppState.dailySnoozeLimit: Int get() = settingState.dailySnoozeLimit
+// Settings
+val AppState.dailySnoozeLimit: Int get() = settingState.settings.snoozeLimit
+val AppState.smartReminderEnabled: Boolean get() = settingState.settings.smartReminderEnabled
 val AppState.currentPriority: Priority get() = priorityState.current
 
 fun PriorityState.asStateFlow(): StateFlow<PriorityState> = MutableStateFlow(this)

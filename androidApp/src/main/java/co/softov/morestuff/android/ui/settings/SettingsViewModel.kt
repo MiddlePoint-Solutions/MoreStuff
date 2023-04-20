@@ -1,10 +1,15 @@
 package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.service.Notifier
+import co.softov.morestuff.android.domain.service.Scheduler
 
-class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
+class SettingsViewModel(
+    private val notifier: Notifier
+) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
     override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
         return state
@@ -24,5 +29,9 @@ class SettingsViewModel : BaseViewModel<SettingsViewState, SettingsViewEvent>(Se
 
     fun clearPendingMessages() {
         dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
+    }
+
+    fun testReviewActivity() {
+        notifier.showReviewNotification(ReviewNotification.Overload(99))
     }
 }
