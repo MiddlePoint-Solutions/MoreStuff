@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class ScheduleAtTimeUseCaseImplTest{
+class ScheduleAtTimeUseCaseImplTest {
     private val scheduler = mockk<Scheduler>()
     private val scheduleAtTimeUseCaseImpl = ScheduleAtTimeUseCaseImpl(scheduler)
     private val scheduleId = 2L
@@ -15,17 +15,17 @@ class ScheduleAtTimeUseCaseImplTest{
 
 
     @Test
-    fun`schedule at Time use case`() = runBlocking{
+    fun `schedule at Time use case`() = runBlocking {
         coEvery { scheduler.scheduleAtExact(scheduleId, time) } just Runs
         coEvery { scheduler.scheduleSmartReminder() } just Runs
 
-        val result = scheduleAtTimeUseCaseImpl.invoke()
+        val result = scheduleAtTimeUseCaseImpl.invoke(scheduleId, time)
 
         assertEquals(Either.Right(true), result)
         coVerify { scheduler.scheduleAtExact(scheduleId, time) }
         coVerify { scheduler.scheduleSmartReminder() }
     }
 
-    }
+}
 
 
