@@ -1,18 +1,16 @@
 package co.softov.morestuff.android.ui.review.swipeable
 
 import androidx.compose.animation.core.*
-import androidx.compose.animation.splineBasedDecay
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.*
 import timber.log.Timber
 
 
-enum class Direction {
+enum class SwipeDirection {
     Left, Right, Up, Down
 }
 
@@ -46,7 +44,7 @@ class SwipeableCardState(
     val flip = Animatable(0f, Float.VectorConverter)
 
     /**
-     * The [Direction] the card was swiped at.
+     * The [SwipeDirection] the card was swiped at.
      *
      * Null value means the card has not been swiped fully yet.
      */
@@ -54,11 +52,11 @@ class SwipeableCardState(
         private set
 
     /**
-     * The [Direction] the card was swiped at.
+     * The [SwipeDirection] the card was swiped at.
      *
      * Null value means the card has not been swiped fully yet.
      */
-    var swipedDirection: Direction? by mutableStateOf(null)
+    var swipedDirection: SwipeDirection? by mutableStateOf(null)
         private set
 
     /**
@@ -79,7 +77,7 @@ class SwipeableCardState(
         reset(tween(200))
     }
 
-    suspend fun fling(direction: Direction, velocity: Velocity) {
+    suspend fun fling(direction: SwipeDirection, velocity: Velocity) {
         isSwiped = true
         val endX = maxWidth * 1.1f
         val endY = maxHeight
@@ -87,22 +85,22 @@ class SwipeableCardState(
 
 
         when (direction) {
-            Direction.Left -> offset.animateTo(
+            SwipeDirection.Left -> offset.animateTo(
                 offset(x = -endX),
                 initialVelocity = offset(x = velocity.x),
                 animationSpec = tween(250)
             )
-            Direction.Right -> offset.animateTo(
+            SwipeDirection.Right -> offset.animateTo(
                 offset(x = endX),
                 initialVelocity = offset(x = velocity.x),
                 animationSpec = spring()
             )
-            Direction.Up -> offset.animateTo(
+            SwipeDirection.Up -> offset.animateTo(
                 offset(y = -endY),
                 initialVelocity = offset(y = velocity.y),
                 animationSpec = tween(250)
             )
-            Direction.Down -> offset.animateTo(
+            SwipeDirection.Down -> offset.animateTo(
                 offset(y = endY),
                 initialVelocity = offset(y = velocity.y),
                 animationSpec = tween(250)
@@ -111,15 +109,15 @@ class SwipeableCardState(
         swipedDirection = direction
     }
 
-    suspend fun swipe(direction: Direction, animationSpec: AnimationSpec<Offset> = tween(300)) {
+    suspend fun swipe(direction: SwipeDirection, animationSpec: AnimationSpec<Offset> = tween(300)) {
         isSwiped = true
         val endX = maxWidth * 1.5f
         val endY = maxHeight
         when (direction) {
-            Direction.Left -> offset.animateTo(offset(x = -endX), animationSpec)
-            Direction.Right -> offset.animateTo(offset(x = endX), animationSpec)
-            Direction.Up -> offset.animateTo(offset(y = -endY), animationSpec)
-            Direction.Down -> offset.animateTo(offset(y = endY), animationSpec)
+            SwipeDirection.Left -> offset.animateTo(offset(x = -endX), animationSpec)
+            SwipeDirection.Right -> offset.animateTo(offset(x = endX), animationSpec)
+            SwipeDirection.Up -> offset.animateTo(offset(y = -endY), animationSpec)
+            SwipeDirection.Down -> offset.animateTo(offset(y = endY), animationSpec)
         }
         swipedDirection = direction
     }

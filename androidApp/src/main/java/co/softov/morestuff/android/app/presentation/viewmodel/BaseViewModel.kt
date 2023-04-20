@@ -26,7 +26,7 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     private val _uiModel = MutableStateFlow(initialState)
     val uiModel: StateFlow<ViewState> = _uiModel
 
-    protected open var enableDebug = false
+    protected open val enableDebug = false
     private val stateTimeTravelDebugger: StateTimeTravelDebugger? by lazy {
         when (BuildConfig.DEBUG && enableDebug) {
             true -> StateTimeTravelDebugger(this::class.java.simpleName)
@@ -38,7 +38,7 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     // (multiple states of the same type holding the same data will not be dispatched multiple times to LiveData stream)
     protected var state by Delegates.observable(initialState) { _, old, new ->
         _uiModel.update { new }
-        viewModelScope.launch(Dispatchers.Default) {
+        viewModelScope.launch {
             if (new != old) {
                 stateTimeTravelDebugger?.apply {
                     addStateTransition(old, new)
