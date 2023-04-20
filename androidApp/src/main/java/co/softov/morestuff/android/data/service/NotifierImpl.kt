@@ -1,13 +1,19 @@
 package co.softov.morestuff.android.data.service
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import android.service.notification.StatusBarNotification
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import co.softov.morestuff.android.MainActivity
 import co.softov.morestuff.android.R
@@ -15,13 +21,18 @@ import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createReplyIntent
 import co.softov.morestuff.android.app.receiver.randomRequestCode
-import co.softov.morestuff.android.app.receiver.setReplayIntentExtras
-import co.softov.morestuff.android.data.utils.toEpochMilliseconds
+import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
+import co.softov.morestuff.android.domain.enums.ReviewNotification
+import co.softov.morestuff.android.domain.model.Defaults
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.Notifier
+import co.softov.morestuff.android.domain.service.Notifier.Companion.GROUP_KEY_REMINDERS
+import co.softov.morestuff.android.domain.service.Notifier.Companion.REMINDERS_CHANNEL_ID
+import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_CHANNEL_ID
+import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_NOTIFICATION_ID
 import timber.log.Timber
 import java.util.*
 
@@ -29,45 +40,94 @@ class NotifierImpl(
     private val context: Context
 ) : Notifier {
 
-    private val notificationManager: NotificationManager =
-        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager: NotificationManagerCompat by lazy {
+        NotificationManagerCompat.from(context)
+    }
+
+    private val activeNotifications: Array<StatusBarNotification>
+        get() = (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+            .activeNotifications
 
     private val appPerson: Person
     private val userPerson: Person
 
+    companion object {
+        private const val SUMMARY_ID = 99999
+    }
+
+
     init {
-        createNotificationChannel()
+        createNotificationChannels()
         appPerson = Person.Builder().setBot(true).setImportant(true).setName("Mr.Stuff").build()
         userPerson = Person.Builder().setName("Me").build()
     }
 
-    override fun showScheduleNotification(
-        scheduleId: Long,
-        message: Message
-    ) {
-        val builder =
-            NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_chat_24dp)
-                .setOnlyAlertOnce(true)
+    override fun showReminderNotification(message: Message) {
+        notifyUser(message.scheduleId.toInt(), createReminderNotification(message))
+        val notificationCount = activeNotifications.size
+        if (notificationCount > Defaults.REMINDER_GROUP_LIMIT) {
+            val summaryNotification = createReviewSummaryNotification(notificationCount)
 
-        val style = NotificationCompat.MessagingStyle(appPerson)
-            .addMessage(message.content, Calendar.getInstance().timeInMillis, appPerson)
+            notifyUser(message.scheduleId.toInt(), createReminderNotification(message))
+            notifyUser(SUMMARY_ID, summaryNotification)
+        }
+    }
 
-        builder.setStyle(style)
+    override fun showReminderNotifications(messages: List<Message>) {
+        val summaryNotification = createReviewSummaryNotification(messages.size)
+        val message = messages.last()
+        notifyUser(message.scheduleId.toInt(), createReminderNotification(message))
+        notifyUser(SUMMARY_ID, summaryNotification)
+    }
 
+    private fun createReminderNotification(message: Message): Notification {
+        val scheduleId = message.scheduleId
         val tomorrow = createReplyIntentWithTitle(scheduleId, TOMORROW)
         val later = createReplyIntentWithTitle(scheduleId, LATER)
         val snooze = createReplyIntentWithTitle(scheduleId, SNOOZE)
         val done = createReplyIntentWithTitle(scheduleId, DONE)
 
-        builder
+        val style = NotificationCompat.MessagingStyle(appPerson)
+            .addMessage(message.content, Calendar.getInstance().timeInMillis, appPerson)
+
+        return NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_chat_24dp)
+            .setOnlyAlertOnce(true)
+            .setGroup(GROUP_KEY_REMINDERS)
+            .setContentIntent(createReminderContentIntent(message.taskId))
+            .setStyle(style)
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
             .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
-            .setContentIntent(createContentIntent(message.taskId))
             .setDeleteIntent(snooze.second)
+            .build()
+    }
 
-        notificationManager.notify(scheduleId.toInt(), builder.build())
+    private fun createReviewSummaryNotification(notificationCount: Int) =
+        NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
+            .setContentTitle("Review tasks")
+            // Set content text to support devices running API level < 24.
+            .setContentText("$notificationCount pending reminders")
+            .setSmallIcon(R.drawable.ic_chat_24dp)
+            // Build summary info into InboxStyle template.
+            .setGroupSummary(true)
+            // Specify which group this notification belongs to.
+            .setGroup(GROUP_KEY_REMINDERS)
+            // Set this notification as the summary for the group.
+            .setContentIntent(
+                createReviewContentIntent(ReviewNotification.Overload(notificationCount))
+            ).build()
+
+    private fun notifyUser(
+        id: Int, notification: Notification
+    ) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationManager.notify(id, notification)
+        }
     }
 
     private fun createReplyIntentWithTitle(
@@ -83,7 +143,7 @@ class NotifierImpl(
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
 
-    private fun createContentIntent(
+    private fun createReminderContentIntent(
         taskId: Long
     ): PendingIntent =
         Intent(context, MainActivity::class.java).apply {
@@ -96,23 +156,29 @@ class NotifierImpl(
             PendingIntent.getActivity(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
+    private fun createReviewContentIntent(type: ReviewNotification): PendingIntent =
+        Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra(MainActivity.EXTRA_PRIORITY_REVIEW, type)
+        }.let {
+            PendingIntent.getActivity(context, randomRequestCode, it, PendingIntent.FLAG_IMMUTABLE)
+        }
+
+    @SuppressLint("MissingPermission")
     override fun showReminderNotificationReply(
         scheduleId: Long,
         messages: List<Message>
     ) {
         val messageStyle = getMessagingStyle(scheduleId.toInt(), messages)
         val notification: Notification =
-            NotificationCompat.Builder(
-                context,
-                NOTIFICATION_CHANNEL_ID
-            )
+            NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
                 .setStyle(messageStyle)
                 .setSmallIcon(R.drawable.ic_chat_24dp)
                 .setOnlyAlertOnce(true)
                 .setTimeoutAfter(2000L)
                 .build()
 
-        notificationManager.notify(scheduleId.toInt(), notification)
+        notifyUser(scheduleId.toInt(), notification)
     }
 
     private fun getMessagingStyle(
@@ -127,12 +193,12 @@ class NotifierImpl(
         if (style == null) {
             style = NotificationCompat.MessagingStyle(appPerson)
             for (message in messages) {
-                val time = message.createTime.toEpochMilliseconds
+                val time = message.createTime.inEpochMilliseconds
                 addMessage(style, message, time)
             }
         } else {
             val message = messages.last()
-            val time = message.createTime.toEpochMilliseconds
+            val time = message.createTime.inEpochMilliseconds
             addMessage(style, message, time)
         }
 
@@ -153,6 +219,7 @@ class NotifierImpl(
         return when (messageType) {
             ContentType.CONFIRM_NEW_TASK,
             ContentType.TASK_REMINDER -> appPerson
+
             else -> userPerson
         }
     }
@@ -160,8 +227,10 @@ class NotifierImpl(
     private fun getActiveNotificationById(id: Int): Notification? =
         when {
             isAtLeastVersion(Build.VERSION_CODES.M) -> {
-                notificationManager.activeNotifications.firstOrNull { it.id == id }?.notification
+                (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
+                    .activeNotifications.firstOrNull { it.id == id }?.notification
             }
+
             else -> null
         }
 
@@ -169,19 +238,52 @@ class NotifierImpl(
         notificationManager.cancel(scheduleId.toInt())
     }
 
-    companion object {
-        private const val NOTIFICATION_CHANNEL_ID = "ReminderNotifications"
+    override fun showReviewNotification(type: ReviewNotification) {
+        val (title, message) = when (type) {
+            ReviewNotification.Morning -> "Morning Review" to "Take a minute to sort priorities :D"
+            ReviewNotification.Afternoon -> "Afternoon Review" to "A midday progress check"
+            ReviewNotification.Evening -> "Evening Review" to "Review the day and prepare for tomorrow"
+            is ReviewNotification.Overload -> "Task Overload" to "Review ${type.tasks} pending tasks"
+        }
+
+        val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
+            .setSmallIcon(R.drawable.priority_48px)
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(true)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setContentIntent(createReviewContentIntent(type))
+
+        notifyUser(REVIEW_NOTIFICATION_ID, builder.build())
     }
 
-    private fun createNotificationChannel() {
+    override fun cancelReminderNotifications() {
+        notificationManager.cancelAll()
+    }
+
+    private fun createNotificationChannels() {
         if (isAtLeastVersion(Build.VERSION_CODES.O)) {
-            val name = "Reminder Notifications"
-            val descriptionText = "Notifications for your reminders"
-            val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance).apply {
-                description = descriptionText
+            NotificationChannel(
+                REMINDERS_CHANNEL_ID,
+                "Reminder Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications for your reminders"
+            }.also {
+                notificationManager.createNotificationChannel(it)
             }
-            notificationManager.createNotificationChannel(channel)
+
+            NotificationChannel(
+                REVIEW_CHANNEL_ID,
+                "Review Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notifications for reviewing your tasks"
+            }.also {
+                notificationManager.createNotificationChannel(it)
+            }
         }
     }
 }

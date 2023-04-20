@@ -5,6 +5,8 @@ import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.message.*
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.priority.*
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
@@ -64,7 +66,6 @@ val storeModule = module {
     }
 
     // Middleware
-
     factoryOf(::LoggerMiddleware)
     factoryOf(::NavigationMiddleware)
     factoryOf(::TaskMiddleware)
@@ -113,6 +114,7 @@ val scheduleUseCases = module {
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
     factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
+    factoryOf(::ScheduleReviewNotificationsImpl) bind ScheduleReviewNotifications::class
 }
 
 val messageUseCases = module {
@@ -124,6 +126,7 @@ val messageUseCases = module {
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
     factoryOf(::ClearActivePendingMessagesImpl) bind ClearActiveReminderMessages::class
+    factoryOf(::CountActiveReminderMessagesImpl) bind CountActiveReminderMessages::class
 }
 
 val priorityUseCases = module {
@@ -137,6 +140,7 @@ val priorityUseCases = module {
 val settingsUseCases = module {
     factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
     factoryOf(::SaveUserSettingsImpl) bind SaveUserSettings::class
+    factoryOf(::CheckFirstTimeImplUseCase) bind CheckFirstTimeUseCase::class
 }
 
 val timeManagerModule = module {

@@ -5,6 +5,7 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import kotlinx.coroutines.CoroutineScope

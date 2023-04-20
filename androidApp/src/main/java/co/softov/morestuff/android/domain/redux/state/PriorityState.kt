@@ -5,7 +5,6 @@ import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.state.PriorityAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitAction
 
 data class PriorityState(
     val current: Priority = Priority.Today(),
@@ -24,7 +23,6 @@ sealed class PriorityAction : Action.FeatureAction() {
 
 fun AppState.reducePriorityState(action: Action): AppState {
     return when (action) {
-        is InitAction,
         is PriorityAction -> copy(priorityState = priorityState.reduce(action))
         else -> this
     }
@@ -32,7 +30,6 @@ fun AppState.reducePriorityState(action: Action): AppState {
 
 fun PriorityState.reduce(action: Action): PriorityState {
     return when (action) {
-//        is SetPriority -> copy(current = action.priority)
         is SetPriorityOptions -> copy(current = action.priority, options = action.options)
         is SetCurrentPriorityOption -> reduceChangePriorityOption(current, action)
         else -> this

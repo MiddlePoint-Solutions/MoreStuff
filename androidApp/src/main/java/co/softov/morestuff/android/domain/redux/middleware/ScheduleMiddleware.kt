@@ -12,6 +12,7 @@ import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
 import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.schedule.*
@@ -43,6 +44,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
+    private val scheduleReviewNotifications: ScheduleReviewNotifications,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
@@ -59,6 +61,12 @@ class ScheduleMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
+
+            is SettingAction.InitSettings -> {
+                if (action.firstTime) {
+                    scope.launch { scheduleReviewNotifications() }
+                }
+            }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
                 with(action) {

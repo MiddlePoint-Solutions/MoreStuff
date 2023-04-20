@@ -1,19 +1,16 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.Defaults
 import co.softov.morestuff.android.domain.model.replyWithTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.CreateScheduleNotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.CreateTaskMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponse
+import co.softov.morestuff.android.domain.usecase.message.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -25,7 +22,9 @@ class MessageMiddleware(
     private val createTaskMessageUseCase: CreateTaskMessageUseCase,
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
-    private val setScheduleResponseMessage: SetScheduleMessageResponse
+    private val setScheduleResponseMessage: SetScheduleMessageResponse,
+    private val countActiveReminderMessages: CountActiveReminderMessages,
+    private val getActiveScheduleMessages: GetActiveScheduleMessages,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -37,6 +36,17 @@ class MessageMiddleware(
     ): Action {
 
         when (action) {
+            is CreateScheduleMessageAction -> scope.launch {
+                createScheduleMessageUseCase(action.scheduleId).map { message ->
+                    dispatch(ShowReminderNotificationAction(message))
+                    // TODO: show task overload notification?
+//                    val activeMessages = getActiveScheduleMessages()
+//                    if (activeMessages.size > Defaults.REMINDER_GROUP_LIMIT) {
+//                        dispatch(NotificationAction.ShowReminderNotificationsAction(activeMessages))
+//                    }
+                }
+            }
+
             is TaskAction.TaskCreatedAction -> scope.launch {
                 createTaskMessageUseCase(action.task)
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
@@ -58,9 +68,9 @@ class MessageMiddleware(
                 setScheduleResponseMessage(action.taskId, "Done", ReplyType.DONE)
             }
 
-            is CreateScheduleMessageAction -> scope.launch {
-                createScheduleMessageUseCase(action.scheduleId).map { message ->
-                    dispatch(CreateScheduleNotificationAction(action.scheduleId, message))
+            is TaskAction.CompleteTasksAction -> scope.launch {
+                action.taskIds.forEach {
+                    setScheduleResponseMessage(it, "Done", ReplyType.DONE)
                 }
             }
 

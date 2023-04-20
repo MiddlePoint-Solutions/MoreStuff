@@ -28,6 +28,8 @@ interface MessageRepository {
 
     suspend fun clearActiveReminderMessages()
 
+    suspend fun countActiveReminderMessages(): Int
+
 }
 
 object MessageDoesNotExist : FeatureFailure

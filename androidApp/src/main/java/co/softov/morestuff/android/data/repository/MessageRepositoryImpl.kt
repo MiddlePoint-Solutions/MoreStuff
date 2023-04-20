@@ -90,6 +90,9 @@ class MessageRepositoryImpl(
         messageQueries.deleteActiveReminderMessages()
     }
 
+    override suspend fun countActiveReminderMessages(): Int =
+        messageQueries.countActiveReminderMessages().executeAsOne().toInt()
+
     private fun getLastCreatedMessageForTask(taskId: Long): Either<Failure, Message> {
         return when (val message =
             messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
