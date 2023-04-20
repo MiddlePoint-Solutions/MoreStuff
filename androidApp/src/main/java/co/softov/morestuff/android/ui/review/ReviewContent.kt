@@ -35,22 +35,21 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
-import co.softov.morestuff.android.presentation.presenter.PriorityReviewModel
-import co.softov.morestuff.android.presentation.presenter.PriorityRound
+import co.softov.morestuff.android.presentation.presenter.ReviewModel
+import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.review.swipeable.*
-import co.softov.morestuff.android.ui.review.swipeable.Direction
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ReviewContent(
     modifier: Modifier = Modifier,
-    viewModel: PriorityReviewViewModel = getViewModel()
+    viewModel: ReviewViewModel = koinViewModel()
 ) {
     Surface {
         Box(
@@ -80,7 +79,7 @@ fun ReviewContent(
                 val states =
                     model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
-                val undoAction: () -> Unit = remember(Unit) {
+                val undoAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.run {
@@ -98,7 +97,7 @@ fun ReviewContent(
                 val negativeAction: () -> Unit = remember(Unit) {
                     {
                         scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(Direction.Left)
+                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
                         }
                     }
                 }
@@ -106,7 +105,7 @@ fun ReviewContent(
                 val positiveAction: () -> Unit = remember(Unit) {
                     {
                         scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(Direction.Right)
+                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
                         }
                     }
                 }
@@ -114,7 +113,7 @@ fun ReviewContent(
                 val doneAction: () -> Unit = remember(Unit) {
                     {
                         scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(Direction.Up)
+                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
                         }
                     }
                 }
@@ -122,14 +121,14 @@ fun ReviewContent(
                 val laterAction: () -> Unit = remember(Unit) {
                     {
                         scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(Direction.Down)
+                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
                         }
                     }
                 }
 
                 when (model.round) {
 
-                    PriorityRound.Today -> {
+                    ReviewRound.Priority -> {
 
                         val visibleState = remember(model.roundNumber) {
                             MutableTransitionState(false)
@@ -165,58 +164,58 @@ fun ReviewContent(
                             )
                         }
                     }
-                    PriorityRound.Now -> {
-
-                        val visibleState = remember(model.roundNumber) {
-                            MutableTransitionState(false)
-                        }
-                        val transition = updateTransition(visibleState, "Visible state")
-
-                        val screenWidth = with(LocalDensity.current) {
-                            LocalConfiguration.current.screenWidthDp.dp.toPx()
-                        }
-
-                        val xPosition by transition.animateFloat(label = "xPosition") {
-                            if (it) 0f else screenWidth
-                        }
-
-                        Box(modifier = Modifier.graphicsLayer {
-                            translationX = xPosition
-                        }) {
-                            TaskPrioritySwipe(
-                                modifier = modifier
-                                    .align(Alignment.Center)
-                                    .layoutId("${model.round}-${model.roundNumber}"),
-                                states = states,
-                                onSwiped = { schedule, direction, isLast ->
-                                    scope.launch {
-                                        if (isLast) {
-                                            visibleState.targetState = false
-                                            delay(100)
-                                        }
-                                    }.invokeOnCompletion {
-                                        viewModel.onTaskSwiped(schedule, direction, isLast)
-                                    }
-                                },
-                            )
-                        }
-
-                        SlideAnimation(
-                            visibleState = visibleState,
-                            key1 = model.roundNumber,
-                            modifier = modifier.align(Alignment.BottomCenter),
-                        ) {
-                            ReviewSwipeControls(
-                                modifier = modifier.align(Alignment.BottomCenter),
-                                negativeAction = negativeAction,
-                                positiveAction = positiveAction,
-                                doneAction = doneAction,
-                                laterAction = laterAction,
-                                undoAction = undoAction,
-                            )
-                        }
-                    }
-                    PriorityRound.Final -> {
+//                    ReviewRound.Sort -> {
+//
+//                        val visibleState = remember(model.roundNumber) {
+//                            MutableTransitionState(false)
+//                        }
+//                        val transition = updateTransition(visibleState, "Visible state")
+//
+//                        val screenWidth = with(LocalDensity.current) {
+//                            LocalConfiguration.current.screenWidthDp.dp.toPx()
+//                        }
+//
+//                        val xPosition by transition.animateFloat(label = "xPosition") {
+//                            if (it) 0f else screenWidth
+//                        }
+//
+//                        Box(modifier = Modifier.graphicsLayer {
+//                            translationX = xPosition
+//                        }) {
+//                            TaskPrioritySwipe(
+//                                modifier = modifier
+//                                    .align(Alignment.Center)
+//                                    .layoutId("${model.round}-${model.roundNumber}"),
+//                                states = states,
+//                                onSwiped = { schedule, direction, isLast ->
+//                                    scope.launch {
+//                                        if (isLast) {
+//                                            visibleState.targetState = false
+//                                            delay(100)
+//                                        }
+//                                    }.invokeOnCompletion {
+//                                        viewModel.onTaskSwiped(schedule, direction, isLast)
+//                                    }
+//                                },
+//                            )
+//                        }
+//
+//                        SlideAnimation(
+//                            visibleState = visibleState,
+//                            key1 = model.roundNumber,
+//                            modifier = modifier.align(Alignment.BottomCenter),
+//                        ) {
+//                            ReviewSwipeControls(
+//                                modifier = modifier.align(Alignment.BottomCenter),
+//                                negativeAction = negativeAction,
+//                                positiveAction = positiveAction,
+//                                doneAction = doneAction,
+//                                laterAction = laterAction,
+//                                undoAction = undoAction,
+//                            )
+//                        }
+//                    }
+                    ReviewRound.Final -> {
 
                         val visibleState = remember(model.roundNumber) {
                             MutableTransitionState(false)
@@ -436,7 +435,7 @@ private fun ReviewSwipeControls(
 private fun TaskPrioritySwipe(
     modifier: Modifier,
     states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
-    onSwiped: (schedule: ScheduleListItemViewModel, direction: Direction, isLast: Boolean) -> Unit,
+    onSwiped: (schedule: ScheduleListItemViewModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
 ) {
 
     Box(
@@ -536,7 +535,7 @@ private fun TaskCard(
 
 @Composable
 private fun RoundInfo(
-    model: PriorityReviewModel,
+    model: ReviewModel,
     modifier: Modifier = Modifier
 ) {
 
@@ -545,9 +544,8 @@ private fun RoundInfo(
     }
     val instructions by remember(model.round) {
         when (model.round) {
-            PriorityRound.Today -> "<-- Tomorrow    Today -->"
-            PriorityRound.Now -> "<-- Next    Now -->"
-            PriorityRound.Final -> ""
+            ReviewRound.Priority -> "<-- Low    High -->"
+            ReviewRound.Final -> ""
         }.let {
             mutableStateOf(it)
         }
@@ -592,7 +590,7 @@ private fun RoundInfo(
             )
 
             val debug = with(model) {
-                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size}  Today: ${today.size}  Now: ${now.size}  Low: ${snooze.size}  Done: ${done.size}  Later: ${later.size}"
+                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size} High: ${high.size}  Low: ${low.size}  Done: ${done.size}"
             }
 
             Text(

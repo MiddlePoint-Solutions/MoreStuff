@@ -18,16 +18,16 @@ import kotlin.math.abs
  * Enables Tinder like swiping gestures.
  *
  * @param state The current state of the swipeable card. Use [rememberSwipeableCardState] to create.
- * @param onSwiped will be called once a swipe gesture is completed. The given [Direction] will indicate which side the gesture was performed on.
+ * @param onSwiped will be called once a swipe gesture is completed. The given [SwipeDirection] will indicate which side the gesture was performed on.
  * @param onSwipeCancel will be called when the gesture is stopped before reaching the minimum threshold to be treated as a full swipe
  * @param blockedDirections the directions which will not trigger a swipe. By default only horizontal swipes are allowed.
  */
 @ExperimentalSwipeableCardApi
 fun Modifier.swipableCard(
     state: SwipeableCardState,
-    onSwiped: (Direction) -> Unit = {},
+    onSwiped: (SwipeDirection) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
-    blockedDirections: List<Direction> = listOf(),
+    blockedDirections: List<SwipeDirection> = listOf(),
 ) = pointerInput(state) {
     coroutineScope {
         val velocityTracker = VelocityTracker()
@@ -82,19 +82,19 @@ fun Modifier.swipableCard(
 
                         if (horizontalTravel > verticalTravel) {
                             if (state.offset.targetValue.x > 0) {
-                                state.fling(Direction.Right, velocity)
-                                onSwiped(Direction.Right)
+                                state.fling(SwipeDirection.Right, velocity)
+                                onSwiped(SwipeDirection.Right)
                             } else {
-                                state.fling(Direction.Left, velocity)
-                                onSwiped(Direction.Left)
+                                state.fling(SwipeDirection.Left, velocity)
+                                onSwiped(SwipeDirection.Left)
                             }
                         } else {
                             if (state.offset.targetValue.y < 0) {
-                                state.fling(Direction.Up, velocity)
-                                onSwiped(Direction.Up)
+                                state.fling(SwipeDirection.Up, velocity)
+                                onSwiped(SwipeDirection.Up)
                             } else {
-                                state.fling(Direction.Down, velocity)
-                                onSwiped(Direction.Down)
+                                state.fling(SwipeDirection.Down, velocity)
+                                onSwiped(SwipeDirection.Down)
                             }
                         }
                     }
@@ -117,30 +117,30 @@ private fun isVelocitySwipe(velocity: Velocity): Boolean {
 }
 
 private fun Offset.coerceIn(
-    blockedDirections: List<Direction>,
+    blockedDirections: List<SwipeDirection>,
     maxHeight: Float,
     maxWidth: Float,
 ): Offset {
     return copy(
         x = x.coerceIn(
-            if (blockedDirections.contains(Direction.Left)) {
+            if (blockedDirections.contains(SwipeDirection.Left)) {
                 0f
             } else {
                 -maxWidth
             },
-            if (blockedDirections.contains(Direction.Right)) {
+            if (blockedDirections.contains(SwipeDirection.Right)) {
                 0f
             } else {
                 maxWidth
             }
         ),
         y = y.coerceIn(
-            if (blockedDirections.contains(Direction.Up)) {
+            if (blockedDirections.contains(SwipeDirection.Up)) {
                 0f
             } else {
                 -maxHeight
             },
-            if (blockedDirections.contains(Direction.Down)) {
+            if (blockedDirections.contains(SwipeDirection.Down)) {
                 0f
             } else {
                 maxHeight

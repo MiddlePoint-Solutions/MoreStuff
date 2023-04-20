@@ -5,7 +5,6 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
-import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import kotlinx.coroutines.CoroutineScope
@@ -24,9 +23,8 @@ class ReviewMiddleware : Middleware<AppState> {
             is ReviewAction.ScheduleReviewResults -> {
                 with(action) {
                     dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.tomorrow))
-                    dispatch(ScheduleAction.RescheduleTasksAction(this.next, Priority.today))
-                    dispatch(ScheduleAction.RescheduleTasksAction(this.now, Priority.today))
-                    dispatch(ScheduleAction.RescheduleTasksAction(later, Priority.later))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.low, Priority.today))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.high, Priority.today))
                     dispatch(TaskAction.CompleteTasksAction(done, true))
                 }
             }

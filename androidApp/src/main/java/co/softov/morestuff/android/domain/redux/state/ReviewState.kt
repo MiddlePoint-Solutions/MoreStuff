@@ -11,10 +11,9 @@ data class ReviewState(
 sealed class ReviewAction : Action.FeatureAction() {
     data class ScheduleReviewResults(
         val tomorrow: List<Long>,
-        val now: List<Long>,
-        val next: List<Long>,
+        val high: List<Long>,
+        val low: List<Long>,
         val done: List<Long>,
-        val later: List<Long>,
     ) : ReviewAction()
 }
 
