@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui
 
 import android.content.Intent
-import co.softov.morestuff.android.NotificationActivity
 import co.softov.morestuff.android.app.navigation.BottomSheetFragmentScreen
 import co.softov.morestuff.android.ui.ScreenKey.LAUNCHED_TASK_CHAT
 import co.softov.morestuff.android.ui.ScreenKey.TASK_CHAT
@@ -25,14 +24,6 @@ object Screens {
     val priorityReview = FragmentScreen("ReviewPriority") { ReviewFragment() }
 
     val taskLists = BottomSheetFragmentScreen("TaskLists") { ListsFragment() }
-
-    val notificationActivity = ActivityScreen {
-        Intent(it, NotificationActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_MULTIPLE_TASK or
-                    Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
-        }
-    }
 
 }
 

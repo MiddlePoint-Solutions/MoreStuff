@@ -41,14 +41,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".NotificationActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/AlertBottomSheetDialogTheme"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-
         <service
             android:name=".app.service.NotificationService"
             android:exported="false" />
