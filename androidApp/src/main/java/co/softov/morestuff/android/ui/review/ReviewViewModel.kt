@@ -12,13 +12,17 @@ import co.softov.morestuff.android.presentation.presenter.ReviewRound.*
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class ReviewViewModel(
     private val getSchedulesForPriorityReviewUseCase: GetSchedulesForPriorityReviewUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private val mapper = ScheduleListItemMapper()
+    private var roundEndDelayJob: Job? = null
 
     override val enableDebug: Boolean
         get() = true
@@ -82,6 +86,8 @@ class ReviewViewModel(
     }
 
     fun undoTask(schedule: ScheduleListItemViewModel) {
+        Timber.d("undoTask: $schedule")
+        roundEndDelayJob?.cancel()
         sendEvent(Undo(schedule))
     }
 
@@ -94,7 +100,6 @@ class ReviewViewModel(
                 done = state.done.map { it.taskId },
             )
         )
-        navigateBack()
     }
 
     fun onTaskSwiped(
@@ -102,6 +107,7 @@ class ReviewViewModel(
         direction: SwipeDirection,
         isLast: Boolean
     ) {
+        Timber.d("onTaskSwiped: $isLast")
         val event = when (direction) {
             SwipeDirection.Left -> OnLowPriority(schedule)
             SwipeDirection.Right -> OnHighPriority(schedule)
@@ -111,12 +117,11 @@ class ReviewViewModel(
         sendEvent(event)
 
         if (isLast) {
-            sendEvent(SetupRound(Final))
+            roundEndDelayJob = viewModelScope.launch {
+                delay(1000)
+                sendEvent(SetupRound(Final))
+                confirmResults()
+            }
         }
     }
-
-    companion object {
-        const val FINAL_ROUND_MINIMUM = 1
-    }
-
 }

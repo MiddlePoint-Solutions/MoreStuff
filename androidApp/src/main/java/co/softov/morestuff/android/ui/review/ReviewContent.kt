@@ -45,6 +45,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun ReviewContent(
@@ -83,18 +84,17 @@ fun ReviewContent(
                     {
                         scope.launch {
                             states.run {
-                                firstVisibleOrNull()?.let { first ->
-                                    getOrNull(indexOf(first) + 1)?.let {
-                                        it.second.undo()
-                                        viewModel.undoTask(it.first)
-                                    }
+                                Timber.d("Undoing")
+                                lastSwipedItem()?.let { lastItem ->
+                                    lastItem.second.undo()
+                                    viewModel.undoTask(lastItem.first)
                                 }
                             }
                         }
                     }
                 }
 
-                val negativeAction: () -> Unit = remember(model.roundNumber) {
+                val lowAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
@@ -102,7 +102,7 @@ fun ReviewContent(
                     }
                 }
 
-                val positiveAction: () -> Unit = remember(model.roundNumber) {
+                val highAction: () -> Unit = remember(model.roundNumber) {
                     {
                         scope.launch {
                             states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
@@ -138,30 +138,35 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.Center),
                             states = states,
                             onSwiped = { schedule, direction, isLast ->
-                                scope.launch {
-                                    if (isLast) {
-                                        visibleState.targetState = false
-                                        delay(100)
-                                    }
-                                }.invokeOnCompletion {
-                                    viewModel.onTaskSwiped(schedule, direction, isLast)
-                                }
+                                viewModel.onTaskSwiped(schedule, direction, isLast)
+
+//                                scope.launch {
+//                                    if (isLast) {
+//                                        delay(500)
+//                                        visibleState.targetState = false
+//                                    }
+//                                }.invokeOnCompletion {
+//                                    viewModel.onTaskSwiped(schedule, direction, isLast)
+//                                }
                             },
                         )
 
                         SlideAnimation(
                             visibleState = visibleState,
-                            key1 = model.roundNumber,
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
                                 modifier = modifier.align(Alignment.BottomCenter),
-                                negativeAction = negativeAction,
-                                positiveAction = positiveAction,
+                                lowAction = lowAction,
+                                highAction = highAction,
                                 doneAction = doneAction,
                                 laterAction = laterAction,
                                 undoAction = undoAction,
                             )
+                        }
+
+                        LaunchedEffect(key1 = model.roundNumber) {
+                            visibleState.targetState = true
                         }
                     }
 
@@ -196,6 +201,7 @@ fun ReviewContent(
                                         modifier.align(Alignment.Center)
                                     )
                                 }
+
                                 states.size == 1 -> {
                                     Box(
                                         modifier
@@ -209,6 +215,7 @@ fun ReviewContent(
                                         )
                                     }
                                 }
+
                                 else -> {
                                     LazyColumn(
                                         contentPadding = PaddingValues(8.dp)
@@ -221,16 +228,19 @@ fun ReviewContent(
                             }
                         }
 
-                        SlideAnimation(
-                            visibleState = visibleState,
-                            key1 = model.roundNumber,
-                            modifier = modifier.align(Alignment.BottomCenter),
-                        ) {
-                            ReviewFinalControls(
-                                modifier = modifier.align(Alignment.BottomCenter),
-                                resetAction = viewModel::reset,
-                                finishAction = viewModel::confirmResults
-                            )
+//                        SlideAnimation(
+//                            visibleState = visibleState,
+//                            modifier = modifier.align(Alignment.BottomCenter),
+//                        ) {
+//                            ReviewFinalControls(
+//                                modifier = modifier.align(Alignment.BottomCenter),
+//                                resetAction = viewModel::reset,
+//                                finishAction = viewModel::confirmResults
+//                            )
+//                        }
+
+                        LaunchedEffect(key1 = model.roundNumber) {
+                            visibleState.targetState = true
                         }
                     }
                 }
@@ -239,11 +249,13 @@ fun ReviewContent(
     }
 }
 
+private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.lastSwipedItem() =
+    reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }?.run {
+        getOrNull(indexOf(this) + 1)
+    } ?: firstOrNull()
+
 private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleOrNull() =
-    reversed()
-        .firstOrNull {
-            it.second.offset.value == Offset(0f, 0f)
-        }
+    reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }
 
 private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
@@ -251,7 +263,6 @@ private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisib
 @Composable
 private fun SlideAnimation(
     visibleState: MutableTransitionState<Boolean>,
-    key1: Any?,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -262,10 +273,6 @@ private fun SlideAnimation(
         exit = slideOutVertically { it * 2 }
     ) {
         content()
-    }
-
-    LaunchedEffect(key1 = key1) {
-        visibleState.targetState = true
     }
 }
 
@@ -323,7 +330,7 @@ private fun ReviewFinalControls(
 
         PriorityButton(
             onSelected = finishAction,
-            text = stringResource(R.string.start).uppercase(),
+            text = stringResource(R.string.done).uppercase(),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .padding(16.dp),
@@ -337,8 +344,8 @@ private fun ReviewFinalControls(
 @Composable
 private fun ReviewSwipeControls(
     modifier: Modifier = Modifier,
-    positiveAction: () -> Unit = {},
-    negativeAction: () -> Unit = {},
+    highAction: () -> Unit = {},
+    lowAction: () -> Unit = {},
     doneAction: () -> Unit = {},
     laterAction: () -> Unit = {},
     undoAction: () -> Unit = {},
@@ -361,7 +368,7 @@ private fun ReviewSwipeControls(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             CircleButton(
-                onClick = negativeAction,
+                onClick = lowAction,
                 icon = Icons.Rounded.ThumbDown
             )
             CircleButton(
@@ -373,7 +380,7 @@ private fun ReviewSwipeControls(
                 icon = Icons.Rounded.Done
             )
             CircleButton(
-                onClick = positiveAction,
+                onClick = highAction,
                 icon = Icons.Rounded.ThumbUp
             )
         }
