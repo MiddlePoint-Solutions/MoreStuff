@@ -21,6 +21,11 @@ interface MessageRepository {
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
+        content: String,
+    ): Either<Failure, Message>
+
+    suspend fun createNormalMessage(
+        taskId: Long,
         content: String
     ): Either<Failure, Message>
 

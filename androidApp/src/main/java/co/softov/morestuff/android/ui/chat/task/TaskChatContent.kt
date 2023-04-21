@@ -8,13 +8,11 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Replay
-import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -45,7 +43,7 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TaskChatContent(
     taskId: Long,
@@ -77,6 +75,7 @@ fun TaskChatContent(
             openBottomSheet = false
         }
     }
+    var messageText by remember { mutableStateOf("") }
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -102,6 +101,8 @@ fun TaskChatContent(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .navigationBarsPadding()
+                        .imePadding(),
                 ) {
                     Messages(
                         messages = messages,
@@ -109,6 +110,40 @@ fun TaskChatContent(
                         modifier = modifier.weight(1f),
                         scrollState = scrollState
                     )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .imePadding()
+                    ) {
+                        TextField(
+                            value = messageText,
+                            onValueChange = { newText -> messageText = newText },
+                            label = { Text("Write a message") },
+                            singleLine = true,
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                               ,
+                            keyboardActions = KeyboardActions(onDone = {
+                                if (messageText.isNotBlank()) {
+                                    viewModel.sendMessage(content = messageText.trim())
+                                    messageText = ""
+                                }
+                            }),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                        )
+                        IconButton(
+                            onClick = {
+                                if (messageText.isNotBlank()) {
+                                    viewModel.sendMessage(content = messageText.trim())
+                                    messageText = ""
+                                }
+                            },
+                            modifier = Modifier.align(Alignment.CenterEnd)
+                        ) {
+                            Icon(Icons.Filled.Send, contentDescription = "send mensaje")
+                        }
+                    }
                 }
             }
         }
@@ -127,6 +162,7 @@ fun TaskChatContent(
         dismissAction = bottomSheetDismissAction
     )
 }
+
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -261,7 +297,10 @@ private fun ScheduleButton(
 
             when (priority.priorityModel.priority) {
                 is Priority.Today -> stringResource(id = R.string.time_option_today, formattedTime)
-                is Priority.Tomorrow -> stringResource(id = R.string.time_option_tomorrow, formattedTime)
+                is Priority.Tomorrow -> stringResource(
+                    id = R.string.time_option_tomorrow,
+                    formattedTime
+                )
                 is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
             }
         }

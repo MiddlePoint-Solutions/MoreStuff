@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -66,6 +67,24 @@ class MessageRepositoryImpl(
         }
         return getMessage(messageId)
     }
+
+    override suspend fun createNormalMessage(
+        taskId: Long,
+        content: String
+    ): Either<Failure, Message> {
+        val messageId: Long = messageQueries.transactionWithResult {
+            messageQueries.insertMessage(
+                task_id = taskId,
+                schedule_id = 0,
+                create_time = timeManager.getCreateTime(),
+                content_type = ContentType.TASK_MESSAGE.value,
+                content = content
+            )
+            lastInsertId
+        }
+        return getMessage(messageId)
+    }
+
 
     override suspend fun addUserReplyMessage(
         taskId: Long,
