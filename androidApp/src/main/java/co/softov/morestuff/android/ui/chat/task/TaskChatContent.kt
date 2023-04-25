@@ -81,133 +81,6 @@ import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
-
-@Composable
-fun TaskChatTopBar(
-    taskId: Long,
-    editScheduleAction: () -> Unit,
-) {
-
-    // TODO: hoist state out of toolbar
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
-    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
-        parametersOf(taskId)
-    }
-    val priority by priorityViewModel.model.collectAsState()
-    val task by viewModel.task.collectAsState()
-    val schedule by viewModel.schedule.collectAsState()
-
-    val focusManager = LocalFocusManager.current
-    Surface(
-        modifier = Modifier
-            .height(180.dp),
-        color = Color(0xff2B3438),
-        tonalElevation = 10.dp,
-    ) {
-        Column {
-            CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colorScheme.onSurface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(bottom = 16.dp, top = 45.dp)
-                        .windowInsetsPadding(
-                            WindowInsets.safeContent.union(WindowInsets.ime)
-                        )
-                ) {
-                    BasicTextField(
-                        value = viewModel.taskTitle,
-                        onValueChange = viewModel::updateTaskTitle,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp),
-                        readOnly = task.isComplete,
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrect = false,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions {
-                            focusManager.clearFocus()
-                        },
-                        maxLines = 4,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textDecoration = when (task.isComplete) {
-                                true -> TextDecoration.LineThrough
-                                false -> null
-                            }
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.Schedule,
-                            contentDescription = stringResource(R.string.cd_schedule_icon),
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        ScheduleButton(schedule, priority, editScheduleAction, task)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun ScheduleButton(
-    schedule: Schedule?,
-    priority: TaskPriorityModel,
-    editScheduleAction: () -> Unit,
-    task: Task,
-    timeFormatter: TimeFormatter = get(),
-) {
-    val title = when {
-        schedule == null -> {
-            stringResource(R.string.task_chat_schedule_reminder)
-        }
-
-        schedule.scheduleUtcTime == null -> {
-            stringResource(R.string.time_option_later)
-        }
-
-        else -> {
-            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
-
-            when (priority.priorityModel.priority) {
-                is Priority.Today -> stringResource(
-                    id = R.string.time_option_today,
-                    formattedTime
-                )
-
-                is Priority.Tomorrow -> stringResource(
-                    id = R.string.time_option_tomorrow,
-                    formattedTime
-                )
-
-                is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
-            }
-        }
-    }.orEmpty()
-
-    PriorityButton(
-        onSelected = editScheduleAction,
-        text = title,
-        shape = RoundedCornerShape(percent = 50),
-        enabled = !task.isComplete
-    )
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun TaskChatContent(
@@ -405,6 +278,133 @@ fun TaskChatContent(
         )
     }
 }
+
+@Composable
+fun TaskChatTopBar(
+    taskId: Long,
+    editScheduleAction: () -> Unit,
+) {
+
+    // TODO: hoist state out of toolbar
+    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
+        parametersOf(taskId)
+    }
+    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
+        parametersOf(taskId)
+    }
+    val priority by priorityViewModel.model.collectAsState()
+    val task by viewModel.task.collectAsState()
+    val schedule by viewModel.schedule.collectAsState()
+
+    val focusManager = LocalFocusManager.current
+    Surface(
+        modifier = Modifier
+            .height(180.dp),
+        color = Color(0xff2B3438),
+        tonalElevation = 10.dp,
+    ) {
+        Column {
+            CompositionLocalProvider(
+                LocalContentColor provides MaterialTheme.colorScheme.onSurface
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 16.dp, top = 45.dp)
+                        .windowInsetsPadding(
+                            WindowInsets.safeContent.union(WindowInsets.ime)
+                        )
+                ) {
+                    BasicTextField(
+                        value = viewModel.taskTitle,
+                        onValueChange = viewModel::updateTaskTitle,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp),
+                        readOnly = task.isComplete,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            autoCorrect = false,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions {
+                            focusManager.clearFocus()
+                        },
+                        maxLines = 4,
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textDecoration = when (task.isComplete) {
+                                true -> TextDecoration.LineThrough
+                                false -> null
+                            }
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Schedule,
+                            contentDescription = stringResource(R.string.cd_schedule_icon),
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        ScheduleButton(schedule, priority, editScheduleAction, task)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ScheduleButton(
+    schedule: Schedule?,
+    priority: TaskPriorityModel,
+    editScheduleAction: () -> Unit,
+    task: Task,
+    timeFormatter: TimeFormatter = get(),
+) {
+    val title = when {
+        schedule == null -> {
+            stringResource(R.string.task_chat_schedule_reminder)
+        }
+
+        schedule.scheduleUtcTime == null -> {
+            stringResource(R.string.time_option_later)
+        }
+
+        else -> {
+            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
+
+            when (priority.priorityModel.priority) {
+                is Priority.Today -> stringResource(
+                    id = R.string.time_option_today,
+                    formattedTime
+                )
+
+                is Priority.Tomorrow -> stringResource(
+                    id = R.string.time_option_tomorrow,
+                    formattedTime
+                )
+
+                is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
+            }
+        }
+    }.orEmpty()
+
+    PriorityButton(
+        onSelected = editScheduleAction,
+        text = title,
+        shape = RoundedCornerShape(percent = 50),
+        enabled = !task.isComplete
+    )
+}
+
+
 
 
 /*@Preview
