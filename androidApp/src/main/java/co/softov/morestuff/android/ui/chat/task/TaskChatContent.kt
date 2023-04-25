@@ -64,6 +64,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
@@ -101,7 +102,7 @@ fun TaskChatTopBar(
     val focusManager = LocalFocusManager.current
     Surface(
         modifier = Modifier
-            .height(120.dp),
+            .height(180.dp),
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
@@ -111,7 +112,7 @@ fun TaskChatTopBar(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(bottom = 16.dp)
+                        .padding(bottom = 16.dp, top = 45.dp)
                         .windowInsetsPadding(
                             WindowInsets.safeContent.union(WindowInsets.ime)
                         )
@@ -120,7 +121,8 @@ fun TaskChatTopBar(
                         value = viewModel.taskTitle,
                         onValueChange = viewModel::updateTaskTitle,
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(start = 16.dp),
                         readOnly = task.isComplete,
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
@@ -146,7 +148,9 @@ fun TaskChatTopBar(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Schedule,
-                            contentDescription = stringResource(R.string.cd_schedule_icon)
+                            contentDescription = stringResource(R.string.cd_schedule_icon),
+                            modifier = Modifier
+                                .padding(start = 16.dp)
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
@@ -226,6 +230,9 @@ fun TaskChatContent(
     )
 
     val messages by viewModel.messages.collectAsState()
+    val filteredMessages =
+        messages.filter { ContentType.withValue(it.contentType.value) == ContentType.TASK_MESSAGE }
+
     val taskPriorityModel by priorityViewModel.model.collectAsState()
 
     var openBottomSheet by remember { mutableStateOf(false) }
@@ -286,101 +293,99 @@ fun TaskChatContent(
     }
     Box(Modifier.fillMaxSize()) {
         Scaffold(
-
             modifier = modifier,
             topBar = topAppBar,
             content = {
                 Surface {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                        .imePadding(),
-                ) {
-                    TaskChatTopBar(
-                        taskId = taskId,
-                        editScheduleAction = {
-                            priorityViewModel.reset()
-                            openBottomSheet = true
-                        },
-                    )
-                            Messages(
-                                messages = messages,
-                                actions = chatActions,
-                                modifier = modifier.weight(1f),
-                                scrollState = scrollState
-                            )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding()
+                            .imePadding(),
+                    ) {
+                        TaskChatTopBar(
+                            taskId = taskId,
+                            editScheduleAction = {
+                                priorityViewModel.reset()
+                                openBottomSheet = true
+                            },
+                        )
+                        Messages(
+                            messages = filteredMessages,
+                            actions = chatActions,
+                            modifier = modifier.weight(1f),
+                            scrollState = scrollState
+                        )
 
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .imePadding()
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .imePadding()
+                                    .background(color = MaterialTheme.colorScheme.primary)
+
                             ) {
-                                Box(
+                                BasicTextField(
+                                    value = messageText,
+                                    onValueChange = { newText -> messageText = newText },
+                                    enabled = true,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(color = MaterialTheme.colorScheme.primary)
-
-                                ) {
-                                    BasicTextField(
-                                        value = messageText,
-                                        onValueChange = { newText -> messageText = newText },
-                                        enabled = true,
-                                        modifier = Modifier
-                                            .fillMaxWidth(0.88f)
-                                            .defaultMinSize(minHeight = 46.dp)
-                                            .padding(
-                                                start = 16.dp,
-                                                top = 8.dp,
-                                                bottom = 8.dp,
-                                                end = 4.dp
-                                            )
-                                            .onFocusChanged { Timber.d("FocusState changed: $it") },
-                                        keyboardOptions = KeyboardOptions(
-                                            capitalization = KeyboardCapitalization.Sentences,
-                                            keyboardType = KeyboardType.Text,
-                                            imeAction = ImeAction.Done
-                                        ),
-                                        keyboardActions = KeyboardActions(onDone = {
-                                            if (messageText.isNotBlank()) {
-                                                viewModel.sendMessage(content = messageText.trim())
-                                                messageText = ""
-                                            }
-                                        }),
-                                        maxLines = 1,
-                                        cursorBrush = SolidColor(LocalContentColor.current),
-                                        textStyle = LocalTextStyle.current.copy(
-                                            color = LocalContentColor.current,
-                                            fontSize = 18.sp
-                                        ),
-                                        decorationBox = { innerTextField ->
-                                            Box {
-                                                if (messageText.isEmpty()) {
-                                                    Text(
-                                                        text = "Write something...",
-                                                        fontSize = 18.sp
-                                                    )
-                                                }
-                                                innerTextField()
-                                            }
-                                        }
-                                    )
-
-                                }
-                                IconButton(
-                                    onClick = {
+                                        .fillMaxWidth(0.88f)
+                                        .defaultMinSize(minHeight = 46.dp)
+                                        .padding(
+                                            start = 16.dp,
+                                            top = 8.dp,
+                                            bottom = 8.dp,
+                                            end = 4.dp
+                                        )
+                                        .onFocusChanged { Timber.d("FocusState changed: $it") },
+                                    keyboardOptions = KeyboardOptions(
+                                        capitalization = KeyboardCapitalization.Sentences,
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Done
+                                    ),
+                                    keyboardActions = KeyboardActions(onDone = {
                                         if (messageText.isNotBlank()) {
                                             viewModel.sendMessage(content = messageText.trim())
                                             messageText = ""
                                         }
-                                    },
-                                    modifier = Modifier.align(Alignment.CenterEnd)
-                                ) {
-                                    Icon(Icons.Filled.Send, contentDescription = "send mensaje")
-                                }
+                                    }),
+                                    maxLines = 1,
+                                    cursorBrush = SolidColor(LocalContentColor.current),
+                                    textStyle = LocalTextStyle.current.copy(
+                                        color = LocalContentColor.current,
+                                        fontSize = 18.sp
+                                    ),
+                                    decorationBox = { innerTextField ->
+                                        Box {
+                                            if (messageText.isEmpty()) {
+                                                Text(
+                                                    text = "Write something...",
+                                                    fontSize = 18.sp
+                                                )
+                                            }
+                                            innerTextField()
+                                        }
+                                    }
+                                )
+
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (messageText.isNotBlank()) {
+                                        viewModel.sendMessage(content = messageText.trim())
+                                        messageText = ""
+                                    }
+                                },
+                                modifier = Modifier.align(Alignment.CenterEnd)
+                            ) {
+                                Icon(Icons.Filled.Send, contentDescription = "send mensaje")
                             }
                         }
+                    }
 
                 }
             }
