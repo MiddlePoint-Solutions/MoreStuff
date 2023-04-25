@@ -6,8 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,12 +35,11 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
-import co.softov.morestuff.android.ui.list.ScheduleListItem
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.review.swipeable.*
+import co.softov.morestuff.android.ui.schedule.PrioritySchedule
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -189,7 +186,7 @@ fun ReviewContent(
                             modifier = Modifier
                                 .align(Alignment.Center)
                                 .fillMaxSize()
-                                .aspectRatio(1f)
+//                                .aspectRatio(1f)
                                 .graphicsLayer {
                                     translationX = xPosition
                                 }
@@ -200,30 +197,11 @@ fun ReviewContent(
                                         "Wooops, nothing to work on? add a new task",
                                         modifier.align(Alignment.Center)
                                     )
-                                }
-
-                                states.size == 1 -> {
-                                    Box(
-                                        modifier
-                                            .padding(24.dp)
-                                            .fillMaxSize()
-                                            .aspectRatio(1f)
-                                    ) {
-                                        TaskCard(
-                                            modifier = modifier.fillMaxSize(),
-                                            schedule = states.first().first
-                                        )
-                                    }
+                                    // TODO: add a new task
                                 }
 
                                 else -> {
-                                    LazyColumn(
-                                        contentPadding = PaddingValues(8.dp)
-                                    ) {
-                                        items(model.roundItems) {
-                                            ScheduleListItem(it)
-                                        }
-                                    }
+                                    PrioritySchedule(viewModel::reorderTaskItem, modifier, model)
                                 }
                             }
                         }

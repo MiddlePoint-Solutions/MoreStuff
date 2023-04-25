@@ -19,7 +19,6 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 
 class ScheduleRepositoryImpl(
     database: StuffDb,
@@ -55,27 +54,50 @@ class ScheduleRepositoryImpl(
         }
     }
 
-    override suspend fun getActiveSchedules(
-        startTime: String?,
-        endTime: String?,
-    ): Either<Failure, List<Schedule>> = scheduleQueries
-        .selectActiveSchedulesFromStartToEndTime(startTime, endTime)
-        .executeAsList().map(mapScheduleDb)
-        .right()
-
-    override suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
-        return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
+    override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
+        return scheduleQueries
+            .selectActiveSchedules()
             .executeAsList()
+            .map(mapScheduleDb)
+            .right()
     }
 
-    override suspend fun getActiveSchedulesFlow(): Flow<List<Schedule>> {
+    override fun getActiveSchedulesFlow(): Flow<List<Schedule>> {
         return scheduleQueries.selectActiveSchedules()
             .asFlow()
             .mapToList()
             .map { mapList(it, mapScheduleDb) }
     }
 
-    override suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
+    override suspend fun getActiveSchedulesByTime(
+        startTime: String,
+        endTime: String,
+    ): Either<Failure, List<Schedule>> = scheduleQueries
+        .selectActiveSchedulesFromStartToEndTime(startTime, endTime)
+        .executeAsList()
+        .map(mapScheduleDb)
+        .right()
+
+    override fun getActiveSchedulesByTimeFlow(
+        startTime: String,
+        endTime: String
+    ): Flow<List<Schedule>> {
+        return scheduleQueries.selectActiveSchedulesFromStartToEndTime(startTime, endTime)
+            .asFlow()
+            .mapToList()
+            .map { mapList(it, mapScheduleDb) }
+    }
+
+    override suspend fun getTodayActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
+        val time = timeManager.todayTimeStringPair
+        return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
+            time.first,
+            time.second,
+            mapper = mapScheduleWithTitleDb
+        ).executeAsList()
+    }
+
+    override fun getTodayActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         val time = timeManager.todayTimeStringPair
         return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
             time.first,
@@ -95,18 +117,20 @@ class ScheduleRepositoryImpl(
     }
 
     override fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
-        return scheduleQueries.selectActiveSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
+        return scheduleQueries.selectActiveSchedulesWithTaskTitle(
+            mapper = mapScheduleWithTitleDb
+        )
             .asFlow()
             .mapToList()
     }
 
-    override suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
+    override fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         return scheduleQueries.selectActiveLaterSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
             .asFlow()
             .mapToList()
     }
 
-    override suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
+    override fun getTomorrowActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         val time = timeManager.tomorrowTimeStringPair
         return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
             time.first,

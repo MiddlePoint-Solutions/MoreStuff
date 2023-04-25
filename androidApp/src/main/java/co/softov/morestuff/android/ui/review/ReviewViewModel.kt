@@ -15,6 +15,7 @@ import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.burnoutcrew.reorderable.ItemPosition
 import timber.log.Timber
 
 class ReviewViewModel(
@@ -25,7 +26,7 @@ class ReviewViewModel(
     private var roundEndDelayJob: Job? = null
 
     override val enableDebug: Boolean
-        get() = true
+        get() = false
 
     init {
         loadData()
@@ -81,6 +82,14 @@ class ReviewViewModel(
         }
     }
 
+    fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+        state = state.copy(
+            roundItems = state.roundItems.toMutableList().apply {
+                add(toPosition, removeAt(fromPosition))
+            }
+        )
+    }
+
     fun reset() {
         setInitialState()
     }
@@ -91,7 +100,7 @@ class ReviewViewModel(
         sendEvent(Undo(schedule))
     }
 
-    fun confirmResults() {
+    private fun confirmResults() {
         dispatchAppStoreAction(
             ReviewAction.ScheduleReviewResults(
                 tomorrow = state.tomorrow.map { it.taskId },

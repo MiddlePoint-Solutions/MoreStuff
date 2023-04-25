@@ -11,23 +11,38 @@ import kotlinx.coroutines.flow.Flow
 interface ScheduleRepository {
 
     suspend fun createSchedule(schedule: Schedule): Either<Failure, Schedule>
+
     suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule>
 
-    suspend fun getActiveSchedules(
-        startTime: String? = null,
-        endTime: String? = null
+    suspend fun getActiveSchedules(): Either<Failure, List<Schedule>>
+
+    fun getActiveSchedulesFlow(): Flow<List<Schedule>>
+
+    suspend fun getActiveSchedulesByTime(
+        startTime: String,
+        endTime: String
     ): Either<Failure, List<Schedule>>
 
-    suspend fun getActiveSchedulesWithTitle(): List<ScheduleWithTitle>
-    suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
-    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule>
+    fun getActiveSchedulesByTimeFlow(
+        startTime: String,
+        endTime: String
+    ): Flow<List<Schedule>>
+
     suspend fun getActiveScheduleWithTitle(scheduleId: Long): Either<Failure, ScheduleWithTitle>
 
-    suspend fun getActiveSchedulesFlow(): Flow<List<Schedule>>
+    suspend fun getTodayActiveSchedulesWithTitle(): List<ScheduleWithTitle>
+
+    suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
+
+    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule>
+
     fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-    suspend fun getActiveTodaySchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-    suspend fun getActiveLaterSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-    suspend fun getActiveTomorrowSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    fun getTodayActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    fun getTomorrowActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
     fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>>
 
