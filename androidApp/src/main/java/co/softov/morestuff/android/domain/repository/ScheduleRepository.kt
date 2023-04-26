@@ -28,6 +28,18 @@ interface ScheduleRepository {
         endTime: String
     ): Flow<List<Schedule>>
 
+    fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    suspend fun getActiveSchedulesWithTitleByTime(
+        startTime: String,
+        endTime: String
+    ): Either<Failure, List<ScheduleWithTitle>>
+
+    fun getActiveSchedulesWithTitleByTimeFlow(
+        startTime: String,
+        endTime: String
+    ): Flow<List<ScheduleWithTitle>>
+
     suspend fun getActiveScheduleWithTitle(scheduleId: Long): Either<Failure, ScheduleWithTitle>
 
     suspend fun getTodayActiveSchedulesWithTitle(): List<ScheduleWithTitle>
@@ -35,14 +47,6 @@ interface ScheduleRepository {
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
 
     suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule>
-
-    fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    fun getTodayActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    fun getTomorrowActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
     fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>>
 
@@ -53,6 +57,15 @@ interface ScheduleRepository {
         startTime: String,
         endTime: String
     ): Either<Failure, Int>
+
+    // TODO: remove these:
+
+    fun getTodayActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    fun getTomorrowActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
+    fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
+
 }
 
 object ScheduleDoesNotExist : FeatureFailure

@@ -124,6 +124,32 @@ class ScheduleRepositoryImpl(
             .mapToList()
     }
 
+    override suspend fun getActiveSchedulesWithTitleByTime(
+        startTime: String,
+        endTime: String
+    ): Either<Failure, List<ScheduleWithTitle>> {
+        return scheduleQueries
+            .selectActiveSchedulesWithTaskTitleByTime(
+                startTime,
+                endTime,
+                mapScheduleWithTitleDb
+            ).executeAsList()
+            .right()
+    }
+
+    override fun getActiveSchedulesWithTitleByTimeFlow(
+        startTime: String,
+        endTime: String
+    ): Flow<List<ScheduleWithTitle>> {
+        return scheduleQueries
+            .selectActiveSchedulesWithTaskTitleByTime(
+                startTime,
+                endTime,
+                mapScheduleWithTitleDb
+            ).asFlow()
+            .mapToList()
+    }
+
     override fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>> {
         return scheduleQueries.selectActiveLaterSchedulesWithTaskTitle(mapper = mapScheduleWithTitleDb)
             .asFlow()

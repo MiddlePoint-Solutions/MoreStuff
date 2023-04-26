@@ -201,7 +201,11 @@ fun ReviewContent(
                                 }
 
                                 else -> {
-                                    PrioritySchedule(viewModel::reorderTaskItem, modifier, model)
+                                    PrioritySchedule(
+                                        model.roundItems,
+                                        viewModel::reorderTaskItem,
+                                        modifier
+                                    )
                                 }
                             }
                         }

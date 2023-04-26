@@ -9,7 +9,11 @@ data class PriorityViewState(
 ) : BaseViewState
 
 sealed class PriorityViewEvent : BaseViewEvent {
+    data class InitPriorityState(val items: List<ScheduleListItemViewModel>) : PriorityViewEvent()
 
+    //TODO: add reorder task item event
+
+    data class ReorderTask(val fromPosition: Int, val toPosition: Int) : PriorityViewEvent()
 }
 
 
