@@ -3,17 +3,13 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityViewState
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PriorityViewModel(
@@ -46,16 +42,29 @@ class PriorityViewModel(
                 items = event.items
             )
 
-            is ReorderTask -> state.copy(
+            is ReorderItem -> state.copy(
                 items = state.items.toMutableList().apply {
                     add(event.toPosition, removeAt(event.fromPosition))
+                }
+            )
+
+            is CompleteItem -> state.copy(
+                items = state.items.toMutableList().apply {
+                    remove(event.item)
                 }
             )
         }
     }
 
     fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
-        sendEvent(ReorderTask(fromPosition, toPosition))
+        sendEvent(ReorderItem(fromPosition, toPosition))
+    }
+
+    fun completeTask(item: ScheduleListItemViewModel) {
+        viewModelScope.launch {
+            delay(300)
+            sendEvent(CompleteItem(item))
+        }
     }
 
 }

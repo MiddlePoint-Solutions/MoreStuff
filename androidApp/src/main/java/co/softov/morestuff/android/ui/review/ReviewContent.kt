@@ -204,6 +204,7 @@ fun ReviewContent(
                                     PrioritySchedule(
                                         model.roundItems,
                                         viewModel::reorderTaskItem,
+                                        {},
                                         modifier
                                     )
                                 }

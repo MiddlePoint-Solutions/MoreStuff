@@ -11,9 +11,9 @@ data class PriorityViewState(
 sealed class PriorityViewEvent : BaseViewEvent {
     data class InitPriorityState(val items: List<ScheduleListItemViewModel>) : PriorityViewEvent()
 
-    //TODO: add reorder task item event
+    data class ReorderItem(val fromPosition: Int, val toPosition: Int) : PriorityViewEvent()
 
-    data class ReorderTask(val fromPosition: Int, val toPosition: Int) : PriorityViewEvent()
+    data class CompleteItem(val item: ScheduleListItemViewModel) : PriorityViewEvent()
 }
 
 

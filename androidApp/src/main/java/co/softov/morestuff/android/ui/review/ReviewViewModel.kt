@@ -3,7 +3,7 @@ package co.softov.morestuff.android.ui.review
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
-import co.softov.morestuff.android.domain.usecase.priority.GetSchedulesForPriorityReviewUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.*
@@ -15,11 +15,10 @@ import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ItemPosition
 import timber.log.Timber
 
 class ReviewViewModel(
-    private val getSchedulesForPriorityReviewUseCase: GetSchedulesForPriorityReviewUseCase
+    private val getSchedulesForPriorityReviewUseCase: GetReviewSchedulesUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private val mapper = ScheduleListItemMapper()
