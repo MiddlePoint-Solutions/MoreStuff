@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.chat.task
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -50,7 +51,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -61,10 +61,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
@@ -75,13 +75,14 @@ import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskChatContent(
     taskId: Long,
@@ -103,8 +104,6 @@ fun TaskChatContent(
     )
 
     val messages by viewModel.messages.collectAsState()
-    val filteredMessages =
-        messages.filter { ContentType.withValue(it.contentType.value) == ContentType.TASK_MESSAGE }
 
     val taskPriorityModel by priorityViewModel.model.collectAsState()
 
@@ -116,7 +115,7 @@ fun TaskChatContent(
             openBottomSheet = false
         }
     }
-    var messageText by remember { mutableStateOf("") }
+
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -125,49 +124,10 @@ fun TaskChatContent(
             openBottomSheet = false
         }
     }
-    val topAppBar: @Composable () -> Unit = {
-        TopAppBar(
-            title = { },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xff2B3438)
-            ),
-            actions = {
-                val task by viewModel.task.collectAsState()
-                when (task.isComplete) {
-                    true -> {
-                        IconButton(onClick = { viewModel.setTaskComplete(false) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Replay,
-                                contentDescription = stringResource(R.string.cd_task_complete)
-                            )
-                        }
-                    }
 
-                    false -> {
-                        IconButton(onClick = { viewModel.setTaskComplete(true) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = stringResource(R.string.cd_task_complete)
-                            )
-                        }
-                    }
-                }
-
-            },
-            navigationIcon = {
-                IconButton(onClick = viewModel::onBackPressed) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back)
-                    )
-                }
-            }
-        )
-    }
     Box(Modifier.fillMaxSize()) {
         Scaffold(
             modifier = modifier,
-            topBar = topAppBar,
             content = {
                 Surface {
                     Column(
@@ -176,6 +136,11 @@ fun TaskChatContent(
                             .navigationBarsPadding()
                             .imePadding(),
                     ) {
+                        TopAppBarTask(
+                            viewModel,
+                            setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
+                            onBackPressed = viewModel::onBackPressed,
+                        )
                         TaskChatTopBar(
                             taskId = taskId,
                             editScheduleAction = {
@@ -184,7 +149,7 @@ fun TaskChatContent(
                             },
                         )
                         Messages(
-                            messages = filteredMessages,
+                            messages = messages,
                             actions = chatActions,
                             modifier = modifier.weight(1f),
                             scrollState = scrollState
@@ -201,62 +166,15 @@ fun TaskChatContent(
                                     .background(color = MaterialTheme.colorScheme.primary)
 
                             ) {
-                                BasicTextField(
-                                    value = messageText,
-                                    onValueChange = { newText -> messageText = newText },
-                                    enabled = true,
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.88f)
-                                        .defaultMinSize(minHeight = 46.dp)
-                                        .padding(
-                                            start = 16.dp,
-                                            top = 8.dp,
-                                            bottom = 8.dp,
-                                            end = 4.dp
+                                TaskMessageTextField(
+                                    sendMessageForTask = { content ->
+                                        viewModel.sendMessageForTask(
+                                            content
                                         )
-                                        .onFocusChanged { Timber.d("FocusState changed: $it") },
-                                    keyboardOptions = KeyboardOptions(
-                                        capitalization = KeyboardCapitalization.Sentences,
-                                        keyboardType = KeyboardType.Text,
-                                        imeAction = ImeAction.Done
-                                    ),
-                                    keyboardActions = KeyboardActions(onDone = {
-                                        if (messageText.isNotBlank()) {
-                                            viewModel.sendMessage(content = messageText.trim())
-                                            messageText = ""
-                                        }
-                                    }),
-                                    maxLines = 1,
-                                    cursorBrush = SolidColor(LocalContentColor.current),
-                                    textStyle = LocalTextStyle.current.copy(
-                                        color = LocalContentColor.current,
-                                        fontSize = 18.sp
-                                    ),
-                                    decorationBox = { innerTextField ->
-                                        Box {
-                                            if (messageText.isEmpty()) {
-                                                Text(
-                                                    text = "Write something...",
-                                                    fontSize = 18.sp
-                                                )
-                                            }
-                                            innerTextField()
-                                        }
-                                    }
+                                    },
                                 )
+                            }
 
-                            }
-                            IconButton(
-                                onClick = {
-                                    if (messageText.isNotBlank()) {
-                                        viewModel.sendMessage(content = messageText.trim())
-                                        messageText = ""
-                                    }
-                                },
-                                modifier = Modifier.align(Alignment.CenterEnd)
-                            ) {
-                                Icon(Icons.Filled.Send, contentDescription = "send mensaje")
-                            }
                         }
                     }
 
@@ -299,7 +217,7 @@ fun TaskChatTopBar(
     val focusManager = LocalFocusManager.current
     Surface(
         modifier = Modifier
-            .height(180.dp),
+            .height(135.dp),
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
@@ -309,7 +227,7 @@ fun TaskChatTopBar(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(bottom = 16.dp, top = 45.dp)
+                        .padding(bottom = 16.dp)
                         .windowInsetsPadding(
                             WindowInsets.safeContent.union(WindowInsets.ime)
                         )
@@ -404,10 +322,123 @@ fun ScheduleButton(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarTask(
+    viewModel: TaskChatViewModel,
+    setTaskComplete: (Boolean) -> Unit,
+    onBackPressed: () -> Unit,
+) {
+    TopAppBar(
+        title = { },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color(0xff2B3438)
+        ),
+        actions = {
+            val task by viewModel.task.collectAsState()
+            when (task.isComplete) {
+                true -> {
+                    IconButton(onClick = { setTaskComplete(false) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Replay,
+                            contentDescription = stringResource(R.string.cd_task_complete)
+                        )
+                    }
+                }
+
+                false -> {
+                    IconButton(onClick = { setTaskComplete(true) }) {
+                        Icon(
+                            imageVector = Icons.Filled.Done,
+                            contentDescription = stringResource(R.string.cd_task_complete)
+                        )
+                    }
+                }
+            }
+
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackPressed) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_navigate_back)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+fun TaskMessageTextField(
+    sendMessageForTask: (String) -> Unit,
+) {
+    var messageText by remember { mutableStateOf("") }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BasicTextField(
+            value = messageText,
+            onValueChange = { newText -> messageText = newText },
+            enabled = true,
+            modifier = Modifier
+                .fillMaxWidth(0.88f)
+                .defaultMinSize(minHeight = 46.dp)
+                .padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                    end = 4.dp
+                )
+                .onFocusChanged {},
+            keyboardOptions = KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                if (messageText.isNotBlank()) {
+                    sendMessageForTask(messageText.trim())
+                    messageText = ""
+                }
+            }),
+            maxLines = 1,
+            cursorBrush = SolidColor(LocalContentColor.current),
+            textStyle = LocalTextStyle.current.copy(
+                color = LocalContentColor.current,
+                fontSize = 18.sp
+            ),
+            decorationBox = { innerTextField ->
+                Box {
+                    if (messageText.isEmpty()) {
+                        Text(
+                            text = "Write something...",
+                            fontSize = 18.sp
+                        )
+                    }
+                    innerTextField()
+                }
+            }
+        )
+
+        IconButton(
+            onClick = {
+                if (messageText.isNotBlank()) {
+                    sendMessageForTask(messageText.trim())
+                    messageText = ""
+                }
+            },
+            modifier = Modifier.align(Alignment.CenterVertically)
+        ) {
+            Icon(Icons.Filled.Send, contentDescription = "send mensaje")
+        }
+    }
+}
 
 
-
-/*@Preview
+@Preview
 @Composable
 fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
@@ -426,4 +457,4 @@ fun TaskChatPreview() {
             taskId = 1
         )
     }
-}*/
+}

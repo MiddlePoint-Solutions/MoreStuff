@@ -30,6 +30,11 @@ class MessageRepositoryImpl(
         return messageQueries.selectMasterMessages().asFlow().mapToList()
             .map { mapList(it, mapMessageDb) }
     }
+    override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
+        return messageQueries.selectMessageByContentType(taskId, ContentType.TASK_MESSAGE.value)
+            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+    }
+
 
     override suspend fun getActiveReminderMessages(): List<Message> {
         return messageQueries.selectActiveReminderMessages().executeAsList()
@@ -48,7 +53,6 @@ class MessageRepositoryImpl(
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
-
     override suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
@@ -61,23 +65,6 @@ class MessageRepositoryImpl(
                 schedule_id = scheduleId,
                 create_time = timeManager.getCreateTime(),
                 content_type = contentType,
-                content = content
-            )
-            lastInsertId
-        }
-        return getMessage(messageId)
-    }
-
-    override suspend fun createNormalMessage(
-        taskId: Long,
-        content: String
-    ): Either<Failure, Message> {
-        val messageId: Long = messageQueries.transactionWithResult {
-            messageQueries.insertMessage(
-                task_id = taskId,
-                schedule_id = 0,
-                create_time = timeManager.getCreateTime(),
-                content_type = ContentType.TASK_MESSAGE.value,
                 content = content
             )
             lastInsertId

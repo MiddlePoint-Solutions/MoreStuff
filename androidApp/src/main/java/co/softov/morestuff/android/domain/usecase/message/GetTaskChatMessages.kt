@@ -4,18 +4,14 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
-interface GetMessages {
-    operator fun invoke(): Flow<List<Message>>
+interface GetTaskChatMessages {
+    operator fun invoke(taskId: Long): Flow<List<Message>>
 }
 
-class GetMessagesImpl(
+class GetTaskChatMessagesImpl(
     private val messageRepository: MessageRepository,
-
-) : GetMessages {
-    override fun invoke(): Flow<List<Message>> {
-        return messageRepository.getAllMessages()
+) : GetTaskChatMessages {
+    override fun invoke(taskId: Long): Flow<List<Message>> {
+        return messageRepository.getTaskChatMessagesFlow(taskId)
     }
-} 
-
-
-
+}
