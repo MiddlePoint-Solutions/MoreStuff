@@ -10,9 +10,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class GetActiveSchedulesImplTest {
+class GetActiveSchedulesUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getActiveSchedulesImpl = GetActiveSchedulesImpl(scheduleRepository)
+    private val getActiveSchedulesImpl = GetActiveSchedulesUseCaseImpl(scheduleRepository)
 
     @Test
     fun `gets active schedules `() = runBlocking {

@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 
-interface TimeFormatter {
+interface TimeFormatterUseCase {
     fun formatTime(timeString: String?, pattern: String): String?
     fun formatTimeOnly(timeString: String?): String?
     fun formatTimeDayAndMonth(timeString: String?): String?
@@ -13,7 +13,7 @@ interface TimeFormatter {
 }
 
 
-class TimeFormatterImpl : TimeFormatter {
+class TimeFormatterUseCaseImpl : TimeFormatterUseCase {
 
     override fun formatTime(timeString: String?, pattern: String): String? {
         return timeString?.let {

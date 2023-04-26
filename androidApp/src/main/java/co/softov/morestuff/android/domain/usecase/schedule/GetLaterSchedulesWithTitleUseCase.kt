@@ -4,13 +4,13 @@ import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import kotlinx.coroutines.flow.Flow
 
-interface GetLaterSchedulesWithTitle {
+interface GetLaterSchedulesWithTitleUseCase {
     suspend operator fun invoke(): Flow<List<ScheduleWithTitle>>
 }
 
-class GetLaterSchedulesWithTitleImpl(
+class GetLaterSchedulesWithTitleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetLaterSchedulesWithTitle {
+) : GetLaterSchedulesWithTitleUseCase {
     override suspend fun invoke(): Flow<List<ScheduleWithTitle>> {
         return scheduleRepository.getActiveLaterSchedulesWithTitleFlow()
     }

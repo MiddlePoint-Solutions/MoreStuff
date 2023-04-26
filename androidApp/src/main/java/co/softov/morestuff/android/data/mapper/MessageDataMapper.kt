@@ -3,19 +3,19 @@ package co.softov.morestuff.android.data.mapper
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatterUseCase
 
 typealias MessageData = co.softov.morestuff.db.Message
 typealias MessageDbMapper = (MessageData) -> Message
 
-fun makeMessageDbMapper(timeFormatter: TimeFormatter): MessageDbMapper = { message ->
-    mapMessageDb(message, timeFormatter)
+fun makeMessageDbMapper(timeFormatterUseCase: TimeFormatterUseCase): MessageDbMapper = { message ->
+    mapMessageDb(message, timeFormatterUseCase)
 }
 
-fun mapMessageDb(input: MessageData, timeFormatter: TimeFormatter): Message {
-    val createTime = timeFormatter.formatTimeOnly(input.create_time)
-    val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
-    val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
+fun mapMessageDb(input: MessageData, timeFormatterUseCase: TimeFormatterUseCase): Message {
+    val createTime = timeFormatterUseCase.formatTimeOnly(input.create_time)
+    val seenTime = timeFormatterUseCase.formatTimeOnly(input.seen_time)
+    val replyTime = timeFormatterUseCase.formatTimeOnly(input.reply_time)
     return Message(
         id = input.id,
         taskId = input.task_id,

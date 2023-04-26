@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Defaults
 import co.softov.morestuff.android.domain.model.replyWithTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -22,8 +21,8 @@ class MessageMiddleware(
     private val createTaskMessageUseCase: CreateTaskMessageUseCase,
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
-    private val setScheduleResponseMessage: SetScheduleMessageResponse,
-    private val countActiveReminderMessages: CountActiveReminderMessages,
+    private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
+    private val countActiveReminderMessagesUseCase: CountActiveReminderMessagesUseCase,
     private val getActiveScheduleMessages: GetActiveScheduleMessages,
 ) : Middleware<AppState> {
 

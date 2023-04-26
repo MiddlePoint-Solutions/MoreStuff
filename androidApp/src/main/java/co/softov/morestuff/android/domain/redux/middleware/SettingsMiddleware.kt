@@ -11,14 +11,14 @@ import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
     private val checkFirstTimeUseCase: CheckFirstTimeUseCase,
     private val getUserSettingsUseCase: GetUserSettingsUseCase,
-    private val saveUserSettings: SaveUserSettings
+    private val saveUserSettingsUseCase: SaveUserSettingsUseCase
 
 ) : Middleware<AppState> {
 
@@ -38,7 +38,7 @@ class SettingsMiddleware(
 
             is SettingAction.SetSnoozeLimit -> scope.launch {
                 val updatedSettings = AppSettings(snoozeLimit = action.limit)
-                saveUserSettings(updatedSettings)
+                saveUserSettingsUseCase(updatedSettings)
             }
             else -> NoOp
         }

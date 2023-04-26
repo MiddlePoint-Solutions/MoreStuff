@@ -44,7 +44,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
-    private val scheduleReviewNotifications: ScheduleReviewNotifications,
+    private val scheduleReviewNotificationsUseCase: ScheduleReviewNotificationsUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
@@ -64,7 +64,7 @@ class ScheduleMiddleware(
 
             is SettingAction.InitSettings -> {
                 if (action.firstTime) {
-                    scope.launch { scheduleReviewNotifications() }
+                    scope.launch { scheduleReviewNotificationsUseCase() }
                 }
             }
 

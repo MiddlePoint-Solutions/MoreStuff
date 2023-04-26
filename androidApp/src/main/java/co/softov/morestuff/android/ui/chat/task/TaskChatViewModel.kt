@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
+import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -31,7 +31,7 @@ class TaskChatViewModel(
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
-    private val createMessageUseCase: CreateMessageUseCase,
+    private val messageRepository: MessageRepository,
 ) : NoStateViewModel() {
 
     val messages: StateFlow<List<Message>> =
@@ -84,14 +84,13 @@ class TaskChatViewModel(
     fun setTaskComplete(complete: Boolean) {
         store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
     }
-
     fun sendMessageForTask(content: String) {
         viewModelScope.launch {
-            createMessageUseCase(
+            messageRepository.createMessage(
                 taskId = taskId,
                 scheduleId = 0,
-                title = content,
-                contentType = ContentType.TASK_MESSAGE,
+                contentType = ContentType.TASK_MESSAGE.value,
+                content = content,
             )
         }
     }

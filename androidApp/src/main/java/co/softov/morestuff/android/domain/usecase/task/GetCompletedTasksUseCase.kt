@@ -4,15 +4,15 @@ import kotlinx.coroutines.flow.Flow
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
-interface GetActiveTasks {
+interface GetCompletedTasksUseCase {
     suspend operator fun invoke(): Flow<List<Task>>
 }
 
-class GetActiveTasksImpl(
+class GetCompletedTasksUseCaseImpl(
     private val taskRepository: TaskRepository
-) : GetActiveTasks {
+) : GetCompletedTasksUseCase {
     override suspend fun invoke(): Flow<List<Task>> {
-        return taskRepository.getActiveTasksFlow()
+        return taskRepository.getCompleteTasksFlow()
     }
 } 
 

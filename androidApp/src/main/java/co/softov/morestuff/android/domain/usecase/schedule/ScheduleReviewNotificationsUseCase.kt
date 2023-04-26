@@ -4,13 +4,13 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.service.Scheduler
 
-interface ScheduleReviewNotifications {
+interface ScheduleReviewNotificationsUseCase {
     suspend operator fun invoke(): Either<Failure, Boolean>
 }
 
-class ScheduleReviewNotificationsImpl(
+class ScheduleReviewNotificationsUseCaseImpl(
     private val scheduler: Scheduler
-) : ScheduleReviewNotifications {
+) : ScheduleReviewNotificationsUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
         scheduler.scheduleReviews()

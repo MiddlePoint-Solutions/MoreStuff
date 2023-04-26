@@ -5,13 +5,13 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
-interface GetScheduleWithTitle {
+interface GetScheduleWithTitleUseCase {
     suspend operator fun invoke(scheduleId: Long): Either<Failure,ScheduleWithTitle>
 }
 
-class GetScheduleWithTitleImpl(
+class GetScheduleWithTitleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetScheduleWithTitle {
+) : GetScheduleWithTitleUseCase {
     override suspend fun invoke(scheduleId: Long): Either<Failure,ScheduleWithTitle> {
         return scheduleRepository.getActiveScheduleWithTitle(scheduleId)
     }

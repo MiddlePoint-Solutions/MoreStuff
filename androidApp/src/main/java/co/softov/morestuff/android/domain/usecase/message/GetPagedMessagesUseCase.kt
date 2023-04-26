@@ -5,15 +5,15 @@ import co.softov.morestuff.android.data.mapper.MessageData
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.android.paging3.QueryPagingSource
 
-interface GetPagedMessages {
+interface GetPagedMessagesUseCase {
     operator fun invoke(): PagedMessagesResult
 }
 
 typealias PagedMessagesResult = PagingSource<Long, MessageData>
 
-class GetPagedMessagesImpl(
+class GetPagedMessagesUseCaseImpl(
     private val database: StuffDb
-) : GetPagedMessages {
+) : GetPagedMessagesUseCase {
     override fun invoke(): PagedMessagesResult {
         return QueryPagingSource(
             queryProvider = database.messageQueries::pageMessages,

@@ -68,7 +68,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatterUseCase
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
@@ -282,7 +282,7 @@ fun ScheduleButton(
     priority: TaskPriorityModel,
     editScheduleAction: () -> Unit,
     task: Task,
-    timeFormatter: TimeFormatter = get(),
+    timeFormatterUseCase: TimeFormatterUseCase = get(),
 ) {
     val title = when {
         schedule == null -> {
@@ -294,7 +294,7 @@ fun ScheduleButton(
         }
 
         else -> {
-            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
+            val formattedTime = timeFormatterUseCase.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
 
             when (priority.priorityModel.priority) {
                 is Priority.Today -> stringResource(
@@ -307,7 +307,7 @@ fun ScheduleButton(
                     formattedTime
                 )
 
-                is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
+                is Priority.Later -> timeFormatterUseCase.formatTimeDayAndMonth(schedule.scheduleUtcTime)
             }
         }
     }.orEmpty()

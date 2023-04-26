@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class GetMessagesForTaskImplTest {
+class GetMessagesUseCaseForTaskImplTest {
     private val messageRepository: MessageRepository = mockk()
     private val getMessagesForTask = GetTaskMessagesFlowUseCaseImpl(messageRepository)
 

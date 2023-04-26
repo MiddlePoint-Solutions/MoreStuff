@@ -12,8 +12,8 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-internal class TimeFormatterImplTest{
-    private val timeFormatter = TimeFormatterImpl()
+internal class TimeFormatterUseCaseImplTest{
+    private val timeFormatter = TimeFormatterUseCaseImpl()
 
     @Test
     fun `formatTime should format input time string using the provided pattern`() {

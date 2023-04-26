@@ -13,12 +13,12 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 
-class GetActiveTasksTest {
+class GetActiveTasksUseCaseTest {
 
     @Test
     fun `Test get active tasks`() {
         val mockTaskRepository: TaskRepository = mockk()
-        val getActiveTasksImpl = GetActiveTasksImpl(mockTaskRepository)
+        val getActiveTasksImpl = GetActiveTasksUseCaseImpl(mockTaskRepository)
         val exampleTasks: List<Task> = createListOfTasks(2)
 
         coEvery { mockTaskRepository.getActiveTasksFlow() } returns flowOf(exampleTasks)

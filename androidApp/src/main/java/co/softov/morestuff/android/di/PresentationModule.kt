@@ -24,11 +24,11 @@ val presentationModule = module {
             page = page,
             getSchedules = get(),
             getLaterSchedules = get(),
-            getActiveTasks = get(),
+            getActiveTasksUseCase = get(),
             getCompleteTasks = get(),
             getTodaySchedules = get(),
             getTomorrowSchedules = get(),
-            timeFormatter = get(),
+            timeFormatterUseCase = get(),
             timeManager = get()
         )
     }
