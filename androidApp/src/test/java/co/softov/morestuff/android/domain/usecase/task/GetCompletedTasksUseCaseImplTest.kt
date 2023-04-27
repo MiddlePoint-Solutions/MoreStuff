@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 
-class GetCompletedTasksImplTest {
+class GetCompletedTasksUseCaseImplTest {
 
     @Test
     fun `get completed task impl test`() {
         val mockTaskRepository: TaskRepository = mockk()
-        val getCompletedTasksImpl = GetCompletedTasksImpl(mockTaskRepository)
+        val getCompletedTasksImpl = GetCompletedTasksUseCaseImpl(mockTaskRepository)
         val completeTasks: List<Task> = createListOfTasks(2)
 
         coEvery { mockTaskRepository.getCompleteTasksFlow() } returns flowOf(completeTasks)

@@ -1,10 +1,8 @@
 package co.softov.morestuff.android.di
 
-import android.app.AlarmManager
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.preference.PreferenceManager
-import androidx.work.WorkManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
@@ -18,8 +16,8 @@ import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.*
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.usecase.message.GetPagedMessages
-import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesImpl
+import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.db.StuffDb
@@ -92,7 +90,7 @@ val dataModule = module {
     singleOf(::NotifierImpl) bind Notifier::class
 
     // Platform specific use-cases
-    factoryOf(::GetPagedMessagesImpl) bind GetPagedMessages::class
+    factoryOf(::GetPagedMessagesUseCaseImpl) bind GetPagedMessagesUseCase::class
 }
 
 internal fun getSharedPreferences(context: Context): SharedPreferences {

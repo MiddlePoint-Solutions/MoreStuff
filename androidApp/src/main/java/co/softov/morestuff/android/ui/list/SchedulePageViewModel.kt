@@ -3,12 +3,12 @@ package co.softov.morestuff.android.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.data.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitle
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlow
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitle
-import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitle
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasks
-import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasks
+import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlowUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.list.model.*
 import kotlinx.coroutines.flow.*
@@ -17,12 +17,12 @@ import timber.log.Timber
 
 class SchedulePageViewModel(
     private val page: PageType,
-    private val getSchedules: GetSchedulesWithTitleFlow,
-    private val getLaterSchedules: GetLaterSchedulesWithTitle,
-    private val getTodaySchedules: GetTodaySchedulesWithTitle,
-    private val getTomorrowSchedules: GetTomorrowSchedulesWithTitle,
-    private val getActiveTasks: GetActiveTasks,
-    private val getCompleteTasks: GetCompletedTasks,
+    private val getSchedules: GetSchedulesWithTitleFlowUseCase,
+    private val getLaterSchedules: GetLaterSchedulesWithTitleUseCase,
+    private val getTodaySchedules: GetTodaySchedulesWithTitleUseCase,
+    private val getTomorrowSchedules: GetTomorrowSchedulesWithTitleUseCase,
+    private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val getCompleteTasks: GetCompletedTasksUseCase,
     private val timeFormatter: TimeFormatter,
     private val timeManager: TimeManager
 ) : ViewModel() {
@@ -61,7 +61,7 @@ class SchedulePageViewModel(
                         .launchIn(this)
                 }
                 PageType.PAGE_ACTIVE_TASKS -> {
-                    getActiveTasks()
+                    getActiveTasksUseCase()
                         .map { taskListItemMapper.map(it) }
                         .onEach { _state.value = SchedulePageViewState(tasks = it) }
                         .launchIn(this)

@@ -2,13 +2,13 @@ package co.softov.morestuff.android.domain.usecase.message
 
 import co.softov.morestuff.android.domain.repository.MessageRepository
 
-interface ClearActiveReminderMessages {
+interface ClearActiveReminderMessagesUseCase {
     suspend operator fun invoke()
 }
 
-class ClearActivePendingMessagesImpl(
+class ClearActivePendingMessagesUseCaseImpl(
     private val messageRepository: MessageRepository
-) : ClearActiveReminderMessages {
+) : ClearActiveReminderMessagesUseCase {
 
     override suspend fun invoke() = messageRepository.clearActiveReminderMessages()
 

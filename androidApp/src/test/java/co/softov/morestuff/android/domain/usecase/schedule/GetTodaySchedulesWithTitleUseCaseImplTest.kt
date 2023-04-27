@@ -11,9 +11,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class GetTodaySchedulesWithTitleImplTest {
+class GetTodaySchedulesWithTitleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getTodaySchedulesWithTitleImpl = GetTodaySchedulesWithTitleImpl(scheduleRepository)
+    private val getTodaySchedulesWithTitleImpl = GetTodaySchedulesWithTitleUseCaseImpl(scheduleRepository)
     private val scheduleWithTitleList = createScheduleWithTitleList(3)
 
     @Test
