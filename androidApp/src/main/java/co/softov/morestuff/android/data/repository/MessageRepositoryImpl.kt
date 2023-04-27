@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -29,6 +30,11 @@ class MessageRepositoryImpl(
         return messageQueries.selectMasterMessages().asFlow().mapToList()
             .map { mapList(it, mapMessageDb) }
     }
+    override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
+        return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
+            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+    }
+
 
     override suspend fun getActiveReminderMessages(): List<Message> {
         return messageQueries.selectActiveReminderMessages().executeAsList()
@@ -47,7 +53,6 @@ class MessageRepositoryImpl(
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
-
     override suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
@@ -66,6 +71,7 @@ class MessageRepositoryImpl(
         }
         return getMessage(messageId)
     }
+
 
     override suspend fun addUserReplyMessage(
         taskId: Long,

@@ -226,9 +226,13 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-commons:1.5.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
 
+    //Test flow whit Turbine
+    testImplementation ("app.cash.turbine:turbine:0.12.3")
+
     //Multiplatform settings
     //implementation("com.russhwolf:multiplatform-settings:1.0.0")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
+
 
     coreLibraryDesugaring(Libs.jdkDesugar)
 }

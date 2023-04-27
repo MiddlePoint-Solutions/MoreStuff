@@ -17,11 +17,13 @@ interface MessageRepository {
 
     fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>>
 
+    fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>>
+
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
-        content: String
+        content: String,
     ): Either<Failure, Message>
 
     suspend fun addUserReplyMessage(taskId: Long, replyType: Int, replyContent: String)

@@ -64,6 +64,7 @@ fun Messages(
                     ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
                     ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
                     ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
+                    ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions)
                 }
             }
         }
