@@ -127,6 +127,7 @@ val messageUseCases = module {
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
     factoryOf(::ClearActivePendingMessagesImpl) bind ClearActiveReminderMessages::class
     factoryOf(::CountActiveReminderMessagesImpl) bind CountActiveReminderMessages::class
+    factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
 }
 
 val priorityUseCases = module {

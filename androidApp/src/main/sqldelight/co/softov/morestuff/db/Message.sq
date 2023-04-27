@@ -40,6 +40,12 @@ FROM message
 WHERE task_id = ?
 ORDER BY datetime(create_time) DESC;
 
+selectTaskMessagesByContentType:
+SELECT *
+FROM message
+WHERE task_id = ? AND content_type = ?
+ORDER BY datetime(create_time) DESC;
+
 selectCurrentTaskMessage:
 SELECT *
 FROM message
