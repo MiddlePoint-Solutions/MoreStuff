@@ -31,7 +31,7 @@ class MessageRepositoryImpl(
             .map { mapList(it, mapMessageDb) }
     }
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByContentType(taskId, ContentType.TASK_MESSAGE.value)
+        return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 

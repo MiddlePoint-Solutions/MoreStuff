@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 
-class GetTaskChatMessagesImplTest {
+class GetTaskChatMessagesUseCaseImplTest {
 
     @Test
     fun `invoke should return messages for given taskId`() = runBlocking {
@@ -26,13 +26,11 @@ class GetTaskChatMessagesImplTest {
             emit(listOf(message1, message2))
         }
 
-        val getTaskChatMessagesImpl = GetTaskChatMessagesImpl(messageRepository)
+        val getTaskChatMessagesImpl = GetTaskChatMessagesUseCaseImpl(messageRepository)
 
         val messagesFlow = getTaskChatMessagesImpl.invoke(taskId)
         val messages = messagesFlow.toList().flatten()
-        assertEquals(2, messages.size)
-        assertEquals(message1, messages[0])
-        assertEquals(message2, messages[1])
+        assertEquals(listOf(message1, message2), messages)
     }
 }
 

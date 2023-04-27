@@ -116,7 +116,6 @@ fun TaskChatContent(
         }
     }
 
-
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
             bottomSheetState.hide()
@@ -125,80 +124,79 @@ fun TaskChatContent(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
-        Scaffold(
-            modifier = modifier,
-            content = {
-                Surface {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .navigationBarsPadding()
-                            .imePadding(),
-                    ) {
-                        TopAppBarTask(
-                            viewModel,
-                            setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
-                            onBackPressed = viewModel::onBackPressed,
-                        )
-                        TaskChatTopBar(
-                            taskId = taskId,
-                            editScheduleAction = {
-                                priorityViewModel.reset()
-                                openBottomSheet = true
-                            },
-                        )
-                        Messages(
-                            messages = messages,
-                            actions = chatActions,
-                            modifier = modifier.weight(1f),
-                            scrollState = scrollState
-                        )
+    Scaffold(
+        topBar = {
+            TopAppBarTaskChat(
+                viewModel,
+                setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
+                onBackPressed = viewModel::onBackPressed,
+            )
+        },
+        modifier = modifier
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            Surface {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .navigationBarsPadding()
+                        .imePadding(),
+                ) {
+                    TaskChatTopBarEditTask(
+                        taskId = taskId,
+                        editScheduleAction = {
+                            priorityViewModel.reset()
+                            openBottomSheet = true
+                        },
+                    )
+                    Messages(
+                        messages = messages,
+                        actions = chatActions,
+                        modifier = modifier.weight(1f),
+                        scrollState = scrollState
+                    )
 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .imePadding()
+                    ) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .imePadding()
+                                .background(color = MaterialTheme.colorScheme.primary)
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(color = MaterialTheme.colorScheme.primary)
-
-                            ) {
-                                TaskMessageTextField(
-                                    sendMessageForTask = { content ->
-                                        viewModel.sendMessageForTask(
-                                            content
-                                        )
-                                    },
-                                )
-                            }
-
+                            TaskMessageTextField(
+                                sendMessageForTask = { content ->
+                                    viewModel.sendMessageForTask(
+                                        content
+                                    )
+                                },
+                            )
                         }
                     }
-
                 }
             }
-        )
 
-        TaskPriorityBottomSheet(
-            model = taskPriorityModel,
-            openBottomSheet = openBottomSheet,
-            bottomSheetState = bottomSheetState,
-            priorityChangeAction = priorityViewModel::priorityChanged,
-            priorityOptionChangeAction = priorityViewModel::onPriorityOptionChanged,
-            confirmationAction = {
-                priorityViewModel.updateTaskSchedule()
-                bottomSheetDismissAction()
-            },
-            dismissAction = bottomSheetDismissAction
-        )
+            TaskPriorityBottomSheet(
+                model = taskPriorityModel,
+                openBottomSheet = openBottomSheet,
+                bottomSheetState = bottomSheetState,
+                priorityChangeAction = priorityViewModel::priorityChanged,
+                priorityOptionChangeAction = priorityViewModel::onPriorityOptionChanged,
+                confirmationAction = {
+                    priorityViewModel.updateTaskSchedule()
+                    bottomSheetDismissAction()
+                },
+                dismissAction = bottomSheetDismissAction
+            )
+        }
     }
 }
 
+
 @Composable
-fun TaskChatTopBar(
+fun TaskChatTopBarEditTask(
     taskId: Long,
     editScheduleAction: () -> Unit,
 ) {
@@ -324,7 +322,7 @@ fun ScheduleButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarTask(
+fun TopAppBarTaskChat(
     viewModel: TaskChatViewModel,
     setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
@@ -442,7 +440,7 @@ fun TaskMessageTextField(
 @Composable
 fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
-        TaskChatTopBar(
+        TaskChatTopBarEditTask(
             taskId = 1,
             editScheduleAction = { },
         )

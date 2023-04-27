@@ -13,8 +13,8 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessages
+import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -26,16 +26,16 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TaskChatViewModel(
-    getTaskChatMessages: GetTaskChatMessages,
+    getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
-    private val messageRepository: MessageRepository,
+    private val createMessageUseCase: CreateMessageUseCase,
 ) : NoStateViewModel() {
 
     val messages: StateFlow<List<Message>> =
-        getTaskChatMessages(taskId = taskId)
+        getTaskChatMessagesUseCase(taskId = taskId)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -84,13 +84,14 @@ class TaskChatViewModel(
     fun setTaskComplete(complete: Boolean) {
         store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
     }
+
     fun sendMessageForTask(content: String) {
         viewModelScope.launch {
-            messageRepository.createMessage(
+            createMessageUseCase(
                 taskId = taskId,
                 scheduleId = 0,
-                contentType = ContentType.TASK_MESSAGE.value,
-                content = content,
+                title = content,
+                contentType = ContentType.TASK_MESSAGE,
             )
         }
     }
