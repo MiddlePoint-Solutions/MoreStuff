@@ -18,8 +18,8 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterUseCase
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.db.StuffDb
 import com.russhwolf.settings.*
 import com.squareup.sqldelight.android.AndroidSqliteDriver
@@ -42,7 +42,7 @@ val dataModule = module {
     single { createDatabase(androidApplication()) }
 
     //Time
-    single<TimeFormatterUseCase> { TimeFormatterUseCaseImpl() }
+    single<TimeFormatter> { TimeFormatterImpl() }
 
     // Repositories
     single<TaskRepository> {
@@ -56,7 +56,7 @@ val dataModule = module {
     single<MessageRepository> {
         MessageRepositoryImpl(
             database = get(),
-            mapMessageDb = makeMessageDbMapper(timeFormatterUseCase = get()),
+            mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
             timeManager = get()
         )
     }

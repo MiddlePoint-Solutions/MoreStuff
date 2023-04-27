@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWith
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterUseCase
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.list.model.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -23,14 +23,14 @@ class SchedulePageViewModel(
     private val getTomorrowSchedules: GetTomorrowSchedulesWithTitleUseCase,
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val getCompleteTasks: GetCompletedTasksUseCase,
-    private val timeFormatterUseCase: TimeFormatterUseCase,
+    private val timeFormatter: TimeFormatter,
     private val timeManager: TimeManager
 ) : ViewModel() {
     private val _state = MutableStateFlow(SchedulePageViewState())
     val state: StateFlow<SchedulePageViewState>
         get() = _state
     private val scheduleItemMapper by lazy { ScheduleListItemMapper() }
-    private val taskListItemMapper by lazy { TaskListItemMapper(timeFormatterUseCase, timeManager) }
+    private val taskListItemMapper by lazy { TaskListItemMapper(timeFormatter, timeManager) }
 
     init {
         Timber.d("Page: $page")
