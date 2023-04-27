@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.usecase.message.GetMessages
+import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
 import co.softov.morestuff.android.ui.Screens
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val getMessages: GetMessages,
+    private val getMessagesUseCase: GetMessagesUseCase,
 ) : NoStateViewModel() {
 
     private val _messages = MutableStateFlow<List<Message>>(listOf())
@@ -27,7 +27,7 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
-            getMessages()
+            getMessagesUseCase()
                 .onEach { _messages.value = it }
                 .launchIn(this)
         }

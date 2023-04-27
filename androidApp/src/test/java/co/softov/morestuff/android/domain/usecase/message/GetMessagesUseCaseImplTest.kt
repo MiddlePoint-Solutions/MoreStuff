@@ -10,9 +10,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class GetMessagesImplTest{
+class GetMessagesUseCaseImplTest{
      private val messageRepository: MessageRepository = mockk()
-     private val getMessages = GetMessagesImpl(messageRepository)
+     private val getMessages = GetMessagesUseCaseImpl(messageRepository)
 
      @Test
      fun `messageRepository getAllMessages`() {

@@ -4,14 +4,14 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
-interface GetMessages {
+interface GetMessagesUseCase {
     operator fun invoke(): Flow<List<Message>>
 }
 
-class GetMessagesImpl(
+class GetMessagesUseCaseImpl(
     private val messageRepository: MessageRepository,
 
-) : GetMessages {
+) : GetMessagesUseCase {
     override fun invoke(): Flow<List<Message>> {
         return messageRepository.getAllMessages()
     }

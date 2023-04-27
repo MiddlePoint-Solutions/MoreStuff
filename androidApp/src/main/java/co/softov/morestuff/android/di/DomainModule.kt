@@ -11,8 +11,8 @@ import co.softov.morestuff.android.domain.usecase.priority.*
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettings
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsImpl
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.*
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
 import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
@@ -42,7 +42,7 @@ val useCaseModules
     }
 
 val serviceModule = module {
-    factoryOf(::BootCompleteSchedulerImpl) bind BootCompleteScheduler::class
+    factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
 }
 
 val storeModule = module {
@@ -86,8 +86,8 @@ val taskUseCases = module {
     factoryOf(::GetTaskUseCaseImpl) bind GetTaskUseCase::class
     factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
     factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
-    factoryOf(::GetActiveTasksImpl) bind GetActiveTasks::class
-    factoryOf(::GetCompletedTasksImpl) bind GetCompletedTasks::class
+    factoryOf(::GetActiveTasksUseCaseImpl) bind GetActiveTasksUseCase::class
+    factoryOf(::GetCompletedTasksUseCaseImpl) bind GetCompletedTasksUseCase::class
     factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
@@ -98,35 +98,35 @@ val scheduleUseCases = module {
     factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
-    factoryOf(::GetScheduleWithTitleImpl) bind GetScheduleWithTitle::class
-    factoryOf(::GetSchedulesWithTitleImpl) bind GetSchedulesWithTitleFlow::class
-    factoryOf(::GetLaterSchedulesWithTitleImpl) bind GetLaterSchedulesWithTitle::class
-    factoryOf(::GetTodaySchedulesWithTitleImpl) bind GetTodaySchedulesWithTitle::class
-    factoryOf(::GetTomorrowSchedulesWithTitleImpl) bind GetTomorrowSchedulesWithTitle::class
+    factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class
+    factoryOf(::GetSchedulesWithTitleImplUseCase) bind GetSchedulesWithTitleFlowUseCase::class
+    factoryOf(::GetLaterSchedulesWithTitleUseCaseImpl) bind GetLaterSchedulesWithTitleUseCase::class
+    factoryOf(::GetTodaySchedulesWithTitleUseCaseImpl) bind GetTodaySchedulesWithTitleUseCase::class
+    factoryOf(::GetTomorrowSchedulesWithTitleUseCaseImpl) bind GetTomorrowSchedulesWithTitleUseCase::class
     factoryOf(::GetSchedulesWithTitleListImpl) bind GetSchedulesWithTitleUseCase::class
-    factoryOf(::GetActiveSchedulesImpl) bind GetActiveSchedules::class
+    factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
     factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
     factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
-    factoryOf(::SetScheduleMessageResponseImpl) bind SetScheduleMessageResponse::class
+    factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetSchedulesForPriorityReviewUseCaseImpl) bind GetSchedulesForPriorityReviewUseCase::class
     factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
-    factoryOf(::ScheduleReviewNotificationsImpl) bind ScheduleReviewNotifications::class
+    factoryOf(::ScheduleReviewNotificationsUseCaseImpl) bind ScheduleReviewNotificationsUseCase::class
 }
 
 val messageUseCases = module {
-    factoryOf(::GetMessagesImpl) bind GetMessages::class
+    factoryOf(::GetMessagesUseCaseImpl) bind GetMessagesUseCase::class
     factoryOf(::GetActiveMessagesImpl) bind GetActiveScheduleMessages::class
     factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
     factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
     factoryOf(::CreateTaskMessageUseCaseImpl) bind CreateTaskMessageUseCase::class
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
-    factoryOf(::ClearActivePendingMessagesImpl) bind ClearActiveReminderMessages::class
-    factoryOf(::CountActiveReminderMessagesImpl) bind CountActiveReminderMessages::class
+    factoryOf(::ClearActivePendingMessagesUseCaseImpl) bind ClearActiveReminderMessagesUseCase::class
+    factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
 }
 
@@ -140,7 +140,7 @@ val priorityUseCases = module {
 
 val settingsUseCases = module {
     factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
-    factoryOf(::SaveUserSettingsImpl) bind SaveUserSettings::class
+    factoryOf(::SaveUserSettingsUseCaseImpl) bind SaveUserSettingsUseCase::class
     factoryOf(::CheckFirstTimeImplUseCase) bind CheckFirstTimeUseCase::class
 }
 

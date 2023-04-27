@@ -8,9 +8,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class SetScheduleMessageResponseImplTest {
+class SetScheduleMessageResponseUseCaseImplTest {
     private val messageRepository: MessageRepository = mockk()
-    private val setScheduleMessageResponse = SetScheduleMessageResponseImpl(messageRepository)
+    private val setScheduleMessageResponse = SetScheduleMessageResponseUseCaseImpl(messageRepository)
 
     @Test
     fun `returns success when message repository addUserReplyMessage is successful`() = runBlocking {

@@ -8,18 +8,18 @@ import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.data.service.TimeManager
 import timber.log.Timber
 
-interface BootCompleteScheduler {
+interface BootCompleteSchedulerUseCase {
     suspend operator fun invoke(): Either<Failure, Boolean>
 }
 
-class BootCompleteSchedulerImpl(
-    private val getActiveSchedules: GetActiveSchedules,
+class BootCompleteSchedulerUseCaseImpl(
+    private val getActiveSchedulesUseCase: GetActiveSchedulesUseCase,
     private val scheduler: Scheduler,
     private val timeManager: TimeManager,
-) : BootCompleteScheduler {
+) : BootCompleteSchedulerUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
-        return when (val result = getActiveSchedules()) {
+        return when (val result = getActiveSchedulesUseCase()) {
             is Either.Left -> result
             is Either.Right -> {
                 reschedule(result.value.toMutableList())

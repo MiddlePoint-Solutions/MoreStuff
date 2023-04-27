@@ -2,13 +2,13 @@ package co.softov.morestuff.android.domain.usecase.message
 
 import co.softov.morestuff.android.domain.repository.MessageRepository
 
-interface CountActiveReminderMessages {
+interface CountActiveReminderMessagesUseCase {
     suspend operator fun invoke(): Int
 }
 
-class CountActiveReminderMessagesImpl(
+class CountActiveReminderMessagesUseCaseImpl(
     private val messageRepository: MessageRepository
-) : CountActiveReminderMessages {
+) : CountActiveReminderMessagesUseCase {
 
     override suspend fun invoke(): Int = messageRepository.countActiveReminderMessages()
 }

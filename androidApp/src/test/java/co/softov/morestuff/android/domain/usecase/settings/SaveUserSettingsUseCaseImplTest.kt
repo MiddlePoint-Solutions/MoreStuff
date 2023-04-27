@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 
-class SaveUserSettingsImplTest {
+class SaveUserSettingsUseCaseImplTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val saveUserSettings = SaveUserSettingsImpl(userRepository)
+    private val saveUserSettings = SaveUserSettingsUseCaseImpl(userRepository)
 
     @Test
     fun `should call setSnoozeLimit with correct param`() = runBlocking {

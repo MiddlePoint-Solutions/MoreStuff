@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.message.ClearActiveReminderMessages
+import co.softov.morestuff.android.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -14,7 +14,7 @@ sealed class DevAction : Action.FeatureAction() {
 }
 
 class DevMiddleware(
-    private val clearActiveReminderMessages: ClearActiveReminderMessages
+    private val clearActiveReminderMessagesUseCase: ClearActiveReminderMessagesUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -26,7 +26,7 @@ class DevMiddleware(
     ): Action {
         when (action) {
             is DevAction.ClearActiveReminderMessages -> scope.launch {
-                clearActiveReminderMessages()
+                clearActiveReminderMessagesUseCase()
             }
             else -> NoOp
         }
