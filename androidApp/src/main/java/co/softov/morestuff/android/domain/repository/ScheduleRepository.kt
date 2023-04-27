@@ -28,6 +28,8 @@ interface ScheduleRepository {
         endTime: String
     ): Flow<List<Schedule>>
 
+    suspend fun getActiveSchedulesWithTitle(): Either<Failure, List<ScheduleWithTitle>>
+
     fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
     suspend fun getActiveSchedulesWithTitleByTime(

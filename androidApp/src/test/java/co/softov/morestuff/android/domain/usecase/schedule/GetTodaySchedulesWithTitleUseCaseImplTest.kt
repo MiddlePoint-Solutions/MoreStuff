@@ -13,14 +13,14 @@ import org.junit.jupiter.api.Test
 
 class GetTodaySchedulesWithTitleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getTodaySchedulesWithTitleImpl = GetTodaySchedulesWithTitleUseCaseImpl(scheduleRepository)
+    private val getTodaySchedulesWithTitleImpl = mockk<GetTodaySchedulesWithTitleUseCase>()
     private val scheduleWithTitleList = createScheduleWithTitleList(3)
 
     @Test
     fun `returns today's schedules with title`() = runBlocking {
         coEvery { scheduleRepository.getTodayActiveSchedulesWithTitleFlow() } returns flowOf(scheduleWithTitleList)
 
-        val result = getTodaySchedulesWithTitleImpl.invoke().first()
+        val result = getTodaySchedulesWithTitleImpl.invoke()
 
         assertEquals(scheduleWithTitleList, result)
         coVerify { scheduleRepository.getTodayActiveSchedulesWithTitleFlow() }

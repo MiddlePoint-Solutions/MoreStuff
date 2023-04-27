@@ -88,6 +88,13 @@ class ScheduleRepositoryImpl(
             .map { mapList(it, mapScheduleDb) }
     }
 
+    override suspend fun getActiveSchedulesWithTitle(): Either<Failure, List<ScheduleWithTitle>> {
+        return scheduleQueries
+            .selectActiveSchedulesWithTaskTitle(mapScheduleWithTitleDb)
+            .executeAsList()
+            .right()
+    }
+
     override suspend fun getTodayActiveSchedulesWithTitle(): List<ScheduleWithTitle> {
         val time = timeManager.todayTimeStringPair
         return scheduleQueries.selectActiveSchedulesWithTaskTitleByTime(
