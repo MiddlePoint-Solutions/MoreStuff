@@ -65,67 +65,21 @@ fun ReviewContent(
         ) {
 
             val model by viewModel.uiModel.collectAsState()
-            val scope = rememberCoroutineScope()
 
-            Column {
-                PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
-                RoundInfo(model)
-            }
+
 
             Box {
 
-                val states =
-                    model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
-
-                val undoAction: () -> Unit = remember(model.roundNumber) {
-                    {
-                        scope.launch {
-                            states.run {
-                                Timber.d("Undoing")
-                                lastSwipedItem()?.let { lastItem ->
-                                    lastItem.second.undo()
-                                    viewModel.undoTask(lastItem.first)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                val lowAction: () -> Unit = remember(model.roundNumber) {
-                    {
-                        scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
-                        }
-                    }
-                }
-
-                val highAction: () -> Unit = remember(model.roundNumber) {
-                    {
-                        scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
-                        }
-                    }
-                }
-
-                val doneAction: () -> Unit = remember(model.roundNumber) {
-                    {
-                        scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
-                        }
-                    }
-                }
-
-                val laterAction: () -> Unit = remember(model.roundNumber) {
-                    {
-                        scope.launch {
-                            states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
-                        }
-                    }
-                }
-
                 when (model.round) {
-
                     ReviewRound.Priority -> {
+
+                        Column {
+                            PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
+                            RoundInfo(model)
+                        }
+
+                        val states =
+                            model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
 
                         val visibleState = remember(model.roundNumber) {
                             MutableTransitionState(false)
@@ -153,12 +107,10 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
+                                states = states,
                                 modifier = modifier.align(Alignment.BottomCenter),
-                                lowAction = lowAction,
-                                highAction = highAction,
-                                doneAction = doneAction,
-                                laterAction = laterAction,
-                                undoAction = undoAction,
+                                undoAction = viewModel::undoTask,
+                                key = model.roundNumber
                             )
                         }
 
@@ -182,31 +134,35 @@ fun ReviewContent(
                             if (it) 0f else screenWidth
                         }
 
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .fillMaxSize()
-//                                .aspectRatio(1f)
-                                .graphicsLayer {
-                                    translationX = xPosition
-                                }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            when {
-                                states.isEmpty() -> {
-                                    Text(
-                                        "Wooops, nothing to work on? add a new task",
-                                        modifier.align(Alignment.Center)
-                                    )
-                                    // TODO: add a new task
-                                }
+                            PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
 
-                                else -> {
-                                    PrioritySchedule(
-                                        model.roundItems,
-                                        viewModel::reorderTaskItem,
-                                        {},
-                                        modifier
-                                    )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .graphicsLayer {
+                                        translationX = xPosition
+                                    }
+                            ) {
+                                when {
+                                    model.roundItems.isEmpty() -> {
+                                        Text(
+                                            "Wooops, nothing to work on? add a new task",
+                                            modifier.align(Alignment.Center)
+                                        )
+                                        // TODO: add a new task
+                                    }
+
+                                    else -> {
+                                        PrioritySchedule(
+                                            model.roundItems,
+                                            viewModel::reorderTaskItem,
+                                            {},
+                                            modifier
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -290,56 +246,68 @@ private fun PriorityReviewTopBar(
 }
 
 @Composable
-private fun ReviewFinalControls(
-    modifier: Modifier = Modifier,
-    resetAction: () -> Unit = {},
-    finishAction: () -> Unit = {}
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Box(Modifier.align(Alignment.CenterHorizontally)) {
-            CircleButton(
-                onClick = resetAction,
-                icon = Icons.Rounded.Replay
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        PriorityButton(
-            onSelected = finishAction,
-            text = stringResource(R.string.done).uppercase(),
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .padding(16.dp),
-            fontSize = 26.sp,
-            shape = RoundedCornerShape(50)
-        )
-
-    }
-}
-
-@Composable
 private fun ReviewSwipeControls(
+    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
-    highAction: () -> Unit = {},
-    lowAction: () -> Unit = {},
-    doneAction: () -> Unit = {},
-    laterAction: () -> Unit = {},
-    undoAction: () -> Unit = {},
+    undoAction: (ScheduleListItemViewModel) -> Unit = {},
+    key: Any? = Unit,
 ) {
+
+    val scope = rememberCoroutineScope()
+
+    val undoLastAction: () -> Unit = remember(key) {
+        {
+            scope.launch {
+                states.run {
+                    Timber.d("Undoing")
+                    lastSwipedItem()?.let { lastItem ->
+                        lastItem.second.undo()
+                        undoAction(lastItem.first)
+                    }
+                }
+            }
+        }
+    }
+
+    val lowAction: () -> Unit = remember(key) {
+        {
+            scope.launch {
+                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
+            }
+        }
+    }
+
+    val highAction: () -> Unit = remember(key) {
+        {
+            scope.launch {
+                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
+            }
+        }
+    }
+
+    val doneAction: () -> Unit = remember(key) {
+        {
+            scope.launch {
+                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
+            }
+        }
+    }
+
+    val laterAction: () -> Unit = remember(key) {
+        {
+            scope.launch {
+                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
+            }
+        }
+    }
+
     Column(
         modifier = modifier
     ) {
 
         Box(Modifier.align(Alignment.CenterHorizontally)) {
             CircleButton(
-                onClick = undoAction,
+                onClick = undoLastAction,
                 icon = Icons.Rounded.Undo
             )
         }
@@ -560,14 +528,6 @@ fun TaskCardPreview() {
 @Composable
 fun ReviewSwipeControlsPreview() {
     MoreStuffTheme(darkTheme = true) {
-        ReviewSwipeControls()
-    }
-}
-
-@Preview
-@Composable
-fun ReviewFinalControlsPreview() {
-    MoreStuffTheme(darkTheme = true) {
-        ReviewFinalControls()
+        ReviewSwipeControls(listOf())
     }
 }
