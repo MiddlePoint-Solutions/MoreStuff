@@ -1,7 +1,11 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +59,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -213,9 +218,22 @@ fun TaskChatTopBarEditTask(
     val schedule by viewModel.schedule.collectAsState()
 
     val focusManager = LocalFocusManager.current
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isTitleEditing = interactionSource.collectIsFocusedAsState()
+    val topBarHeight by animateDpAsState(
+        targetValue = if (isTitleEditing.value) {
+            LocalConfiguration.current.screenHeightDp.dp
+        } else {
+            135.dp
+        },
+        animationSpec = tween(400)
+    )
+
+
     Surface(
         modifier = Modifier
-            .height(135.dp),
+            .height(topBarHeight),
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
@@ -233,6 +251,7 @@ fun TaskChatTopBarEditTask(
                     BasicTextField(
                         value = viewModel.taskTitle,
                         onValueChange = viewModel::updateTaskTitle,
+                        interactionSource = interactionSource,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(start = 16.dp),
