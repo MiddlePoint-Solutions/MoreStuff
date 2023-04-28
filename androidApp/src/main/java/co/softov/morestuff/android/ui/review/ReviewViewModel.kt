@@ -3,7 +3,7 @@ package co.softov.morestuff.android.ui.review
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
-import co.softov.morestuff.android.domain.usecase.priority.GetSchedulesForPriorityReviewUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.*
@@ -18,14 +18,14 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ReviewViewModel(
-    private val getSchedulesForPriorityReviewUseCase: GetSchedulesForPriorityReviewUseCase
+    private val getSchedulesForPriorityReviewUseCase: GetReviewSchedulesUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private val mapper = ScheduleListItemMapper()
     private var roundEndDelayJob: Job? = null
 
     override val enableDebug: Boolean
-        get() = true
+        get() = false
 
     init {
         loadData()
@@ -81,6 +81,14 @@ class ReviewViewModel(
         }
     }
 
+    fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+        state = state.copy(
+            roundItems = state.roundItems.toMutableList().apply {
+                add(toPosition, removeAt(fromPosition))
+            }
+        )
+    }
+
     fun reset() {
         setInitialState()
     }
@@ -91,7 +99,7 @@ class ReviewViewModel(
         sendEvent(Undo(schedule))
     }
 
-    fun confirmResults() {
+    private fun confirmResults() {
         dispatchAppStoreAction(
             ReviewAction.ScheduleReviewResults(
                 tomorrow = state.tomorrow.map { it.taskId },

@@ -18,11 +18,11 @@ class GetTomorrowSchedulesWithTitleUseCaseImplTest {
 
     @Test
     fun `returns tomorrow schedules with title`() = runBlocking {
-        coEvery { scheduleRepository.getActiveTomorrowSchedulesWithTitleFlow() } returns flowOf(scheduleWithTitleList)
+        coEvery { scheduleRepository.getTomorrowActiveSchedulesWithTitleFlow() } returns flowOf(scheduleWithTitleList)
 
         val result = getTomorrowSchedulesWithTitleImpl.invoke().first()
 
         assertEquals(scheduleWithTitleList, result)
-        coVerify { scheduleRepository.getActiveTomorrowSchedulesWithTitleFlow() }
+        coVerify { scheduleRepository.getTomorrowActiveSchedulesWithTitleFlow() }
     }
 }

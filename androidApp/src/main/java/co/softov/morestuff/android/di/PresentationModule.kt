@@ -7,6 +7,7 @@ import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.review.ReviewViewModel
+import co.softov.morestuff.android.ui.schedule.PriorityViewModel
 import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -34,6 +35,7 @@ val presentationModule = module {
     }
 
     viewModelOf(::ReviewViewModel)
+    viewModelOf(::PriorityViewModel)
     viewModelOf(::TaskPriorityViewModel)
     viewModelOf(::TaskChatViewModel)
 }

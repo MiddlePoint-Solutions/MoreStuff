@@ -3,13 +3,13 @@ package co.softov.morestuff.android.domain.usecase.priority
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
-interface GetSchedulesForPriorityReviewUseCase {
+interface GetReviewSchedulesUseCase {
     suspend operator fun invoke(): List<ScheduleWithTitle>
 }
 
-class GetSchedulesForPriorityReviewUseCaseImpl(
+class GetReviewSchedulesUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetSchedulesForPriorityReviewUseCase {
+) : GetReviewSchedulesUseCase {
 
     override suspend fun invoke(): List<ScheduleWithTitle> =
         scheduleRepository.getActiveSchedulesWithStaleReminders()

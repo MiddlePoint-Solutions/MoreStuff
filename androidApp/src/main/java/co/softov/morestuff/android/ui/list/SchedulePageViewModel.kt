@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.data.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
@@ -19,7 +19,7 @@ class SchedulePageViewModel(
     private val page: PageType,
     private val getSchedules: GetSchedulesWithTitleFlowUseCase,
     private val getLaterSchedules: GetLaterSchedulesWithTitleUseCase,
-    private val getTodaySchedules: GetTodaySchedulesWithTitleUseCase,
+    private val getTodaySchedules: GetTodaySchedulesWithTitleFlowUseCase,
     private val getTomorrowSchedules: GetTomorrowSchedulesWithTitleUseCase,
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val getCompleteTasks: GetCompletedTasksUseCase,
