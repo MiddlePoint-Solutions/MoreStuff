@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent.*
@@ -13,7 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class PriorityViewModel(
-    private val getTodaySchedules: GetTodaySchedulesWithTitleUseCase,
+    private val getReviewSchedulesUseCase: GetReviewSchedulesUseCase
 ) : BaseViewModel<PriorityViewState, PriorityViewEvent>(PriorityViewState()) {
 
     private val mapper = ScheduleListItemMapper()
@@ -27,8 +28,7 @@ class PriorityViewModel(
 
     override fun onLoadData() {
         viewModelScope.launch {
-            getTodaySchedules()
-                .getOrElse { listOf() }
+            getReviewSchedulesUseCase()
                 .map(mapper::map)
                 .also {
                     sendEvent(InitPriorityState(it))
