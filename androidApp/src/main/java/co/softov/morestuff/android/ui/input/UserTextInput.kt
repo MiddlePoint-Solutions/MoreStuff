@@ -2,11 +2,22 @@ package co.softov.morestuff.android.ui.input
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,25 +33,27 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.main.input.ListIcon
 import co.softov.morestuff.android.ui.main.input.SendIcon
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import timber.log.Timber
 
 @Composable
 fun UserTextInput(
     sendAction: (String) -> Unit,
     listAction: () -> Unit,
-) {
+    voiceToText: VoiceToTextInterface,
+
+    ) {
 
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
+
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
 
@@ -97,11 +110,12 @@ fun UserTextInput(
                     }
                 )
             }
+            VoiceToTextInput(voiceToText) { newText ->
+                value = value.copy(text = newText)
+            }
 
             Box(
-                modifier = Modifier
-                    .weight(0.12f)
-                    .height(IntrinsicSize.Min)
+                modifier = Modifier.weight(0.12f).height(IntrinsicSize.Min)
             ) {
                 when {
                     value.text.isBlank() -> ListIcon(listAction)
@@ -115,13 +129,17 @@ fun UserTextInput(
     }
 }
 
+
+
+/*
 @Preview
 @Composable
 private fun ChatInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         UserTextInput(
             sendAction = {},
-            listAction = {}
+            listAction = {},
+
         )
     }
 }
@@ -132,7 +150,10 @@ private fun ChatInputPreview() {
     MoreStuffTheme {
         UserTextInput(
             sendAction = {},
-            listAction = {}
+            listAction = {},
+            voiceToText = ,
+
         )
     }
 }
+*/

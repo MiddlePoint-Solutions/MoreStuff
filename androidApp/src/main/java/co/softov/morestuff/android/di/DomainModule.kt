@@ -1,5 +1,7 @@
 package co.softov.morestuff.android.di
 
+import co.softov.morestuff.android.app.features.VoiceToTextInterface
+import co.softov.morestuff.android.app.features.VoiceToTextParser
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.data.service.TimeManager
@@ -44,6 +46,11 @@ val useCaseModules
 val serviceModule = module {
     factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
 }
+
+val voiceToTextModule = module {
+    factoryOf(::VoiceToTextParser) bind VoiceToTextInterface::class
+}
+
 
 val storeModule = module {
     // Store
