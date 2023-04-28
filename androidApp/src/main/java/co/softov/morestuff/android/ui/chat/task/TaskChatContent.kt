@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -215,7 +216,7 @@ fun TaskChatTopBarEditTask(
     val focusManager = LocalFocusManager.current
     Surface(
         modifier = Modifier
-            .height(135.dp),
+            .height(IntrinsicSize.Min),
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
@@ -235,7 +236,7 @@ fun TaskChatTopBarEditTask(
                         onValueChange = viewModel::updateTaskTitle,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp),
+                            .padding(top = 50.dp),
                         readOnly = task.isComplete,
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
@@ -262,9 +263,7 @@ fun TaskChatTopBarEditTask(
                         Icon(
                             imageVector = Icons.Filled.Schedule,
                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                        )
+                            )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
