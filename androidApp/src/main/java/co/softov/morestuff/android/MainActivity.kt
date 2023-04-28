@@ -5,14 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
-import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
@@ -71,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             EXTRA_PRIORITY_REVIEW,
             ReviewNotification::class.java
         )?.let {
-            router.navigateTo(Screens.priorityReview)
+            router.navigateTo(Screens.review)
             intent.setReviewIntentExtras(null)
         }
 

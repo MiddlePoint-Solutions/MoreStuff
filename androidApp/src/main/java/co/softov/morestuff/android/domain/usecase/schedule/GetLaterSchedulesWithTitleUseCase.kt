@@ -12,7 +12,7 @@ class GetLaterSchedulesWithTitleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
 ) : GetLaterSchedulesWithTitleUseCase {
     override suspend fun invoke(): Flow<List<ScheduleWithTitle>> {
-        return scheduleRepository.getActiveLaterSchedulesWithTitleFlow()
+        return scheduleRepository.getLaterActiveSchedulesWithTitleFlow()
     }
 } 
 
