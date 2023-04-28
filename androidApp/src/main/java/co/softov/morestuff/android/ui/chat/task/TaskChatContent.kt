@@ -232,7 +232,6 @@ fun TaskChatTopBarEditTask(
                     Modifier.height(IntrinsicSize.Min)
                 }
             ),
-
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
@@ -441,7 +440,7 @@ fun TaskMessageTextField(
                     messageText = ""
                 }
             }),
-            maxLines = 1,
+            maxLines = Int.MAX_VALUE,
             cursorBrush = SolidColor(LocalContentColor.current),
             textStyle = LocalTextStyle.current.copy(
                 color = LocalContentColor.current,

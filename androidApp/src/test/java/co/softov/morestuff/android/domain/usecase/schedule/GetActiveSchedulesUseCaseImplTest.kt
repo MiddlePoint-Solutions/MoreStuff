@@ -20,12 +20,12 @@ class GetActiveSchedulesUseCaseImplTest {
         val endTime = "13"
         val schedules = createListOfSchedulesForTest(2)
 
-        coEvery { scheduleRepository.getActiveSchedules(startTime, endTime) } returns Either.Right(
+        coEvery { scheduleRepository.getActiveSchedulesByTime(startTime, endTime) } returns Either.Right(
             schedules)
 
         val result = getActiveSchedulesImpl.invoke(startTime, endTime)
 
         assertEquals(Either.Right(schedules), result)
-        coVerify { scheduleRepository.getActiveSchedules(startTime, endTime) }
+        coVerify { scheduleRepository.getActiveSchedulesByTime(startTime, endTime) }
     }
 }
