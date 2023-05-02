@@ -16,16 +16,15 @@ class GetActiveSchedulesUseCaseImplTest {
 
     @Test
     fun `gets active schedules `() = runBlocking {
-        val startTime = "12"
-        val endTime = "13"
         val schedules = createListOfSchedulesForTest(2)
 
-        coEvery { scheduleRepository.getActiveSchedules(startTime, endTime) } returns Either.Right(
-            schedules)
+        coEvery { scheduleRepository.getActiveSchedules() } returns Either.Right(
+            schedules
+        )
 
-        val result = getActiveSchedulesImpl.invoke(startTime, endTime)
+        val result = getActiveSchedulesImpl.invoke()
 
         assertEquals(Either.Right(schedules), result)
-        coVerify { scheduleRepository.getActiveSchedules(startTime, endTime) }
+        coVerify { scheduleRepository.getActiveSchedules() }
     }
 }

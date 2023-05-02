@@ -37,8 +37,8 @@ android {
         compileSdk = 33
         minSdk = 25
         targetSdk = 33
-        versionCode = 7
-        versionName = "0.3.4"
+        versionCode = 8
+        versionName = "0.3.5"
     }
 
     buildTypes {
@@ -160,6 +160,8 @@ dependencies {
     // TODO: import when available
 //    implementation("com.alexstyl.swipeablecard:swipeablecard:0.2.0")
 
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
     // Compose
     implementation(platform(Libs.AndroidX.Compose.bom))
     implementation(Libs.AndroidX.Compose.activityCompose)
@@ -233,6 +235,4 @@ dependencies {
     //implementation("com.russhwolf:multiplatform-settings:1.0.0")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
 
-
-    coreLibraryDesugaring(Libs.jdkDesugar)
 }

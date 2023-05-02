@@ -11,15 +11,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
 import co.softov.morestuff.android.ui.drawer.DrawerViewModel
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MoreStuffScaffold(
     content: @Composable (PaddingValues) -> Unit,
-    viewModel: DrawerViewModel = getViewModel(),
+    viewModel: DrawerViewModel = koinViewModel(),
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
@@ -42,7 +41,7 @@ fun MoreStuffScaffold(
                 DrawerLayout(
                     closeDrawer = closeDrawer,
                     showSettings = viewModel::showSettings,
-                    showPriorityReview = viewModel::showPriorityReview
+                    showPriorityReview = viewModel::showReview
                 )
             }
         },
@@ -52,7 +51,8 @@ fun MoreStuffScaffold(
                 topBar = {
                     MoreStuffTopBar(
                         openDrawer = { scope.launch { drawerState.open() } },
-                        showPriorityReview = viewModel::showPriorityReview
+                        showReview = viewModel::showReview,
+                        showPriority = viewModel::showPriority
                     )
                 },
                 content = content,

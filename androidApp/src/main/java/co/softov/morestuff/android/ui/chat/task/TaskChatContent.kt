@@ -432,7 +432,7 @@ fun TaskMessageTextField(
                     messageText = ""
                 }
             }),
-            maxLines = 1,
+            maxLines = Int.MAX_VALUE,
             cursorBrush = SolidColor(LocalContentColor.current),
             textStyle = LocalTextStyle.current.copy(
                 color = LocalContentColor.current,

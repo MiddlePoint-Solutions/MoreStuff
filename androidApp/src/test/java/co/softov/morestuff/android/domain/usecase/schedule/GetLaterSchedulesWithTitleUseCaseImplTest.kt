@@ -20,12 +20,12 @@ class GetLaterSchedulesWithTitleUseCaseImplTest {
 
     @Test
     fun `returns later schedules with title`() = runBlocking {
-        coEvery { scheduleRepository.getActiveLaterSchedulesWithTitleFlow() } returns flowOf(scheduleWithTitle)
+        coEvery { scheduleRepository.getLaterActiveSchedulesWithTitleFlow() } returns flowOf(scheduleWithTitle)
 
         val result = getLaterSchedulesWithTitleImpl.invoke().toList().flatten()
 
         assertEquals(scheduleWithTitle, result)
-        coVerify { scheduleRepository.getActiveLaterSchedulesWithTitleFlow() }
+        coVerify { scheduleRepository.getLaterActiveSchedulesWithTitleFlow() }
     }
 
 }
