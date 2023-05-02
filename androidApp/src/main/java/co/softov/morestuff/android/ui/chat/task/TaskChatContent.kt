@@ -1,11 +1,7 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -222,9 +218,18 @@ fun TaskChatTopBarEditTask(
 
     val focusManager = LocalFocusManager.current
     val isExpanded = remember { mutableStateOf(false) }
-
+    val onBackPressed = remember {
+        {
+            if(isExpanded.value){
+                focusManager.clearFocus()
+                isExpanded.value = false
+            }
+        }
+    }
+BackHandler(isExpanded.value, onBackPressed)
     Surface(
         modifier = Modifier
+            .animateContentSize ()
             .then(
                 if (isExpanded.value) {
                     Modifier.fillMaxHeight()
@@ -239,80 +244,63 @@ fun TaskChatTopBarEditTask(
             CompositionLocalProvider(
                 LocalContentColor provides MaterialTheme.colorScheme.onSurface
             ) {
-                AnimatedVisibility(
-                    visible = true,
-                    enter = slideInVertically(
-                        initialOffsetY = { -1000 },
-                        animationSpec = tween(
-                            durationMillis = 3000,
-                            easing = FastOutSlowInEasing
+                Column(
+                    modifier = Modifier
+                        .padding(top = 45.dp)
+                        .windowInsetsPadding(
+                            WindowInsets.safeContent.union(WindowInsets.ime)
                         )
-                    ),
-                    exit = slideOutVertically(
-                        targetOffsetY = { -100 },
-                        animationSpec = tween(
-                            durationMillis = 3000,
-                            easing = FastOutSlowInEasing
-                        )
-                    )
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 45.dp)
-                            .windowInsetsPadding(
-                                WindowInsets.safeContent.union(WindowInsets.ime)
-                            )
-                    ) {
-                        BasicTextField(
-                            value = viewModel.taskTitle,
-                            onValueChange = viewModel::updateTaskTitle,
+                    BasicTextField(
+                        value = viewModel.taskTitle,
+                        onValueChange = viewModel::updateTaskTitle,
 
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 15.dp)
-                                .onFocusChanged { focusState ->
-                                    isExpanded.value = focusState.isFocused
-                                },
-                            readOnly = task.isComplete,
-                            keyboardOptions = KeyboardOptions(
-                                capitalization = KeyboardCapitalization.Sentences,
-                                autoCorrect = false,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions {
-                                focusManager.clearFocus()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 15.dp)
+                            .onFocusChanged { focusState ->
+                                isExpanded.value = focusState.isFocused
                             },
-                            maxLines = 4,
-                            textStyle = MaterialTheme.typography.headlineMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textDecoration = when (task.isComplete) {
-                                    true -> TextDecoration.LineThrough
-                                    false -> null
-                                }
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                        readOnly = task.isComplete,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            autoCorrect = false,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions {
+                            focusManager.clearFocus()
+                        },
+                        maxLines = 4,
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textDecoration = when (task.isComplete) {
+                                true -> TextDecoration.LineThrough
+                                false -> null
+                            }
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Schedule,
+                            contentDescription = stringResource(R.string.cd_schedule_icon),
+                            modifier = Modifier
+                                .padding(start = 16.dp)
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Filled.Schedule,
-                                contentDescription = stringResource(R.string.cd_schedule_icon),
-                                modifier = Modifier
-                                    .padding(start = 16.dp)
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            ScheduleButton(schedule, priority, editScheduleAction, task)
-                        }
+                        ScheduleButton(schedule, priority, editScheduleAction, task)
                     }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun ScheduleButton(
