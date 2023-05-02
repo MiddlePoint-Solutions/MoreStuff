@@ -40,11 +40,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -112,7 +113,7 @@ fun TaskChatContent(
     val taskPriorityModel by priorityViewModel.model.collectAsState()
 
     var openBottomSheet by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberSheetState()
+    val bottomSheetState = rememberModalBottomSheetState()
 
     val bottomSheetDismissAction: () -> Unit = {
         scope.launch { bottomSheetState.hide() }.invokeOnCompletion {

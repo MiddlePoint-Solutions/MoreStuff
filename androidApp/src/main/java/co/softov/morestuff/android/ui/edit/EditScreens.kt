@@ -33,7 +33,7 @@ fun EditTaskTitleAlertDialog(
     dismissAction: () -> Unit,
 ) {
 
-    val bottomSheetState = rememberSheetState(skipHalfExpanded = false)
+    val bottomSheetState = rememberModalBottomSheetState()
 
     if (openBottomSheet) {
         AlertDialog(
