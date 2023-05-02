@@ -52,10 +52,10 @@ FROM message
 WHERE task_id = ?
 ORDER BY id DESC LIMIT 1;
 
-selectCurrentTaskMessageId:
+selectTaskMessage:
 SELECT id
 FROM message
-WHERE task_id = ?
+WHERE task_id = ? AND content_type = ?
 ORDER BY id DESC LIMIT 1;
 
 insertMessage:

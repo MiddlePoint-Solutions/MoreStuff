@@ -30,8 +30,12 @@ class MessageRepositoryImpl(
         return messageQueries.selectMasterMessages().asFlow().mapToList()
             .map { mapList(it, mapMessageDb) }
     }
+
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
+        return messageQueries.selectTaskMessagesByContentType(
+            taskId,
+            ContentType.TASK_MESSAGE.value
+        )
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 
@@ -53,6 +57,7 @@ class MessageRepositoryImpl(
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
+
     override suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
@@ -79,7 +84,7 @@ class MessageRepositoryImpl(
         replyContent: String,
     ) {
         // TODO: this logic should be moved into 2 use cases
-        when (val messageId = getCurrentTaskMessageId(taskId)) {
+        when (val messageId = getCurrentTaskMessageId(taskId, ContentType.TASK_REMINDER)) {
             is Either.Right -> {
                 messageQueries.updateTaskMessageReply(
                     reply_type = replyType,
@@ -88,6 +93,7 @@ class MessageRepositoryImpl(
                     id = messageId.value
                 )
             }
+
             is Either.Left -> MessageDoesNotExist
         }
     }
@@ -99,18 +105,13 @@ class MessageRepositoryImpl(
     override suspend fun countActiveReminderMessages(): Int =
         messageQueries.countActiveReminderMessages().executeAsOne().toInt()
 
-    private fun getLastCreatedMessageForTask(taskId: Long): Either<Failure, Message> {
-        return when (val message =
-            messageQueries.selectCurrentTaskMessage(taskId).executeAsOneOrNull()) {
-            null -> Either.Left(MessageDoesNotExist)
-            else -> Either.Right(mapMessageDb(message))
-        }
-    }
-
-    private fun getCurrentTaskMessageId(taskId: Long): Either<Failure, Long> {
-        val id = messageQueries.selectCurrentTaskMessageId(task_id = taskId).executeAsOneOrNull()
-        return id?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
-    }
-
+    private fun getCurrentTaskMessageId(
+        taskId: Long,
+        contentType: ContentType
+    ): Either<Failure, Long> =
+        messageQueries.selectTaskMessage(
+            task_id = taskId,
+            content_type = contentType.value
+        ).executeAsOneOrNull()?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
 
 }
