@@ -19,6 +19,7 @@ import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import co.softov.morestuff.android.ui.input.UserInput
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,7 @@ fun TestContent(
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
     var skipHalfExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberSheetState(skipHalfExpanded = skipHalfExpanded)
+    val bottomSheetState = rememberModalBottomSheetState()
 
 // App content
     Column(
@@ -74,19 +75,26 @@ fun TestContent(
                     Text("Hide Bottom Sheet")
                 }
             }
-            LazyColumn {
-                items(50) {
-                    ListItem(
-                        headlineText = { Text("Item $it") },
-                        leadingContent = {
-                            Icon(
-                                Icons.Default.Favorite,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    )
-                }
+
+            UserInput(
+                modifier = Modifier.imePadding(),
+                showTaskListAction = { /*TODO*/ },
+                onMessageSent = { }) {
+
             }
+//            LazyColumn {
+//                items(50) {
+//                    ListItem(
+//                        headlineContent = { Text("Item $it") },
+//                        leadingContent = {
+//                            Icon(
+//                                Icons.Default.Favorite,
+//                                contentDescription = "Localized description"
+//                            )
+//                        }
+//                    )
+//                }
+//            }
         }
     }
 }

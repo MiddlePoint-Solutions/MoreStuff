@@ -21,7 +21,7 @@ import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 fun TaskPriorityBottomSheet(
     model: TaskPriorityModel,
     openBottomSheet: Boolean = false,
-    bottomSheetState: SheetState = rememberSheetState(skipHalfExpanded = false),
+    bottomSheetState: SheetState = rememberModalBottomSheetState(),
     priorityChangeAction: (Priority) -> Unit = {},
     priorityOptionChangeAction: (PriorityOption) -> Unit = {},
     confirmationAction: () -> Unit = {},

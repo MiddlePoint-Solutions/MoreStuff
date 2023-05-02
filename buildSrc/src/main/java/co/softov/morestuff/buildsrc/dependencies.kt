@@ -119,18 +119,18 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "2023.03.00"
+            private const val version = "2023.04.01"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"
-            const val foundation = "androidx.compose.foundation:foundation:1.4.2"
+            const val foundation = "androidx.compose.foundation:foundation"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout"
             const val paging = "androidx.paging:paging-compose:1.0.0-alpha16"
 
-            const val ui = "androidx.compose.ui:ui:1.4.2"
+            const val ui = "androidx.compose.ui:ui"
             const val viewBinding = "androidx.compose.ui:ui-viewbinding"
             const val animation = "androidx.compose.animation:animation"
-            const val material3 = "androidx.compose.material3:material3:1.1.0-alpha07"
+            const val material3 = "androidx.compose.material3:material3:1.1.0-rc01"
 
 
             const val materialIcons = "androidx.compose.material:material-icons-core"
