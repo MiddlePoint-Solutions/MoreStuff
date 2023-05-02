@@ -4,6 +4,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface VoiceToTextInterface {
     val state: StateFlow<VoiceToTextParserState>
-    fun startListening(languageCode: String)
+    fun startListening()
     fun stopListening()
 }

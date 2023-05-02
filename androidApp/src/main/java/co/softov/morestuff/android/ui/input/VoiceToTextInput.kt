@@ -11,11 +11,15 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
@@ -41,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -57,6 +62,7 @@ fun VoiceToTextInput(
     val state by voiceToText.state.collectAsState()
     val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val showPermissionDialog = remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(voiceToText.state) {
         voiceToText.state.collect { newState ->
@@ -64,17 +70,18 @@ fun VoiceToTextInput(
         }
     }
 
+
     val onRecord = {
         if (!state.isSpeaking) {
             if (canRecord) {
-                voiceToText.startListening("en")
-
+                voiceToText.startListening()
+                showDialog.value = true
             } else {
                 showPermissionDialog.value = true
             }
         } else {
             voiceToText.stopListening()
-
+            showDialog.value = false
         }
     }
 
@@ -102,7 +109,9 @@ fun VoiceToTextInput(
                 Button(onClick = { dismissDialog = true }) {
                     Text("Dismiss")
                 }
-            }
+            },
+            shape = RoundedCornerShape(4.dp),
+            backgroundColor = MaterialTheme.colorScheme.primary
         )
     }
 
@@ -111,11 +120,6 @@ fun VoiceToTextInput(
             canRecord = true
         }
     }
-
-
-
-
-
 
     Box(
         modifier = Modifier.height(IntrinsicSize.Min)
@@ -136,11 +140,34 @@ fun VoiceToTextInput(
             }
         }
     }
+    LaunchedEffect(state.isSpeaking) {
+        if (!state.isSpeaking) {
+            showDialog.value = false
+        }
+    }
+
+    if (showDialog.value) {
+        Dialog(onDismissRequest = { showDialog.value = false }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                RecordingOverlay(isVisible = state.isSpeaking)
+                Text(
+                    text = "Listening",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+        }
+    }
 }
 
 
 @Composable
-fun RecordingOverlay(isVisible: Boolean ) {
+fun RecordingOverlay(isVisible: Boolean) {
     val infiniteTransition = rememberInfiniteTransition()
     val waveScale by infiniteTransition.animateFloat(
         initialValue = 0.9f,

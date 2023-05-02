@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import app.cash.molecule.RecompositionClock
@@ -21,7 +19,6 @@ import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresent
 import co.softov.morestuff.android.presentation.presenter.PriorityPresenter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.input.RecordingOverlay
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import kotlinx.coroutines.launch
@@ -55,13 +52,6 @@ fun MainContent(
     )
 
     val state by voiceToText.state.collectAsState()
-
-    // Modifica el estado de showRecordingOverlay según el estado de grabación
-    val showRecordingOverlay by remember(state) {
-        derivedStateOf {
-            state.isSpeaking
-        }
-    }
 
     val messageItems = viewModel.messages.collectAsState()
     Surface(modifier) {
@@ -102,10 +92,6 @@ fun MainContent(
                         voiceToText = voiceToText,
 
                         )
-                }
-
-                if (showRecordingOverlay) {
-                    RecordingOverlay(isVisible = true)
                 }
             }
         }

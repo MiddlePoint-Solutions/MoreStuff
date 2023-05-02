@@ -2,6 +2,7 @@ package co.softov.morestuff.android.app.features
 
 import android.app.Application
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -9,6 +10,7 @@ import android.speech.SpeechRecognizer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Locale
 
 class VoiceToTextParser(
     private val app: Application,
@@ -16,8 +18,9 @@ class VoiceToTextParser(
     private val _state = MutableStateFlow(VoiceToTextParserState())
     override val state = _state.asStateFlow()
     val recognizer = SpeechRecognizer.createSpeechRecognizer(app)
+    private val languageCode = getDeviceLanguageCode()
 
-    override fun startListening(languageCode: String) {
+    override fun startListening() {
         _state.update { VoiceToTextParserState() }
 
         if (!SpeechRecognizer.isRecognitionAvailable(app)) {
@@ -33,7 +36,7 @@ class VoiceToTextParser(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE,languageCode )
         }
 
         recognizer.setRecognitionListener(this)
@@ -120,6 +123,15 @@ class VoiceToTextParser(
     override fun onEvent(eventType: Int, params: Bundle?) {
         TODO("Not yet implemented")
     }
+    private fun getDeviceLanguageCode(): String {
+        val locale: Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            app.resources.configuration.locales[0]
+        } else {
+            @Suppress("DEPRECATION")
+            app.resources.configuration.locale
+        }
+        return locale.language
+    }
 }
 
 data class VoiceToTextParserState(
@@ -127,3 +139,4 @@ data class VoiceToTextParserState(
     val isSpeaking: Boolean = false,
     val error: String? = null,
 )
+
