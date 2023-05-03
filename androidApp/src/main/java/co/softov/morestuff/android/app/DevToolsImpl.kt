@@ -24,7 +24,7 @@ class DevToolsImpl(private val observableSettings: ObservableSettings) : DevTool
 
     init {
 
-        _debugReminders = observableSettings.getBoolean(keyDebugReminders, defaultValue = true)
+        _debugReminders = observableSettings.getBoolean(keyDebugReminders, defaultValue = false)
         _todayDebugTime = observableSettings.getInt(keyTodayDebugTime, defaultValue = 1)
         _keepScreenOn = observableSettings.getBoolean(keyKeepScreenOn, defaultValue = false)
     }
