@@ -47,6 +47,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -79,6 +81,8 @@ import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
+import com.alorma.compose.settings.ui.SettingsSwitch
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
@@ -120,6 +124,17 @@ fun TaskChatContent(
         }
     }
 
+    val debugMessageSwitchState =
+        rememberPreferenceBooleanSettingState("debug_message_switch", false)
+
+    LaunchedEffect(Unit) {
+        viewModel.setShowDebugMessages(debugMessageSwitchState.value)
+    }
+
+    fun onToggleDebugMessages(isChecked: Boolean) {
+        viewModel.toggleDebugMessages(isChecked)
+    }
+
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
             bottomSheetState.hide()
@@ -138,6 +153,7 @@ fun TaskChatContent(
         },
         modifier = modifier
     ) {
+
         Box(Modifier.fillMaxSize()) {
             Surface {
                 Column(
@@ -153,6 +169,13 @@ fun TaskChatContent(
                             openBottomSheet = true
                         },
                     )
+                    DebugMessageSwitch(
+                        onToggleDebugMessages = { isChecked ->
+                            viewModel.toggleDebugMessages(isChecked)
+                            debugMessageSwitchState.value = isChecked
+                        }
+                    )
+
                     Messages(
                         messages = messages,
                         actions = chatActions,
@@ -198,6 +221,45 @@ fun TaskChatContent(
     }
 }
 
+@Composable
+fun DebugMessageSwitch(
+    onToggleDebugMessages: (Boolean) -> Unit,
+) {
+    val memoryStorage =
+        rememberPreferenceBooleanSettingState("debug_message_switch_storage", false)
+    val enabledState = rememberPreferenceBooleanSettingState("debug_message_switch_enabled", true)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .background(color = Color(0xff2B3438)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SettingsSwitch(
+            enabled = enabledState.defaultValue,
+            state = memoryStorage,
+            title = {
+                Text(
+                    text = "Debug Messages",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            onCheckedChange = { newValue ->
+                onToggleDebugMessages(newValue)
+                memoryStorage.value = newValue
+            }
+        )
+    }
+}
+
+
+
+
+
+
 
 @Composable
 fun TaskChatTopBarEditTask(
@@ -220,16 +282,16 @@ fun TaskChatTopBarEditTask(
     val isExpanded = remember { mutableStateOf(false) }
     val onBackPressed = remember {
         {
-            if(isExpanded.value){
+            if (isExpanded.value) {
                 focusManager.clearFocus()
                 isExpanded.value = false
             }
         }
     }
-BackHandler(isExpanded.value, onBackPressed)
+    BackHandler(isExpanded.value, onBackPressed)
     Surface(
         modifier = Modifier
-            .animateContentSize ()
+            .animateContentSize()
             .then(
                 if (isExpanded.value) {
                     Modifier.fillMaxHeight()

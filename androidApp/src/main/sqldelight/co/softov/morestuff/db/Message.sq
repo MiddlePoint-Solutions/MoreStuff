@@ -46,6 +46,13 @@ FROM message
 WHERE task_id = ? AND content_type = ?
 ORDER BY datetime(create_time) DESC;
 
+selectDebugTaskMessagesByContentTypes:
+SELECT *
+FROM message
+WHERE task_id = ? AND content_type IN (?,?,?)
+ORDER BY datetime(create_time) DESC;
+
+
 selectCurrentTaskMessage:
 SELECT *
 FROM message

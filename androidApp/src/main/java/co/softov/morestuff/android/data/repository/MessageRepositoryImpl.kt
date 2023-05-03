@@ -4,12 +4,12 @@ package co.softov.morestuff.android.data.repository
 import arrow.core.Either
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.mapList
+import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.data.service.TimeManager
-import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -33,6 +33,15 @@ class MessageRepositoryImpl(
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+    }
+
+    override fun getTaskChatDebugMessagesFlow(taskId: Long): Flow<List<Message>> {
+        return messageQueries.selectDebugTaskMessagesByContentTypes(
+            taskId,
+            ContentType.CONFIRM_NEW_TASK.value,
+            ContentType.TASK_REMINDER.value,
+            ContentType.TASK_MESSAGE.value
+        ).asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 
 

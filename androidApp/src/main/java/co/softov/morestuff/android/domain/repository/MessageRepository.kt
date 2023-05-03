@@ -19,6 +19,8 @@ interface MessageRepository {
 
     fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>>
 
+    fun getTaskChatDebugMessagesFlow(taskId: Long): Flow<List<Message>>
+
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
