@@ -36,7 +36,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.main.input.ListIcon
 import co.softov.morestuff.android.ui.main.input.SendIcon
@@ -46,10 +45,8 @@ import timber.log.Timber
 fun UserTextInput(
     sendAction: (String) -> Unit,
     listAction: () -> Unit,
-    voiceToText: VoiceToTextInterface,
 
     ) {
-
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
@@ -110,7 +107,7 @@ fun UserTextInput(
                     }
                 )
             }
-            VoiceToTextInput(voiceToText) { newText ->
+            VoiceToTextInput { newText ->
                 value = value.copy(text = newText)
             }
 
@@ -128,7 +125,6 @@ fun UserTextInput(
         }
     }
 }
-
 
 
 /*

@@ -12,7 +12,6 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.*
 import androidx.core.view.WindowCompat
-import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
 import co.softov.morestuff.android.app.receiver.setReviewIntentExtras
@@ -35,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val router: AppRouter by inject()
-    private val voiceToText: VoiceToTextInterface by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             MoreStuffTheme {
                 MoreStuffScaffold(
                     content = {
-                        MainContent(voiceToText = voiceToText)
+                        MainContent()
                     }
                 )
             }

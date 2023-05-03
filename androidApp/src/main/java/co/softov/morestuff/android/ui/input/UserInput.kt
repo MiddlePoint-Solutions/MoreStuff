@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import co.softov.morestuff.android.ui.components.PermissionRequester
 
 val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
@@ -19,7 +18,6 @@ fun UserInput(
     modifier: Modifier = Modifier,
     onMessageSent: (String) -> Unit,
     resetScroll: () -> Unit,
-    voiceToText: VoiceToTextInterface,
 
     ) {
     Surface(shadowElevation = 9.dp) {
@@ -31,9 +29,7 @@ fun UserInput(
                     resetScroll()
                     onMessageSent(it)
                 },
-                voiceToText = voiceToText,
-
-                )
+            )
         }
     }
 }

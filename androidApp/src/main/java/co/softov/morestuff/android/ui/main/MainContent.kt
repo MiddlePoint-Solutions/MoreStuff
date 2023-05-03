@@ -13,7 +13,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import app.cash.molecule.RecompositionClock
 import app.cash.molecule.launchMolecule
-import co.softov.morestuff.android.app.features.VoiceToTextInterface
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
 import co.softov.morestuff.android.presentation.presenter.PriorityPresenter
@@ -27,7 +26,6 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun MainContent(
     modifier: Modifier = Modifier,
-    voiceToText: VoiceToTextInterface,
 ) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -51,7 +49,6 @@ fun MainContent(
         taskChatAction = viewModel::showTaskChat,
     )
 
-    val state by voiceToText.state.collectAsState()
 
     val messageItems = viewModel.messages.collectAsState()
     Surface(modifier) {
@@ -88,10 +85,8 @@ fun MainContent(
                             scope.launch {
                                 //scrollState.scrollToItem(index = 0)
                             }
-                        },
-                        voiceToText = voiceToText,
-
-                        )
+                        }
+                    )
                 }
             }
         }

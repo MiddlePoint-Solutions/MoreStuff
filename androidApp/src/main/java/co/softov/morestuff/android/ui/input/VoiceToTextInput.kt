@@ -46,18 +46,19 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import co.softov.morestuff.android.app.features.VoiceToTextInterface
+import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
+import org.koin.compose.koinInject
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun VoiceToTextInput(
-    voiceToText: VoiceToTextInterface,
     onUpdateValue: (String) -> Unit,
 ) {
+    val voiceToText: VoiceToTextInterface = koinInject()
     var canRecord by remember { mutableStateOf(false) }
     val state by voiceToText.state.collectAsState()
     val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
@@ -74,7 +75,7 @@ fun VoiceToTextInput(
     val onRecord = {
         if (!state.isSpeaking) {
             if (canRecord) {
-                voiceToText.startListening()
+                voiceToText.startListening("en")
                 showDialog.value = true
             } else {
                 showPermissionDialog.value = true

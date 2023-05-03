@@ -51,7 +51,7 @@ class MsApplication : Application() {
                     add(dataModule)
                     add(presentationModule)
                     add(navigationModule)
-                    add(voiceToTextModule)
+                    add(featuresModule)
                 }
             )
         }
