@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -234,9 +236,10 @@ fun TaskChatTopBarEditTask(
         }
     }
     BackHandler(isExpanded.value, onBackPressed)
+
     Surface(
         modifier = Modifier
-            .animateContentSize()
+            .animateContentSize(animationSpec = snap())
             .then(
                 if (isExpanded.value) {
                     Modifier.fillMaxHeight()
@@ -247,46 +250,66 @@ fun TaskChatTopBarEditTask(
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
-        Column {
-            CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colorScheme.onSurface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 45.dp)
-                        .windowInsetsPadding(
-                            WindowInsets.safeContent.union(WindowInsets.ime)
-                        )
+        Box {
+            Column(Modifier.align(Alignment.TopStart)) {
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onSurface
                 ) {
-                    BasicTextField(
-                        value = viewModel.taskTitle,
-                        onValueChange = viewModel::updateTaskTitle,
-
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 15.dp)
-                            .onFocusChanged { focusState ->
-                                isExpanded.value = focusState.isFocused
-                            },
-                        readOnly = task.isComplete,
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrect = false,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions {
-                            focusManager.clearFocus()
-                        },
-                        maxLines = 4,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textDecoration = when (task.isComplete) {
-                                true -> TextDecoration.LineThrough
-                                false -> null
+                            .padding(top = 45.dp)
+                            .windowInsetsPadding(
+                                WindowInsets.safeContent.union(WindowInsets.ime)
+                            )
+                            .weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 15.dp)
+                                .onFocusChanged { focusState ->
+                                    isExpanded.value = focusState.isFocused
+                                },
+                        ) {
+                            BasicTextField(
+                                value = viewModel.taskTitle,
+                                onValueChange = viewModel::updateTaskTitle,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .fillMaxWidth()
+                                    .onFocusChanged { focusState ->
+                                        if (!task.isComplete) {
+                                            isExpanded.value = focusState.isFocused
+                                        } else {
+                                            focusManager.clearFocus()
+                                        }
+                                    },
+                                readOnly = task.isComplete,
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    autoCorrect = false,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions {
+                                    focusManager.clearFocus()
+                                },
+                                maxLines = 4,
+                                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textDecoration = when (task.isComplete) {
+                                        true -> TextDecoration.LineThrough
+                                        false -> null
+                                    }
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                            )
+                            LaunchedEffect(task.isComplete) {
+                                if (task.isComplete) {
+                                    focusManager.clearFocus()
+                                }
                             }
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                    )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -372,7 +395,7 @@ fun TopAppBarTaskChat(
     setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
     isExpanded: MutableState<Boolean>,
-    ) {
+) {
     val task by viewModel.task.collectAsState()
     val alphaValue by animateFloatAsState(
         targetValue = if (isExpanded.value) 0.3f else 1f,
