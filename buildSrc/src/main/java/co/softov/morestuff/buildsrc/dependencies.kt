@@ -112,10 +112,11 @@ object Libs {
         }
 
         object Lifecycle {
-            private const val version = "2.5.1"
+            private const val version = "2.6.1"
             const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
+            const val runtimeCompose = "androidx.lifecycle:lifecycle-runtime-compose:$version"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
+            const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:$version"
         }
 
         object Compose {
@@ -140,10 +141,6 @@ object Libs {
 
             const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
             const val activityCompose = "androidx.activity:activity-compose:1.6.1"
-
-            object Lifecycle {
-                const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
-            }
 
             object Test {
                 private const val version = "1.4.0"
