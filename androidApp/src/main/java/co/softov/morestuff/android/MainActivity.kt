@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val router: AppRouter by inject()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -48,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         handleLaunchIntent()
 
         setContent {
+
             MoreStuffTheme {
                 MoreStuffScaffold(
                     content = {
@@ -55,7 +55,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 )
             }
+
         }
+
     }
 
     private fun handleLaunchIntent() {

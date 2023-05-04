@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.main
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
@@ -21,7 +22,6 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MainContent(
@@ -49,38 +49,47 @@ fun MainContent(
         taskChatAction = viewModel::showTaskChat,
     )
 
+
     val messageItems = viewModel.messages.collectAsState()
     Surface(modifier) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
 
-            Messages(
-                messages = messageItems.value,
-                actions = chatActions,
-                modifier = Modifier.weight(1f),
-                scrollState = scrollState
-            )
+                    Messages(
+                        messages = messageItems.value,
+                        actions = chatActions,
+                        modifier = Modifier.weight(1f),
+                        scrollState = scrollState
+                    )
+                    PriorityInput(
+                        model = priorityOptions,
+                        onPriorityChange = viewModel::priorityChanged,
+                        onPriorityOptionChange = viewModel::onPriorityOptionChanged
+                    )
 
-            PriorityInput(
-                model = priorityOptions,
-                onPriorityChange = viewModel::priorityChanged,
-                onPriorityOptionChange = viewModel::onPriorityOptionChanged
-            )
-
-            UserInput(
-                modifier = Modifier.imePadding(),
-                showTaskListAction = viewModel::showTaskList,
-                onMessageSent = { content ->
-                    viewModel.addNewTask(content)
-                },
-                resetScroll = {
-                    scope.launch {
-                        //scrollState.scrollToItem(index = 0)
-                    }
-                },
-            )
+                    UserInput(
+                        modifier = Modifier.imePadding(),
+                        showTaskListAction = viewModel::showTaskList,
+                        onMessageSent = { content ->
+                            viewModel.addNewTask(content)
+                        },
+                        resetScroll = {
+                            scope.launch {
+                                //scrollState.scrollToItem(index = 0)
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
+
