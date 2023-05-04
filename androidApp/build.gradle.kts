@@ -140,8 +140,9 @@ dependencies {
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
 
     implementation(Libs.AndroidX.Lifecycle.runtimeKtx)
-    implementation(Libs.AndroidX.Lifecycle.extensions)
+    implementation(Libs.AndroidX.Lifecycle.runtimeCompose)
     implementation(Libs.AndroidX.Lifecycle.viewModel)
+    implementation(Libs.AndroidX.Lifecycle.viewModelCompose)
 
     implementation(Libs.AndroidX.coreKtx)
     implementation(Libs.AndroidX.preferenceKtx)
@@ -175,7 +176,6 @@ dependencies {
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
     implementation(Libs.AndroidX.Compose.tooling)
     implementation(Libs.AndroidX.Compose.animation)
-    implementation(Libs.AndroidX.Compose.Lifecycle.viewModelCompose)
     implementation(Libs.AndroidX.Compose.paging)
 
     // Alorma Compose Settings
