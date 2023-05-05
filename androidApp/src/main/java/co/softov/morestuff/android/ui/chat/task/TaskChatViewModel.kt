@@ -11,7 +11,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.repository.MessageRepository
@@ -56,12 +56,12 @@ class TaskChatViewModel(
     )
 
 
-    val task: StateFlow<Task> =
+    val task: StateFlow<TaskDomain> =
         getTaskFlow(taskId)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
-                initialValue = Task.empty()
+                initialValue = TaskDomain()
             )
 
     val schedule: StateFlow<Schedule?> =

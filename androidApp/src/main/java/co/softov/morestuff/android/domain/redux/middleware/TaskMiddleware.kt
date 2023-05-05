@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.app.extensions.simpleName
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
@@ -26,7 +26,7 @@ sealed class TaskAction : Action.FeatureAction() {
     data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
     internal data class TaskCreatedAction(
-        val task: Task,
+        val task: TaskDomain,
         val priority: Priority
     ) : TaskAction() {
         override val log: String

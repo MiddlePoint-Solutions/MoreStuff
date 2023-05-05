@@ -1,11 +1,11 @@
 package co.softov.morestuff.android.ui.list.model
 
 import co.softov.morestuff.android.data.service.TimeManager
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 
 class TaskListItemMapper(private val timeFormatter: TimeFormatter, private val timeManager: TimeManager) {
-    fun map(input: Task): TaskListItemViewModel {
+    fun map(input: TaskDomain): TaskListItemViewModel {
         val inputDateTime = timeManager.nowLocalDateTimeString
 
         val createTime: String
@@ -25,7 +25,7 @@ class TaskListItemMapper(private val timeFormatter: TimeFormatter, private val t
         )
     }
 
-    fun map(input: List<Task>): List<TaskListItemViewModel> {
+    fun map(input: List<TaskDomain>): List<TaskListItemViewModel> {
         return input.map { map(it) }
     }
 }

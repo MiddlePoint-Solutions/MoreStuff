@@ -1,12 +1,12 @@
 package co.softov.morestuff.android.data.utils
 
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import kotlinx.datetime.*
 
 // Task
-val Task.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()
-val Task.completeLocalDateTime: LocalDateTime? get() = completeTime?.toLocalDateTime()
+val TaskDomain.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()
+val TaskDomain.completeLocalDateTime: LocalDateTime? get() = completeTime?.toLocalDateTime()
 
 // Schedule
 val Schedule.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()

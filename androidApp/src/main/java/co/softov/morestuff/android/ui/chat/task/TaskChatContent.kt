@@ -44,7 +44,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -77,7 +76,7 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
@@ -358,7 +357,7 @@ fun ScheduleButton(
     schedule: Schedule?,
     priority: TaskPriorityModel,
     editScheduleAction: () -> Unit,
-    task: Task,
+    task: TaskDomain,
     timeFormatter: TimeFormatter = get(),
     modifier: Modifier,
 ) {
