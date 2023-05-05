@@ -31,26 +31,16 @@ class TaskRepositoryImpl(
     private val taskQueries = database.taskQueries
     private fun getLastInsertedRowId(): Long = taskQueries.lastInsertRowId().executeAsOne()
 
-    private fun createTaskData(
+    override suspend fun createTask(
         title: String,
         priorityScore: Long,
         taskType: TaskType,
-    ) = TaskData(
-        id = 0,
-        uuid = UUID.randomUUID().toString(),
-        title = title,
-        create_time = timeManager.getCreateTime(),
-        complete_time = null,
-        priority_score = priorityScore,
-        task_type = taskType
-    )
-
-    override suspend fun createTask(title: String): Either<Failure, TaskDomain> {
+    ): Either<Failure, TaskDomain> {
         return taskQueries.transactionWithResult {
             val data = createTaskData(
                 title = title,
-                priorityScore = 0,
-                taskType = TaskType.System
+                priorityScore = priorityScore,
+                taskType = taskType
             )
             taskQueries.insertTask(data)
             val taskId = getLastInsertedRowId()
@@ -97,9 +87,22 @@ class TaskRepositoryImpl(
         }
     }
 
-
     override suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean> {
         taskQueries.updateTaskTitle(title, taskId)
         return Right(true)
     }
+
+    private fun createTaskData(
+        title: String,
+        priorityScore: Long,
+        taskType: TaskType,
+    ) = TaskData(
+        id = 0,
+        uuid = UUID.randomUUID().toString(),
+        title = title,
+        create_time = timeManager.getCreateTime(),
+        complete_time = null,
+        priority_score = priorityScore,
+        task_type = taskType
+    )
 }

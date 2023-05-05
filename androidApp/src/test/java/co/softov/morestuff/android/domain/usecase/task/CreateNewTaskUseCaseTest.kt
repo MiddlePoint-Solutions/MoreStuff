@@ -3,6 +3,7 @@ package co.softov.morestuff.android.domain.usecase.task
 import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.createTaskForTest
+import co.softov.morestuff.android.domain.enums.TaskType
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -12,8 +13,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 
 
-
-class CreateNewTaskUseCaseImplTestJU5{
+class CreateNewTaskUseCaseTest {
     private lateinit var taskRepository: TaskRepository
     private lateinit var useCase: CreateNewTaskUseCaseImpl
 
@@ -25,15 +25,15 @@ class CreateNewTaskUseCaseImplTestJU5{
 
     @Test
     fun `create new task use case`() = runBlocking {
-        val taskParams = TaskParams("title")
+        val taskParams = TaskParams("title", 0, TaskType.User)
         val task = createTaskForTest()
 
-        coEvery { taskRepository.createTask(taskParams.title) } returns Either.Right(task)
+        coEvery { taskRepository.createTask(any(), any(), any()) } returns Either.Right(task)
 
         val result = useCase.invoke(taskParams)
         assertEquals(Either.Right(task), result)
     }
-    }
+}
 
 
 

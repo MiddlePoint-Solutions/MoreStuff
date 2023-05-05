@@ -34,7 +34,7 @@ class MainViewModel(
     }
 
     fun addNewTask(title: String) {
-        store.dispatch(TaskAction.CreateTask(title))
+        store.dispatch(TaskAction.CreateUserTaskAction(title, Priority.today))
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
