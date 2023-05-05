@@ -134,6 +134,7 @@ fun TaskChatContent(
         }
     }
 
+    var isExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -141,6 +142,7 @@ fun TaskChatContent(
                 viewModel,
                 setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
                 onBackPressed = viewModel::onBackPressed,
+                isExpanded = isExpanded
             )
         },
         modifier = modifier
@@ -159,6 +161,8 @@ fun TaskChatContent(
                             priorityViewModel.reset()
                             openBottomSheet = true
                         },
+                        isExpanded = isExpanded,
+                        setIsExpanded = { value -> isExpanded = value }
                     )
                     Messages(
                         messages = messages,
@@ -210,6 +214,8 @@ fun TaskChatContent(
 fun TaskChatTopBarEditTask(
     taskId: Long,
     editScheduleAction: () -> Unit,
+    isExpanded: Boolean,
+    setIsExpanded: (Boolean) -> Unit,
 ) {
 
     // TODO: hoist state out of toolbar
@@ -225,14 +231,11 @@ fun TaskChatTopBarEditTask(
 
     val focusManager = LocalFocusManager.current
 
-    var isExpanded by remember { mutableStateOf(false) }
 
-    val onBackPressed = remember {
-        {
-            if (isExpanded) {
-                focusManager.clearFocus()
-                isExpanded = false
-            }
+    val onBackPressed = {
+        if (isExpanded) {
+            focusManager.clearFocus()
+            setIsExpanded(false)
         }
     }
     BackHandler(isExpanded, onBackPressed)
@@ -268,7 +271,7 @@ fun TaskChatTopBarEditTask(
                                 .fillMaxWidth()
                                 .padding(top = 15.dp)
                                 .onFocusChanged { focusState ->
-                                    isExpanded = focusState.isFocused
+                                    setIsExpanded(focusState.isFocused)
                                 },
                         ) {
                             BasicTextField(
@@ -279,7 +282,7 @@ fun TaskChatTopBarEditTask(
                                     .fillMaxWidth()
                                     .onFocusChanged { focusState ->
                                         if (!task.isComplete) {
-                                            isExpanded = focusState.isFocused
+                                            setIsExpanded(focusState.isFocused)
                                         } else {
                                             focusManager.clearFocus()
                                         }
@@ -394,8 +397,9 @@ fun TopAppBarTaskChat(
     viewModel: TaskChatViewModel,
     setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
+    isExpanded: Boolean,
 ) {
-    val isExpanded by remember { mutableStateOf(false) }
+
     val task by viewModel.task.collectAsState()
     val alphaValue by animateFloatAsState(
         targetValue = if (isExpanded) 0.3f else 1f,
@@ -515,7 +519,7 @@ fun TaskMessageTextField(
 }
 
 
-@Preview
+/*@Preview
 @Composable
 fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
@@ -524,7 +528,7 @@ fun TaskChatTopBarPreview() {
             editScheduleAction = { },
         )
     }
-}
+}*/
 
 @Preview
 @Composable
