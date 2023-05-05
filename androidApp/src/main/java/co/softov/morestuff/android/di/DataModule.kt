@@ -13,6 +13,7 @@ import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.repository.*
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -21,7 +22,10 @@ import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCas
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.db.StuffDb
+import co.softov.morestuff.db.Task
 import com.russhwolf.settings.*
+import com.squareup.sqldelight.ColumnAdapter
+import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -110,6 +114,9 @@ internal fun createDatabase(context: Context): StuffDb {
             StuffDb.Schema,
             context,
             Constants.DATABASE_NAME
+        ),
+        taskAdapter = Task.Adapter(
+            task_typeAdapter = EnumColumnAdapter()
         )
     )
 }

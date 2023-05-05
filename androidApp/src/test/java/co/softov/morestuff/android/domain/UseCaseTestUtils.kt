@@ -5,12 +5,12 @@ import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Schedule
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import kotlinx.datetime.*
 
 val timeManager = TimeManagerImpl()
-fun createListOfTasks(amount: Long): List<Task> {
+fun createListOfTasks(amount: Long): List<TaskDomain> {
     return buildList {
         for (i in 1..amount) {
             add(createTaskForTest())
@@ -22,8 +22,8 @@ fun createTaskForTest(
     id: Long = 1,
     title: String = "",
     timeUtils: String = timeManager.nowLocalDateTimeString,
-): Task {
-    return Task(id, title, timeUtils)
+): TaskDomain {
+    return TaskDomain(id, title, timeUtils)
 }
 
 
