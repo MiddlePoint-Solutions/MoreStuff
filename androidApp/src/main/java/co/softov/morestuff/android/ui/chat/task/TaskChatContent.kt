@@ -52,7 +52,6 @@ import androidx.compose.material3.rememberSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -134,14 +133,14 @@ fun TaskChatContent(
             openBottomSheet = false
         }
     }
-    val isExpanded = remember { mutableStateOf(false) }
+
+
     Scaffold(
         topBar = {
             TopAppBarTaskChat(
                 viewModel,
                 setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
                 onBackPressed = viewModel::onBackPressed,
-                isExpanded = isExpanded
             )
         },
         modifier = modifier
@@ -160,7 +159,6 @@ fun TaskChatContent(
                             priorityViewModel.reset()
                             openBottomSheet = true
                         },
-                        isExpanded = isExpanded
                     )
                     Messages(
                         messages = messages,
@@ -212,7 +210,6 @@ fun TaskChatContent(
 fun TaskChatTopBarEditTask(
     taskId: Long,
     editScheduleAction: () -> Unit,
-    isExpanded: MutableState<Boolean>,
 ) {
 
     // TODO: hoist state out of toolbar
@@ -227,21 +224,24 @@ fun TaskChatTopBarEditTask(
     val schedule by viewModel.schedule.collectAsState()
 
     val focusManager = LocalFocusManager.current
+
+    var isExpanded by remember { mutableStateOf(false) }
+
     val onBackPressed = remember {
         {
-            if (isExpanded.value) {
+            if (isExpanded) {
                 focusManager.clearFocus()
-                isExpanded.value = false
+                isExpanded = false
             }
         }
     }
-    BackHandler(isExpanded.value, onBackPressed)
+    BackHandler(isExpanded, onBackPressed)
 
     Surface(
         modifier = Modifier
             .animateContentSize(animationSpec = snap())
             .then(
-                if (isExpanded.value) {
+                if (isExpanded) {
                     Modifier.fillMaxHeight()
                 } else {
                     Modifier.height(IntrinsicSize.Min)
@@ -268,7 +268,7 @@ fun TaskChatTopBarEditTask(
                                 .fillMaxWidth()
                                 .padding(top = 15.dp)
                                 .onFocusChanged { focusState ->
-                                    isExpanded.value = focusState.isFocused
+                                    isExpanded = focusState.isFocused
                                 },
                         ) {
                             BasicTextField(
@@ -279,7 +279,7 @@ fun TaskChatTopBarEditTask(
                                     .fillMaxWidth()
                                     .onFocusChanged { focusState ->
                                         if (!task.isComplete) {
-                                            isExpanded.value = focusState.isFocused
+                                            isExpanded = focusState.isFocused
                                         } else {
                                             focusManager.clearFocus()
                                         }
@@ -319,19 +319,19 @@ fun TaskChatTopBarEditTask(
                             contentDescription = stringResource(R.string.cd_schedule_icon),
                             modifier = Modifier
                                 .padding(start = 16.dp)
-                                .alpha(if (isExpanded.value) 0f else 1f)
+                                .alpha(if (isExpanded) 0f else 1f)
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        Crossfade(targetState = isExpanded.value) { expanded ->
+                        Crossfade(targetState = isExpanded) { expanded ->
                             if (!expanded) {
                                 ScheduleButton(
                                     schedule,
                                     priority,
                                     editScheduleAction,
                                     task,
-                                    modifier = Modifier.alpha(if (isExpanded.value) 0f else 1f)
+                                    modifier = Modifier.alpha(if (isExpanded) 0f else 1f)
                                 )
                             }
                         }
@@ -394,11 +394,11 @@ fun TopAppBarTaskChat(
     viewModel: TaskChatViewModel,
     setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    isExpanded: MutableState<Boolean>,
 ) {
+    val isExpanded by remember { mutableStateOf(false) }
     val task by viewModel.task.collectAsState()
     val alphaValue by animateFloatAsState(
-        targetValue = if (isExpanded.value) 0.3f else 1f,
+        targetValue = if (isExpanded) 0.3f else 1f,
         animationSpec = tween(durationMillis = 500)
     )
 
@@ -408,7 +408,7 @@ fun TopAppBarTaskChat(
             containerColor = Color(0xff2B3438)
         ),
         actions = {
-            if (!isExpanded.value) {
+            if (!isExpanded) {
                 when (task.isComplete) {
                     true -> {
                         IconButton(onClick = { setTaskComplete(false) }) {
@@ -433,7 +433,7 @@ fun TopAppBarTaskChat(
             }
         },
         navigationIcon = {
-            if (!isExpanded.value) {
+            if (!isExpanded) {
                 IconButton(onClick = onBackPressed) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
@@ -519,11 +519,9 @@ fun TaskMessageTextField(
 @Composable
 fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
-        val isExpanded = remember { mutableStateOf(false) }
         TaskChatTopBarEditTask(
             taskId = 1,
             editScheduleAction = { },
-            isExpanded = isExpanded
         )
     }
 }
