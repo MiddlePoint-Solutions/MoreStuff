@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.app.extensions.simpleName
+import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
@@ -17,10 +17,15 @@ import kotlinx.coroutines.launch
 
 sealed class TaskAction : Action.FeatureAction() {
 
-    data class CreateTask(val title: String) : TaskAction() {
-        override val log: String
-            get() = "${this.simpleName}(title=$title)"
-    }
+    data class CreateUserTaskAction(
+        val title: String,
+        val priority: Priority
+    ) : TaskAction()
+
+    data class CreateSystemTaskAction(
+        val title: String,
+        val priority: Priority
+    ) : TaskAction()
 
     data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
     data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
@@ -28,10 +33,7 @@ sealed class TaskAction : Action.FeatureAction() {
     internal data class TaskCreatedAction(
         val task: TaskDomain,
         val priority: Priority
-    ) : TaskAction() {
-        override val log: String
-            get() = "${this.simpleName}($task,$priority)"
-    }
+    ) : TaskAction()
 }
 
 class TaskMiddleware(
@@ -47,8 +49,17 @@ class TaskMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is CreateTask -> scope.launch {
-                val params = TaskParams(action.title)
+            is CreateUserTaskAction -> scope.launch {
+                // TODO: Priority score calculation result with task priority
+                val params = TaskParams(action.title, 0, TaskType.User)
+                val priority = state.priorityState.current
+                createTaskUseCase(params).map { task ->
+                    dispatch(TaskCreatedAction(task, priority))
+                }
+            }
+
+            is CreateSystemTaskAction -> scope.launch {
+                val params = TaskParams(action.title, 0, TaskType.System)
                 val priority = state.priorityState.current
                 createTaskUseCase(params).map { task ->
                     dispatch(TaskCreatedAction(task, priority))
