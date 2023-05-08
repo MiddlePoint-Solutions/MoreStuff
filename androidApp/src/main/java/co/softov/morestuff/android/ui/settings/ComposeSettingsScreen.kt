@@ -22,30 +22,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
-import com.alorma.compose.settings.storage.preferences.rememberPreferenceBooleanSettingState
-import com.alorma.compose.settings.storage.preferences.rememberPreferenceFloatSettingState
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
-import org.koin.androidx.compose.get
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import org.koin.compose.rememberKoinInject
 
-@Preview
+
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
-    devTools: DevTools = rememberKoinInject()
+    devTools: DevTools = rememberKoinInject(),
 ) {
     SettingsContent(
         onBack = viewModel::navigateBackSettings,
@@ -65,7 +58,7 @@ private fun SettingsContent(
     onClearActiveMessages: () -> Unit,
     onTestReviewActivity: () -> Unit,
     onSmartReminder: (Boolean) -> Unit,
-    devTools: DevTools
+    devTools: DevTools,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         SettingsTopBar(navigateBackSettings = onBack)
@@ -85,6 +78,9 @@ private fun SettingsContent(
                 clearPendingMessages = onClearActiveMessages,
                 testReviewActivity = onTestReviewActivity,
             )
+            DebugMessageSwitch(
+                onToggleDebugMessages = {}
+            )
             Notification()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
@@ -97,6 +93,37 @@ private fun SettingsContent(
     }
 }
 
+@Composable
+fun DebugMessageSwitch(
+    onToggleDebugMessages: (Boolean) -> Unit,
+) {
+    val memoryStorage =
+        rememberMultiplatformBooleanSettingState("debug_message_switch_storage", false)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .background(color = Color(0xff2B3438)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SettingsSwitch(
+            state = memoryStorage,
+            title = {
+                Text(
+                    text = "Debug Messages",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            onCheckedChange = { newValue ->
+                onToggleDebugMessages(newValue)
+                memoryStorage.value = newValue
+            }
+        )
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,10 +174,10 @@ fun SelectTheme() {
 
 @Composable
 fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
-    val settingSnoozeLimit = rememberPreferenceFloatSettingState(
+    val settingSnoozeLimit = rememberMultiplatformPreferenceFloatSettingState(
         key = "snooze_limit_key", defaultValue = 0F
     )
-    val enabledState = rememberPreferenceBooleanSettingState(
+    val enabledState = rememberMultiplatformBooleanSettingState(
         key = "enabled_state_key", defaultValue = true
     )
     Row(
@@ -238,7 +265,7 @@ fun Notification() {
 
 @Composable
 fun KeepDeviceScreenOn(devTools: DevTools) {
-    val memoryStorage = rememberPreferenceBooleanSettingState("keep_screen_on", false)
+    val memoryStorage = rememberMultiplatformBooleanSettingState("keep_screen_on", false)
     val enabledState = rememberBooleanSettingState(true)
     val context = LocalContext.current
     LaunchedEffect(memoryStorage.value) {
@@ -271,8 +298,8 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
 
 @Composable
 fun ReminderDebugging(devTools: DevTools) {
-    val switchState = rememberPreferenceBooleanSettingState("switch_state", false)
-    val reminderDelayState = rememberPreferenceFloatSettingState("reminder_delay", 60f)
+    val switchState = rememberMultiplatformBooleanSettingState("switch_state", false)
+    val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState("reminder_delay", 60f)
     LaunchedEffect(switchState.value) {
         devTools.debugReminders = switchState.value
     }
@@ -321,8 +348,8 @@ fun ReminderDebugging(devTools: DevTools) {
 @Composable
 fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
-        rememberPreferenceBooleanSettingState("smart_reminder_memory_storage", false)
-    val enabledState = rememberPreferenceBooleanSettingState("smart_reminder_enabled", true)
+        rememberMultiplatformBooleanSettingState("smart_reminder_memory_storage", false)
+    val enabledState = rememberMultiplatformBooleanSettingState("smart_reminder_enabled", true)
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -445,10 +472,11 @@ fun About() {
     }
 }
 
+/*
 @Preview
 @Composable
 private fun SettingsPreview() {
     MoreStuffTheme(darkTheme = true) {
         SettingsScreen()
     }
-}
+}*/

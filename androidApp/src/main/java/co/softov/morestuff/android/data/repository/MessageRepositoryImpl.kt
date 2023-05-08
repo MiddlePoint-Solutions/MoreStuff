@@ -35,16 +35,6 @@ class MessageRepositoryImpl(
             .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 
-    override fun getTaskChatDebugMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectDebugTaskMessagesByContentTypes(
-            taskId,
-            ContentType.CONFIRM_NEW_TASK.value,
-            ContentType.TASK_REMINDER.value,
-            ContentType.TASK_MESSAGE.value
-        ).asFlow().mapToList().map { mapList(it, mapMessageDb) }
-    }
-
-
     override suspend fun getActiveReminderMessages(): List<Message> {
         return messageQueries.selectActiveReminderMessages().executeAsList()
             .map { mapMessageDb(it) }
@@ -120,6 +110,4 @@ class MessageRepositoryImpl(
         val id = messageQueries.selectCurrentTaskMessageId(task_id = taskId).executeAsOneOrNull()
         return id?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
     }
-
-
 }

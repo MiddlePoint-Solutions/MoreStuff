@@ -14,17 +14,16 @@ import co.softov.morestuff.android.domain.model.Task
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.domain.usecase.message.GetTaskChatDebugMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -32,28 +31,27 @@ import kotlinx.coroutines.launch
 class TaskChatViewModel(
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
-    getTaskChatDebugMessagesUseCase: GetTaskChatDebugMessagesUseCase,
+    getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
     private val messageRepository: MessageRepository,
+    private val settings: Settings,
 ) : NoStateViewModel() {
 
-    private val showDebugMessages = MutableStateFlow(false)
-    fun setShowDebugMessages(value: Boolean) {
-        showDebugMessages.value = value
+    private fun getDebugMessageSwitchState(): Boolean {
+        return settings.getBoolean("debug_message_switch_storage", false)
     }
 
-    fun toggleDebugMessages(isChecked: Boolean) {
-        showDebugMessages.value = isChecked
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val messages: StateFlow<List<Message>> = showDebugMessages.flatMapLatest { showDebug ->
-        if (showDebug) {
-            getTaskChatDebugMessagesUseCase(taskId = taskId)
-        } else {
-            getTaskChatMessagesUseCase(taskId = taskId)
+    val messages: StateFlow<List<Message>> = flow {
+        while (true) {
+            val showDebug = getDebugMessageSwitchState()
+            val messages = if (showDebug) {
+                getTaskMessagesFlowUseCase(taskId = taskId).first()
+            } else {
+                getTaskChatMessagesUseCase(taskId = taskId).first()
+            }
+            emit(messages)
         }
     }.stateIn(
         scope = viewModelScope,
