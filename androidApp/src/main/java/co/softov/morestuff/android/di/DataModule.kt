@@ -7,13 +7,13 @@ import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
+import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
+import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.repository.*
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -24,7 +24,6 @@ import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
 import com.russhwolf.settings.*
-import com.squareup.sqldelight.ColumnAdapter
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.android.ext.koin.androidApplication
@@ -70,7 +69,8 @@ val dataModule = module {
     single<ScheduleRepository> {
         ScheduleRepositoryImpl(
             database = get(),
-            mapScheduleDb = makeScheduleDbMapper(),
+            mapScheduleData = makeScheduleDataMapper(),
+            mapScheduleDomain = makeScheduleDomainMapper(),
             mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
             timeManager = get()
         )

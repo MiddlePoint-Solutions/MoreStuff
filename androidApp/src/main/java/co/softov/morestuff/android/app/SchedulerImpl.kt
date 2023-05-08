@@ -7,7 +7,7 @@ import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createReviewIntent
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.SmartReminderWorker
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.service.Scheduler

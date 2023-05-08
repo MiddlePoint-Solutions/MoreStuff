@@ -11,10 +11,9 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.db.StuffDb
-import co.softov.morestuff.db.Task
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne

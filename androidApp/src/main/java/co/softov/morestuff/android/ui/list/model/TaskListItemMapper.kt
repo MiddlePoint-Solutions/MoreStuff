@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.ui.list.model
 
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 

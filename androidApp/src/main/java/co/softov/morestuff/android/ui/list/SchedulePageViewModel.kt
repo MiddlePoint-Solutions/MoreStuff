@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCase

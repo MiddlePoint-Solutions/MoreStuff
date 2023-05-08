@@ -4,7 +4,7 @@ import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import co.softov.morestuff.android.app.features.VoiceToTextParser
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
