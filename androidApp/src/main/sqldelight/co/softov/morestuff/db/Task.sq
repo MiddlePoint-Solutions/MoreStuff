@@ -26,6 +26,13 @@ FROM task
 WHERE complete_time IS NOT NULL
 ORDER BY task.complete_time DESC;
 
+selectHighestPriorityScore:
+SELECT max(priority_score) FROM task;
+
+selectLowestPriorityScore:
+SELECT min(priority_score) FROM task;
+
+
 selectTaskById:
 SELECT *
 FROM task

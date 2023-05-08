@@ -69,6 +69,12 @@ class TaskRepositoryImpl(
         .asFlow()
         .mapToList()
 
+    override suspend fun getHighestPriorityScore(): Long = taskQueries
+        .selectHighestPriorityScore().executeAsOne().max ?: 0
+
+    override suspend fun getLowestPriorityScore(): Long = taskQueries
+        .selectLowestPriorityScore().executeAsOne().min ?: 0
+
     override suspend fun updateTasksComplete(
         taskIds: List<Long>,
         complete: Boolean,

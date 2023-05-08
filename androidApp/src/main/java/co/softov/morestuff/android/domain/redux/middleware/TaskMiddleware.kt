@@ -10,6 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +39,8 @@ sealed class TaskAction : Action.FeatureAction() {
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
-    private val setTaskCompleteUseCase: SetTasksCompleteUseCase
+    private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
+    private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -50,11 +52,12 @@ class TaskMiddleware(
     ): Action {
         when (action) {
             is CreateUserTaskAction -> scope.launch {
-                // TODO: Priority score calculation result with task priority
-                val params = TaskParams(action.title, 0, TaskType.User)
-                val priority = state.priorityState.current
-                createTaskUseCase(params).map { task ->
-                    dispatch(TaskCreatedAction(task, priority))
+                with(action) {
+                    val priorityScore = getDefaultPriorityScoreUseCase(priority)
+                    val params = TaskParams(title, priorityScore, TaskType.User)
+                    createTaskUseCase(params).map { task ->
+                        dispatch(TaskCreatedAction(task, priority))
+                    }
                 }
             }
 
