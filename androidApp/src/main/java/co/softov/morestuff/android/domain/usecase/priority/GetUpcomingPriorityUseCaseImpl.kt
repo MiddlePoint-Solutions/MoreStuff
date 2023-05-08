@@ -24,10 +24,10 @@ class GetUpcomingPriorityUseCaseImpl( val timeManager: TimeManager) :
 
         //  TODO: consider using a sealed class to represent the time.
         val priority = when {
-            localTime.hour < 8 -> Priority.Today(TimeOfDayOption.Morning)
-            localTime.hour in 9..11 -> Priority.Today(TimeOfDayOption.Afternoon)
-            localTime.hour in 12..16 -> Priority.Today(TimeOfDayOption.Evening)
-            else -> Priority.Tomorrow(TimeOfDayOption.Morning)
+            localTime.hour < 8 -> Priority.Now(TimeOfDayOption.Morning)
+            localTime.hour in 9..11 -> Priority.Now(TimeOfDayOption.Afternoon)
+            localTime.hour in 12..16 -> Priority.Now(TimeOfDayOption.Evening)
+            else -> Priority.Later(TimeOfDayOption.Morning)
         }
 
         return Either.Right(priority)

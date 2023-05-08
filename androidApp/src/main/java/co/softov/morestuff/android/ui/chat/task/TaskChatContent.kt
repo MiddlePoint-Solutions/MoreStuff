@@ -374,17 +374,17 @@ fun ScheduleButton(
             val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
 
             when (priority.priorityModel.priority) {
-                is Priority.Today -> stringResource(
+                is Priority.Now -> stringResource(
                     id = R.string.time_option_today,
                     formattedTime
                 )
 
-                is Priority.Tomorrow -> stringResource(
+                is Priority.Later -> stringResource(
                     id = R.string.time_option_tomorrow,
                     formattedTime
                 )
 
-                is Priority.Later -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
+                is Priority.Plan -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
             }
         }
     }.orEmpty()

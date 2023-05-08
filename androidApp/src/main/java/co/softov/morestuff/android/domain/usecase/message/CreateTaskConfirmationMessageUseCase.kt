@@ -23,9 +23,9 @@ class CreateTaskConfirmationMessageUseCaseImpl(
     override suspend fun invoke(taskId: Long, priority: Priority): Either<Failure,Boolean> {
         delay(1300)
         val confirmTitle = when (priority) {
-            is Priority.Later -> createLaterConfirmationTitle(priority)
-            is Priority.Today -> createTodayConfirmationTitle(priority)
-            is Priority.Tomorrow -> createTomorrowConfirmationTitle(priority)
+            is Priority.Plan -> createLaterConfirmationTitle(priority)
+            is Priority.Now -> createTodayConfirmationTitle(priority)
+            is Priority.Later -> createTomorrowConfirmationTitle(priority)
         }
         createMessageUseCase(
             taskId,
@@ -36,19 +36,19 @@ class CreateTaskConfirmationMessageUseCaseImpl(
     }
 
     private fun createTodayConfirmationTitle(
-        today: Priority.Today
+        today: Priority.Now
     ): String {
         return "No worries, will remind you soon!"
     }
 
     private fun createTomorrowConfirmationTitle(
-        tomorrow: Priority.Tomorrow
+        tomorrow: Priority.Later
     ): String {
         return "Great, remind you tomorrow!"
     }
 
     private fun createLaterConfirmationTitle(
-        later: Priority.Later
+        later: Priority.Plan
     ): String {
         return "Saving this for later"
     }

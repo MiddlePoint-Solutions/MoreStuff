@@ -19,7 +19,7 @@ class GetActiveSchedulesByPriorityImpl(
     override suspend fun invoke(
         priority: Priority
     ): Either<Failure, List<Schedule>> = when (priority) {
-        is Priority.Today -> {
+        is Priority.Now -> {
             if (priority.option == DefaultOption.Auto) {
                 // TODO(Alex) write tests for use cases (SQL and everything)
                 // TODO(Joseph) fetch schedules that are active in the past hour
@@ -27,7 +27,7 @@ class GetActiveSchedulesByPriorityImpl(
             }
             getActiveSchedulesUseCase()
         }
-        is Priority.Tomorrow -> TODO("Implement get tomorrow priority")
-        is Priority.Later -> TODO("Implement get Later priority")
+        is Priority.Later -> TODO("Implement get tomorrow priority")
+        is Priority.Plan -> TODO("Implement get Later priority")
     }
 }

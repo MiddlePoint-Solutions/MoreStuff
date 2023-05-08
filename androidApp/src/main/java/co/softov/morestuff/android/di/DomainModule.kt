@@ -16,8 +16,6 @@ import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCas
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.*
-import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
-import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import org.koin.core.module.dsl.factoryOf
@@ -67,7 +65,6 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            priorityMiddleware = get(),
             reviewMiddleware = get(),
         )
     }
@@ -81,7 +78,6 @@ val storeModule = module {
     factoryOf(::NotificationMiddleware)
     factoryOf(::SettingsMiddleware)
     factoryOf(::ReminderMiddleware)
-    factoryOf(::PriorityMiddleware)
     factoryOf(::ErrorMiddleware)
     factoryOf(::ReviewMiddleware)
     factoryOf(::DevMiddleware)
@@ -103,6 +99,7 @@ val taskUseCases = module {
 
 val scheduleUseCases = module {
     factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
+    factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class
@@ -114,7 +111,6 @@ val scheduleUseCases = module {
     factoryOf(::GetSchedulesWithTitleListImpl) bind GetSchedulesWithTitleUseCase::class
     factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
     factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
-    factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
     factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
     factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
@@ -139,9 +135,6 @@ val messageUseCases = module {
 }
 
 val priorityUseCases = module {
-    factoryOf(::GetPriorityTimeUseCaseImpl) bind GetPriorityTimeUseCase::class
-    factoryOf(::GetPriorityOptionsUseCase)
-    factoryOf(::GetSchedulePriorityUseCaseImpl) bind GetSchedulePriorityUseCase::class
     factoryOf(::MapScheduleToPriorityUseCaseImpl) bind MapScheduleToPriorityUseCase::class
     factoryOf(::GetUpcomingPriorityUseCaseImpl) bind GetUpcomingPriorityUseCase::class
 }

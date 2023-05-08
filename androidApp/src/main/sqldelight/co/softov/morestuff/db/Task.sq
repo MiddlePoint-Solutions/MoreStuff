@@ -32,7 +32,7 @@ FROM task
 WHERE id = ?;
 
 insertTask:
-INSERT INTO task
+INSERT INTO task (uuid, create_time, complete_time, title, priority_score, task_type)
 VALUES ?;
 
 updateTaskComplete:
