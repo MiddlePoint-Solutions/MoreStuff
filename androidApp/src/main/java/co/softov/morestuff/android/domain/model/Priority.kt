@@ -23,11 +23,3 @@ enum class DefaultOption : PriorityOption {
     Auto, Custom
 }
 
-enum class TimeOfDayOption : PriorityOption {
-    Morning, Noon, Afternoon, Evening,
-}
-
-enum class LaterOption : PriorityOption {
-    Weekend, Someday
-}
-
