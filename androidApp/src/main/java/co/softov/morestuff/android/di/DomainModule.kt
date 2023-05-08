@@ -36,7 +36,6 @@ val useCaseModules
     get() = buildList {
         add(taskUseCases)
         add(scheduleUseCases)
-        add(priorityUseCases)
         add(messageUseCases)
         add(settingsUseCases)
     }
@@ -134,10 +133,6 @@ val messageUseCases = module {
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
 }
 
-val priorityUseCases = module {
-    factoryOf(::MapScheduleToPriorityUseCaseImpl) bind MapScheduleToPriorityUseCase::class
-    factoryOf(::GetUpcomingPriorityUseCaseImpl) bind GetUpcomingPriorityUseCase::class
-}
 
 val settingsUseCases = module {
     factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
