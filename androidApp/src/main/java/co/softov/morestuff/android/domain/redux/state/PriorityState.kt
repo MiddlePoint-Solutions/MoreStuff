@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.redux.state.PriorityAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 
 data class PriorityState(
-    val current: Priority = Priority.Today(),
+    val current: Priority = Priority.Now(),
     val options: List<PriorityOption> = listOf()
 )
 
@@ -41,9 +41,9 @@ private fun PriorityState.reduceChangePriorityOption(
     action: SetCurrentPriorityOption
 ) = copy(
     current = when (current) {
+        is Priority.Plan -> current.copy("")
+        is Priority.Now -> current.copy(option = action.option)
         is Priority.Later -> current.copy(option = action.option)
-        is Priority.Today -> current.copy(option = action.option)
-        is Priority.Tomorrow -> current.copy(option = action.option)
     }
 )
 

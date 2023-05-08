@@ -21,7 +21,7 @@ fun UserPriorityInput(
     onPrioritySelected: (Priority) -> Unit
 ) {
 
-    val priorityButtons = listOf(Priority.Today(), Priority.Tomorrow(), Priority.Later())
+    val priorityButtons = listOf(Priority.Now(), Priority.Later(), Priority.Plan(""))
 
     Surface(
         shadowElevation = 8.dp
@@ -43,9 +43,9 @@ fun UserPriorityInput(
 
 val Priority.title: String
     @Composable get() = when (this) {
-        is Priority.Today -> stringResource(id = R.string.priority_today)
-        is Priority.Tomorrow -> stringResource(id = R.string.priority_tomorrow)
-        is Priority.Later -> stringResource(id = R.string.priority_later)
+        is Priority.Now -> stringResource(id = R.string.priority_today)
+        is Priority.Later -> stringResource(id = R.string.priority_tomorrow)
+        is Priority.Plan -> stringResource(id = R.string.priority_later)
     }
 
 @Preview
@@ -53,7 +53,7 @@ val Priority.title: String
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         UserPriorityInput(
-            currentPriority = Priority.Today()
+            currentPriority = Priority.Now()
         ) {}
     }
 }
@@ -63,7 +63,7 @@ fun UserPriorityInputPreviewDark() {
 fun UserPriorityInputPreview() {
     MoreStuffTheme {
         UserPriorityInput(
-            currentPriority = Priority.Today()
+            currentPriority = Priority.Now()
         ) {}
     }
 }

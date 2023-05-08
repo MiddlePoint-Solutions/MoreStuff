@@ -22,9 +22,9 @@ class ReviewMiddleware : Middleware<AppState> {
 
             is ReviewAction.ScheduleReviewResults -> {
                 with(action) {
-                    dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.tomorrow))
-                    dispatch(ScheduleAction.RescheduleTasksAction(this.low, Priority.today))
-                    dispatch(ScheduleAction.RescheduleTasksAction(this.high, Priority.today))
+                    dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.Later()))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.low, Priority.Now()))
+                    dispatch(ScheduleAction.RescheduleTasksAction(this.high, Priority.Now()))
                     dispatch(TaskAction.CompleteTasksAction(done, true))
                 }
             }

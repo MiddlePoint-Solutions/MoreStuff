@@ -31,7 +31,7 @@ class MapScheduleToPriorityUseCaseImpl( val timeManager: TimeManager) :
                         else -> DefaultOption.Auto
                     }
 
-                    Priority.today.copy(option = option)
+                    Priority.Now(option = option)
                 }
                 timeManager.isTomorrow(it) -> {
                     val morning = timeManager.tomorrowLocalDateTime(8)
@@ -46,14 +46,14 @@ class MapScheduleToPriorityUseCaseImpl( val timeManager: TimeManager) :
                         else -> DefaultOption.Auto
                     }
 
-                    Priority.tomorrow.copy(option = option)
+                    Priority.Later(option = option)
                 }
                 timeManager.isLater(it) -> {
-                    Priority.later
+                    Priority.Plan("")
                 }
-                else -> Priority.today
+                else -> Priority.Now()
             }
-        } ?: Priority.later
+        } ?: Priority.Later()
         return Either.Right(priority)
     }
 }

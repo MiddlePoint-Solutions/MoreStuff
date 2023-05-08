@@ -111,10 +111,11 @@ class ScheduleMiddleware(
             }
 
             is ScheduleReplyAction -> {
+                TODO("How do we handle schedule reply actions?")
                 val replyType = action.replyType
                 val schedule = action.schedule
                 when (replyType) {
-                    LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
+                    LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Plan(TODO(""))))
                     SNOOZE -> if (state.dailySnoozeLimit > 0) {
                         checkTaskSnoozeLimit(
                             scope,
@@ -123,9 +124,10 @@ class ScheduleMiddleware(
                             dispatch
                         )
                     } else {
-                        dispatch(RescheduleTaskAction(schedule.taskId, Today()))
+                        dispatch(RescheduleTaskAction(schedule.taskId, Now()))
                     }
-                    TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
+
+                    TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }
             }
@@ -137,9 +139,10 @@ class ScheduleMiddleware(
                         if (state.dailySnoozeLimit > 0) {
                             checkTaskSnoozeLimit(scope, taskId, state.dailySnoozeLimit, dispatch)
                         } else {
-                            dispatch(RescheduleTaskAction(taskId, Today()))
+                            dispatch(RescheduleTaskAction(taskId, Now()))
                         }
                     }
+
                     TOMORROW -> TODO()
                     DONE -> TODO()
                 }
@@ -178,9 +181,10 @@ class ScheduleMiddleware(
             val timeOption = when (val result = getTaskScheduleCountUseCase(taskId)) {
                 is Either.Right -> {
                     Timber.d("### Today Schedule count, taskId: $taskId = ${result.value} ###")
-                    if (result.value > snoozeLimit) Tomorrow() else Today()
+                    if (result.value > snoozeLimit) Later() else Now()
                 }
-                else -> Today()
+
+                else -> Now()
             }
             dispatch(RescheduleTaskAction(taskId, timeOption))
         }

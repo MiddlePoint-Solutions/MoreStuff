@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.model.PriorityOptionsModel
-import co.softov.morestuff.android.ui.main.input.PriorityOptions
 
 @Composable
 fun PriorityInput(
@@ -29,9 +28,9 @@ fun PriorityInput(
 
         UserPriorityInput(
             currentPriority = when (model.priority) {
+                is Priority.Plan -> Priority.Plan("")
+                is Priority.Now -> Priority.Now()
                 is Priority.Later -> Priority.Later()
-                is Priority.Today -> Priority.Today()
-                is Priority.Tomorrow -> Priority.Tomorrow()
             },
             onPrioritySelected = onPriorityChange
         )
@@ -51,9 +50,6 @@ fun UserPriorityOptionsInput(
             )
             .padding(5.dp)
     ) {
-        PriorityOptions(
-            model = model,
-            onOptionSelected = onOptionSelected
-        )
+
     }
 }
