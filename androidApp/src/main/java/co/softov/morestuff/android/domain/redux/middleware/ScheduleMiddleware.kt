@@ -5,7 +5,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Priority.*
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
@@ -29,10 +29,10 @@ sealed class ScheduleAction : Action.FeatureAction() {
         val priority: Priority
     ) : ScheduleAction()
 
-    internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
+    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain) : ScheduleAction()
 
     internal data class ScheduleReplyAction(
-        val schedule: Schedule,
+        val schedule: ScheduleDomain,
         val replyType: ReplyType
     ) : ScheduleAction()
 

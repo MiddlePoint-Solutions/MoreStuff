@@ -75,7 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -354,7 +354,7 @@ fun TaskChatTopBarEditTask(
 
 @Composable
 fun ScheduleButton(
-    schedule: Schedule?,
+    schedule: ScheduleDomain?,
     priority: TaskPriorityModel,
     editScheduleAction: () -> Unit,
     task: TaskDomain,

@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
@@ -64,7 +64,7 @@ class TaskChatViewModel(
                 initialValue = TaskDomain()
             )
 
-    val schedule: StateFlow<Schedule?> =
+    val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
             .map { it.getOrElse { null } }
             .stateIn(

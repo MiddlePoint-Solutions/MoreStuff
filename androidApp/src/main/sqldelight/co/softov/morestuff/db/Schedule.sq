@@ -99,7 +99,7 @@ AND schedule_time_local BETWEEN :start AND :end;
 
 insertSchedule:
 INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone)
-VALUES (?,?,?,?,?);
+VALUES ?;
 
 updateScheduleActive:
 UPDATE schedule

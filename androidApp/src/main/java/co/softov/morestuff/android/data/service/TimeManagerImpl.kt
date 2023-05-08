@@ -1,128 +1,11 @@
 package co.softov.morestuff.android.data.service
 
+import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.datetime.*
 import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
-
-interface TimeManager {
-    /**
-    Current UTC time as an Instant object.
-     */
-    val nowUtcInstant: Instant
-
-    /**
-    Current UTC time as a string.
-     */
-    val nowUtcInstantString: String
-
-    /**
-    Current UTC time in milliseconds.
-     */
-    val nowUtcMillis: Long
-
-    /**
-    Current local date and time.
-     */
-    val nowLocalDateTime: LocalDateTime
-
-    /**
-    Current time zone.
-     */
-    val currentTimeZone: TimeZone
-
-    /**
-    Current local date and time as a string.
-     */
-    val nowLocalDateTimeString: String
-
-    /**
-    A string representing the local date and time one hour back from the current UTC time.
-     */
-    val localDateTime1HourBack: String
-
-    /**
-    A pair of strings representing the start and end time of today.
-     */
-    val todayTimeStringPair: Pair<String, String>
-
-    /**
-    A pair of strings representing the start and end time of tomorrow.
-     */
-    val tomorrowTimeStringPair: Pair<String, String>
-
-    /**
-    Returns the time the TimeManager instance was created as a string.
-     */
-    fun getCreateTime(): String
-
-    /**
-    Converts a UTC time string to a LocalDateTime object.
-     */
-    fun utcStringToLocalDateTime(time: String): LocalDateTime
-
-    /**
-    Checks if the given local time string is today.
-     */
-    fun isToday(localTime: String): Boolean
-
-    /**
-    Checks if the given local time string is tomorrow.
-     */
-    fun isTomorrow(localTime: String): Boolean
-
-    /**
-    Checks if the given local time string is later than tomorrow.
-     */
-    fun isLater(localTime: String): Boolean
-
-    /**
-    Returns a UTC string representing the start of today with the given hour and minute.
-     */
-    fun todayUtcString(hour: Int = 0, minute: Int = 0): String
-
-    /**
-    Returns a UTC string representing the start of tomorrow with the given hour and minute.
-     */
-    fun tomorrowUtcString(hour: Int = 0, minute: Int = 0): String
-
-    /**
-    Returns a string representing the start of tomorrow in the local time zone with the given hour and minute.
-     */
-    fun tomorrowLocalDateTimeString(hour: Int = 0, minute: Int = 0): String
-
-    /**
-    Returns a LocalDateTime object representing the start of tomorrow in the local time zone with the given hour and minute.
-     */
-    fun tomorrowLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime
-
-    /**
-    Returns a string representing the start of today in the local time zone with the given hour and minute.
-     */
-    fun todayLocalDateTimeString(hour: Int = 0, minute: Int = 0): String
-
-    /**
-    Returns a LocalDateTime object representing the start of today in the local time zone with the given hour and minute.
-     */
-    fun todayLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime
-
-    /**
-    Returns a LocalDateTime object representing the current time with the given hour and minute added.
-     */
-    fun todayLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime
-
-    /**
-    Returns a LocalDateTime object representing 10:00 AM on the next weekend day (Saturday or Sunday).
-     */
-    fun weekendLocalDateTime(): LocalDateTime
-
-    /**
-    Returns a pair of strings representing the start and end time of today.
-     */
-    fun getTodayTimeRange(): Pair<String, String>
-
-}
 
 class TimeManagerImpl : TimeManager {
     override val nowUtcInstant: Instant get() = Clock.System.now()
@@ -154,6 +37,10 @@ class TimeManagerImpl : TimeManager {
 
     override fun utcStringToLocalDateTime(time: String): LocalDateTime {
         return time.toInstant().toLocalDateTime(currentTimeZone)
+    }
+
+    override fun localDateTimeStringToUtc(time: String): Instant {
+        return time.toLocalDateTime().toInstant(currentTimeZone)
     }
 
     override fun isToday(localTime: String): Boolean {

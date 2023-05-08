@@ -4,29 +4,29 @@ package co.softov.morestuff.android.domain.repository
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import kotlinx.coroutines.flow.Flow
 
 interface ScheduleRepository {
 
-    suspend fun createSchedule(schedule: Schedule): Either<Failure, Schedule>
+    suspend fun createSchedule(schedule: ScheduleDomain): Either<Failure, ScheduleDomain>
 
-    suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule>
+    suspend fun getSchedule(scheduleId: Long): Either<Failure, ScheduleDomain>
 
-    suspend fun getActiveSchedules(): Either<Failure, List<Schedule>>
+    suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>>
 
-    fun getActiveSchedulesFlow(): Flow<List<Schedule>>
+    fun getActiveSchedulesFlow(): Flow<List<ScheduleDomain>>
 
     suspend fun getActiveSchedulesByTime(
         startTime: String,
         endTime: String
-    ): Either<Failure, List<Schedule>>
+    ): Either<Failure, List<ScheduleDomain>>
 
     fun getActiveSchedulesByTimeFlow(
         startTime: String,
         endTime: String
-    ): Flow<List<Schedule>>
+    ): Flow<List<ScheduleDomain>>
 
     suspend fun getActiveSchedulesWithTitle(): Either<Failure, List<ScheduleWithTitle>>
 
@@ -48,9 +48,9 @@ interface ScheduleRepository {
 
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
 
-    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, Schedule>
+    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, ScheduleDomain>
 
-    fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, Schedule>>
+    fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, ScheduleDomain>>
 
     suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle>
 
