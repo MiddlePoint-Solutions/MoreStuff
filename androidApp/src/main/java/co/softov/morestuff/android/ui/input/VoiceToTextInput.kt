@@ -151,7 +151,10 @@ fun VoiceToTextInput(
     }
 
     if (showDialog.value) {
-        Dialog(onDismissRequest = { showDialog.value = false }) {
+        Dialog(onDismissRequest = {
+            showDialog.value = false
+            voiceToText.stopListening()
+        }) {
             Card(shape = RectangleShape, modifier = Modifier.size(200.dp)) {
                 Column(
                     modifier = Modifier
