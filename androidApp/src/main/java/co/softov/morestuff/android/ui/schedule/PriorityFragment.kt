@@ -15,7 +15,7 @@ class PriorityFragment : BaseComposeFragment() {
         dismissDialog: () -> Unit
     ) {
         Timber.d("ScreenContent")
-        PriorityScreen()
+        PriorityContent()
     }
 
 }

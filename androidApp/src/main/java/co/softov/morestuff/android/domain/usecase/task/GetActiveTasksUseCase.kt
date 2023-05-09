@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetActiveTasksUseCase {
-    suspend operator fun invoke(): Flow<List<TaskDomain>>
+    operator fun invoke(): Flow<List<TaskDomain>>
 }
 
 class GetActiveTasksUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : GetActiveTasksUseCase {
-    override suspend fun invoke(): Flow<List<TaskDomain>> {
+    override fun invoke(): Flow<List<TaskDomain>> {
         return taskRepository.getActiveTasksFlow()
     }
 } 

@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.model.Priority
@@ -16,6 +17,8 @@ import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.schedule.PriorityContent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
@@ -32,52 +35,51 @@ fun MainContent(
         onResume = { viewModel.onResume() }
     )
 
-    val chatActions = ChatActions(
-        scheduleAction = viewModel::scheduleResponse,
-        taskChatAction = viewModel::showTaskChat,
-    )
-
-
-    val messages = viewModel.messages.collectAsStateWithLifecycle()
-    val priority = viewModel.priorityModel
+//    val chatActions = ChatActions(
+//        scheduleAction = viewModel::scheduleResponse,
+//        taskChatAction = viewModel::showTaskChat,
+//    )
+//                    Messages(
+//                        messages = messages.value,
+//                        actions = chatActions,
+//                        modifier = Modifier.weight(1f),
+//                        scrollState = scrollState
+//                    )
 
     Surface(modifier) {
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
             ) {
-                Column(
+
+
+                PriorityContent(
                     modifier = Modifier
-                        .fillMaxSize()
-                ) {
+                        .weight(1f),
+                    listState = scrollState
+                )
 
-                    Messages(
-                        messages = messages.value,
-                        actions = chatActions,
-                        modifier = Modifier.weight(1f),
-                        scrollState = scrollState
-                    )
+                PriorityInput(
+                    model = viewModel.priorityModel,
+                    onPriorityChange = viewModel::priorityChanged,
+                )
 
-                    PriorityInput(
-                        model = priority,
-                        onPriorityChange = viewModel::priorityChanged,
-                    )
-
-                    UserInput(
-                        modifier = Modifier.imePadding(),
-                        showTaskListAction = viewModel::showTaskList,
-                        onMessageSent = { content ->
-                            viewModel.addNewTask(content)
-                        },
-                        resetScroll = {
-                            scope.launch {
-                                //scrollState.scrollToItem(index = 0)
-                            }
+                UserInput(
+                    modifier = Modifier.imePadding(),
+                    showTaskListAction = viewModel::showTaskList,
+                    onMessageSent = { content ->
+                        viewModel.addNewTask(content)
+                    },
+                    resetScroll = {
+                        scope.launch {
+                            delay(200)
+                            scrollState.animateScrollToItem(index = 0)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }

@@ -18,7 +18,8 @@ ORDER BY datetime(create_time);
 selectAllActive:
 SELECT *
 FROM task
-WHERE complete_time IS NULL;
+WHERE complete_time IS NULL
+ORDER BY priority_score DESC, datetime(create_time) DESC;
 
 selectAllComplete:
 SELECT *

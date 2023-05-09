@@ -52,7 +52,6 @@ fun MoreStuffScaffold(
                     MoreStuffTopBar(
                         openDrawer = { scope.launch { drawerState.open() } },
                         showReview = viewModel::showReview,
-                        showPriority = viewModel::showPriority
                     )
                 },
                 content = content,

@@ -19,7 +19,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 fun MoreStuffTopBar(
     openDrawer: () -> Unit,
     showReview: () -> Unit,
-    showPriority: () -> Unit,
 ) {
     TopAppBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
@@ -37,14 +36,6 @@ fun MoreStuffTopBar(
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-            IconButton(onClick = showPriority) {
-                Icon(
-                    imageVector = Icons.Rounded.Assignment,
-                    contentDescription = stringResource(R.string.cd_priority_review),
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
         }
     )
 }
@@ -56,7 +47,6 @@ fun MoreStuffTopBarPreview() {
         MoreStuffTopBar(
             openDrawer = {},
             showReview = {},
-            showPriority = {}
         )
     }
 }

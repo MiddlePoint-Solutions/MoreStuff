@@ -6,7 +6,7 @@ import arrow.core.Either.Right
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.TaskData
 import co.softov.morestuff.android.data.mapper.mapList
-import co.softov.morestuff.android.data.mapper.taskDbMapper
+import co.softov.morestuff.android.data.mapper.TaskDataMapper
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
@@ -23,7 +23,7 @@ import java.util.UUID
 
 class TaskRepositoryImpl(
     database: StuffDb,
-    private val mapTaskDb: taskDbMapper,
+    private val mapTaskData: TaskDataMapper,
     private val timeManager: TimeManager,
 ) : TaskRepository {
 
@@ -43,7 +43,7 @@ class TaskRepositoryImpl(
             )
             taskQueries.insertTask(data)
             val taskId = getLastInsertedRowId()
-            mapTaskDb(data)
+            mapTaskData(data)
                 .copy(id = taskId)
                 .right()
         }
@@ -52,16 +52,16 @@ class TaskRepositoryImpl(
     override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> {
         return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
             null -> Left(TaskDoesNotExist)
-            else -> Right(mapTaskDb(taskDb))
+            else -> Right(mapTaskData(taskDb))
         }
     }
 
     override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
-        return taskQueries.selectTaskById(id = taskId).asFlow().mapToOne().map { mapTaskDb(it) }
+        return taskQueries.selectTaskById(id = taskId).asFlow().mapToOne().map { mapTaskData(it) }
     }
 
-    override suspend fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskDb) }
+    override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskData) }
     }
 
     override suspend fun getCompleteTasksFlow(): Flow<List<TaskDomain>> = taskQueries

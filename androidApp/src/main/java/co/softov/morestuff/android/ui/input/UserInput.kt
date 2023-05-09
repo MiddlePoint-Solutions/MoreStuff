@@ -18,8 +18,7 @@ fun UserInput(
     modifier: Modifier = Modifier,
     onMessageSent: (String) -> Unit,
     resetScroll: () -> Unit,
-
-    ) {
+) {
     Surface(shadowElevation = 9.dp) {
         Column(modifier = modifier) {
             PermissionRequester()
