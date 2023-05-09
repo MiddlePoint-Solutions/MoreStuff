@@ -15,7 +15,7 @@ class GetDefaultPriorityScoreUseCaseImpl(
         return when (priority) {
             is Priority.Now -> getHighestPriorityScoreUseCase() + 1
             is Priority.Later -> getLowestPriorityScoreUseCase() - 1
-            is Priority.Plan -> getPlanPriorityScoreUseCase()
+            is Priority.Plan -> getPlanPriorityScoreUseCase(priority.localTime)
         }
     }
 }
