@@ -12,9 +12,9 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.koin.test.inject
 
-class GetDefaultPriorityScoreUseCaseTest: DomainKoinTest {
+class GetDefaultPriorityScoreUseCaseTest {
 
-    private val timeManager: TimeManager by inject()
+    private val timeManager: TimeManager = TimeManagerImpl()
     private val getHighestPriorityScoreUseCase = mockk<GetHighestPriorityScoreUseCase>()
     private val getLowestPriorityScoreUseCase = mockk<GetLowestPriorityScoreUseCase>()
     private val getPlanPriorityScoreUseCase = GetPlanPriorityScoreUseCaseImpl(

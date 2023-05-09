@@ -8,7 +8,6 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PriorityOption
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.redux.state.PriorityAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
 import co.softov.morestuff.android.ui.Screens
@@ -42,11 +41,11 @@ class MainViewModel(
     }
 
     fun priorityChanged(priority: Priority) {
-        store.dispatch(PriorityAction.SetPriority(priority))
+
     }
 
     fun onPriorityOptionChanged(option: PriorityOption) {
-        store.dispatch(PriorityAction.SetCurrentPriorityOption(option))
+
     }
 
     fun onResume() {

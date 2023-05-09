@@ -12,9 +12,9 @@ data class AppSettingsState(
 )
 
 sealed class SettingAction : Action.FeatureAction() {
-    data class InitSettings(val firstTime: Boolean, val settings: AppSettings) : PriorityAction()
-    data class SetSnoozeLimit(val limit: Int) : PriorityAction()
-    data class EnableSmartReminder(val enable: Boolean) : PriorityAction()
+    data class InitSettings(val firstTime: Boolean, val settings: AppSettings) : SettingAction()
+    data class SetSnoozeLimit(val limit: Int) : SettingAction()
+    data class EnableSmartReminder(val enable: Boolean) : SettingAction()
 
 }
 
