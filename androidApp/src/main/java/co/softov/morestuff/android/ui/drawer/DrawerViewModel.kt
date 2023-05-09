@@ -13,8 +13,4 @@ class DrawerViewModel : NoStateViewModel() {
         router.navigateTo(Screens.review)
     }
 
-    fun showPriority() {
-        router.navigateTo(Screens.priority)
-    }
-
 }

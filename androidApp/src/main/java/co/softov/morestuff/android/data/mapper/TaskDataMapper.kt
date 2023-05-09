@@ -4,13 +4,13 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 
 typealias TaskData = co.softov.morestuff.db.Task
 
-typealias taskDbMapper = (TaskData) -> TaskDomain
+typealias TaskDataMapper = (TaskData) -> TaskDomain
 
-fun makeTaskDbMapper(): taskDbMapper = { task ->
-    mapTaskDb(task)
+fun makeTaskDbMapper(): TaskDataMapper = { task ->
+    mapTaskData(task)
 }
 
-fun mapTaskDb(input: TaskData): TaskDomain {
+fun mapTaskData(input: TaskData): TaskDomain {
     return TaskDomain(
         id = input.id,
         uuid = input.uuid,

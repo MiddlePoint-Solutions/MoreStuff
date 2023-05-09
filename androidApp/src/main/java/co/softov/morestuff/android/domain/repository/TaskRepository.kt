@@ -24,7 +24,7 @@ interface TaskRepository {
 
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
     fun getTaskFlow(taskId: Long): Flow<TaskDomain>
-    suspend fun getActiveTasksFlow(): Flow<List<TaskDomain>>
+    fun getActiveTasksFlow(): Flow<List<TaskDomain>>
     suspend fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
     suspend fun getHighestPriorityScore(): Long
     suspend fun getLowestPriorityScore(): Long

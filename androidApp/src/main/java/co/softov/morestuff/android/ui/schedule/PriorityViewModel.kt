@@ -1,23 +1,33 @@
 package co.softov.morestuff.android.ui.schedule
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityViewState
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PriorityViewModel(
-    private val getReviewSchedulesUseCase: GetReviewSchedulesUseCase
+    private val getActiveTasksUseCase: GetActiveTasksUseCase
 ) : BaseViewModel<PriorityViewState, PriorityViewEvent>(PriorityViewState()) {
-
-    private val mapper = ScheduleListItemMapper()
 
     override val enableDebug: Boolean
         get() = false
@@ -26,14 +36,15 @@ class PriorityViewModel(
         loadData()
     }
 
+    var tasks: List<TaskDomain> by mutableStateOf(listOf())
+        private set
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoadData() {
-        viewModelScope.launch {
-            getReviewSchedulesUseCase()
-                .map(mapper::map)
-                .also {
-                    sendEvent(InitPriorityState(it))
-                }
-        }
+        getActiveTasksUseCase()
+            .mapLatest {
+                tasks = it
+            }.launchIn(viewModelScope)
     }
 
     override fun onReduceState(event: PriorityViewEvent): PriorityViewState {
@@ -57,10 +68,12 @@ class PriorityViewModel(
     }
 
     fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
-        sendEvent(ReorderItem(fromPosition, toPosition))
+        tasks = tasks.toMutableList().apply {
+            add(toPosition, removeAt(fromPosition))
+        }
     }
 
-    fun completeTask(item: ScheduleListItemViewModel) {
+    fun completeTask(item: TaskDomain) {
         viewModelScope.launch {
             delay(300)
             sendEvent(CompleteItem(item))

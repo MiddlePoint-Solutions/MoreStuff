@@ -53,7 +53,7 @@ val dataModule = module {
     single<TaskRepository> {
         TaskRepositoryImpl(
             database = get(),
-            mapTaskDb = makeTaskDbMapper(),
+            mapTaskData = makeTaskDbMapper(),
             timeManager = get()
         )
     }

@@ -3,7 +3,6 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,21 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.FractionalThreshold
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
@@ -49,6 +46,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -58,46 +56,16 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriorityScreen(
+fun PriorityContent(
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel()
 ) {
 
-    val model by viewModel.uiModel.collectAsState()
-
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text(text = "Priority") }
-        )
-    }) {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-        ) {
-            Box {
-                PrioritySchedule(
-                    items = model.items,
-                    reorderAction = viewModel::reorderTaskItem,
-                    completeAction = viewModel::completeTask
-                )
-            }
-        }
-    }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PrioritySchedule(
-    items: List<ScheduleListItemViewModel>,
-    reorderAction: (Int, Int) -> Unit,
-    completeAction: (ScheduleListItemViewModel) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-
     val state = rememberReorderableLazyListState(
+        listState = listState,
         onMove = { to, from ->
-            reorderAction(to.index, from.index)
+            viewModel.reorderTaskItem(to.index, from.index)
         }
     )
 
@@ -108,13 +76,12 @@ fun PrioritySchedule(
             .reorderable(state),
         contentPadding = PaddingValues(8.dp)
     ) {
-        items(items, key = { it.taskId }) {
-
+        items(viewModel.tasks, key = { it.id }) {
             val item by rememberUpdatedState(it)
             val dismissState = rememberDismissState(
                 confirmValueChange = { dismissValue ->
                     if (dismissValue == DismissValue.DismissedToEnd) {
-                        completeAction(item)
+                        viewModel.completeTask(item)
                         true
                     } else false
                 }
@@ -138,17 +105,18 @@ fun PrioritySchedule(
                 }
             })
 
-            ReorderableItem(state, key = it.taskId) { isDragging ->
+            ReorderableItem(state, key = it.id) { isDragging ->
                 SwipeToDismiss(
                     state = dismissState,
                     background = { SwipeBackground(dismissState) },
                     dismissContent = {
-                        ScheduleItem(
+                        TaskItem(
                             it,
                             Modifier.detectReorderAfterLongPress(state),
                             isDragging = isDragging
                         )
-                    })
+                    }
+                )
             }
 
 
@@ -158,8 +126,8 @@ fun PrioritySchedule(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleItem(
-    task: ScheduleListItemViewModel,
+fun TaskItem(
+    task: TaskDomain,
     modifier: Modifier = Modifier,
     isDragging: Boolean = false,
     itemAction: () -> Unit = {},
@@ -184,7 +152,7 @@ fun ScheduleItem(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = task.taskTitle,
+                text = "${task.title} * ${task.id} * ${task.priorityScore}",
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )

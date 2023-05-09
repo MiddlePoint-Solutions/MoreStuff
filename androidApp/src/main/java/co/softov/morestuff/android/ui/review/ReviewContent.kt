@@ -38,7 +38,6 @@ import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.review.swipeable.*
-import co.softov.morestuff.android.ui.schedule.PrioritySchedule
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -156,12 +155,7 @@ fun ReviewContent(
                                     }
 
                                     else -> {
-                                        PrioritySchedule(
-                                            model.roundItems,
-                                            viewModel::reorderTaskItem,
-                                            {},
-                                            modifier
-                                        )
+                                       // TODO(Joseph): go back to main screen
                                     }
                                 }
                             }
