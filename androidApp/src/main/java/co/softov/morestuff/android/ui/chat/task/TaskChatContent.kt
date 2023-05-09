@@ -127,6 +127,7 @@ fun TaskChatContent(
         }
     }
 
+
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
             bottomSheetState.hide()
@@ -148,6 +149,7 @@ fun TaskChatContent(
         },
         modifier = modifier
     ) {
+
         Box(Modifier.fillMaxSize()) {
             Surface {
                 Column(
@@ -165,6 +167,8 @@ fun TaskChatContent(
                         isExpanded = isExpanded,
                         setIsExpanded = { value -> isExpanded = value }
                     )
+
+
                     Messages(
                         messages = messages,
                         actions = chatActions,
@@ -211,6 +215,10 @@ fun TaskChatContent(
 }
 
 
+
+
+
+
 @Composable
 fun TaskChatTopBarEditTask(
     taskId: Long,
@@ -231,8 +239,6 @@ fun TaskChatTopBarEditTask(
     val schedule by viewModel.schedule.collectAsState()
 
     val focusManager = LocalFocusManager.current
-
-
     val onBackPressed = {
         if (isExpanded) {
             focusManager.clearFocus()
