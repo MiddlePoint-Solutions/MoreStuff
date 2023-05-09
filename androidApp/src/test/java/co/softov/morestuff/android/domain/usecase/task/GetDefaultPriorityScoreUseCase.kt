@@ -1,22 +1,26 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.service.TimeManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.koin.test.inject
 
-class GetDefaultPriorityScoreUseCaseTest {
+class GetDefaultPriorityScoreUseCaseTest: DomainKoinTest {
 
+    private val timeManager: TimeManager by inject()
     private val getHighestPriorityScoreUseCase = mockk<GetHighestPriorityScoreUseCase>()
     private val getLowestPriorityScoreUseCase = mockk<GetLowestPriorityScoreUseCase>()
     private val getPlanPriorityScoreUseCase = GetPlanPriorityScoreUseCaseImpl(
         getLowestPriorityScoreUseCase = getLowestPriorityScoreUseCase,
         getHighestPriorityScoreUseCase = getHighestPriorityScoreUseCase,
-        timeManager = TimeManagerImpl()
+        timeManager = timeManager
     )
 
     private val getDefaultPriorityScoreUseCase = GetDefaultPriorityScoreUseCaseImpl(
@@ -45,7 +49,8 @@ class GetDefaultPriorityScoreUseCaseTest {
     fun `default "Plan" priority score for should be the lowest score available`() = runBlocking {
         coEvery { getLowestPriorityScoreUseCase() } returns 42
         coEvery { getHighestPriorityScoreUseCase() } returns 84
-        val result = getDefaultPriorityScoreUseCase(Priority.Plan("AnyTime"))
+        val scheduleLocalTime = timeManager.todayLocalDateTimeByAdding(hour = 1).toString()
+        val result = getDefaultPriorityScoreUseCase(Priority.Plan(scheduleLocalTime))
         Assertions.assertEquals(42, result)
     }
 

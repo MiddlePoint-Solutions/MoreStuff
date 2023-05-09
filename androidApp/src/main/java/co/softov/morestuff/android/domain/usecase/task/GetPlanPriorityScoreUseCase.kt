@@ -6,8 +6,8 @@ import kotlin.math.max
 
 interface GetPlanPriorityScoreUseCase {
     suspend operator fun invoke(
+        scheduleTimeLocal: String,
         taskCreateTimeUtc: String? = null,
-        scheduleTimeUtc: String? = null
     ): Long
 }
 
@@ -17,23 +17,25 @@ class GetPlanPriorityScoreUseCaseImpl(
     private val timeManager: TimeManager,
 ) : GetPlanPriorityScoreUseCase {
     override suspend fun invoke(
+        scheduleTimeLocal: String,
         taskCreateTimeUtc: String?,
-        scheduleTimeUtc: String?
     ): Long {
 
-        val lp = getLowestPriorityScoreUseCase()
-        if(taskCreateTimeUtc == null || scheduleTimeUtc == null) {
-            return lp
-        }
+        val createTime =
+            taskCreateTimeUtc?.toInstant()?.epochSeconds ?: timeManager.nowUtcInstant.epochSeconds
+        val scheduleTime = timeManager.localDateTimeStringToUtc(scheduleTimeLocal).epochSeconds
+        val currentTime = timeManager.nowUtcInstant.epochSeconds
 
         val hp = getHighestPriorityScoreUseCase()
-        val createTimeMs = taskCreateTimeUtc.toInstant().epochSeconds
-        val scheduleTimeMs = scheduleTimeUtc.toInstant().epochSeconds
-        val currentTimeMs = timeManager.nowUtcInstant.epochSeconds
+        val lp = getLowestPriorityScoreUseCase()
+
+        println(
+            "createTime: $createTime\n scheduleTime: $scheduleTime\n currentTime: $currentTime"
+        )
 
         return lp + (
-                max(0, currentTimeMs - createTimeMs) /
-                        max(0, scheduleTimeMs - createTimeMs)
+                max(0, currentTime - createTime) /
+                        max(0, scheduleTime - createTime)
                 ) * (hp - lp)
     }
 }
