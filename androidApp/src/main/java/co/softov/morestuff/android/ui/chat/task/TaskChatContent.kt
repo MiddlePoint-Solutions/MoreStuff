@@ -1,7 +1,11 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +52,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +61,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -130,12 +136,15 @@ fun TaskChatContent(
         }
     }
 
+    var isExpanded by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBarTaskChat(
                 viewModel,
                 setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
                 onBackPressed = viewModel::onBackPressed,
+                isExpanded = isExpanded
             )
         },
         modifier = modifier
@@ -155,6 +164,8 @@ fun TaskChatContent(
                             priorityViewModel.reset()
                             openBottomSheet = true
                         },
+                        isExpanded = isExpanded,
+                        setIsExpanded = { value -> isExpanded = value }
                     )
 
 
@@ -212,6 +223,8 @@ fun TaskChatContent(
 fun TaskChatTopBarEditTask(
     taskId: Long,
     editScheduleAction: () -> Unit,
+    isExpanded: Boolean,
+    setIsExpanded: (Boolean) -> Unit,
 ) {
 
     // TODO: hoist state out of toolbar
@@ -226,21 +239,19 @@ fun TaskChatTopBarEditTask(
     val schedule by viewModel.schedule.collectAsState()
 
     val focusManager = LocalFocusManager.current
-    val isExpanded = remember { mutableStateOf(false) }
-    val onBackPressed = remember {
-        {
-            if (isExpanded.value) {
-                focusManager.clearFocus()
-                isExpanded.value = false
-            }
+    val onBackPressed = {
+        if (isExpanded) {
+            focusManager.clearFocus()
+            setIsExpanded(false)
         }
     }
-    BackHandler(isExpanded.value, onBackPressed)
+    BackHandler(isExpanded, onBackPressed)
+
     Surface(
         modifier = Modifier
-            .animateContentSize()
+            .animateContentSize(animationSpec = snap())
             .then(
-                if (isExpanded.value) {
+                if (isExpanded) {
                     Modifier.fillMaxHeight()
                 } else {
                     Modifier.height(IntrinsicSize.Min)
@@ -249,46 +260,66 @@ fun TaskChatTopBarEditTask(
         color = Color(0xff2B3438),
         tonalElevation = 10.dp,
     ) {
-        Column {
-            CompositionLocalProvider(
-                LocalContentColor provides MaterialTheme.colorScheme.onSurface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 45.dp)
-                        .windowInsetsPadding(
-                            WindowInsets.safeContent.union(WindowInsets.ime)
-                        )
+        Box {
+            Column(Modifier.align(Alignment.TopStart)) {
+                CompositionLocalProvider(
+                    LocalContentColor provides MaterialTheme.colorScheme.onSurface
                 ) {
-                    BasicTextField(
-                        value = viewModel.taskTitle,
-                        onValueChange = viewModel::updateTaskTitle,
-
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 15.dp)
-                            .onFocusChanged { focusState ->
-                                isExpanded.value = focusState.isFocused
-                            },
-                        readOnly = task.isComplete,
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Sentences,
-                            autoCorrect = false,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions {
-                            focusManager.clearFocus()
-                        },
-                        maxLines = 4,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textDecoration = when (task.isComplete) {
-                                true -> TextDecoration.LineThrough
-                                false -> null
+                            .padding(top = 45.dp)
+                            .windowInsetsPadding(
+                                WindowInsets.safeContent.union(WindowInsets.ime)
+                            )
+                            .weight(1f)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 15.dp)
+                                .onFocusChanged { focusState ->
+                                    setIsExpanded(focusState.isFocused)
+                                },
+                        ) {
+                            BasicTextField(
+                                value = viewModel.taskTitle,
+                                onValueChange = viewModel::updateTaskTitle,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .fillMaxWidth()
+                                    .onFocusChanged { focusState ->
+                                        if (!task.isComplete) {
+                                            setIsExpanded(focusState.isFocused)
+                                        } else {
+                                            focusManager.clearFocus()
+                                        }
+                                    },
+                                readOnly = task.isComplete,
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Sentences,
+                                    autoCorrect = false,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions {
+                                    focusManager.clearFocus()
+                                },
+                                maxLines = 4,
+                                textStyle = MaterialTheme.typography.headlineMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    textDecoration = when (task.isComplete) {
+                                        true -> TextDecoration.LineThrough
+                                        false -> null
+                                    }
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                            )
+                            LaunchedEffect(task.isComplete) {
+                                if (task.isComplete) {
+                                    focusManager.clearFocus()
+                                }
                             }
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                    )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -298,11 +329,22 @@ fun TaskChatTopBarEditTask(
                             contentDescription = stringResource(R.string.cd_schedule_icon),
                             modifier = Modifier
                                 .padding(start = 16.dp)
+                                .alpha(if (isExpanded) 0f else 1f)
                         )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        ScheduleButton(schedule, priority, editScheduleAction, task)
+                        Crossfade(targetState = isExpanded) { expanded ->
+                            if (!expanded) {
+                                ScheduleButton(
+                                    schedule,
+                                    priority,
+                                    editScheduleAction,
+                                    task,
+                                    modifier = Modifier.alpha(if (isExpanded) 0f else 1f)
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -318,6 +360,7 @@ fun ScheduleButton(
     editScheduleAction: () -> Unit,
     task: Task,
     timeFormatter: TimeFormatter = get(),
+    modifier: Modifier,
 ) {
     val title = when {
         schedule == null -> {
@@ -361,41 +404,53 @@ fun TopAppBarTaskChat(
     viewModel: TaskChatViewModel,
     setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
+    isExpanded: Boolean,
 ) {
+
+    val task by viewModel.task.collectAsState()
+    val alphaValue by animateFloatAsState(
+        targetValue = if (isExpanded) 0.3f else 1f,
+        animationSpec = tween(durationMillis = 500)
+    )
+
     TopAppBar(
         title = { },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color(0xff2B3438)
         ),
         actions = {
-            val task by viewModel.task.collectAsState()
-            when (task.isComplete) {
-                true -> {
-                    IconButton(onClick = { setTaskComplete(false) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Replay,
-                            contentDescription = stringResource(R.string.cd_task_complete)
-                        )
+            if (!isExpanded) {
+                when (task.isComplete) {
+                    true -> {
+                        IconButton(onClick = { setTaskComplete(false) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Replay,
+                                contentDescription = stringResource(R.string.cd_task_complete),
+                                modifier = Modifier.alpha(alphaValue)
+                            )
+                        }
                     }
-                }
 
-                false -> {
-                    IconButton(onClick = { setTaskComplete(true) }) {
-                        Icon(
-                            imageVector = Icons.Filled.Done,
-                            contentDescription = stringResource(R.string.cd_task_complete)
-                        )
+                    false -> {
+                        IconButton(onClick = { setTaskComplete(true) }) {
+                            Icon(
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = stringResource(R.string.cd_task_complete),
+                                modifier = Modifier.alpha(alphaValue)
+                            )
+                        }
                     }
                 }
             }
-
         },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_navigate_back)
-                )
+            if (!isExpanded) {
+                IconButton(onClick = onBackPressed) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_navigate_back)
+                    )
+                }
             }
         }
     )
@@ -478,6 +533,9 @@ fun TaskChatTopBarPreview() {
         TaskChatTopBarEditTask(
             taskId = 1,
             editScheduleAction = { },
+            isExpanded = true,
+            setIsExpanded = {}
+
         )
     }
 }
