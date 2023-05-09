@@ -37,6 +37,8 @@ val dataModule = module {
         SharedPreferencesSettings(getSharedPreferences(androidContext()))
     }
 
+    single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
+
     singleOf(::DevToolsImpl) bind DevTools::class
     // Database
     single { createDatabase(androidApplication()) }

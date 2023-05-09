@@ -1,10 +1,15 @@
 package co.softov.morestuff.android.app
 
+import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGE
 import co.softov.morestuff.android.domain.DevTools
 import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SettingsListener
 
-class DevToolsImpl(private val observableSettings: ObservableSettings) : DevTools {
+class DevToolsImpl(
+    private val observableSettings: ObservableSettings,
+    private val settings: Settings,
+    ) : DevTools {
 
     private val keyDebugReminders = "debug_reminder"
     private val keyTodayDebugTime = "debug_reminder_today_offset"
@@ -49,6 +54,9 @@ class DevToolsImpl(private val observableSettings: ObservableSettings) : DevTool
             observableSettings.putBoolean(keyKeepScreenOn, value)
             _keepScreenOn = value
         }
+    override fun getDebugMessageSwitchState(): Boolean {
+        return settings.getBoolean(KEY_DEBUG_MESSAGE, false)
+    }
 
 }
 
