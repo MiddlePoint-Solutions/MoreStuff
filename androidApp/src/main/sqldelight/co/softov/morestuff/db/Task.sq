@@ -32,7 +32,6 @@ SELECT max(priority_score) FROM task;
 selectLowestPriorityScore:
 SELECT min(priority_score) FROM task;
 
-
 selectTaskById:
 SELECT *
 FROM task

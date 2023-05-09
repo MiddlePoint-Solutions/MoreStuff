@@ -20,6 +20,6 @@ val Priority.replyWithTitle: Pair<String, ReplyType>
 sealed interface PriorityOption
 
 enum class DefaultOption : PriorityOption {
-    Auto, Custom
+    Auto
 }
 
