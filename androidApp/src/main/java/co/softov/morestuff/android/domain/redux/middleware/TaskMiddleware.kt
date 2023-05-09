@@ -63,10 +63,7 @@ class TaskMiddleware(
 
             is CreateSystemTaskAction -> scope.launch {
                 val params = TaskParams(action.title, 0, TaskType.System)
-                val priority = state.priorityState.current
-                createTaskUseCase(params).map { task ->
-                    dispatch(TaskCreatedAction(task, priority))
-                }
+                TODO("Create system task")
             }
 
             is CompleteTaskAction -> scope.launch {

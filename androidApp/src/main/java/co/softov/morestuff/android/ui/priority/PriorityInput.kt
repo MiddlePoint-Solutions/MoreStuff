@@ -15,23 +15,13 @@ import co.softov.morestuff.android.domain.model.PriorityOptionsModel
 
 @Composable
 fun PriorityInput(
-    model: PriorityOptionsModel,
+    model: Priority,
     onPriorityChange: (Priority) -> Unit,
-    onPriorityOptionChange: (PriorityOption) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        UserPriorityOptionsInput(
-            model = model,
-            onOptionSelected = onPriorityOptionChange,
-        )
-
         UserPriorityInput(
-            currentPriority = when (model.priority) {
-                is Priority.Plan -> Priority.Plan("")
-                is Priority.Now -> Priority.Now()
-                is Priority.Later -> Priority.Later()
-            },
+            currentPriority = model,
             onPrioritySelected = onPriorityChange
         )
     }

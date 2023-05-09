@@ -60,12 +60,6 @@ fun TaskPriorityBottomSheet(
                     )
                 }
             }
-
-            PriorityInput(
-                model = model.priorityModel,
-                onPriorityChange = priorityChangeAction,
-                onPriorityOptionChange = priorityOptionChangeAction
-            )
         }
     }
 }
