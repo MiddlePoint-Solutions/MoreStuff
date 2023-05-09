@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -38,7 +38,9 @@ fun MainContent(
     )
 
 
-    val messageItems = viewModel.messages.collectAsState()
+    val messages = viewModel.messages.collectAsStateWithLifecycle()
+    val priority = viewModel.priorityModel
+
     Surface(modifier) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -52,13 +54,14 @@ fun MainContent(
                 ) {
 
                     Messages(
-                        messages = messageItems.value,
+                        messages = messages.value,
                         actions = chatActions,
                         modifier = Modifier.weight(1f),
                         scrollState = scrollState
                     )
+
                     PriorityInput(
-                        model = Priority.Now(),
+                        model = priority,
                         onPriorityChange = viewModel::priorityChanged,
                     )
 
