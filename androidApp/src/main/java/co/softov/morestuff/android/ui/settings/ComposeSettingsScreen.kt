@@ -10,9 +10,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.NotificationAdd
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material.icons.filled.SmartButton
+import androidx.compose.material.icons.filled.SmartScreen
+import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,10 +41,7 @@ import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
-import org.koin.androidx.compose.get
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import org.koin.compose.rememberKoinInject
 
 @Preview
@@ -130,17 +133,26 @@ fun SelectTheme() {
     val enabledState = rememberBooleanSettingState(true)
     val themeOptions = listOf("Light", "Dark", "System")
     Row {
-        SettingsList(enabled = enabledState.value, title = {
-            Text(
-                text = "Select Theme", fontSize = 18.sp
-            )
-        }, items = themeOptions, onItemSelected = { index, _ ->
-            when (index) {
-                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-        })
+        SettingsList(
+            enabled = enabledState.value,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.SelectAll,
+                    contentDescription = "Select Theme") },
+            title = {
+                Text(
+                    text = "Select Theme",
+
+                    )
+            },
+            items = themeOptions,
+            onItemSelected = { index, _ ->
+                when (index) {
+                    0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+            })
     }
 }
 
@@ -154,13 +166,18 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
         key = "enabled_state_key", defaultValue = true
     )
     Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
     ) {
         SettingsSlider(enabled = enabledState.value,
             state = settingSnoozeLimit,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Snooze,
+                    contentDescription = "Snooze Limit") },
             title = {
                 Text(
-                    text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}", fontSize = 18.sp
+                    text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
                 )
             },
             steps = 9,
@@ -219,11 +236,19 @@ fun DeveloperSettings(
 fun Notification() {
     //val onClick = { TODO() }
     Row(
-        modifier = Modifier.padding(15.dp), verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.padding(15.dp),
+        verticalAlignment = Alignment.CenterVertically
+
     ) {
+        Icon(
+            imageVector = Icons.Default.Notifications,
+            contentDescription = "Notifications",
+            modifier = Modifier
+                .padding(end = 18.dp)
+        )
         Text(
+
             text = "Notification",
-            fontSize = 18.sp,
             color = MaterialTheme.colorScheme.onSurface,
         )
     }
@@ -250,10 +275,13 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
         SettingsSwitch(enabled = enabledState.value,
             state = memoryStorage,
             modifier = Modifier.padding(end = 16.dp),
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.SmartScreen,
+                    contentDescription = "Keep device screen on") },
             title = {
                 Text(
                     text = "Keep device screen on",
-                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
             },
@@ -280,16 +308,23 @@ fun ReminderDebugging(devTools: DevTools) {
         devTools.todayDebugTime = reminderDelayState.value.toInt()
     }
     Column {
-        SettingsSwitch(enabled = true, modifier = Modifier.padding(end = 16.dp), title = {
-            Text(
-                text = "Reminder Debugging",
-                fontSize = 18.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Left
-            )
-        }, state = switchState, onCheckedChange = { isChecked ->
-            devTools.debugReminders = isChecked
-        })
+        SettingsSwitch(
+            enabled = true,
+            modifier = Modifier.padding(end = 16.dp),
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Alarm,
+                    contentDescription = "Reminder Debugging") },
+            title = {
+                Text(
+
+                    text = "Reminder Debugging",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            }, state = switchState, onCheckedChange = { isChecked ->
+                devTools.debugReminders = isChecked
+            })
         if (switchState.value) {
             Row(
                 modifier = Modifier
@@ -300,7 +335,6 @@ fun ReminderDebugging(devTools: DevTools) {
                 Column {
                     Text(
                         text = "Today reminder delay ${reminderDelayState.value.toInt()}",
-                        fontSize = 16.sp,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                     SettingsSlider(enabled = switchState.value,
@@ -331,10 +365,13 @@ fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
             enabled = enabledState.defaultValue,
             state = memoryStorage,
             modifier = Modifier.padding(end = 16.dp),
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.SmartButton,
+                    contentDescription = "Smart Reminder") },
             title = {
                 Text(
                     text = "Smart Reminder",
-                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )
@@ -407,7 +444,6 @@ fun About() {
         ) {
             Text(
                 text = "Version",
-                fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.onSurface,
             )
 
@@ -430,7 +466,6 @@ fun About() {
             ) {
                 Text(
                     text = "Send feedback",
-                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
