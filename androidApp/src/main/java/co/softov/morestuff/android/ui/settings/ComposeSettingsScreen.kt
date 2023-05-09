@@ -25,6 +25,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
+import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGE
+import co.softov.morestuff.android.data.Constants.KEY_ENABLED_STATE_SNOOZE_LIMIT
+import co.softov.morestuff.android.data.Constants.KEY_KEEP_DEVICE_SCREEN_ON
+import co.softov.morestuff.android.data.Constants.KEY_REMINDER_DEBUGGING_DELAY_STATE
+import co.softov.morestuff.android.data.Constants.KEY_REMINDER_DEBUGGING_SWITCH_STATE
+import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_ENABLED
+import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_STORAGE
+import co.softov.morestuff.android.data.Constants.KEY_USER_SNOOZE_LIMIT
 import co.softov.morestuff.android.domain.DevTools
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.ui.SettingsList
@@ -78,9 +86,7 @@ private fun SettingsContent(
                 clearPendingMessages = onClearActiveMessages,
                 testReviewActivity = onTestReviewActivity,
             )
-            DebugMessageSwitch(
-                onToggleDebugMessages = {}
-            )
+            DebugMessageSwitch()
             Notification()
             KeepDeviceScreenOn(devTools = devTools)
             ReminderDebugging(devTools = devTools)
@@ -94,11 +100,9 @@ private fun SettingsContent(
 }
 
 @Composable
-fun DebugMessageSwitch(
-    onToggleDebugMessages: (Boolean) -> Unit,
-) {
+fun DebugMessageSwitch() {
     val memoryStorage =
-        rememberMultiplatformBooleanSettingState("debug_message_switch_storage", false)
+        rememberMultiplatformBooleanSettingState(KEY_DEBUG_MESSAGE, false)
 
     Row(
         modifier = Modifier
@@ -118,7 +122,6 @@ fun DebugMessageSwitch(
                 )
             },
             onCheckedChange = { newValue ->
-                onToggleDebugMessages(newValue)
                 memoryStorage.value = newValue
             }
         )
@@ -175,10 +178,10 @@ fun SelectTheme() {
 @Composable
 fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     val settingSnoozeLimit = rememberMultiplatformPreferenceFloatSettingState(
-        key = "snooze_limit_key", defaultValue = 0F
+        KEY_USER_SNOOZE_LIMIT,  0F
     )
     val enabledState = rememberMultiplatformBooleanSettingState(
-        key = "enabled_state_key", defaultValue = true
+        KEY_ENABLED_STATE_SNOOZE_LIMIT,  true
     )
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()
@@ -265,7 +268,7 @@ fun Notification() {
 
 @Composable
 fun KeepDeviceScreenOn(devTools: DevTools) {
-    val memoryStorage = rememberMultiplatformBooleanSettingState("keep_screen_on", false)
+    val memoryStorage = rememberMultiplatformBooleanSettingState(KEY_KEEP_DEVICE_SCREEN_ON, false)
     val enabledState = rememberBooleanSettingState(true)
     val context = LocalContext.current
     LaunchedEffect(memoryStorage.value) {
@@ -298,8 +301,8 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
 
 @Composable
 fun ReminderDebugging(devTools: DevTools) {
-    val switchState = rememberMultiplatformBooleanSettingState("switch_state", false)
-    val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState("reminder_delay", 60f)
+    val switchState = rememberMultiplatformBooleanSettingState(KEY_REMINDER_DEBUGGING_SWITCH_STATE, false)
+    val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState(KEY_REMINDER_DEBUGGING_DELAY_STATE, 60f)
     LaunchedEffect(switchState.value) {
         devTools.debugReminders = switchState.value
     }
@@ -348,8 +351,8 @@ fun ReminderDebugging(devTools: DevTools) {
 @Composable
 fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
-        rememberMultiplatformBooleanSettingState("smart_reminder_memory_storage", false)
-    val enabledState = rememberMultiplatformBooleanSettingState("smart_reminder_enabled", true)
+        rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_STORAGE, false)
+    val enabledState = rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
 
     Column(
         horizontalAlignment = Alignment.Start,

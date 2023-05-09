@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
@@ -19,7 +20,6 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -36,16 +36,12 @@ class TaskChatViewModel(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
     private val messageRepository: MessageRepository,
-    private val settings: Settings,
+    devTools: DevTools,
 ) : NoStateViewModel() {
-
-    private fun getDebugMessageSwitchState(): Boolean {
-        return settings.getBoolean("debug_message_switch_storage", false)
-    }
 
     val messages: StateFlow<List<Message>> = flow {
         while (true) {
-            val showDebug = getDebugMessageSwitchState()
+            val showDebug = devTools.getDebugMessageSwitchState()
             val messages = if (showDebug) {
                 getTaskMessagesFlowUseCase(taskId = taskId).first()
             } else {
