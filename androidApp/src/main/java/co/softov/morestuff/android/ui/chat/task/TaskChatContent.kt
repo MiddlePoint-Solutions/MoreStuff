@@ -519,16 +519,19 @@ fun TaskMessageTextField(
 }
 
 
-/*@Preview
+@Preview
 @Composable
 fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskChatTopBarEditTask(
             taskId = 1,
             editScheduleAction = { },
+            isExpanded = true,
+            setIsExpanded = {}
+
         )
     }
-}*/
+}
 
 @Preview
 @Composable
