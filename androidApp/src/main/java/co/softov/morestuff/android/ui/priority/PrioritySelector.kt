@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
@@ -15,15 +16,18 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
-fun UserPriorityInput(
+fun PrioritySelector(
+    priority: Priority,
+    onPrioritySelected: (Priority) -> Unit,
     modifier: Modifier = Modifier,
-    currentPriority: Priority,
-    onPrioritySelected: (Priority) -> Unit
 ) {
 
-    val priorityButtons = listOf(Priority.Now(), Priority.Later(), Priority.Plan(""))
+    val priorityButtons = remember {
+        listOf(Priority.Now(), Priority.Later(), Priority.Plan(""))
+    }
 
     Surface(
+        modifier = modifier,
         shadowElevation = 8.dp
     ) {
         Row {
@@ -32,7 +36,7 @@ fun UserPriorityInput(
                     modifier = Modifier
                         .weight(0.34f)
                         .height(50.dp),
-                    selected = it == currentPriority,
+                    selected = it == priority,
                     onSelected = { onPrioritySelected(it) },
                     text = it.title.toUpperCase(Locale.current)
                 )
@@ -41,20 +45,21 @@ fun UserPriorityInput(
     }
 }
 
-val Priority.title: String
+private val Priority.title: String
     @Composable get() = when (this) {
-        is Priority.Now -> stringResource(id = R.string.priority_today)
-        is Priority.Later -> stringResource(id = R.string.priority_tomorrow)
-        is Priority.Plan -> stringResource(id = R.string.priority_later)
+        is Priority.Now -> stringResource(id = R.string.priority_now)
+        is Priority.Later -> stringResource(id = R.string.priority_later)
+        is Priority.Plan -> stringResource(id = R.string.priority_plan)
     }
 
 @Preview
 @Composable
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
-        UserPriorityInput(
-            currentPriority = Priority.Now()
-        ) {}
+        PrioritySelector(
+            priority = Priority.Now(),
+            onPrioritySelected = {}
+        )
     }
 }
 
@@ -62,8 +67,9 @@ fun UserPriorityInputPreviewDark() {
 @Composable
 fun UserPriorityInputPreview() {
     MoreStuffTheme {
-        UserPriorityInput(
-            currentPriority = Priority.Now()
-        ) {}
+        PrioritySelector(
+            priority = Priority.Now(),
+            onPrioritySelected = {}
+        )
     }
 }

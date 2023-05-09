@@ -20,8 +20,8 @@ fun PriorityInput(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier) {
-        UserPriorityInput(
-            currentPriority = model,
+        PrioritySelector(
+            priority = model,
             onPrioritySelected = onPriorityChange
         )
     }
