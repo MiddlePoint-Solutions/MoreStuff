@@ -112,25 +112,26 @@ object Libs {
         }
 
         object Lifecycle {
-            private const val version = "2.5.1"
+            private const val version = "2.6.1"
             const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
-            const val extensions = "androidx.lifecycle:lifecycle-extensions:2.2.0"
+            const val runtimeCompose = "androidx.lifecycle:lifecycle-runtime-compose:$version"
             const val viewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:$version"
+            const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:$version"
         }
 
         object Compose {
-            private const val version = "2023.03.00"
+            private const val version = "2023.04.01"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"
-            const val foundation = "androidx.compose.foundation:foundation:1.4.2"
+            const val foundation = "androidx.compose.foundation:foundation"
             const val foundationLayout = "androidx.compose.foundation:foundation-layout"
             const val paging = "androidx.paging:paging-compose:1.0.0-alpha16"
 
-            const val ui = "androidx.compose.ui:ui:1.4.2"
+            const val ui = "androidx.compose.ui:ui"
             const val viewBinding = "androidx.compose.ui:ui-viewbinding"
             const val animation = "androidx.compose.animation:animation"
-            const val material3 = "androidx.compose.material3:material3:1.1.0-alpha07"
+            const val material3 = "androidx.compose.material3:material3:1.1.0-rc01"
 
 
             const val materialIcons = "androidx.compose.material:material-icons-core"
@@ -140,10 +141,6 @@ object Libs {
 
             const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
             const val activityCompose = "androidx.activity:activity-compose:1.6.1"
-
-            object Lifecycle {
-                const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
-            }
 
             object Test {
                 private const val version = "1.4.0"
