@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 
 @Composable
-fun UserChatItem(message: Message, actions: ChatActions) {
+fun UserChatItem(message: Message, actions: TaskActions) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,6 +46,6 @@ fun UserChatItem(message: Message, actions: ChatActions) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme(darkTheme = true) {
-        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+        UserChatItem(message = MockData.Message.userNewTask, TaskActions())
     }
 }

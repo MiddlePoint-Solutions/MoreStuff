@@ -36,7 +36,7 @@ private fun isAutoScrollingEnabled(
 @Composable
 fun Messages(
     messages: List<Message>,
-    actions: ChatActions,
+    actions: TaskActions,
     modifier: Modifier = Modifier,
     scrollState: LazyListState
 ) {
