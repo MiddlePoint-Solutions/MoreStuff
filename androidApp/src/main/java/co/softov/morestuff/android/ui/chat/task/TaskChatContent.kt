@@ -78,7 +78,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
@@ -109,7 +109,7 @@ fun TaskChatContent(
         parametersOf(taskId)
     }
 
-    val chatActions = ChatActions(
+    val taskActions = TaskActions(
         scheduleAction = viewModel::scheduleResponse,
     )
 
@@ -170,7 +170,7 @@ fun TaskChatContent(
 
                     Messages(
                         messages = messages,
-                        actions = chatActions,
+                        actions = taskActions,
                         modifier = modifier.weight(1f),
                         scrollState = scrollState
                     )

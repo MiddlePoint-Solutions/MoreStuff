@@ -7,24 +7,38 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.enums.TaskType
 import kotlinx.datetime.*
+import java.util.UUID
 
 val timeManager = TimeManagerImpl()
 fun createListOfTasks(amount: Long): List<TaskDomain> {
     return buildList {
         for (i in 1..amount) {
-            add(createTaskForTest())
+            add(createTaskForTest(id = i, priorityScore = i, timeUtils = timeManager.nowLocalDateTimeString))
         }
     }
 }
+
 
 fun createTaskForTest(
     id: Long = 1,
     title: String = "",
     timeUtils: String = timeManager.nowLocalDateTimeString,
+    priorityScore: Long = 0,
+    taskType: TaskType = TaskType.System
 ): TaskDomain {
-    return TaskDomain(id, title, timeUtils)
+    return TaskDomain(
+        id = id,
+        uuid = UUID.randomUUID().toString(),
+        title = title,
+        createTime = timeUtils,
+        completeTime = null,
+        priorityScore = priorityScore,
+        taskType = taskType
+    )
 }
+
 
 
 fun createListOfSchedulesForTest(amount: Long): List<ScheduleDomain> {

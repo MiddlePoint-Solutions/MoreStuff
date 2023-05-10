@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +46,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.ui.chat.TaskActions
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -59,7 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PriorityContent(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    viewModel: PriorityViewModel = koinViewModel()
+    viewModel: PriorityViewModel = koinViewModel(),
 ) {
 
     val state = rememberReorderableLazyListState(
@@ -67,6 +66,9 @@ fun PriorityContent(
         onMove = { to, from ->
             viewModel.reorderTaskItem(to.index, from.index)
         }
+    )
+    val taskActions = TaskActions(
+        taskChatAction = viewModel::showTaskChat,
     )
 
     LazyColumn(
@@ -113,7 +115,8 @@ fun PriorityContent(
                         TaskItem(
                             it,
                             Modifier.detectReorderAfterLongPress(state),
-                            isDragging = isDragging
+                            isDragging = isDragging,
+                            taskActions = taskActions
                         )
                     }
                 )
@@ -130,7 +133,7 @@ fun TaskItem(
     task: TaskDomain,
     modifier: Modifier = Modifier,
     isDragging: Boolean = false,
-    itemAction: () -> Unit = {},
+    taskActions: TaskActions,
 ) {
 
     val elevation = CardDefaults.cardElevation(
@@ -138,7 +141,7 @@ fun TaskItem(
     )
 
     Card(
-        onClick = itemAction,
+        onClick = { taskActions.taskChatAction(task.id) },
         elevation = elevation,
         modifier = modifier
             .fillMaxWidth()
