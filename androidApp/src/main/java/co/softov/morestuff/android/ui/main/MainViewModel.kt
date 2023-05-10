@@ -8,24 +8,19 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
 import co.softov.morestuff.android.ui.Screens
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val getMessagesUseCase: GetMessagesUseCase,
+    getMessagesUseCase: GetMessagesUseCase,
+    private val timeManager: TimeManager,
 ) : NoStateViewModel() {
 
     val messages: StateFlow<List<Message>> =
@@ -36,18 +31,29 @@ class MainViewModel(
                 initialValue = listOf()
             )
 
-    var priorityModel by mutableStateOf<Priority>(Priority.Now())
+    var priorityModel by mutableStateOf(PriorityUI.Now)
         private set
 
+    var planTime by mutableStateOf(timeManager.getDefaultPlanTime())
+
+    fun updatePlanTime() {
+        planTime = timeManager.getDefaultPlanTime()
+    }
+
     fun addNewTask(title: String) {
-        store.dispatch(TaskAction.CreateUserTaskAction(title, priorityModel))
+        val priority = when (priorityModel) {
+            PriorityUI.Now -> Priority.Now()
+            PriorityUI.Later -> Priority.Later()
+            PriorityUI.Plan -> Priority.Plan(planTime.toString())
+        }
+        store.dispatch(TaskAction.CreateUserTaskAction(title, priority))
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
     }
 
-    fun priorityChanged(priority: Priority) {
+    fun priorityChanged(priority: PriorityUI) {
         priorityModel = priority
     }
 
@@ -58,6 +64,5 @@ class MainViewModel(
     fun showTaskList() {
         router.showBottomSheet(Screens.taskLists)
     }
-
 
 }

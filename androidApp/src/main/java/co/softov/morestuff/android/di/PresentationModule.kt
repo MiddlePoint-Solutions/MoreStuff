@@ -5,6 +5,7 @@ import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.list.model.PageType
+import co.softov.morestuff.android.ui.priority.PlanViewModel
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.review.ReviewViewModel
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
@@ -38,4 +39,5 @@ val presentationModule = module {
     viewModelOf(::PriorityViewModel)
     viewModelOf(::TaskPriorityViewModel)
     viewModelOf(::TaskChatViewModel)
+    viewModelOf(::PlanViewModel)
 }

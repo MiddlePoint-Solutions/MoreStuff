@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.data.service
 
+import co.softov.morestuff.android.domain.enums.RelativeDate
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.datetime.*
+import timber.log.Timber
 import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -104,5 +106,14 @@ class TimeManagerImpl : TimeManager {
 
     override fun getTodayTimeRange(): Pair<String, String> = todayTimeStringPair
 
+    override fun getDefaultPlanTime(): LocalDateTime {
+        // TODO: get the current and change to the closest quarter (13:00, 13:15, 13:30, 13:45, 14:00)
+        return todayLocalDateTimeByAdding()
+    }
 
+    override fun getRelativeDate(timeString: String): RelativeDate = when {
+        isToday(timeString) -> RelativeDate.Today
+        isTomorrow(timeString) -> RelativeDate.Tomorrow
+        else -> RelativeDate.Date
+    }
 }
