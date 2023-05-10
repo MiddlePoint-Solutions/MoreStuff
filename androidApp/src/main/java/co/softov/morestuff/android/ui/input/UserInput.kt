@@ -9,9 +9,6 @@ import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.ui.components.PermissionRequester
 
-val KeyboardShownKey = SemanticsPropertyKey<Boolean>("KeyboardShownKey")
-var SemanticsPropertyReceiver.keyboardShownProperty by KeyboardShownKey
-
 @Composable
 fun UserInput(
     showTaskListAction: () -> Unit,

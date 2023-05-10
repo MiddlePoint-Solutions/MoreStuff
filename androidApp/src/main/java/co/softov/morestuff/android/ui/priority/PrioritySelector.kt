@@ -13,17 +13,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.ui.main.PriorityUI
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun PrioritySelector(
-    priority: Priority,
-    onPrioritySelected: (Priority) -> Unit,
+    priority: PriorityUI,
+    onPrioritySelected: (PriorityUI) -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
     val priorityButtons = remember {
-        listOf(Priority.Now(), Priority.Later(), Priority.Plan(""))
+        listOf(
+            PriorityUI.Now, PriorityUI.Later, PriorityUI.Plan
+        )
     }
 
     Surface(
@@ -45,11 +48,11 @@ fun PrioritySelector(
     }
 }
 
-private val Priority.title: String
+private val PriorityUI.title: String
     @Composable get() = when (this) {
-        is Priority.Now -> stringResource(id = R.string.priority_now)
-        is Priority.Later -> stringResource(id = R.string.priority_later)
-        is Priority.Plan -> stringResource(id = R.string.priority_plan)
+        PriorityUI.Now -> stringResource(id = R.string.priority_now)
+        PriorityUI.Later -> stringResource(id = R.string.priority_later)
+        PriorityUI.Plan -> stringResource(id = R.string.priority_plan)
     }
 
 @Preview
@@ -57,7 +60,7 @@ private val Priority.title: String
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         PrioritySelector(
-            priority = Priority.Now(),
+            priority = PriorityUI.Now,
             onPrioritySelected = {}
         )
     }
@@ -68,7 +71,7 @@ fun UserPriorityInputPreviewDark() {
 fun UserPriorityInputPreview() {
     MoreStuffTheme {
         PrioritySelector(
-            priority = Priority.Now(),
+            priority = PriorityUI.Now,
             onPrioritySelected = {}
         )
     }

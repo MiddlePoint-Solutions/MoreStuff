@@ -50,7 +50,6 @@ fun MainContent(
                     .fillMaxSize()
             ) {
 
-
                 PriorityContent(
                     modifier = Modifier
                         .weight(1f),
@@ -58,7 +57,8 @@ fun MainContent(
                 )
 
                 PriorityInput(
-                    model = viewModel.priorityModel,
+                    priority = viewModel.priorityModel,
+                    planLocalTime = { viewModel.planTime },
                     onPriorityChange = viewModel::priorityChanged,
                 )
 

@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.service
 
+import co.softov.morestuff.android.domain.enums.RelativeDate
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -124,5 +125,9 @@ interface TimeManager {
     Returns a pair of strings representing the start and end time of today.
      */
     fun getTodayTimeRange(): Pair<String, String>
+
+    fun getDefaultPlanTime(): LocalDateTime
+
+    fun getRelativeDate(timeString: String): RelativeDate
 
 }

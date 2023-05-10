@@ -4,12 +4,12 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-
 interface TimeFormatter {
     fun formatTime(timeString: String?, pattern: String): String?
     fun formatTimeOnly(timeString: String?): String?
     fun formatTimeDayAndMonth(timeString: String?): String?
     fun formatToDateTime(timeString: String?): String?
+
 }
 
 
@@ -37,4 +37,5 @@ class TimeFormatterImpl : TimeFormatter {
     override fun formatToDateTime(timeString: String?): String? {
         return formatTime(timeString, "dd/MM/yyyy HH:mm")
     }
+
 }

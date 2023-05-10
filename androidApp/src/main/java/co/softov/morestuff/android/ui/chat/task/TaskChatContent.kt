@@ -115,8 +115,6 @@ fun TaskChatContent(
 
     val messages by viewModel.messages.collectAsState()
 
-    val taskPriorityModel by priorityViewModel.model.collectAsState()
-
     var openBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
 
@@ -196,19 +194,6 @@ fun TaskChatContent(
                     }
                 }
             }
-
-            TaskPriorityBottomSheet(
-                model = taskPriorityModel,
-                openBottomSheet = openBottomSheet,
-                bottomSheetState = bottomSheetState,
-                priorityChangeAction = priorityViewModel::priorityChanged,
-                priorityOptionChangeAction = priorityViewModel::onPriorityOptionChanged,
-                confirmationAction = {
-                    priorityViewModel.updateTaskSchedule()
-                    bottomSheetDismissAction()
-                },
-                dismissAction = bottomSheetDismissAction
-            )
         }
     }
 }
