@@ -83,7 +83,7 @@ class TimeManagerImplTest {
 
     @Test
     fun `todayLocalDateTime should return LocalDateTime`() {
-        val localDateTime = timeManager.todayLocalDateTime()
+        val localDateTime = timeManager.localDateTime()
         assertNotNull(localDateTime)
     }
 

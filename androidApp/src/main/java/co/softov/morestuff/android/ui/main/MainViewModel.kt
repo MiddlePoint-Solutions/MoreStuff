@@ -17,6 +17,7 @@ import co.softov.morestuff.android.ui.Screens
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.LocalDateTime
 
 class MainViewModel(
     getMessagesUseCase: GetMessagesUseCase,
@@ -34,10 +35,10 @@ class MainViewModel(
     var priorityModel by mutableStateOf(PriorityUI.Now)
         private set
 
-    var planTime by mutableStateOf(timeManager.getDefaultPlanTime())
+    var planTime: LocalDateTime by mutableStateOf(timeManager.getDefaultPlanTime())
 
-    fun updatePlanTime() {
-        planTime = timeManager.getDefaultPlanTime()
+    fun updatePlanTime(hour: Int, minute: Int) {
+        planTime = timeManager.localDateTime(planTime, hour, minute)
     }
 
     fun addNewTask(title: String) {

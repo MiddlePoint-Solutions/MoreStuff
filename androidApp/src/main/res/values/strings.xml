@@ -77,6 +77,8 @@
     <string name="cd_priority_review">Open Priority Review</string>
     <string name="cd_settings">Show Settings</string>
     <string name="start">Start</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
 
 
 </resources>

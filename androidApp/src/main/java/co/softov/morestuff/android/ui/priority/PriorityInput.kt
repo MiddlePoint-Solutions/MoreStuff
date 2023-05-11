@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,9 +16,11 @@ import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -27,10 +30,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.domain.model.PriorityOptionsModel
+import androidx.compose.ui.window.Dialog
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.main.PriorityUI
 import co.softov.morestuff.android.ui.main.PriorityUI.*
@@ -41,41 +46,42 @@ import org.koin.compose.koinInject
 @Composable
 fun PriorityInput(
     priority: PriorityUI,
-    planLocalTime: () -> LocalDateTime,
+    planTime: () -> LocalDateTime,
     onPriorityChange: (PriorityUI) -> Unit,
+    onTimeChange: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
     timeFormatter: TimeFormatter = koinInject(),
 ) {
-
     Column(modifier = modifier) {
 
-        var showDatePickerDialog by remember {
-            mutableStateOf(false)
-        }
-
-        var showTimePickerDialog by remember {
-            mutableStateOf(false)
-        }
+        var showDatePickerDialog by remember { mutableStateOf(false) }
+        var showTimePickerDialog by remember { mutableStateOf(false) }
 
         if (showDatePickerDialog) {
-            PriorityDatePicker {
-                showDatePickerDialog = false
-            }
+            PriorityDatePicker { showDatePickerDialog = false }
         }
 
         if (showTimePickerDialog) {
+            val displayTime = planTime()
             val timePickerState = rememberTimePickerState(
-                10, 30
+                initialHour = displayTime.hour,
+                initialMinute = displayTime.minute
             )
-
-            val dismissTimePicker: () -> Unit = {
-                showTimePickerDialog = false
-            }
-
-            PriorityTimePickerDialog(dismissTimePicker, timePickerState)
+            PriorityTimePickerDialog(
+                dismissTimePicker = { showTimePickerDialog = false },
+                onTimeChange = { onTimeChange(timePickerState.hour, timePickerState.minute) },
+                state = timePickerState
+            )
         }
 
-        AnimatedVisibility(priority == Plan) {
+        val showPlanInput by remember(priority) {
+            derivedStateOf { priority == Plan }
+        }
+
+        AnimatedVisibility(
+            showPlanInput,
+            enter = expandVertically()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,7 +91,7 @@ fun PriorityInput(
                     )
                     .padding(10.dp)
             ) {
-                if (priority == Plan) {
+                if (showPlanInput) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
@@ -100,7 +106,7 @@ fun PriorityInput(
 
                         val time by remember {
                             derivedStateOf {
-                                timeFormatter.formatTimeOnly(planLocalTime().toString())
+                                timeFormatter.formatTimeOnly(planTime().toString())
                             }
                         }
 
@@ -111,7 +117,6 @@ fun PriorityInput(
                         )
                     }
                 }
-
             }
         }
 
@@ -126,37 +131,46 @@ fun PriorityInput(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityTimePickerDialog(
     dismissTimePicker: () -> Unit,
-    timePickerState: TimePickerState = rememberTimePickerState()
+    onTimeChange: () -> Unit,
+    state: TimePickerState = rememberTimePickerState()
 ) {
-    DatePickerDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onDismissRequest.
-            dismissTimePicker()
+    Dialog(onDismissRequest = { dismissTimePicker() }) {
+        Surface(
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    dismissTimePicker()
-                },
-                enabled = true
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    dismissTimePicker()
+                TimePicker(
+                    state = state,
+                    layoutType = TimePickerLayoutType.Vertical
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = {
+                            dismissTimePicker()
+                        }
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+
+                    TextButton(
+                        onClick = {
+                            onTimeChange()
+                            dismissTimePicker()
+                        }
+                    ) {
+                        Text(stringResource(R.string.ok))
+                    }
                 }
-            ) {
-                Text("Cancel")
             }
         }
-    ) {
-        TimePicker(state = timePickerState)
     }
 }
 
@@ -198,51 +212,3 @@ private fun PriorityDatePicker(
         DatePicker(state = datePickerState)
     }
 }
-
-@Composable
-fun UserPriorityOptionsInput(
-    model: PriorityOptionsModel,
-    onOptionSelected: (PriorityOption) -> Unit = {}
-) {
-    Box(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-            )
-            .padding(5.dp)
-    ) {
-
-    }
-}
-
-//
-//@Composable
-//fun TimePicker(
-//    label: String,
-//    value: String,
-//    onValueChange: (String) -> Unit,
-//    keyboardActions: KeyboardActions = KeyboardActions.Default,
-//    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-//    pattern: String = "HH:mm",
-//    is24HourView: Boolean = true,
-//) {
-//    val formatter = DateTimeFormatter.ofPattern(pattern)
-//    val time = if (value.isNotBlank()) LocalTime.parse(value, formatter) else LocalTime.now()
-//    val dialog = TimePickerDialog(
-//        LocalContext.current,
-//        { _, hour, minute -> onValueChange(LocalTime.of(hour, minute).toString()) },
-//        time.hour,
-//        time.minute,
-//        is24HourView,
-//    )
-//
-//    TextField(
-//        value = value,
-//        onValueChange = {},
-//        enabled = false,
-//        modifier = Modifier.clickable { dialog.show() },
-//        keyboardOptions = keyboardOptions,
-//        keyboardActions = keyboardActions,
-//    )
-//}

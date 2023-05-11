@@ -131,7 +131,7 @@ object Libs {
             const val ui = "androidx.compose.ui:ui"
             const val viewBinding = "androidx.compose.ui:ui-viewbinding"
             const val animation = "androidx.compose.animation:animation"
-            const val material3 = "androidx.compose.material3:material3:1.1.0-rc01"
+            const val material3 = "androidx.compose.material3:material3:1.1.0"
 
 
             const val materialIcons = "androidx.compose.material:material-icons-core"

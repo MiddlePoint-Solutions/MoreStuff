@@ -109,7 +109,7 @@ interface TimeManager {
     /**
     Returns a LocalDateTime object representing the start of today in the local time zone with the given hour and minute.
      */
-    fun todayLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime
+    fun localDateTime(localDateTime: LocalDateTime, hour: Int = 0, minute: Int = 0): LocalDateTime
 
     /**
     Returns a LocalDateTime object representing the current time with the given hour and minute added.

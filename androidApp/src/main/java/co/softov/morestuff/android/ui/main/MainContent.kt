@@ -58,8 +58,9 @@ fun MainContent(
 
                 PriorityInput(
                     priority = viewModel.priorityModel,
-                    planLocalTime = { viewModel.planTime },
+                    planTime = { viewModel.planTime },
                     onPriorityChange = viewModel::priorityChanged,
+                    onTimeChange = viewModel::updatePlanTime
                 )
 
                 UserInput(

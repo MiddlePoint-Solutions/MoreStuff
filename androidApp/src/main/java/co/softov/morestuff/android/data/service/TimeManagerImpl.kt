@@ -3,11 +3,9 @@ package co.softov.morestuff.android.data.service
 import co.softov.morestuff.android.domain.enums.RelativeDate
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.datetime.*
-import timber.log.Timber
 import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 
 class TimeManagerImpl : TimeManager {
     override val nowUtcInstant: Instant get() = Clock.System.now()
@@ -24,10 +22,12 @@ class TimeManagerImpl : TimeManager {
     override val nowLocalDateTimeString: String get() = nowLocalDateTime.toString()
 
     override val todayTimeStringPair: Pair<String, String>
-        get() = todayLocalDateTime(0, 0).toString() to todayLocalDateTime(23, 59).toString()
+        get() = localDateTime(nowLocalDateTime, 0, 0).toString() to
+                localDateTime(nowLocalDateTime, 23, 59).toString()
 
     override val tomorrowTimeStringPair: Pair<String, String>
-        get() = tomorrowLocalDateTime(0, 0).toString() to tomorrowLocalDateTime(23, 59).toString()
+        get() = tomorrowLocalDateTime(0, 0).toString() to
+                tomorrowLocalDateTime(23, 59).toString()
 
     override fun getCreateTime(): String = nowUtcInstant.toString()
 
@@ -58,7 +58,7 @@ class TimeManagerImpl : TimeManager {
     }
 
     override fun todayUtcString(hour: Int, minute: Int): String =
-        todayLocalDateTime(hour, minute).toInstant(currentTimeZone).toString()
+        localDateTime(nowLocalDateTime, hour, minute).toInstant(currentTimeZone).toString()
 
     override fun tomorrowUtcString(hour: Int, minute: Int): String =
         tomorrowLocalDateTime(hour, minute).toInstant(currentTimeZone).toString()
@@ -74,9 +74,13 @@ class TimeManagerImpl : TimeManager {
             }
 
     override fun todayLocalDateTimeString(hour: Int, minute: Int): String =
-        todayLocalDateTime(hour, minute).toString()
+        localDateTime(nowLocalDateTime, hour, minute).toString()
 
-    override fun todayLocalDateTime(hour: Int, minute: Int): LocalDateTime =
+    override fun localDateTime(
+        localDateTime: LocalDateTime,
+        hour: Int,
+        minute: Int
+    ): LocalDateTime =
         nowLocalDateTime.run {
             LocalDateTime(year, month, dayOfMonth, hour, minute, second, 0)
         }
