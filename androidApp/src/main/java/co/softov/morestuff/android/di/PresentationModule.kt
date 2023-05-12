@@ -24,14 +24,11 @@ val presentationModule = module {
     viewModel { (page: PageType) ->
         SchedulePageViewModel(
             page = page,
-            getSchedules = get(),
-            getLaterSchedules = get(),
-            getActiveTasksUseCase = get(),
             getCompleteTasks = get(),
-            getTodaySchedules = get(),
-            getTomorrowSchedules = get(),
             timeFormatter = get(),
-            timeManager = get()
+            timeManager = get(),
+            getLaterTaskUseCase = get(),
+            getNowTaskUseCase = get()
         )
     }
 

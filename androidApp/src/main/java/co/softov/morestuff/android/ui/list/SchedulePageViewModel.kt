@@ -3,12 +3,9 @@ package co.softov.morestuff.android.ui.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetLaterTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetNowTaskUseCase
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.list.model.*
 import kotlinx.coroutines.flow.*
@@ -17,57 +14,36 @@ import timber.log.Timber
 
 class SchedulePageViewModel(
     private val page: PageType,
-    private val getSchedules: GetSchedulesWithTitleFlowUseCase,
-    private val getLaterSchedules: GetLaterSchedulesWithTitleUseCase,
-    private val getTodaySchedules: GetTodaySchedulesWithTitleFlowUseCase,
-    private val getTomorrowSchedules: GetTomorrowSchedulesWithTitleUseCase,
-    private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val getNowTaskUseCase: GetNowTaskUseCase,
+    private val getLaterTaskUseCase: GetLaterTaskUseCase,
     private val getCompleteTasks: GetCompletedTasksUseCase,
     private val timeFormatter: TimeFormatter,
-    private val timeManager: TimeManager
+    private val timeManager: TimeManager,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SchedulePageViewState())
     val state: StateFlow<SchedulePageViewState>
         get() = _state
-    private val scheduleItemMapper by lazy { ScheduleListItemMapper() }
     private val taskListItemMapper by lazy { TaskListItemMapper(timeFormatter, timeManager) }
 
     init {
         Timber.d("Page: $page")
         viewModelScope.launch {
             when (page) {
-                PageType.PAGE_ACTIVE_SCHEDULES -> {
-                    getSchedules()
-                        .map { scheduleItemMapper.map(it) }
-                        .onEach { _state.value = SchedulePageViewState(schedules = it) }
-                        .launchIn(this)
-                }
-                PageType.PAGE_ACTIVE_TODAY -> {
-                    getTodaySchedules()
-                        .map { scheduleItemMapper.map(it) }
-                        .onEach { _state.value = SchedulePageViewState(schedules = it) }
-                        .launchIn(this)
-                }
-                PageType.PAGE_ACTIVE_TOMORROW -> {
-                    getTomorrowSchedules()
-                        .map { scheduleItemMapper.map(it) }
-                        .onEach { _state.value = SchedulePageViewState(schedules = it) }
+
+                PageType.PAGE_ACTIVE_NOW -> {
+                    getNowTaskUseCase()
+                        .map { taskListItemMapper.map(it) }
+                        .onEach { _state.value = SchedulePageViewState(tasks = it) }
                         .launchIn(this)
                 }
                 PageType.PAGE_ACTIVE_LATER -> {
-                    getLaterSchedules()
-                        .map { scheduleItemMapper.map(it) }
-                        .onEach { _state.value = SchedulePageViewState(schedules = it) }
-                        .launchIn(this)
-                }
-                PageType.PAGE_ACTIVE_TASKS -> {
-                    getActiveTasksUseCase()
+                    getLaterTaskUseCase()
                         .map { taskListItemMapper.map(it) }
                         .onEach { _state.value = SchedulePageViewState(tasks = it) }
                         .launchIn(this)
                 }
                 PageType.PAGE_COMPLETE_TASKS -> {
-                    getCompleteTasks().onEach { Timber.d("ALEXXX: $it") }
+                    getCompleteTasks()
                         .map { taskListItemMapper.map(it) }
                         .onEach { _state.value = SchedulePageViewState(tasks = it) }
                         .launchIn(this)

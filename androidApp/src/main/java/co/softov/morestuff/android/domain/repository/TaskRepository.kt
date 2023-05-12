@@ -19,13 +19,15 @@ interface TaskRepository {
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
     suspend fun updateTasksComplete(
         taskIds: List<Long>,
-        complete: Boolean
+        complete: Boolean,
     ): Either<Failure, Boolean>
 
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
     fun getTaskFlow(taskId: Long): Flow<TaskDomain>
     fun getActiveTasksFlow(): Flow<List<TaskDomain>>
-    suspend fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
+    fun getNowTasksFlow(): Flow<List<TaskDomain>>
+    fun getLaterTasksFlow(): Flow<List<TaskDomain>>
+    fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
     suspend fun getHighestPriorityScore(): Long
     suspend fun getLowestPriorityScore(): Long
 }
