@@ -79,6 +79,7 @@
     <string name="start">Start</string>
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
-
+    <string name="relative_today">Today</string>
+    <string name="relative_tomorrow">Tomorrow</string>
 
 </resources>

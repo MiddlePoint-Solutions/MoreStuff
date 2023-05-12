@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.data.service
 
-import co.softov.morestuff.android.domain.enums.RelativeDate
+import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.datetime.*
 import java.time.DayOfWeek
@@ -81,7 +81,7 @@ class TimeManagerImpl : TimeManager {
         hour: Int,
         minute: Int
     ): LocalDateTime =
-        nowLocalDateTime.run {
+        localDateTime.run {
             LocalDateTime(year, month, dayOfMonth, hour, minute, second, 0)
         }
 
@@ -115,9 +115,14 @@ class TimeManagerImpl : TimeManager {
         return todayLocalDateTimeByAdding()
     }
 
-    override fun getRelativeDate(timeString: String): RelativeDate = when {
-        isToday(timeString) -> RelativeDate.Today
-        isTomorrow(timeString) -> RelativeDate.Tomorrow
-        else -> RelativeDate.Date
+    override fun getRelativeDate(timeString: String): RelativeDateDisplay = when {
+        isToday(timeString) -> RelativeDateDisplay.Today
+        isTomorrow(timeString) -> RelativeDateDisplay.Tomorrow
+        else -> RelativeDateDisplay.Date
     }
+
+    override fun epochMillisToLocalDateTime(epochMillis: Long, hour: Int, minute: Int) =
+        Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(currentTimeZone).run {
+            localDateTime(this, hour, minute)
+        }
 }
