@@ -79,6 +79,7 @@ fun PriorityInput(
                     .padding(10.dp)
             ) {
                 if (showPlanInput) {
+
                     val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
 
                     if (showDatePickerDialog) {
@@ -135,6 +136,10 @@ fun PriorityInput(
                             text = time ?: "",
                             shape = RoundedCornerShape(percent = 50)
                         )
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        SchedulePermissionRequester()
                     }
                 }
             }
