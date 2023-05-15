@@ -13,15 +13,11 @@ import co.softov.morestuff.android.ui.list.model.title
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 val pages = listOf(
-    PageType.PAGE_ACTIVE_SCHEDULES,
-    PageType.PAGE_ACTIVE_TODAY,
-    PageType.PAGE_ACTIVE_TOMORROW,
+    PageType.PAGE_ACTIVE_NOW,
     PageType.PAGE_ACTIVE_LATER,
     PageType.PAGE_COMPLETE_TASKS,
-    PageType.PAGE_ACTIVE_TASKS
 )
 
 @OptIn(ExperimentalPagerApi::class)
@@ -53,7 +49,7 @@ private fun ScheduleTabs(
     ScrollableTabRow(
         // Our selected tab is our current page
         selectedTabIndex = pagerState.currentPage,
-        edgePadding = 24.dp,
+        edgePadding = 43.dp,
         divider = {},
         modifier = Modifier.fillMaxWidth()
     ) {
