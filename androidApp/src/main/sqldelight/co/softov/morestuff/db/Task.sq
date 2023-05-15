@@ -54,3 +54,8 @@ WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+updateTaskPriorityScore:
+UPDATE task
+SET priority_score = ?
+WHERE id = ?;

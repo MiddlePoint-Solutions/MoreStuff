@@ -28,6 +28,8 @@ interface TaskRepository {
     suspend fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
     suspend fun getHighestPriorityScore(): Long
     suspend fun getLowestPriorityScore(): Long
+    suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean>
+    suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean>
 }
 
 object TaskDoesNotExist : FeatureFailure

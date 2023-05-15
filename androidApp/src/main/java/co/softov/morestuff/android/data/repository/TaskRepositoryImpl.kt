@@ -5,14 +5,14 @@ import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.TaskData
-import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.data.mapper.TaskDataMapper
+import co.softov.morestuff.android.data.mapper.mapList
+import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -110,4 +110,27 @@ class TaskRepositoryImpl(
         priority_score = priorityScore,
         task_type = taskType
     )
+
+    override suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean> {
+        return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+            null -> Left(TaskDoesNotExist)
+            else -> taskQueries.transactionWithResult {
+                val newPriorityScore = taskDb.priority_score + 1
+                taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
+                Right(true)
+            }
+        }
+    }
+
+    override suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean> {
+        return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+            null -> Left(TaskDoesNotExist)
+            else -> taskQueries.transactionWithResult {
+                val newPriorityScore = taskDb.priority_score - 1
+                taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
+                Right(true)
+            }
+        }
+    }
+
 }

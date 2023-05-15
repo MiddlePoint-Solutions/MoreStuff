@@ -99,7 +99,8 @@ val taskUseCases = module {
     factoryOf(::GetHighestPriorityScoreUseCaseImpl) bind GetHighestPriorityScoreUseCase::class
     factoryOf(::GetLowestPriorityScoreUseCaseImpl) bind GetLowestPriorityScoreUseCase::class
     factoryOf(::GetDefaultPriorityScoreUseCaseImpl) bind GetDefaultPriorityScoreUseCase::class
-
+    factoryOf(::IncreaseTaskPriorityScoreUseCaseImpl) bind IncreaseTaskPriorityScoreUseCase::class
+    factoryOf(::DecreaseTaskPriorityScoreUseCaseImpl) bind DecreaseTaskPriorityScoreUseCase::class
 }
 
 

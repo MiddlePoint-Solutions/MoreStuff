@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 class PriorityViewModel(
-    private val getActiveTasksUseCase: GetActiveTasksUseCase
+    private val getActiveTasksUseCase: GetActiveTasksUseCase,
 ) : BaseViewModel<PriorityViewState, PriorityViewEvent>(PriorityViewState()) {
 
     override val enableDebug: Boolean
@@ -64,6 +64,28 @@ class PriorityViewModel(
             add(toPosition, removeAt(fromPosition))
         }
     }
+
+
+//TODO: reorder task items and add new score:
+//
+// fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+//        tasks = tasks.toMutableList().apply {
+//            val movedTask = removeAt(fromPosition)
+//            add(toPosition, movedTask)
+//
+//            if (toPosition > fromPosition) {
+//                viewModelScope.launch {
+//                    decreaseTaskPriorityScoreUseCase(movedTask.id)
+//                }
+//            } else {
+//                viewModelScope.launch {
+//                    increaseTaskPriorityScoreUseCase(movedTask.id)
+//                }
+//            }
+//        }
+//    }
+
+
 
     fun completeTask(item: TaskDomain) {
         viewModelScope.launch {
