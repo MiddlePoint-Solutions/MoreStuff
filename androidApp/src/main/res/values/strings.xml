@@ -82,5 +82,6 @@
     <string name="relative_today">Today</string>
     <string name="relative_tomorrow">Tomorrow</string>
     <string name="cd_plan_scheduling_requires_your_permission">Plan scheduling requires your permission</string>
+    <string name="mr_stuff_image">MR.Stuff image</string>
 
 </resources>
