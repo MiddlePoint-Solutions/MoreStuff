@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -36,19 +37,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.main.PriorityUI
 import co.softov.morestuff.android.ui.main.PriorityUI.*
-import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
+import kotlin.reflect.KFunction1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityInput(
     priority: PriorityUI,
-    planTime: () -> LocalDateTime,
+    planModel: PlanModel,
     onPriorityChange: (PriorityUI) -> Unit,
     onTimeChange: (Int, Int) -> Unit,
+    onDateChange: (Long) -> Unit,
     modifier: Modifier = Modifier,
     timeFormatter: TimeFormatter = koinInject(),
 ) {
@@ -56,23 +60,6 @@ fun PriorityInput(
 
         var showDatePickerDialog by remember { mutableStateOf(false) }
         var showTimePickerDialog by remember { mutableStateOf(false) }
-
-        if (showDatePickerDialog) {
-            PriorityDatePicker { showDatePickerDialog = false }
-        }
-
-        if (showTimePickerDialog) {
-            val displayTime = planTime()
-            val timePickerState = rememberTimePickerState(
-                initialHour = displayTime.hour,
-                initialMinute = displayTime.minute
-            )
-            PriorityTimePickerDialog(
-                dismissTimePicker = { showTimePickerDialog = false },
-                onTimeChange = { onTimeChange(timePickerState.hour, timePickerState.minute) },
-                state = timePickerState
-            )
-        }
 
         val showPlanInput by remember(priority) {
             derivedStateOf { priority == Plan }
@@ -92,21 +79,55 @@ fun PriorityInput(
                     .padding(10.dp)
             ) {
                 if (showPlanInput) {
+
+                    val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
+
+                    if (showDatePickerDialog) {
+                        val datePickerState = rememberDatePickerState(
+                            initialSelectedDateMillis = planModel.epochMs
+                        )
+
+                        PriorityDatePicker(
+                            dismissDialog = { showDatePickerDialog = false },
+                            onDateChange = {
+                                datePickerState.selectedDateMillis?.let { onDateChange(it) }
+                            },
+                            state = datePickerState
+                        )
+                    }
+
+                    if (showTimePickerDialog) {
+                        val timePickerState = rememberTimePickerState(
+                            initialHour = planModel.hour,
+                            initialMinute = planModel.minute
+                        )
+                        PriorityTimePicker(
+                            dismissTimePicker = { showTimePickerDialog = false },
+                            onTimeChange = {
+                                onTimeChange(
+                                    timePickerState.hour,
+                                    timePickerState.minute
+                                )
+                            },
+                            state = timePickerState
+                        )
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         PriorityButton(
                             onSelected = { showDatePickerDialog = true },
-                            text = "Today",
+                            text = getRelativeDate(planModel, timeFormatter),
                             shape = RoundedCornerShape(percent = 50)
                         )
 
                         Spacer(modifier = Modifier.width(16.dp))
 
-                        val time by remember {
+                        val time by remember(displayTime) {
                             derivedStateOf {
-                                timeFormatter.formatTimeOnly(planTime().toString())
+                                timeFormatter.formatTimeOnly(displayTime.toString())
                             }
                         }
 
@@ -115,6 +136,10 @@ fun PriorityInput(
                             text = time ?: "",
                             shape = RoundedCornerShape(percent = 50)
                         )
+
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        SchedulePermissionRequester()
                     }
                 }
             }
@@ -128,8 +153,20 @@ fun PriorityInput(
 }
 
 @Composable
+private fun getRelativeDate(
+    planModel: PlanModel,
+    timeFormatter: TimeFormatter
+) = when (planModel.relativeDisplay) {
+    RelativeDateDisplay.Today -> stringResource(R.string.relative_today)
+    RelativeDateDisplay.Tomorrow -> stringResource(R.string.relative_tomorrow)
+    RelativeDateDisplay.Date -> {
+        timeFormatter.formatTimeDayAndMonth(planModel.planTime.toString()) ?: "Error"
+    }
+}
+
+@Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun PriorityTimePickerDialog(
+private fun PriorityTimePicker(
     dismissTimePicker: () -> Unit,
     onTimeChange: () -> Unit,
     state: TimePickerState = rememberTimePickerState()
@@ -177,21 +214,16 @@ private fun PriorityTimePickerDialog(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityDatePicker(
-    dismissDialog: () -> Unit
+    dismissDialog: () -> Unit,
+    onDateChange: () -> Unit,
+    state: DatePickerState = rememberDatePickerState()
 ) {
-    val datePickerState = rememberDatePickerState(
-        yearRange = IntRange(2023, 2024) // TODO: this should be dynamic
-    )
     DatePickerDialog(
-        onDismissRequest = {
-            // Dismiss the dialog when the user clicks outside the dialog or on the back
-            // button. If you want to disable that functionality, simply use an empty
-            // onDismissRequest.
-            dismissDialog()
-        },
+        onDismissRequest = { dismissDialog() },
         confirmButton = {
             TextButton(
                 onClick = {
+                    onDateChange()
                     dismissDialog()
                 },
                 enabled = true
@@ -209,6 +241,6 @@ private fun PriorityDatePicker(
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(state = state)
     }
 }

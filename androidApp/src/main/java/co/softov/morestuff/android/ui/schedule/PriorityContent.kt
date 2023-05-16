@@ -71,58 +71,60 @@ fun PriorityContent(
         taskChatAction = viewModel::showTaskChat,
     )
 
-    LazyColumn(
-        state = state.listState,
-        modifier = modifier
-            .fillMaxSize()
-            .reorderable(state),
-        contentPadding = PaddingValues(8.dp)
-    ) {
-        items(viewModel.tasks, key = { it.id }) {
-            val item by rememberUpdatedState(it)
-            val dismissState = rememberDismissState(
-                confirmValueChange = { dismissValue ->
-                    if (dismissValue == DismissValue.DismissedToEnd) {
-                        viewModel.completeTask(item)
-                        true
-                    } else false
-                }
-            )
-
-            var willDismissDirection: DismissDirection? by remember {
-                mutableStateOf(null)
-            }
-
-            LaunchedEffect(key1 = Unit, block = {
-                snapshotFlow { dismissState.dismissDirection }
-                    .collect { dismissDirection ->
-                        willDismissDirection = dismissDirection
-                    }
-            })
-
-            val haptic = LocalHapticFeedback.current
-            LaunchedEffect(key1 = willDismissDirection, block = {
-                if (willDismissDirection != null) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            })
-
-            ReorderableItem(state, key = it.id) { isDragging ->
-                SwipeToDismiss(
-                    state = dismissState,
-                    background = { SwipeBackground(dismissState) },
-                    dismissContent = {
-                        TaskItem(
-                            it,
-                            Modifier.detectReorderAfterLongPress(state),
-                            isDragging = isDragging,
-                            taskActions = taskActions
-                        )
+    Box(modifier) {
+        LazyColumn(
+            state = state.listState,
+            modifier = modifier
+                .fillMaxSize()
+                .reorderable(state),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            items(viewModel.tasks, key = { it.id }) {
+                val item by rememberUpdatedState(it)
+                val dismissState = rememberDismissState(
+                    confirmValueChange = { dismissValue ->
+                        if (dismissValue == DismissValue.DismissedToEnd) {
+                            viewModel.completeTask(item)
+                            true
+                        } else false
                     }
                 )
+
+                var willDismissDirection: DismissDirection? by remember {
+                    mutableStateOf(null)
+                }
+
+                LaunchedEffect(key1 = Unit, block = {
+                    snapshotFlow { dismissState.dismissDirection }
+                        .collect { dismissDirection ->
+                            willDismissDirection = dismissDirection
+                        }
+                })
+
+                val haptic = LocalHapticFeedback.current
+                LaunchedEffect(key1 = willDismissDirection, block = {
+                    if (willDismissDirection != null) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                })
+
+                ReorderableItem(state, key = it.id) { isDragging ->
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = { SwipeBackground(dismissState) },
+                        dismissContent = {
+                            TaskItem(
+                                it,
+                                Modifier.detectReorderAfterLongPress(state),
+                                isDragging = isDragging,
+                                taskActions = taskActions
+                            )
+                        }
+                    )
+                }
+
+
             }
-
-
         }
     }
 }
@@ -155,7 +157,7 @@ fun TaskItem(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = "${task.title} * ${task.id} * ${task.priorityScore}",
+                text = "${task.title} * id: ${task.id} * score: ${task.priorityScore}",
                 textAlign = TextAlign.Start,
                 modifier = Modifier.padding(4.dp)
             )
@@ -173,7 +175,7 @@ fun SwipeBackground(dismissState: DismissState) {
             DismissValue.Default -> Color.LightGray
             DismissValue.DismissedToEnd -> Color.Green
             DismissValue.DismissedToStart -> Color.Red
-        }
+        }, label = "Color animation"
     )
     val alignment = when (direction) {
         DismissDirection.StartToEnd -> Alignment.CenterStart
@@ -184,7 +186,8 @@ fun SwipeBackground(dismissState: DismissState) {
         DismissDirection.EndToStart -> Icons.Default.Delete
     }
     val scale by animateFloatAsState(
-        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+        if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,
+        label = "Scale animation"
     )
 
     Box(
