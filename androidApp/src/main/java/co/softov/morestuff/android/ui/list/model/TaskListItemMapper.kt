@@ -4,7 +4,10 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 
-class TaskListItemMapper(private val timeFormatter: TimeFormatter, private val timeManager: TimeManager) {
+class TaskListItemMapper(
+    private val timeFormatter: TimeFormatter,
+    private val timeManager: TimeManager,
+) {
     fun map(input: TaskDomain): TaskListItemViewModel {
         val inputDateTime = timeManager.nowLocalDateTimeString
 

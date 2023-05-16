@@ -6,6 +6,7 @@ import arrow.core.Either.Right
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.TaskData
 import co.softov.morestuff.android.data.mapper.TaskDataMapper
+import co.softov.morestuff.android.data.mapper.mapCompleteTaskData
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
@@ -64,10 +65,20 @@ class TaskRepositoryImpl(
         return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskData) }
     }
 
-    override suspend fun getCompleteTasksFlow(): Flow<List<TaskDomain>> = taskQueries
-        .selectAllComplete(mapper = ::TaskDomain)
-        .asFlow()
-        .mapToList()
+    override fun getNowTasksFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.selectHighestPriorityTasks().asFlow().mapToList()
+            .map { mapList(it, mapTaskData) }
+    }
+
+    override fun getLaterTasksFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.selectLowestPriorityTasks().asFlow().mapToList()
+            .map { mapList(it, mapTaskData) }
+    }
+
+    override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.selectAllComplete().asFlow().mapToList()
+            .map { mapList(it, ::mapCompleteTaskData) }
+    }
 
     override suspend fun getHighestPriorityScore(): Long = taskQueries
         .selectHighestPriorityScore().executeAsOne().max ?: 0

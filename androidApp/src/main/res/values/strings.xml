@@ -58,7 +58,7 @@
     <string name="page_title_active">Active</string>
     <string name="page_title_complete">Complete</string>
     <string name="page_title_schedule">Schedule</string>
-    <string name="page_title_today">Today</string>
+    <string name="page_title_now">Now</string>
     <string name="page_title_tomorrow">Tomorrow</string>
     <string name="page_title_later">Later</string>
     <string name="textfield_desc">Text Input</string>

@@ -5,21 +5,14 @@ import androidx.compose.ui.res.stringResource
 import co.softov.morestuff.android.R
 
 enum class PageType {
-    PAGE_ACTIVE_TASKS,
     PAGE_COMPLETE_TASKS,
-    PAGE_ACTIVE_SCHEDULES,
-    PAGE_ACTIVE_TODAY,
-    PAGE_ACTIVE_TOMORROW,
+    PAGE_ACTIVE_NOW,
     PAGE_ACTIVE_LATER
 }
 
 val PageType.title
-    @Composable get() = when(this) {
-        PageType.PAGE_ACTIVE_TASKS -> stringResource(id = R.string.page_title_active)
+    @Composable get() = when (this) {
         PageType.PAGE_COMPLETE_TASKS -> stringResource(id = R.string.page_title_complete)
-        PageType.PAGE_ACTIVE_SCHEDULES -> stringResource(id = R.string.page_title_schedule)
-        PageType.PAGE_ACTIVE_TODAY -> stringResource(id = R.string.page_title_today)
-        PageType.PAGE_ACTIVE_TOMORROW -> stringResource(id = R.string.page_title_tomorrow)
+        PageType.PAGE_ACTIVE_NOW -> stringResource(id = R.string.page_title_now)
         PageType.PAGE_ACTIVE_LATER -> stringResource(id = R.string.page_title_later)
     }
-

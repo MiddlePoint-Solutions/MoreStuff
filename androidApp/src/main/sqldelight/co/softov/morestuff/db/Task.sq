@@ -33,6 +33,18 @@ SELECT max(priority_score) FROM task;
 selectLowestPriorityScore:
 SELECT min(priority_score) FROM task;
 
+selectHighestPriorityTasks:
+SELECT *
+FROM task
+WHERE priority_score > 0 AND complete_time IS NULL
+ORDER BY priority_score DESC;
+
+selectLowestPriorityTasks:
+SELECT *
+FROM task
+WHERE priority_score < 0 AND complete_time IS NULL
+ORDER BY priority_score DESC;
+
 selectTaskById:
 SELECT *
 FROM task
