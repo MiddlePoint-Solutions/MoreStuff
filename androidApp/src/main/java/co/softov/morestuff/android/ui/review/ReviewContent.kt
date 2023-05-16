@@ -7,7 +7,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.*
@@ -35,8 +34,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
-import co.softov.morestuff.android.ui.priority.PriorityButton
+import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.launch
@@ -182,15 +180,15 @@ fun ReviewContent(
     }
 }
 
-private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.lastSwipedItem() =
+private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.lastSwipedItem() =
     reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }?.run {
         getOrNull(indexOf(this) + 1)
     } ?: firstOrNull()
 
-private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleOrNull() =
+private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.firstVisibleOrNull() =
     reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }
 
-private fun List<Pair<ScheduleListItemViewModel, SwipeableCardState>>.firstVisibleStateOrNull() =
+private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
 
 @Composable
@@ -241,9 +239,9 @@ private fun PriorityReviewTopBar(
 
 @Composable
 private fun ReviewSwipeControls(
-    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
+    states: List<Pair<TaskListItemViewModel, SwipeableCardState>>,
     modifier: Modifier = Modifier,
-    undoAction: (ScheduleListItemViewModel) -> Unit = {},
+    undoAction: (TaskListItemViewModel) -> Unit = {},
     key: Any? = Unit,
 ) {
 
@@ -336,8 +334,8 @@ private fun ReviewSwipeControls(
 @OptIn(ExperimentalSwipeableCardApi::class)
 private fun TaskPrioritySwipe(
     modifier: Modifier,
-    states: List<Pair<ScheduleListItemViewModel, SwipeableCardState>>,
-    onSwiped: (schedule: ScheduleListItemViewModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
+    states: List<Pair<TaskListItemViewModel, SwipeableCardState>>,
+    onSwiped: (schedule: TaskListItemViewModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
 ) {
 
     Box(
@@ -345,10 +343,10 @@ private fun TaskPrioritySwipe(
             .padding(24.dp)
             .fillMaxSize()
     ) {
-        states.forEachIndexed { index, (schedule, state) ->
+        states.forEachIndexed { index, (task, state) ->
             if (state.swipedDirection == null) {
 
-                val selectedState = remember(schedule.taskId) { MutableTransitionState(false) }
+                val selectedState = remember(task.id) { MutableTransitionState(false) }
                 val selectedTransition = updateTransition(selectedState, "Selected Transition")
                 val ratio by selectedTransition.animateFloat(label = "AspectRatio") {
                     if (it) 0.8f else 1f
@@ -356,7 +354,7 @@ private fun TaskPrioritySwipe(
 
                 TaskCard(
                     modifier = modifier
-                        .layoutId(schedule.taskId)
+                        .layoutId(task.id)
                         .fillMaxSize()
                         .aspectRatio(ratio)
                         .swipableCard(state = state)
@@ -366,12 +364,12 @@ private fun TaskPrioritySwipe(
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
                         },
-                    schedule = schedule
+                    task = task
                 )
             }
-            LaunchedEffect(schedule, state.swipedDirection) {
+            LaunchedEffect(task, state.swipedDirection) {
                 state.swipedDirection?.let {
-                    onSwiped(schedule, it, states.first().first == schedule)
+                    onSwiped(task, it, states.first().first == task)
                 }
             }
         }
@@ -401,7 +399,7 @@ private fun CircleButton(
 @Composable
 private fun TaskCard(
     modifier: Modifier = Modifier,
-    schedule: ScheduleListItemViewModel,
+    task: TaskListItemViewModel,
 ) {
     Card(
         modifier = modifier,
@@ -423,7 +421,7 @@ private fun TaskCard(
         ) {
             Column(Modifier.align(Alignment.Center)) {
                 Text(
-                    text = schedule.taskTitle,
+                    text = task.title,
                     color = MaterialTheme.colorScheme.onPrimary,
                     textAlign = TextAlign.Center,
                     fontSize = 22.sp,
@@ -513,7 +511,7 @@ fun TaskCardPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskCard(
             modifier = Modifier.aspectRatio(1f),
-            schedule = ScheduleListItemViewModel(taskTitle = "Hellooooo there")
+            task = TaskListItemViewModel(title = "Hellooooo there", createTime = "", completeTime = "", id = 0L)
         )
     }
 }
