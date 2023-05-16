@@ -3,25 +3,37 @@ package co.softov.morestuff.android.ui.review
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
-import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
+import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTaskUseCase
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
-import co.softov.morestuff.android.presentation.presenter.ReviewRound.*
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemMapper
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
+import co.softov.morestuff.android.presentation.presenter.ReviewRound.Priority
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.OnDone
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.OnHighPriority
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.OnLowPriority
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.OnTomorrow
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupInitialRound
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupRound
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.Undo
+import co.softov.morestuff.android.ui.list.model.TaskListItemMapper
+import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ReviewViewModel(
-    private val getSchedulesForPriorityReviewUseCase: GetReviewSchedulesUseCase
+    private val getTasksForReviewUseCase: GetReviewTaskUseCase,
+    timeManager: TimeManager,
+    timeFormatter: TimeFormatter
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
-    private val mapper = ScheduleListItemMapper()
+    private val mapper = TaskListItemMapper(timeFormatter, timeManager)
     private var roundEndDelayJob: Job? = null
 
     override val enableDebug: Boolean
@@ -76,10 +88,14 @@ class ReviewViewModel(
 
     private fun setInitialState(round: ReviewRound = Priority) {
         viewModelScope.launch {
-            val schedules = getSchedulesForPriorityReviewUseCase().map(mapper::map).shuffled()
-            sendEvent(SetupInitialRound(round, schedules))
+            val task = getTasksForReviewUseCase()
+                .first() // Get the first emitted list from the flow
+                .map(mapper::map) // Convert each TaskDomain to TaskListItemViewModel
+            sendEvent(SetupInitialRound(round, task))
         }
     }
+
+
 
     fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
         state = state.copy(
@@ -93,34 +109,34 @@ class ReviewViewModel(
         setInitialState()
     }
 
-    fun undoTask(schedule: ScheduleListItemViewModel) {
-        Timber.d("undoTask: $schedule")
+    fun undoTask(task: TaskListItemViewModel) {
+        Timber.d("undoTask: $task")
         roundEndDelayJob?.cancel()
-        sendEvent(Undo(schedule))
+        sendEvent(Undo(task))
     }
 
     private fun confirmResults() {
         dispatchAppStoreAction(
             ReviewAction.ScheduleReviewResults(
-                tomorrow = state.tomorrow.map { it.taskId },
-                high = state.high.map { it.taskId },
-                low = state.low.map { it.taskId },
-                done = state.done.map { it.taskId },
+                tomorrow = state.tomorrow.map { it.id },
+                high = state.high.map { it.id },
+                low = state.low.map { it.id },
+                done = state.done.map { it.id },
             )
         )
     }
 
     fun onTaskSwiped(
-        schedule: ScheduleListItemViewModel,
+        task: TaskListItemViewModel,
         direction: SwipeDirection,
         isLast: Boolean
     ) {
         Timber.d("onTaskSwiped: $isLast")
         val event = when (direction) {
-            SwipeDirection.Left -> OnLowPriority(schedule)
-            SwipeDirection.Right -> OnHighPriority(schedule)
-            SwipeDirection.Up -> OnDone(schedule)
-            SwipeDirection.Down -> OnTomorrow(schedule)
+            SwipeDirection.Left -> OnLowPriority(task)
+            SwipeDirection.Right -> OnHighPriority(task)
+            SwipeDirection.Up -> OnDone(task)
+            SwipeDirection.Down -> OnTomorrow(task)
         }
         sendEvent(event)
 
