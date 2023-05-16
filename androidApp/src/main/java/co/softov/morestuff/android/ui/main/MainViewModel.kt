@@ -100,4 +100,8 @@ class MainViewModel(
         router.showBottomSheet(Screens.taskLists)
     }
 
+    fun showTaskChat(taskId: Long) {
+
+    }
+
 }

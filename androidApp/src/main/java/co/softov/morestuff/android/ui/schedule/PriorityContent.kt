@@ -71,58 +71,60 @@ fun PriorityContent(
         taskChatAction = viewModel::showTaskChat,
     )
 
-    LazyColumn(
-        state = state.listState,
-        modifier = modifier
-            .fillMaxSize()
-            .reorderable(state),
-        contentPadding = PaddingValues(8.dp)
-    ) {
-        items(viewModel.tasks, key = { it.id }) {
-            val item by rememberUpdatedState(it)
-            val dismissState = rememberDismissState(
-                confirmValueChange = { dismissValue ->
-                    if (dismissValue == DismissValue.DismissedToEnd) {
-                        viewModel.completeTask(item)
-                        true
-                    } else false
-                }
-            )
-
-            var willDismissDirection: DismissDirection? by remember {
-                mutableStateOf(null)
-            }
-
-            LaunchedEffect(key1 = Unit, block = {
-                snapshotFlow { dismissState.dismissDirection }
-                    .collect { dismissDirection ->
-                        willDismissDirection = dismissDirection
-                    }
-            })
-
-            val haptic = LocalHapticFeedback.current
-            LaunchedEffect(key1 = willDismissDirection, block = {
-                if (willDismissDirection != null) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            })
-
-            ReorderableItem(state, key = it.id) { isDragging ->
-                SwipeToDismiss(
-                    state = dismissState,
-                    background = { SwipeBackground(dismissState) },
-                    dismissContent = {
-                        TaskItem(
-                            it,
-                            Modifier.detectReorderAfterLongPress(state),
-                            isDragging = isDragging,
-                            taskActions = taskActions
-                        )
+    Box(modifier) {
+        LazyColumn(
+            state = state.listState,
+            modifier = modifier
+                .fillMaxSize()
+                .reorderable(state),
+            contentPadding = PaddingValues(8.dp)
+        ) {
+            items(viewModel.tasks, key = { it.id }) {
+                val item by rememberUpdatedState(it)
+                val dismissState = rememberDismissState(
+                    confirmValueChange = { dismissValue ->
+                        if (dismissValue == DismissValue.DismissedToEnd) {
+                            viewModel.completeTask(item)
+                            true
+                        } else false
                     }
                 )
+
+                var willDismissDirection: DismissDirection? by remember {
+                    mutableStateOf(null)
+                }
+
+                LaunchedEffect(key1 = Unit, block = {
+                    snapshotFlow { dismissState.dismissDirection }
+                        .collect { dismissDirection ->
+                            willDismissDirection = dismissDirection
+                        }
+                })
+
+                val haptic = LocalHapticFeedback.current
+                LaunchedEffect(key1 = willDismissDirection, block = {
+                    if (willDismissDirection != null) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                })
+
+                ReorderableItem(state, key = it.id) { isDragging ->
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = { SwipeBackground(dismissState) },
+                        dismissContent = {
+                            TaskItem(
+                                it,
+                                Modifier.detectReorderAfterLongPress(state),
+                                isDragging = isDragging,
+                                taskActions = taskActions
+                            )
+                        }
+                    )
+                }
+
+
             }
-
-
         }
     }
 }
