@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.service
 
-import co.softov.morestuff.android.domain.enums.RelativeDate
+import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -128,6 +128,7 @@ interface TimeManager {
 
     fun getDefaultPlanTime(): LocalDateTime
 
-    fun getRelativeDate(timeString: String): RelativeDate
+    fun getRelativeDate(timeString: String): RelativeDateDisplay
 
+    fun epochMillisToLocalDateTime(epochMillis: Long, hour: Int = 0, minute: Int = 0): LocalDateTime
 }

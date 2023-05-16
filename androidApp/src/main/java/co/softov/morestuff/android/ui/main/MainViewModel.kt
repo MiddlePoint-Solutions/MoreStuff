@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
+import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
@@ -17,7 +19,9 @@ import co.softov.morestuff.android.ui.Screens
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import timber.log.Timber
 
 class MainViewModel(
     getMessagesUseCase: GetMessagesUseCase,
@@ -35,17 +39,47 @@ class MainViewModel(
     var priorityModel by mutableStateOf(PriorityUI.Now)
         private set
 
-    var planTime: LocalDateTime by mutableStateOf(timeManager.getDefaultPlanTime())
+    var planModel by mutableStateOf(createPlanModel())
+        private set
+
+    private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
+        PlanModel(
+            planTime = this,
+            hour = hour,
+            minute = minute,
+            epochMs = currentTimeZoneInstant.toEpochMilliseconds()
+        )
+    }
+
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        planTime = timeManager.localDateTime(planTime, hour, minute)
+        val updatedPlanTime = timeManager.localDateTime(planModel.planTime, hour, minute)
+        planModel = planModel.copy(
+            planTime = updatedPlanTime,
+            hour = hour,
+            minute = minute,
+            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
+        )
+    }
+
+    fun updatePlanDate(dateMillis: Long) {
+        Timber.d("updatePlanDate: $dateMillis")
+        val updatedPlanTime =
+            timeManager.epochMillisToLocalDateTime(dateMillis, planModel.hour, planModel.minute)
+        planModel = planModel.copy(
+            planTime = updatedPlanTime,
+            relativeDisplay = timeManager.getRelativeDate(updatedPlanTime.toString()),
+            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
+        )
+        Timber.d("updatePlanDate: $planModel")
+
     }
 
     fun addNewTask(title: String) {
         val priority = when (priorityModel) {
             PriorityUI.Now -> Priority.Now()
             PriorityUI.Later -> Priority.Later()
-            PriorityUI.Plan -> Priority.Plan(planTime.toString())
+            PriorityUI.Plan -> Priority.Plan(planModel.planTime.toString())
         }
         store.dispatch(TaskAction.CreateUserTaskAction(title, priority))
     }
@@ -64,6 +98,10 @@ class MainViewModel(
 
     fun showTaskList() {
         router.showBottomSheet(Screens.taskLists)
+    }
+
+    fun showTaskChat(taskId: Long) {
+
     }
 
 }
