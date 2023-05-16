@@ -6,7 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityViewState
@@ -19,6 +21,8 @@ import kotlinx.coroutines.launch
 
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val decreaseTaskPriorityScoreUseCase: DecreaseTaskPriorityScoreUseCase,
+    private val increaseTaskPriorityScoreUseCase: IncreaseTaskPriorityScoreUseCase,
 ) : BaseViewModel<PriorityViewState, PriorityViewEvent>(PriorityViewState()) {
 
     override val enableDebug: Boolean
@@ -67,24 +71,23 @@ class PriorityViewModel(
 
 
 //TODO: reorder task items and add new score:
-//
-// fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
-//        tasks = tasks.toMutableList().apply {
-//            val movedTask = removeAt(fromPosition)
-//            add(toPosition, movedTask)
-//
-//            if (toPosition > fromPosition) {
-//                viewModelScope.launch {
-//                    decreaseTaskPriorityScoreUseCase(movedTask.id)
-//                }
-//            } else {
-//                viewModelScope.launch {
-//                    increaseTaskPriorityScoreUseCase(movedTask.id)
-//                }
-//            }
-//        }
-//    }
 
+    /* fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+            tasks = tasks.toMutableList().apply {
+                val movedTask = removeAt(fromPosition)
+                add(toPosition, movedTask)
+
+               if (toPosition > fromPosition) {
+                   viewModelScope.launch {
+                        decreaseTaskPriorityScoreUseCase(movedTask.id)
+                    }
+                } else {
+                    viewModelScope.launch {
+                        increaseTaskPriorityScoreUseCase(movedTask.id)
+                    }
+                }
+            }
+        }*/
 
 
     fun completeTask(item: TaskDomain) {

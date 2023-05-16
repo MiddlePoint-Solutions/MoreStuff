@@ -1,28 +1,34 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
+import arrow.core.getOrElse
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class DecreaseTaskPriorityScoreUseCaseTest {
+class DecreaseTaskPriorityScoreUseCaseImplTest {
 
-    private val mockTaskRepository: TaskRepository = mockk()
-    private val decreaseTaskScore = DecreaseTaskPriorityScoreUseCaseImpl(mockTaskRepository)
-
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `Given a task id, when use case is invoked, then verify the priority score is decreased`() {
-        runBlocking {
-            val taskId: Long = 1
-            val expected = Either.Right(true)
+    fun `should decrease task priority score when invoked`() = runTest {
+        val taskRepository: TaskRepository = mockk()
+        val useCase = IncreaseTaskPriorityScoreUseCaseImpl(taskRepository)
+        val taskId = 1L
+        val initialPriorityScore = 5L
+        val increasedPriorityScore = initialPriorityScore - 1
 
-            coEvery { mockTaskRepository.decreaseTaskPriorityScore(taskId) } returns expected
-            val result = decreaseTaskScore.invoke(taskId)
+        coEvery { taskRepository.increaseTaskPriorityScore(taskId) } returns Either.Right(
+            increasedPriorityScore
+        )
+        val result = useCase.invoke(taskId)
 
-            assertEquals(expected, result)
-        }
+        assert(result.isRight())
+        assert(result.getOrElse { 0L } == increasedPriorityScore)
+        coVerify(exactly = 1) { taskRepository.increaseTaskPriorityScore(taskId) }
     }
 }

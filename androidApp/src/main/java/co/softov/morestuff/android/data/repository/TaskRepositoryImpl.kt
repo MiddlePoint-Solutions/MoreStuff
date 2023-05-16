@@ -122,24 +122,25 @@ class TaskRepositoryImpl(
         task_type = taskType
     )
 
-    override suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean> {
+    override suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
         return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
             null -> Left(TaskDoesNotExist)
             else -> taskQueries.transactionWithResult {
                 val newPriorityScore = taskDb.priority_score + 1
                 taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
-                Right(true)
+                Right(newPriorityScore)
             }
         }
     }
 
-    override suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Boolean> {
+
+    override suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
         return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
             null -> Left(TaskDoesNotExist)
             else -> taskQueries.transactionWithResult {
                 val newPriorityScore = taskDb.priority_score - 1
                 taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
-                Right(true)
+                Right(newPriorityScore)
             }
         }
     }
