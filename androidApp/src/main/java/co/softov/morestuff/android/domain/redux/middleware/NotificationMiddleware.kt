@@ -67,7 +67,7 @@ class NotificationMiddleware(
                 notifier.userInteractedWithNotification(action.scheduleId)
             }
 
-            is ReviewAction.ScheduleReviewResults -> {
+            is ReviewAction.TaskReviewResults -> {
                 notifier.cancelReminderNotifications()
             }
 

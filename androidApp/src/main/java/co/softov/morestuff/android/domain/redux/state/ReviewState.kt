@@ -9,7 +9,7 @@ data class ReviewState(
 )
 
 sealed class ReviewAction : Action.FeatureAction() {
-    data class ScheduleReviewResults(
+    data class TaskReviewResults(
         val tomorrow: List<Long>,
         val high: List<Long>,
         val low: List<Long>,

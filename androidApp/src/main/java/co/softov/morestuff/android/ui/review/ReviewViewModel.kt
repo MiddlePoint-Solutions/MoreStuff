@@ -117,7 +117,7 @@ class ReviewViewModel(
 
     private fun confirmResults() {
         dispatchAppStoreAction(
-            ReviewAction.ScheduleReviewResults(
+            ReviewAction.TaskReviewResults(
                 tomorrow = state.tomorrow.map { it.id },
                 high = state.high.map { it.id },
                 low = state.low.map { it.id },
