@@ -37,6 +37,8 @@ interface TaskRepository {
         aboveTaskId: Long,
         priorityScore: Long
     ): Either<Failure, Long>
+
+    suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
 }
 
 object TaskDoesNotExist : FeatureFailure

@@ -105,6 +105,7 @@ val taskUseCases = module {
     factoryOf(::GetLaterTaskUseCaseImpl) bind GetLaterTaskUseCase::class
     factoryOf(::GetNowTaskUseCaseImpl) bind GetNowTaskUseCase::class
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
+    factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
 }
 
 

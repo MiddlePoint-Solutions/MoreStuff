@@ -85,6 +85,7 @@ class ReviewViewModel(
     fun undo(item: ReviewItemUiModel) {
         Timber.d("undoTask: $item")
         roundEndDelayJob?.cancel()
+        dispatchAppStoreAction(ReviewAction.UndoReviewTaskUpdateAction(item.id, item.priorityScore))
         sendEvent(Undo(item))
     }
 

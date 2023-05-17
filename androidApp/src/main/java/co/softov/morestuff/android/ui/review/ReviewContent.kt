@@ -35,7 +35,6 @@ import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
-import co.softov.morestuff.android.ui.model.TaskListItemViewModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.launch
@@ -103,9 +102,10 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
-                                states = states,
-                                modifier = modifier.align(Alignment.BottomCenter),
+                                lastItemSwiped = { states.lastSwipedItem() },
+                                firstVisibleState = { states.firstVisibleStateOrNull() },
                                 undoAction = viewModel::undo,
+                                modifier = modifier.align(Alignment.BottomCenter),
                                 key = model.round
                             )
                         }
@@ -238,24 +238,21 @@ private fun PriorityReviewTopBar(
 
 @Composable
 private fun ReviewSwipeControls(
-    states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
+    lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+    firstVisibleState: () -> SwipeableCardState?,
+    undoAction: (ReviewItemUiModel) -> Unit,
     modifier: Modifier = Modifier,
-    undoAction: (ReviewItemUiModel) -> Unit = {},
     key: Any? = Unit,
 ) {
 
     val scope = rememberCoroutineScope()
 
-    val undoLastAction: () -> Unit = remember(key) {
-        {
-            scope.launch {
-                states.run {
-                    Timber.d("Undoing")
-                    lastSwipedItem()?.let { lastItem ->
-                        lastItem.second.undo()
-                        undoAction(lastItem.first)
-                    }
-                }
+    val undoLastAction: () -> Unit = {
+        scope.launch {
+            Timber.d("Undoing")
+            lastItemSwiped()?.let { lastItem ->
+                lastItem.second.undo()
+                undoAction(lastItem.first)
             }
         }
     }
@@ -263,7 +260,7 @@ private fun ReviewSwipeControls(
     val lowAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
+                firstVisibleState()?.swipe(SwipeDirection.Left)
             }
         }
     }
@@ -271,7 +268,7 @@ private fun ReviewSwipeControls(
     val highAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
+                firstVisibleState()?.swipe(SwipeDirection.Right)
             }
         }
     }
@@ -279,7 +276,7 @@ private fun ReviewSwipeControls(
     val doneAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
+                firstVisibleState()?.swipe(SwipeDirection.Up)
             }
         }
     }
@@ -287,7 +284,7 @@ private fun ReviewSwipeControls(
     val laterAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
+                firstVisibleState()?.swipe(SwipeDirection.Down)
             }
         }
     }
@@ -524,6 +521,6 @@ fun TaskCardPreview() {
 @Composable
 fun ReviewSwipeControlsPreview() {
     MoreStuffTheme(darkTheme = true) {
-        ReviewSwipeControls(listOf())
+        ReviewSwipeControls({ null }, { null }, {})
     }
 }
