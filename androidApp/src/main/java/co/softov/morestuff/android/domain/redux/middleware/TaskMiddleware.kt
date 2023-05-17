@@ -10,7 +10,9 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import kotlinx.coroutines.CoroutineScope
@@ -35,12 +37,19 @@ sealed class TaskAction : Action.FeatureAction() {
         val task: TaskDomain,
         val priority: Priority
     ) : TaskAction()
+
+    data class DecreaseTaskPriorityScoreAction(val taskId: List<Long>): TaskAction()
+    data class IncreaseTaskPriorityScoreAction (val taskId: List<Long>): TaskAction()
+
 }
+
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
     private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
+    private val decreaseTaskPriorityScoreUseCase: DecreaseTaskPriorityScoreUseCase,
+    private val increaseTaskPriorityScoreUseCase: IncreaseTaskPriorityScoreUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -75,6 +84,20 @@ class TaskMiddleware(
             is CompleteTasksAction -> scope.launch {
                 with(action) {
                     setTaskCompleteUseCase(taskIds, complete)
+                }
+            }
+            is DecreaseTaskPriorityScoreAction -> scope.launch {
+                with(action) {
+                    taskId.forEach { individualTaskId ->
+                        decreaseTaskPriorityScoreUseCase(individualTaskId)
+                    }
+                }
+            }
+            is IncreaseTaskPriorityScoreAction -> scope.launch {
+                with(action) {
+                    taskId.forEach { individualTaskId ->
+                        increaseTaskPriorityScoreUseCase(individualTaskId)
+                    }
                 }
             }
 

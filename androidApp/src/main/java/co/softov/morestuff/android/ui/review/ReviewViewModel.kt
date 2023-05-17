@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTaskUseCase
@@ -133,9 +134,18 @@ class ReviewViewModel(
     ) {
         Timber.d("onTaskSwiped: $isLast")
         val event = when (direction) {
-            SwipeDirection.Left -> OnLowPriority(task)
-            SwipeDirection.Right -> OnHighPriority(task)
-            SwipeDirection.Up -> OnDone(task)
+            SwipeDirection.Left -> {
+                dispatchAppStoreAction(TaskAction.DecreaseTaskPriorityScoreAction(listOf(task.id)))
+                OnLowPriority(task)
+            }
+            SwipeDirection.Right -> {
+                dispatchAppStoreAction(TaskAction.IncreaseTaskPriorityScoreAction(listOf(task.id)))
+                OnHighPriority(task)
+            }
+            SwipeDirection.Up -> {
+                dispatchAppStoreAction(TaskAction.CompleteTaskAction(task.id, true))
+                OnDone(task)
+            }
             SwipeDirection.Down -> OnTomorrow(task)
         }
         sendEvent(event)
