@@ -14,9 +14,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
-import co.softov.morestuff.android.ui.list.model.PageType
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
-import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
+import co.softov.morestuff.android.ui.model.PageType
+import co.softov.morestuff.android.ui.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.ui.model.TaskListItemViewModel
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -77,7 +77,7 @@ fun ScheduleListItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier,  itemAction: () -> Unit = {}) {
+fun TaskListItem(task: TaskListItemViewModel, modifier: Modifier = Modifier, itemAction: () -> Unit = {}) {
     Card(
         onClick = itemAction,
         elevation = CardDefaults.cardElevation(),

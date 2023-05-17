@@ -34,7 +34,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
-import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
+import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.launch
@@ -63,8 +63,6 @@ fun ReviewContent(
 
             val model by viewModel.uiModel.collectAsState()
 
-
-
             Box {
 
                 when (model.round) {
@@ -76,9 +74,9 @@ fun ReviewContent(
                         }
 
                         val states =
-                            model.roundItems.map { it to rememberSwipeableCardState(model.roundNumber) }
+                            model.items.map { it to rememberSwipeableCardState(model.round) }
 
-                        val visibleState = remember(model.roundNumber) {
+                        val visibleState = remember(model.round) {
                             MutableTransitionState(false)
                         }
 
@@ -104,21 +102,22 @@ fun ReviewContent(
                             modifier = modifier.align(Alignment.BottomCenter),
                         ) {
                             ReviewSwipeControls(
-                                states = states,
+                                lastItemSwiped = { states.lastSwipedItem() },
+                                firstVisibleState = { states.firstVisibleStateOrNull() },
+                                undoAction = viewModel::undo,
                                 modifier = modifier.align(Alignment.BottomCenter),
-                                undoAction = viewModel::undoTask,
-                                key = model.roundNumber
+                                key = model.round
                             )
                         }
 
-                        LaunchedEffect(key1 = model.roundNumber) {
+                        LaunchedEffect(key1 = model.round) {
                             visibleState.targetState = true
                         }
                     }
 
                     ReviewRound.Final -> {
 
-                        val visibleState = remember(model.roundNumber) {
+                        val visibleState = remember(model.round) {
                             MutableTransitionState(false)
                         }
                         val transition = updateTransition(visibleState, "Visible state")
@@ -144,7 +143,7 @@ fun ReviewContent(
                                     }
                             ) {
                                 when {
-                                    model.roundItems.isEmpty() -> {
+                                    model.items.isEmpty() -> {
                                         Text(
                                             "Wooops, nothing to work on? add a new task",
                                             modifier.align(Alignment.Center)
@@ -153,7 +152,7 @@ fun ReviewContent(
                                     }
 
                                     else -> {
-                                       // TODO(Joseph): go back to main screen
+                                        // TODO(Joseph): go back to main screen
                                     }
                                 }
                             }
@@ -170,7 +169,7 @@ fun ReviewContent(
 //                            )
 //                        }
 
-                        LaunchedEffect(key1 = model.roundNumber) {
+                        LaunchedEffect(key1 = model.round) {
                             visibleState.targetState = true
                         }
                     }
@@ -180,15 +179,15 @@ fun ReviewContent(
     }
 }
 
-private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.lastSwipedItem() =
+private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.lastSwipedItem() =
     reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }?.run {
         getOrNull(indexOf(this) + 1)
     } ?: firstOrNull()
 
-private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.firstVisibleOrNull() =
+private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull() =
     reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }
 
-private fun List<Pair<TaskListItemViewModel, SwipeableCardState>>.firstVisibleStateOrNull() =
+private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
 
 @Composable
@@ -239,24 +238,21 @@ private fun PriorityReviewTopBar(
 
 @Composable
 private fun ReviewSwipeControls(
-    states: List<Pair<TaskListItemViewModel, SwipeableCardState>>,
+    lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+    firstVisibleState: () -> SwipeableCardState?,
+    undoAction: (ReviewItemUiModel) -> Unit,
     modifier: Modifier = Modifier,
-    undoAction: (TaskListItemViewModel) -> Unit = {},
     key: Any? = Unit,
 ) {
 
     val scope = rememberCoroutineScope()
 
-    val undoLastAction: () -> Unit = remember(key) {
-        {
-            scope.launch {
-                states.run {
-                    Timber.d("Undoing")
-                    lastSwipedItem()?.let { lastItem ->
-                        lastItem.second.undo()
-                        undoAction(lastItem.first)
-                    }
-                }
+    val undoLastAction: () -> Unit = {
+        scope.launch {
+            Timber.d("Undoing")
+            lastItemSwiped()?.let { lastItem ->
+                lastItem.second.undo()
+                undoAction(lastItem.first)
             }
         }
     }
@@ -264,7 +260,7 @@ private fun ReviewSwipeControls(
     val lowAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Left)
+                firstVisibleState()?.swipe(SwipeDirection.Left)
             }
         }
     }
@@ -272,7 +268,7 @@ private fun ReviewSwipeControls(
     val highAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Right)
+                firstVisibleState()?.swipe(SwipeDirection.Right)
             }
         }
     }
@@ -280,7 +276,7 @@ private fun ReviewSwipeControls(
     val doneAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Up)
+                firstVisibleState()?.swipe(SwipeDirection.Up)
             }
         }
     }
@@ -288,7 +284,7 @@ private fun ReviewSwipeControls(
     val laterAction: () -> Unit = remember(key) {
         {
             scope.launch {
-                states.firstVisibleStateOrNull()?.swipe(SwipeDirection.Down)
+                firstVisibleState()?.swipe(SwipeDirection.Down)
             }
         }
     }
@@ -334,8 +330,8 @@ private fun ReviewSwipeControls(
 @OptIn(ExperimentalSwipeableCardApi::class)
 private fun TaskPrioritySwipe(
     modifier: Modifier,
-    states: List<Pair<TaskListItemViewModel, SwipeableCardState>>,
-    onSwiped: (schedule: TaskListItemViewModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
+    states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
+    onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
 ) {
 
     Box(
@@ -399,7 +395,7 @@ private fun CircleButton(
 @Composable
 private fun TaskCard(
     modifier: Modifier = Modifier,
-    task: TaskListItemViewModel,
+    task: ReviewItemUiModel,
 ) {
     Card(
         modifier = modifier,
@@ -439,8 +435,8 @@ private fun RoundInfo(
     modifier: Modifier = Modifier
 ) {
 
-    val info by remember(model.roundNumber) {
-        mutableStateOf("Round ${model.roundNumber} - ${model.round}")
+    val info by remember(model.round) {
+        mutableStateOf("Round ${model.round}")
     }
     val instructions by remember(model.round) {
         when (model.round) {
@@ -478,7 +474,7 @@ private fun RoundInfo(
         if (BuildConfig.DEBUG) {
 
             val total by remember {
-                mutableStateOf("Total: ${model.roundItems.size}")
+                mutableStateOf("Total: ${model.items.size}")
             }
 
             Text(
@@ -490,7 +486,7 @@ private fun RoundInfo(
             )
 
             val debug = with(model) {
-                "RoundItems: ${roundItems.size}  Tomorrow: ${tomorrow.size} High: ${high.size}  Low: ${low.size}  Done: ${done.size}"
+                "RoundItems: ${items.size}"
             }
 
             Text(
@@ -511,7 +507,12 @@ fun TaskCardPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskCard(
             modifier = Modifier.aspectRatio(1f),
-            task = TaskListItemViewModel(title = "Hellooooo there", createTime = "", completeTime = "", id = 0L)
+            task = ReviewItemUiModel(
+                title = "Hellooooo there",
+                createTime = "",
+                id = 0,
+                priorityScore = 0
+            )
         )
     }
 }
@@ -520,6 +521,6 @@ fun TaskCardPreview() {
 @Composable
 fun ReviewSwipeControlsPreview() {
     MoreStuffTheme(darkTheme = true) {
-        ReviewSwipeControls(listOf())
+        ReviewSwipeControls({ null }, { null }, {})
     }
 }

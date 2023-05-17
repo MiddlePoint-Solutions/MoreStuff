@@ -12,7 +12,6 @@ import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.Re
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationsAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderOverloadNotification
-import co.softov.morestuff.android.domain.redux.state.ReviewAction
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
@@ -65,10 +64,6 @@ class NotificationMiddleware(
 
             is ReminderAction.UserResponseAction -> {
                 notifier.userInteractedWithNotification(action.scheduleId)
-            }
-
-            is ReviewAction.TaskReviewResults -> {
-                notifier.cancelReminderNotifications()
             }
 
             else -> NoOp
