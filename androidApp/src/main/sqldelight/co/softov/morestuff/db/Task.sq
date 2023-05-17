@@ -19,7 +19,7 @@ selectAllActive:
 SELECT *
 FROM task
 WHERE complete_time IS NULL
-ORDER BY priority_score DESC, datetime(create_time) DESC;
+ORDER BY priority_score DESC;
 
 selectAllComplete:
 SELECT *
@@ -69,5 +69,10 @@ SELECT last_insert_rowid();
 
 updateTaskPriorityScore:
 UPDATE task
-SET priority_score = ?
-WHERE id = ?;
+SET priority_score = :priority_score
+WHERE id = :task_id;
+
+decrementTaskPriorityScore:
+UPDATE task
+SET priority_score = priority_score - 1
+WHERE id = :task_id OR priority_score < :priority_score;

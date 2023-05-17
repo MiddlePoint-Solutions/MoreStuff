@@ -63,8 +63,11 @@ fun PriorityContent(
 
     val state = rememberReorderableLazyListState(
         listState = listState,
-        onMove = { to, from ->
-            viewModel.reorderTaskItem(to.index, from.index)
+        onMove = { from, to ->
+            viewModel.updateTaskOrder(from.index, to.index)
+        },
+        onDragEnd = { start, end ->
+            viewModel.reorderTaskItem(start, end)
         }
     )
     val taskActions = TaskActions(
