@@ -6,9 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
-import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent
 import co.softov.morestuff.android.presentation.presenter.PriorityViewEvent.*
 import co.softov.morestuff.android.presentation.presenter.PriorityViewState
@@ -18,11 +17,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
-    private val decreaseTaskPriorityScoreUseCase: DecreaseTaskPriorityScoreUseCase,
-    private val increaseTaskPriorityScoreUseCase: IncreaseTaskPriorityScoreUseCase,
+    private val reorderTaskUseCase: ReorderTaskUseCase,
 ) : BaseViewModel<PriorityViewState, PriorityViewEvent>(PriorityViewState()) {
 
     override val enableDebug: Boolean
@@ -34,6 +33,8 @@ class PriorityViewModel(
 
     var tasks: List<TaskDomain> by mutableStateOf(listOf())
         private set
+
+    private var lastChange = 0 to 0
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun onLoadData() {
@@ -63,31 +64,23 @@ class PriorityViewModel(
         }
     }
 
-    fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+    fun updateTaskOrder(fromPosition: Int, toPosition: Int) {
         tasks = tasks.toMutableList().apply {
             add(toPosition, removeAt(fromPosition))
         }
+        lastChange = toPosition to fromPosition
     }
 
-
-//TODO: reorder task items and add new score:
-
-    /* fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
-            tasks = tasks.toMutableList().apply {
-                val movedTask = removeAt(fromPosition)
-                add(toPosition, movedTask)
-
-               if (toPosition > fromPosition) {
-                   viewModelScope.launch {
-                        decreaseTaskPriorityScoreUseCase(movedTask.id)
-                    }
-                } else {
-                    viewModelScope.launch {
-                        increaseTaskPriorityScoreUseCase(movedTask.id)
-                    }
-                }
+    fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
+        if (fromPosition != toPosition) {
+            Timber.d("lastChange: $lastChange")
+            val task1 = tasks[lastChange.first]
+            val task2 = tasks[lastChange.second]
+            viewModelScope.launch {
+                reorderTaskUseCase(task1.id, task2.id, task2.priorityScore)
             }
-        }*/
+        }
+    }
 
 
     fun completeTask(item: TaskDomain) {
