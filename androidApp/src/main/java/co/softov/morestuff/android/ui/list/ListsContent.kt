@@ -8,8 +8,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.ui.list.model.PageType
-import co.softov.morestuff.android.ui.list.model.title
+import co.softov.morestuff.android.ui.model.PageType
+import co.softov.morestuff.android.ui.model.title
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch

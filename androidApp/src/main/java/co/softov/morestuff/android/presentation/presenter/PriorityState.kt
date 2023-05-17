@@ -3,7 +3,7 @@ package co.softov.morestuff.android.presentation.presenter
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.ui.model.ScheduleListItemViewModel
 
 data class PriorityViewState(
     val items: List<TaskDomain> = listOf()

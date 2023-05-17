@@ -2,7 +2,8 @@ package co.softov.morestuff.android.presentation.presenter
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
+import co.softov.morestuff.android.domain.enums.ReviewActionType
+import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 
 enum class ReviewRound {
     Priority, Final
@@ -10,26 +11,21 @@ enum class ReviewRound {
 
 data class ReviewModel(
     val round: ReviewRound = ReviewRound.Priority,
-    val roundNumber: Int = 0,
-    val roundItems: List<TaskListItemViewModel> = listOf(),
-    val high: List<TaskListItemViewModel> = listOf(),
-    val low: List<TaskListItemViewModel> = listOf(),
-    val done: List<TaskListItemViewModel> = listOf(),
-    val tomorrow: List<TaskListItemViewModel> = listOf(),
+    val items: List<ReviewItemUiModel> = listOf(),
+    val actions: List<Pair<ReviewItemUiModel, ReviewActionType>> = listOf()
 ) : BaseViewState
 
 sealed class ReviewViewEvent : BaseViewEvent {
     data class SetupInitialRound(
         val round: ReviewRound,
-        val items: List<TaskListItemViewModel>,
+        val items: List<ReviewItemUiModel>,
     ) : ReviewViewEvent()
 
     data class SetupRound(val round: ReviewRound) : ReviewViewEvent()
-    data class OnHighPriority(val item: TaskListItemViewModel) : ReviewViewEvent()
-    data class OnLowPriority(val item: TaskListItemViewModel) : ReviewViewEvent()
-    data class OnDone(val item: TaskListItemViewModel) : ReviewViewEvent()
-    data class OnTomorrow(val item: TaskListItemViewModel) : ReviewViewEvent()
-    data class Undo(val item: TaskListItemViewModel) : ReviewViewEvent()
+
+    data class ItemReview(val item: ReviewItemUiModel, val action: ReviewActionType) : ReviewViewEvent()
+
+    data class Undo(val item: ReviewItemUiModel) : ReviewViewEvent()
 }
 
 
