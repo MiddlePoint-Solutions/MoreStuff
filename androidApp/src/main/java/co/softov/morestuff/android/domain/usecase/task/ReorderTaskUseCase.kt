@@ -5,13 +5,21 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface ReorderTaskUseCase {
-    suspend operator fun invoke(taskId: Long, priorityScore: Long): Either<Failure, Long>
+    suspend operator fun invoke(
+        taskId: Long,
+        aboveTaskId: Long,
+        priorityScore: Long
+    ): Either<Failure, Long>
 }
 
 class ReorderTaskUseCaseImpl(
     private val taskRepository: TaskRepository,
 ) : ReorderTaskUseCase {
-    override suspend operator fun invoke(taskId: Long, priorityScore: Long): Either<Failure, Long> {
-        return taskRepository.reorderTask(taskId, priorityScore)
+    override suspend operator fun invoke(
+        taskId: Long,
+        aboveTaskId: Long,
+        priorityScore: Long
+    ): Either<Failure, Long> {
+        return taskRepository.reorderTask(taskId, aboveTaskId, priorityScore)
     }
 }

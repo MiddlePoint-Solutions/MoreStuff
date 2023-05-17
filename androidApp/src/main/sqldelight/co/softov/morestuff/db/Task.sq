@@ -75,4 +75,4 @@ WHERE id = :task_id;
 decrementTaskPriorityScore:
 UPDATE task
 SET priority_score = priority_score - 1
-WHERE priority_score < ?;
+WHERE id = :task_id OR priority_score < :priority_score;

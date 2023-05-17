@@ -77,7 +77,7 @@ class PriorityViewModel(
             val task1 = tasks[lastChange.first]
             val task2 = tasks[lastChange.second]
             viewModelScope.launch {
-                reorderTaskUseCase(task1.id, task2.priorityScore)
+                reorderTaskUseCase(task1.id, task2.id, task2.priorityScore)
             }
         }
     }

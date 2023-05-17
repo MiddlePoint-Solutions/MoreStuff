@@ -145,10 +145,10 @@ class TaskRepositoryImpl(
         }
     }
 
-    override suspend fun reorderTask(taskId: Long, priorityScore: Long): Either<Failure, Long> {
+    override suspend fun reorderTask(taskId: Long, aboveTaskId: Long, priorityScore: Long): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
             taskQueries.updateTaskPriorityScore(priorityScore, taskId)
-            taskQueries.decrementTaskPriorityScore(priorityScore)
+            taskQueries.decrementTaskPriorityScore(aboveTaskId, priorityScore)
             Right(priorityScore)
         }
     }
