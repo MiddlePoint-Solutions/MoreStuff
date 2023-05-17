@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.list.model
+package co.softov.morestuff.android.ui.model
 
 data class ScheduleListItemViewModel(
     val scheduleId: Long = 0,

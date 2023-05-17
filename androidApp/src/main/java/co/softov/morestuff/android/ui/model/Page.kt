@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.list.model
+package co.softov.morestuff.android.ui.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

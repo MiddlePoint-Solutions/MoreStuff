@@ -1,6 +1,7 @@
-package co.softov.morestuff.android.ui.list.model
+package co.softov.morestuff.android.ui.model.map
 
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
+import co.softov.morestuff.android.ui.model.ScheduleListItemViewModel
 
 class ScheduleListItemMapper {
     fun map(input: ScheduleWithTitle): ScheduleListItemViewModel {
