@@ -148,12 +148,14 @@ class ReviewViewModel(
             }
             SwipeDirection.Down -> OnTomorrow(task)
         }
-        sendEvent(event)
+        //sendEvent(event)
+
 
         if (isLast) {
             roundEndDelayJob = viewModelScope.launch {
-                delay(1000)
-                sendEvent(SetupRound(Final))
+                delay(500)
+                //sendEvent(SetupRound(Final))
+                navigateBack()
                 confirmResults()
             }
         }
