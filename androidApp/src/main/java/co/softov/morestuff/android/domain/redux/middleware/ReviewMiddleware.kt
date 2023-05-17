@@ -20,7 +20,7 @@ class ReviewMiddleware : Middleware<AppState> {
     ): Action {
         when (action) {
 
-            is ReviewAction.ScheduleReviewResults -> {
+            is ReviewAction.TaskReviewResults -> {
                 with(action) {
                     dispatch(ScheduleAction.RescheduleTasksAction(tomorrow, Priority.Later()))
                     dispatch(ScheduleAction.RescheduleTasksAction(this.low, Priority.Now()))

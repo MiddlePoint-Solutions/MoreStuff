@@ -93,6 +93,7 @@ val taskUseCases = module {
     factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
+    factoryOf(::GetReviewTaskUseCaseImpl) bind GetReviewTaskUseCase::class
 
     // Task priority score
     factoryOf(::GetPlanPriorityScoreUseCaseImpl) bind GetPlanPriorityScoreUseCase::class
