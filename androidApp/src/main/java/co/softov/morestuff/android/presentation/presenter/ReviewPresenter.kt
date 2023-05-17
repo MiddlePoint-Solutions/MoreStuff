@@ -2,7 +2,7 @@ package co.softov.morestuff.android.presentation.presenter
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.ui.list.model.TaskListItemViewModel
 
 enum class ReviewRound {
     Priority, Final
@@ -11,25 +11,25 @@ enum class ReviewRound {
 data class ReviewModel(
     val round: ReviewRound = ReviewRound.Priority,
     val roundNumber: Int = 0,
-    val roundItems: List<ScheduleListItemViewModel> = listOf(),
-    val high: List<ScheduleListItemViewModel> = listOf(),
-    val low: List<ScheduleListItemViewModel> = listOf(),
-    val done: List<ScheduleListItemViewModel> = listOf(),
-    val tomorrow: List<ScheduleListItemViewModel> = listOf(),
+    val roundItems: List<TaskListItemViewModel> = listOf(),
+    val high: List<TaskListItemViewModel> = listOf(),
+    val low: List<TaskListItemViewModel> = listOf(),
+    val done: List<TaskListItemViewModel> = listOf(),
+    val tomorrow: List<TaskListItemViewModel> = listOf(),
 ) : BaseViewState
 
 sealed class ReviewViewEvent : BaseViewEvent {
     data class SetupInitialRound(
         val round: ReviewRound,
-        val items: List<ScheduleListItemViewModel>,
+        val items: List<TaskListItemViewModel>,
     ) : ReviewViewEvent()
 
     data class SetupRound(val round: ReviewRound) : ReviewViewEvent()
-    data class OnHighPriority(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnLowPriority(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnDone(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnTomorrow(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class Undo(val item: ScheduleListItemViewModel) : ReviewViewEvent()
+    data class OnHighPriority(val item: TaskListItemViewModel) : ReviewViewEvent()
+    data class OnLowPriority(val item: TaskListItemViewModel) : ReviewViewEvent()
+    data class OnDone(val item: TaskListItemViewModel) : ReviewViewEvent()
+    data class OnTomorrow(val item: TaskListItemViewModel) : ReviewViewEvent()
+    data class Undo(val item: TaskListItemViewModel) : ReviewViewEvent()
 }
 
 
