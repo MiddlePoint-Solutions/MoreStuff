@@ -1,25 +1,51 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
+import arrow.core.left
 import co.softov.morestuff.android.domain.model.Failure
+import co.softov.morestuff.android.domain.model.TaskReorderFailure
 import co.softov.morestuff.android.domain.repository.TaskRepository
+
+val NA: Nothing? = null
 
 interface ReorderTaskUseCase {
     suspend operator fun invoke(
         taskId: Long,
-        aboveTaskId: Long,
-        priorityScore: Long
+        aboveScore: Long? = NA,
+        belowScore: Long? = NA,
     ): Either<Failure, Long>
 }
 
 class ReorderTaskUseCaseImpl(
     private val taskRepository: TaskRepository,
+    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
         taskId: Long,
-        aboveTaskId: Long,
-        priorityScore: Long
-    ): Either<Failure, Long> {
-        return taskRepository.reorderTask(taskId, aboveTaskId, priorityScore)
+        aboveScore: Long?,
+        belowScore: Long?,
+    ): Either<Failure, Long> = when {
+        aboveScore == NA && belowScore == NA -> {
+            TaskReorderFailure("No values provided for above or below priority score").left()
+        }
+
+        aboveScore == NA -> {
+            updateTaskPriorityScoreUseCase(taskId, (belowScore ?: 0) + 1)
+        }
+
+        belowScore == NA -> {
+            updateTaskPriorityScoreUseCase(taskId, aboveScore - 1)
+        }
+
+        else -> {
+            val average = (aboveScore + belowScore) / 2
+            if (aboveScore == average) {
+                taskRepository.reorderTaskByAdding(taskId, average)
+            } else if (belowScore == average) {
+                taskRepository.reorderTaskBySubtracting(taskId, average)
+            } else {
+                updateTaskPriorityScoreUseCase(taskId, average)
+            }
+        }
     }
 }
