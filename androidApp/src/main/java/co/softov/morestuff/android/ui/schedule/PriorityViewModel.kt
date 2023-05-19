@@ -73,11 +73,12 @@ class PriorityViewModel(
 
     fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
         if (fromPosition != toPosition) {
-            Timber.d("lastChange: $lastChange")
-            val task1 = tasks[lastChange.first]
-            val task2 = tasks[lastChange.second]
+            Timber.d("lastChange $toPosition: ${tasks[toPosition].title}")
+            val taskId = tasks[toPosition].id
+            val scoreAbove = tasks.getOrNull(toPosition - 1)?.priorityScore
+            val scoreBelow = tasks.getOrNull(toPosition + 1)?.priorityScore
             viewModelScope.launch {
-                reorderTaskUseCase(task1.id, task2.id, task2.priorityScore)
+                reorderTaskUseCase(taskId, scoreAbove, scoreBelow)
             }
         }
     }
