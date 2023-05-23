@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
@@ -60,7 +61,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -78,7 +78,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.TaskActions
@@ -303,18 +302,18 @@ fun TaskChatTopBarEditTask(
                                 .alpha(if (isExpanded) 0f else 1f)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(20.dp))
 
                         Crossfade(targetState = isExpanded) { expanded ->
                             if (!expanded) {
                                 SetReminderButton(
                                     modifier = Modifier.alpha(if (isExpanded) 0f else 1f),
-                                    planModel = mainViewModel.planModel,
+                                    planModel = viewModel.planModel,
                                     onTimeChange = viewModel::updatePlanTime,
                                     onDateChange = viewModel::updatePlanDate,
                                     onCreatePlanAndReschedule = viewModel::createPlanAndReschedule,
-
-                                    )
+                                    cancelActiveSchedule = viewModel::cancelActiveSchedule
+                                )
                             }
                         }
                     }
@@ -333,16 +332,14 @@ fun SetReminderButton(
     timeFormatter: TimeFormatter = koinInject(),
     modifier: Modifier,
     onCreatePlanAndReschedule: () -> Unit,
-    ) {
-    val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
-    val time by remember(displayTime) {
-        derivedStateOf {
-            timeFormatter.formatTimeOnly(displayTime.toString())
-        }
-    }
-    var buttonText by rememberSaveable { mutableStateOf("") }
+    cancelActiveSchedule: () -> Unit,
+) {
+
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
+    var dateSelected by remember { mutableStateOf(false) }
+    var timeSelected by remember { mutableStateOf(false) }
+    val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
@@ -352,12 +349,12 @@ fun SetReminderButton(
         PriorityDatePicker(
             dismissDialog = { showDatePickerDialog = false },
             onDateChange = {
-                val selectedDateMillis = datePickerState.selectedDateMillis
-                selectedDateMillis?.let {
+                datePickerState.selectedDateMillis?.let {
                     onDateChange(it)
+                    dateSelected = true
                 }
-                showDatePickerDialog = false
-                showTimePickerDialog = true
+                //showDatePickerDialog = false
+                // showTimePickerDialog = true
             },
             state = datePickerState,
         )
@@ -371,26 +368,51 @@ fun SetReminderButton(
         PriorityTimePicker(
             dismissTimePicker = { showTimePickerDialog = false },
             onTimeChange = {
-                onTimeChange(timePickerState.hour, timePickerState.minute)
+                onTimeChange(
+                    timePickerState.hour,
+                    timePickerState.minute
+                )
+                timeSelected = true
                 onCreatePlanAndReschedule()
-                showTimePickerDialog = false
+                //showTimePickerDialog = false
             },
             state = timePickerState
         )
     }
 
     Row(modifier = modifier) {
-        buttonText = when (planModel.relativeDisplay) {
-            RelativeDateDisplay.Today -> stringResource(id = R.string.task_chat_schedule_reminder)
-            else -> getRelativeDate(planModel, timeFormatter) + " " + (time ?: "")
-        }
         PriorityButton(
-            onSelected = {
-                showDatePickerDialog = true
-            },
-            text = buttonText,
+            onSelected = { showDatePickerDialog = true },
+            text = getRelativeDate(planModel, timeFormatter),
             shape = RoundedCornerShape(percent = 50),
         )
+        Spacer(modifier = Modifier.width(16.dp))
+
+        val time by remember(displayTime) {
+            derivedStateOf {
+                timeFormatter.formatTimeOnly(displayTime.toString())
+            }
+        }
+
+        PriorityButton(
+            onSelected = { showTimePickerDialog = true },
+            text = time ?: "",
+            shape = RoundedCornerShape(percent = 50),
+        )
+
+        if (dateSelected || timeSelected) {
+            IconButton(
+                onClick = { cancelActiveSchedule() },
+                modifier = Modifier
+                    .padding(start = 15.dp)
+            ) {
+                Icon(
+                    Icons.Default.Cancel,
+                    contentDescription = "Cancel",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
         SchedulePermissionRequester()
     }
 }

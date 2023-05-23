@@ -117,10 +117,10 @@ class TaskChatViewModel(
         }
     }
 
-    var planModel by mutableStateOf(createPlanModelForTaskChat())
+    var planModel by mutableStateOf(createPlanModel())
         private set
 
-    fun createPlanModelForTaskChat() = timeManager.getDefaultPlanTime().run {
+    private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(
             planTime = this,
             hour = hour,
@@ -157,6 +157,9 @@ class TaskChatViewModel(
 
     }
 
+    fun cancelActiveSchedule(){
+        store.dispatch(ScheduleAction.CancelActiveSchedule(taskId))
+    }
 
     fun onBackPressed() {
         router.exit()
