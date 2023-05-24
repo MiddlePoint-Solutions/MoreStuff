@@ -16,7 +16,7 @@ import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.CancelActiveSchedule
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.CancelActiveScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ExecuteScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.RescheduleTaskAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.RescheduleTasksAction
@@ -42,7 +42,7 @@ import timber.log.Timber
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
     data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
-    data class CancelActiveSchedule(val taskIds: Long) : ScheduleAction()
+    data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
 
     data class RescheduleTasksAction(
         val taskIds: List<Long>,
@@ -119,9 +119,9 @@ class ScheduleMiddleware(
                 }
             }
 
-            is CancelActiveSchedule -> scope.launch {
+            is CancelActiveScheduleAction -> scope.launch {
                 with(action) {
-                    cancelActiveScheduleUseCase(taskIds)
+                    cancelActiveScheduleUseCase(taskId)
                 }
             }
 

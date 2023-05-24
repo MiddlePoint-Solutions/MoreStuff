@@ -7,7 +7,7 @@ import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
-class CancelActiveScheduleUseCaseImplTest {
+class CancelActiveScheduleActionUseCaseImplTest {
     private val scheduler = mockk<Scheduler>()
     private val getActiveSchedule = mockk<GetActiveScheduleUseCase>(relaxed = true)
     private val setScheduleFulfilled = mockk<SetScheduleFulfilledUseCase>(relaxed = true)

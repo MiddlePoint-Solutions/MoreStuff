@@ -78,10 +78,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.TaskActions
-import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
@@ -90,6 +91,7 @@ import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.compose.koinInject
@@ -206,7 +208,7 @@ fun TaskChatTopBarEditTask(
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
-    val mainViewModel: MainViewModel = getViewModel()
+    val haveSchedule: StateFlow<ScheduleDomain?> = viewModel.schedule
     val task by viewModel.task.collectAsState()
     val focusManager = LocalFocusManager.current
     val onBackPressed = {
@@ -312,7 +314,8 @@ fun TaskChatTopBarEditTask(
                                     onTimeChange = viewModel::updatePlanTime,
                                     onDateChange = viewModel::updatePlanDate,
                                     onCreatePlanAndReschedule = viewModel::createPlanAndReschedule,
-                                    cancelActiveSchedule = viewModel::cancelActiveSchedule
+                                    cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                                    haveSchedule = haveSchedule,
                                 )
                             }
                         }
@@ -333,13 +336,13 @@ fun SetReminderButton(
     modifier: Modifier,
     onCreatePlanAndReschedule: () -> Unit,
     cancelActiveSchedule: () -> Unit,
+    haveSchedule: StateFlow<ScheduleDomain?>,
 ) {
 
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
-    var dateSelected by remember { mutableStateOf(false) }
-    var timeSelected by remember { mutableStateOf(false) }
     val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
+    val schedule by haveSchedule.collectAsState()
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
@@ -351,10 +354,9 @@ fun SetReminderButton(
             onDateChange = {
                 datePickerState.selectedDateMillis?.let {
                     onDateChange(it)
-                    dateSelected = true
                 }
-                //showDatePickerDialog = false
-                // showTimePickerDialog = true
+                showDatePickerDialog = false
+                showTimePickerDialog = true
             },
             state = datePickerState,
         )
@@ -372,39 +374,43 @@ fun SetReminderButton(
                     timePickerState.hour,
                     timePickerState.minute
                 )
-                timeSelected = true
                 onCreatePlanAndReschedule()
-                //showTimePickerDialog = false
+                showTimePickerDialog = false
             },
             state = timePickerState
         )
     }
 
     Row(modifier = modifier) {
-        PriorityButton(
-            onSelected = { showDatePickerDialog = true },
-            text = getRelativeDate(planModel, timeFormatter),
-            shape = RoundedCornerShape(percent = 50),
-        )
-        Spacer(modifier = Modifier.width(16.dp))
 
         val time by remember(displayTime) {
             derivedStateOf {
                 timeFormatter.formatTimeOnly(displayTime.toString())
             }
         }
+        val buttonText = if (schedule == null) {
+            stringResource(id = R.string.task_chat_schedule_reminder)
+        } else {
+            when (planModel.relativeDisplay) {
+                RelativeDateDisplay.Today -> stringResource(id = R.string.relative_today) + " " + (time
+                    ?: "")
+
+                else -> getRelativeDate(planModel, timeFormatter) + " " + (time ?: "")
+            }
+        }
 
         PriorityButton(
-            onSelected = { showTimePickerDialog = true },
-            text = time ?: "",
+            onSelected = { showDatePickerDialog = true },
+            text = buttonText,
             shape = RoundedCornerShape(percent = 50),
         )
+        Spacer(modifier = Modifier.width(16.dp))
 
-        if (dateSelected || timeSelected) {
+        if (schedule != null) {
             IconButton(
                 onClick = { cancelActiveSchedule() },
                 modifier = Modifier
-                    .padding(start = 15.dp)
+                    .padding(start = 5.dp)
             ) {
                 Icon(
                     Icons.Default.Cancel,

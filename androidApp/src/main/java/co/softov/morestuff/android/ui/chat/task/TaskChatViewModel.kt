@@ -4,9 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
+import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
@@ -30,8 +30,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
 class TaskChatViewModel(
@@ -71,9 +73,27 @@ class TaskChatViewModel(
                 initialValue = TaskDomain()
             )
 
+    var planModel by mutableStateOf(createPlanModel())
+        private set
+
     val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
-            .map { it.getOrElse { null } }
+            .map { it.orNull() }
+            .onEach {
+                it?.let { scheduleDomain ->
+                    if (scheduleDomain.scheduleLocalTime != null) {
+                        val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
+                        planModel = PlanModel(
+                            planTime = localTime,
+                            relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
+                            hour = localTime.hour,
+                            minute = localTime.minute,
+                            epochMs = scheduleDomain.scheduleLocalTime.inEpochMilliseconds
+                        )
+                        Timber.d("planplan: $planModel")
+                    }
+                }
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -88,6 +108,7 @@ class TaskChatViewModel(
             taskTitle = getTaskFlow(taskId = taskId).first().title
         }
     }
+
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
@@ -116,9 +137,6 @@ class TaskChatViewModel(
             )
         }
     }
-
-    var planModel by mutableStateOf(createPlanModel())
-        private set
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(
@@ -157,8 +175,9 @@ class TaskChatViewModel(
 
     }
 
-    fun cancelActiveSchedule(){
-        store.dispatch(ScheduleAction.CancelActiveSchedule(taskId))
+    fun cancelActiveSchedule() {
+        store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
+        planModel = createPlanModel()
     }
 
     fun onBackPressed() {
