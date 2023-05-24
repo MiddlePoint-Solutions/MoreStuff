@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
-import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
@@ -19,8 +18,6 @@ import co.softov.morestuff.android.ui.Screens
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
 import timber.log.Timber
 
 class MainViewModel(
@@ -44,7 +41,7 @@ class MainViewModel(
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(
-            planTime = this,
+            planTime = timeManager.getDefaultPlanTime(),
             hour = hour,
             minute = minute,
             epochMs = currentTimeZoneInstant.toEpochMilliseconds()

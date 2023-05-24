@@ -111,8 +111,19 @@ class TimeManagerImpl : TimeManager {
     override fun getTodayTimeRange(): Pair<String, String> = todayTimeStringPair
 
     override fun getDefaultPlanTime(): LocalDateTime {
-        // TODO: get the current and change to the closest quarter (13:00, 13:15, 13:30, 13:45, 14:00)
-        return todayLocalDateTimeByAdding()
+        val now = nowLocalDateTime
+        val minutes = now.minute
+        val nextQuarterHour: Int = when {
+            minutes < 10 -> 15
+            minutes < 25 -> 30
+            minutes < 40 -> 45
+            else -> 0
+        }
+        return if (nextQuarterHour == 0) {
+            LocalDateTime(now.year, now.month, now.dayOfMonth, now.hour + 1, 0, 0, 0)
+        } else {
+            LocalDateTime(now.year, now.month, now.dayOfMonth, now.hour, nextQuarterHour, 0, 0)
+        }
     }
 
     override fun getRelativeDate(timeString: String): RelativeDateDisplay = when {
