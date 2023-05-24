@@ -111,7 +111,6 @@ class ScheduleMiddleware(
             }
 
             is ScheduleReplyAction -> {
-                TODO("How do we handle schedule reply actions?")
                 val replyType = action.replyType
                 val schedule = action.schedule
                 when (replyType) {
