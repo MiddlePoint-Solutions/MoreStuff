@@ -86,6 +86,7 @@ import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
+import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
@@ -430,6 +431,7 @@ fun ScheduleButton(
                 )
             }
         }
+        SchedulePermissionRequester()
     }
 }
 
