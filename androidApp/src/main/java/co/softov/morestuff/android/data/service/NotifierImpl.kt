@@ -82,7 +82,6 @@ class NotifierImpl(
 
     private fun createReminderNotification(message: Message): Notification {
         val scheduleId = message.scheduleId
-        //val tomorrow = createReplyIntentWithTitle(scheduleId, TOMORROW)
         val later = createReplyIntentWithTitle(scheduleId, LATER)
         val snooze = createReplyIntentWithTitle(scheduleId, SNOOZE)
         val done = createReplyIntentWithTitle(scheduleId, DONE)
@@ -97,7 +96,6 @@ class NotifierImpl(
             .setContentIntent(createReminderContentIntent(message.taskId))
             .setStyle(style)
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
-            //.addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
             .setDeleteIntent(snooze.second)
             .build()
