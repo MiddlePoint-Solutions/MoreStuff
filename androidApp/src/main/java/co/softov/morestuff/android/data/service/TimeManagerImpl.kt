@@ -113,17 +113,34 @@ class TimeManagerImpl : TimeManager {
     override fun getDefaultPlanTime(): LocalDateTime {
         val now = nowLocalDateTime
         val minutes = now.minute
+        val nextHour: Int
         val nextQuarterHour: Int = when {
-            minutes < 10 -> 15
-            minutes < 25 -> 30
-            minutes < 40 -> 45
-            else -> 0
+            minutes < 10 -> {
+                nextHour = now.hour
+                15
+            }
+
+            minutes < 25 -> {
+                nextHour = now.hour
+                30
+            }
+
+            minutes < 40 -> {
+                nextHour = now.hour
+                45
+            }
+
+            minutes < 55 -> {
+                nextHour = now.hour + 1
+                0
+            }
+
+            else -> {
+                nextHour = now.hour + 1
+                15
+            }
         }
-        return if (nextQuarterHour == 0) {
-            LocalDateTime(now.year, now.month, now.dayOfMonth, now.hour + 1, 0, 0, 0)
-        } else {
-            LocalDateTime(now.year, now.month, now.dayOfMonth, now.hour, nextQuarterHour, 0, 0)
-        }
+        return LocalDateTime(now.year, now.month, now.dayOfMonth, nextHour, nextQuarterHour, 0, 0)
     }
 
     override fun getRelativeDate(timeString: String): RelativeDateDisplay = when {
