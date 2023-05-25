@@ -79,21 +79,7 @@ class TaskChatViewModel(
     val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
             .map { it.orNull() }
-            .onEach {
-                it?.let { scheduleDomain ->
-                    if (scheduleDomain.scheduleLocalTime != null) {
-                        val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-                        planModel = PlanModel(
-                            planTime = localTime,
-                            relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
-                            hour = localTime.hour,
-                            minute = localTime.minute,
-                            epochMs = scheduleDomain.scheduleLocalTime.inEpochMilliseconds
-                        )
-                        Timber.d("planplan: $planModel")
-                    }
-                }
-            }
+            .onEach { it?.let { createPlanModelForScheduleVal(it) } }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -109,6 +95,19 @@ class TaskChatViewModel(
         }
     }
 
+    private fun createPlanModelForScheduleVal(scheduleDomain: ScheduleDomain) {
+        if (scheduleDomain.scheduleLocalTime != null) {
+            val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
+            planModel = PlanModel(
+                planTime = localTime,
+                relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
+                hour = localTime.hour,
+                minute = localTime.minute,
+                epochMs = scheduleDomain.scheduleLocalTime.inEpochMilliseconds
+            )
+            Timber.d("planplan: $planModel")
+        }
+    }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         store.dispatch(UserResponseAction(scheduleId, replyType))
