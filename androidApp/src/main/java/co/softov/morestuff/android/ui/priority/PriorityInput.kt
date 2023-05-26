@@ -153,9 +153,9 @@ fun PriorityInput(
 }
 
 @Composable
-private fun getRelativeDate(
+fun getRelativeDate(
     planModel: PlanModel,
-    timeFormatter: TimeFormatter
+    timeFormatter: TimeFormatter,
 ) = when (planModel.relativeDisplay) {
     RelativeDateDisplay.Today -> stringResource(R.string.relative_today)
     RelativeDateDisplay.Tomorrow -> stringResource(R.string.relative_tomorrow)
@@ -166,10 +166,10 @@ private fun getRelativeDate(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun PriorityTimePicker(
+fun PriorityTimePicker(
     dismissTimePicker: () -> Unit,
     onTimeChange: () -> Unit,
-    state: TimePickerState = rememberTimePickerState()
+    state: TimePickerState = rememberTimePickerState(),
 ) {
     Dialog(onDismissRequest = { dismissTimePicker() }) {
         Surface(
@@ -213,10 +213,10 @@ private fun PriorityTimePicker(
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-private fun PriorityDatePicker(
+fun PriorityDatePicker(
     dismissDialog: () -> Unit,
     onDateChange: () -> Unit,
-    state: DatePickerState = rememberDatePickerState()
+    state: DatePickerState = rememberDatePickerState(),
 ) {
     DatePickerDialog(
         onDismissRequest = { dismissDialog() },

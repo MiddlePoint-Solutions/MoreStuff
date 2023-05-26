@@ -34,6 +34,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
@@ -48,11 +49,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,21 +78,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
+import co.softov.morestuff.android.ui.chat.TaskActions
+import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
-import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
-import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
+import co.softov.morestuff.android.ui.priority.PriorityDatePicker
+import co.softov.morestuff.android.ui.priority.PriorityTimePicker
+import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
+import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 
@@ -102,10 +106,6 @@ fun TaskChatContent(
     val scope = rememberCoroutineScope()
 
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
-
-    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
         parametersOf(taskId)
     }
 
@@ -157,12 +157,8 @@ fun TaskChatContent(
                 ) {
                     TaskChatTopBarEditTask(
                         taskId = taskId,
-                        editScheduleAction = {
-                            priorityViewModel.reset()
-                            openBottomSheet = true
-                        },
                         isExpanded = isExpanded,
-                        setIsExpanded = { value -> isExpanded = value }
+                        setIsExpanded = { value -> isExpanded = value },
                     )
 
 
@@ -199,14 +195,9 @@ fun TaskChatContent(
 }
 
 
-
-
-
-
 @Composable
 fun TaskChatTopBarEditTask(
     taskId: Long,
-    editScheduleAction: () -> Unit,
     isExpanded: Boolean,
     setIsExpanded: (Boolean) -> Unit,
 ) {
@@ -215,13 +206,13 @@ fun TaskChatTopBarEditTask(
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
-    val priorityViewModel = getViewModel<TaskPriorityViewModel> {
-        parametersOf(taskId)
-    }
-    val priority by priorityViewModel.model.collectAsState()
-    val task by viewModel.task.collectAsState()
-    val schedule by viewModel.schedule.collectAsState()
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+    val planModel = viewModel.planModel
+    val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
 
+
+    val task by viewModel.task.collectAsState()
     val focusManager = LocalFocusManager.current
     val onBackPressed = {
         if (isExpanded) {
@@ -316,16 +307,23 @@ fun TaskChatTopBarEditTask(
                                 .alpha(if (isExpanded) 0f else 1f)
                         )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(20.dp))
 
                         Crossfade(targetState = isExpanded) { expanded ->
                             if (!expanded) {
                                 ScheduleButton(
-                                    schedule,
-                                    priority,
-                                    editScheduleAction,
-                                    task,
-                                    modifier = Modifier.alpha(if (isExpanded) 0f else 1f)
+                                    modifier = Modifier.alpha(if (isExpanded) 0f else 1f),
+                                    planModel = viewModel.planModel,
+                                    onTimeChange = viewModel::updatePlanTime,
+                                    onDateChange = viewModel::updatePlanDate,
+                                    onCreatePlanAndReschedule = viewModel::createPlanAndReschedule,
+                                    cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                                    taskId = taskId,
+                                    showDatePickerDialog = showDatePickerDialog,
+                                    showTimePickerDialog = showTimePickerDialog,
+                                    onShowDatePickerDialogChange = { showDatePickerDialog = it },
+                                    onShowTimePickerDialogChange = { showTimePickerDialog = it },
+                                    displayTime = displayTime.toString()
                                 )
                             }
                         }
@@ -336,50 +334,105 @@ fun TaskChatTopBarEditTask(
     }
 }
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleButton(
-    schedule: ScheduleDomain?,
-    priority: TaskPriorityModel,
-    editScheduleAction: () -> Unit,
-    task: TaskDomain,
-    timeFormatter: TimeFormatter = get(),
-    modifier: Modifier,
+    planModel: PlanModel,
+    onTimeChange: (Int, Int) -> Unit,
+    onDateChange: (Long) -> Unit,
+    timeFormatter: TimeFormatter = koinInject(),
+    modifier: Modifier = Modifier,
+    onCreatePlanAndReschedule: () -> Unit,
+    cancelActiveSchedule: () -> Unit,
+    taskId: Long,
+    showDatePickerDialog: Boolean,
+    showTimePickerDialog: Boolean,
+    onShowDatePickerDialogChange: (Boolean) -> Unit,
+    onShowTimePickerDialogChange: (Boolean) -> Unit,
+    displayTime: String,
 ) {
-    val title = when {
-        schedule == null -> {
-            stringResource(R.string.task_chat_schedule_reminder)
-        }
+    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
+        parametersOf(taskId)
+    }
+    val schedule by viewModel.schedule.collectAsState()
 
-        schedule.scheduleUtcTime == null -> {
-            stringResource(R.string.time_option_later)
-        }
+    if (showDatePickerDialog) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = planModel.epochMs
+        )
 
-        else -> {
-            val formattedTime = timeFormatter.formatTimeOnly(schedule.scheduleUtcTime) ?: ""
+        PriorityDatePicker(
+            dismissDialog = { onShowDatePickerDialogChange(false) },
+            onDateChange = {
+                datePickerState.selectedDateMillis?.let {
+                    onDateChange(it)
+                }
+                onShowDatePickerDialogChange(false)
+                onShowTimePickerDialogChange(true)
 
-            when (priority.priorityModel.priority) {
-                is Priority.Now -> stringResource(
-                    id = R.string.time_option_today,
-                    formattedTime
+            },
+            state = datePickerState,
+        )
+    }
+
+    if (showTimePickerDialog) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = planModel.hour,
+            initialMinute = planModel.minute
+        )
+        PriorityTimePicker(
+            dismissTimePicker = { onShowTimePickerDialogChange(false) },
+            onTimeChange = {
+                onTimeChange(
+                    timePickerState.hour,
+                    timePickerState.minute
                 )
+                onCreatePlanAndReschedule()
+                onShowTimePickerDialogChange(false)
+            },
+            state = timePickerState
+        )
+    }
 
-                is Priority.Later -> stringResource(
-                    id = R.string.time_option_tomorrow,
-                    formattedTime
-                )
+    Row(modifier = modifier) {
 
-                is Priority.Plan -> timeFormatter.formatTimeDayAndMonth(schedule.scheduleUtcTime)
+        val time by remember(displayTime) {
+            derivedStateOf {
+                timeFormatter.formatTimeOnly(displayTime.toString())
             }
         }
-    }.orEmpty()
 
-    PriorityButton(
-        onSelected = editScheduleAction,
-        text = title,
-        shape = RoundedCornerShape(percent = 50),
-        enabled = !task.isComplete
-    )
+        val buttonText = when {
+            schedule == null -> stringResource(id = R.string.task_chat_schedule_reminder)
+            planModel.relativeDisplay == RelativeDateDisplay.Today -> stringResource(id = R.string.relative_today) + " " + (time
+                ?: "")
+
+            else -> getRelativeDate(planModel, timeFormatter) + " " + (time ?: "")
+        }
+
+
+        PriorityButton(
+            onSelected = { onShowDatePickerDialogChange(true) },
+            text = buttonText,
+            shape = RoundedCornerShape(percent = 50),
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+
+        if (schedule != null) {
+            IconButton(
+                onClick = { cancelActiveSchedule() },
+                modifier = Modifier
+                    .padding(start = 5.dp)
+            ) {
+                Icon(
+                    Icons.Default.Cancel,
+                    contentDescription = "Cancel",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        SchedulePermissionRequester()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -516,7 +569,6 @@ fun TaskChatTopBarPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskChatTopBarEditTask(
             taskId = 1,
-            editScheduleAction = { },
             isExpanded = true,
             setIsExpanded = {}
 
