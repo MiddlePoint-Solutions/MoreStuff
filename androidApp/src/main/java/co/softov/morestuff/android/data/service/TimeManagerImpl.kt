@@ -6,6 +6,7 @@ import kotlinx.datetime.*
 import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 class TimeManagerImpl : TimeManager {
     override val nowUtcInstant: Instant get() = Clock.System.now()
@@ -85,10 +86,12 @@ class TimeManagerImpl : TimeManager {
             LocalDateTime(year, month, dayOfMonth, hour, minute, second, 0)
         }
 
-    override fun todayLocalDateTimeByAdding(hour: Int, minute: Int): LocalDateTime =
-        nowLocalDateTime.run {
-            LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
-        }
+    override fun todayLocalDateTimeByAdding(hour: Int, minute: Int): LocalDateTime {
+        return (nowLocalDateTime.toInstant(currentTimeZone) + hour.hours + minute.minutes).toLocalDateTime(currentTimeZone)
+//        return nowLocalDateTime.run {
+//            LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
+//        }
+    }
 
     override fun weekendLocalDateTime(): LocalDateTime {
         val daysUntilWeekend = when (nowLocalDateTime.dayOfWeek) {
