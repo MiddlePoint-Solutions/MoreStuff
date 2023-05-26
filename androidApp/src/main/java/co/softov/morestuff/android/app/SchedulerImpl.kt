@@ -12,6 +12,7 @@ import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.service.Scheduler
 import org.koin.core.component.KoinComponent
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -75,21 +76,8 @@ class SchedulerImpl(
 
         Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 12)
-            set(Calendar.MINUTE, 12)
-        }.also {
-            alarmManager.setInexactRepeating(
-                AlarmManager.RTC_WAKEUP,
-                it.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                NotificationReceiver.createReviewIntent(context, ReviewNotification.Afternoon)
-            )
-        }
-
-        Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, 19)
-            set(Calendar.MINUTE, 30)
+            set(Calendar.HOUR_OF_DAY, 20)
+            set(Calendar.MINUTE, 0)
         }.also {
             alarmManager.setInexactRepeating(
                 AlarmManager.RTC_WAKEUP,
