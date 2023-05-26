@@ -3,26 +3,29 @@ package co.softov.morestuff.android.app.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import co.softov.morestuff.android.domain.usecase.schedule.BootCompleteSchedulerUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
-class BootReceiver : BroadcastReceiver() {
+class BootReceiver : BroadcastReceiver(), KoinComponent {
+
+    val bootCompleteUseCase: BootCompleteSchedulerUseCase by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("onReceive")
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            startBootService(context)
+            goAsync(Dispatchers.IO) {
+                bootCompleteUseCase()
+            }
         }
     }
 
-    private fun startBootService(context: Context) {
-        // TODO: BootService was causing crashes, should use work manager instead.
-        /*Intent(context, BootService::class.java).let {
-            Timber.d("startBootService")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(it)
-            } else {
-                context.startService(it)
-            }
-        }*/
-    }
 }
