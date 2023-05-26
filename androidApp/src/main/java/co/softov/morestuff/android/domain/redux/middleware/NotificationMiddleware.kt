@@ -60,6 +60,7 @@ class NotificationMiddleware(
             }
 
             is ShowReviewNotification -> {
+                // TODO(Joseph): we should be checking if we have anything to review
                 notifier.showReviewNotification(action.reviewType)
             }
 

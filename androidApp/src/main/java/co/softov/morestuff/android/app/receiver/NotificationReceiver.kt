@@ -10,7 +10,10 @@ import co.softov.morestuff.android.app.service.NotificationService
 import co.softov.morestuff.android.app.work.NotificationResponseWorker
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.domain.redux.AppStore
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -20,12 +23,17 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_NOTIFICATION_REPLY -> onNotificationReply(context, intent)
-            ACTION_NOTIFICATION_REVIEW -> onReviewNotification(context, intent)
+            ACTION_NOTIFICATION_REVIEW -> onReviewNotification(intent)
         }
     }
 
-    private fun onReviewNotification(context: Context, intent: Intent) {
-
+    private fun onReviewNotification(intent: Intent) {
+        intent.getReviewIntentExtras()?.let {
+            goAsync(Dispatchers.Default) {
+                val store: AppStore = get()
+                store.dispatchSuspend(NotificationAction.ShowReviewNotification(it))
+            }
+        }
     }
 
     private fun onNotificationReply(context: Context, intent: Intent) {
