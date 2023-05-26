@@ -27,6 +27,8 @@
     <string name="time_option_later">Later</string>
     <string name="time_option_tomorrow">Tomorrow %s</string>
     <string name="time_option_today">Today %s</string>
+    <string name="schedule_set_day">Set Date</string>
+    <string name="schedule_set_time">Set Time</string>
 
     <string name="option_complete">Complete</string>
 
