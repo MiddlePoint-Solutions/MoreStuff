@@ -33,24 +33,24 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.main.input.ListIcon
 import co.softov.morestuff.android.ui.main.input.SendIcon
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import timber.log.Timber
 
 @Composable
 fun UserTextInput(
     sendAction: (String) -> Unit,
     listAction: () -> Unit,
-
-    ) {
+) {
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
-
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
 
@@ -112,7 +112,9 @@ fun UserTextInput(
             }
 
             Box(
-                modifier = Modifier.weight(0.12f).height(IntrinsicSize.Min)
+                modifier = Modifier
+                    .weight(0.12f)
+                    .height(IntrinsicSize.Min)
             ) {
                 when {
                     value.text.isBlank() -> ListIcon(listAction)
@@ -127,7 +129,6 @@ fun UserTextInput(
 }
 
 
-/*
 @Preview
 @Composable
 private fun ChatInputPreviewDark() {
@@ -135,7 +136,6 @@ private fun ChatInputPreviewDark() {
         UserTextInput(
             sendAction = {},
             listAction = {},
-
         )
     }
 }
@@ -147,9 +147,6 @@ private fun ChatInputPreview() {
         UserTextInput(
             sendAction = {},
             listAction = {},
-            voiceToText = ,
-
         )
     }
 }
-*/
