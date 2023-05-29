@@ -121,7 +121,7 @@ class ScheduleMiddleware(
                 }
             }
 
-            is CancelActiveScheduleAction -> scope.launch {
+            is ScheduleAction.CancelActiveScheduleAction -> scope.launch {
                 with(action) {
                     cancelActiveScheduleUseCase(taskId)
                 }
