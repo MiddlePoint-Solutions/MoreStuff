@@ -43,6 +43,7 @@ import timber.log.Timber
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
     data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
+    data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
 
     data class RescheduleTasksAction(
         val taskIds: List<Long>,
@@ -58,7 +59,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
     internal data class SmartRescheduleAction(
         val taskIds: List<Long>,
-        val replyType: ReplyType
+        val replyType: ReplyType,
     ) : ScheduleAction()
 }
 
@@ -79,7 +80,7 @@ class ScheduleMiddleware(
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
 
@@ -117,6 +118,12 @@ class ScheduleMiddleware(
                     rescheduleTaskUseCase(params).map {
                         dispatch(ScheduleCreatedAction(it))
                     }
+                }
+            }
+
+            is CancelActiveScheduleAction -> scope.launch {
+                with(action) {
+                    cancelActiveScheduleUseCase(taskId)
                 }
             }
 
@@ -185,7 +192,7 @@ class ScheduleMiddleware(
         scope: CoroutineScope,
         taskId: Long,
         snoozeLimit: Int,
-        dispatch: Dispatch
+        dispatch: Dispatch,
     ) {
         scope.launch {
             val timeOption = when (val result = getTaskScheduleCountUseCase(taskId)) {

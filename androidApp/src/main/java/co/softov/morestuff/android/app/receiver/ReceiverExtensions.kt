@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.app.receiver
 
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -11,8 +12,13 @@ import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.K
 
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReviewNotification
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.random.Random
 
 
@@ -21,6 +27,19 @@ val random = Random(3112)
 val randomRequestCode: Int
     get() = ((System.currentTimeMillis() + random.nextInt()) / 1000).toInt()
 
+fun BroadcastReceiver.goAsync(
+    context: CoroutineContext = EmptyCoroutineContext,
+    block: suspend CoroutineScope.() -> Unit
+) {
+    val pendingResult = goAsync()
+    CoroutineScope(SupervisorJob()).launch(context) {
+        try {
+            block()
+        } finally {
+            pendingResult.finish()
+        }
+    }
+}
 
 fun NotificationReceiver.Companion.createReplyIntent(
     context: Context,

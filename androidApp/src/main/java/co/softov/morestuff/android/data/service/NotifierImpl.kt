@@ -248,7 +248,6 @@ class NotifierImpl(
 
         val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
             .setSmallIcon(R.drawable.priority_48px)
-            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
             .setContentTitle(title)
             .setContentText(message)
