@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
 import arrow.core.Either
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.DONE
 import co.softov.morestuff.android.domain.enums.ReplyType.LATER
@@ -16,7 +17,6 @@ import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.CancelActiveScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ExecuteScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.RescheduleTaskAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.RescheduleTasksAction
@@ -26,6 +26,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.SmartR
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
@@ -72,7 +73,8 @@ class ScheduleMiddleware(
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
     private val rescheduleTaskUseCase: RescheduleTaskUseCase,
 ) : Middleware<AppState> {
-
+    val timeManager: TimeManager = TimeManagerImpl()
+    private val oneHourLater = timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
     override fun invoke(
         state: AppState,
         action: Action,
@@ -137,22 +139,11 @@ class ScheduleMiddleware(
             }
 
             is ScheduleReplyAction -> {
-                TODO("How do we handle schedule reply actions?")
                 val replyType = action.replyType
                 val schedule = action.schedule
                 when (replyType) {
                     LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Plan(TODO(""))))
-                    SNOOZE -> if (state.dailySnoozeLimit > 0) {
-                        checkTaskSnoozeLimit(
-                            scope,
-                            schedule.taskId,
-                            state.dailySnoozeLimit,
-                            dispatch
-                        )
-                    } else {
-                        dispatch(RescheduleTaskAction(schedule.taskId, Now()))
-                    }
-
+                    SNOOZE -> dispatch(RescheduleTaskAction(schedule.taskId, Plan(oneHourLater.toString())))
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }
