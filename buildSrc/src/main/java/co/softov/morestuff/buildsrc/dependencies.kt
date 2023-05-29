@@ -120,7 +120,7 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "2023.04.01"
+            private const val version = "2023.05.01"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"
