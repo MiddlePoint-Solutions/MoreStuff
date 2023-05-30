@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismiss
@@ -101,6 +102,8 @@ fun PriorityContent(
                     }
                 })
 
+                Divider()
+
                 ReorderableItem(state, key = it.id) { isDragging ->
                     SwipeToDismiss(
                         state = dismissState,
@@ -115,6 +118,8 @@ fun PriorityContent(
                         }
                     )
                 }
+
+                Divider()
 
 
             }
