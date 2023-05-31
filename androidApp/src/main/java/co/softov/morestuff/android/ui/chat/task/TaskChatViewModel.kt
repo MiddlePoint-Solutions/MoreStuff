@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.regex.Pattern
 
 class TaskChatViewModel(
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
@@ -109,7 +110,16 @@ class TaskChatViewModel(
             )
         }
     }
-
+    fun findFirstUrl(content: String, urlPattern: Pattern): String? {
+        val matcher = urlPattern.matcher(content)
+        return if (matcher.find()) {
+            var url = content.substring(matcher.start(), matcher.end())
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                url = "https://$url"
+            }
+            url
+        } else null
+    }
 
     fun onBackPressed() {
         router.exit()

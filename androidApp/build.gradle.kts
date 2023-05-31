@@ -235,4 +235,9 @@ dependencies {
     //implementation("com.russhwolf:multiplatform-settings:1.0.0")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
 
+    //LinkPreview
+    implementation ("org.jsoup:jsoup:1.10.3")
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
+
 }
