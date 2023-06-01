@@ -68,12 +68,16 @@ class PriorityViewModel(
     }
 
     fun completeTask(item: TaskDomain) {
-        lastCompleted = item
-        tasks = tasks.toMutableList().apply {
-            remove(item)
+        viewModelScope.launch {
+            delay(120)
+            lastCompleted = item
+            tasks = tasks.toMutableList().apply {
+                remove(item)
+            }
+            dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+            notification = Complete
         }
-        dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
-        notification = Complete
+
     }
 
     fun showTaskChat(taskId: Long) {
