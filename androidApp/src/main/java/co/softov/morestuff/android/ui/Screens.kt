@@ -6,7 +6,6 @@ import co.softov.morestuff.android.ui.ScreenKey.TASK_CHAT
 import co.softov.morestuff.android.ui.chat.task.TaskChatFragment
 import co.softov.morestuff.android.ui.list.ListsFragment
 import co.softov.morestuff.android.ui.review.ReviewFragment
-import co.softov.morestuff.android.ui.schedule.PriorityFragment
 import co.softov.morestuff.android.ui.settings.SettingsFragment
 import com.github.terrakok.cicerone.androidx.FragmentScreen
 
@@ -21,8 +20,6 @@ object Screens {
     val ComposeSettings = FragmentScreen("ComposeSettings") { SettingsFragment() }
 
     val review = FragmentScreen("Review") { ReviewFragment() }
-
-    val priority = FragmentScreen("Priority") { PriorityFragment() }
 
     val taskLists = BottomSheetFragmentScreen("TaskLists") { ListsFragment() }
 

@@ -23,6 +23,9 @@ import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
@@ -31,6 +34,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -39,21 +43,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.MaterialColors
 import co.softov.morestuff.android.app.ui.get
 import co.softov.morestuff.android.ui.chat.TaskActions
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
@@ -69,9 +80,32 @@ fun PriorityContent(
         }
     )
 
+    val resources = LocalContext.current.resources
+    LaunchedEffect(viewModel.notification) {
+        when (viewModel.notification) {
+            NotificationState.Complete -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(R.string.snack_task_completed),
+                    actionLabel = resources.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
+                ).also {
+                    Timber.d("SnackBarResult: $it")
+                    when (it) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
+                    }
+                }
+            }
+
+            else -> {}
+        }
+    }
+
     val taskActions = TaskActions(
         taskChatAction = viewModel::showTaskChat,
     )
+
+    val scope = rememberCoroutineScope()
 
     Box(modifier) {
         LazyColumn(
@@ -111,13 +145,13 @@ fun PriorityContent(
                     }
                 })
 
-                ReorderableItem(state, key = task.id) { isDragging ->
+                ReorderableItem(state, key = item.id) { isDragging ->
                     SwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
                             PriorityItem(
-                                task,
+                                item,
                                 Modifier.detectReorderAfterLongPress(state),
                                 isDragging = isDragging,
                                 taskActions = taskActions

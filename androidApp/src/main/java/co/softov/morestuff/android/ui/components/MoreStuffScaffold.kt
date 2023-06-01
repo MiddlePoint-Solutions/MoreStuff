@@ -3,7 +3,6 @@ package co.softov.morestuff.android.ui.components
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.Scaffold
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -17,6 +16,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MoreStuffScaffold(
+    snackbarHostState: SnackbarHostState,
     content: @Composable (PaddingValues) -> Unit,
     viewModel: DrawerViewModel = koinViewModel(),
 ) {
@@ -48,6 +48,7 @@ fun MoreStuffScaffold(
         content = {
             Scaffold(
                 modifier = Modifier.systemBarsPadding(),
+                snackbarHost = { SnackbarHost(snackbarHostState) },
                 topBar = {
                     MoreStuffTopBar(
                         openDrawer = { scope.launch { drawerState.open() } },
