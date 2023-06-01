@@ -192,6 +192,7 @@ dependencies {
     implementation(Libs.Accompanist.pager)
     implementation(Libs.Accompanist.pagerIndicators)
     implementation(Libs.Accompanist.permissions)
+    implementation(Libs.Accompanist.systemUi)
 
     // Firebase
     implementation(platform(Libs.Firebase.bom))
