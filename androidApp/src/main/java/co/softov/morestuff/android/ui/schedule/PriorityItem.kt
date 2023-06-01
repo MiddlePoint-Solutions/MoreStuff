@@ -48,7 +48,7 @@ fun PriorityItem(
         Text(
             text = "${task.title} * score: ${task.priorityScore}",
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(12.dp)
         )
     }
 }

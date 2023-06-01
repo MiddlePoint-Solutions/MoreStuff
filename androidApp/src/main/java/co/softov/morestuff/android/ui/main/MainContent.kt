@@ -90,7 +90,7 @@ fun MainContent(
                     )
                 } else {
                     PriorityContent(
-                        snackbarHostState = snackbarHostState,
+                        snackBarHostState = snackbarHostState,
                         modifier = Modifier.weight(1f),
                         listState = scrollState
                     )
