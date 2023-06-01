@@ -10,7 +10,11 @@ import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
@@ -48,10 +52,17 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
 
+            val snackbarHostState = remember { SnackbarHostState() }
+
             MoreStuffTheme {
                 MoreStuffScaffold(
+                    snackbarHostState = snackbarHostState,
                     content = {
-                        MainContent()
+                        Box(Modifier.padding(it)) {
+                            MainContent(
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
                     }
                 )
             }
