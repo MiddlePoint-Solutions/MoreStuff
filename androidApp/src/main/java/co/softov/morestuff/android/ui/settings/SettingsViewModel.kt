@@ -46,6 +46,6 @@ class SettingsViewModel(
     }
 
     fun testReviewActivity() {
-        notifier.showReviewNotification(ReviewNotification.Overload(99))
+        notifier.showReviewNotification(ReviewNotification.Evening)
     }
 }

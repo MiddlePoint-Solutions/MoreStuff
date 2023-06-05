@@ -85,9 +85,7 @@ class ScheduleMiddleware(
         when (action) {
 
             is SettingAction.InitSettings -> {
-                if (action.firstTime) {
-                    scope.launch { scheduleReviewNotificationsUseCase() }
-                }
+                scope.launch { scheduleReviewNotificationsUseCase() }
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
@@ -143,7 +141,13 @@ class ScheduleMiddleware(
                 val schedule = action.schedule
                 when (replyType) {
                     LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Plan(TODO(""))))
-                    SNOOZE -> dispatch(RescheduleTaskAction(schedule.taskId, Plan(oneHourLater.toString())))
+                    SNOOZE -> dispatch(
+                        RescheduleTaskAction(
+                            schedule.taskId,
+                            Plan(oneHourLater.toString())
+                        )
+                    )
+
                     TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
                     DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }

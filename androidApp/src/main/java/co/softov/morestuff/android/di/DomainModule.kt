@@ -10,6 +10,8 @@ import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.priority.*
+import co.softov.morestuff.android.domain.usecase.review.GetCurrentReviewNotificationUseCase
+import co.softov.morestuff.android.domain.usecase.review.GetCurrentReviewNotificationUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.*
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
@@ -38,6 +40,7 @@ val useCaseModules
         add(scheduleUseCases)
         add(messageUseCases)
         add(settingsUseCases)
+        add(reviewUseCases)
     }
 
 val serviceModule = module {
@@ -151,6 +154,10 @@ val settingsUseCases = module {
     factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
     factoryOf(::SaveUserSettingsUseCaseImpl) bind SaveUserSettingsUseCase::class
     factoryOf(::CheckFirstTimeImplUseCase) bind CheckFirstTimeUseCase::class
+}
+
+val reviewUseCases = module {
+    factoryOf(::GetCurrentReviewNotificationUseCaseImpl) bind GetCurrentReviewNotificationUseCase::class
 }
 
 val timeManagerModule = module {

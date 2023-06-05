@@ -62,8 +62,8 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
         const val KEY_REVIEW_EXTRA = "REVIEW_EXTRA"
         const val KEY_TASK_ID = "TASK_ID"
 
-        const val REQUEST_CODE_REVIEW_MORNING = 424240
-        const val REQUEST_CODE_REVIEW_EVENING = 424241
-        const val REQUEST_CODE_REVIEW_AFTERNOON = 424243
+        const val REQUEST_CODE_REVIEW_MORNING = 42421
+        const val REQUEST_CODE_REVIEW_EVENING = 42422
+        const val REQUEST_CODE_REVIEW_AFTERNOON = 42423
     }
 }

@@ -115,6 +115,7 @@ sqldelight {
     database("StuffDb") {
         packageName = "co.softov.morestuff.db"
         schemaOutputDirectory = file("src/main/sqldelight/databases")
+
     }
 }
 
