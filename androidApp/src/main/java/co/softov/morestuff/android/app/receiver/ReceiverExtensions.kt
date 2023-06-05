@@ -22,7 +22,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.random.Random
 
 
-
 val random = Random(3112)
 val randomRequestCode: Int
     get() = ((System.currentTimeMillis() + random.nextInt()) / 1000).toInt()
@@ -59,19 +58,41 @@ fun NotificationReceiver.Companion.createReplyIntent(
 fun NotificationReceiver.Companion.createReviewIntent(
     context: Context,
     type: ReviewNotification
-): PendingIntent =
-    Intent(context, NotificationReceiver::class.java)
-        .setAction(ACTION_NOTIFICATION_REVIEW)
-        .setReviewIntentExtras(type)
-        .let {
-            val requestCode = when(type) {
-                ReviewNotification.Morning -> REQUEST_CODE_REVIEW_MORNING
-                ReviewNotification.Afternoon -> REQUEST_CODE_REVIEW_AFTERNOON
-                ReviewNotification.Evening -> REQUEST_CODE_REVIEW_EVENING
-                is ReviewNotification.Overload -> randomRequestCode
-            }
-            PendingIntent.getBroadcast(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
-        }
+) = Intent(context, NotificationReceiver::class.java)
+    .setAction(ACTION_NOTIFICATION_REVIEW)
+    .setReviewIntentExtras(type)
+
+fun NotificationReceiver.Companion.createReviewPendingIntent(
+    context: Context,
+    intent: Intent,
+    type: ReviewNotification
+) = PendingIntent.getBroadcast(
+    context,
+    getReviewIntentRequestCode(type),
+    intent,
+    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+)
+
+
+fun NotificationReceiver.Companion.createCancelReviewPendingIntent(
+    context: Context,
+    intent: Intent,
+    type: ReviewNotification
+) = PendingIntent.getBroadcast(
+    context,
+    getReviewIntentRequestCode(type),
+    intent,
+    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+)
+
+
+fun NotificationReceiver.Companion.getReviewIntentRequestCode(
+    type: ReviewNotification
+) = when (type) {
+    ReviewNotification.Morning -> REQUEST_CODE_REVIEW_MORNING
+    ReviewNotification.Afternoon -> REQUEST_CODE_REVIEW_AFTERNOON
+    ReviewNotification.Evening -> REQUEST_CODE_REVIEW_EVENING
+}
 
 fun Intent.getScheduleIdExtra() = getLongExtra(KEY_SCHEDULE_ID, 0)
 fun Intent.setScheduleIdExtra(scheduleId: Long) = putExtra(KEY_SCHEDULE_ID, scheduleId)

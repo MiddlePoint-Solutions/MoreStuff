@@ -14,7 +14,4 @@ sealed class ReviewNotification : Parcelable {
     @Parcelize
     object Evening : ReviewNotification()
 
-    @Parcelize
-    data class Overload(val tasks: Int) : ReviewNotification()
-
 }
