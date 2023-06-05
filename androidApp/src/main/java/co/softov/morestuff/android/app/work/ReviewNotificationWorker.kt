@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.redux.AppStore
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction
 import co.softov.morestuff.android.domain.service.Notifier
 import org.koin.core.component.KoinComponent
@@ -17,7 +18,7 @@ import org.koin.core.component.inject
 
 class ReviewNotificationWorker(
     context: Context,
-    private val params: WorkerParameters
+    params: WorkerParameters
 ) : CoroutineWorker(context, params), KoinComponent {
 
     private val store: AppStore by inject()
@@ -28,10 +29,6 @@ class ReviewNotificationWorker(
 
     override suspend fun doWork(): Result {
         setForeground(getForegroundInfo())
-        val scheduleId = params.inputData.getLong(PARAM_SCHEDULE_ID, -1)
-        val replyTypeCode = params.inputData.getInt(PARAM_REPLY_TYPE, ReplyType.SNOOZE.value)
-        val replyType = ReplyType.withValue(replyTypeCode)
-        store.dispatchSuspend(ReminderAction.UserResponseAction(scheduleId, replyType))
         return Result.success()
     }
 
@@ -47,15 +44,5 @@ class ReviewNotificationWorker(
 
         private const val NOTIFICATION_ID = 91192
 
-        private const val PARAM_SCHEDULE_ID = "scheduleId"
-        private const val PARAM_REPLY_TYPE = "replyType"
-
-        fun createWorkerData(scheduleId: Long, replyType: ReplyType): Data =
-            Data.Builder()
-                .putLong(PARAM_SCHEDULE_ID, scheduleId)
-                .putInt(PARAM_REPLY_TYPE, replyType.value)
-                .build()
-
-        fun createWorkerTag(scheduleId: Long) = "ScheduleResponse-$scheduleId"
     }
 }
