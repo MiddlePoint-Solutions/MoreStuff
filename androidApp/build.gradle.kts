@@ -12,6 +12,7 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("koin")
     id("app.cash.molecule")
+    id ("org.jetbrains.kotlin.plugin.serialization")
 }
 
 group = "io.middlepoint.morestuff"
@@ -115,6 +116,7 @@ sqldelight {
     database("StuffDb") {
         packageName = "co.softov.morestuff.db"
         schemaOutputDirectory = file("src/main/sqldelight/databases")
+        verifyMigrations = true
     }
 }
 
@@ -238,6 +240,9 @@ dependencies {
     //LinkPreview
     implementation ("org.jsoup:jsoup:1.10.3")
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+
 
 
 }

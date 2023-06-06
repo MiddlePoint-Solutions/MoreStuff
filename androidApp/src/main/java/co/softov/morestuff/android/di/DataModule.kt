@@ -10,6 +10,7 @@ import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
+import co.softov.morestuff.android.data.mapper.makeSelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
@@ -62,6 +63,7 @@ val dataModule = module {
         MessageRepositoryImpl(
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
+            mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(),
             timeManager = get()
         )
     }

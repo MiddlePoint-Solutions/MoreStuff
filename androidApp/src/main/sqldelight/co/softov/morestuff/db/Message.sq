@@ -41,10 +41,11 @@ WHERE task_id = ?
 ORDER BY datetime(create_time) DESC;
 
 selectTaskMessagesByContentType:
-SELECT *
+SELECT message.*, url_metadata.json_data
 FROM message
-WHERE task_id = ? AND content_type = ?
-ORDER BY datetime(create_time) DESC;
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+WHERE message.task_id = ? AND message.content_type = ?
+ORDER BY datetime(message.create_time) DESC;
 
 selectCurrentTaskMessage:
 SELECT *

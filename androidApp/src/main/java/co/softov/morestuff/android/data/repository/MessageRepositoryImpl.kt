@@ -2,27 +2,37 @@ package co.softov.morestuff.android.data.repository
 
 
 import arrow.core.Either
+import arrow.core.compose
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
+import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import org.jsoup.Jsoup
 
 class MessageRepositoryImpl(
     database: StuffDb,
     private val mapMessageDb: MessageDbMapper,
+    private val mapMessageTaskChatDb: SelectTaskMessagesByContentTypeMapper,
     private val timeManager: TimeManager,
 ) : MessageRepository {
 
     private val messageQueries = database.messageQueries
+    private val urlMetadataQueries = database.urlMetadataQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
@@ -35,10 +45,13 @@ class MessageRepositoryImpl(
         return messageQueries.selectTaskMessagesByContentType(
             taskId,
             ContentType.TASK_MESSAGE.value
-        )
-            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+        ).asFlow().mapToList().map { mapList(it, mapMessageDb.compose(mapMessageTaskChatDb)) }
     }
 
+    override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
+        return messageQueries.selectMessageByTaskId(taskId)
+            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+    }
 
     override suspend fun getActiveReminderMessages(): List<Message> {
         return messageQueries.selectActiveReminderMessages().executeAsList()
@@ -51,11 +64,6 @@ class MessageRepositoryImpl(
             null -> Either.Left(MessageDoesNotExist)
             else -> Either.Right(mapMessageDb(message))
         }
-    }
-
-    override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByTaskId(taskId)
-            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
     }
 
     override suspend fun createMessage(
@@ -107,11 +115,105 @@ class MessageRepositoryImpl(
 
     private fun getCurrentTaskMessageId(
         taskId: Long,
-        contentType: ContentType
+        contentType: ContentType,
     ): Either<Failure, Long> =
         messageQueries.selectTaskMessage(
             task_id = taskId,
             content_type = contentType.value
         ).executeAsOneOrNull()?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
+
+    override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
+        withContext(Dispatchers.IO) {
+            try {
+                val userAgent = "Mozilla"
+                val referrer = "http://www.google.com"
+                val timeout = 10000
+                val docSelectQuery = "meta[property^=og:]"
+                val openGraphKey = "content"
+                val property = "property"
+                val ogImage = "og:image"
+                val ogDescription = "og:description"
+                val ogUrl = "og:url"
+                val ogTitle = "og:title"
+                val ogSiteName = "og:site_name"
+                val ogType = "og:type"
+                var url = inputUrl
+
+                if (!url.contains("http")) {
+                    url = "http://$url"
+                }
+
+                val response = Jsoup.connect(url)
+                    .ignoreContentType(true)
+                    .userAgent(userAgent)
+                    .referrer(referrer)
+                    .timeout(timeout)
+                    .followRedirects(true)
+                    .execute()
+
+                val doc = response.parse()
+
+                val ogTags = doc.select(docSelectQuery)
+
+                val openGraphResult = OpenGraphResult()
+
+                ogTags.forEach { tag ->
+
+                    when (tag.attr(property)) {
+                        ogImage -> {
+                            openGraphResult.image = tag.attr(openGraphKey)
+                        }
+
+                        ogDescription -> {
+                            openGraphResult.description = tag.attr(openGraphKey)
+                        }
+
+                        ogUrl -> {
+                            openGraphResult.url = tag.attr(openGraphKey)
+                        }
+
+                        ogTitle -> {
+                            openGraphResult.title = tag.attr(openGraphKey)
+                        }
+
+                        ogSiteName -> {
+                            openGraphResult.siteName = tag.attr(openGraphKey)
+                        }
+
+                        ogType -> {
+                            openGraphResult.type = tag.attr(openGraphKey)
+                        }
+                    }
+                }
+
+                return@withContext openGraphResult
+            } catch (e: Exception) {
+                e.printStackTrace()
+                return@withContext null
+            }
+        }
+
+    override suspend fun insertUrlMetadata(
+        url: String,
+        openGraphResult: OpenGraphResult,
+        messageId: Long,
+    ) {
+        val openGraphResultJson = Json.encodeToString(openGraphResult)
+        urlMetadataQueries.insertUrlMetadata(
+            url = url,
+            json_data = openGraphResultJson,
+            message_id = messageId
+        )
+    }
+
+    override suspend fun getMetadata(messageId: Long): List<Pair<String, OpenGraphResult>> {
+        return urlMetadataQueries.getUrlMetadata(messageId).executeAsList().map { row ->
+            val url = row.url
+            val jsonData = row.json_data
+            val openGraphResult = Json.decodeFromString<OpenGraphResult>(jsonData)
+            url to openGraphResult
+        }
+    }
+
 
 }

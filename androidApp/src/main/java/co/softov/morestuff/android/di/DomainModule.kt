@@ -138,12 +138,13 @@ val messageUseCases = module {
     factoryOf(::GetActiveMessagesImpl) bind GetActiveScheduleMessages::class
     factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
     factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
-    factoryOf(::CreateTaskMessageUseCaseImpl) bind CreateTaskMessageUseCase::class
+    factoryOf(::CreateUserTaskMessageUseCaseImpl) bind CreateUserTaskMessageUseCase::class
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
     factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
     factoryOf(::ClearActivePendingMessagesUseCaseImpl) bind ClearActiveReminderMessagesUseCase::class
     factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
+    factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
 }
 
 

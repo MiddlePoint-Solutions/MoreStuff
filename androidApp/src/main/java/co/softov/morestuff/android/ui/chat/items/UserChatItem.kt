@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.usecase.message.findFirstUrl
 import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -54,6 +55,7 @@ fun UserChatItem(message: Message, actions: TaskActions) {
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
+    val messageId = message.id
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = Pattern.compile(
@@ -61,8 +63,8 @@ fun UserChatItem(message: Message, actions: TaskActions) {
         Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
     )
 
-    val firstUrl = viewModel.findFirstUrl(message.content, urlPattern)
-    val openGraphResult = getOpenGraphData(firstUrl)
+    val firstUrl = findFirstUrl(message.content, urlPattern)
+    val openGraphResult = getOpenGraphData(firstUrl, messageId)
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
@@ -84,9 +86,6 @@ fun UserChatItem(message: Message, actions: TaskActions) {
                 contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
             ) {
                 Column(modifier = Modifier.padding(end = 5.dp, bottom = 4.dp)) {
-                    if (openGraphResult?.title != null && openGraphResult.description != null) {
-                        OpenGraphPreview(openGraphResult)
-                    }
 
                     SelectionContainer {
                         ClickableText(
@@ -109,6 +108,9 @@ fun UserChatItem(message: Message, actions: TaskActions) {
                             }
                         )
                     }
+                    if (openGraphResult?.title != null && openGraphResult.description != null) {
+                        OpenGraphPreview(openGraphResult)
+                    }
 
                 }
             }
@@ -118,10 +120,11 @@ fun UserChatItem(message: Message, actions: TaskActions) {
 
 
 @Composable
-fun getOpenGraphData(firstUrl: String?): OpenGraphResult? {
+fun getOpenGraphData(firstUrl: String?, messageId: Long): OpenGraphResult? {
+    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM")
     return produceState<OpenGraphResult?>(initialValue = null) {
         value = if (firstUrl != null) {
-            fetchOpenGraphMetadata(firstUrl)
+            viewModel.fetchOpenGraphMetadata(firstUrl, messageId)
         } else null
     }.value
 }
@@ -146,7 +149,8 @@ fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pat
         withStyle(
             style = SpanStyle(
                 textDecoration = TextDecoration.Underline,
-                color = Color.Blue
+                color = Color.White,
+                fontSize = 16.sp
             )
         ) {
             append(originalUrl)
@@ -174,11 +178,14 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
         ) {
             Text(
                 text = openGraphResult.title ?: "",
-                style = TextStyle(fontWeight = FontWeight.Bold),
+                style = TextStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                ),
                 modifier = Modifier.weight(1f)
             )
             if (openGraphResult.image != null) {
-                Box(modifier = Modifier.size(80.dp)) {
+                Box(modifier = Modifier.size(40.dp)) {
                     Image(
                         painter = rememberAsyncImagePainter(openGraphResult.image),
                         contentDescription = null,
@@ -189,82 +196,11 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
         }
         Text(
             text = openGraphResult.description ?: "",
+            fontSize = 9.sp,
             modifier = Modifier.padding(top = 8.dp)
         )
     }
 }
-
-
-/*@Composable
-fun UserChatItem(message: Message, actions: TaskActions) {
-    val uriHandler = LocalUriHandler.current
-    val coroutineScope = rememberCoroutineScope()
-    val urlPattern = Pattern.compile(
-        "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?",
-        Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
-    )
-
-    val text = buildAnnotatedString {
-        val matcher = urlPattern.matcher(message.content)
-        var lastEnd = 0
-
-        while (matcher.find()) {
-            val start = matcher.start()
-            val end = matcher.end()
-
-            if (start > lastEnd) {
-                append(message.content.substring(lastEnd, start))
-            }
-            var url = message.content.substring(start, end)
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://$url"
-            }
-            pushStringAnnotation("URL", url)
-            withStyle(style = SpanStyle(textDecoration = TextDecoration.Underline, color = Color.Blue)) {
-                append(url)
-            }
-            pop()
-            lastEnd = end
-        }
-        if (lastEnd < message.content.length) {
-            append(message.content.substring(lastEnd))
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 45.dp)
-            .clickable { actions.taskChatAction(message.taskId) },
-        horizontalArrangement = Arrangement.End
-    ) {
-        Column(
-            modifier = Modifier.padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                color = MaterialTheme.colorScheme.userChatItem,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
-            ) {
-                ClickableText(
-                    modifier = Modifier.padding(8.dp),
-                    text = text,
-                    style = LocalTextStyle.current.copy(color = Color.White, fontSize = 16.sp),
-                    onClick = { offset ->
-                        text.getStringAnnotations("URL", offset, offset).firstOrNull()?.let {
-                            coroutineScope.launch {
-                                try {
-                                    uriHandler.openUri(it.item)
-                                } catch (e: Exception) {
-                                }
-                            }
-                        }
-                    }
-                )
-            }
-        }
-    }
-}*/
 
 
 @Preview

@@ -78,11 +78,10 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
-import co.softov.morestuff.android.ui.priority.TaskPriorityBottomSheet
 import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
@@ -184,11 +183,7 @@ fun TaskChatContent(
                                 .background(color = MaterialTheme.colorScheme.primary)
                         ) {
                             TaskMessageTextField(
-                                sendMessageForTask = { content ->
-                                    viewModel.sendMessageForTask(
-                                        content
-                                    )
-                                },
+                                sendMessageForTask = viewModel::sendMessageForTask,
                             )
                         }
                     }

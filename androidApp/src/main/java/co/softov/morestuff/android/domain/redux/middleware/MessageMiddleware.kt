@@ -1,6 +1,8 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.replyWithTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -15,12 +17,14 @@ import kotlinx.coroutines.launch
 
 sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
+    internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) : MessageAction()
 }
 
 class MessageMiddleware(
-    private val createTaskMessageUseCase: CreateTaskMessageUseCase,
+    private val createUserTaskMessageUseCase: CreateUserTaskMessageUseCase,
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
+    private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
     private val countActiveReminderMessagesUseCase: CountActiveReminderMessagesUseCase,
     private val getActiveScheduleMessages: GetActiveScheduleMessages,
@@ -46,8 +50,12 @@ class MessageMiddleware(
                 }
             }
 
+            is MessageAction.CreateUserTaskMessageAction -> scope.launch{
+                val task = TaskDomain(id = action.taskId, title = action.content)
+                createUserTaskMessageUseCase(task)
+            }
             is TaskAction.TaskCreatedAction -> scope.launch {
-                createTaskMessageUseCase(action.task)
+                createMessageUseCase(action.task.id, title = action.task.title, contentType = ContentType.USER_NEW_TASK)
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 

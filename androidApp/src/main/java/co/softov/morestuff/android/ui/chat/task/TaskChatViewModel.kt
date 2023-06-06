@@ -7,19 +7,21 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -27,7 +29,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.regex.Pattern
 
 class TaskChatViewModel(
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
@@ -37,6 +38,7 @@ class TaskChatViewModel(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
     private val messageRepository: MessageRepository,
+    private val fetchOpenGraphMetadataUseCase: FetchOpenGraphMetadataUseCase,
     devTools: DevTools,
 ) : NoStateViewModel() {
 
@@ -101,24 +103,11 @@ class TaskChatViewModel(
     }
 
     fun sendMessageForTask(content: String) {
-        viewModelScope.launch {
-            messageRepository.createMessage(
-                taskId = taskId,
-                scheduleId = 0,
-                contentType = ContentType.TASK_MESSAGE.value,
-                content = content,
-            )
-        }
+        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
-    fun findFirstUrl(content: String, urlPattern: Pattern): String? {
-        val matcher = urlPattern.matcher(content)
-        return if (matcher.find()) {
-            var url = content.substring(matcher.start(), matcher.end())
-            if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                url = "https://$url"
-            }
-            url
-        } else null
+
+    suspend fun fetchOpenGraphMetadata(inputUrl: String, messageId: Long): OpenGraphResult? {
+        return fetchOpenGraphMetadataUseCase(inputUrl, messageId)
     }
 
     fun onBackPressed() {
