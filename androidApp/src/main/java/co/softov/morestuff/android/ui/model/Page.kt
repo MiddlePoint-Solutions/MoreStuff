@@ -7,7 +7,8 @@ import co.softov.morestuff.android.R
 enum class PageType {
     PAGE_COMPLETE_TASKS,
     PAGE_ACTIVE_NOW,
-    PAGE_ACTIVE_LATER
+    PAGE_ACTIVE_LATER,
+    PAGE_SCHEDULE
 }
 
 val PageType.title
@@ -15,4 +16,5 @@ val PageType.title
         PageType.PAGE_COMPLETE_TASKS -> stringResource(id = R.string.page_title_complete)
         PageType.PAGE_ACTIVE_NOW -> stringResource(id = R.string.page_title_now)
         PageType.PAGE_ACTIVE_LATER -> stringResource(id = R.string.page_title_later)
+        PageType.PAGE_SCHEDULE -> stringResource(id = R.string.page_title_schedule)
     }

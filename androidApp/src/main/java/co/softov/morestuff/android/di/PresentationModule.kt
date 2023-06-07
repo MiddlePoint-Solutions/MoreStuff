@@ -2,8 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.drawer.DrawerViewModel
-import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.model.PageType
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.priority.PlanViewModel
@@ -30,7 +30,8 @@ val presentationModule = module {
             timeFormatter = get(),
             timeManager = get(),
             getLaterTaskUseCase = get(),
-            getNowTaskUseCase = get()
+            getNowTaskUseCase = get(),
+            getSchedules = get()
         )
     }
 
