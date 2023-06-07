@@ -20,7 +20,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +37,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.usecase.message.findFirstUrl
 import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -55,16 +53,14 @@ fun UserChatItem(message: Message, actions: TaskActions) {
     val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
         parametersOf(taskId)
     }
-    val messageId = message.id
+
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = Pattern.compile(
         "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?",
         Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
     )
-
-    val firstUrl = findFirstUrl(message.content, urlPattern)
-    val openGraphResult = getOpenGraphData(firstUrl, messageId)
+    val openGraphResult =  message.openGraphResult
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
@@ -118,16 +114,6 @@ fun UserChatItem(message: Message, actions: TaskActions) {
     }
 }
 
-
-@Composable
-fun getOpenGraphData(firstUrl: String?, messageId: Long): OpenGraphResult? {
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM")
-    return produceState<OpenGraphResult?>(initialValue = null) {
-        value = if (firstUrl != null) {
-            viewModel.fetchOpenGraphMetadata(firstUrl, messageId)
-        } else null
-    }.value
-}
 
 fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern) {
     val matcher = urlPattern.matcher(content)

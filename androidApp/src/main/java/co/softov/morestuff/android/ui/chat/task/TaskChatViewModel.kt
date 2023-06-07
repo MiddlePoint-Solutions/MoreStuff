@@ -17,8 +17,6 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
@@ -26,7 +24,6 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import kotlinx.coroutines.flow.SharingStarted
@@ -47,8 +44,6 @@ class TaskChatViewModel(
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
-    private val messageRepository: MessageRepository,
-    private val fetchOpenGraphMetadataUseCase: FetchOpenGraphMetadataUseCase,
     private val timeManager: TimeManager,
     private val fetchOpenGraphMetadataUseCase: FetchOpenGraphMetadataUseCase,
     devTools: DevTools,
@@ -135,9 +130,6 @@ class TaskChatViewModel(
     fun sendMessageForTask(content: String) {
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
-
-    suspend fun fetchOpenGraphMetadata(inputUrl: String, messageId: Long): OpenGraphResult? {
-        return fetchOpenGraphMetadataUseCase(inputUrl, messageId)
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(

@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 
 sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
-    internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) : MessageAction()
+    internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
+        MessageAction()
 }
 
 class MessageMiddleware(
@@ -35,7 +36,7 @@ class MessageMiddleware(
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
 
         when (action) {
@@ -50,12 +51,17 @@ class MessageMiddleware(
                 }
             }
 
-            is MessageAction.CreateUserTaskMessageAction -> scope.launch{
+            is MessageAction.CreateUserTaskMessageAction -> scope.launch {
                 val task = TaskDomain(id = action.taskId, title = action.content)
                 createUserTaskMessageUseCase(task)
             }
+
             is TaskAction.TaskCreatedAction -> scope.launch {
-                createMessageUseCase(action.task.id, title = action.task.title, contentType = ContentType.USER_NEW_TASK)
+                createMessageUseCase(
+                    action.task.id,
+                    title = action.task.title,
+                    contentType = ContentType.USER_NEW_TASK
+                )
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 

@@ -63,7 +63,7 @@ val dataModule = module {
         MessageRepositoryImpl(
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
-            mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(),
+            mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(timeFormatter = get()),
             timeManager = get()
         )
     }
