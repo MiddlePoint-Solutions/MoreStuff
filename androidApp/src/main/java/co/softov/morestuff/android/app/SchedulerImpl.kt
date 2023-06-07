@@ -81,7 +81,7 @@ class SchedulerImpl(
                 set(Calendar.MINUTE, 50)
             }.also {
                 alarmManager.setInexactRepeating(
-                    AlarmManager.RTC_WAKEUP,
+                    AlarmManager.RTC,
                     it.timeInMillis,
                     AlarmManager.INTERVAL_DAY,
                     NotificationReceiver.createReviewPendingIntent(
@@ -113,7 +113,7 @@ class SchedulerImpl(
             }
 
             alarmManager.setInexactRepeating(
-                AlarmManager.RTC_WAKEUP,
+                AlarmManager.RTC,
                 calendar.timeInMillis,
                 AlarmManager.INTERVAL_DAY,
                 NotificationReceiver.createReviewPendingIntent(
