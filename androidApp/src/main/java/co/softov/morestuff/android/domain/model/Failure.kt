@@ -7,3 +7,5 @@ interface FeatureFailure : Failure
 data class PriorityOptionsError(val message: String?) : FeatureFailure
 
 data class PrioritySchedulingNotAllowed(val priority: Priority) : FeatureFailure
+
+data class TaskReorderFailure(val message: String?) : Failure

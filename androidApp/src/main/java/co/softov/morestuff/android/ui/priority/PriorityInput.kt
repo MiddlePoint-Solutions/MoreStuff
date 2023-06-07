@@ -12,17 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerLayoutType
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -31,11 +22,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
@@ -43,7 +32,6 @@ import co.softov.morestuff.android.ui.main.PlanModel
 import co.softov.morestuff.android.ui.main.PriorityUI
 import co.softov.morestuff.android.ui.main.PriorityUI.*
 import org.koin.compose.koinInject
-import kotlin.reflect.KFunction1
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,9 +141,9 @@ fun PriorityInput(
 }
 
 @Composable
-private fun getRelativeDate(
+fun getRelativeDate(
     planModel: PlanModel,
-    timeFormatter: TimeFormatter
+    timeFormatter: TimeFormatter,
 ) = when (planModel.relativeDisplay) {
     RelativeDateDisplay.Today -> stringResource(R.string.relative_today)
     RelativeDateDisplay.Tomorrow -> stringResource(R.string.relative_tomorrow)
@@ -164,83 +152,3 @@ private fun getRelativeDate(
     }
 }
 
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun PriorityTimePicker(
-    dismissTimePicker: () -> Unit,
-    onTimeChange: () -> Unit,
-    state: TimePickerState = rememberTimePickerState()
-) {
-    Dialog(onDismissRequest = { dismissTimePicker() }) {
-        Surface(
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                TimePicker(
-                    state = state,
-                    layoutType = TimePickerLayoutType.Vertical
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = {
-                            dismissTimePicker()
-                        }
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-
-                    TextButton(
-                        onClick = {
-                            onTimeChange()
-                            dismissTimePicker()
-                        }
-                    ) {
-                        Text(stringResource(R.string.ok))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun PriorityDatePicker(
-    dismissDialog: () -> Unit,
-    onDateChange: () -> Unit,
-    state: DatePickerState = rememberDatePickerState()
-) {
-    DatePickerDialog(
-        onDismissRequest = { dismissDialog() },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDateChange()
-                    dismissDialog()
-                },
-                enabled = true
-            ) {
-                Text("OK")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    dismissDialog()
-                }
-            ) {
-                Text("Cancel")
-            }
-        }
-    ) {
-        DatePicker(state = state)
-    }
-}

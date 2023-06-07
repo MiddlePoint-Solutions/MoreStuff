@@ -6,11 +6,12 @@ object Libs {
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
     object Accompanist {
-        private const val version = "0.31.2-alpha"
+        private const val version = "0.31.3-beta"
         const val insetsUi = "com.google.accompanist:accompanist-insets-ui:$version"
         const val pager = "com.google.accompanist:accompanist-pager:$version"
         const val pagerIndicators = "com.google.accompanist:accompanist-pager-indicators:$version"
         const val permissions = "com.google.accompanist:accompanist-permissions:$version"
+        const val systemUi = "com.google.accompanist:accompanist-systemuicontroller:$version"
     }
 
     object Kotlin {
@@ -120,7 +121,7 @@ object Libs {
         }
 
         object Compose {
-            private const val version = "2023.04.01"
+            private const val version = "2023.05.01"
             const val bom = "androidx.compose:compose-bom:$version"
 
             const val runtime = "androidx.compose.runtime:runtime"

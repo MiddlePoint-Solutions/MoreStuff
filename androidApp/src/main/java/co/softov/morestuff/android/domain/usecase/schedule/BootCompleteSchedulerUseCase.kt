@@ -13,16 +13,18 @@ interface BootCompleteSchedulerUseCase {
 }
 
 class BootCompleteSchedulerUseCaseImpl(
+    private val scheduleReviewNotificationsUseCase: ScheduleReviewNotificationsUseCase,
     private val getActiveSchedulesUseCase: GetActiveSchedulesUseCase,
     private val scheduler: Scheduler,
     private val timeManager: TimeManager,
 ) : BootCompleteSchedulerUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
+        scheduleReviewNotificationsUseCase()
         return when (val result = getActiveSchedulesUseCase()) {
             is Either.Left -> result
             is Either.Right -> {
-                reschedule(result.value.toMutableList())
+//                reschedule(result.value.toMutableList()) // Joseph: do we really need to reschedule here? unless they are exact schedule.
                 Either.Right(true)
             }
         }
@@ -42,17 +44,6 @@ class BootCompleteSchedulerUseCaseImpl(
             schedule.scheduleLocalTime?.let { time ->
                 scheduler.scheduleAtExact(schedule.id, time)
             }
-        }
-
-        // TODO: Get missed schedules that were not fulfilled and create reminders for them
-        // TODO: should update the current schedule or create a new one?
-        // TODO: How are we going to display this?
-        //  What if there is a schedule that should show now and missed schedules?
-        //  The priority goes to the current scheduled reminder and the missed schedules should be shown at a different time.
-        activeSchedules.removeAll(futureSchedules)
-        Timber.d("execute, missed schedules: ${activeSchedules.size}")
-        activeSchedules.forEach {
-
         }
     }
 }

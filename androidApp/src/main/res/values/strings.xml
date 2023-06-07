@@ -27,6 +27,8 @@
     <string name="time_option_later">Later</string>
     <string name="time_option_tomorrow">Tomorrow %s</string>
     <string name="time_option_today">Today %s</string>
+    <string name="schedule_set_day">Set Date</string>
+    <string name="schedule_set_time">Set Time</string>
 
     <string name="option_complete">Complete</string>
 
@@ -83,5 +85,8 @@
     <string name="relative_tomorrow">Tomorrow</string>
     <string name="cd_plan_scheduling_requires_your_permission">Plan scheduling requires your permission</string>
     <string name="mr_stuff_image">MR.Stuff image</string>
+    <string name="snack_task_archived">Task archived</string>
+    <string name="undo">Undo</string>
+    <string name="snack_task_completed">Task completed</string>
 
 </resources>

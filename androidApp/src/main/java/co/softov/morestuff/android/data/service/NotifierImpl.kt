@@ -82,7 +82,6 @@ class NotifierImpl(
 
     private fun createReminderNotification(message: Message): Notification {
         val scheduleId = message.scheduleId
-        val tomorrow = createReplyIntentWithTitle(scheduleId, TOMORROW)
         val later = createReplyIntentWithTitle(scheduleId, LATER)
         val snooze = createReplyIntentWithTitle(scheduleId, SNOOZE)
         val done = createReplyIntentWithTitle(scheduleId, DONE)
@@ -97,7 +96,6 @@ class NotifierImpl(
             .setContentIntent(createReminderContentIntent(message.taskId))
             .setStyle(style)
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
-            .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
             .setDeleteIntent(snooze.second)
             .build()
@@ -115,7 +113,7 @@ class NotifierImpl(
             .setGroup(GROUP_KEY_REMINDERS)
             // Set this notification as the summary for the group.
             .setContentIntent(
-                createReviewContentIntent(ReviewNotification.Overload(notificationCount))
+                createReviewContentIntent(ReviewNotification.Morning)
             ).build()
 
     private fun notifyUser(
@@ -142,6 +140,8 @@ class NotifierImpl(
         }
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
+
+
 
     private fun createReminderContentIntent(
         taskId: Long
@@ -243,12 +243,10 @@ class NotifierImpl(
             ReviewNotification.Morning -> "Morning Review" to "Take a minute to sort priorities :D"
             ReviewNotification.Afternoon -> "Afternoon Review" to "A midday progress check"
             ReviewNotification.Evening -> "Evening Review" to "Review the day and prepare for tomorrow"
-            is ReviewNotification.Overload -> "Task Overload" to "Review ${type.tasks} pending tasks"
         }
 
         val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
             .setSmallIcon(R.drawable.priority_48px)
-            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
             .setContentTitle(title)
             .setContentText(message)

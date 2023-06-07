@@ -8,10 +8,7 @@ import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationsAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderOverloadNotification
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.*
 import kotlinx.coroutines.CoroutineScope
 
 sealed class NotificationAction : Action.FeatureAction() {
@@ -23,8 +20,8 @@ sealed class NotificationAction : Action.FeatureAction() {
         val messages: List<Message>
     ) : NotificationAction()
 
-    internal data class ShowReminderOverloadNotification(
-        val taskCount: Int
+    internal data class ShowReviewNotification(
+        val reviewType: ReviewNotification
     ) : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
@@ -53,9 +50,8 @@ class NotificationMiddleware(
                 notifier.showReminderNotifications(action.messages)
             }
 
-            is ShowReminderOverloadNotification -> {
-                notifier.cancelReminderNotifications()
-                notifier.showReviewNotification(ReviewNotification.Overload(action.taskCount))
+            is ShowReviewNotification -> {
+                notifier.showReviewNotification(action.reviewType)
             }
 
             is RemoveScheduleNotificationAction -> {

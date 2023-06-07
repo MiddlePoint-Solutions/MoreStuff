@@ -1,61 +1,62 @@
 package co.softov.morestuff.android.ui.schedule
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.ui.MaterialColors
+import co.softov.morestuff.android.app.ui.get
 import co.softov.morestuff.android.ui.chat.TaskActions
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
+    snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
@@ -70,6 +71,26 @@ fun PriorityContent(
             viewModel.reorderTaskItem(start, end)
         }
     )
+
+    val resources = LocalContext.current.resources
+    LaunchedEffect(viewModel.notification) {
+        when (viewModel.notification) {
+            NotificationState.Complete -> {
+                snackBarHostState.showSnackbar(
+                    message = resources.getString(R.string.snack_task_completed),
+                    actionLabel = resources.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
+                ).also {
+                    when (it) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
+                    }
+                }
+            }
+            else -> {}
+        }
+    }
+
     val taskActions = TaskActions(
         taskChatAction = viewModel::showTaskChat,
     )
@@ -80,10 +101,11 @@ fun PriorityContent(
             modifier = modifier
                 .fillMaxSize()
                 .reorderable(state),
-            contentPadding = PaddingValues(8.dp)
+            horizontalAlignment = Alignment.End
         ) {
-            items(viewModel.tasks, key = { it.id }) {
-                val item by rememberUpdatedState(it)
+            items(viewModel.tasks, key = { it.id }) { task ->
+                val item by rememberUpdatedState(task)
+
                 val dismissState = rememberDismissState(
                     confirmValueChange = { dismissValue ->
                         if (dismissValue == DismissValue.DismissedToEnd) {
@@ -111,59 +133,31 @@ fun PriorityContent(
                     }
                 })
 
-                ReorderableItem(state, key = it.id) { isDragging ->
+                ReorderableItem(state, key = item.id) { isDragging ->
                     SwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
-                            TaskItem(
-                                it,
+                            PriorityItem(
+                                item,
                                 Modifier.detectReorderAfterLongPress(state),
                                 isDragging = isDragging,
                                 taskActions = taskActions
                             )
                         }
                     )
+
+                    AnimatedVisibility(
+                        visible = !isDragging,
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                    ) {
+                        Divider(
+                            thickness = 0.7.dp,
+                            modifier = Modifier.fillMaxWidth(0.8f)
+                        )
+                    }
                 }
-
-
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TaskItem(
-    task: TaskDomain,
-    modifier: Modifier = Modifier,
-    isDragging: Boolean = false,
-    taskActions: TaskActions,
-) {
-
-    val elevation = CardDefaults.cardElevation(
-        defaultElevation = animateDpAsState(if (isDragging) 12.dp else 0.dp).value
-    )
-
-    Card(
-        onClick = { taskActions.taskChatAction(task.id) },
-        elevation = elevation,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(56.dp)
-                .padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-        ) {
-            Text(
-                text = "${task.title} * id: ${task.id} * score: ${task.priorityScore}",
-                textAlign = TextAlign.Start,
-                modifier = Modifier.padding(4.dp)
-            )
         }
     }
 }
@@ -175,9 +169,9 @@ fun SwipeBackground(dismissState: DismissState) {
 
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> Color.LightGray
-            DismissValue.DismissedToEnd -> Color.Green
-            DismissValue.DismissedToStart -> Color.Red
+            DismissValue.Default -> MaterialColors.BlueGrey[500]
+            DismissValue.DismissedToEnd -> MaterialColors.Green[500]
+            DismissValue.DismissedToStart -> MaterialColors.Blue[700]
         }, label = "Color animation"
     )
     val alignment = when (direction) {
@@ -186,7 +180,7 @@ fun SwipeBackground(dismissState: DismissState) {
     }
     val icon = when (direction) {
         DismissDirection.StartToEnd -> Icons.Default.Done
-        DismissDirection.EndToStart -> Icons.Default.Delete
+        DismissDirection.EndToStart -> Icons.Default.Archive
     }
     val scale by animateFloatAsState(
         if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,

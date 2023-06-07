@@ -10,7 +10,15 @@ import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
@@ -22,6 +30,7 @@ import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.github.terrakok.cicerone.Navigator
 import com.github.terrakok.cicerone.NavigatorHolder
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
@@ -48,16 +57,38 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
 
+            TransparentSystemBars()
+            val snackbarHostState = remember { SnackbarHostState() }
+
             MoreStuffTheme {
                 MoreStuffScaffold(
+                    snackbarHostState = snackbarHostState,
                     content = {
-                        MainContent()
+                        Box(Modifier.padding(top = it.calculateTopPadding())) {
+                            MainContent(
+                                snackbarHostState = snackbarHostState
+                            )
+                        }
                     }
                 )
             }
 
         }
 
+    }
+
+    @Composable
+    private fun TransparentSystemBars() {
+        val systemUiController = rememberSystemUiController()
+        val useDarkIcons = !isSystemInDarkTheme()
+
+        DisposableEffect(systemUiController, useDarkIcons) {
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons
+            )
+            onDispose {}
+        }
     }
 
     private fun handleLaunchIntent() {

@@ -38,8 +38,8 @@ android {
         compileSdk = 33
         minSdk = 25
         targetSdk = 33
-        versionCode = 8
-        versionName = "0.3.5"
+        versionCode = 12
+        versionName = "0.4.1-mvp"
     }
 
     buildTypes {
@@ -116,7 +116,11 @@ sqldelight {
     database("StuffDb") {
         packageName = "co.softov.morestuff.db"
         schemaOutputDirectory = file("src/main/sqldelight/databases")
+
         verifyMigrations = true
+
+
+
     }
 }
 
@@ -192,6 +196,7 @@ dependencies {
     implementation(Libs.Accompanist.pager)
     implementation(Libs.Accompanist.pagerIndicators)
     implementation(Libs.Accompanist.permissions)
+    implementation(Libs.Accompanist.systemUi)
 
     // Firebase
     implementation(platform(Libs.Firebase.bom))
