@@ -18,6 +18,7 @@ val pages = listOf(
     PageType.PAGE_ACTIVE_NOW,
     PageType.PAGE_ACTIVE_LATER,
     PageType.PAGE_COMPLETE_TASKS,
+    PageType.PAGE_SCHEDULE
 )
 
 @OptIn(ExperimentalPagerApi::class)
@@ -49,7 +50,7 @@ private fun ScheduleTabs(
     ScrollableTabRow(
         // Our selected tab is our current page
         selectedTabIndex = pagerState.currentPage,
-        edgePadding = 43.dp,
+        edgePadding = 3.dp,
         divider = {},
         modifier = Modifier.fillMaxWidth()
     ) {
