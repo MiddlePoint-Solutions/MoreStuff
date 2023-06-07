@@ -1,24 +1,35 @@
 package co.softov.morestuff.android.data.mapper
 
+import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.SelectTaskMessagesByContentType
+import kotlinx.serialization.json.Json
+import co.softov.morestuff.android.domain.model.Message
 
-typealias SelectTaskMessagesByContentTypeMapper = (SelectTaskMessagesByContentType) -> MessageData
+typealias SelectTaskMessagesByContentTypeMapper = (SelectTaskMessagesByContentType) -> Message
 
-fun makeSelectTaskMessagesByContentTypeMapper(): SelectTaskMessagesByContentTypeMapper = { selectTaskMessagesByContentType ->
-    mapSelectTaskMessagesByContentTypeToMessageData(selectTaskMessagesByContentType)
+fun makeSelectTaskMessagesByContentTypeMapper(timeFormatter: TimeFormatter): (SelectTaskMessagesByContentType) -> Message = { selectTaskMessagesByContentType ->
+    mapSelectTaskMessagesByContentTypeToMessageData(selectTaskMessagesByContentType, timeFormatter)
 }
 
-fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByContentType): MessageData {
-    return MessageData(
+fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByContentType, timeFormatter: TimeFormatter): Message {
+    val createTime = timeFormatter.formatTimeOnly(input.create_time)
+    val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
+    val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
+    val openGraphResult = input.json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
+    return Message(
         id = input.id,
-        task_id = input.task_id,
-        schedule_id = input.schedule_id,
-        content_type = input.content_type,
-        create_time = input.create_time,
-        seen_time = input.seen_time,
+        taskId = input.task_id,
+        scheduleId = input.schedule_id,
+        contentType = ContentType.withValue(input.content_type),
+        createTime = createTime ?: "",
+        seenTime = seenTime,
         content = input.content,
-        reply_type = input.reply_type,
-        reply_content = input.reply_content,
-        reply_time = input.reply_time,
+        replyType = input.reply_type?.let { ReplyType.withValue(it) },
+        replyContent = input.reply_content,
+        replyTime = replyTime,
+        openGraphResult = openGraphResult
     )
 }

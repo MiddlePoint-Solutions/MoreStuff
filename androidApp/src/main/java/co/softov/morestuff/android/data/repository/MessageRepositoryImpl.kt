@@ -2,7 +2,6 @@ package co.softov.morestuff.android.data.repository
 
 
 import arrow.core.Either
-import arrow.core.compose
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
@@ -45,7 +44,7 @@ class MessageRepositoryImpl(
         return messageQueries.selectTaskMessagesByContentType(
             taskId,
             ContentType.TASK_MESSAGE.value
-        ).asFlow().mapToList().map { mapList(it, mapMessageDb.compose(mapMessageTaskChatDb)) }
+        ).asFlow().mapToList().map { mapList(it, mapMessageTaskChatDb) }
     }
 
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {

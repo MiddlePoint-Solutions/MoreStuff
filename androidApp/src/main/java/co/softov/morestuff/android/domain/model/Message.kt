@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.model
 
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 
 data class Message(
     val id: Long,
@@ -13,6 +14,7 @@ data class Message(
     val content: String,
     val replyType: ReplyType?,
     val replyContent: String?,
-    val replyTime: String?
+    val replyTime: String?,
+    val openGraphResult: OpenGraphResult?,
 )
 

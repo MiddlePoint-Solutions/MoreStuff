@@ -26,7 +26,8 @@ fun mapMessageDb(input: MessageData, timeFormatter: TimeFormatter): Message {
         content = input.content,
         replyType = input.reply_type?.let { ReplyType.withValue(it) },
         replyContent = input.reply_content,
-        replyTime = replyTime
+        replyTime = replyTime,
+        openGraphResult = null,
     )
 }
 
