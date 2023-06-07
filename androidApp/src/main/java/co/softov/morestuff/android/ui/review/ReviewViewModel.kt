@@ -73,6 +73,7 @@ class ReviewViewModel(
         viewModelScope.launch {
             val task = getTasksForReviewUseCase()
                 .first()
+                .shuffled()
                 .map(reviewItemMapper::map)
             sendEvent(SetupInitialRound(round, task))
         }
