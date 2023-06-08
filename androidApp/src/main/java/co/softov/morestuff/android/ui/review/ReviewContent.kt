@@ -44,7 +44,7 @@ import timber.log.Timber
 @Composable
 fun ReviewContent(
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = koinViewModel()
+    viewModel: ReviewViewModel = koinViewModel(),
 ) {
     Surface {
         Box(
@@ -194,7 +194,7 @@ private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateO
 private fun SlideAnimation(
     visibleState: MutableTransitionState<Boolean>,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     AnimatedVisibility(
         visibleState = visibleState,
@@ -209,7 +209,7 @@ private fun SlideAnimation(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-    navigateUp: () -> Unit = {}
+    navigateUp: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -354,9 +354,6 @@ private fun TaskPrioritySwipe(
                         .fillMaxSize()
                         .aspectRatio(ratio)
                         .swipableCard(state = state)
-                        .graphicsLayer {
-                            translationY = -(5 * index).dp.toPx()
-                        }
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
                         },
@@ -400,7 +397,7 @@ private fun TaskCard(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
+            defaultElevation = 5.dp
         )
     ) {
         Box(
@@ -432,7 +429,7 @@ private fun TaskCard(
 @Composable
 private fun RoundInfo(
     model: ReviewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val info by remember(model.round) {
