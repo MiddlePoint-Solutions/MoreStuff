@@ -68,6 +68,7 @@ interface ScheduleRepository {
 
     fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
+    suspend fun taskHasSchedule(taskId: Long): Boolean
 }
 
 object ScheduleDoesNotExist : FeatureFailure
