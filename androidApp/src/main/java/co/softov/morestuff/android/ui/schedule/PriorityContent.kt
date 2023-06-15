@@ -31,7 +31,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -51,7 +50,6 @@ import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,19 +132,19 @@ fun PriorityContent(
                 })
 
                 ReorderableItem(state, key = item.id) { isDragging ->
+                    val canBeReordered = item.id !in viewModel.tasksWithSchedule
                     SwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
                             PriorityItem(
                                 item,
-                                Modifier.detectReorderAfterLongPress(state),
+                                if (canBeReordered) Modifier.detectReorderAfterLongPress(state) else Modifier,
                                 isDragging = isDragging,
                                 taskActions = taskActions
                             )
                         }
                     )
-
                     AnimatedVisibility(
                         visible = !isDragging,
                         modifier = Modifier.align(Alignment.BottomEnd)

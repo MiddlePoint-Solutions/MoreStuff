@@ -7,23 +7,22 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.ui.Screens
-import co.softov.morestuff.android.ui.schedule.NotificationState.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
+import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
+import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import kotlin.time.Duration.Companion.seconds
 
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
+    private val scheduleRepository: ScheduleRepository,
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
@@ -39,12 +38,18 @@ class PriorityViewModel(
     var notification: NotificationState by mutableStateOf(None)
         private set
 
+    var tasksWithSchedule: List<Long> by mutableStateOf(listOf())
+        private set
+
     private var lastChange = 0 to 0
     private var lastCompleted: TaskDomain? = null
 
     override fun onLoadData() {
         getActiveTasksUseCase()
-            .onEach { tasks = it }
+            .onEach { tasks ->
+                this.tasks = tasks
+                tasksWithSchedule = tasks.filter { task -> scheduleRepository.taskHasSchedule(task.id) }.map { it.id }
+            }
             .launchIn(viewModelScope)
     }
 
