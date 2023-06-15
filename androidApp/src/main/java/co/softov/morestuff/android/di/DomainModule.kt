@@ -67,7 +67,7 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            reviewMiddleware = get(),
+            reviewMiddleware = get()
         )
     }
 
@@ -109,6 +109,7 @@ val taskUseCases = module {
     factoryOf(::GetNowTaskUseCaseImpl) bind GetNowTaskUseCase::class
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
+    factoryOf(::UpdatePlanTaskPriorityUseCaseImpl) bind UpdatePlanTaskPriorityUseCase::class
 }
 
 

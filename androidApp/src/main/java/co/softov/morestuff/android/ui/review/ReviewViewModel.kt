@@ -5,6 +5,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTaskUseCase
 import co.softov.morestuff.android.domain.enums.ReviewActionType
 import co.softov.morestuff.android.domain.redux.middleware.ReviewAction
+import co.softov.morestuff.android.domain.usecase.task.UpdatePlanTaskPriorityUseCase
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
@@ -26,6 +27,7 @@ import timber.log.Timber
 class ReviewViewModel(
     private val getTasksForReviewUseCase: GetReviewTaskUseCase,
     private val reviewItemMapper: ReviewItemMapper,
+    private val updatePlanTaskPriorityUseCase: UpdatePlanTaskPriorityUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
@@ -108,8 +110,10 @@ class ReviewViewModel(
 
         if (isLast) {
             roundEndDelayJob = viewModelScope.launch {
+
                 delay(500)
                 navigateBack()
+                updatePlanTaskPriorityUseCase.invoke()
                 sendEvent(SetupRound(Final)) // TODO(Joseph) This would be used with compose navigation.
             }
         }
