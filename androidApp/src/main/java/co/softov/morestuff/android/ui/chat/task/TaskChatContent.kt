@@ -66,7 +66,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -232,7 +231,7 @@ fun TaskChatTopBarEditTask(
                     Modifier.height(IntrinsicSize.Min)
                 }
             ),
-        color = Color(0xff2B3438),
+        color = MaterialTheme.colorScheme.primaryContainer,
         tonalElevation = 10.dp,
     ) {
         Box {
@@ -453,7 +452,7 @@ fun TopAppBarTaskChat(
     TopAppBar(
         title = { },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xff2B3438)
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         actions = {
             if (!isExpanded) {
