@@ -356,9 +356,6 @@ private fun TaskPrioritySwipe(
                         .fillMaxSize()
                         .aspectRatio(ratio)
                         .swipableCard(state = state)
-                        .graphicsLayer {
-                            translationY = -(5 * index).dp.toPx()
-                        }
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
                         },
@@ -410,7 +407,7 @@ private fun TaskCard(
         Card(
             modifier = modifier,
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 8.dp
+                defaultElevation = 5.dp
             )
         ) {
             Box(
