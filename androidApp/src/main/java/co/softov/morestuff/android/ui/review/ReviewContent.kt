@@ -85,15 +85,6 @@ fun ReviewContent(
                             states = states,
                             onSwiped = { schedule, direction, isLast ->
                                 viewModel.onTaskSwiped(schedule, direction, isLast)
-
-//                                scope.launch {
-//                                    if (isLast) {
-//                                        delay(500)
-//                                        visibleState.targetState = false
-//                                    }
-//                                }.invokeOnCompletion {
-//                                    viewModel.onTaskSwiped(schedule, direction, isLast)
-//                                }
                             },
                             onComplete = viewModel::completeTask
                         )
@@ -158,17 +149,6 @@ fun ReviewContent(
                                 }
                             }
                         }
-
-//                        SlideAnimation(
-//                            visibleState = visibleState,
-//                            modifier = modifier.align(Alignment.BottomCenter),
-//                        ) {
-//                            ReviewFinalControls(
-//                                modifier = modifier.align(Alignment.BottomCenter),
-//                                resetAction = viewModel::reset,
-//                                finishAction = viewModel::confirmResults
-//                            )
-//                        }
 
                         LaunchedEffect(key1 = model.round) {
                             visibleState.targetState = true
@@ -354,11 +334,11 @@ private fun TaskPrioritySwipe(
                     modifier = modifier
                         .layoutId(task.id)
                         .fillMaxSize()
-                        .aspectRatio(ratio)
-                        .swipableCard(state = state)
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
-                        },
+                        }
+                        .aspectRatio(ratio)
+                        .swipableCard(state = state),
                     task = task,
                     onComplete = onComplete
                 )
@@ -535,7 +515,7 @@ private fun RoundInfo(
 }
 
 
-/*@Preview
+@Preview
 @Composable
 fun TaskCardPreview() {
     MoreStuffTheme(darkTheme = true) {
@@ -545,12 +525,13 @@ fun TaskCardPreview() {
                 title = "Hellooooo there",
                 createTime = "",
                 id = 0,
-                priorityScore = 0
-            )
-            onComplete{}
+                priorityScore = 0,
+                isCompleted = false
+            ),
+            onComplete = {}
         )
     }
-}*/
+}
 
 @Preview
 @Composable
