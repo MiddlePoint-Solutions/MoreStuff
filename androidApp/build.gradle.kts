@@ -247,6 +247,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
 
 
 
