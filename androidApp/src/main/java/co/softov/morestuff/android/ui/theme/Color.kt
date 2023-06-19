@@ -19,6 +19,9 @@ val Red800 = Color(0xffd00036)
 val BlueDark = Color(0xFFB3E5FC)
 val BlueLight = Color(0xFF303F9F)
 
+val primaryLightTheme = Color(0xFFEFF2FA)
+val primaryContainerLightTheme =Color(0xFFB8C1DF)
+val secondaryContainerLightTheme = Color(0xFF6A7493)
 
 
 

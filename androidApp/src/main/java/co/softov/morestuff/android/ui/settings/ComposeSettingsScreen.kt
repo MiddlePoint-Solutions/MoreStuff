@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.settings
 
 import android.app.Activity
-import android.content.Intent
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.ScrollState
@@ -14,7 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
-import androidx.compose.material.icons.filled.ImportExport
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SelectAll
@@ -62,7 +61,6 @@ fun SettingsScreen(
         onClearActiveMessages = viewModel::clearPendingMessages,
         onTestReviewActivity = viewModel::testReviewActivity,
         onSmartReminder = viewModel::smartReminderEnabled,
-        onTaskExport = { viewModel.activeTasksForExport },
         devTools = devTools // TODO: This is better moved into the settings ViewModel
     )
 }
@@ -75,7 +73,6 @@ private fun SettingsContent(
     onClearActiveMessages: () -> Unit,
     onTestReviewActivity: () -> Unit,
     onSmartReminder: (Boolean) -> Unit,
-    onTaskExport: () -> List<String>,
     devTools: DevTools,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -95,7 +92,6 @@ private fun SettingsContent(
             DeveloperSettings(
                 clearPendingMessages = onClearActiveMessages,
                 testReviewActivity = onTestReviewActivity,
-                onTaskExport = onTaskExport,
             )
             DebugMessageSwitch()
             Notification()
@@ -105,7 +101,6 @@ private fun SettingsContent(
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
-
             About()
         }
     }
@@ -125,14 +120,18 @@ fun DebugMessageSwitch() {
     ) {
         SettingsSwitch(
             state = memoryStorage,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Message,
+                    contentDescription = "Debug Messages") },
             title = {
                 Text(
                     text = "Debug Messages",
-                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )
             },
+            modifier = Modifier.padding(end = 16.dp),
             onCheckedChange = { newValue ->
                 memoryStorage.value = newValue
             }
@@ -149,11 +148,11 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
                 text = "Settings",
                 fontSize = 25.sp,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 105.dp)
+                modifier = Modifier.padding(start = 98.dp)
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xff2B3438)
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         navigationIcon = {
             IconButton(onClick = navigateBackSettings) {
@@ -177,9 +176,7 @@ fun SelectTheme() {
             icon = {
                 Icon(
                     imageVector = Icons.Default.SelectAll,
-                    contentDescription = "Select Theme"
-                )
-            },
+                    contentDescription = "Select Theme") },
             title = {
                 Text(
                     text = "Select Theme",
@@ -201,10 +198,10 @@ fun SelectTheme() {
 @Composable
 fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     val settingSnoozeLimit = rememberMultiplatformPreferenceFloatSettingState(
-        KEY_USER_SNOOZE_LIMIT, 0F
+        KEY_USER_SNOOZE_LIMIT,  0F
     )
     val enabledState = rememberMultiplatformBooleanSettingState(
-        KEY_ENABLED_STATE_SNOOZE_LIMIT, true
+        KEY_ENABLED_STATE_SNOOZE_LIMIT,  true
     )
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -215,9 +212,7 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Snooze,
-                    contentDescription = "Snooze Limit"
-                )
-            },
+                    contentDescription = "Snooze Limit") },
             title = {
                 Text(
                     text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
@@ -236,7 +231,6 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
 fun DeveloperSettings(
     clearPendingMessages: () -> Unit,
     testReviewActivity: () -> Unit,
-    onTaskExport: () -> List<String>
 ) {
     Column {
         Row(
@@ -272,25 +266,6 @@ fun DeveloperSettings(
             },
             title = { Text(text = "Test priority review notification") },
             onClick = testReviewActivity,
-        )
-
-        SettingsMenuLink(
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.ImportExport,
-                    contentDescription = "Export tasks"
-                )
-            },
-            title = { Text(text = "Export tasks") },
-            onClick = {
-                val sendIntent: Intent = Intent().apply {
-                    action = Intent.ACTION_SEND
-                    putExtra(Intent.EXTRA_TEXT, onTaskExport().joinToString(separator = "\n"))
-                    type = "text/plain"
-                }
-                val shareIntent = Intent.createChooser(sendIntent, null)
-                context.startActivity(shareIntent)
-            },
         )
     }
 }
@@ -341,9 +316,7 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.SmartScreen,
-                    contentDescription = "Keep device screen on"
-                )
-            },
+                    contentDescription = "Keep device screen on") },
             title = {
                 Text(
                     text = "Keep device screen on",
@@ -364,10 +337,8 @@ fun KeepDeviceScreenOn(devTools: DevTools) {
 
 @Composable
 fun ReminderDebugging(devTools: DevTools) {
-    val switchState =
-        rememberMultiplatformBooleanSettingState(KEY_REMINDER_DEBUGGING_SWITCH_STATE, false)
-    val reminderDelayState =
-        rememberMultiplatformPreferenceFloatSettingState(KEY_REMINDER_DEBUGGING_DELAY_STATE, 60f)
+    val switchState = rememberMultiplatformBooleanSettingState(KEY_REMINDER_DEBUGGING_SWITCH_STATE, false)
+    val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState(KEY_REMINDER_DEBUGGING_DELAY_STATE, 60f)
     LaunchedEffect(switchState.value) {
         devTools.debugReminders = switchState.value
     }
@@ -381,9 +352,7 @@ fun ReminderDebugging(devTools: DevTools) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Alarm,
-                    contentDescription = "Reminder Debugging"
-                )
-            },
+                    contentDescription = "Reminder Debugging") },
             title = {
                 Text(
 
@@ -425,8 +394,7 @@ fun ReminderDebugging(devTools: DevTools) {
 fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
         rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_STORAGE, false)
-    val enabledState =
-        rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
+    val enabledState = rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -438,9 +406,7 @@ fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.SmartButton,
-                    contentDescription = "Smart Reminder"
-                )
-            },
+                    contentDescription = "Smart Reminder") },
             title = {
                 Text(
                     text = "Smart Reminder",

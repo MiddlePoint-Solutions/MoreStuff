@@ -11,11 +11,13 @@ import androidx.compose.ui.graphics.Color
 
 
 private val LightColors = lightColorScheme(
-    primary = Color.White,
+    primary = primaryLightTheme,
+    primaryContainer = primaryContainerLightTheme,
     onPrimary = Color.Black,
-    secondary = Orange300,
+    secondary = Orange500,
+    secondaryContainer = secondaryContainerLightTheme,
     onSecondary = Color.Black,
-    error = Red800
+    error = Red200,
 )
 
 val ColorScheme.userChatItem: Color
