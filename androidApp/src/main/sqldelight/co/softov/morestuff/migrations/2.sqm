@@ -1,0 +1,18 @@
+
+ALTER TABLE url_metadata RENAME TO url_metadata_old;
+
+
+CREATE TABLE url_metadata (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL,
+    json_data TEXT NOT NULL,
+    message_id INTEGER,
+    FOREIGN KEY(message_id) REFERENCES message(id)
+);
+
+
+INSERT INTO url_metadata(url, json_data, message_id)
+SELECT url, json_data, message_id FROM url_metadata_old;
+
+
+DROP TABLE url_metadata_old;

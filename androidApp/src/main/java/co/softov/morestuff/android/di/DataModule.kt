@@ -6,6 +6,9 @@ import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
+import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
@@ -64,6 +67,9 @@ val dataModule = module {
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
             mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(timeFormatter = get()),
+            selectMasterMessagesMapper= SelectMasterMessagesMapper(timeFormatter = get()),
+            selectMessageByTaskIdMapper = SelectMessageByTaskIdMapper(timeFormatter = get()),
+            selectMessageByIdMapper = SelectMessageByIdMapper(timeFormatter = get()),
             timeManager = get()
         )
     }

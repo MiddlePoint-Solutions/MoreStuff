@@ -3,6 +3,9 @@ package co.softov.morestuff.android.data.repository
 
 import arrow.core.Either
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
+import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
@@ -27,6 +30,9 @@ class MessageRepositoryImpl(
     database: StuffDb,
     private val mapMessageDb: MessageDbMapper,
     private val mapMessageTaskChatDb: SelectTaskMessagesByContentTypeMapper,
+    private val selectMasterMessagesMapper: SelectMasterMessagesMapper,
+    private val selectMessageByTaskIdMapper: SelectMessageByTaskIdMapper,
+    private val selectMessageByIdMapper: SelectMessageByIdMapper,
     private val timeManager: TimeManager,
 ) : MessageRepository {
 
@@ -37,7 +43,7 @@ class MessageRepositoryImpl(
     override fun getAllMessages(): Flow<List<Message>> {
 //        return messageQueries.selectAll().asFlow().mapToList()
         return messageQueries.selectMasterMessages().asFlow().mapToList()
-            .map { mapList(it, mapMessageDb) }
+            .map { mapList(it, selectMasterMessagesMapper) }
     }
 
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
@@ -49,7 +55,7 @@ class MessageRepositoryImpl(
 
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectMessageByTaskId(taskId)
-            .asFlow().mapToList().map { mapList(it, mapMessageDb) }
+            .asFlow().mapToList().map { mapList(it, selectMessageByTaskIdMapper) }
     }
 
     override suspend fun getActiveReminderMessages(): List<Message> {
@@ -61,7 +67,7 @@ class MessageRepositoryImpl(
         return when (val message =
             messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
             null -> Either.Left(MessageDoesNotExist)
-            else -> Either.Right(mapMessageDb(message))
+            else -> Either.Right(selectMessageByIdMapper(message))
         }
     }
 
@@ -119,7 +125,9 @@ class MessageRepositoryImpl(
         messageQueries.selectTaskMessage(
             task_id = taskId,
             content_type = contentType.value
-        ).executeAsOneOrNull()?.let { Either.Right(it) } ?: Either.Left(MessageDoesNotExist)
+        ).executeAsOneOrNull()?.let { Either.Right(it.id) } ?: Either.Left(MessageDoesNotExist)
+
+
 
     override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
         withContext(Dispatchers.IO) {

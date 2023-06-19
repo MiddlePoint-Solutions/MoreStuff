@@ -18,8 +18,9 @@ FROM message
 ORDER BY datetime(create_time) DESC;
 
 selectMasterMessages:
-SELECT *
+SELECT message.*, url_metadata.json_data
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE (content_type = 100 OR content_type = 101 OR (content_type = 200 AND reply_content IS NULL))
 ORDER BY datetime(create_time) DESC;
 
@@ -30,13 +31,15 @@ FROM message
 WHERE (content_type = 200 AND reply_time IS NULL);
 
 selectMessageById:
-SELECT *
+SELECT message.*, url_metadata.json_data
 FROM message
-WHERE id = ?;
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+WHERE message.id = ?;
 
 selectMessageByTaskId:
-SELECT *
+SELECT message.*, url_metadata.json_data
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ?
 ORDER BY datetime(create_time) DESC;
 
@@ -48,14 +51,17 @@ WHERE message.task_id = ? AND message.content_type = ?
 ORDER BY datetime(message.create_time) DESC;
 
 selectCurrentTaskMessage:
-SELECT *
+SELECT message.*, url_metadata.json_data
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ?
 ORDER BY id DESC LIMIT 1;
 
+
 selectTaskMessage:
-SELECT id
+SELECT message.id, url_metadata.json_data
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ? AND content_type = ?
 ORDER BY id DESC LIMIT 1;
 
