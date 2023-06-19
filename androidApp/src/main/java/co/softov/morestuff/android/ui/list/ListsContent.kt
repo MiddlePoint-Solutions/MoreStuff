@@ -1,7 +1,15 @@
 package co.softov.morestuff.android.ui.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -11,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.ui.model.PageType
 import co.softov.morestuff.android.ui.model.title
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import com.google.accompanist.pager.*
 import kotlinx.coroutines.launch
 
 val pages = listOf(
@@ -21,26 +28,46 @@ val pages = listOf(
     PageType.PAGE_SCHEDULE
 )
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ListsContent(
     modifier: Modifier = Modifier,
     itemAction: (taskId: Long) -> Unit = {},
 ) {
-    val pagerState = rememberPagerState(initialPage = 0)
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ) {
+        pages.size
+    }
     Column(modifier) {
         ScheduleTabs(pagerState, pages)
-        HorizontalPager(state = pagerState, count = pages.size) { page ->
-            Surface(
-                contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
-            ) {
-                ScheduleList(page = pages[page], itemAction)
+        HorizontalPager(
+            modifier = Modifier,
+            state = pagerState,
+            pageSpacing = 0.dp,
+            userScrollEnabled = true,
+            reverseLayout = false,
+            contentPadding = PaddingValues(0.dp),
+            beyondBoundsPageCount = 0,
+            pageSize = PageSize.Fill,
+            key = null,
+            pageNestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
+                Orientation.Horizontal
+            ),
+            pageContent = { page ->
+                Surface(
+                    contentColor = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    ScheduleList(page = pages[page], itemAction)
+                }
             }
-        }
+
+        )
     }
 }
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ScheduleTabs(
     pagerState: PagerState,
