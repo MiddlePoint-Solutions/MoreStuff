@@ -24,7 +24,8 @@ class ReviewItemMapper(
             id = input.id,
             createTime = createTime,
             title = input.title,
-            priorityScore = input.priorityScore
+            priorityScore = input.priorityScore,
+            isCompleted = input.isComplete
         )
     }
 
