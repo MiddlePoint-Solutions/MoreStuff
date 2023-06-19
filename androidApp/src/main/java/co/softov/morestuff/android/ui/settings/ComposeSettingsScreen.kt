@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SelectAll
@@ -119,14 +120,18 @@ fun DebugMessageSwitch() {
     ) {
         SettingsSwitch(
             state = memoryStorage,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Message,
+                    contentDescription = "Debug Messages") },
             title = {
                 Text(
                     text = "Debug Messages",
-                    fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )
             },
+            modifier = Modifier.padding(end = 16.dp),
             onCheckedChange = { newValue ->
                 memoryStorage.value = newValue
             }
@@ -143,11 +148,11 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
                 text = "Settings",
                 fontSize = 25.sp,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 105.dp)
+                modifier = Modifier.padding(start = 98.dp)
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color(0xff2B3438)
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         navigationIcon = {
             IconButton(onClick = navigateBackSettings) {

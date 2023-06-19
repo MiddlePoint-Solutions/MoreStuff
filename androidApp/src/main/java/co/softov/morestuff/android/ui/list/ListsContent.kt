@@ -83,7 +83,12 @@ private fun ScheduleTabs(
     ) {
         pages.forEachIndexed { index, page ->
             Tab(
-                text = { Text(page.title) },
+                text = {
+                    Text(
+                        text = page.title,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                },
                 selected = pagerState.currentPage == index,
                 onClick = {
                     coroutineScope.launch { pagerState.scrollToPage(index) }
