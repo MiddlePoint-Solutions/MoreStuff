@@ -95,6 +95,7 @@ fun ReviewContent(
 //                                    viewModel.onTaskSwiped(schedule, direction, isLast)
 //                                }
                             },
+                            onComplete = viewModel::completeTask
                         )
 
                         SlideAnimation(
@@ -332,6 +333,7 @@ private fun TaskPrioritySwipe(
     modifier: Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
+    onComplete: (ReviewItemUiModel) -> Unit,
 ) {
 
     Box(
@@ -357,7 +359,8 @@ private fun TaskPrioritySwipe(
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
                         },
-                    task = task
+                    task = task,
+                    onComplete = onComplete
                 )
             }
             LaunchedEffect(task, state.swipedDirection) {
@@ -393,38 +396,72 @@ private fun CircleButton(
 private fun TaskCard(
     modifier: Modifier = Modifier,
     task: ReviewItemUiModel,
+    onComplete: (ReviewItemUiModel) -> Unit,
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 5.dp
-        )
+    val visibleState = remember { mutableStateOf(true) }
+
+    AnimatedVisibility(
+        visible = visibleState.value,
+        exit = fadeOut(animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing))
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            rememberRandomColor(),
-                            rememberRandomColor(),
+        Card(
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 5.dp
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                rememberRandomColor(),
+                                rememberRandomColor(),
+                            )
                         )
                     )
-                )
-        ) {
-            Column(Modifier.align(Alignment.Center)) {
-                Text(
-                    text = task.title,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    textAlign = TextAlign.Center,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(10.dp)
-                )
+            ) {
+                Column(Modifier.align(Alignment.Center)) {
+                    Text(
+                        text = task.title,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(16.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                onComplete(task)
+                                visibleState.value = false
+                            },
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
+                        ) {
+                            Text(
+                                text = "Done",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
+
 
 @Composable
 private fun RoundInfo(
@@ -498,7 +535,7 @@ private fun RoundInfo(
 }
 
 
-@Preview
+/*@Preview
 @Composable
 fun TaskCardPreview() {
     MoreStuffTheme(darkTheme = true) {
@@ -510,9 +547,10 @@ fun TaskCardPreview() {
                 id = 0,
                 priorityScore = 0
             )
+            onComplete{}
         )
     }
-}
+}*/
 
 @Preview
 @Composable
