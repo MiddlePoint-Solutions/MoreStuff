@@ -7,9 +7,9 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.TaskHasScheduleUseCase
 import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
@@ -22,7 +22,7 @@ import timber.log.Timber
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
-    private val scheduleRepository: ScheduleRepository,
+    private val taskHasScheduleUseCase: TaskHasScheduleUseCase,
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
@@ -48,7 +48,7 @@ class PriorityViewModel(
         getActiveTasksUseCase()
             .onEach { tasks ->
                 this.tasks = tasks
-                tasksWithSchedule = tasks.filter { task -> scheduleRepository.taskHasSchedule(task.id) }.map { it.id }
+                tasksWithSchedule = tasks.filter { task -> taskHasScheduleUseCase(task.id) }.map { it.id }
             }
             .launchIn(viewModelScope)
     }

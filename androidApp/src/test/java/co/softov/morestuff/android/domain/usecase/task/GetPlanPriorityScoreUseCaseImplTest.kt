@@ -36,16 +36,16 @@ class GetPlanPriorityScoreUseCaseImplTest {
         val lp: Long = 10
         val hp: Long = 100
 
+        val expectedScore = lp + (
+                max(0, currentTime - createTime) /
+                        max(0, scheduleTime - createTime)
+                ) * (hp - lp)
+
         coEvery { getLowestPriorityScoreUseCase.invoke() } returns lp
         coEvery { getHighestPriorityScoreUseCase.invoke() } returns hp
         coEvery { timeManager.localDateTimeStringToUtc(scheduleTimeLocal) } returns scheduleTimeLocal.toInstant()
         coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime)
 
-        val expectedScore = if (scheduleTime - createTime != 0L) {
-            lp + (max(0, currentTime - createTime) / max(0, scheduleTime - createTime)) * (hp - lp)
-        } else {
-            lp
-        }
 
         val actualScore = useCase.invoke(scheduleTimeLocal, taskCreateTimeUtc)
 

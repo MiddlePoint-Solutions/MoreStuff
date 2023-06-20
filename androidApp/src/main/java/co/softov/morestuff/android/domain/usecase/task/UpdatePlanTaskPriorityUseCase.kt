@@ -1,8 +1,8 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
-import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
 
 
 interface UpdatePlanTaskPriorityUseCase {
@@ -11,14 +11,14 @@ interface UpdatePlanTaskPriorityUseCase {
 
 class UpdatePlanTaskPriorityUseCaseImpl(
     private val taskRepository: TaskRepository,
-    private val scheduleRepository: ScheduleRepository,
-    private val getPlanPriorityScoreUseCase: GetPlanPriorityScoreUseCase
+    private val getPlanPriorityScoreUseCase: GetPlanPriorityScoreUseCase,
+    private val getActiveScheduleForTaskUseCase: GetActiveScheduleForTaskUseCase
 ) : UpdatePlanTaskPriorityUseCase {
 
     override suspend fun invoke() {
         taskRepository.getActiveTasksFlow().collect { tasks ->
             for (task in tasks) {
-                val schedule = scheduleRepository.getActiveScheduleForTask(task.id)
+                val schedule = getActiveScheduleForTaskUseCase(task.id)
                 if (schedule is Either.Right) {
                     val scheduleDomain = schedule.value
                     val newPriorityScore = getPlanPriorityScoreUseCase(
