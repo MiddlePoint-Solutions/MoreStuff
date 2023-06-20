@@ -5,7 +5,11 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTaskUseCase
 import co.softov.morestuff.android.domain.enums.ReviewActionType
 import co.softov.morestuff.android.domain.redux.middleware.ReviewAction
+
 import co.softov.morestuff.android.domain.usecase.task.UpdatePlanTaskPriorityUseCase
+
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
@@ -118,4 +122,8 @@ class ReviewViewModel(
             }
         }
     }
+    fun completeTask(item: ReviewItemUiModel) {
+        dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+    }
+
 }

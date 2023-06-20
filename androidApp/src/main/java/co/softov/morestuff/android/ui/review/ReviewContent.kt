@@ -44,7 +44,7 @@ import timber.log.Timber
 @Composable
 fun ReviewContent(
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = koinViewModel()
+    viewModel: ReviewViewModel = koinViewModel(),
 ) {
     Surface {
         Box(
@@ -85,16 +85,8 @@ fun ReviewContent(
                             states = states,
                             onSwiped = { schedule, direction, isLast ->
                                 viewModel.onTaskSwiped(schedule, direction, isLast)
-
-//                                scope.launch {
-//                                    if (isLast) {
-//                                        delay(500)
-//                                        visibleState.targetState = false
-//                                    }
-//                                }.invokeOnCompletion {
-//                                    viewModel.onTaskSwiped(schedule, direction, isLast)
-//                                }
                             },
+                            onComplete = viewModel::completeTask
                         )
 
                         SlideAnimation(
@@ -158,17 +150,6 @@ fun ReviewContent(
                             }
                         }
 
-//                        SlideAnimation(
-//                            visibleState = visibleState,
-//                            modifier = modifier.align(Alignment.BottomCenter),
-//                        ) {
-//                            ReviewFinalControls(
-//                                modifier = modifier.align(Alignment.BottomCenter),
-//                                resetAction = viewModel::reset,
-//                                finishAction = viewModel::confirmResults
-//                            )
-//                        }
-
                         LaunchedEffect(key1 = model.round) {
                             visibleState.targetState = true
                         }
@@ -194,7 +175,7 @@ private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateO
 private fun SlideAnimation(
     visibleState: MutableTransitionState<Boolean>,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     AnimatedVisibility(
         visibleState = visibleState,
@@ -209,7 +190,7 @@ private fun SlideAnimation(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-    navigateUp: () -> Unit = {}
+    navigateUp: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -332,6 +313,7 @@ private fun TaskPrioritySwipe(
     modifier: Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
+    onComplete: (ReviewItemUiModel) -> Unit,
 ) {
 
     Box(
@@ -352,15 +334,13 @@ private fun TaskPrioritySwipe(
                     modifier = modifier
                         .layoutId(task.id)
                         .fillMaxSize()
-                        .aspectRatio(ratio)
-                        .swipableCard(state = state)
-                        .graphicsLayer {
-                            translationY = -(5 * index).dp.toPx()
-                        }
                         .clickable {
                             selectedState.targetState = !selectedState.currentState
-                        },
-                    task = task
+                        }
+                        .aspectRatio(ratio)
+                        .swipableCard(state = state),
+                    task = task,
+                    onComplete = onComplete
                 )
             }
             LaunchedEffect(task, state.swipedDirection) {
@@ -396,43 +376,77 @@ private fun CircleButton(
 private fun TaskCard(
     modifier: Modifier = Modifier,
     task: ReviewItemUiModel,
+    onComplete: (ReviewItemUiModel) -> Unit,
 ) {
-    Card(
-        modifier = modifier,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp
-        )
+    val visibleState = remember { mutableStateOf(true) }
+
+    AnimatedVisibility(
+        visible = visibleState.value,
+        exit = fadeOut(animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing))
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.horizontalGradient(
-                        listOf(
-                            rememberRandomColor(),
-                            rememberRandomColor(),
+        Card(
+            modifier = modifier,
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 5.dp
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                rememberRandomColor(),
+                                rememberRandomColor(),
+                            )
                         )
                     )
-                )
-        ) {
-            Column(Modifier.align(Alignment.Center)) {
-                Text(
-                    text = task.title,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    textAlign = TextAlign.Center,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(10.dp)
-                )
+            ) {
+                Column(Modifier.align(Alignment.Center)) {
+                    Text(
+                        text = task.title,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        textAlign = TextAlign.Center,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(10.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(16.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                onComplete(task)
+                                visibleState.value = false
+                            },
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
+                        ) {
+                            Text(
+                                text = "Done",
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                    }
+                }
             }
         }
     }
 }
 
+
 @Composable
 private fun RoundInfo(
     model: ReviewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val info by remember(model.round) {
@@ -511,8 +525,10 @@ fun TaskCardPreview() {
                 title = "Hellooooo there",
                 createTime = "",
                 id = 0,
-                priorityScore = 0
-            )
+                priorityScore = 0,
+                isCompleted = false
+            ),
+            onComplete = {}
         )
     }
 }
