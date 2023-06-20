@@ -22,7 +22,6 @@ sealed class MessageAction : Action.FeatureAction() {
 }
 
 class MessageMiddleware(
-    private val createUserTaskMessageUseCase: CreateUserTaskMessageUseCase,
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
@@ -53,7 +52,7 @@ class MessageMiddleware(
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
                 val task = TaskDomain(id = action.taskId, title = action.content)
-                createUserTaskMessageUseCase(task)
+                createMessageUseCase(task.id, title = action.content, ContentType.TASK_MESSAGE )
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
