@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import kotlinx.datetime.*
 import java.util.UUID
 
@@ -116,6 +117,7 @@ fun createMessageForTest(
     replyType: ReplyType = ReplyType.DONE,
     replyContent: String = "",
     replyTime: String = "",
+    openGraphResult: OpenGraphResult = OpenGraphResult()
 ): Message {
     return Message(
         id,
@@ -127,6 +129,7 @@ fun createMessageForTest(
         content,
         replyType,
         replyContent,
-        replyTime
+        replyTime,
+        openGraphResult
     )
 }

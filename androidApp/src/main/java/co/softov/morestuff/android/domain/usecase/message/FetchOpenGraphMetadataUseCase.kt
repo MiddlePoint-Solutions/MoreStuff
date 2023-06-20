@@ -8,10 +8,11 @@ interface FetchOpenGraphMetadataUseCase {
 }
 
 class FetchOpenGraphMetadataUseCaseImpl(
-    private val messageRepository: MessageRepository
+    private val messageRepository: MessageRepository,
+    private val getMetadataUseCase: GetMetadataUseCase
 ) : FetchOpenGraphMetadataUseCase {
     override suspend fun invoke(inputUrl: String, messageId: Long): OpenGraphResult? {
-        val existingMetadata = messageRepository.getMetadata(messageId)
+        val existingMetadata = getMetadataUseCase(messageId)
             .find { it.first == inputUrl }?.second
 
         if (existingMetadata != null) {

@@ -1,5 +1,6 @@
 CREATE TABLE url_metadata (
-    url TEXT PRIMARY KEY NOT NULL,
+    id_metadata INTEGER PRIMARY KEY AUTOINCREMENT,
+    url TEXT NOT NULL,
     json_data TEXT NOT NULL,
     message_id INTEGER,
     FOREIGN KEY(message_id) REFERENCES message(id)

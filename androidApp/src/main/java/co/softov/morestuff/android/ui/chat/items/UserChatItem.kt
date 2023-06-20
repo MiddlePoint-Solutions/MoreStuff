@@ -26,40 +26,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.TaskActions
-import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
+import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
+import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
-import org.koin.core.parameter.parametersOf
-import java.util.regex.Pattern
 
 @Composable
 fun UserChatItem(message: Message, actions: TaskActions) {
-    val taskId = message.taskId
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
-
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
-    val urlPattern = Pattern.compile(
-        "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?",
-        Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
-    )
+    val urlPattern = urlPattern
     val openGraphResult =  message.openGraphResult
 
     val text = buildAnnotatedString {
@@ -114,40 +100,6 @@ fun UserChatItem(message: Message, actions: TaskActions) {
     }
 }
 
-
-fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern) {
-    val matcher = urlPattern.matcher(content)
-    var lastEnd = 0
-
-    while (matcher.find()) {
-        val start = matcher.start()
-        val end = matcher.end()
-
-        if (start > lastEnd) {
-            append(content.substring(lastEnd, start))
-        }
-        val originalUrl = content.substring(start, end)
-        var processedUrl = originalUrl
-        if (!processedUrl.startsWith("http://") && !processedUrl.startsWith("https://")) {
-            processedUrl = "https://$processedUrl"
-        }
-        pushStringAnnotation("URL", processedUrl)
-        withStyle(
-            style = SpanStyle(
-                textDecoration = TextDecoration.Underline,
-                color = Color.White,
-                fontSize = 16.sp
-            )
-        ) {
-            append(originalUrl)
-        }
-        pop()
-        lastEnd = end
-    }
-    if (lastEnd < content.length) {
-        append(content.substring(lastEnd))
-    }
-}
 
 
 @Composable

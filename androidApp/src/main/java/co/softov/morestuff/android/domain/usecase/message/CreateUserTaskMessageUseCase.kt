@@ -5,6 +5,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.ui.utils.urlPattern
 import java.util.regex.Pattern
 
 
@@ -24,10 +25,7 @@ class CreateUserTaskMessageUseCaseImpl(
             title = task.title,
             contentType = ContentType.TASK_MESSAGE
         ).map { message ->
-            val urlPattern = Pattern.compile(
-                "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?",
-                Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
-            )
+            val urlPattern = urlPattern
 
             val firstUrl = findFirstUrl(task.title, urlPattern)
             if (firstUrl != null) {
