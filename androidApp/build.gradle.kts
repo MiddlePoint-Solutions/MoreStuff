@@ -173,6 +173,7 @@ dependencies {
     implementation(Libs.AndroidX.Compose.foundation)
     implementation(Libs.AndroidX.Compose.foundationLayout)
     implementation(Libs.AndroidX.Compose.material3)
+    implementation(Libs.AndroidX.Compose.constraintLayout)
     implementation(Libs.AndroidX.Compose.materialIcons)
     implementation(Libs.AndroidX.Compose.materialIconsExtended)
     implementation(Libs.AndroidX.Compose.tooling)
