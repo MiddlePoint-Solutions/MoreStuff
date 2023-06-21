@@ -8,17 +8,21 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.repository.MessageRepository
+
+
+
 import co.softov.morestuff.android.domain.service.TimeManager
+
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
@@ -44,7 +48,10 @@ class TaskChatViewModel(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
     private val messageRepository: MessageRepository,
+
+
     private val timeManager: TimeManager,
+
     devTools: DevTools,
 ) : NoStateViewModel() {
 
@@ -127,14 +134,7 @@ class TaskChatViewModel(
     }
 
     fun sendMessageForTask(content: String) {
-        viewModelScope.launch {
-            messageRepository.createMessage(
-                taskId = taskId,
-                scheduleId = 0,
-                contentType = ContentType.TASK_MESSAGE.value,
-                content = content,
-            )
-        }
+        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
