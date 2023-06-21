@@ -6,10 +6,14 @@ import androidx.preference.PreferenceManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
+import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
+import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
+import co.softov.morestuff.android.data.mapper.makeSelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.repository.*
 import co.softov.morestuff.android.data.service.NotifierImpl
@@ -62,6 +66,10 @@ val dataModule = module {
         MessageRepositoryImpl(
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
+            mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(timeFormatter = get()),
+            selectMasterMessagesMapper= SelectMasterMessagesMapper(timeFormatter = get()),
+            selectMessageByTaskIdMapper = SelectMessageByTaskIdMapper(timeFormatter = get()),
+            selectMessageByIdMapper = SelectMessageByIdMapper(timeFormatter = get()),
             timeManager = get()
         )
     }

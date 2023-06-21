@@ -13,11 +13,10 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 
-
-class CreateScheduleMessageUseCaseImplTest{
+class CreateScheduleMessageUseCaseImplTest {
 
     @Test
-    fun`should return message when schedule is created`(){
+    fun `should return message when schedule is created`() {
         val getScheduleTaskUseCase: GetTaskForScheduleUseCase = mockk()
         val createMessageUseCase: CreateMessageUseCase = mockk()
         val createScheduleMessageUseCaseImpl = CreateScheduleMessageUseCaseImpl(
@@ -31,18 +30,23 @@ class CreateScheduleMessageUseCaseImplTest{
         val message = createMessageForTest()
 
         coEvery { getScheduleTaskUseCase(scheduleId) } returns Either.Right(task)
-        coEvery { createMessageUseCase(taskId, scheduleId, task.title, ContentType.TASK_REMINDER) } returns message.right()
+        coEvery {
+            createMessageUseCase(
+                taskId,
+                task.title,
+                ContentType.TASK_REMINDER,
+                scheduleId
+            )
+        } returns message.right()
 
         runBlocking {
             val result = createScheduleMessageUseCaseImpl(scheduleId)
             assertTrue(result is Either.Right)
             result as Either.Right
             assertEquals(message, result.value)
-            }
         }
-
-
     }
+}
 
 
 

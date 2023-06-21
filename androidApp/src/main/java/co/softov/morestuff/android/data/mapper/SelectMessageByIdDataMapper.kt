@@ -4,18 +4,21 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.db.SelectMessageById
+import kotlinx.serialization.json.Json
 
-typealias MessageData = co.softov.morestuff.db.Message
-typealias MessageDbMapper = (MessageData) -> Message
+typealias SelectMessageByIdMapper = (SelectMessageById) -> Message
 
-fun makeMessageDbMapper(timeFormatter: TimeFormatter): MessageDbMapper = { message ->
-    mapMessageDb(message, timeFormatter)
+fun SelectMessageByIdMapper(timeFormatter: TimeFormatter): (SelectMessageById) -> Message = { SelectMessageById ->
+    mapSelectMessageByIdMessageData(SelectMessageById, timeFormatter)
 }
 
-fun mapMessageDb(input: MessageData, timeFormatter: TimeFormatter): Message {
+fun mapSelectMessageByIdMessageData(input: SelectMessageById, timeFormatter: TimeFormatter): Message {
     val createTime = timeFormatter.formatTimeOnly(input.create_time)
     val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
     val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
+    val openGraphResult = input.json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
     return Message(
         id = input.id,
         taskId = input.task_id,
@@ -27,13 +30,6 @@ fun mapMessageDb(input: MessageData, timeFormatter: TimeFormatter): Message {
         replyType = input.reply_type?.let { ReplyType.withValue(it) },
         replyContent = input.reply_content,
         replyTime = replyTime,
-        openGraphResult = null,
+        openGraphResult = openGraphResult
     )
 }
-
-
-
-
-
-
-
