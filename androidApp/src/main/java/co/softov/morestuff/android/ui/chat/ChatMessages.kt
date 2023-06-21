@@ -49,9 +49,7 @@ fun Messages(
     Box(modifier = modifier) {
         LazyColumn(
             reverseLayout = true,
-            modifier = modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+            modifier = modifier.fillMaxSize(),
             state = scrollState,
             contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
         ) {

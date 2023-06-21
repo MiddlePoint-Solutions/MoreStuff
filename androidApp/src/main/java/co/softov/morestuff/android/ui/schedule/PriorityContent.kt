@@ -5,6 +5,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -58,6 +59,7 @@ import timber.log.Timber
 fun PriorityContent(
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
+    onItemDragging: (Boolean) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
@@ -87,6 +89,7 @@ fun PriorityContent(
                     }
                 }
             }
+
             else -> {}
         }
     }
@@ -101,6 +104,7 @@ fun PriorityContent(
             modifier = modifier
                 .fillMaxSize()
                 .reorderable(state),
+            contentPadding = PaddingValues(bottom = 130.dp),
             horizontalAlignment = Alignment.End
         ) {
             items(viewModel.tasks, key = { it.id }) { task ->
@@ -155,6 +159,10 @@ fun PriorityContent(
                             thickness = 0.7.dp,
                             modifier = Modifier.fillMaxWidth(0.8f)
                         )
+                    }
+
+                    LaunchedEffect(key1 = isDragging) {
+                        onItemDragging(isDragging)
                     }
                 }
             }

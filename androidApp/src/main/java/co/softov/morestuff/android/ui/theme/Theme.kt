@@ -10,7 +10,7 @@ import androidx.compose.ui.graphics.Color
 
 
 
-private val LightColors = lightColorScheme(
+private val lightColors = lightColorScheme(
     primary = primaryLightTheme,
     primaryContainer = primaryContainerLightTheme,
     onPrimary = Color.Black,
@@ -20,13 +20,7 @@ private val LightColors = lightColorScheme(
     error = Red200,
 )
 
-val ColorScheme.userChatItem: Color
-    get() = Indigo400
-
-val ColorScheme.appChatItem: Color
-    get() = Indigo200
-
-private val DarkColors = darkColorScheme(
+private val darkColors = darkColorScheme(
     primary = BlueGray600,
     primaryContainer = BlueGray900,
     onPrimary = Color.White,
@@ -42,7 +36,7 @@ fun MoreStuffTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors else LightColors,
+        colorScheme = if (darkTheme) darkColors else lightColors,
         typography = Typography(),
     ) {
         CustomSelectionColor(darkTheme) {

@@ -34,6 +34,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
+import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -170,22 +171,6 @@ private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull
 
 private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
-
-@Composable
-private fun SlideAnimation(
-    visibleState: MutableTransitionState<Boolean>,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
-) {
-    AnimatedVisibility(
-        visibleState = visibleState,
-        modifier = modifier,
-        enter = slideInVertically { it * 2 },
-        exit = slideOutVertically { it * 2 }
-    ) {
-        content()
-    }
-}
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
