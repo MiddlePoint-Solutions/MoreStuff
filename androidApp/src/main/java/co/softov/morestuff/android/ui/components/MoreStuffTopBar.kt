@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -20,24 +21,26 @@ fun MoreStuffTopBar(
     openDrawer: () -> Unit,
     showReview: () -> Unit,
 ) {
-    TopAppBar(
-        title = { Text(text = stringResource(id = R.string.app_name)) },
-        navigationIcon = {
-            IconButton(onClick = openDrawer) {
-                Icon(Icons.Filled.Menu, "")
+    Surface(shadowElevation = 5.dp) {
+        TopAppBar(
+            title = { Text(text = stringResource(id = R.string.app_name)) },
+            navigationIcon = {
+                IconButton(onClick = openDrawer) {
+                    Icon(Icons.Filled.Menu, "")
+                }
+            },
+            actions = {
+                IconButton(onClick = showReview) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.priority_48px),
+                        contentDescription = stringResource(R.string.cd_priority_review),
+                        modifier = Modifier.size(32.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
-        },
-        actions = {
-            IconButton(onClick = showReview) {
-                Icon(
-                    painter = painterResource(id = R.drawable.priority_48px),
-                    contentDescription = stringResource(R.string.cd_priority_review),
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
-    )
+        )
+    }
 }
 
 @Preview
