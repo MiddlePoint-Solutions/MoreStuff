@@ -148,6 +148,7 @@ val messageUseCases = module {
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
     factoryOf(::GetMetadataUseCaseImpl) bind GetMetadataUseCase::class
+    factoryOf(::ExtractUrlAndFetchMetadataUseCaseImpl) bind ExtractUrlAndFetchMetadataUseCase::class
 }
 
 

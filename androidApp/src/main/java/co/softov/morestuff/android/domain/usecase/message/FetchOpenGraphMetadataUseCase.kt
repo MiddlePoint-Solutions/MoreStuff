@@ -13,10 +13,9 @@ class FetchOpenGraphMetadataUseCaseImpl(
 ) : FetchOpenGraphMetadataUseCase {
     override suspend fun invoke(inputUrl: String, messageId: Long): OpenGraphResult? {
         val existingMetadata = getMetadataUseCase(messageId)
-            .find { it.first == inputUrl }?.second
 
-        if (existingMetadata != null) {
-            return existingMetadata
+        if (existingMetadata?.first == inputUrl) {
+            return existingMetadata.second
         }
 
         return messageRepository.fetchOpenGraphMetadata(inputUrl)

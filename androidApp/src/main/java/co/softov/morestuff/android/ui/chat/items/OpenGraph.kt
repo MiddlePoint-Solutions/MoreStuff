@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class OpenGraphResult(
-    var title: String? = null,
-    var description: String? = null,
-    var url: String? = null,
-    var image: String? = null,
-    var siteName: String? = null,
-    var type: String? = null
+    val title: String? = null,
+    val description: String? = null,
+    val url: String? = null,
+    val image: String? = null,
+    val siteName: String? = null,
+    val type: String? = null
 )
 

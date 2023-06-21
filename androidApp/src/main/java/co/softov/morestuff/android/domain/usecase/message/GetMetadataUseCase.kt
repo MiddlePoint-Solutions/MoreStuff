@@ -5,16 +5,17 @@ import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 
 
 interface GetMetadataUseCase {
-    suspend operator fun invoke(messageId: Long): List<Pair<String, OpenGraphResult>>
+    suspend operator fun invoke(messageId: Long): Pair<String, OpenGraphResult>?
 }
 
 class GetMetadataUseCaseImpl(
     private val messageRepository: MessageRepository
 ) : GetMetadataUseCase {
-    override suspend fun invoke(messageId: Long): List<Pair<String, OpenGraphResult>> {
+    override suspend fun invoke(messageId: Long): Pair<String, OpenGraphResult>? {
         return messageRepository.getMetadata(messageId)
     }
 }
+
 
 
 

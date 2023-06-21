@@ -128,7 +128,6 @@ class MessageRepositoryImpl(
         ).executeAsOneOrNull()?.let { Either.Right(it.id) } ?: Either.Left(MessageDoesNotExist)
 
 
-
     override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
         withContext(Dispatchers.IO) {
             try {
@@ -150,46 +149,24 @@ class MessageRepositoryImpl(
                     url = "http://$url"
                 }
 
-                val response = Jsoup.connect(url)
-                    .ignoreContentType(true)
-                    .userAgent(userAgent)
-                    .referrer(referrer)
-                    .timeout(timeout)
-                    .followRedirects(true)
-                    .execute()
+                val response = Jsoup.connect(url).ignoreContentType(true).userAgent(userAgent)
+                    .referrer(referrer).timeout(timeout).followRedirects(true).execute()
 
                 val doc = response.parse()
 
                 val ogTags = doc.select(docSelectQuery)
 
-                val openGraphResult = OpenGraphResult()
+                var openGraphResult = OpenGraphResult()
 
                 ogTags.forEach { tag ->
-
-                    when (tag.attr(property)) {
-                        ogImage -> {
-                            openGraphResult.image = tag.attr(openGraphKey)
-                        }
-
-                        ogDescription -> {
-                            openGraphResult.description = tag.attr(openGraphKey)
-                        }
-
-                        ogUrl -> {
-                            openGraphResult.url = tag.attr(openGraphKey)
-                        }
-
-                        ogTitle -> {
-                            openGraphResult.title = tag.attr(openGraphKey)
-                        }
-
-                        ogSiteName -> {
-                            openGraphResult.siteName = tag.attr(openGraphKey)
-                        }
-
-                        ogType -> {
-                            openGraphResult.type = tag.attr(openGraphKey)
-                        }
+                    openGraphResult = when (tag.attr(property)) {
+                        ogImage -> openGraphResult.copy(image = tag.attr(openGraphKey))
+                        ogDescription -> openGraphResult.copy(description = tag.attr(openGraphKey))
+                        ogUrl -> openGraphResult.copy(url = tag.attr(openGraphKey))
+                        ogTitle -> openGraphResult.copy(title = tag.attr(openGraphKey))
+                        ogSiteName -> openGraphResult.copy(siteName = tag.attr(openGraphKey))
+                        ogType -> openGraphResult.copy(type = tag.attr(openGraphKey))
+                        else -> openGraphResult
                     }
                 }
 
@@ -213,14 +190,13 @@ class MessageRepositoryImpl(
         )
     }
 
-    override suspend fun getMetadata(messageId: Long): List<Pair<String, OpenGraphResult>> {
-        return urlMetadataQueries.getUrlMetadata(messageId).executeAsList().map { row ->
-            val url = row.url
-            val jsonData = row.json_data
-            val openGraphResult = Json.decodeFromString<OpenGraphResult>(jsonData)
-            url to openGraphResult
-        }
+    override suspend fun getMetadata(messageId: Long): Pair<String, OpenGraphResult>? {
+        val metadata =
+            urlMetadataQueries.getUrlMetadata(messageId).executeAsOneOrNull() ?: return null
+        val url = metadata.url
+        val jsonData = metadata.json_data
+        val openGraphResult = Json.decodeFromString<OpenGraphResult>(jsonData)
+        return url to openGraphResult
     }
-
 
 }

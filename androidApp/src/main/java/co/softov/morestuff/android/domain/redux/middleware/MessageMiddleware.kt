@@ -2,7 +2,6 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.replyWithTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
@@ -11,7 +10,12 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateS
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.message.*
+import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
+import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -51,8 +55,7 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                val task = TaskDomain(id = action.taskId, title = action.content)
-                createMessageUseCase(task.id, title = action.content, ContentType.TASK_MESSAGE )
+                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE )
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {

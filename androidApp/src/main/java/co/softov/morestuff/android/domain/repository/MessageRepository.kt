@@ -34,7 +34,7 @@ interface MessageRepository {
     suspend fun countActiveReminderMessages(): Int
     suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult?
     suspend fun insertUrlMetadata(url: String, openGraphResult: OpenGraphResult, messageId: Long)
-    suspend fun getMetadata(messageId: Long): List<Pair<String, OpenGraphResult>>
+    suspend fun getMetadata(messageId: Long): Pair<String, OpenGraphResult>?
 
 }
 

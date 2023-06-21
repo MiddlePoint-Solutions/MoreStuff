@@ -15,7 +15,8 @@ class CreateMessageUseCaseImplTest {
     @Test
     fun `should return created message`() {
         val messageRepository: MessageRepository = mockk()
-        val createMessageUseCaseImpl = CreateMessageUseCaseImpl(messageRepository)
+        val extractUrlAndFetchMetadataUseCase: ExtractUrlAndFetchMetadataUseCase = mockk()
+        val createMessageUseCaseImpl = CreateMessageUseCaseImpl(messageRepository,extractUrlAndFetchMetadataUseCase )
         val taskId = 1L
         val scheduleId = 1L
         val title = "Test Message"
@@ -23,9 +24,10 @@ class CreateMessageUseCaseImplTest {
         val expectedMessage = createMessageForTest()
 
         coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value, title) } returns expectedMessage.right()
+        coEvery { extractUrlAndFetchMetadataUseCase(title, any()) } returns Unit.right()
 
         runBlocking {
-            val result = createMessageUseCaseImpl.invoke(taskId, scheduleId, title, contentType)
+            val result = createMessageUseCaseImpl.invoke(taskId,title,   contentType, scheduleId)
             assertEquals(expectedMessage.right(), result)
         }
     }

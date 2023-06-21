@@ -5,8 +5,6 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.ui.utils.urlPattern
-import java.util.regex.Pattern
 
 interface CreateMessageUseCase {
     suspend operator fun invoke(
@@ -19,7 +17,7 @@ interface CreateMessageUseCase {
 
 class CreateMessageUseCaseImpl(
     private val messageRepository: MessageRepository,
-    private val fetchOpenGraphMetadataUseCase: FetchOpenGraphMetadataUseCase,
+    private val extractUrlAndFetchMetadataUseCase: ExtractUrlAndFetchMetadataUseCase
 ) : CreateMessageUseCase {
 
     override suspend fun invoke(
@@ -31,28 +29,9 @@ class CreateMessageUseCaseImpl(
         val messageResult = messageRepository.createMessage(taskId, scheduleId, contentType.value, title)
 
         messageResult.map { message ->
-            val urlPattern = urlPattern
-
-            val firstUrl = findFirstUrl(title, urlPattern)
-            if (firstUrl != null) {
-                val openGraphResult = fetchOpenGraphMetadataUseCase.invoke(firstUrl, message.id)
-                if (openGraphResult != null) {
-                    messageRepository.insertUrlMetadata(firstUrl, openGraphResult, message.id)
-                }
-            }
+            extractUrlAndFetchMetadataUseCase(title, message.id)
         }
-
         return messageResult
     }
 }
 
-fun findFirstUrl(content: String, urlPattern: Pattern): String? {
-    val matcher = urlPattern.matcher(content)
-    return if (matcher.find()) {
-        var url = content.substring(matcher.start(), matcher.end())
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://$url"
-        }
-        url
-    } else null
-}
