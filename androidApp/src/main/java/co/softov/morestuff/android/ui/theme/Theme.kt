@@ -20,6 +20,12 @@ private val lightColors = lightColorScheme(
     error = Red200,
 )
 
+val ColorScheme.userChatItem: Color
+    get() = Indigo400
+
+val ColorScheme.appChatItem: Color
+    get() = Indigo200
+
 private val darkColors = darkColorScheme(
     primary = BlueGray600,
     primaryContainer = BlueGray900,
