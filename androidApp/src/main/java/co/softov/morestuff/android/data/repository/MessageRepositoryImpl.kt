@@ -189,14 +189,4 @@ class MessageRepositoryImpl(
             message_id = messageId
         )
     }
-
-    override suspend fun getMetadata(messageId: Long): Pair<String, OpenGraphResult>? {
-        val metadata =
-            urlMetadataQueries.getUrlMetadata(messageId).executeAsOneOrNull() ?: return null
-        val url = metadata.url
-        val jsonData = metadata.json_data
-        val openGraphResult = Json.decodeFromString<OpenGraphResult>(jsonData)
-        return url to openGraphResult
-    }
-
 }

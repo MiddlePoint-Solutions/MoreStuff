@@ -17,7 +17,7 @@ interface CreateMessageUseCase {
 
 class CreateMessageUseCaseImpl(
     private val messageRepository: MessageRepository,
-    private val extractUrlAndFetchMetadataUseCase: ExtractUrlAndFetchMetadataUseCase
+    private val checkForUrlMetadataUseCase: CheckForUrlMetadataUseCase
 ) : CreateMessageUseCase {
 
     override suspend fun invoke(
@@ -29,7 +29,7 @@ class CreateMessageUseCaseImpl(
         val messageResult = messageRepository.createMessage(taskId, scheduleId, contentType.value, title)
 
         messageResult.map { message ->
-            extractUrlAndFetchMetadataUseCase(title, message.id)
+            checkForUrlMetadataUseCase(title, message.id)
         }
         return messageResult
     }

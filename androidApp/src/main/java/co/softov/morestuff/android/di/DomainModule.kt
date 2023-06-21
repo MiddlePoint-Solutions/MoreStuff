@@ -147,8 +147,8 @@ val messageUseCases = module {
     factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
-    factoryOf(::GetMetadataUseCaseImpl) bind GetMetadataUseCase::class
-    factoryOf(::ExtractUrlAndFetchMetadataUseCaseImpl) bind ExtractUrlAndFetchMetadataUseCase::class
+
+    factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
 }
 
 

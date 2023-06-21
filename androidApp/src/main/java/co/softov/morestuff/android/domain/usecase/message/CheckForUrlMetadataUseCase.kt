@@ -7,17 +7,17 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.ui.utils.urlPattern
 import java.util.regex.Pattern
 
-interface ExtractUrlAndFetchMetadataUseCase {
+interface CheckForUrlMetadataUseCase {
     suspend operator fun invoke(
         title: String,
         messageId: Long
     ): Either<Failure, Unit>
 }
 
-class ExtractUrlAndFetchMetadataUseCaseImpl(
+class CheckForUrlMetadataUseCaseImpl(
     private val messageRepository: MessageRepository,
     private val fetchOpenGraphMetadataUseCase: FetchOpenGraphMetadataUseCase,
-) : ExtractUrlAndFetchMetadataUseCase {
+) : CheckForUrlMetadataUseCase {
 
     override suspend fun invoke(
         title: String,
@@ -27,7 +27,7 @@ class ExtractUrlAndFetchMetadataUseCaseImpl(
 
         val firstUrl = findFirstUrl(title, urlPattern)
         return if (firstUrl != null) {
-            val openGraphResult = fetchOpenGraphMetadataUseCase(firstUrl, messageId)
+            val openGraphResult = fetchOpenGraphMetadataUseCase(firstUrl)
             if (openGraphResult != null) {
                 messageRepository.insertUrlMetadata(firstUrl, openGraphResult, messageId)
                 Either.Right(Unit)
