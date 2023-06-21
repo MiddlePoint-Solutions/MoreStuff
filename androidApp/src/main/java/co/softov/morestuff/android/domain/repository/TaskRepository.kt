@@ -3,10 +3,10 @@ package co.softov.morestuff.android.domain.repository
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.enums.TaskType
-import kotlinx.coroutines.flow.Flow
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.TaskDomain
+import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
 
@@ -43,6 +43,8 @@ interface TaskRepository {
     ): Either<Failure, Long>
 
     suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
+    suspend fun getTasksWithoutScheduleFlow(): Flow<List<TaskDomain>>
+    suspend fun getActiveTasksWithScheduleFlow(): Flow<List<TaskDomain>>
 }
 
 object TaskDoesNotExist : FeatureFailure

@@ -3,22 +3,15 @@ package co.softov.morestuff.android.domain.usecase.task
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
-interface GetReviewTaskUseCase {
+interface GetTaskForReviewUseCase {
     suspend operator fun invoke(): Flow<List<TaskDomain>>
 }
 
-class GetReviewTaskUseCaseImpl(
+class GetTaskForReviewUseCaseImpl(
     private val taskRepository: TaskRepository,
-    private val taskHasScheduleUseCase: TaskHasScheduleUseCase
-) : GetReviewTaskUseCase {
+) : GetTaskForReviewUseCase {
 
     override suspend fun invoke(): Flow<List<TaskDomain>> =
-        taskRepository.getActiveTasksFlow()
-            .map { tasks ->
-                tasks.filterNot { task ->
-                    taskHasScheduleUseCase(task.id)
-                }
-            }
+        taskRepository.getTasksWithoutScheduleFlow()
 }

@@ -211,8 +211,4 @@ class ScheduleRepositoryImpl(
         return Right(limit.toInt())
     }
 
-    override suspend fun taskHasSchedule(taskId: Long): Boolean {
-        return scheduleQueries.selectActiveScheduleByTaskId(taskId).executeAsOneOrNull() != null
-    }
-
 }

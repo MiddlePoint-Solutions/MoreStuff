@@ -8,7 +8,6 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.math.max
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -25,30 +24,45 @@ class GetPlanPriorityScoreUseCaseImplTest {
     )
 
     @Test
-    fun `test invoke`() = runBlocking {
-        val scheduleTimeLocal = "2023-06-19T20:00:00Z"
+    fun `calculate priority for plan task whit positive numbers`() = runBlocking {
         val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
-
-        val createTime = taskCreateTimeUtc.toInstant().epochSeconds
-        val scheduleTime = scheduleTimeLocal.toInstant().epochSeconds
-        val currentTime = "2023-06-19T15:00:00Z".toInstant().epochSeconds
+        val scheduleTimeLocal = "2023-06-19T20:00:00Z"
+        val currentTime = "2023-06-19T15:00:00Z"
 
         val lp: Long = 10
         val hp: Long = 100
 
-        val expectedScore = lp + (
-                max(0, currentTime - createTime) /
-                        max(0, scheduleTime - createTime)
-                ) * (hp - lp)
+        val expectedScore: Long = 55
 
-        coEvery { getLowestPriorityScoreUseCase.invoke() } returns lp
-        coEvery { getHighestPriorityScoreUseCase.invoke() } returns hp
+        coEvery { getLowestPriorityScoreUseCase() } returns lp
+        coEvery { getHighestPriorityScoreUseCase() } returns hp
         coEvery { timeManager.localDateTimeStringToUtc(scheduleTimeLocal) } returns scheduleTimeLocal.toInstant()
-        coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime)
-
+        coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime.toInstant().epochSeconds)
 
         val actualScore = useCase.invoke(scheduleTimeLocal, taskCreateTimeUtc)
 
         assertEquals(expectedScore, actualScore)
-    }}
+    }
+
+    @Test
+    fun `calculate priority for plan task whit negative numbers`() = runBlocking {
+        val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
+        val scheduleTimeLocal = "2023-06-19T20:00:00Z"
+        val currentTime = "2023-06-19T15:00:00Z"
+
+        val lp: Long = -10
+        val hp: Long = -100
+
+        val expectedScore: Long = -55
+
+        coEvery { getLowestPriorityScoreUseCase() } returns lp
+        coEvery { getHighestPriorityScoreUseCase() } returns hp
+        coEvery { timeManager.localDateTimeStringToUtc(scheduleTimeLocal) } returns scheduleTimeLocal.toInstant()
+        coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime.toInstant().epochSeconds)
+
+        val actualScore = useCase.invoke(scheduleTimeLocal, taskCreateTimeUtc)
+
+        assertEquals(expectedScore, actualScore)
+    }
+}
 

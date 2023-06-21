@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.usecase.task.GetReviewTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetTaskForReviewUseCase
 import co.softov.morestuff.android.domain.enums.ReviewActionType
 import co.softov.morestuff.android.domain.redux.middleware.ReviewAction
 
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ReviewViewModel(
-    private val getTasksForReviewUseCase: GetReviewTaskUseCase,
+    private val getTasksForReviewUseCase: GetTaskForReviewUseCase,
     private val reviewItemMapper: ReviewItemMapper,
     private val updatePlanTaskPriorityUseCase: UpdatePlanTaskPriorityUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {

@@ -174,4 +174,18 @@ class TaskRepositoryImpl(
         taskQueries.updateTaskPriorityScore(priorityScore, taskId)
         return Right(priorityScore)
     }
+
+    override suspend fun getTasksWithoutScheduleFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.getActiveTaskWhithoutSchedule()
+            .asFlow()
+            .mapToList()
+            .map { tasks ->
+                tasks.map { task ->
+                    mapTaskData(task)
+                }
+            }
+    }
+    override suspend fun getActiveTasksWithScheduleFlow(): Flow<List<TaskDomain>> {
+        return taskQueries.selectActiveTasksWithSchedule().asFlow().mapToList().map { mapList(it, mapTaskData) }
+    }
 }
