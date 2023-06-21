@@ -17,7 +17,7 @@ fun SlideAnimation(
         visibleState = visibleState,
         modifier = modifier,
         enter = slideInVertically { it * 2 },
-        exit = slideOutVertically { it * 2 }
+        exit = slideOutVertically { (it * 1.5).toInt() }
     ) {
         content()
     }
