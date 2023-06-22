@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
+import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.app.navigation.AppRouter
 import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
 import co.softov.morestuff.android.app.receiver.setReviewIntentExtras
@@ -56,7 +57,6 @@ class MainActivity : AppCompatActivity() {
         handleLaunchIntent()
 
         setContent {
-
             TransparentSystemBars()
             val snackbarHostState = remember { SnackbarHostState() }
 
@@ -103,18 +103,9 @@ class MainActivity : AppCompatActivity() {
             ReviewNotification::class.java
         )?.let {
             router.navigateTo(Screens.review)
-            intent.setReviewIntentExtras(null)
+            intent = intent.setReviewIntentExtras(null)
         }
-
     }
-
-    fun <T> Intent.getParcelableExtraCompat(name: String?, clazz: Class<T>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(name, clazz)
-        } else {
-            intent.getParcelableExtra(name)
-        }
-
 
     @SuppressLint("BatteryLife")
     private fun showBatteryOptimizationRequest() {
@@ -141,15 +132,8 @@ class MainActivity : AppCompatActivity() {
         super.onPause()
     }
 
-    private fun showSettingsScreen() {
-        router.navigateTo((Screens.ComposeSettings))
-    }
-
-
     companion object {
-
         const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
         const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
-
     }
 }

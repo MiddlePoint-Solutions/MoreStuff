@@ -40,6 +40,9 @@ android {
         targetSdk = 33
         versionCode = 14
         versionName = "0.4.3"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -85,6 +88,11 @@ android {
             it.useJUnitPlatform()
         }
     }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 
@@ -127,7 +135,15 @@ sqldelight {
 dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.material3:material3")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
 
     // Kotlin
@@ -249,7 +265,7 @@ dependencies {
 
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
-
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
 
 }
