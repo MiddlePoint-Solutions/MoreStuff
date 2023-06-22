@@ -1,12 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import arrow.core.Either
 import co.softov.morestuff.android.domain.createListOfTasks
 import co.softov.morestuff.android.domain.createScheduleForTest
-import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
-import co.softov.morestuff.android.domain.repository.TaskRepository
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,33 +11,30 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 
 
-internal class UpdatePlanTaskPriorityUseCaseImplTest {
+internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
-    private val taskRepository = mockk<TaskRepository>(relaxed = true)
-    private val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
+    private val getActiveTasksWithScheduleUseCase = mockk<GetActiveTasksWithScheduleUseCase>(relaxed = true)
     private val getPlanPriorityScoreUseCase = mockk<GetPlanPriorityScoreUseCase>(relaxed = true)
-    private val getActiveScheduleForTaskUseCase = mockk<GetActiveScheduleForTaskUseCase>(relaxed = true)
-    private val useCase = UpdatePlanTaskPriorityUseCaseImpl(
-        taskRepository,
+    private val updateTaskPriorityScoreUseCase = mockk<UpdateTaskPriorityScoreUseCase>(relaxed = true)
+    private val useCase = UpdatePlannedTasksPriorityUseCaseImpl(
+        getActiveTasksWithScheduleUseCase,
         getPlanPriorityScoreUseCase,
-        getActiveScheduleForTaskUseCase
+        updateTaskPriorityScoreUseCase
     )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `verify that priority of tasks with schedule is updated`() = runTest {
-        val tasks = createListOfTasks(3)
+        val tasks = createListOfTasks(3).mapIndexed { index, task ->
+            val schedule = createScheduleForTest(taskId = task.id, scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00")
+            task.copy(activeSchedule = schedule)
+        }
 
         val schedules = tasks.mapIndexed { index, task ->
             createScheduleForTest(taskId = task.id, scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00")
         }
 
-        coEvery { taskRepository.getActiveTasksFlow() } returns flowOf(tasks)
-        coEvery { getActiveScheduleForTaskUseCase(any()) } answers {
-            val taskId = firstArg<Long>()
-            val index = tasks.indexOfFirst { it.id == taskId }
-            Either.Right(schedules[index])
-        }
+        coEvery { getActiveTasksWithScheduleUseCase() } returns flowOf(tasks)
         coEvery { getPlanPriorityScoreUseCase(any(), any()) } answers {
             val scheduleTimeLocal = firstArg<String>()
 
@@ -66,9 +58,11 @@ internal class UpdatePlanTaskPriorityUseCaseImplTest {
             } else {
                 30L
             }
-            coVerify { taskRepository.updateTaskPriority(task.id, newPriorityScore) }
+            coVerify(exactly = tasks.size) { updateTaskPriorityScoreUseCase(any(), any()) }
         }
     }
+
+
 
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -76,16 +70,16 @@ internal class UpdatePlanTaskPriorityUseCaseImplTest {
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
         val tasks = createListOfTasks(2)
 
-        coEvery { taskRepository.getActiveTasksFlow() } returns flowOf(tasks)
-        coEvery { scheduleRepository.getActiveScheduleForTask(any()) } returns Either.Left(TaskDoesNotExist)
+        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns flowOf(tasks)
 
         useCase.invoke()
 
         tasks.forEach { task ->
-            coVerify(exactly = 0) { taskRepository.updateTaskPriority(task.id, any()) }
+            coVerify(exactly = 0) { updateTaskPriorityScoreUseCase(task.id, any()) }
         }
     }
 }
+
 
 
 

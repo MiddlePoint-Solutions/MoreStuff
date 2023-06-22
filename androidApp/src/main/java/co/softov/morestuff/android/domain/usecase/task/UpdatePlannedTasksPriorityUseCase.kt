@@ -1,19 +1,18 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import co.softov.morestuff.android.domain.repository.TaskRepository
 
-
-interface UpdatePlanTaskPriorityUseCase {
+interface UpdatePlannedTasksPriorityUseCase {
     suspend operator fun invoke()
 }
 
-class UpdatePlanTaskPriorityUseCaseImpl(
-    private val taskRepository: TaskRepository,
+class UpdatePlannedTasksPriorityUseCaseImpl(
+    private val getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase,
     private val getPlanPriorityScoreUseCase: GetPlanPriorityScoreUseCase,
-) : UpdatePlanTaskPriorityUseCase {
+    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
+) : UpdatePlannedTasksPriorityUseCase {
 
     override suspend fun invoke() {
-        taskRepository.getActiveTasksWithScheduleFlow().collect { tasks ->
+        getActiveTasksWithScheduleUseCase().collect { tasks ->
             for (task in tasks) {
                 val scheduleDomain = task.activeSchedule
                 if (scheduleDomain?.scheduleLocalTime != null) {
@@ -21,7 +20,7 @@ class UpdatePlanTaskPriorityUseCaseImpl(
                         scheduleTimeLocal = scheduleDomain.scheduleLocalTime.toString(),
                         taskCreateTimeUtc = task.createTime
                     )
-                    taskRepository.updateTaskPriority(task.id, newPriorityScore)
+                    updateTaskPriorityScoreUseCase(task.id, newPriorityScore)
                 }
             }
         }
