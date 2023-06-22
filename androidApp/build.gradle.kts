@@ -38,8 +38,8 @@ android {
         compileSdk = 33
         minSdk = 25
         targetSdk = 33
-        versionCode = 13
-        versionName = "0.4.2-mvp"
+        versionCode = 14
+        versionName = "0.4.3"
     }
 
     buildTypes {
