@@ -13,9 +13,11 @@ import org.junit.jupiter.api.Test
 
 internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
-    private val getActiveTasksWithScheduleUseCase = mockk<GetActiveTasksWithScheduleUseCase>(relaxed = true)
+    private val getActiveTasksWithScheduleUseCase =
+        mockk<GetActiveTasksWithScheduleUseCase>(relaxed = true)
     private val getPlanPriorityScoreUseCase = mockk<GetPlanPriorityScoreUseCase>(relaxed = true)
-    private val updateTaskPriorityScoreUseCase = mockk<UpdateTaskPriorityScoreUseCase>(relaxed = true)
+    private val updateTaskPriorityScoreUseCase =
+        mockk<UpdateTaskPriorityScoreUseCase>(relaxed = true)
     private val useCase = UpdatePlannedTasksPriorityUseCaseImpl(
         getActiveTasksWithScheduleUseCase,
         getPlanPriorityScoreUseCase,
@@ -26,12 +28,18 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     @Test
     fun `verify that priority of tasks with schedule is updated`() = runTest {
         val tasks = createListOfTasks(3).mapIndexed { index, task ->
-            val schedule = createScheduleForTest(taskId = task.id, scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00")
+            val schedule = createScheduleForTest(
+                taskId = task.id,
+                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00"
+            )
             task.copy(activeSchedule = schedule)
         }
 
         val schedules = tasks.mapIndexed { index, task ->
-            createScheduleForTest(taskId = task.id, scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00")
+            createScheduleForTest(
+                taskId = task.id,
+                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00"
+            )
         }
 
         coEvery { getActiveTasksWithScheduleUseCase() } returns flowOf(tasks)
@@ -63,18 +71,16 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     }
 
 
-
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
-        val tasks = createListOfTasks(2)
+        val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(activeSchedule = null) }
 
-        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns flowOf(tasks)
+        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns flowOf(tasksWithoutSchedule)
 
         useCase.invoke()
 
-        tasks.forEach { task ->
+        tasksWithoutSchedule.forEach { task ->
             coVerify(exactly = 0) { updateTaskPriorityScoreUseCase(task.id, any()) }
         }
     }
