@@ -150,6 +150,8 @@ val messageUseCases = module {
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
 
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
+    factoryOf(::RealClipboardHandler) bind ClipboardHandler::class
+    factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
 }
 
 

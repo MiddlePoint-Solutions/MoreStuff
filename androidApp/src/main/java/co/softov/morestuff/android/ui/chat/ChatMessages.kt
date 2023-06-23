@@ -2,17 +2,29 @@ package co.softov.morestuff.android.ui.chat
 
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -38,11 +50,12 @@ fun Messages(
     messages: List<Message>,
     actions: TaskActions,
     modifier: Modifier = Modifier,
-    scrollState: LazyListState
+    scrollState: LazyListState,
+    onCopyMessage: (Message) -> Unit,
+    onDeleteMessage: (Message) -> Unit,
 ) {
-
     val scope = rememberCoroutineScope()
-    var itemsCount by remember { mutableStateOf(0) }
+    var itemsCount by remember { mutableIntStateOf(0) }
     val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount, scrollState)
     itemsCount = messages.size
 
@@ -59,10 +72,10 @@ fun Messages(
             ) { item ->
 
                 when (item.contentType) {
-                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
+                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions, onCopyMessage = onCopyMessage, onDeleteMessage = onDeleteMessage )
                     ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
                     ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
-                    ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions)
+                    ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions,onCopyMessage = onCopyMessage, onDeleteMessage = onDeleteMessage  )
                 }
             }
         }

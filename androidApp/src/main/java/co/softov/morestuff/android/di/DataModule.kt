@@ -50,6 +50,9 @@ val dataModule = module {
     // Database
     single { createDatabase(androidApplication()) }
 
+    //MessageQueries
+    single { get<StuffDb>().messageQueries }
+
     //Time
     single<TimeFormatter> { TimeFormatterImpl() }
 

@@ -1,7 +1,8 @@
 package co.softov.morestuff.android.ui.chat.items
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,18 +14,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -41,12 +46,20 @@ import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UserChatItem(message: Message, actions: TaskActions) {
+fun UserChatItem(
+    message: Message,
+    actions: TaskActions,
+    onCopyMessage: (Message) -> Unit,
+    onDeleteMessage: (Message) -> Unit,
+) {
+    var showMenu by remember { mutableStateOf(false) }
+    var isSelected by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
-    val openGraphResult =  message.openGraphResult
+    val openGraphResult = message.openGraphResult
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
@@ -56,40 +69,54 @@ fun UserChatItem(message: Message, actions: TaskActions) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 45.dp)
-            .clickable { actions.taskChatAction(message.taskId) },
+            .combinedClickable(
+                onClick = { actions.taskChatAction(message.taskId) },
+                onLongClick = {
+                    showMenu = true
+                    isSelected = true
+                }
+            ),
         horizontalArrangement = Arrangement.End
     ) {
         Column(
-            modifier = Modifier.padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
+            modifier = Modifier
+                .padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
+                .graphicsLayer {
+                    scaleX = if (isSelected) 1.2f else 1.0f
+                    scaleY = if (isSelected) 1.2f else 1.0f
+                }
         ) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
                 color = MaterialTheme.colorScheme.userChatItem,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
-            ) {
-                Column(modifier = Modifier.padding(end = 5.dp, bottom = 4.dp)) {
+                contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
 
-                    SelectionContainer {
-                        ClickableText(
-                            modifier = Modifier.padding(8.dp),
-                            text = text,
-                            style = LocalTextStyle.current.copy(
-                                color = Color.White,
-                                fontSize = 16.sp
-                            ),
-                            onClick = { offset ->
-                                text.getStringAnnotations("URL", offset, offset).firstOrNull()
-                                    ?.let {
-                                        coroutineScope.launch {
-                                            try {
-                                                uriHandler.openUri(it.item)
-                                            } catch (e: Exception) {
-                                            }
+                ) {
+                Column(
+                    modifier = Modifier
+                        .padding(end = 5.dp, bottom = 4.dp)
+                ) {
+
+                    ClickableText(
+                        modifier = Modifier.padding(8.dp),
+                        text = text,
+                        style = LocalTextStyle.current.copy(
+                            color = Color.White,
+                            fontSize = 16.sp
+                        ),
+                        onClick = { offset ->
+                            text.getStringAnnotations("URL", offset, offset).firstOrNull()
+                                ?.let {
+                                    coroutineScope.launch {
+                                        try {
+                                            uriHandler.openUri(it.item)
+                                        } catch (e: Exception) {
                                         }
                                     }
-                            }
-                        )
-                    }
+                                }
+                        }
+                    )
+
                     if (openGraphResult?.title != null && openGraphResult.description != null) {
                         OpenGraphPreview(openGraphResult)
                     }
@@ -97,9 +124,19 @@ fun UserChatItem(message: Message, actions: TaskActions) {
                 }
             }
         }
+
+        if (showMenu) {
+            ShowContextMenu(
+                message,
+                onCopyMessage = onCopyMessage,
+                onDeleteMessage = onDeleteMessage,
+                showMenu = showMenu,
+                onClose = { showMenu = false
+                    isSelected = false}
+            )
+        }
     }
 }
-
 
 
 @Composable
@@ -145,6 +182,7 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme(darkTheme = true) {
-        UserChatItem(message = MockData.Message.userNewTask, TaskActions())
+        UserChatItem(message = MockData.Message.userNewTask, TaskActions(), onCopyMessage = {},
+            onDeleteMessage = {})
     }
 }

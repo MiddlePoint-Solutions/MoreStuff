@@ -94,3 +94,7 @@ LIMIT :limit OFFSET :offset;
 lastInsertRowId:
 SELECT last_insert_rowid()
 ;
+deleteMessage:
+DELETE FROM message
+WHERE id = ?;
+

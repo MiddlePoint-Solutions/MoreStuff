@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.task
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,12 +18,9 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.repository.MessageRepository
-
-
-
 import co.softov.morestuff.android.domain.service.TimeManager
-
+import co.softov.morestuff.android.domain.usecase.message.ClipboardHandler
+import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
@@ -46,6 +44,8 @@ class TaskChatViewModel(
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
+    private val clipboardHandler: ClipboardHandler,
+    private val deleteMessageUseCase: DeleteMessageUseCase,
     private val taskId: Long,
     private val timeManager: TimeManager,
     devTools: DevTools,
@@ -179,4 +179,13 @@ class TaskChatViewModel(
         planModel = createPlanModel()
     }
 
+    @SuppressLint("ServiceCast")
+    fun copyToClipboard(text: String) {
+        clipboardHandler.copyToClipboard(text)
+    }
+    fun deleteMessage(messageId:Long) {
+        viewModelScope.launch {
+            deleteMessageUseCase(messageId)
+        }
+    }
 }
