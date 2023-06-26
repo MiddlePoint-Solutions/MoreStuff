@@ -40,6 +40,9 @@ android {
         targetSdk = 33
         versionCode = 14
         versionName = "0.4.3"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -85,6 +88,11 @@ android {
             it.useJUnitPlatform()
         }
     }
+    packagingOptions {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 
@@ -127,7 +135,15 @@ sqldelight {
 dependencies {
     implementation(project(":shared"))
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.material3:material3")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
 
     // Kotlin
@@ -155,9 +171,6 @@ dependencies {
     implementation(Libs.AndroidX.pagingKtx)
     implementation(Libs.AndroidX.constraintLayout)
     implementation(Libs.AndroidX.workKtx)
-
-    // Navigation
-    implementation("com.github.terrakok:cicerone:7.1")
 
     // Modal Drawer Layout
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
@@ -243,13 +256,16 @@ dependencies {
     //implementation("com.russhwolf:multiplatform-settings:1.0.0")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
 
-    //LinkPreview
     implementation ("org.jsoup:jsoup:1.10.3")
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-
+    implementation("com.arkivanov.decompose:decompose:2.0.0-beta-01")
+    implementation("com.arkivanov.decompose:extensions-compose-jetpack:2.0.0-beta-01")
+//    implementation("io.github.xxfast:decompose-router:0.2.1")
+    implementation("com.arkivanov.essenty:parcelable:1.1.0")
 
 }

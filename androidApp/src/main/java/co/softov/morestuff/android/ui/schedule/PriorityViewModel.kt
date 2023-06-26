@@ -11,7 +11,6 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
-import co.softov.morestuff.android.ui.Screens
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
@@ -90,10 +89,6 @@ class PriorityViewModel(
             notification = Complete
         }
 
-    }
-
-    fun showTaskChat(taskId: Long) {
-        router.navigateTo(Screens.taskChat(taskId))
     }
 
     fun undoLastCompleted() {

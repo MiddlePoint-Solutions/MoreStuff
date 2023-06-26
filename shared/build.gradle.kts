@@ -28,13 +28,14 @@ kotlin {
                 //Key-Value storage
                 //implementation("com.russhwolf:multiplatform-settings:1.0.0")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
-                // Decompose
-                implementation("com.arkivanov.decompose:decompose:1.0.0")
-                implementation("com.arkivanov.essenty:lifecycle:1.0.0")
-                implementation("com.arkivanov.essenty:parcelable:1.0.0")
-                implementation("com.arkivanov.essenty:state-keeper:1.0.0")
-                implementation("com.arkivanov.essenty:instance-keeper:1.0.0")
-                implementation("com.arkivanov.essenty:back-handler:1.0.0")
+
+                val decompose = "2.1.0-compose-experimental-alpha-02"
+
+                // Decompose-router
+//                implementation("io.github.xxfast:decompose-router:0.2.1")
+//                implementation("com.arkivanov.decompose:decompose:$decompose")
+//                implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decompose")
+//                implementation("com.arkivanov.essenty:parcelable:1.1.0")
             }
         }
 

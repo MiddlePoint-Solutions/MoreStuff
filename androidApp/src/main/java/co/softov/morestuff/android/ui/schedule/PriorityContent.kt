@@ -56,6 +56,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun PriorityContent(
     snackBarHostState: SnackbarHostState,
+    showTaskChat: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     onItemDragging: (Boolean) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
@@ -93,7 +94,7 @@ fun PriorityContent(
     }
 
     val taskActions = TaskActions(
-        taskChatAction = viewModel::showTaskChat,
+        taskChatAction = showTaskChat,
     )
 
     Box(modifier) {

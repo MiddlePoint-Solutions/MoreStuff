@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.main.PlanModel
-import co.softov.morestuff.android.ui.main.PriorityUI
-import co.softov.morestuff.android.ui.main.PriorityUI.*
+import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.PriorityUI
+import co.softov.morestuff.android.ui.home.PriorityUI.*
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)

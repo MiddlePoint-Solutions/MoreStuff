@@ -3,12 +3,10 @@ package co.softov.morestuff.android.app.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.BuildConfig
-import co.softov.morestuff.android.app.navigation.AppRouter
-import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.AppStore
+import co.softov.morestuff.android.domain.redux.store.Action
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -21,7 +19,6 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
 ) : ViewModel(), KoinComponent {
 
     protected val store: AppStore by inject()
-    protected val router: AppRouter by inject()
 
     private val _uiModel = MutableStateFlow(initialState)
     val uiModel: StateFlow<ViewState> = _uiModel
@@ -74,7 +71,4 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) =
         viewModelScope.launch(block = block)
 
-    fun navigateBack() {
-        router.exit()
-    }
 }

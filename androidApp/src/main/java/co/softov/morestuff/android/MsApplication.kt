@@ -50,7 +50,6 @@ class MsApplication : Application() {
                     addAll(domainModules)
                     add(dataModule)
                     add(presentationModule)
-                    add(navigationModule)
                     add(featuresModule)
                 }
             )

@@ -23,10 +23,6 @@ class SettingsViewModel(
         dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
     }
 
-    fun navigateBackSettings() {
-        router.exit()
-    }
-
     fun clearPendingMessages() {
         dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
     }
