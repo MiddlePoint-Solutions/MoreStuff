@@ -2,7 +2,7 @@ package co.softov.morestuff.buildsrc
 
 object Libs {
     const val androidGradlePlugin = "com.android.tools.build:gradle:7.4.2"
-    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.7.0"
+    const val moleculeGradlePlugin = "app.cash.molecule:molecule-gradle-plugin:0.9.0"
     const val jdkDesugar = "com.android.tools:desugar_jdk_libs:1.2.0"
 
     object Accompanist {
@@ -15,7 +15,7 @@ object Libs {
     }
 
     object Kotlin {
-        private const val version = "1.8.0"
+        private const val version = "1.8.20"
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$version"
         const val serialization = "org.jetbrains.kotlin:kotlin-serialization:$version"
         const val gradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
@@ -71,14 +71,14 @@ object Libs {
     }
 
     object Koin {
-        private const val version = "3.4.0"
+        private const val version = "3.4.2"
         const val gradlePlugin = "io.insert-koin:koin-gradle-plugin:3.2.0"
         const val android = "io.insert-koin:koin-android:$version"
         const val androidCompat = "io.insert-koin:koin-android-compat:$version"
-        const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.3"
+        const val androidxCompose = "io.insert-koin:koin-androidx-compose:3.4.5"
 
-        const val test = "io.insert-koin:koin-test:$version"
-        const val testJunit = "io.insert-koin:koin-test-junit5:$version"
+        const val test = "io.insert-koin:koin-test:3.4.1"
+        const val testJunit = "io.insert-koin:koin-test-junit5:3.4.1"
     }
 
     object Test {
@@ -142,7 +142,7 @@ object Libs {
             const val tooling = "androidx.compose.ui:ui-tooling"
 
             const val navigation = "androidx.navigation:navigation-compose:2.4.0-alpha08"
-            const val activityCompose = "androidx.activity:activity-compose:1.6.1"
+            const val activityCompose = "androidx.activity:activity-compose:1.7.2"
 
             object Test {
                 private const val version = "1.4.0"

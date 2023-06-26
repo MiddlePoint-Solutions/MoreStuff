@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
-import co.softov.morestuff.android.ui.main.input.ListIcon
-import co.softov.morestuff.android.ui.main.input.SendIcon
+import co.softov.morestuff.android.ui.home.input.ListIcon
+import co.softov.morestuff.android.ui.home.input.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import timber.log.Timber
 

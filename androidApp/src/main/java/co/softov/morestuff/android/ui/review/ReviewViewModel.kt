@@ -114,9 +114,7 @@ class ReviewViewModel(
 
         if (isLast) {
             roundEndDelayJob = viewModelScope.launch {
-
                 delay(500)
-                navigateBack()
                 updatePlannedTasksPriorityUseCase.invoke()
                 sendEvent(SetupRound(Final)) // TODO(Joseph) This would be used with compose navigation.
             }

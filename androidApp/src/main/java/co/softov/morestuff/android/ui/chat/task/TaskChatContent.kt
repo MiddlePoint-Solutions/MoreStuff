@@ -82,12 +82,9 @@ import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.TaskActions
 
-import co.softov.morestuff.android.ui.chat.task.model.TaskPriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
-import co.softov.morestuff.android.ui.priority.TaskPriorityViewModel
 
-import co.softov.morestuff.android.ui.main.PlanModel
-import co.softov.morestuff.android.ui.priority.PriorityButton
+import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
@@ -105,6 +102,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun TaskChatContent(
     taskId: Long,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
@@ -145,7 +143,7 @@ fun TaskChatContent(
             TopAppBarTaskChat(
                 viewModel,
                 setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
-                onBackPressed = viewModel::onBackPressed,
+                onBackPressed = onBack,
                 isExpanded = isExpanded
             )
         },
@@ -582,7 +580,8 @@ fun TaskChatTopBarPreview() {
 fun TaskChatPreview() {
     MoreStuffTheme(darkTheme = true) {
         TaskChatContent(
-            taskId = 1
+            taskId = 1,
+            onBack = {}
         )
     }
 }

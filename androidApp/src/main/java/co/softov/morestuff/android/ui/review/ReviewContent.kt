@@ -44,6 +44,7 @@ import timber.log.Timber
 
 @Composable
 fun ReviewContent(
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
@@ -70,7 +71,7 @@ fun ReviewContent(
                     ReviewRound.Priority -> {
 
                         Column {
-                            PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
+                            PriorityReviewTopBar(navigateUp = onBack)
                             RoundInfo(model)
                         }
 
@@ -126,7 +127,7 @@ fun ReviewContent(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            PriorityReviewTopBar(navigateUp = viewModel::navigateBack)
+                            PriorityReviewTopBar(navigateUp = onBack)
 
                             Box(
                                 modifier = Modifier
@@ -145,7 +146,7 @@ fun ReviewContent(
                                     }
 
                                     else -> {
-                                        // TODO(Joseph): go back to main screen
+                                        onBack()
                                     }
                                 }
                             }

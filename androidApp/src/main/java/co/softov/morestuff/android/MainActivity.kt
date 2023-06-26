@@ -3,78 +3,74 @@ package co.softov.morestuff.android
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
-import co.softov.morestuff.android.app.navigation.AppRouter
-import co.softov.morestuff.android.app.navigation.MoreStuffNavigator
+import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.app.receiver.setReviewIntentExtras
 import co.softov.morestuff.android.domain.enums.ReviewNotification
-import co.softov.morestuff.android.ui.Screens
-import co.softov.morestuff.android.ui.components.MoreStuffScaffold
+import co.softov.morestuff.android.nav.Screen
+import co.softov.morestuff.android.nav.Screen.*
+import co.softov.morestuff.android.ui.chat.task.TaskChatContent
+import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.main.ProvideComponentContext
+import co.softov.morestuff.android.ui.review.ReviewContent
+import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import com.github.terrakok.cicerone.Navigator
-import com.github.terrakok.cicerone.NavigatorHolder
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.defaultComponentContext
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimation
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.StackNavigationSource
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val navigatorHolder: NavigatorHolder by inject()
-    private val appNavigator: Navigator by lazy {
-        MoreStuffNavigator(this, android.R.id.content)
-    }
-
-    private val router: AppRouter by inject()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        onBackPressedDispatcher.addCallback(this) {
-            router.exit()
-        }
-
         handleLaunchIntent()
 
+        val rootComponentContext = defaultComponentContext()
+
         setContent {
-
             TransparentSystemBars()
-            val snackbarHostState = remember { SnackbarHostState() }
-
             MoreStuffTheme {
-                MoreStuffScaffold(
-                    snackbarHostState = snackbarHostState,
-                    content = {
-                        Box(Modifier.padding(top = it.calculateTopPadding())) {
-                            MainContent(
-                                snackbarHostState = snackbarHostState
-                            )
-                        }
+                Surface {
+                    ProvideComponentContext(rootComponentContext) {
+                        MainContent()
                     }
-                )
+                }
             }
-
         }
-
     }
 
     @Composable
@@ -94,7 +90,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleLaunchIntent() {
         intent.getLongExtra(EXTRA_TASK_ID, 0).let {
             if (it > 0) {
-                router.navigateTo(Screens.launchedTaskChat(it))
+                // router.navigateTo(Screens.launchedTaskChat(it)) TODO: return
                 intent.putExtra(EXTRA_TASK_ID, 0)
             }
         }
@@ -102,19 +98,10 @@ class MainActivity : AppCompatActivity() {
             EXTRA_PRIORITY_REVIEW,
             ReviewNotification::class.java
         )?.let {
-            router.navigateTo(Screens.review)
-            intent.setReviewIntentExtras(null)
+            // router.navigateTo(Screens.review) TODO:
+            intent = intent.setReviewIntentExtras(null)
         }
-
     }
-
-    fun <T> Intent.getParcelableExtraCompat(name: String?, clazz: Class<T>) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(name, clazz)
-        } else {
-            intent.getParcelableExtra(name)
-        }
-
 
     @SuppressLint("BatteryLife")
     private fun showBatteryOptimizationRequest() {
@@ -131,25 +118,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResumeFragments() {
-        super.onResumeFragments()
-        navigatorHolder.setNavigator(appNavigator)
-    }
-
-    override fun onPause() {
-        navigatorHolder.removeNavigator()
-        super.onPause()
-    }
-
-    private fun showSettingsScreen() {
-        router.navigateTo((Screens.ComposeSettings))
-    }
-
-
     companion object {
-
         const val EXTRA_TASK_ID = "EXTRA_TASK_ID"
         const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
-
     }
 }

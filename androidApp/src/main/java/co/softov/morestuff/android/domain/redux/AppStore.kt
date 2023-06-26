@@ -8,7 +8,6 @@ class AppStore(
     logger: LoggerMiddleware,
     devMiddleware: DevMiddleware,
     errorMiddleware: ErrorMiddleware,
-    navigator: NavigationMiddleware,
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
@@ -32,6 +31,5 @@ class AppStore(
         responseMiddleware,
         notificationMiddleware,
         reviewMiddleware,
-        navigator
     )
 )

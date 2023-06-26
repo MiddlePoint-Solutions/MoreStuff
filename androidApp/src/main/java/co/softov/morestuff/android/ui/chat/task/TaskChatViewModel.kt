@@ -28,7 +28,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import co.softov.morestuff.android.ui.main.PlanModel
+import co.softov.morestuff.android.ui.home.PlanModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -179,7 +179,4 @@ class TaskChatViewModel(
         planModel = createPlanModel()
     }
 
-    fun onBackPressed() {
-        router.exit()
-    }
 }
