@@ -5,7 +5,6 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
-import co.softov.morestuff.android.data.mapper.ScheduleData
 import co.softov.morestuff.android.data.mapper.ScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.ScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.ScheduleWithTitleDbMapper
@@ -211,4 +210,5 @@ class ScheduleRepositoryImpl(
             scheduleQueries.countTaskSchedulesByTime(taskId, startTime, endTime).executeAsOne()
         return Right(limit.toInt())
     }
+
 }

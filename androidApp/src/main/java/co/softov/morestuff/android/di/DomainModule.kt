@@ -67,7 +67,7 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            reviewMiddleware = get(),
+            reviewMiddleware = get()
         )
     }
 
@@ -96,7 +96,8 @@ val taskUseCases = module {
     factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
-    factoryOf(::GetReviewTaskUseCaseImpl) bind GetReviewTaskUseCase::class
+    factoryOf(::GetTaskForReviewUseCaseImpl) bind GetTaskForReviewUseCase::class
+    factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
 
     // Task priority score
     factoryOf(::GetPlanPriorityScoreUseCaseImpl) bind GetPlanPriorityScoreUseCase::class
@@ -109,6 +110,7 @@ val taskUseCases = module {
     factoryOf(::GetNowTaskUseCaseImpl) bind GetNowTaskUseCase::class
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
+    factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
 }
 
 
@@ -134,6 +136,7 @@ val scheduleUseCases = module {
     factoryOf(::GetReviewSchedulesUseCaseImpl) bind GetReviewSchedulesUseCase::class
     factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
     factoryOf(::ScheduleReviewNotificationsUseCaseImpl) bind ScheduleReviewNotificationsUseCase::class
+    factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
 }
 
 val messageUseCases = module {

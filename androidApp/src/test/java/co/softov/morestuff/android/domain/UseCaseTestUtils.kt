@@ -27,7 +27,8 @@ fun createTaskForTest(
     title: String = "",
     timeUtils: String = timeManager.nowLocalDateTimeString,
     priorityScore: Long = 0,
-    taskType: TaskType = TaskType.System
+    taskType: TaskType = TaskType.System,
+    activeSchedule: ScheduleDomain = createScheduleForTest(taskId = id)
 ): TaskDomain {
     return TaskDomain(
         id = id,
@@ -36,9 +37,11 @@ fun createTaskForTest(
         createTime = timeUtils,
         completeTime = null,
         priorityScore = priorityScore,
-        taskType = taskType
+        taskType = taskType,
+        activeSchedule = activeSchedule
     )
 }
+
 
 
 
