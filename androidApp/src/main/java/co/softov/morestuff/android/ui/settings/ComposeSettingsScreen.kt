@@ -52,11 +52,12 @@ import org.koin.compose.rememberKoinInject
 
 @Composable
 fun SettingsScreen(
+    onBack: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
     devTools: DevTools = rememberKoinInject(),
 ) {
     SettingsContent(
-        onBack = viewModel::navigateBackSettings,
+        onBack = onBack,
         onSnoozeLimit = viewModel::onSnoozeLimitChanged,
         onClearActiveMessages = viewModel::clearPendingMessages,
         onTestReviewActivity = viewModel::testReviewActivity,

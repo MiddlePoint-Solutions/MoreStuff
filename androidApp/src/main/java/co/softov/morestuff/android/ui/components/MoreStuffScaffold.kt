@@ -17,6 +17,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun MoreStuffScaffold(
     snackbarHostState: SnackbarHostState,
+    showSettings: () -> Unit,
+    showReview: () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
     viewModel: DrawerViewModel = koinViewModel(),
 ) {
@@ -40,8 +42,8 @@ fun MoreStuffScaffold(
             ModalDrawerSheet {
                 DrawerLayout(
                     closeDrawer = closeDrawer,
-                    showSettings = viewModel::showSettings,
-                    showPriorityReview = viewModel::showReview
+                    showSettings = showSettings,
+                    showPriorityReview = showReview
                 )
             }
         },
@@ -52,7 +54,7 @@ fun MoreStuffScaffold(
                 topBar = {
                     MoreStuffTopBar(
                         openDrawer = { scope.launch { drawerState.open() } },
-                        showReview = viewModel::showReview,
+                        showReview = showReview,
                     )
                 },
                 content = content,

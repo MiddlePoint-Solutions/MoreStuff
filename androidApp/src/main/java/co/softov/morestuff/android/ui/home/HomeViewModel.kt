@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.home
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,13 +14,12 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
-import co.softov.morestuff.android.ui.Screens
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 
-class MainViewModel(
+class HomeViewModel(
     getMessagesUseCase: GetMessagesUseCase,
     private val timeManager: TimeManager,
 ) : NoStateViewModel() {
@@ -91,14 +90,6 @@ class MainViewModel(
 
     fun onResume() {
         store.dispatch(OnResumeAction)
-    }
-
-    fun showTaskList() {
-        router.showBottomSheet(Screens.taskLists)
-    }
-
-    fun showTaskChat(taskId: Long) {
-
     }
 
 }

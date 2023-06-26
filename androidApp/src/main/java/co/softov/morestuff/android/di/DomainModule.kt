@@ -60,7 +60,6 @@ val storeModule = module {
             logger = get(),
             devMiddleware = get(),
             errorMiddleware = get(),
-            navigator = get(),
             taskMiddleware = get(),
             messageMiddleware = get(),
             scheduleMiddleware = get(),
@@ -73,7 +72,6 @@ val storeModule = module {
 
     // Middleware
     factoryOf(::LoggerMiddleware)
-    factoryOf(::NavigationMiddleware)
     factoryOf(::TaskMiddleware)
     factoryOf(::ScheduleMiddleware)
     factoryOf(::MessageMiddleware)

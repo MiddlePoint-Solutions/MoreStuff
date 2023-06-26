@@ -12,8 +12,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.ui.main.PriorityUI
+import co.softov.morestuff.android.ui.home.PriorityUI
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable

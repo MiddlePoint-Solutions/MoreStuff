@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui.home
 
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import kotlinx.datetime.LocalDateTime

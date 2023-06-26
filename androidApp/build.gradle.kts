@@ -172,9 +172,6 @@ dependencies {
     implementation(Libs.AndroidX.constraintLayout)
     implementation(Libs.AndroidX.workKtx)
 
-    // Navigation
-    implementation("com.github.terrakok:cicerone:7.1")
-
     // Modal Drawer Layout
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
 
@@ -259,7 +256,6 @@ dependencies {
     //implementation("com.russhwolf:multiplatform-settings:1.0.0")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
 
-    //LinkPreview
     implementation ("org.jsoup:jsoup:1.10.3")
     implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 
@@ -267,5 +263,9 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation("com.arkivanov.decompose:decompose:2.0.0-beta-01")
+    implementation("com.arkivanov.decompose:extensions-compose-jetpack:2.0.0-beta-01")
+//    implementation("io.github.xxfast:decompose-router:0.2.1")
+    implementation("com.arkivanov.essenty:parcelable:1.1.0")
 
 }

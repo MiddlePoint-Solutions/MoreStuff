@@ -15,7 +15,6 @@ buildscript {
         classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.serialization)
         classpath(co.softov.morestuff.buildsrc.Libs.Koin.gradlePlugin)
         classpath(co.softov.morestuff.buildsrc.Libs.moleculeGradlePlugin)
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
     }
 }
 group = "co.softov.morestuff"
