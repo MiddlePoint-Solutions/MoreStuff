@@ -1,5 +1,7 @@
 package co.softov.morestuff.android.ui.chat
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Box
@@ -21,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -45,6 +46,7 @@ private fun isAutoScrollingEnabled(
     scrollState: LazyListState
 ) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun Messages(
     messages: List<Message>,
@@ -72,7 +74,7 @@ fun Messages(
             ) { item ->
 
                 when (item.contentType) {
-                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions, onCopyMessage = onCopyMessage, onDeleteMessage = onDeleteMessage )
+                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions, onCopyMessage = {}, onDeleteMessage = {} )
                     ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
                     ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
                     ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions,onCopyMessage = onCopyMessage, onDeleteMessage = onDeleteMessage  )

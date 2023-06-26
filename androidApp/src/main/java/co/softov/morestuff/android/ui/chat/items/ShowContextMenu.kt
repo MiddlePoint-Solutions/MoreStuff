@@ -24,6 +24,7 @@ fun ShowContextMenu(
     onDeleteMessage: (Message) -> Unit,
     showMenu: Boolean,
     onClose: () -> Unit,
+    modifier: Modifier
 ) {
     val contextMenuItems = listOf(
         ContextMenuItem("Copy", Icons.Default.ContentCopy) {

@@ -1,5 +1,10 @@
 package co.softov.morestuff.android.ui.chat.items
 
+import android.annotation.SuppressLint
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -13,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -37,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.getSystemService
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -46,6 +52,8 @@ import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.S)
+@SuppressLint("ServiceCast")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
@@ -60,80 +68,101 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
+    val vibrator = LocalContext.current.getSystemService<Vibrator>()
+
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
     }
 
+    val urls = text.getStringAnnotations("URL", start = 0, end = text.length)
+    val hasUrl = urls.isNotEmpty()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 45.dp)
-            .combinedClickable(
-                onClick = { actions.taskChatAction(message.taskId) },
-                onLongClick = {
-                    showMenu = true
-                    isSelected = true
-                }
-            ),
+            .padding(start = 45.dp),
         horizontalArrangement = Arrangement.End
     ) {
         Column(
             modifier = Modifier
                 .padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
                 .graphicsLayer {
-                    scaleX = if (isSelected) 1.2f else 1.0f
-                    scaleY = if (isSelected) 1.2f else 1.0f
+                    scaleX = if (isSelected) 1.1f else 1.0f
+                    scaleY = if (isSelected) 1.1f else 1.0f
                 }
         ) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
                 color = MaterialTheme.colorScheme.userChatItem,
                 contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                modifier = Modifier
+                    .padding(end = 5.dp, bottom = 4.dp)
+                    .combinedClickable(
+                        onClick = {
+                            if (hasUrl) {
+                                coroutineScope.launch {
+                                    try {
+                                        uriHandler.openUri(urls.first().item)
+                                    } catch (e: Exception) {
+                                    }
+                                }
+                            } else {
+                                actions.taskChatAction(message.taskId)
+                            }
+                        },
+                        onLongClick = {
+                            showMenu = true
+                            isSelected = true
 
-                ) {
+                            vibrator?.let {
+                                if (Build.VERSION.SDK_INT >= 29) {
+                                    val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+                                    it.vibrate(effect)
+                                } else if (Build.VERSION.SDK_INT >= 26) {
+                                    val effect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
+                                    it.vibrate(effect)
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    it.vibrate(50)
+                                }
+                            }
+
+                        }
+                    )
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(end = 5.dp, bottom = 4.dp)
                 ) {
-
-                    ClickableText(
+                    Text(
                         modifier = Modifier.padding(8.dp),
                         text = text,
                         style = LocalTextStyle.current.copy(
                             color = Color.White,
                             fontSize = 16.sp
-                        ),
-                        onClick = { offset ->
-                            text.getStringAnnotations("URL", offset, offset).firstOrNull()
-                                ?.let {
-                                    coroutineScope.launch {
-                                        try {
-                                            uriHandler.openUri(it.item)
-                                        } catch (e: Exception) {
-                                        }
-                                    }
-                                }
-                        }
+                        )
                     )
 
                     if (openGraphResult?.title != null && openGraphResult.description != null) {
                         OpenGraphPreview(openGraphResult)
                     }
 
+                    if (showMenu) {
+                        ShowContextMenu(
+                            message,
+                            onCopyMessage = onCopyMessage,
+                            onDeleteMessage = onDeleteMessage,
+                            showMenu = showMenu,
+                            onClose = {
+                                showMenu = false
+                                isSelected = false
+                            },
+                            modifier = Modifier.padding(top = 20.dp)
+                        )
+                    }
                 }
             }
-        }
-
-        if (showMenu) {
-            ShowContextMenu(
-                message,
-                onCopyMessage = onCopyMessage,
-                onDeleteMessage = onDeleteMessage,
-                showMenu = showMenu,
-                onClose = { showMenu = false
-                    isSelected = false}
-            )
         }
     }
 }
@@ -178,6 +207,7 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 }
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Preview
 @Composable
 fun UserChatItemPreview() {
