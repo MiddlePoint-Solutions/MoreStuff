@@ -33,9 +33,10 @@ class GetPlanPriorityScoreUseCaseImpl(
             "createTime: $createTime\n scheduleTime: $scheduleTime\n currentTime: $currentTime"
         )
 
-        return lp + (
-                max(0, currentTime - createTime) /
-                        max(0, scheduleTime - createTime)
-                ) * (hp - lp)
+        val currentDiff = max(0, currentTime - createTime)
+        val scheduleDiff = scheduleTime - createTime
+        val priorityDiff = hp - lp
+
+        return (lp + (currentDiff.toFloat() / scheduleDiff.toFloat()) * priorityDiff).toLong()
     }
 }

@@ -9,7 +9,8 @@ data class TaskDomain(
     val createTime: String = "",
     val completeTime: String? = null,
     val priorityScore: Long = 0,
-    val taskType: TaskType = TaskType.System
+    val taskType: TaskType = TaskType.System,
+    val activeSchedule: ScheduleDomain? = null
 ) {
 
     val isComplete: Boolean get() = completeTime != null
