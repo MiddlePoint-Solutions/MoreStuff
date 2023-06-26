@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.nav.Screen
+import co.softov.morestuff.android.nav.Screen.*
 import co.softov.morestuff.android.ui.chat.task.TaskChatContent
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.review.ReviewContent
@@ -26,25 +27,27 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 
 @Composable
-fun MainContent() {
+fun MainContent(
+    initialScreen: Screen? = null
+) {
     val navigation = remember { StackNavigation<Screen>() }
     ChildStack(
         source = navigation,
-        initialStack = { listOf(Screen.Home) },
+        initialStack = { initialScreen?.let { listOf(Home, it) } ?: listOf(Home) },
         handleBackButton = true,
         animation = stackAnimation(fade() + scale()),
     ) { screen ->
         when (screen) {
-            Screen.Home -> HomeScreen(
-                showSettings = { navigation.push(Screen.Settings) },
-                showReview = { navigation.push(Screen.Review) },
-                showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) }
+            Home -> HomeScreen(
+                showSettings = { navigation.push(Settings) },
+                showReview = { navigation.push(Review) },
+                showTaskChat = { taskId -> navigation.push(TaskChat(taskId)) }
             )
 
-            Screen.Review -> ReviewContent(onBack = navigation::pop)
-            Screen.Settings -> SettingsScreen(onBack = navigation::pop)
+            Review -> ReviewContent(onBack = navigation::pop)
+            Settings -> SettingsScreen(onBack = navigation::pop)
 
-            is Screen.TaskChat -> TaskChatContent(
+            is TaskChat -> TaskChatContent(
                 taskId = screen.taskId,
                 onBack = navigation::pop
             )
