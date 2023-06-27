@@ -106,10 +106,17 @@ fun PriorityContent(
 
                 val dismissState = rememberDismissState(
                     confirmValueChange = { dismissValue ->
-                        if (dismissValue == DismissValue.DismissedToEnd) {
-                            viewModel.completeTask(item)
-                            true
-                        } else false
+                        when (dismissValue) {
+                            DismissValue.Default -> false
+                            DismissValue.DismissedToEnd -> {
+                                viewModel.completeTask(item)
+                                true
+                            }
+                            DismissValue.DismissedToStart -> {
+
+                                false
+                            }
+                        }
                     }
                 )
 
@@ -137,6 +144,7 @@ fun PriorityContent(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
+
                             PriorityItem(
                                 task = item,
                                 onClick = showTaskChat,
@@ -144,6 +152,7 @@ fun PriorityContent(
                                 isDragging = isDragging
                             )
                         }
+
                     )
                     AnimatedVisibility(
                         visible = !isDragging,

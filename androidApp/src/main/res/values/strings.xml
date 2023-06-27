@@ -91,5 +91,6 @@
     <string name="title_activity_share">ShareActivity</string>
     <string name="select_chat">Select Chat</string>
     <string name="cd_search_chats">Search Chats</string>
+    <string name="cd_scheduled_task_icon">Scheduled task icon</string>
 
 </resources>
