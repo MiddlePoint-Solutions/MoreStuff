@@ -8,11 +8,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.nav.Screen
-import co.softov.morestuff.android.nav.Screen.*
-import co.softov.morestuff.android.ui.chat.task.TaskChatContent
+import co.softov.morestuff.android.nav.Screen.Home
+import co.softov.morestuff.android.nav.Screen.Review
+import co.softov.morestuff.android.nav.Screen.Settings
+import co.softov.morestuff.android.nav.Screen.Share
+import co.softov.morestuff.android.nav.Screen.TaskChat
+import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.review.ReviewContent
 import co.softov.morestuff.android.ui.settings.SettingsScreen
+import co.softov.morestuff.android.ui.share.ShareScreen
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimation
@@ -23,14 +28,18 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackA
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.StackNavigationSource
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.replaceCurrent
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainContent(
-    initialScreen: Screen? = null
+    initialScreen: Screen?,
+    navigation: StackNavigation<Screen>,
+    viewModel: MainViewModel = koinViewModel(),
 ) {
-    val navigation = remember { StackNavigation<Screen>() }
     ChildStack(
         source = navigation,
         initialStack = { initialScreen?.let { listOf(Home, it) } ?: listOf(Home) },
@@ -41,15 +50,26 @@ fun MainContent(
             Home -> HomeScreen(
                 showSettings = { navigation.push(Settings) },
                 showReview = { navigation.push(Review) },
-                showTaskChat = { taskId -> navigation.push(TaskChat(taskId)) }
+                showTaskChat = { navigation.push(TaskChat(it)) }
             )
 
             Review -> ReviewContent(onBack = navigation::pop)
             Settings -> SettingsScreen(onBack = navigation::pop)
 
-            is TaskChat -> TaskChatContent(
+            is TaskChat -> TaskChatScreen(
                 taskId = screen.taskId,
                 onBack = navigation::pop
+            )
+
+            is Share -> ShareScreen(
+                onBack = navigation::pop,
+                shareToTask = { taskId ->
+                    // TODO: take into account the content being shared. (screen.shareable)
+                    navigation.replaceCurrent(
+                        TaskChat(taskId),
+                        onComplete = { viewModel.shareTextToTask(taskId, screen.content) }
+                    )
+                }
             )
         }
     }

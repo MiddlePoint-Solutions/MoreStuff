@@ -9,18 +9,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
-import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MoreStuffScaffold(
+fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
     showSettings: () -> Unit,
     showReview: () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
-    viewModel: DrawerViewModel = koinViewModel(),
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
