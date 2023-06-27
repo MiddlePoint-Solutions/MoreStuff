@@ -31,6 +31,7 @@ import co.softov.morestuff.android.ui.main.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import timber.log.Timber
@@ -68,7 +69,9 @@ class MainActivity : AppCompatActivity() {
                     val screen = handleLaunchIntent(it)
                     Timber.d("onNewIntent: $screen")
                     if (screen != null) {
-                        navigation.push(screen)
+                        navigation.navigate {
+                            listOf(Home, screen)
+                        }
                     }
                 }
                 addOnNewIntentListener(listener)
