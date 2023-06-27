@@ -47,13 +47,13 @@ class TaskChatViewModel(
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val taskId: Long,
-    private val messageRepository: MessageRepository,
-
-
     private val timeManager: TimeManager,
-
     devTools: DevTools,
 ) : NoStateViewModel() {
+
+    init {
+        Timber.d("TaskChatViewModel: $taskId")
+    }
 
     val messages: StateFlow<List<Message>> = flow {
         while (true) {

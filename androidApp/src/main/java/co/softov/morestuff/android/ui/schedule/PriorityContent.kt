@@ -93,10 +93,6 @@ fun PriorityContent(
         }
     }
 
-    val taskActions = TaskActions(
-        taskChatAction = showTaskChat,
-    )
-
     Box(modifier) {
         LazyColumn(
             state = state.listState,
@@ -143,10 +139,10 @@ fun PriorityContent(
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
                             PriorityItem(
-                                item,
+                                task = item,
+                                onClick = showTaskChat,
                                 if (canBeReordered) Modifier.detectReorderAfterLongPress(state) else Modifier,
-                                isDragging = isDragging,
-                                taskActions = taskActions
+                                isDragging = isDragging
                             )
                         }
                     )

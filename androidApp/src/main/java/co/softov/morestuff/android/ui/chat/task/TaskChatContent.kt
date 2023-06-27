@@ -68,6 +68,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -76,7 +77,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.Messages
@@ -85,32 +90,63 @@ import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.priority.PriorityButton
 
 import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.list.SchedulePageViewModel
+import co.softov.morestuff.android.ui.main.LocalComponentContext
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
 
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.arkivanov.decompose.ComponentContext
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.QualifierValue
+import org.koin.core.qualifier.named
+import timber.log.Timber
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskChatContent(
+fun ProvideLocalViewModelStoreOwner(
+    localViewModelStoreOwner: ViewModelStoreOwner,
+    content: @Composable () -> Unit
+) {
+    CompositionLocalProvider(
+        LocalViewModelStoreOwner provides localViewModelStoreOwner,
+        content = content
+    )
+}
+
+@Composable
+fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
+    ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
+        TaskChatContent(
+            taskId = taskId,
+            onBack = onBack,
+            viewModel = koinViewModel { parametersOf(taskId) },
+            modifier = modifier
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TaskChatContent(
+    taskId: Long,
+    onBack: () -> Unit,
+    viewModel: TaskChatViewModel,
+    modifier: Modifier = Modifier,
+) {
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
 
     val taskActions = TaskActions(
         scheduleAction = viewModel::scheduleResponse,
@@ -120,13 +156,6 @@ fun TaskChatContent(
 
     var openBottomSheet by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
-
-    val bottomSheetDismissAction: () -> Unit = {
-        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-            openBottomSheet = false
-        }
-    }
-
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -308,7 +337,7 @@ fun TaskChatTopBarEditTask(
 
                         Spacer(modifier = Modifier.width(20.dp))
 
-                        Crossfade(targetState = isExpanded) { expanded ->
+                        Crossfade(targetState = isExpanded, label = "") { expanded ->
                             if (!expanded) {
                                 ScheduleButton(
                                     modifier = Modifier.alpha(if (isExpanded) 0f else 1f),
@@ -446,7 +475,8 @@ fun TopAppBarTaskChat(
     val task by viewModel.task.collectAsState()
     val alphaValue by animateFloatAsState(
         targetValue = if (isExpanded) 0.3f else 1f,
-        animationSpec = tween(durationMillis = 500)
+        animationSpec = tween(durationMillis = 500),
+        label = "Task chat top bar alpha animation"
     )
 
     TopAppBar(
@@ -575,13 +605,13 @@ fun TaskChatTopBarPreview() {
     }
 }
 
-@Preview
-@Composable
-fun TaskChatPreview() {
-    MoreStuffTheme(darkTheme = true) {
-        TaskChatContent(
-            taskId = 1,
-            onBack = {}
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun TaskChatPreview() {
+//    MoreStuffTheme(darkTheme = true) {
+//        TaskChatContent(
+//            taskId = 1,
+//            onBack = {}
+//        )
+//    }
+//}
