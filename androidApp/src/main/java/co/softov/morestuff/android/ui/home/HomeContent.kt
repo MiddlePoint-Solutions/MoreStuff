@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -31,6 +32,7 @@ import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.list.ListsContent
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -80,6 +82,7 @@ fun HomeContent(
     )
 
     val messages by viewModel.messages.collectAsState()
+    var showTaskLists by remember { mutableStateOf(false) }
 
     val chatActions = remember {
         TaskActions(
@@ -90,6 +93,13 @@ fun HomeContent(
 
     val visibleState = remember {
         MutableTransitionState(true)
+    }
+
+    if (showTaskLists) {
+        ModalBottomSheet(
+            onDismissRequest = { showTaskLists = false },
+            content = { ListsContent(itemAction = showTaskChat) }
+        )
     }
 
     Surface {
@@ -119,7 +129,6 @@ fun HomeContent(
                     ConstraintLayout {
                         val (bottomSheet, userInput) = createRefs()
 
-                        // Creating a Bottom Sheet
                         Box(
                             modifier = Modifier
                                 .constrainAs(bottomSheet) { bottom.linkTo(userInput.top) }
@@ -156,9 +165,7 @@ fun HomeContent(
                             )
 
                             UserInput(
-                                showTaskListAction = {
-                                    // TODO: show task lists
-                                },
+                                showTaskListAction = { showTaskLists = true },
                                 onMessageSent = viewModel::addNewTask,
                                 resetScroll = {
                                     scope.launch {
