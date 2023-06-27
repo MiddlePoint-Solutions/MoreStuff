@@ -26,16 +26,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
-import co.softov.morestuff.android.nav.Screen
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.TaskActions
-import co.softov.morestuff.android.ui.components.MoreStuffScaffold
+import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -48,7 +46,7 @@ fun HomeScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
-    MoreStuffScaffold(
+    MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         showSettings = showSettings,
         showReview = showReview,
@@ -82,7 +80,6 @@ fun HomeContent(
     )
 
     val messages by viewModel.messages.collectAsState()
-    var showChat by remember { mutableStateOf(false) }
 
     val chatActions = remember {
         TaskActions(

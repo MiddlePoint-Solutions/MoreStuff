@@ -12,21 +12,32 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.nav.Screen
 import co.softov.morestuff.android.nav.Screen.*
+import co.softov.morestuff.android.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.main.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +45,34 @@ class MainActivity : AppCompatActivity() {
         showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val initialScreen = handleLaunchIntent()
-
+        val initialScreen = handleLaunchIntent(intent)
         val rootComponentContext = defaultComponentContext()
-
         setContent {
+
+            val navigation = remember { StackNavigation<Screen>() }
+
             TransparentSystemBars()
             MoreStuffTheme {
                 Surface {
                     ProvideComponentContext(rootComponentContext) {
-                        MainContent(initialScreen)
+                        MainContent(
+                            initialScreen = initialScreen,
+                            navigation = navigation
+                        )
                     }
                 }
+            }
+
+            DisposableEffect(Unit) {
+                val listener = Consumer<Intent> {
+                    val screen = handleLaunchIntent(it)
+                    Timber.d("onNewIntent: $screen")
+                    if (screen != null) {
+                        navigation.push(screen)
+                    }
+                }
+                addOnNewIntentListener(listener)
+                onDispose { removeOnNewIntentListener(listener) }
             }
         }
     }
@@ -64,7 +91,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLaunchIntent(): Screen? = when {
+    private fun handleLaunchIntent(intent: Intent): Screen? = when {
+        intent.action == Intent.ACTION_SEND -> {
+            if ("text/plain" == intent.type) {
+                intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                    Share(Shareable.Text, it)
+                }
+            } else if (intent.type?.startsWith("image/") == true) {
+                TODO("Implement image sharing")
+            } else null
+        }
+
         intent.getLongExtra(EXTRA_TASK_ID, 0) > 0 -> {
             TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
         }
