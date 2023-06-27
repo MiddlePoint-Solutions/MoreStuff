@@ -1,7 +1,5 @@
 package co.softov.morestuff.android.ui.chat
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Box
@@ -45,8 +43,6 @@ private fun isAutoScrollingEnabled(
     itemsCount: Int,
     scrollState: LazyListState
 ) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
-
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun Messages(
     messages: List<Message>,

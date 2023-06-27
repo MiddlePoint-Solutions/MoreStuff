@@ -142,7 +142,9 @@ fun HomeContent(
                                         messages = messages,
                                         actions = chatActions,
                                         modifier = modifier,
-                                        scrollState = chatScrollState
+                                        scrollState = chatScrollState,
+                                        onCopyMessage = {},
+                                        onDeleteMessage = {}
                                     )
 
                                 },

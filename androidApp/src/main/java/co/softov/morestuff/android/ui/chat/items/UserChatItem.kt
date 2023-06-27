@@ -1,9 +1,6 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import android.annotation.SuppressLint
 import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -33,8 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.getSystemService
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.TaskActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -52,8 +46,6 @@ import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.S)
-@SuppressLint("ServiceCast")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
@@ -68,7 +60,6 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
-    val vibrator = LocalContext.current.getSystemService<Vibrator>()
 
 
     val text = buildAnnotatedString {
@@ -87,10 +78,6 @@ fun UserChatItem(
         Column(
             modifier = Modifier
                 .padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
-                .graphicsLayer {
-                    scaleX = if (isSelected) 1.1f else 1.0f
-                    scaleY = if (isSelected) 1.1f else 1.0f
-                }
         ) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
@@ -114,20 +101,6 @@ fun UserChatItem(
                         onLongClick = {
                             showMenu = true
                             isSelected = true
-
-                            vibrator?.let {
-                                if (Build.VERSION.SDK_INT >= 29) {
-                                    val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
-                                    it.vibrate(effect)
-                                } else if (Build.VERSION.SDK_INT >= 26) {
-                                    val effect = VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE)
-                                    it.vibrate(effect)
-                                } else {
-                                    @Suppress("DEPRECATION")
-                                    it.vibrate(50)
-                                }
-                            }
-
                         }
                     )
             ) {
