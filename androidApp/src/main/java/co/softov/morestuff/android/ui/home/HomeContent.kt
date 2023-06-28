@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.chat.TaskActions
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
@@ -85,7 +85,7 @@ fun HomeContent(
     var showTaskLists by remember { mutableStateOf(false) }
 
     val chatActions = remember {
-        TaskActions(
+        ChatActions(
             scheduleAction = viewModel::scheduleResponse,
             taskChatAction = showTaskChat,
         )
@@ -142,9 +142,7 @@ fun HomeContent(
                                         messages = messages,
                                         actions = chatActions,
                                         modifier = modifier,
-                                        scrollState = chatScrollState,
-                                        onCopyMessage = {},
-                                        onDeleteMessage = {}
+                                        scrollState = chatScrollState
                                     )
 
                                 },

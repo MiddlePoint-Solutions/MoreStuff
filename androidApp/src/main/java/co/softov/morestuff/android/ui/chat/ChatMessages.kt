@@ -46,11 +46,9 @@ private fun isAutoScrollingEnabled(
 @Composable
 fun Messages(
     messages: List<Message>,
-    actions: TaskActions,
+    actions: ChatActions,
     modifier: Modifier = Modifier,
     scrollState: LazyListState,
-    onCopyMessage: (Message) -> Unit,
-    onDeleteMessage: (Message) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var itemsCount by remember { mutableIntStateOf(0) }
@@ -70,10 +68,10 @@ fun Messages(
             ) { item ->
 
                 when (item.contentType) {
-                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions, onCopyMessage = {}, onDeleteMessage = {} )
+                    ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions )
                     ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
                     ContentType.TASK_REMINDER -> TaskReminderItem(message = item, actions = actions)
-                    ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions,onCopyMessage = onCopyMessage, onDeleteMessage = onDeleteMessage  )
+                    ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions)
                 }
             }
         }

@@ -39,7 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.ui.chat.TaskActions
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
@@ -51,9 +51,7 @@ import timber.log.Timber
 @Composable
 fun UserChatItem(
     message: Message,
-    actions: TaskActions,
-    onCopyMessage: (Message) -> Unit,
-    onDeleteMessage: (Message) -> Unit,
+    actions: ChatActions,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
@@ -137,18 +135,16 @@ fun UserChatItem(
                         OpenGraphPreview(openGraphResult)
                     }
 
-                    if (showMenu) {
-                        ShowContextMenu(
-                            message,
-                            onCopyMessage = onCopyMessage,
-                            onDeleteMessage = onDeleteMessage,
-                            showMenu = showMenu,
-                            onClose = {
-                                showMenu = false
-                            },
-                            modifier = Modifier.padding(top = 20.dp)
-                        )
-                    }
+                    ShowContextMenu(
+                        message,
+                        onCopyMessage = actions.copyMessage,
+                        onDeleteMessage = actions.deleteMessage,
+                        showMenu = showMenu,
+                        onClose = {
+                            showMenu = false
+                        },
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
                 }
             }
         }
@@ -199,7 +195,6 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme(darkTheme = true) {
-        UserChatItem(message = MockData.Message.userNewTask, TaskActions(), onCopyMessage = {},
-            onDeleteMessage = {})
+        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }
