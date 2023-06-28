@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.message
 
+import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.db.MessageQueries
 
 interface DeleteMessageUseCase {
@@ -7,9 +8,9 @@ interface DeleteMessageUseCase {
 }
 
 class DeleteMessageUseCaseImpl(
-    private val messageQueries: MessageQueries
+    private val messageRepository: MessageRepository
 ) : DeleteMessageUseCase {
     override suspend fun invoke(messageId: Long) {
-        messageQueries.deleteMessage(messageId)
+        messageRepository.deleteMessage(messageId)
     }
 }
