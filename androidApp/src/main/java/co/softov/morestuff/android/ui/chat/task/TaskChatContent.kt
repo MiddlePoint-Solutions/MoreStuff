@@ -84,30 +84,21 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.chat.TaskActions
-
-import co.softov.morestuff.android.ui.priority.PriorityButton
-
 import co.softov.morestuff.android.ui.home.PlanModel
-import co.softov.morestuff.android.ui.list.SchedulePageViewModel
-import co.softov.morestuff.android.ui.main.LocalComponentContext
+import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
-
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import com.arkivanov.decompose.ComponentContext
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import org.koin.core.qualifier.QualifierValue
-import org.koin.core.qualifier.named
-import timber.log.Timber
 
 @Composable
 fun ProvideLocalViewModelStoreOwner(
@@ -148,8 +139,15 @@ private fun TaskChatContent(
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val taskActions = TaskActions(
+    val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
+        copyMessage = { message ->
+            viewModel.copyToClipboard(message.content)
+        },
+        deleteMessage = { message ->
+            viewModel.deleteMessage(messageId = message.id)
+        }
+
     )
 
     val messages by viewModel.messages.collectAsState()
@@ -196,7 +194,7 @@ private fun TaskChatContent(
 
                     Messages(
                         messages = messages,
-                        actions = taskActions,
+                        actions = chatActions,
                         modifier = modifier.weight(1f),
                         scrollState = scrollState
                     )
@@ -426,7 +424,7 @@ fun ScheduleButton(
 
         val time by remember(displayTime) {
             derivedStateOf {
-                timeFormatter.formatTimeOnly(displayTime.toString())
+                timeFormatter.formatTimeOnly(displayTime)
             }
         }
 
