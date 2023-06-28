@@ -1,8 +1,7 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,7 +45,6 @@ import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
     message: Message,
@@ -85,38 +83,43 @@ fun UserChatItem(
                 contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .padding(end = 5.dp, bottom = 4.dp)
-                    .combinedClickable(
-                        onClick = {
-                            if (hasUrl) {
-                                coroutineScope.launch {
-                                    try {
-                                        uriHandler.openUri(urls.first().item)
-                                    } catch (e: Exception) {
-                                    }
-                                }
-                            } else {
-                                actions.taskChatAction(message.taskId)
-                            }
-                        },
-                        onLongClick = {
-                            showMenu = true
-                            isSelected = true
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        }
-                    )
+                    .clickable {
+                        showMenu = true
+                        isSelected = true
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+
             ) {
                 Column(
                     modifier = Modifier
                         .padding(end = 5.dp, bottom = 4.dp)
                 ) {
                     Text(
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .padding(end = 15.dp)
+                            .run {
+                                if (hasUrl) {
+                                    clickable {
+                                        coroutineScope.launch {
+                                            try {
+                                                uriHandler.openUri(urls.first().item)
+                                            } catch (e: Exception) {
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    this
+
+                                }
+                            },
                         text = text,
                         style = LocalTextStyle.current.copy(
                             color = Color.White,
                             fontSize = 16.sp
                         )
                     )
+
 
                     if (openGraphResult?.title != null && openGraphResult.description != null) {
                         OpenGraphPreview(openGraphResult)
