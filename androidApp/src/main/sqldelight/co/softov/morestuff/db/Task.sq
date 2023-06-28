@@ -16,10 +16,19 @@ FROM task
 ORDER BY datetime(create_time);
 
 selectAllActive:
-SELECT *
+SELECT
+    task.*,
+    schedule.id AS schedule_id,
+    schedule.task_id AS schedule_task_id,
+    schedule.active AS schedule_active,
+    schedule.create_time AS schedule_create_time,
+    schedule.timezone AS schedule_timezone,
+    schedule.schedule_time_utc,
+    schedule.schedule_time_local
 FROM task
-WHERE complete_time IS NULL
-ORDER BY priority_score DESC;
+LEFT JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
+WHERE task.complete_time IS NULL
+ORDER BY task.priority_score DESC;
 
 selectAllComplete:
 SELECT *

@@ -1,11 +1,70 @@
+@file:Suppress("LocalVariableName")
+
 package co.softov.morestuff.android.data.mapper
 
+import co.softov.morestuff.android.data.utils.let7
+import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.db.SelectAllComplete
 
 typealias TaskData = co.softov.morestuff.db.Task
-
 typealias TaskDataMapper = (TaskData) -> TaskDomain
+
+typealias TaskWithScheduleDataMapper = (
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+    schedule_id: Long?,
+    schedule_task_id: Long?,
+    schedule_active: Boolean?,
+    schedule_create_time: String?,
+    schedule_timezone: String?,
+    schedule_time_utc: String?,
+    schedule_time_local: String?
+) -> TaskDomain
+
+fun makeTaskWithScheduleDataMapper(): TaskWithScheduleDataMapper = ::mapTaskWithScheduleData
+fun mapTaskWithScheduleData(
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+    schedule_id: Long?,
+    schedule_task_id: Long?,
+    schedule_active: Boolean?,
+    schedule_create_time: String?,
+    schedule_timezone: String?,
+    schedule_time_utc: String?,
+    schedule_time_local: String?
+): TaskDomain {
+    return TaskDomain(
+        id = id,
+        uuid = uuid,
+        createTime = create_time,
+        completeTime = complete_time,
+        title = title,
+        priorityScore = priority_score,
+        taskType = task_type,
+        activeSchedule = let7(
+            schedule_id,
+            schedule_task_id,
+            schedule_create_time,
+            schedule_time_local,
+            schedule_time_utc,
+            schedule_timezone,
+            schedule_active,
+            block = ::ScheduleDomain
+        )
+    )
+}
 
 fun makeTaskDbMapper(): TaskDataMapper = { task ->
     mapTaskData(task)

@@ -9,6 +9,7 @@ import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
+import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
@@ -59,6 +60,7 @@ val dataModule = module {
         TaskRepositoryImpl(
             database = get(),
             mapTaskData = makeTaskDbMapper(),
+            mapTaskWithScheduleData = makeTaskWithScheduleDataMapper(),
             timeManager = get()
         )
     }
