@@ -27,26 +27,32 @@ class CheckForUrlMetadataUseCaseImpl(
 
         val firstUrl = findFirstUrl(title, urlPattern)
         return if (firstUrl != null) {
-            val openGraphResult = fetchOpenGraphMetadataUseCase(firstUrl)
-            if (openGraphResult != null) {
-                messageRepository.insertUrlMetadata(firstUrl, openGraphResult, messageId)
-                Either.Right(Unit)
+            val (url, isComplete) = firstUrl
+            if (isComplete) {
+                val openGraphResult = fetchOpenGraphMetadataUseCase(url)
+                if (openGraphResult != null) {
+                    messageRepository.insertUrlMetadata(url, openGraphResult, messageId)
+                    Either.Right(Unit)
+                } else {
+                    Either.Left(OpenGraphMetadataFetchFailure("Failure to fetch OpenGraph metadata"))
+                }
             } else {
-                Either.Left(OpenGraphMetadataFetchFailure("Failure to fetch OpenGraph metadata"))
+                Either.Right(Unit)
             }
         } else {
             Either.Right(Unit)
         }
     }
-}
 
-fun findFirstUrl(content: String, urlPattern: Pattern): String? {
-    val matcher = urlPattern.matcher(content)
-    return if (matcher.find()) {
-        var url = content.substring(matcher.start(), matcher.end())
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            url = "https://$url"
-        }
-        url
-    } else null
+    fun findFirstUrl(content: String, urlPattern: Pattern): Pair<String, Boolean>? {
+        val matcher = urlPattern.matcher(content)
+        return if (matcher.find()) {
+            var url = content.substring(matcher.start(), matcher.end())
+            val isComplete = url.startsWith("http://") || url.startsWith("https://")
+            if (!isComplete) {
+                url = "https://$url"
+            }
+            Pair(url, isComplete)
+        } else null
+    }
 }

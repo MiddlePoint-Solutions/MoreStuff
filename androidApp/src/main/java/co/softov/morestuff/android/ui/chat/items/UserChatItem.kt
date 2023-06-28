@@ -1,7 +1,5 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -30,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -60,7 +60,7 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
-
+    val haptic = LocalHapticFeedback.current
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
@@ -101,6 +101,7 @@ fun UserChatItem(
                         onLongClick = {
                             showMenu = true
                             isSelected = true
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         }
                     )
             ) {
@@ -180,7 +181,6 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 }
 
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Preview
 @Composable
 fun UserChatItemPreview() {
