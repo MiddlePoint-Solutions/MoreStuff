@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +46,7 @@ import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun UserChatItem(
@@ -59,12 +61,24 @@ fun UserChatItem(
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
 
-    val text = buildAnnotatedString {
-        appendUrlsWithStyle(message.content, urlPattern)
+    val content by remember {
+        derivedStateOf {
+            buildAnnotatedString {
+                appendUrlsWithStyle(message.content, urlPattern)
+            }
+        }
     }
 
-    val urls = text.getStringAnnotations("URL", start = 0, end = text.length)
-    val hasUrl = urls.isNotEmpty()
+    val urls by remember {
+        derivedStateOf {
+            try {
+                content.getStringAnnotations("URL", start = 0, end = content.length).first().item
+            } catch (e: Exception) {
+                Timber.w(e, "Error when trying to open URL")
+                null
+            }
+        }
+    }
 
     val haptic = LocalHapticFeedback.current
     LaunchedEffect(key1 = showMenu, block = {
@@ -103,21 +117,15 @@ fun UserChatItem(
                             .padding(8.dp)
                             .padding(end = 15.dp)
                             .run {
-                                if (hasUrl) {
+                                urls?.let {
                                     clickable {
                                         coroutineScope.launch {
-                                            try {
-                                                uriHandler.openUri(urls.first().item)
-                                            } catch (e: Exception) {
-                                            }
+                                            uriHandler.openUri(it)
                                         }
                                     }
-                                } else {
-                                    this
-
-                                }
+                                } ?: this
                             },
-                        text = text,
+                        text = content,
                         style = LocalTextStyle.current.copy(
                             color = Color.White,
                             fontSize = 16.sp
