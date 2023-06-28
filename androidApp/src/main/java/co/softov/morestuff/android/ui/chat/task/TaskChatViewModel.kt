@@ -179,7 +179,7 @@ class TaskChatViewModel(
         planModel = createPlanModel()
     }
 
-    @SuppressLint("ServiceCast")
+
     fun copyToClipboard(text: String) {
         clipboardHandler.copyToClipboard(text)
     }
