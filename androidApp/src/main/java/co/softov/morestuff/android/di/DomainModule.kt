@@ -6,6 +6,8 @@ import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.data.service.ClipboardHandlerImpl
 import co.softov.morestuff.android.domain.usecase.message.*
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
@@ -150,7 +152,7 @@ val messageUseCases = module {
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
 
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
-    factoryOf(::RealClipboardHandler) bind ClipboardHandler::class
+    factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
 }
 
