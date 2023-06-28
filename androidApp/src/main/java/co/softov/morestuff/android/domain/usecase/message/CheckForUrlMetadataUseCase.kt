@@ -27,8 +27,8 @@ class CheckForUrlMetadataUseCaseImpl(
 
         val firstUrl = findFirstUrl(title, urlPattern)
         return if (firstUrl != null) {
-            val (url, isComplete) = firstUrl
-            if (isComplete) {
+            val (url, isSecureUrl) = firstUrl
+            if (isSecureUrl) {
                 val openGraphResult = fetchOpenGraphMetadataUseCase(url)
                 if (openGraphResult != null) {
                     messageRepository.insertUrlMetadata(url, openGraphResult, messageId)
