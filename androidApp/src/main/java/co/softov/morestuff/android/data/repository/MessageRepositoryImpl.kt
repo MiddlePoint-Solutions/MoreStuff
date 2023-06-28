@@ -189,4 +189,8 @@ class MessageRepositoryImpl(
             message_id = messageId
         )
     }
+
+    override suspend fun deleteMessage(messageId: Long) {
+        messageQueries.deleteMessage(messageId)
+    }
 }
