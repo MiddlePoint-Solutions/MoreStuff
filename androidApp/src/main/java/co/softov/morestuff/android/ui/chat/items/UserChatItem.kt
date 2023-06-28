@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,12 +54,10 @@ fun UserChatItem(
     onDeleteMessage: (Message) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
-    var isSelected by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
-    val haptic = LocalHapticFeedback.current
 
     val text = buildAnnotatedString {
         appendUrlsWithStyle(message.content, urlPattern)
@@ -66,6 +65,13 @@ fun UserChatItem(
 
     val urls = text.getStringAnnotations("URL", start = 0, end = text.length)
     val hasUrl = urls.isNotEmpty()
+
+    val haptic = LocalHapticFeedback.current
+    LaunchedEffect(key1 = showMenu, block = {
+        if (showMenu) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    })
 
     Row(
         modifier = Modifier
@@ -85,8 +91,6 @@ fun UserChatItem(
                     .padding(end = 5.dp, bottom = 4.dp)
                     .clickable {
                         showMenu = true
-                        isSelected = true
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
 
             ) {
@@ -133,7 +137,6 @@ fun UserChatItem(
                             showMenu = showMenu,
                             onClose = {
                                 showMenu = false
-                                isSelected = false
                             },
                             modifier = Modifier.padding(top = 20.dp)
                         )
