@@ -99,8 +99,7 @@ fun ReviewContent(
                                 lastItemSwiped = { states.lastSwipedItem() },
                                 firstVisibleState = { states.firstVisibleStateOrNull() },
                                 undoAction = viewModel::undo,
-                                modifier = modifier.align(Alignment.BottomCenter),
-                                key = model.round
+                                modifier = modifier.align(Alignment.BottomCenter)
                             )
                         }
 
@@ -208,8 +207,7 @@ private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier,
-    key: Any? = Unit,
+    modifier: Modifier = Modifier
 ) {
 
     val scope = rememberCoroutineScope()
@@ -224,37 +222,30 @@ private fun ReviewSwipeControls(
         }
     }
 
-    val lowAction: () -> Unit = remember(key) {
-        {
+    val lowAction: () -> Unit = {
             scope.launch {
                 firstVisibleState()?.swipe(SwipeDirection.Left)
             }
         }
-    }
 
-    val highAction: () -> Unit = remember(key) {
-        {
+    val highAction: () -> Unit = {
             scope.launch {
                 firstVisibleState()?.swipe(SwipeDirection.Right)
             }
         }
-    }
 
-    val doneAction: () -> Unit = remember(key) {
-        {
+    val doneAction: () -> Unit = {
             scope.launch {
                 firstVisibleState()?.swipe(SwipeDirection.Up)
             }
         }
-    }
 
-    val laterAction: () -> Unit = remember(key) {
-        {
+    val laterAction: () -> Unit = {
             scope.launch {
                 firstVisibleState()?.swipe(SwipeDirection.Down)
             }
         }
-    }
+
 
     Column(
         modifier = modifier
