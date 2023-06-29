@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import kotlinx.datetime.*
 import java.util.UUID
@@ -16,7 +17,13 @@ val timeManager = TimeManagerImpl()
 fun createListOfTasks(amount: Long): List<TaskDomain> {
     return buildList {
         for (i in 1..amount) {
-            add(createTaskForTest(id = i, priorityScore = i, timeUtils = timeManager.nowLocalDateTimeString))
+            add(
+                createTaskForTest(
+                    id = i,
+                    priorityScore = i,
+                    timeUtils = timeManager.nowLocalDateTimeString
+                )
+            )
         }
     }
 }
@@ -43,8 +50,6 @@ fun createTaskForTest(
 }
 
 
-
-
 fun createListOfSchedulesForTest(amount: Long): List<ScheduleDomain> {
     return buildList {
         for (i in 1..amount) {
@@ -61,8 +66,18 @@ fun createScheduleForTest(
     scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
+    scheduleType: ScheduleType = ScheduleType.OneTime
 ): ScheduleDomain {
-    return ScheduleDomain(id, taskId, createTime, scheduleTimeLocal, scheduleTimeUtc, timeZone, active)
+    return ScheduleDomain(
+        id,
+        taskId,
+        createTime,
+        scheduleTimeLocal,
+        scheduleTimeUtc,
+        timeZone,
+        active,
+        scheduleType
+    )
 }
 
 fun createScheduleUseCaseTest(
@@ -73,8 +88,18 @@ fun createScheduleUseCaseTest(
     scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
+    scheduleType: ScheduleType = ScheduleType.OneTime
 ): ScheduleDomain {
-    return ScheduleDomain(id, taskId, createTime, scheduleTimeLocal, scheduleTimeUtc, timeZone, active)
+    return ScheduleDomain(
+        id,
+        taskId,
+        createTime,
+        scheduleTimeLocal,
+        scheduleTimeUtc,
+        timeZone,
+        active,
+        scheduleType
+    )
         .copy(
             scheduleUtcTime = LocalDateTime.parse(scheduleTimeLocal)
                 .toInstant(TimeZone.of(timeZone)).toString()

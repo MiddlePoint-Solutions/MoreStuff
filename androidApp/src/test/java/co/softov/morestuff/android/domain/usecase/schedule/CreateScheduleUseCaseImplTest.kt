@@ -1,10 +1,12 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
+import arrow.core.right
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.createScheduleUseCaseTest
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -21,13 +23,15 @@ import org.koin.test.inject
 class CreateScheduleUseCaseImplTest : DomainKoinTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
     private val timeManager by inject<TimeManager>()
+    private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>()
 
     private val createTime =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
 
     private val createScheduleUseCaseImpl = CreateScheduleUseCaseImpl(
         scheduleRepository,
-        timeManager
+        timeManager,
+        cancelActiveScheduleUseCase
     )
 
     @Test
@@ -42,12 +46,19 @@ class CreateScheduleUseCaseImplTest : DomainKoinTest {
             timeZone = TimeZone.currentSystemDefault().id
         )
 
+        coEvery { cancelActiveScheduleUseCase(any()) } coAnswers { schedule.right() }
+
         coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
             Either.Right(schedule)
         }
 
-        val result = createScheduleUseCaseImpl.invoke(taskId,,)
+        val result = createScheduleUseCaseImpl.invoke(taskId, ScheduleType.OneTime, localTime)
         Assertions.assertEquals(Either.Right(schedule.copy(id = 1)), result)
-        coVerify { scheduleRepository.createSchedule(any()) }
+
+        coVerify {
+            cancelActiveScheduleUseCase(any())
+            scheduleRepository.createSchedule(any())
+        }
+
     }
 }
