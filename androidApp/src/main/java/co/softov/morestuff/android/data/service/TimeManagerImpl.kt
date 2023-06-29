@@ -87,10 +87,7 @@ class TimeManagerImpl : TimeManager {
         }
 
     override fun todayLocalDateTimeByAdding(hour: Int, minute: Int): LocalDateTime {
-        return (nowLocalDateTime.toInstant(currentTimeZone) + hour.hours + minute.minutes).toLocalDateTime(currentTimeZone)
-//        return nowLocalDateTime.run {
-//            LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
-//        }
+        return (nowUtcInstant + hour.hours + minute.minutes).toLocalDateTime(currentTimeZone)
     }
 
     override fun weekendLocalDateTime(): LocalDateTime {

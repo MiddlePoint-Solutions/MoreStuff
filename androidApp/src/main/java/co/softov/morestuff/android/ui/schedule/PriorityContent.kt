@@ -114,7 +114,7 @@ fun PriorityContent(
                             }
 
                             DismissValue.DismissedToStart -> {
-
+                                viewModel.toggleReminder(item)
                                 false
                             }
                         }

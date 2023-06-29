@@ -22,6 +22,7 @@ import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCase
@@ -59,7 +60,7 @@ class ScheduleMiddleware(
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
-    private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
+    private val createReminderScheduleUseCase: CreateReminderScheduleUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
 ) : Middleware<AppState> {
@@ -147,6 +148,14 @@ class ScheduleMiddleware(
                         dispatch(CreateScheduleMessageAction(schedule.id))
                     }
                 }
+            }
+
+            is ScheduleAction.CreateReminderScheduleAction -> scope.launch {
+                createReminderScheduleUseCase(action.taskId)
+            }
+
+            is ScheduleAction.CancelReminderScheduleAction -> scope.launch {
+                cancelActiveScheduleUseCase(action.taskId)
             }
 
             else -> NoOp
