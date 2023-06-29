@@ -16,7 +16,7 @@ class SmartReminderWorker(
     private val store: AppStore by inject()
 
     override suspend fun doWork(): Result {
-        store.dispatchSuspend(ReminderAction.SmartReminderAction)
+        // tODO: use this for updating plan priority score instead
         return Result.success()
     }
 }

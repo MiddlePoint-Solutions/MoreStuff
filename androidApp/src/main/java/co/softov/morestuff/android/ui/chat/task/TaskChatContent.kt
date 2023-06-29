@@ -342,7 +342,7 @@ fun TaskChatTopBarEditTask(
                                     planModel = viewModel.planModel,
                                     onTimeChange = viewModel::updatePlanTime,
                                     onDateChange = viewModel::updatePlanDate,
-                                    onCreatePlanAndReschedule = viewModel::createPlanAndReschedule,
+                                    onCreatePlanAndReschedule = viewModel::createOneTimeSchedule,
                                     cancelActiveSchedule = viewModel::cancelActiveSchedule,
                                     taskId = taskId,
                                     showDatePickerDialog = showDatePickerDialog,

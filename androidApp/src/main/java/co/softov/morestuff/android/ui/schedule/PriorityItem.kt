@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
@@ -54,12 +56,26 @@ fun PriorityItem(
             overflow = TextOverflow.Ellipsis
         )
 
-        if (task.hasSchedule) {
-            Icon(
-                imageVector = Icons.Default.Schedule,
-                contentDescription = stringResource(R.string.cd_scheduled_task_icon),
-                tint = MaterialTheme.colorScheme.onSurface
-            )
+        val activeSchedule = task.activeSchedule
+
+        if (activeSchedule != null) {
+            when (activeSchedule.scheduleType) {
+                ScheduleType.OneTime -> {
+                    Icon(
+                        imageVector = Icons.Default.Schedule,
+                        contentDescription = stringResource(R.string.cd_scheduled_task_icon),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                ScheduleType.Reminder -> {
+                    Icon(
+                        imageVector = Icons.Default.NotificationsActive,
+                        contentDescription = stringResource(R.string.cd_task_reminder_icon),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+
         }
     }
 }

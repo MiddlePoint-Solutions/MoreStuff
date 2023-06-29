@@ -46,7 +46,7 @@ class CreateScheduleUseCaseImplTest : DomainKoinTest {
             Either.Right(schedule)
         }
 
-        val result = createScheduleUseCaseImpl.invoke(taskId, priority)
+        val result = createScheduleUseCaseImpl.invoke(taskId,,)
         Assertions.assertEquals(Either.Right(schedule.copy(id = 1)), result)
         coVerify { scheduleRepository.createSchedule(any()) }
     }
