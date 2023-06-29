@@ -137,14 +137,12 @@ fun HomeContent(
                             BottomSheetScaffold(
                                 scaffoldState = bottomSheetScaffoldState,
                                 sheetContent = {
-
                                     Messages(
                                         messages = messages,
                                         actions = chatActions,
                                         modifier = modifier,
                                         scrollState = chatScrollState
                                     )
-
                                 },
                                 sheetPeekHeight = 30.dp
                             ) {}

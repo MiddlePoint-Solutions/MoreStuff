@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.chat.task
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,13 +12,14 @@ import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
@@ -146,9 +146,14 @@ class TaskChatViewModel(
         )
     }
 
-    fun createPlanAndReschedule() {
-        val newPriority = Priority.Plan(planModel.planTime.toString())
-        store.dispatch(ScheduleAction.RescheduleTaskAction(taskId, newPriority))
+    fun createOneTimeSchedule() {
+        dispatchAppStoreAction(
+            ScheduleAction.RescheduleTaskAction(
+                taskId,
+                ScheduleType.OneTime,
+                planModel.planTime.toString()
+            )
+        )
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
@@ -183,7 +188,8 @@ class TaskChatViewModel(
     fun copyToClipboard(text: String) {
         clipboardHandler.copyToClipboard(text)
     }
-    fun deleteMessage(messageId:Long) {
+
+    fun deleteMessage(messageId: Long) {
         viewModelScope.launch {
             deleteMessageUseCase(messageId)
         }

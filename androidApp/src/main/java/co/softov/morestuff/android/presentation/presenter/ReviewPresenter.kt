@@ -6,11 +6,11 @@ import co.softov.morestuff.android.domain.enums.ReviewActionType
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 
 enum class ReviewRound {
-    Priority, Final
+    Review, Final
 }
 
 data class ReviewModel(
-    val round: ReviewRound = ReviewRound.Priority,
+    val round: ReviewRound = ReviewRound.Review,
     val items: List<ReviewItemUiModel> = listOf(),
     val actions: List<Pair<ReviewItemUiModel, ReviewActionType>> = listOf()
 ) : BaseViewState

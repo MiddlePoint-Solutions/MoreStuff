@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.task
 
+import arrow.core.right
 import co.softov.morestuff.android.domain.createListOfTasks
 import co.softov.morestuff.android.domain.createScheduleForTest
 import io.mockk.coEvery
@@ -42,7 +43,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
             )
         }
 
-        coEvery { getActiveTasksWithScheduleUseCase() } returns flowOf(tasks)
+        coEvery { getActiveTasksWithScheduleUseCase() } returns tasks.right()
         coEvery { getPlanPriorityScoreUseCase(any(), any()) } answers {
             val scheduleTimeLocal = firstArg<String>()
 
@@ -66,8 +67,11 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
             } else {
                 30L
             }
-            coVerify(exactly = tasks.size) { updateTaskPriorityScoreUseCase(any(), any()) }
+
         }
+
+        coVerify(exactly = tasks.size) { updateTaskPriorityScoreUseCase(any(), any()) }
+
     }
 
 
@@ -76,7 +80,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
         val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(activeSchedule = null) }
 
-        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns flowOf(tasksWithoutSchedule)
+        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns tasksWithoutSchedule.right()
 
         useCase.invoke()
 

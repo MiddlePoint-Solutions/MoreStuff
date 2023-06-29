@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
+import co.softov.morestuff.android.data.mapper.TaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.TaskData
 import co.softov.morestuff.android.data.mapper.TaskDataMapper
 import co.softov.morestuff.android.data.mapper.mapCompleteTaskData
@@ -25,6 +26,7 @@ import java.util.UUID
 class TaskRepositoryImpl(
     database: StuffDb,
     private val mapTaskData: TaskDataMapper,
+    private val mapTaskWithScheduleData: TaskWithScheduleDataMapper,
     private val timeManager: TimeManager,
 ) : TaskRepository {
 
@@ -62,7 +64,7 @@ class TaskRepositoryImpl(
     }
 
     override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectAllActive().asFlow().mapToList().map { mapList(it, mapTaskData) }
+        return taskQueries.selectAllActive(mapper = mapTaskWithScheduleData).asFlow().mapToList()
     }
 
     override fun getNowTasksFlow(): Flow<List<TaskDomain>> {
@@ -175,17 +177,12 @@ class TaskRepositoryImpl(
         return Right(priorityScore)
     }
 
-    override suspend fun getTasksWithoutScheduleFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.getActiveTaskWhithoutSchedule()
-            .asFlow()
-            .mapToList()
-            .map { tasks ->
-                tasks.map { task ->
-                    mapTaskData(task)
-                }
-            }
+    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> {
+        return taskQueries.getActiveTaskWhithoutSchedule().executeAsList().map(mapTaskData).right()
     }
-    override suspend fun getActiveTasksWithScheduleFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectActiveTasksWithSchedule().asFlow().mapToList().map { mapList(it, mapTaskData) }
+
+    override suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>> {
+        return taskQueries.selectActiveTasksWithSchedule(mapper = mapTaskWithScheduleData)
+            .executeAsList().right()
     }
 }

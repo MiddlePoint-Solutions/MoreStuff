@@ -14,5 +14,6 @@ data class TaskDomain(
 ) {
 
     val isComplete: Boolean get() = completeTime != null
+    val hasSchedule: Boolean get() = activeSchedule != null
 
 }

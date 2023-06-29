@@ -96,7 +96,7 @@ val taskUseCases = module {
     factoryOf(::SetTasksCompleteImpl) bind SetTasksCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
-    factoryOf(::GetTaskForReviewUseCaseImpl) bind GetTaskForReviewUseCase::class
+    factoryOf(::GetTasksWithoutScheduleUseCaseImpl) bind GetTasksWithoutScheduleUseCase::class
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
 
     // Task priority score
@@ -117,6 +117,8 @@ val taskUseCases = module {
 val scheduleUseCases = module {
     factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
+    factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
+    factoryOf(::CreateReminderScheduleUseCaseImpl) bind CreateReminderScheduleUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class
@@ -134,7 +136,6 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetReviewSchedulesUseCaseImpl) bind GetReviewSchedulesUseCase::class
-    factoryOf(::RescheduleTaskUseCaseImpl) bind RescheduleTaskUseCase::class
     factoryOf(::ScheduleReviewNotificationsUseCaseImpl) bind ScheduleReviewNotificationsUseCase::class
     factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
 }

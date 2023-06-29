@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.review
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.usecase.task.GetTaskForReviewUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import co.softov.morestuff.android.domain.enums.ReviewActionType
 import co.softov.morestuff.android.domain.redux.middleware.ReviewAction
 
@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
-import co.softov.morestuff.android.presentation.presenter.ReviewRound.Priority
+import co.softov.morestuff.android.presentation.presenter.ReviewRound.Review
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.ItemReview
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupInitialRound
@@ -24,24 +24,18 @@ import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ReviewViewModel(
-    private val getTasksForReviewUseCase: GetTaskForReviewUseCase,
+    private val getTasksWithoutScheduleUseCase: GetTasksWithoutScheduleUseCase,
     private val reviewItemMapper: ReviewItemMapper,
-    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
 
     override val enableDebug: Boolean
         get() = false
-
-    init {
-        loadData()
-    }
 
     override fun onLoadData() {
         setInitialState()
@@ -53,8 +47,8 @@ class ReviewViewModel(
         }
 
         is SetupRound -> when (event.round) {
-            Priority -> ReviewModel(
-                round = Priority,
+            Review -> ReviewModel(
+                round = Review,
                 items = state.items
             )
 
@@ -75,18 +69,13 @@ class ReviewViewModel(
 
     }
 
-    private fun setInitialState(round: ReviewRound = Priority) {
+    private fun setInitialState(round: ReviewRound = Review) {
         viewModelScope.launch {
-            val task = getTasksForReviewUseCase()
-                .first()
-                .shuffled()
-                .map(reviewItemMapper::map)
-            sendEvent(SetupInitialRound(round, task))
+            getTasksWithoutScheduleUseCase().map {
+                val tasks = it.shuffled().map(reviewItemMapper::map)
+                sendEvent(SetupInitialRound(round, tasks))
+            }
         }
-    }
-
-    fun reset() {
-        setInitialState()
     }
 
     fun undo(item: ReviewItemUiModel) {
@@ -114,12 +103,13 @@ class ReviewViewModel(
 
         if (isLast) {
             roundEndDelayJob = viewModelScope.launch {
+                dispatchAppStoreAction(TaskAction.UpdatePlannedTasksPriorityScore)
                 delay(500)
-                updatePlannedTasksPriorityUseCase.invoke()
-                sendEvent(SetupRound(Final)) // TODO(Joseph) This would be used with compose navigation.
+                sendEvent(SetupRound(Final))
             }
         }
     }
+
     fun completeTask(item: ReviewItemUiModel) {
         dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
     }

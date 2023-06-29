@@ -5,16 +5,14 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
-
-interface GetActiveTasksWithScheduleUseCase {
+interface GetTasksWithoutScheduleUseCase {
     suspend operator fun invoke(): Either<Failure, List<TaskDomain>>
 }
 
+class GetTasksWithoutScheduleUseCaseImpl(
+    private val taskRepository: TaskRepository,
+) : GetTasksWithoutScheduleUseCase {
 
-class GetActiveTasksWithScheduleUseCaseImpl(
-    private val taskRepository: TaskRepository
-) : GetActiveTasksWithScheduleUseCase {
-    override suspend operator fun invoke(): Either<Failure, List<TaskDomain>> {
-        return taskRepository.getTasksWithSchedule()
-    }
+    override suspend fun invoke(): Either<Failure, List<TaskDomain>> =
+        taskRepository.getTasksWithoutSchedule()
 }
