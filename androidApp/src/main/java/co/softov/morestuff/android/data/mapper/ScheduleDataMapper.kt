@@ -32,7 +32,8 @@ fun mapScheduleData(input: ScheduleData): ScheduleDomain {
         scheduleLocalTime = input.schedule_time_local,
         scheduleUtcTime = input.schedule_time_utc,
         timezone = input.timezone,
-        active = input.active
+        active = input.active,
+        scheduleType = input.schedule_type
     )
 }
 
@@ -45,7 +46,8 @@ fun mapScheduleDomain(input: ScheduleDomain): ScheduleData {
             schedule_time_local = scheduleLocalTime,
             schedule_time_utc = scheduleUtcTime,
             timezone = timezone,
-            active = active
+            active = active,
+            schedule_type = scheduleType
         )
     }
 }

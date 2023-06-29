@@ -106,10 +106,18 @@ fun PriorityContent(
 
                 val dismissState = rememberDismissState(
                     confirmValueChange = { dismissValue ->
-                        if (dismissValue == DismissValue.DismissedToEnd) {
-                            viewModel.completeTask(item)
-                            true
-                        } else false
+                        when (dismissValue) {
+                            DismissValue.Default -> false
+                            DismissValue.DismissedToEnd -> {
+                                viewModel.completeTask(item)
+                                true
+                            }
+
+                            DismissValue.DismissedToStart -> {
+                                viewModel.toggleReminder(item)
+                                false
+                            }
+                        }
                     }
                 )
 
@@ -132,7 +140,6 @@ fun PriorityContent(
                 })
 
                 ReorderableItem(state, key = item.id) { isDragging ->
-                    val canBeReordered = item.id !in viewModel.tasksWithSchedule
                     SwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
@@ -140,10 +147,11 @@ fun PriorityContent(
                             PriorityItem(
                                 task = item,
                                 onClick = showTaskChat,
-                                if (canBeReordered) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                                if (!item.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
                                 isDragging = isDragging
                             )
                         }
+
                     )
                     AnimatedVisibility(
                         visible = !isDragging,

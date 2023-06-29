@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.replyWithTitle
+import co.softov.morestuff.android.domain.enums.displayTitle
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
@@ -55,7 +55,7 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE )
+                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE)
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
@@ -67,15 +67,10 @@ class MessageMiddleware(
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 
-            is ScheduleAction.RescheduleTaskAction -> scope.launch {
-                val (title, replyType) = action.priority.replyWithTitle
-                setScheduleResponseMessage(action.taskId, title, replyType)
-            }
-
-            is ScheduleAction.RescheduleTasksAction -> scope.launch {
-                val (title, replyType) = action.priority.replyWithTitle
-                action.taskIds.forEach {
-                    setScheduleResponseMessage(it, title, replyType)
+            is ScheduleAction.ScheduleReplyAction -> scope.launch {
+                with(action) {
+                    val title = replyType.displayTitle
+                    setScheduleResponseMessage(schedule.taskId, title, replyType)
                 }
             }
 

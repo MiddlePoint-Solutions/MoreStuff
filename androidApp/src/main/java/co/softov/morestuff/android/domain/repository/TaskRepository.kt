@@ -43,8 +43,8 @@ interface TaskRepository {
     ): Either<Failure, Long>
 
     suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
-    suspend fun getTasksWithoutScheduleFlow(): Flow<List<TaskDomain>>
-    suspend fun getActiveTasksWithScheduleFlow(): Flow<List<TaskDomain>>
+    suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
+    suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>>
 }
 
 object TaskDoesNotExist : FeatureFailure

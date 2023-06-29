@@ -24,7 +24,7 @@ class GetPlanPriorityScoreUseCaseImplTest {
     )
 
     @Test
-    fun `calculate priority for plan task whit positive numbers`() = runBlocking {
+    fun `calculate priority for plan task with positive priority`() = runBlocking {
         val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
         val scheduleTimeLocal = "2023-06-19T20:00:00Z"
         val currentTime = "2023-06-19T15:00:00Z"
@@ -45,7 +45,7 @@ class GetPlanPriorityScoreUseCaseImplTest {
     }
 
     @Test
-    fun `calculate priority for plan task whit negative numbers`() = runBlocking {
+    fun `calculate priority for plan task with negative priority`() = runBlocking {
         val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
         val scheduleTimeLocal = "2023-06-19T20:00:00Z"
         val currentTime = "2023-06-19T15:00:00Z"
@@ -54,6 +54,27 @@ class GetPlanPriorityScoreUseCaseImplTest {
         val hp: Long = -100
 
         val expectedScore: Long = -55
+
+        coEvery { getLowestPriorityScoreUseCase() } returns lp
+        coEvery { getHighestPriorityScoreUseCase() } returns hp
+        coEvery { timeManager.localDateTimeStringToUtc(scheduleTimeLocal) } returns scheduleTimeLocal.toInstant()
+        coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime.toInstant().epochSeconds)
+
+        val actualScore = useCase.invoke(scheduleTimeLocal, taskCreateTimeUtc)
+
+        assertEquals(expectedScore, actualScore)
+    }
+
+    @Test
+    fun `calculate priority for plan task with negative and positive priority`() = runBlocking {
+        val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
+        val scheduleTimeLocal = "2023-06-19T20:00:00Z"
+        val currentTime = "2023-06-19T15:00:00Z"
+
+        val lp: Long = 77
+        val hp: Long = -103
+
+        val expectedScore: Long = -13
 
         coEvery { getLowestPriorityScoreUseCase() } returns lp
         coEvery { getHighestPriorityScoreUseCase() } returns hp

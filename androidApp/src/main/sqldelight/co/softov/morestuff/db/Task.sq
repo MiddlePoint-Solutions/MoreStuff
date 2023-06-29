@@ -16,10 +16,44 @@ FROM task
 ORDER BY datetime(create_time);
 
 selectAllActive:
+SELECT
+    task.*,
+    schedule.id AS schedule_id,
+    schedule.task_id AS schedule_task_id,
+    schedule.active AS schedule_active,
+    schedule.create_time AS schedule_create_time,
+    schedule.timezone AS schedule_timezone,
+    schedule.schedule_time_utc,
+    schedule.schedule_time_local,
+    schedule.schedule_type
+FROM task
+LEFT JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
+WHERE task.complete_time IS NULL
+ORDER BY task.priority_score DESC;
+
+selectActiveTasksWithSchedule:
+SELECT
+    task.*,
+    schedule.id AS schedule_id,
+    schedule.task_id AS schedule_task_id,
+    schedule.active AS schedule_active,
+    schedule.create_time AS schedule_create_time,
+    schedule.timezone AS schedule_timezone,
+    schedule.schedule_time_utc,
+    schedule.schedule_time_local,
+    schedule.schedule_type
+FROM task
+INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
+WHERE task.complete_time IS NULL;
+
+getActiveTaskWhithoutSchedule:
 SELECT *
 FROM task
-WHERE complete_time IS NULL
-ORDER BY priority_score DESC;
+WHERE complete_time IS NULL AND id NOT IN (
+    SELECT task_id
+    FROM schedule
+    WHERE active = 1
+);
 
 selectAllComplete:
 SELECT *
@@ -81,22 +115,3 @@ incrementTaskPriorityScore:
 UPDATE task
 SET priority_score = priority_score + 1
 WHERE priority_score >= :priority_score;
-
-getActiveTaskWhithoutSchedule:
-SELECT *
-FROM task
-WHERE complete_time IS NULL AND id NOT IN (
-    SELECT task_id
-    FROM schedule
-    WHERE active = 1
-);
-
-selectActiveTasksWithSchedule:
-SELECT task.*
-FROM task
-JOIN schedule ON task.id = schedule.task_id
-WHERE task.complete_time IS NULL AND schedule.active = 1;
-
-
-
-

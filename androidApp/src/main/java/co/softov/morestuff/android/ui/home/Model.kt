@@ -7,7 +7,6 @@ enum class PriorityUI {
     Now, Later, Plan
 }
 
-// TODO: Continue with state creation
 data class PlanModel(
     val planTime: LocalDateTime,
     val relativeDisplay: RelativeDateDisplay = RelativeDateDisplay.Today,

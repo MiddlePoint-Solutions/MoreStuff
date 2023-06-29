@@ -6,7 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
@@ -22,7 +24,6 @@ import timber.log.Timber
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
-    private val getActiveScheduleForTaskUseCase: GetActiveScheduleForTaskUseCase
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
@@ -38,23 +39,12 @@ class PriorityViewModel(
     var notification: NotificationState by mutableStateOf(None)
         private set
 
-    var tasksWithSchedule: List<Long> by mutableStateOf(listOf())
-        private set
-
     private var lastChange = 0 to 0
     private var lastCompleted: TaskDomain? = null
 
     override fun onLoadData() {
         getActiveTasksUseCase()
-            .onEach { tasks ->
-                this.tasks = tasks
-                tasksWithSchedule = tasks.filter { task ->
-                    when (getActiveScheduleForTaskUseCase(task.id)) {
-                        is Either.Right -> true
-                        is Either.Left -> false
-                    }
-                }.map { it.id }
-            }
+            .onEach { tasks = it }
             .launchIn(viewModelScope)
     }
 
@@ -88,7 +78,17 @@ class PriorityViewModel(
             dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
             notification = Complete
         }
+    }
 
+    fun toggleReminder(item: TaskDomain) {
+        when (val schedule = item.activeSchedule) {
+            null -> dispatchAppStoreAction(ScheduleAction.CreateReminderScheduleAction(item.id))
+            else -> {
+                if (schedule.scheduleType == ScheduleType.Reminder) {
+                    dispatchAppStoreAction(ScheduleAction.CancelReminderScheduleAction(item.id))
+                }
+            }
+        }
     }
 
     fun undoLastCompleted() {

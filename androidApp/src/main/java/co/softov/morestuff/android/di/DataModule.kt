@@ -9,6 +9,7 @@ import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
+import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
@@ -25,6 +26,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCas
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
+import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
 import com.russhwolf.settings.*
@@ -59,6 +61,7 @@ val dataModule = module {
         TaskRepositoryImpl(
             database = get(),
             mapTaskData = makeTaskDbMapper(),
+            mapTaskWithScheduleData = makeTaskWithScheduleDataMapper(),
             timeManager = get()
         )
     }
@@ -68,7 +71,7 @@ val dataModule = module {
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
             mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(timeFormatter = get()),
-            selectMasterMessagesMapper= SelectMasterMessagesMapper(timeFormatter = get()),
+            selectMasterMessagesMapper = SelectMasterMessagesMapper(timeFormatter = get()),
             selectMessageByTaskIdMapper = SelectMessageByTaskIdMapper(timeFormatter = get()),
             selectMessageByIdMapper = SelectMessageByIdMapper(timeFormatter = get()),
             timeManager = get()
@@ -126,6 +129,9 @@ internal fun createDatabase(context: Context): StuffDb {
         ),
         taskAdapter = Task.Adapter(
             task_typeAdapter = EnumColumnAdapter()
+        ),
+        scheduleAdapter = Schedule.Adapter(
+            schedule_typeAdapter = EnumColumnAdapter()
         )
     )
 }
