@@ -7,5 +7,6 @@ data class ScheduleDomain(
     val scheduleLocalTime: String?,
     val scheduleUtcTime: String?,
     val timezone: String,
-    val active: Boolean
+    val active: Boolean,
+    val scheduleType: ScheduleType,
 )

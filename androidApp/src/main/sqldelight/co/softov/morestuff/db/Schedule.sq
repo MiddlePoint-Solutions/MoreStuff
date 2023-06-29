@@ -1,3 +1,6 @@
+import co.softov.morestuff.android.domain.enums.TaskType;
+import co.softov.morestuff.android.domain.model.ScheduleType;
+
 CREATE TABLE schedule(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     task_id INTEGER NOT NULL,
@@ -6,6 +9,7 @@ CREATE TABLE schedule(
     schedule_time_utc TEXT,
     timezone TEXT NOT NULL,
     active INTEGER AS Boolean NOT NULL DEFAULT 1,
+    schedule_type TEXT AS ScheduleType NOT NULL,
     FOREIGN KEY(task_id) REFERENCES task(id)
     );
 
@@ -98,7 +102,7 @@ WHERE task_id = :task_id
 AND schedule_time_local BETWEEN :start AND :end;
 
 insertSchedule:
-INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone)
+INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone, schedule_type)
 VALUES ?;
 
 updateScheduleActive:

@@ -7,6 +7,7 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.PrioritySchedulingNotAllowed
+import co.softov.morestuff.android.domain.model.ScheduleType
 import timber.log.Timber
 
 interface CreateScheduleUseCase {
@@ -28,7 +29,8 @@ class CreateScheduleUseCaseImpl(
                     scheduleLocalTime = priority.localTime,
                     scheduleUtcTime = utcTime,
                     timezone = timeManager.currentTimeZone.id,
-                    active = true
+                    active = true,
+                    scheduleType = ScheduleType.OneTime,
                 )
                 Timber.d("### Scheduling, task $taskId = -> ${schedule.scheduleLocalTime}} ###")
                 scheduleRepository.createSchedule(schedule)

@@ -24,7 +24,8 @@ SELECT
     schedule.create_time AS schedule_create_time,
     schedule.timezone AS schedule_timezone,
     schedule.schedule_time_utc,
-    schedule.schedule_time_local
+    schedule.schedule_time_local,
+    schedule.schedule_type
 FROM task
 LEFT JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
 WHERE task.complete_time IS NULL
@@ -39,7 +40,8 @@ SELECT
     schedule.create_time AS schedule_create_time,
     schedule.timezone AS schedule_timezone,
     schedule.schedule_time_utc,
-    schedule.schedule_time_local
+    schedule.schedule_time_local,
+    schedule.schedule_type
 FROM task
 INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
 WHERE task.complete_time IS NULL;
