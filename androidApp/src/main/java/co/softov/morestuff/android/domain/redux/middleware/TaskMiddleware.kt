@@ -15,6 +15,7 @@ import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUs
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
+import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -38,13 +39,15 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority
     ) : TaskAction()
 
+    object UpdatePlannedTasksPriorityScore : TaskAction()
 }
 
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
-    private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase
+    private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
+    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -80,6 +83,10 @@ class TaskMiddleware(
                 with(action) {
                     setTaskCompleteUseCase(taskIds, complete)
                 }
+            }
+
+            is UpdatePlannedTasksPriorityScore -> scope.launch {
+                updatePlannedTasksPriorityUseCase()
             }
 
             else -> NoOp

@@ -112,6 +112,7 @@ fun PriorityContent(
                                 viewModel.completeTask(item)
                                 true
                             }
+
                             DismissValue.DismissedToStart -> {
 
                                 false
@@ -139,16 +140,14 @@ fun PriorityContent(
                 })
 
                 ReorderableItem(state, key = item.id) { isDragging ->
-                    val canBeReordered = item.id !in viewModel.tasksWithSchedule
                     SwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState) },
                         dismissContent = {
-
                             PriorityItem(
                                 task = item,
                                 onClick = showTaskChat,
-                                if (canBeReordered) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                                if (!item.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
                                 isDragging = isDragging
                             )
                         }

@@ -18,22 +18,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
+import co.softov.morestuff.android.ui.chat.task.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
@@ -43,11 +44,31 @@ import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable
+fun ReviewScreen(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
+    ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
+        ReviewContent(
+            onBack = onBack,
+            modifier = modifier
+        )
+    }
+
+}
+
+@Composable
 fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
+
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
     Surface {
         Box(
             modifier = Modifier
@@ -68,7 +89,7 @@ fun ReviewContent(
             Box {
 
                 when (model.round) {
-                    ReviewRound.Priority -> {
+                    ReviewRound.Review -> {
 
                         Column {
                             PriorityReviewTopBar(navigateUp = onBack)
@@ -109,50 +130,8 @@ fun ReviewContent(
                     }
 
                     ReviewRound.Final -> {
-
-                        val visibleState = remember(model.round) {
-                            MutableTransitionState(false)
-                        }
-                        val transition = updateTransition(visibleState, "Visible state")
-
-                        val screenWidth = with(LocalDensity.current) {
-                            LocalConfiguration.current.screenWidthDp.dp.toPx()
-                        }
-
-                        val xPosition by transition.animateFloat(label = "xPosition") {
-                            if (it) 0f else screenWidth
-                        }
-
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            PriorityReviewTopBar(navigateUp = onBack)
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .graphicsLayer {
-                                        translationX = xPosition
-                                    }
-                            ) {
-                                when {
-                                    model.items.isEmpty() -> {
-                                        Text(
-                                            "Wooops, nothing to work on? add a new task",
-                                            modifier.align(Alignment.Center)
-                                        )
-                                        // TODO: add a new task
-                                    }
-
-                                    else -> {
-                                        onBack()
-                                    }
-                                }
-                            }
-                        }
-
-                        LaunchedEffect(key1 = model.round) {
-                            visibleState.targetState = true
+                        LaunchedEffect(Unit) {
+                            onBack()
                         }
                     }
                 }
@@ -223,28 +202,28 @@ private fun ReviewSwipeControls(
     }
 
     val lowAction: () -> Unit = {
-            scope.launch {
-                firstVisibleState()?.swipe(SwipeDirection.Left)
-            }
+        scope.launch {
+            firstVisibleState()?.swipe(SwipeDirection.Left)
         }
+    }
 
     val highAction: () -> Unit = {
-            scope.launch {
-                firstVisibleState()?.swipe(SwipeDirection.Right)
-            }
+        scope.launch {
+            firstVisibleState()?.swipe(SwipeDirection.Right)
         }
+    }
 
     val doneAction: () -> Unit = {
-            scope.launch {
-                firstVisibleState()?.swipe(SwipeDirection.Up)
-            }
+        scope.launch {
+            firstVisibleState()?.swipe(SwipeDirection.Up)
         }
+    }
 
     val laterAction: () -> Unit = {
-            scope.launch {
-                firstVisibleState()?.swipe(SwipeDirection.Down)
-            }
+        scope.launch {
+            firstVisibleState()?.swipe(SwipeDirection.Down)
         }
+    }
 
 
     Column(
@@ -431,7 +410,7 @@ private fun RoundInfo(
     }
     val instructions by remember(model.round) {
         when (model.round) {
-            ReviewRound.Priority -> "<-- Low    High -->"
+            ReviewRound.Review -> "<-- Low    High -->"
             ReviewRound.Final -> ""
         }.let {
             mutableStateOf(it)

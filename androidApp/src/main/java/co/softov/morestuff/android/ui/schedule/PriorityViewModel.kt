@@ -22,7 +22,6 @@ import timber.log.Timber
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
-    private val getActiveScheduleForTaskUseCase: GetActiveScheduleForTaskUseCase
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
@@ -38,23 +37,12 @@ class PriorityViewModel(
     var notification: NotificationState by mutableStateOf(None)
         private set
 
-    var tasksWithSchedule: List<Long> by mutableStateOf(listOf())
-        private set
-
     private var lastChange = 0 to 0
     private var lastCompleted: TaskDomain? = null
 
     override fun onLoadData() {
         getActiveTasksUseCase()
-            .onEach { tasks ->
-                this.tasks = tasks
-                tasksWithSchedule = tasks.filter { task ->
-                    when (getActiveScheduleForTaskUseCase(task.id)) {
-                        is Either.Right -> true
-                        is Either.Left -> false
-                    }
-                }.map { it.id }
-            }
+            .onEach { tasks = it }
             .launchIn(viewModelScope)
     }
 

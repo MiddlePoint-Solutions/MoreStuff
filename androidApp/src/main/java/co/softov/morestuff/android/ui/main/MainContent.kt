@@ -16,6 +16,7 @@ import co.softov.morestuff.android.nav.Screen.TaskChat
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.review.ReviewContent
+import co.softov.morestuff.android.ui.review.ReviewScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
 import com.arkivanov.decompose.ComponentContext
@@ -53,7 +54,7 @@ fun MainContent(
                 showTaskChat = { navigation.push(TaskChat(it)) }
             )
 
-            Review -> ReviewContent(onBack = navigation::pop)
+            Review -> ReviewScreen(onBack = navigation::pop)
             Settings -> SettingsScreen(onBack = navigation::pop)
 
             is TaskChat -> TaskChatScreen(

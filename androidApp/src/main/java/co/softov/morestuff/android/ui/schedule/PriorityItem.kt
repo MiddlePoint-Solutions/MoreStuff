@@ -48,7 +48,7 @@ fun PriorityItem(
             text = "${task.title} * score: ${task.priorityScore}",
             textAlign = TextAlign.Start,
             modifier = Modifier
-                .fillMaxWidth(0.8f)
+                .fillMaxWidth(0.9f)
                 .padding(12.dp),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
