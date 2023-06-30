@@ -44,7 +44,7 @@ SELECT
     schedule.schedule_type
 FROM task
 INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
-WHERE task.complete_time IS NULL;
+WHERE task.complete_time IS NULL AND schedule_type = 'OneTime';
 
 getActiveTaskWhithoutSchedule:
 SELECT *
@@ -52,7 +52,7 @@ FROM task
 WHERE complete_time IS NULL AND id NOT IN (
     SELECT task_id
     FROM schedule
-    WHERE active = 1
+    WHERE active = 1 AND schedule_type = 'OneTime'
 );
 
 selectAllComplete:
