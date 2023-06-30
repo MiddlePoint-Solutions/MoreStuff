@@ -16,12 +16,10 @@ class CancelActiveScheduleUseCaseImpl(
 ) : CancelActiveScheduleUseCase {
 
     override suspend fun invoke(taskId: Long): Either<Failure, ScheduleDomain> {
-        return getActiveSchedule(taskId).also { result ->
-            if (result is Either.Right) {
-                val scheduleId = result.value.id
-                setScheduleFulfilled(scheduleId)
-                scheduler.cancelSchedule(scheduleId)
-            }
+        return getActiveSchedule(taskId).tap { schedule ->
+            val scheduleId = schedule.id
+            setScheduleFulfilled(scheduleId)
+            scheduler.cancelSchedule(scheduleId)
         }
     }
 }

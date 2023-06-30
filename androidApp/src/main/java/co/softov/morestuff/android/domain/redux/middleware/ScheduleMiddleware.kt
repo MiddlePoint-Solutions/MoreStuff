@@ -151,7 +151,9 @@ class ScheduleMiddleware(
             }
 
             is ScheduleAction.CreateReminderScheduleAction -> scope.launch {
-                createReminderScheduleUseCase(action.taskId)
+                createReminderScheduleUseCase(action.taskId).map {
+                    dispatch(ScheduleCreatedAction(it))
+                }
             }
 
             is ScheduleAction.CancelReminderScheduleAction -> scope.launch {
