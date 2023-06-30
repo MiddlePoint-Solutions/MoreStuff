@@ -105,6 +105,7 @@ fun PriorityContent(
                 val item by rememberUpdatedState(task)
 
                 val dismissState = rememberDismissState(
+                    positionalThreshold = { 80.dp.toPx() },
                     confirmValueChange = { dismissValue ->
                         when (dismissValue) {
                             DismissValue.Default -> false
