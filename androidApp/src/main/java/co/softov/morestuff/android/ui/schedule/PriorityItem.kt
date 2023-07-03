@@ -57,7 +57,6 @@ fun PriorityItem(
         )
 
         val activeSchedule = task.activeSchedule
-
         if (activeSchedule != null) {
             when (activeSchedule.scheduleType) {
                 ScheduleType.OneTime -> {

@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.nav
+package co.softov.morestuff.android.domain.nav
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
@@ -20,8 +20,4 @@ sealed class Screen : Parcelable {
     @Parcelize
     data class Share(val shareable: Shareable, val content: String) : Screen()
 
-}
-
-enum class Shareable {
-    Text, Image
 }

@@ -3,16 +3,22 @@ package co.softov.morestuff.android.ui.main
 import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import co.softov.morestuff.android.nav.Screen
-import co.softov.morestuff.android.nav.Screen.Home
-import co.softov.morestuff.android.nav.Screen.Review
-import co.softov.morestuff.android.nav.Screen.Settings
-import co.softov.morestuff.android.nav.Screen.Share
-import co.softov.morestuff.android.nav.Screen.TaskChat
+import co.softov.morestuff.android.app.util.LifecycleEventsObserver
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.domain.nav.Screen.Home
+import co.softov.morestuff.android.domain.nav.Screen.Review
+import co.softov.morestuff.android.domain.nav.Screen.Settings
+import co.softov.morestuff.android.domain.nav.Screen.Share
+import co.softov.morestuff.android.domain.nav.Screen.TaskChat
+import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.review.ReviewContent
@@ -41,6 +47,11 @@ fun MainContent(
     navigation: StackNavigation<Screen>,
     viewModel: MainViewModel = koinViewModel(),
 ) {
+
+    LifecycleEventsObserver(
+        onResume = { viewModel.onResume() }
+    )
+
     ChildStack(
         source = navigation,
         initialStack = { initialScreen?.let { listOf(Home, it) } ?: listOf(Home) },
@@ -64,13 +75,14 @@ fun MainContent(
 
             is Share -> ShareScreen(
                 onBack = navigation::pop,
-                shareToTask = { taskId ->
-                    // TODO: take into account the content being shared. (screen.shareable)
+                shareable = screen.shareable,
+                content = screen.content,
+                shareToExistingTask = { taskId ->
                     navigation.replaceCurrent(
                         TaskChat(taskId),
                         onComplete = { viewModel.shareTextToTask(taskId, screen.content) }
                     )
-                }
+                },
             )
         }
     }

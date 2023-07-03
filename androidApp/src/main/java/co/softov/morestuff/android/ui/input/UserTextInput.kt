@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -19,8 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -45,11 +49,18 @@ import timber.log.Timber
 
 @Composable
 fun UserTextInput(
+    initialValue: String = "",
     sendAction: (String) -> Unit,
     listAction: () -> Unit,
 ) {
+
     var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue())
+        mutableStateOf(TextFieldValue(text = initialValue))
+    }
+
+    LaunchedEffect(initialValue) {
+        Timber.d("InitialValue: $initialValue")
+        Timber.d("InitialValue: $value")
     }
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
@@ -83,10 +94,7 @@ fun UserTextInput(
                         .clearFocusOnKeyboardDismiss()
                         .fillMaxWidth()
                         .align(Alignment.CenterVertically)
-                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)
-                        .onFocusChanged {
-                            Timber.d("FocusState changed: $it")
-                        },
+                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         keyboardType = KeyboardType.Text
@@ -100,16 +108,22 @@ fun UserTextInput(
                     decorationBox = { innerTextField ->
                         Box {
                             if (value.text.isEmpty()) {
-                                Text(text = "Write something...", fontSize = 18.sp)
+                                Text(
+                                    text = stringResource(R.string.write_something),
+                                    fontSize = 18.sp
+                                )
                             }
                             innerTextField()
                         }
                     }
                 )
             }
-            VoiceToTextInput { newText ->
-                value = value.copy(text = newText)
-            }
+
+            VoiceToTextInput(
+                onUpdateValue = {
+                    value = value.copy(text = it)
+                }
+            )
 
             Box(
                 modifier = Modifier
@@ -127,7 +141,6 @@ fun UserTextInput(
         }
     }
 }
-
 
 @Preview
 @Composable
