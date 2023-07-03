@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
@@ -105,7 +107,7 @@ fun PriorityContent(
                 val item by rememberUpdatedState(task)
 
                 val dismissState = rememberDismissState(
-                    positionalThreshold = { 80.dp.toPx() },
+                    positionalThreshold = { 120.dp.toPx() },
                     confirmValueChange = { dismissValue ->
                         when (dismissValue) {
                             DismissValue.Default -> false
@@ -143,7 +145,7 @@ fun PriorityContent(
                 ReorderableItem(state, key = item.id) { isDragging ->
                     SwipeToDismiss(
                         state = dismissState,
-                        background = { SwipeBackground(dismissState) },
+                        background = { SwipeBackground(dismissState, item.hasReminder) },
                         dismissContent = {
                             PriorityItem(
                                 task = item,
@@ -175,7 +177,10 @@ fun PriorityContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SwipeBackground(dismissState: DismissState) {
+private fun SwipeBackground(
+    dismissState: DismissState,
+    hasReminder: Boolean
+) {
     val direction = dismissState.dismissDirection ?: return
 
     val color by animateColorAsState(
@@ -191,7 +196,7 @@ fun SwipeBackground(dismissState: DismissState) {
     }
     val icon = when (direction) {
         DismissDirection.StartToEnd -> Icons.Default.Done
-        DismissDirection.EndToStart -> Icons.Default.Archive
+        DismissDirection.EndToStart -> if (hasReminder) Icons.Default.NotificationsOff else Icons.Default.Notifications
     }
     val scale by animateFloatAsState(
         if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,

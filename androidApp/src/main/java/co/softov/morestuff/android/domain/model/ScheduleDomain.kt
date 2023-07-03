@@ -10,3 +10,6 @@ data class ScheduleDomain(
     val active: Boolean,
     val scheduleType: ScheduleType,
 )
+
+fun ScheduleDomain.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
+fun ScheduleDomain.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime

@@ -14,6 +14,7 @@ data class TaskDomain(
 ) {
 
     val isComplete: Boolean get() = completeTime != null
-    val hasSchedule: Boolean get() = activeSchedule != null
+    val hasSchedule: Boolean get() = activeSchedule?.isOneTime() ?: false
+    val hasReminder: Boolean get() = activeSchedule?.isReminder() ?: false
 
 }
