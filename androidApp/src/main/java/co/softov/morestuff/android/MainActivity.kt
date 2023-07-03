@@ -12,33 +12,25 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.domain.enums.ReviewNotification
-import co.softov.morestuff.android.nav.Screen
-import co.softov.morestuff.android.nav.Screen.*
-import co.softov.morestuff.android.nav.Shareable
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.domain.nav.Screen.*
+import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.main.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
-import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import timber.log.Timber
 
-
 class MainActivity : AppCompatActivity() {
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

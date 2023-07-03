@@ -36,13 +36,14 @@ import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
 import kotlinx.coroutines.launch
 
-private val JumpToBottomThreshold = 56.dp
+private val jumpToBottomThreshold = 56.dp
 
 private fun isAutoScrollingEnabled(
     pagingItemsCount: Int,
     itemsCount: Int,
     scrollState: LazyListState
 ) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
+
 @Composable
 fun Messages(
     messages: List<Message>,
@@ -87,7 +88,7 @@ fun Messages(
         // Jump to bottom button shows up when user scrolls past a threshold.
         // Convert to pixels:
         val jumpThreshold = with(LocalDensity.current) {
-            JumpToBottomThreshold.toPx()
+            jumpToBottomThreshold.toPx()
         }
 
         // Show the button if the first visible item is not the first one or if the offset is

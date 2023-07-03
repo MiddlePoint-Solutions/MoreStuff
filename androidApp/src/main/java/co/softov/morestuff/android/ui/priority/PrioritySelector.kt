@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.home.PriorityUI
+import co.softov.morestuff.android.ui.home.PriorityUI.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
@@ -24,7 +25,7 @@ fun PrioritySelector(
 
     val priorityButtons = remember {
         listOf(
-            PriorityUI.Now, PriorityUI.Later, PriorityUI.Plan
+            Now, Later, Plan
         )
     }
 
@@ -33,33 +34,44 @@ fun PrioritySelector(
         shadowElevation = 8.dp
     ) {
         Row {
-            priorityButtons.forEach {
-                PriorityButton(
-                    modifier = Modifier
-                        .weight(0.34f)
-                        .height(50.dp),
-                    selected = it == priority,
-                    onSelected = { onPrioritySelected(it) },
-                    text = it.title.toUpperCase(Locale.current)
-                )
-            }
+
+            PriorityButton(
+                modifier = Modifier
+                    .weight(0.34f)
+                    .height(50.dp),
+                selected = Now == priority,
+                onSelected = { onPrioritySelected(Now) },
+                text = stringResource(id = R.string.priority_now)
+            )
+
+            PriorityButton(
+                modifier = Modifier
+                    .weight(0.34f)
+                    .height(50.dp),
+                selected = Later == priority,
+                onSelected = { onPrioritySelected(Later) },
+                text = stringResource(id = R.string.priority_later)
+            )
+
+            PriorityButton(
+                modifier = Modifier
+                    .weight(0.34f)
+                    .height(50.dp),
+                selected = Plan == priority,
+                onSelected = { onPrioritySelected(Plan) },
+                text = stringResource(id = R.string.priority_plan)
+            )
+
         }
     }
 }
-
-private val PriorityUI.title: String
-    @Composable get() = when (this) {
-        PriorityUI.Now -> stringResource(id = R.string.priority_now)
-        PriorityUI.Later -> stringResource(id = R.string.priority_later)
-        PriorityUI.Plan -> stringResource(id = R.string.priority_plan)
-    }
 
 @Preview
 @Composable
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme(darkTheme = true) {
         PrioritySelector(
-            priority = PriorityUI.Now,
+            priority = Now,
             onPrioritySelected = {}
         )
     }
@@ -70,7 +82,7 @@ fun UserPriorityInputPreviewDark() {
 fun UserPriorityInputPreview() {
     MoreStuffTheme {
         PrioritySelector(
-            priority = PriorityUI.Now,
+            priority = Now,
             onPrioritySelected = {}
         )
     }

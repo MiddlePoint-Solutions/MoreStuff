@@ -4,13 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import arrow.core.Either
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
