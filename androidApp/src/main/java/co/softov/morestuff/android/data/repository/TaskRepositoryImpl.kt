@@ -37,7 +37,7 @@ class TaskRepositoryImpl(
         title: String,
         priorityScore: Long,
         taskType: TaskType,
-    ): Either<Failure, TaskDomain> {
+    ): TaskDomain {
         return taskQueries.transactionWithResult {
             val data = createTaskData(
                 title = title,
@@ -46,9 +46,7 @@ class TaskRepositoryImpl(
             )
             taskQueries.insertTask(data)
             val taskId = getLastInsertedRowId()
-            mapTaskData(data)
-                .copy(id = taskId)
-                .right()
+            mapTaskData(data).copy(id = taskId)
         }
     }
 

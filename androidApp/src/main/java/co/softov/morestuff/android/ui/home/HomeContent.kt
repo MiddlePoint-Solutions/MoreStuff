@@ -3,7 +3,6 @@ package co.softov.morestuff.android.ui.home
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -26,12 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.list.ListsContent
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
@@ -70,23 +69,18 @@ fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
+    mainChatViewModel: MainChatViewModel = koinViewModel(),
+    userInputViewModel: UserInputViewModel = koinViewModel()
 ) {
     val priorityScrollState = rememberLazyListState()
     val chatScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val viewModel: HomeViewModel = koinViewModel()
-
-    LifecycleEventsObserver(
-        onResume = { viewModel.onResume() }
-    )
-
-    val messages by viewModel.messages.collectAsState()
+    val messages by mainChatViewModel.messages.collectAsState()
     var showTaskLists by remember { mutableStateOf(false) }
 
     val chatActions = remember {
         ChatActions(
-            scheduleAction = viewModel::scheduleResponse,
             taskChatAction = showTaskChat,
         )
     }
@@ -148,31 +142,27 @@ fun HomeContent(
                             ) {}
                         }
 
-                        Column(
+                        UserInput(
                             modifier = Modifier
                                 .constrainAs(userInput) { bottom.linkTo(parent.bottom) }
-                                .imePadding()
-                        ) {
-
-                            PriorityInput(
-                                priority = viewModel.priorityModel,
-                                planModel = viewModel.planModel,
-                                onPriorityChange = viewModel::priorityChanged,
-                                onTimeChange = viewModel::updatePlanTime,
-                                onDateChange = viewModel::updatePlanDate,
-                            )
-
-                            UserInput(
-                                showTaskListAction = { showTaskLists = true },
-                                onMessageSent = viewModel::addNewTask,
-                                resetScroll = {
-                                    scope.launch {
-                                        delay(200)
-                                        priorityScrollState.animateScrollToItem(index = 0)
-                                    }
+                                .imePadding(),
+                            priorityContent = {
+                                PriorityInput(
+                                    priority = userInputViewModel.priorityModel,
+                                    planModel = userInputViewModel.planModel,
+                                    onPriorityChange = userInputViewModel::priorityChanged,
+                                    onTimeChange = userInputViewModel::updatePlanTime,
+                                    onDateChange = userInputViewModel::updatePlanDate,
+                                )
+                            },
+                            showTaskLists = { showTaskLists = true },
+                            onSubmitInput = {
+                                userInputViewModel.createNewTask(it)
+                                scope.launch {
+                                    delay(200)
+                                    priorityScrollState.animateScrollToItem(index = 0)
                                 }
-                            )
-                        }
+                            })
                     }
                 }
             }

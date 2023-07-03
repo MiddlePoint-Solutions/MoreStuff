@@ -46,7 +46,6 @@ sealed class TaskAction : Action.FeatureAction() {
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
-    private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
     private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase
 ) : Middleware<AppState> {
 
@@ -60,16 +59,14 @@ class TaskMiddleware(
         when (action) {
             is CreateUserTaskAction -> scope.launch {
                 with(action) {
-                    val priorityScore = getDefaultPriorityScoreUseCase(priority)
-                    val params = TaskParams(title, priorityScore, TaskType.User)
-                    createTaskUseCase(params).map { task ->
-                        dispatch(TaskCreatedAction(task, priority))
-                    }
+                    val params = TaskParams(title, priority, TaskType.User)
+                    val task = createTaskUseCase(params)
+                    dispatch(TaskCreatedAction(task, priority))
                 }
             }
 
             is CreateSystemTaskAction -> scope.launch {
-                val params = TaskParams(action.title, 0, TaskType.System)
+//                val params = TaskParams(action.title, 0, TaskType.System)
                 TODO("Create system task")
             }
 

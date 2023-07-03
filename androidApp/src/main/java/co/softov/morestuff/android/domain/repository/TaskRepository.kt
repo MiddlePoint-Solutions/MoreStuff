@@ -14,7 +14,7 @@ interface TaskRepository {
         title: String,
         priorityScore: Long,
         taskType: TaskType,
-    ): Either<Failure, TaskDomain>
+    ): TaskDomain
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
     suspend fun updateTasksComplete(

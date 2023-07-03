@@ -147,22 +147,9 @@ private fun TaskChatContent(
         deleteMessage = { message ->
             viewModel.deleteMessage(messageId = message.id)
         }
-
     )
 
     val messages by viewModel.messages.collectAsState()
-
-    var openBottomSheet by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState()
-
-    BackHandler(bottomSheetState.isVisible) {
-        scope.launch {
-            bottomSheetState.hide()
-        }.invokeOnCompletion {
-            openBottomSheet = false
-        }
-    }
-
     var isExpanded by remember { mutableStateOf(false) }
 
     Scaffold(

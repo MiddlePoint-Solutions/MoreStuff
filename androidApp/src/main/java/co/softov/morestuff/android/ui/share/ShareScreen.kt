@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.share
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -19,12 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.nav.Shareable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShareScreen(
     onBack: () -> Unit,
-    shareToTask: (taskId: Long) -> Unit,
+    shareable: Shareable,
+    content: String,
+    shareToExistingTask: (taskId: Long) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -54,7 +56,9 @@ fun ShareScreen(
         },
         content = {
             ShareContent(
-                shareToTask = shareToTask,
+                shareToTask = shareToExistingTask,
+                shareable = shareable,
+                content = content,
                 modifier = Modifier.padding(it)
             )
         },

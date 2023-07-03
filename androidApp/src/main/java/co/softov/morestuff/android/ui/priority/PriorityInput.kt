@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -55,7 +56,8 @@ fun PriorityInput(
 
         AnimatedVisibility(
             showPlanInput,
-            enter = expandVertically()
+            enter = expandVertically(),
+            exit = shrinkVertically()
         ) {
             Box(
                 modifier = Modifier

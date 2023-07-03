@@ -64,9 +64,9 @@
     <string name="page_title_tomorrow">Tomorrow</string>
     <string name="page_title_later">Later</string>
     <string name="textfield_desc">Text Input</string>
-    <string name="priority_now">Now</string>
-    <string name="priority_plan">Plan</string>
-    <string name="priority_later">Later</string>
+    <string name="priority_now">NOW</string>
+    <string name="priority_plan">PLAN</string>
+    <string name="priority_later">LATER</string>
     <string name="done">Done</string>
     <string name="new_messages">Scroll Down</string>
     <string name="cd_navigate_back">Navigate Back</string>
@@ -93,5 +93,7 @@
     <string name="cd_search_chats">Search Chats</string>
     <string name="cd_scheduled_task_icon">Scheduled task icon</string>
     <string name="cd_task_reminder_icon">Task reminder icon</string>
+    <string name="create_new_chat">Create New Chat</string>
+    <string name="write_something">Write something...</string>
 
 </resources>
