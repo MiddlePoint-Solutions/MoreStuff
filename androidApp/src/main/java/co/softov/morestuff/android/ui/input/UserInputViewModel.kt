@@ -19,7 +19,6 @@ import timber.log.Timber
 
 class UserInputViewModel(
     private val timeManager: TimeManager,
-    private val createTaskUseCase: CreateTaskUseCase
 ) : NoStateViewModel() {
 
     var priorityModel by mutableStateOf(PriorityUI.Now)
@@ -70,20 +69,6 @@ class UserInputViewModel(
 
     fun createNewTask(title: String) {
         store.dispatch(TaskAction.CreateUserTaskAction(title, currentPriority))
-    }
-
-    /**
-     * Creates a new task and returns its id.
-     * This is only used when we need the taskId for navigation.
-     *
-     * @return TaskId of the newly created task
-     */
-    suspend fun createNewShareableTask(title: String): Long {
-        val priority = currentPriority
-        val params = TaskParams(title, priority, TaskType.User)
-        val task = createTaskUseCase(params)
-        store.dispatchSuspend(TaskAction.TaskCreatedAction(task, priority))
-        return task.id
     }
 
     fun priorityChanged(priority: PriorityUI) {
