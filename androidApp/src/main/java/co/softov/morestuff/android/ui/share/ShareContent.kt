@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
@@ -63,10 +64,10 @@ fun ShareContent(
         }
     }
 
-    var newTaskContent by remember { mutableStateOf<String?>(null) }
+    var newTaskContent by remember { mutableStateOf<Pair<String, Priority>?>(null) }
     LaunchedEffect(newTaskContent) {
         newTaskContent?.let {
-            val taskId = userInputViewModel.createNewShareableTask(it)
+            val taskId = shareViewModel.createNewShareableTask(it.first, it.second)
             shareToTask(taskId)
         }
     }
@@ -121,7 +122,7 @@ fun ShareContent(
                             onDateChange = userInputViewModel::updatePlanDate,
                         )
                     },
-                    onSubmitInput = { newTaskContent = it }
+                    onSubmitInput = { newTaskContent = it to userInputViewModel.currentPriority }
                 )
             }
         )
