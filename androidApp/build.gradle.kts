@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import co.softov.morestuff.buildsrc.Libs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -126,146 +125,102 @@ sqldelight {
         schemaOutputDirectory = file("src/main/sqldelight/databases")
 
         verifyMigrations = true
-
-
-
     }
 }
 
 dependencies {
     implementation(project(":shared"))
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.material3:material3")
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.2")
-
-    // Kotlin
-    implementation(Libs.Kotlin.stdlib)
-    implementation(Libs.Kotlin.reflect)
-    implementation(Libs.Kotlinx.datetime)
-
-    // Arrow
-    implementation(platform(Libs.Arrow.bom))
-    implementation(Libs.Arrow.core)
-
-    // Androidx
-    implementation(Libs.AndroidX.appcompat)
-    implementation(Libs.AndroidX.Fragment.fragmentKtx)
-    implementation(Libs.AndroidX.Activity.activityKtx)
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-
-    implementation(Libs.AndroidX.Lifecycle.runtimeKtx)
-    implementation(Libs.AndroidX.Lifecycle.runtimeCompose)
-    implementation(Libs.AndroidX.Lifecycle.viewModel)
-    implementation(Libs.AndroidX.Lifecycle.viewModelCompose)
-
-    implementation(Libs.AndroidX.coreKtx)
-    implementation(Libs.AndroidX.preferenceKtx)
-    implementation(Libs.AndroidX.pagingKtx)
-    implementation(Libs.AndroidX.constraintLayout)
-    implementation(Libs.AndroidX.workKtx)
-
-    // Modal Drawer Layout
-    implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-
-    // UI
-    implementation(Libs.Google.material)
-    // TODO: import when available
-//    implementation("com.alexstyl.swipeablecard:swipeablecard:0.2.0")
-
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
-
-    // Compose
-    implementation(platform(Libs.AndroidX.Compose.bom))
-    implementation(Libs.AndroidX.Compose.activityCompose)
-    implementation(Libs.AndroidX.Compose.runtime)
-    implementation(Libs.AndroidX.Compose.ui)
-    implementation(Libs.AndroidX.Compose.viewBinding)
-    implementation(Libs.AndroidX.Compose.foundation)
-    implementation(Libs.AndroidX.Compose.foundationLayout)
-    implementation(Libs.AndroidX.Compose.material3)
-    implementation(Libs.AndroidX.Compose.constraintLayout)
-    implementation(Libs.AndroidX.Compose.materialIcons)
-    implementation(Libs.AndroidX.Compose.materialIconsExtended)
-    implementation(Libs.AndroidX.Compose.tooling)
-    implementation(Libs.AndroidX.Compose.animation)
-    implementation(Libs.AndroidX.Compose.paging)
-
-    // Alorma Compose Settings
-    implementation("com.github.alorma:compose-settings-ui-m3:0.22.0")
-    implementation("com.github.alorma:compose-settings-storage-preferences:0.22.0")
-
-    // Android Studio Preview support
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-
-    implementation(Libs.Accompanist.insetsUi)
-    implementation(Libs.Accompanist.pager)
-    implementation(Libs.Accompanist.pagerIndicators)
-    implementation(Libs.Accompanist.permissions)
-    implementation(Libs.Accompanist.systemUi)
-
-    // Firebase
-    implementation(platform(Libs.Firebase.bom))
-    implementation(Libs.Firebase.crashlytics)
-    implementation(Libs.Firebase.analytics)
-
-    // SQLDelight
-    implementation(Libs.Sqldelight.androidDriver)
-    implementation(Libs.Sqldelight.coroutinesJvmExt)
-    implementation(Libs.Sqldelight.androidPagingExt)
-    implementation(Libs.Sqldelight.androidPaging3Ext)
-    testImplementation(Libs.Sqldelight.Test.sqlDriver)
-
-    testImplementation("org.xerial:sqlite-jdbc:3.8.10.2") {
-        // Override the version of sqlite used by sqlite-driver to match Android API 24 (minSdkVersion)
-        version {
-            strictly("3.8.10.2")
-        }
-
-    }
-
-    // Timber logging
-    implementation(Libs.Log.timber)
-
-    // Koin Android
-    implementation(Libs.Koin.android)
-    implementation(Libs.Koin.androidCompat)
-    implementation(Libs.Koin.androidxCompose)
-    testImplementation(Libs.Koin.test)
-    testImplementation(Libs.Koin.testJunit)
-
-    // Testing
-//    testImplementation(Libs.Test.junit)
-    testImplementation("io.mockk:mockk:1.12.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.0-M1")
-    testImplementation("org.junit.platform:junit-platform-commons:1.5.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
-
-    //Test flow whit Turbine
-    testImplementation ("app.cash.turbine:turbine:0.12.3")
-
-    //Multiplatform settings
-    //implementation("com.russhwolf:multiplatform-settings:1.0.0")
-    implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
-
-    implementation ("org.jsoup:jsoup:1.10.3")
-    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
-
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
-    implementation ("org.jetbrains.kotlin:kotlin-serialization:1.8.21")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-
-    implementation("com.arkivanov.decompose:decompose:2.0.0-beta-01")
-    implementation("com.arkivanov.decompose:extensions-compose-jetpack:2.0.0-beta-01")
-//    implementation("io.github.xxfast:decompose-router:0.2.1")
-    implementation("com.arkivanov.essenty:parcelable:1.1.0")
-
+    coreLibraryDesugaring (libs.jdkDesugar)
+    implementation (libs.androidxCoreKtx)
+    implementation (libs.androidxLifecycleRuntimeKtx)
+    implementation (libs.androidxActivityCompose)
+    implementation (platform(libs.androidxComposeBom))
+    implementation (libs.androidxLegacySupportV4)
+    implementation (libs.androidxDrawerlayout)
+    implementation (libs.reorderable)
+    implementation (libs.settingsUiM3)
+    implementation (libs.settingsStoragePreferences)
+    implementation (libs.uiToolingPreview)
+    implementation (libs.uiTooling)
+    implementation (libs.sqliteJdbc)
+    testImplementation (libs.mockk)
+    testImplementation (libs.junitJupiter)
+    testImplementation (libs.junitPlatformCommons)
+    testImplementation (libs.kotlinxCoroutinesTest)
+    testImplementation (libs.turbine)
+    implementation (libs.multiplatformSettingsNoArg)
+    implementation (libs.jsoup)
+    implementation (libs.coilCompose)
+    implementation (libs.kotlinxSerializationJson)
+    implementation (libs.kotlinSerialization)
+    debugImplementation (libs.uiTestManifest)
+    implementation (libs.decompose)
+    implementation (libs.extensionsComposeJetpack)
+    implementation (libs.parcelable)
+    implementation (libs.accompanistInsetsUi)
+    implementation (libs.accompanistPager)
+    implementation (libs.accompanistPagerIndicators)
+    implementation (libs.accompanistPermissions)
+    implementation (libs.accompanistSystemUiController)
+    implementation (libs.kotlinStdlib)
+    implementation (libs.kotlinSerialization)
+    implementation (libs.kotlinReflect)
+    implementation (platform(libs.arrowBom))
+    implementation (libs.arrowCore)
+    implementation (libs.kotlinxDatetime)
+    implementation (libs.coroutinesCore)
+    implementation (libs.coroutinesAndroid)
+    testImplementation (libs.coroutinesTest)
+    implementation (libs.okhttp)
+    implementation (libs.okhttpLogging)
+    implementation (libs.sqldelightAndroidDriver)
+    implementation (libs.sqldelightCoroutinesJvmExt)
+    implementation (libs.sqldelightAndroidPagingExt)
+    implementation (libs.sqldelightAndroidPaging3Ext)
+    testImplementation (libs.sqldelightTestSqlDriver)
+    implementation (platform(libs.firebaseBom))
+    implementation (libs.firebaseCrashlytics)
+    implementation (libs.firebaseAnalytics)
+    implementation (libs.googleServices)
+    implementation (libs.googleMaterial)
+    implementation (libs.koinAndroid)
+    implementation (libs.koinAndroidCompat)
+    implementation (libs.koinAndroidxCompose)
+    testImplementation (libs.koinTest)
+    testImplementation (libs.koinTestJunit)
+    testImplementation (libs.junit)
+    implementation (libs.timber)
+    implementation (libs.appcompat)
+    implementation (libs.palette)
+    implementation (libs.pagingKtx)
+    implementation (libs.preferenceKtx)
+    implementation (libs.workKtx)
+    implementation (libs.constraintLayout)
+    implementation (libs.coreKtx)
+    implementation (libs.activityKtx)
+    implementation (libs.fragmentKtx)
+    implementation (libs.constraintLayoutCompose)
+    implementation (libs.runtimeKtx)
+    implementation (libs.runtimeCompose)
+    implementation (libs.viewModel)
+    implementation (libs.viewModelCompose)
+    implementation (platform(libs.composeBom))
+    implementation (libs.composeRuntime)
+    implementation (libs.composeFoundation)
+    implementation (libs.composeFoundationLayout)
+    implementation (libs.pagingCompose)
+    implementation (libs.composeUi)
+    implementation (libs.composeViewBinding)
+    implementation (libs.composeAnimation)
+    implementation (libs.composeMaterial3)
+    implementation (libs.constraintLayoutCompose)
+    implementation (libs.composeMaterialIcons)
+    implementation (libs.composeMaterialIconsExtended)
+    implementation( libs.composeTooling)
+    implementation (libs.navigationCompose)
+    implementation (libs.activityCompose)
+    testImplementation (libs.testCore)
+    testImplementation (libs.testRules)
+    testImplementation (libs.extJUnit)
+    testImplementation (libs.espressoCore)
 }

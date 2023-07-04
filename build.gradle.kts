@@ -1,5 +1,3 @@
-import java.net.URI
-
 buildscript {
     repositories {
         google()
@@ -7,14 +5,14 @@ buildscript {
     }
 
     dependencies {
-        classpath(co.softov.morestuff.buildsrc.Libs.androidGradlePlugin)
-        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.gradlePlugin)
-        classpath(co.softov.morestuff.buildsrc.Libs.Google.googleServices)
-        classpath(co.softov.morestuff.buildsrc.Libs.Firebase.gradlePlugin)
-        classpath(co.softov.morestuff.buildsrc.Libs.Sqldelight.gradlePlugin)
-        classpath(co.softov.morestuff.buildsrc.Libs.Kotlin.serialization)
-        classpath(co.softov.morestuff.buildsrc.Libs.Koin.gradlePlugin)
-        classpath(co.softov.morestuff.buildsrc.Libs.moleculeGradlePlugin)
+        classpath(libs.androidGradlePlugin)
+        classpath(libs.gradlePlugin)
+        classpath(libs.googleServices)
+        classpath(libs.firebaseCrashlyticsPlugin)
+        classpath(libs.sqldelightPlugin)
+        classpath(libs.kotlinSerialization)
+        classpath(libs.koinPlugin)
+        classpath(libs.moleculePlugin)
     }
 }
 group = "co.softov.morestuff"
