@@ -95,5 +95,11 @@
     <string name="cd_task_reminder_icon">Task reminder icon</string>
     <string name="create_new_chat">Create New Chat</string>
     <string name="write_something">Write something...</string>
+    <string name="cd_complete_task">Complete task</string>
+    <string name="complete">Complete</string>
+    <string name="move_to_top">Move to Top</string>
+    <string name="cd_move_to_top">Move task to top</string>
+    <string name="move_to_bottom">Move to Bottom</string>
+    <string name="cd_move_task_to_bottom">Move task to bottom</string>
 
 </resources>

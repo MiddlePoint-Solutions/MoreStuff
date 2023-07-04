@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
@@ -95,6 +97,18 @@ class PriorityViewModel(
             dispatchAppStoreAction(TaskAction.CompleteTaskAction(task.id, false))
             lastCompleted = null
         }
+    }
+
+    fun moveToTop(task: TaskDomain) {
+        dispatchAppStoreAction(
+            PriorityAction.TaskPriorityUpdateAction(task.id, PriorityActionType.Now)
+        )
+    }
+
+    fun moveToBottom(task: TaskDomain) {
+        dispatchAppStoreAction(
+            PriorityAction.TaskPriorityUpdateAction(task.id, PriorityActionType.Later)
+        )
     }
 
     fun resetNotification() {

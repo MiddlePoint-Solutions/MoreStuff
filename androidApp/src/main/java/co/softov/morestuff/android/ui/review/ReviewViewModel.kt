@@ -3,10 +3,8 @@ package co.softov.morestuff.android.ui.review
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
-import co.softov.morestuff.android.domain.enums.ReviewActionType
-import co.softov.morestuff.android.domain.redux.middleware.ReviewAction
-
-import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
+import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 
@@ -81,7 +79,7 @@ class ReviewViewModel(
     fun undo(item: ReviewItemUiModel) {
         Timber.d("undoTask: $item")
         roundEndDelayJob?.cancel()
-        dispatchAppStoreAction(ReviewAction.UndoReviewTaskUpdateAction(item.id, item.priorityScore))
+        dispatchAppStoreAction(PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore))
         sendEvent(Undo(item))
     }
 
@@ -92,13 +90,13 @@ class ReviewViewModel(
     ) {
         Timber.d("onTaskSwiped: $isLast")
         val reviewAction = when (direction) {
-            SwipeDirection.Left -> ReviewActionType.Less
-            SwipeDirection.Right -> ReviewActionType.More
-            SwipeDirection.Up -> ReviewActionType.Now
-            SwipeDirection.Down -> ReviewActionType.Later
+            SwipeDirection.Left -> PriorityActionType.Less
+            SwipeDirection.Right -> PriorityActionType.More
+            SwipeDirection.Up -> PriorityActionType.Now
+            SwipeDirection.Down -> PriorityActionType.Later
         }
 
-        dispatchAppStoreAction(ReviewAction.ReviewPriorityScoreUpdateAction(item.id, reviewAction))
+        dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction))
         sendEvent(ItemReview(item, reviewAction))
 
         if (isLast) {
