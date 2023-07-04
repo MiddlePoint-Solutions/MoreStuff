@@ -68,7 +68,7 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            reviewMiddleware = get()
+            priorityMiddleware = get()
         )
     }
 
@@ -81,7 +81,7 @@ val storeModule = module {
     factoryOf(::SettingsMiddleware)
     factoryOf(::ReminderMiddleware)
     factoryOf(::ErrorMiddleware)
-    factoryOf(::ReviewMiddleware)
+    factoryOf(::PriorityMiddleware)
     factoryOf(::DevMiddleware)
 
 }

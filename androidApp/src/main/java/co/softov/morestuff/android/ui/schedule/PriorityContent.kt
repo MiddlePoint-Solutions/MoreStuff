@@ -4,47 +4,27 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FractionalThreshold
-import androidx.compose.material.ThresholdConfig
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,12 +41,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.MaterialColors
 import co.softov.morestuff.android.app.ui.get
@@ -125,53 +100,35 @@ fun PriorityContent(
         }
     }
 
-    taskOptions?.let {
+    taskOptions?.let {task ->
         val sheetState = rememberModalBottomSheetState()
-        ModalBottomSheet(
-            onDismissRequest = {
-                taskOptions = null
-            },
+        val dismissDialog = { taskOptions = null }
+        TaskOptionsDialog(
             sheetState = sheetState,
-        ) {
-
-            TextButton(
-                onClick = {
-                    scope.launch {
-                        viewModel.completeTask(it)
-                        sheetState.hide()
-                        taskOptions = null
-                    }
-                },
-                modifier = Modifier
-                    .padding(10.dp)
-                    .clickable {
-                        scope.launch {
-                            viewModel.completeTask(it)
-                            sheetState.hide()
-                            taskOptions = null
-                        }
-                    },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Done,
-                    contentDescription = stringResource(R.string.cd_complete_task)
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Text(
-                    text = stringResource(R.string.complete),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
+            task = task,
+            dismissDialog = dismissDialog,
+            completeTask = {
+                scope.launch {
+                    viewModel.completeTask(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToTop = {
+                scope.launch {
+                    viewModel.moveToTop(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToBottom = {
+                scope.launch {
+                    viewModel.moveToBottom(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
             }
-
-            Spacer(modifier = Modifier.height(120.dp))
-        }
+        )
     }
 
     Box(modifier) {
@@ -187,7 +144,7 @@ fun PriorityContent(
                 val item by rememberUpdatedState(task)
 
                 val dismissState = rememberNoFlingDismissState(
-                    positionalThreshold = { 160.dp.toPx() },
+                    positionalThreshold = { 140.dp.toPx() },
                     confirmValueChange = { dismissValue ->
                         when (dismissValue) {
                             DismissValue.Default -> false

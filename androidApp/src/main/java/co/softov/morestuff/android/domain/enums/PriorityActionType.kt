@@ -1,5 +1,5 @@
 package co.softov.morestuff.android.domain.enums
 
-enum class ReviewActionType {
+enum class PriorityActionType {
     Now, Later, More, Less
 }

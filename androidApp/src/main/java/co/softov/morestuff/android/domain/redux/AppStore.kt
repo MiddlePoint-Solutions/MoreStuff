@@ -14,7 +14,7 @@ class AppStore(
     responseMiddleware: ReminderMiddleware,
     notificationMiddleware: NotificationMiddleware,
     settingsMiddleware: SettingsMiddleware,
-    reviewMiddleware: ReviewMiddleware,
+    priorityMiddleware: PriorityMiddleware,
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
@@ -30,6 +30,6 @@ class AppStore(
         messageMiddleware,
         responseMiddleware,
         notificationMiddleware,
-        reviewMiddleware,
+        priorityMiddleware,
     )
 )
