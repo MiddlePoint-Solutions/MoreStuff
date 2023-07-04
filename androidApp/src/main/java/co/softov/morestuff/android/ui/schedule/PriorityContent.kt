@@ -6,9 +6,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +21,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FractionalThreshold
+import androidx.compose.material.ThresholdConfig
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
@@ -56,14 +61,19 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.MaterialColors
 import co.softov.morestuff.android.app.ui.get
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.ui.compose.NoFlingDismissState
+import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
+import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -176,14 +186,13 @@ fun PriorityContent(
             items(viewModel.tasks, key = { it.id }) { task ->
                 val item by rememberUpdatedState(task)
 
-                val dismissState = rememberDismissState(
-                    positionalThreshold = { 120.dp.toPx() },
+                val dismissState = rememberNoFlingDismissState(
+                    positionalThreshold = { 160.dp.toPx() },
                     confirmValueChange = { dismissValue ->
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
                                 taskOptions = item
-//                                viewModel.completeTask(item)
                                 false
                             }
 
@@ -214,7 +223,7 @@ fun PriorityContent(
                 })
 
                 ReorderableItem(state, key = item.id) { isDragging ->
-                    SwipeToDismiss(
+                    NoFlingSwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState, item.hasReminder) },
                         dismissContent = {
@@ -249,7 +258,7 @@ fun PriorityContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SwipeBackground(
-    dismissState: DismissState,
+    dismissState: NoFlingDismissState,
     hasReminder: Boolean
 ) {
     val direction = dismissState.dismissDirection ?: return
