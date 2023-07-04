@@ -1,13 +1,12 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.app.extensions.simpleName
-import co.softov.morestuff.android.domain.enums.ReviewActionType
+import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.middleware.ReviewAction.ReviewPriorityScoreUpdateAction
-import co.softov.morestuff.android.domain.redux.middleware.ReviewAction.UndoReviewTaskUpdateAction
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.TaskPriorityUpdateAction
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.UndoTaskPriorityUpdateAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
@@ -17,21 +16,21 @@ import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class ReviewAction : Action.FeatureAction() {
+sealed class PriorityAction : Action.FeatureAction() {
 
-    data class UndoReviewTaskUpdateAction(
+    data class UndoTaskPriorityUpdateAction(
         val taskId: Long,
         val score: Long
-    ) : ReviewAction()
+    ) : PriorityAction()
 
-    data class ReviewPriorityScoreUpdateAction(
+    data class TaskPriorityUpdateAction(
         val taskId: Long,
-        val actionType: ReviewActionType
-    ) : ReviewAction()
+        val actionType: PriorityActionType
+    ) : PriorityAction()
 
 }
 
-class ReviewMiddleware(
+class PriorityMiddleware(
     private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
     private val decrementTaskPriorityScoreUseCase: DecrementTaskPriorityScoreUseCase,
     private val incrementTaskPriorityScoreUseCase: IncrementTaskPriorityScoreUseCase,
@@ -47,25 +46,25 @@ class ReviewMiddleware(
     ): Action {
         when (action) {
 
-            is ReviewPriorityScoreUpdateAction -> scope.launch {
+            is TaskPriorityUpdateAction -> scope.launch {
                 when (action.actionType) {
-                    ReviewActionType.Now -> {
+                    PriorityActionType.Now -> {
                         val score = getDefaultPriorityScoreUseCase(Priority.Now())
                         updateTaskPriorityScoreUseCase(action.taskId, score)
                     }
 
-                    ReviewActionType.Later -> {
+                    PriorityActionType.Later -> {
                         val score = getDefaultPriorityScoreUseCase(Priority.Later())
                         updateTaskPriorityScoreUseCase(action.taskId, score)
                     }
 
-                    ReviewActionType.More -> incrementTaskPriorityScoreUseCase(action.taskId)
-                    ReviewActionType.Less -> decrementTaskPriorityScoreUseCase(action.taskId)
+                    PriorityActionType.More -> incrementTaskPriorityScoreUseCase(action.taskId)
+                    PriorityActionType.Less -> decrementTaskPriorityScoreUseCase(action.taskId)
 
                 }
             }
 
-            is UndoReviewTaskUpdateAction -> scope.launch {
+            is UndoTaskPriorityUpdateAction -> scope.launch {
                 updateTaskPriorityScoreUseCase(action.taskId, action.score)
             }
 

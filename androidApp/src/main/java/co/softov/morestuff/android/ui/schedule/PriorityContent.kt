@@ -14,12 +14,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissState
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,13 +25,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.rememberDismissState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -47,6 +45,11 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.MaterialColors
 import co.softov.morestuff.android.app.ui.get
+import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.ui.compose.NoFlingDismissState
+import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
+import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
+import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -63,6 +66,9 @@ fun PriorityContent(
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
+
+    val scope = rememberCoroutineScope()
+    var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
 
     val state = rememberReorderableLazyListState(
         listState = listState,
@@ -94,6 +100,37 @@ fun PriorityContent(
         }
     }
 
+    taskOptions?.let {task ->
+        val sheetState = rememberModalBottomSheetState()
+        val dismissDialog = { taskOptions = null }
+        TaskOptionsDialog(
+            sheetState = sheetState,
+            task = task,
+            dismissDialog = dismissDialog,
+            completeTask = {
+                scope.launch {
+                    viewModel.completeTask(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToTop = {
+                scope.launch {
+                    viewModel.moveToTop(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToBottom = {
+                scope.launch {
+                    viewModel.moveToBottom(task)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            }
+        )
+    }
+
     Box(modifier) {
         LazyColumn(
             state = state.listState,
@@ -106,14 +143,14 @@ fun PriorityContent(
             items(viewModel.tasks, key = { it.id }) { task ->
                 val item by rememberUpdatedState(task)
 
-                val dismissState = rememberDismissState(
-                    positionalThreshold = { 120.dp.toPx() },
+                val dismissState = rememberNoFlingDismissState(
+                    positionalThreshold = { 140.dp.toPx() },
                     confirmValueChange = { dismissValue ->
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                viewModel.completeTask(item)
-                                true
+                                taskOptions = item
+                                false
                             }
 
                             DismissValue.DismissedToStart -> {
@@ -143,7 +180,7 @@ fun PriorityContent(
                 })
 
                 ReorderableItem(state, key = item.id) { isDragging ->
-                    SwipeToDismiss(
+                    NoFlingSwipeToDismiss(
                         state = dismissState,
                         background = { SwipeBackground(dismissState, item.hasReminder) },
                         dismissContent = {
@@ -178,7 +215,7 @@ fun PriorityContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SwipeBackground(
-    dismissState: DismissState,
+    dismissState: NoFlingDismissState,
     hasReminder: Boolean
 ) {
     val direction = dismissState.dismissDirection ?: return

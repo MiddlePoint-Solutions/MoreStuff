@@ -72,7 +72,6 @@ fun UserChatItem(
             try {
                 content.getStringAnnotations("URL", start = 0, end = content.length).first().item
             } catch (e: Exception) {
-                Timber.w(e, "Error when trying to open URL")
                 null
             }
         }
