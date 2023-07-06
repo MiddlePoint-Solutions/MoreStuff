@@ -69,6 +69,7 @@ runtime = "1.4.3"
 firebaseCrashlyticsPlugin ="2.9.2"
 sqldelightPlugin = "1.5.5"
 koinPlugin = "3.2.0"
+lottiCompose = "6.0.1"
 
 
 
@@ -81,11 +82,6 @@ sqldelightPlugin = { id = "com.squareup.sqldelight", version.ref = "sqldelightPl
 googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 koinPlugin = { id = "org.koin.koin-gradle-plugin", version.ref = "koinPlugin" }
-
-
-
-
-
 
 [libraries]
 gradlePlugin = {module ="org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin"}
@@ -185,3 +181,4 @@ testCore = { module = "androidx.test:core", version.ref = "testCore" }
 testRules = { module = "androidx.test:rules", version.ref = "testCore" }
 extJUnit = { module = "androidx.test.ext:junit-ktx", version.ref = "extJUnit" }
 espressoCore = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
+lottiCompose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottiCompose" }

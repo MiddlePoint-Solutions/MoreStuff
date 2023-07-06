@@ -186,9 +186,7 @@ dependencies {
     implementation (libs.koinAndroid)
     implementation (libs.koinAndroidCompat)
     implementation (libs.koinAndroidxCompose)
-    testImplementation (libs.koinTest)
-    testImplementation (libs.koinTestJunit)
-    testImplementation (libs.junit)
+
     implementation (libs.timber)
     implementation (libs.appcompat)
     implementation (libs.palette)
@@ -204,7 +202,6 @@ dependencies {
     implementation (libs.runtimeCompose)
     implementation (libs.viewModel)
     implementation (libs.viewModelCompose)
-    implementation (platform(libs.composeBom))
     implementation (libs.composeRuntime)
     implementation (libs.composeFoundation)
     implementation (libs.composeFoundationLayout)
@@ -219,8 +216,13 @@ dependencies {
     implementation( libs.composeTooling)
     implementation (libs.navigationCompose)
     implementation (libs.activityCompose)
+    implementation (libs.lottiCompose)
     testImplementation (libs.testCore)
     testImplementation (libs.testRules)
-    testImplementation (libs.extJUnit)
     testImplementation (libs.espressoCore)
+    testImplementation (libs.koinTest)
+    testImplementation (libs.koinTestJunit)
+    testImplementation (libs.junit)
+    testImplementation (libs.extJUnit)
+
 }

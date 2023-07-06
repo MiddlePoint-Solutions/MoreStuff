@@ -23,6 +23,7 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.review.ReviewContent
 import co.softov.morestuff.android.ui.review.ReviewScreen
+import co.softov.morestuff.android.ui.schedule.ConfettiPopAnimation
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
 import com.arkivanov.decompose.ComponentContext
@@ -86,6 +87,8 @@ fun MainContent(
             )
         }
     }
+
+
 }
 
 val LocalComponentContext: ProvidableCompositionLocal<ComponentContext> =
