@@ -1,6 +1,9 @@
 package co.softov.morestuff.android.ui.schedule
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -56,25 +59,30 @@ fun PriorityItem(
             overflow = TextOverflow.Ellipsis
         )
 
-        val activeSchedule = task.activeSchedule
-        if (activeSchedule != null) {
-            when (activeSchedule.scheduleType) {
-                ScheduleType.OneTime -> {
-                    Icon(
-                        imageVector = Icons.Default.Schedule,
-                        contentDescription = stringResource(R.string.cd_scheduled_task_icon),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                ScheduleType.Reminder -> {
-                    Icon(
-                        imageVector = Icons.Default.NotificationsActive,
-                        contentDescription = stringResource(R.string.cd_task_reminder_icon),
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
+        AnimatedVisibility(
+            visible = task.activeSchedule != null,
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
+            task.activeSchedule?.let { activeSchedule ->
+                when (activeSchedule.scheduleType) {
+                    ScheduleType.OneTime -> {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = stringResource(R.string.cd_scheduled_task_icon),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+
+                    ScheduleType.Reminder -> {
+                        Icon(
+                            imageVector = Icons.Default.NotificationsActive,
+                            contentDescription = stringResource(R.string.cd_task_reminder_icon),
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
-
         }
     }
 }

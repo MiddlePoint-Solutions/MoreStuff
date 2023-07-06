@@ -18,6 +18,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

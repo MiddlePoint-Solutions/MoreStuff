@@ -23,6 +23,7 @@ import co.softov.morestuff.android.domain.nav.Screen.*
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.main.ProvideComponentContext
+import co.softov.morestuff.android.ui.schedule.ConfettiPopAnimation
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
