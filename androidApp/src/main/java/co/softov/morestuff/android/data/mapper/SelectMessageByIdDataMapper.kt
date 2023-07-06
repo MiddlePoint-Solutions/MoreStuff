@@ -30,6 +30,7 @@ fun mapSelectMessageByIdMessageData(input: SelectMessageById, timeFormatter: Tim
         replyType = input.reply_type?.let { ReplyType.withValue(it) },
         replyContent = input.reply_content,
         replyTime = replyTime,
-        openGraphResult = openGraphResult
+        openGraphResult = openGraphResult,
+        imagePath = null
     )
 }

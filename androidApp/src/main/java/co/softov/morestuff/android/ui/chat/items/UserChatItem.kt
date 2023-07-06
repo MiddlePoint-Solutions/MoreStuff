@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.items
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -45,6 +48,7 @@ import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -144,6 +148,9 @@ fun UserChatItem(
                         },
                         modifier = Modifier.padding(top = 20.dp)
                     )
+                    message.imagePath?.let { imagePath ->
+                        ImageOpenGraphPreview(imagePath)
+                    }
                 }
             }
         }
@@ -188,6 +195,28 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
         )
     }
 }
+
+@Composable
+fun ImageOpenGraphPreview(dataForMessage: DataForMessage) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .scale(0.9f)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(dataForMessage.filePath),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
 
 
 @Preview

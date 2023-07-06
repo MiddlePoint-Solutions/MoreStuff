@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.ui.chat.task
 
+
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -23,10 +26,12 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.ui.home.PlanModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -35,6 +40,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
@@ -44,6 +50,7 @@ class TaskChatViewModel(
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
+    private val handleImagesUseCase: HandleImagesUseCase,
     private val clipboardHandler: ClipboardHandler,
     private val deleteMessageUseCase: DeleteMessageUseCase,
     private val taskId: Long,
@@ -136,6 +143,10 @@ class TaskChatViewModel(
     fun sendMessageForTask(content: String) {
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
+    fun sendImagesForTask(images: List<Uri>, context: Context) {
+        store.dispatch(MessageAction.CreateUserTaskImageMessageAction(taskId, images, context))
+    }
+
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(
@@ -182,6 +193,14 @@ class TaskChatViewModel(
     fun cancelActiveSchedule() {
         store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
         planModel = createPlanModel()
+    }
+
+    fun handleImages(uris: List<Uri>, context: Context, id: Long) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                handleImagesUseCase(uris, context, id)
+            }
+        }
     }
 
 

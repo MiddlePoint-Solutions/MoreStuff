@@ -16,5 +16,6 @@ data class Message(
     val replyContent: String?,
     val replyTime: String?,
     val openGraphResult: OpenGraphResult?,
+    val imagePath: DataForMessage?
 )
 

@@ -1,6 +1,12 @@
 package co.softov.morestuff.android.ui.chat.task
 
+import android.content.Context
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -36,6 +42,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Send
@@ -67,6 +74,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -99,6 +107,7 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @Composable
 fun ProvideLocalViewModelStoreOwner(
@@ -150,6 +159,38 @@ private fun TaskChatContent(
     )
 
     val messages by viewModel.messages.collectAsState()
+
+    var openBottomSheet by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState()
+
+    val bottomSheetDismissAction: () -> Unit = {
+        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+            openBottomSheet = false
+        }
+    }
+    val context = LocalContext.current
+
+    ///// -->> https://developer.android.com/training/data-storage/shared/photopicker
+    val pickMultipleMedia =
+        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+            if (uris.isNotEmpty()) {
+                scope.launch {
+                    val messageId = viewModel.messages.value.firstOrNull()?.id ?: 0
+                    viewModel.handleImages(uris,context, messageId)
+                }
+            }
+        }
+
+//////
+
+    BackHandler(bottomSheetState.isVisible) {
+        scope.launch {
+            bottomSheetState.hide()
+        }.invokeOnCompletion {
+            openBottomSheet = false
+        }
+    }
+
     var isExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -198,6 +239,8 @@ private fun TaskChatContent(
                         ) {
                             TaskMessageTextField(
                                 sendMessageForTask = viewModel::sendMessageForTask,
+                                pickImages = { pickMultipleMedia.launch(PickVisualMediaRequest( ////<<<------
+                                    ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }  ////<<<------
                             )
                         }
                     }
@@ -510,6 +553,7 @@ fun TopAppBarTaskChat(
 @Composable
 fun TaskMessageTextField(
     sendMessageForTask: (String) -> Unit,
+    pickImages: () -> Unit
 ) {
     var messageText by remember { mutableStateOf("") }
 
@@ -561,6 +605,13 @@ fun TaskMessageTextField(
                 }
             }
         )
+
+        IconButton(
+            onClick = pickImages,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        ) {
+            Icon(Icons.Filled.PhotoLibrary, contentDescription = "select images")
+        }
 
         IconButton(
             onClick = {

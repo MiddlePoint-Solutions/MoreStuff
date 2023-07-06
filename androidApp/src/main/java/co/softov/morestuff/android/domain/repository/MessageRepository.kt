@@ -1,10 +1,14 @@
 package co.softov.morestuff.android.domain.repository
 
 
+import android.content.Context
+import android.net.Uri
 import arrow.core.Either
+import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import kotlinx.coroutines.flow.Flow
 
@@ -32,8 +36,15 @@ interface MessageRepository {
     suspend fun clearActiveReminderMessages()
 
     suspend fun countActiveReminderMessages(): Int
+
     suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult?
+
     suspend fun insertUrlMetadata(url: String, openGraphResult: OpenGraphResult, messageId: Long)
+
+    suspend fun insertMessageData(dataForMessage: DataForMessage)
+
+    suspend fun handleImages(uris: List<Uri>, context: Context, timeManager: TimeManager, id: Long)
+
     suspend fun deleteMessage(messageId: Long)
 
 }

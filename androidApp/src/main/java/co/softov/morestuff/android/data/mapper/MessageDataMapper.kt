@@ -28,6 +28,7 @@ fun mapMessageDb(input: MessageData, timeFormatter: TimeFormatter): Message {
         replyContent = input.reply_content,
         replyTime = replyTime,
         openGraphResult = null,
+        imagePath = null
     )
 }
 

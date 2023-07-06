@@ -1,6 +1,10 @@
 package co.softov.morestuff.android.data.repository
 
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import arrow.core.Either
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
@@ -9,11 +13,13 @@ import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.service.createImageFile
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -25,6 +31,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
+import java.io.FileOutputStream
 
 class MessageRepositoryImpl(
     database: StuffDb,
@@ -38,6 +45,7 @@ class MessageRepositoryImpl(
 
     private val messageQueries = database.messageQueries
     private val urlMetadataQueries = database.urlMetadataQueries
+    private val messageDataQueries = database.messageDataQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
@@ -189,6 +197,38 @@ class MessageRepositoryImpl(
             message_id = messageId
         )
     }
+
+    override suspend fun insertMessageData(dataForMessage: DataForMessage) {
+        val dataForMessageJson = Json.encodeToString(dataForMessage)
+        messageDataQueries.insertMessageData(
+            dataForMessage.id,
+            dataForMessage.fileName,
+            dataForMessage.filePath,
+            dataForMessage.creationTime,
+            json_data_message = dataForMessageJson
+        )
+    }
+    override suspend fun handleImages(uris: List<Uri>, context: Context, timeManager: TimeManager, id: Long) {
+        uris.forEach { uri ->
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+
+            val imageFile = createImageFile(timeManager).toFile()
+
+            val outputStream = FileOutputStream(imageFile)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            outputStream.close()
+
+            val path = imageFile.absolutePath
+            val fileName = path.split("/").last()
+            val creationTime = System.currentTimeMillis().toString()
+            val dataForMessage = DataForMessage(id, fileName, path, creationTime)
+            insertMessageData(dataForMessage)
+        }
+    }
+
 
     override suspend fun deleteMessage(messageId: Long) {
         messageQueries.deleteMessage(messageId)

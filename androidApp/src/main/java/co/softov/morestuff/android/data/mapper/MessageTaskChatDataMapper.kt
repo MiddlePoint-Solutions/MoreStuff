@@ -2,6 +2,7 @@ package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
+import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.SelectTaskMessagesByContentType
@@ -11,7 +12,7 @@ import co.softov.morestuff.android.domain.model.Message
 typealias SelectTaskMessagesByContentTypeMapper = (SelectTaskMessagesByContentType) -> Message
 
 fun makeSelectTaskMessagesByContentTypeMapper(timeFormatter: TimeFormatter): (SelectTaskMessagesByContentType) -> Message = { selectTaskMessagesByContentType ->
-    mapSelectTaskMessagesByContentTypeToMessageData(selectTaskMessagesByContentType, timeFormatter)
+    mapSelectTaskMessagesByContentTypeToMessageData(selectTaskMessagesByContentType, timeFormatter, )
 }
 
 fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByContentType, timeFormatter: TimeFormatter): Message {
@@ -19,6 +20,7 @@ fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByC
     val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
     val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
     val openGraphResult = input.json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
+    val dataForMessage = input.json_data_message?.let {Json.decodeFromString<DataForMessage>(it)}
     return Message(
         id = input.id,
         taskId = input.task_id,
@@ -30,6 +32,7 @@ fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByC
         replyType = input.reply_type?.let { ReplyType.withValue(it) },
         replyContent = input.reply_content,
         replyTime = replyTime,
-        openGraphResult = openGraphResult
+        openGraphResult = openGraphResult,
+        imagePath = dataForMessage
     )
 }

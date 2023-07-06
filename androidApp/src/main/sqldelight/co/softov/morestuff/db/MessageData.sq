@@ -1,11 +1,3 @@
-CREATE TABLE url_metadata (
-    id_metadata INTEGER PRIMARY KEY AUTOINCREMENT,
-    url TEXT NOT NULL,
-    json_data TEXT NOT NULL,
-    message_id INTEGER,
-    FOREIGN KEY(message_id) REFERENCES message(id)
-);
-
 CREATE TABLE message_data (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     message_id INTEGER NOT NULL,
@@ -15,3 +7,9 @@ CREATE TABLE message_data (
     json_data_message TEXT NOT NULL,
     FOREIGN KEY(message_id) REFERENCES message(id)
 );
+
+
+
+insertMessageData:
+INSERT INTO message_data(message_id, file_name, file_path, creation_time, json_data_message)
+VALUES (?, ?, ?, ?, ?);
