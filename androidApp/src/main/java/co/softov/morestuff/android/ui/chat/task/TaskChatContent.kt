@@ -1,12 +1,9 @@
 package co.softov.morestuff.android.ui.chat.task
 
-import android.content.Context
-import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -103,11 +100,11 @@ import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonNull.content
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @Composable
 fun ProvideLocalViewModelStoreOwner(
@@ -172,11 +169,10 @@ private fun TaskChatContent(
 
     ///// -->> https://developer.android.com/training/data-storage/shared/photopicker
     val pickMultipleMedia =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-            if (uris.isNotEmpty()) {
+        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uris ->
+            if (uris != null) {
                 scope.launch {
-                    val messageId = viewModel.messages.value.firstOrNull()?.id ?: 0
-                    viewModel.handleImages(uris,context, messageId)
+                    viewModel.sendImageMessageForTask(content, uris, context)
                 }
             }
         }

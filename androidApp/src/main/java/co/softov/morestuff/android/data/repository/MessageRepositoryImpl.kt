@@ -19,7 +19,6 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.service.createImageFile
 import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
@@ -32,6 +31,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
 import java.io.FileOutputStream
+import java.nio.file.Path
 
 class MessageRepositoryImpl(
     database: StuffDb,
@@ -97,7 +97,6 @@ class MessageRepositoryImpl(
         }
         return getMessage(messageId)
     }
-
 
     override suspend fun addUserReplyMessage(
         taskId: Long,
@@ -208,10 +207,10 @@ class MessageRepositoryImpl(
             json_data_message = dataForMessageJson
         )
     }
-    override suspend fun handleImages(uris: List<Uri>, context: Context, timeManager: TimeManager, id: Long) {
-        uris.forEach { uri ->
+    override suspend fun handleImages(uris: Uri, context: Context, timeManager: TimeManager, id: Long) {
+
             val contentResolver = context.contentResolver
-            val inputStream = contentResolver.openInputStream(uri)
+            val inputStream = contentResolver.openInputStream(uris)
             val bitmap = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
 
@@ -226,7 +225,14 @@ class MessageRepositoryImpl(
             val creationTime = System.currentTimeMillis().toString()
             val dataForMessage = DataForMessage(id, fileName, path, creationTime)
             insertMessageData(dataForMessage)
-        }
+
+    }
+
+    fun createImageFile(timeManager: TimeManager): Path {
+        val currentMoment = timeManager.nowLocalDateTime
+        val timeStamp = "${currentMoment.year}${currentMoment.monthNumber}${currentMoment.dayOfMonth}_${currentMoment.hour}${currentMoment.minute}${currentMoment.second}"
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        return kotlin.io.path.createTempFile(prefix = imageFileName, suffix = ".jpg")
     }
 
 

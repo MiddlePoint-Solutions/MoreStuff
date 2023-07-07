@@ -1,3 +1,4 @@
+/*
 package co.softov.morestuff.android.domain.service
 
 import android.Manifest
@@ -157,25 +158,35 @@ fun Camera(timeManager: TimeManager) {
 
 
 //This use java
+*/
 /*@SuppressLint("SimpleDateFormat")
 fun Context.createImageFile(): File {
     // Create an image file name
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
     val imageFileName = "JPEG_" + timeStamp + "_"
     return File.createTempFile(
-        imageFileName, *//* prefix *//*
-        ".jpg", *//* suffix *//*
-        externalCacheDir      *//* directory *//*
+        imageFileName, *//*
+*/
+/* prefix *//*
+*/
+/*
+        ".jpg", *//*
+*/
+/* suffix *//*
+*/
+/*
+        externalCacheDir      *//*
+*/
+/* directory *//*
+*/
+/*
     )
-}*/
+}*//*
+
 
 
 
 //Kotlin Multiplatform
-fun createImageFile(timeManager: TimeManager): Path {
-    val currentMoment = timeManager.nowLocalDateTime
-    val timeStamp = "${currentMoment.year}${currentMoment.monthNumber}${currentMoment.dayOfMonth}_${currentMoment.hour}${currentMoment.minute}${currentMoment.second}"
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    return createTempFile(prefix = imageFileName, suffix = ".jpg")
-}
 
+
+*/

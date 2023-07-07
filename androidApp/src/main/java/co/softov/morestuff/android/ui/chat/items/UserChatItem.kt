@@ -1,22 +1,23 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import android.net.Uri
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -29,9 +30,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
@@ -40,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -48,9 +54,10 @@ import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import java.io.File
 
 @Composable
 fun UserChatItem(
@@ -98,63 +105,147 @@ fun UserChatItem(
             modifier = Modifier
                 .padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
         ) {
-            Surface(
-                shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                color = MaterialTheme.colorScheme.userChatItem,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+            Box(
                 modifier = Modifier
                     .padding(end = 5.dp, bottom = 4.dp)
                     .clickable {
                         showMenu = true
                     }
-
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(end = 5.dp, bottom = 4.dp)
-                ) {
-                    Text(
+                if (message.imagePath != null) {
+                    ImageWithCoilCompose(
+                        dataForMessage = message.imagePath,
                         modifier = Modifier
-                            .padding(8.dp)
-                            .padding(end = 15.dp)
-                            .run {
-                                urls?.let {
-                                    clickable {
-                                        coroutineScope.launch {
-                                            uriHandler.openUri(it)
-                                        }
-                                    }
-                                } ?: this
-                            },
-                        text = content,
-                        style = LocalTextStyle.current.copy(
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
-                    )
-
-
-                    if (openGraphResult?.title != null && openGraphResult.description != null) {
-                        OpenGraphPreview(openGraphResult)
-                    }
-
-                    ShowContextMenu(
+                            .fillMaxSize()
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(8.dp)),
                         message,
-                        onCopyMessage = actions.copyMessage,
-                        onDeleteMessage = actions.deleteMessage,
-                        showMenu = showMenu,
-                        onClose = {
-                            showMenu = false
-                        },
-                        modifier = Modifier.padding(top = 20.dp)
+                        actions
                     )
-                    message.imagePath?.let { imagePath ->
-                        ImageOpenGraphPreview(imagePath)
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        color = MaterialTheme.colorScheme.userChatItem,
+                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .padding(end = 15.dp)
+                                .run {
+                                    urls?.let {
+                                        clickable {
+                                            coroutineScope.launch {
+                                                uriHandler.openUri(it)
+                                            }
+                                        }
+                                    } ?: this
+                                }
+                        ) {
+                            Text(
+                                text = content,
+                                style = LocalTextStyle.current.copy(
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                )
+                            )
+                        }
                     }
                 }
             }
+
+            if (openGraphResult?.title != null && openGraphResult.description != null) {
+                OpenGraphPreview(openGraphResult)
+            }
+
+            ShowContextMenu(
+                message,
+                onCopyMessage = actions.copyMessage,
+                onDeleteMessage = actions.deleteMessage,
+                showMenu = showMenu,
+                onClose = {
+                    showMenu = false
+                },
+                modifier = Modifier.padding(top = 20.dp)
+            )
         }
     }
+}
+
+@Composable
+fun ImageWithCoilCompose(
+    dataForMessage: DataForMessage,
+    modifier: Modifier = Modifier,
+    message: Message,
+    actions: ChatActions,
+) {
+    val context = LocalContext.current
+    val imagePainter = rememberAsyncImagePainter(dataForMessage.filePath)
+    var showMenu by remember { mutableStateOf(false) }
+    var showImage by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val haptic = LocalHapticFeedback.current
+
+    var pressJob: Job? = null
+
+    Image(
+        painter = imagePainter,
+        contentDescription = null,
+        modifier = modifier
+            .rotate(90F)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = { offset ->
+                        pressJob = scope.launch {
+                            delay(500)
+                            showMenu = true
+                        }
+                        val success = tryAwaitRelease()
+                        pressJob?.cancel()
+
+                        if (success && !showMenu) {
+                            val uri = FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                File(dataForMessage.filePath)
+                            )
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(uri, "image/*")
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            }
+                            context.startActivity(intent)
+                            showImage = true
+                        }
+                    }
+                )
+            }
+    )
+
+    if (showMenu) {
+        ShowContextMenu(
+            message,
+            onCopyMessage = actions.copyMessage,
+            onDeleteMessage = actions.deleteMessage,
+            showMenu = showMenu,
+            onClose = {
+                showMenu = false
+            },
+            modifier = Modifier.padding(top = 20.dp)
+        )
+    }
+
+    LaunchedEffect(key1 = showMenu, block = {
+        if (showMenu) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    })
+
+    LaunchedEffect(key1 = showImage, block = {
+        if (showImage) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            showImage = false
+        }
+    })
 }
 
 
@@ -195,28 +286,6 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
         )
     }
 }
-
-@Composable
-fun ImageOpenGraphPreview(dataForMessage: DataForMessage) {
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .scale(0.9f)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(80.dp)
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(dataForMessage.filePath),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-    }
-}
-
 
 
 @Preview

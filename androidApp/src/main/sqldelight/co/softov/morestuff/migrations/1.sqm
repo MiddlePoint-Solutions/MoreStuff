@@ -5,13 +5,3 @@ CREATE TABLE url_metadata (
     message_id INTEGER,
     FOREIGN KEY(message_id) REFERENCES message(id)
 );
-
-CREATE TABLE message_data (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    message_id INTEGER NOT NULL,
-    file_name TEXT NOT NULL,
-    file_path TEXT NOT NULL,
-    creation_time TEXT NOT NULL,
-    json_data_message TEXT NOT NULL,
-    FOREIGN KEY(message_id) REFERENCES message(id)
-);

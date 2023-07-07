@@ -43,7 +43,7 @@ interface MessageRepository {
 
     suspend fun insertMessageData(dataForMessage: DataForMessage)
 
-    suspend fun handleImages(uris: List<Uri>, context: Context, timeManager: TimeManager, id: Long)
+    suspend fun handleImages(uris: Uri, context: Context, timeManager: TimeManager, id: Long)
 
     suspend fun deleteMessage(messageId: Long)
 

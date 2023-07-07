@@ -13,7 +13,6 @@ import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -31,7 +30,6 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlow
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.ui.home.PlanModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -40,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
@@ -50,7 +47,6 @@ class TaskChatViewModel(
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     private val getTaskFlow: GetTaskFlowUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
-    private val handleImagesUseCase: HandleImagesUseCase,
     private val clipboardHandler: ClipboardHandler,
     private val deleteMessageUseCase: DeleteMessageUseCase,
     private val taskId: Long,
@@ -143,8 +139,9 @@ class TaskChatViewModel(
     fun sendMessageForTask(content: String) {
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
-    fun sendImagesForTask(images: List<Uri>, context: Context) {
-        store.dispatch(MessageAction.CreateUserTaskImageMessageAction(taskId, images, context))
+
+    fun sendImageMessageForTask(content: String, uris: Uri, context: Context) {
+        store.dispatch(MessageAction.CreateImageMessageAction(taskId, content, uris, context))
     }
 
 
@@ -194,15 +191,6 @@ class TaskChatViewModel(
         store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
         planModel = createPlanModel()
     }
-
-    fun handleImages(uris: List<Uri>, context: Context, id: Long) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                handleImagesUseCase(uris, context, id)
-            }
-        }
-    }
-
 
     fun copyToClipboard(text: String) {
         clipboardHandler.copyToClipboard(text)

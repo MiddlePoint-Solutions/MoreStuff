@@ -271,10 +271,12 @@ val messageUseCases = module {
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
 
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
+
     //factoryOf(::HandleImagesUseCaseImpl) bind HandleImagesUseCaseImpl::class
     factory<HandleImagesUseCase> { HandleImagesUseCaseImpl(messageRepository = get(), timeManager = get()) }
     factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
+    factoryOf (::CreateMessageWithImageUseCaseImpl) bind CreateMessageWithImageUseCase::class
 }
 
 
