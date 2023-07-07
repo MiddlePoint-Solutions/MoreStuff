@@ -19,13 +19,14 @@ import co.softov.morestuff.android.MainActivity
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
+import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
+import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import co.softov.morestuff.android.app.receiver.createReplyIntent
 import co.softov.morestuff.android.app.receiver.randomRequestCode
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ReplyType.*
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.model.Defaults
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.Notifier
@@ -113,7 +114,7 @@ class NotifierImpl(
             .setGroup(GROUP_KEY_REMINDERS)
             // Set this notification as the summary for the group.
             .setContentIntent(
-                createReviewContentIntent(ReviewNotification.Morning)
+                createReviewContentIntent()
             ).build()
 
     private fun notifyUser(
@@ -141,12 +142,11 @@ class NotifierImpl(
         return actionText to NotificationReceiver.createReplyIntent(context, scheduleId, type)
     }
 
-
-
     private fun createReminderContentIntent(
         taskId: Long
     ): PendingIntent =
         Intent(context, MainActivity::class.java).apply {
+            action = ACTION_NOTIFICATION_REMINDER
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra(MainActivity.EXTRA_TASK_ID, taskId)
         }.let {
@@ -156,10 +156,10 @@ class NotifierImpl(
             PendingIntent.getActivity(context, requestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
 
-    private fun createReviewContentIntent(type: ReviewNotification): PendingIntent =
+    private fun createReviewContentIntent(): PendingIntent =
         Intent(context, MainActivity::class.java).apply {
+            action = ACTION_NOTIFICATION_REVIEW
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(MainActivity.EXTRA_PRIORITY_REVIEW, type)
         }.let {
             PendingIntent.getActivity(context, randomRequestCode, it, PendingIntent.FLAG_IMMUTABLE)
         }
@@ -238,12 +238,9 @@ class NotifierImpl(
         notificationManager.cancel(scheduleId.toInt())
     }
 
-    override fun showReviewNotification(type: ReviewNotification) {
-        val (title, message) = when (type) {
-            ReviewNotification.Morning -> "Morning Review" to "Take a minute to sort priorities :D"
-            ReviewNotification.Afternoon -> "Afternoon Review" to "A midday progress check"
-            ReviewNotification.Evening -> "Evening Review" to "Review the day and prepare for tomorrow"
-        }
+    override fun showReviewNotification() {
+        // TODO: use time to customize review message?
+        val (title, message) = "Review tasks" to "Take a minute to sort priorities"
 
         val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
             .setSmallIcon(R.drawable.priority_48px)
@@ -252,7 +249,6 @@ class NotifierImpl(
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setContentIntent(createReviewContentIntent(type))
 
         notifyUser(REVIEW_NOTIFICATION_ID, builder.build())
     }

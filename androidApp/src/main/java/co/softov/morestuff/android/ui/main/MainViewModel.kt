@@ -4,9 +4,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 
-class MainViewModel(
-
-) : NoStateViewModel() {
+class MainViewModel : NoStateViewModel() {
 
     fun onResume() {
         store.dispatch(OnResumeAction)

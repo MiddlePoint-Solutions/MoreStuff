@@ -17,13 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
-import co.softov.morestuff.android.domain.enums.ReviewNotification
+import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
+import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.*
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.main.ProvideComponentContext
-import co.softov.morestuff.android.ui.schedule.ConfettiPopAnimation
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -87,8 +87,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLaunchIntent(intent: Intent): Screen? = when {
-        intent.action == Intent.ACTION_SEND -> {
+    private fun handleLaunchIntent(intent: Intent): Screen? = when (intent.action) {
+        Intent.ACTION_SEND -> {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                     Share(Shareable.Text, it)
@@ -98,14 +98,11 @@ class MainActivity : AppCompatActivity() {
             } else null
         }
 
-        intent.getLongExtra(EXTRA_TASK_ID, 0) > 0 -> {
+        ACTION_NOTIFICATION_REMINDER -> {
             TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
         }
 
-        intent.getParcelableExtraCompat(
-            EXTRA_PRIORITY_REVIEW,
-            ReviewNotification::class.java
-        ) != null -> {
+        ACTION_NOTIFICATION_REVIEW -> {
             Review
         }
 

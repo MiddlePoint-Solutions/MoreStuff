@@ -52,6 +52,11 @@ interface TimeManager {
     val tomorrowTimeStringPair: Pair<String, String>
 
     /**
+     *
+     */
+
+
+    /**
     Returns the time the TimeManager instance was created as a string.
      */
     fun getCreateTime(): String

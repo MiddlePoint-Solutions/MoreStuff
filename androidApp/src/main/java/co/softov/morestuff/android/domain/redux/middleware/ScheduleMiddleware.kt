@@ -19,15 +19,15 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.Schedu
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleReviewNotificationsUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNextReviewNotificationsUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,7 +56,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
-    private val scheduleReviewNotificationsUseCase: ScheduleReviewNotificationsUseCase,
+    private val scheduleNextReviewNotificationsUseCase: ScheduleNextReviewNotificationsUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
@@ -75,8 +75,10 @@ class ScheduleMiddleware(
     ): Action {
         when (action) {
 
+            is OnResumeAction,
+            is NotificationAction.ShowReviewNotification,
             is SettingAction.InitSettings -> {
-                scope.launch { scheduleReviewNotificationsUseCase() }
+                scheduleNextReviewNotificationsUseCase()
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
