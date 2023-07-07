@@ -249,6 +249,7 @@ class NotifierImpl(
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setContentIntent(createReviewContentIntent())
 
         notifyUser(REVIEW_NOTIFICATION_ID, builder.build())
     }

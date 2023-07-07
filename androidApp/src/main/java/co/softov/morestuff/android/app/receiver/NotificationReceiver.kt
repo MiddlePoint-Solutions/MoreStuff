@@ -47,7 +47,7 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
         const val ACTION_NOTIFICATION_REVIEW =
             "co.softov.morestuff.androidApp.ACTION_NOTIFICATION_REVIEW"
         const val ACTION_NOTIFICATION_REMINDER =
-            "co.softov.morestuff.androidApp.ACTION_NOTIFICATION_REVIEW"
+            "co.softov.morestuff.androidApp.ACTION_NOTIFICATION_REMINDER"
 
         const val KEY_SCHEDULE_ID = "SCHEDULE_ID"
         const val KEY_REPLY_EXTRA = "REPLY_EXTRA"
