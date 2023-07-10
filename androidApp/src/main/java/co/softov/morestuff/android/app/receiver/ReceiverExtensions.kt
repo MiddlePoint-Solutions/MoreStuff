@@ -7,11 +7,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.KEY_REPLY_EXTRA
-import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.KEY_REVIEW_EXTRA
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.KEY_SCHEDULE_ID
-
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -57,18 +54,15 @@ fun NotificationReceiver.Companion.createReplyIntent(
 
 fun NotificationReceiver.Companion.createReviewIntent(
     context: Context,
-    type: ReviewNotification
 ) = Intent(context, NotificationReceiver::class.java)
     .setAction(ACTION_NOTIFICATION_REVIEW)
-    .setReviewIntentExtras(type)
 
 fun NotificationReceiver.Companion.createReviewPendingIntent(
     context: Context,
     intent: Intent,
-    type: ReviewNotification
-) = PendingIntent.getBroadcast(
+): PendingIntent = PendingIntent.getBroadcast(
     context,
-    getReviewIntentRequestCode(type),
+    REQUEST_CODE_REVIEW,
     intent,
     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 )
@@ -77,22 +71,12 @@ fun NotificationReceiver.Companion.createReviewPendingIntent(
 fun NotificationReceiver.Companion.createCancelReviewPendingIntent(
     context: Context,
     intent: Intent,
-    type: ReviewNotification
-) = PendingIntent.getBroadcast(
+): PendingIntent? = PendingIntent.getBroadcast(
     context,
-    getReviewIntentRequestCode(type),
+    REQUEST_CODE_REVIEW,
     intent,
     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
 )
-
-
-fun NotificationReceiver.Companion.getReviewIntentRequestCode(
-    type: ReviewNotification
-) = when (type) {
-    ReviewNotification.Morning -> REQUEST_CODE_REVIEW_MORNING
-    ReviewNotification.Afternoon -> REQUEST_CODE_REVIEW_AFTERNOON
-    ReviewNotification.Evening -> REQUEST_CODE_REVIEW_EVENING
-}
 
 fun Intent.getScheduleIdExtra() = getLongExtra(KEY_SCHEDULE_ID, 0)
 fun Intent.setScheduleIdExtra(scheduleId: Long) = putExtra(KEY_SCHEDULE_ID, scheduleId)
@@ -103,14 +87,6 @@ fun Intent.setReplayIntentExtras(scheduleId: Long, type: ReplyType) =
 fun Intent.getReplyIntentExtras(): ReplyIntentExtras? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         getParcelableExtra(KEY_REPLY_EXTRA, ReplyIntentExtras::class.java)
-    } else getParcelableExtra(KEY_REPLY_EXTRA)
-
-fun Intent.setReviewIntentExtras(type: ReviewNotification?) =
-    putExtra(KEY_REVIEW_EXTRA, type as? Parcelable)
-
-fun Intent.getReviewIntentExtras(): ReviewNotification? =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getParcelableExtra(KEY_REVIEW_EXTRA, ReviewNotification::class.java)
     } else getParcelableExtra(KEY_REPLY_EXTRA)
 
 @Parcelize
