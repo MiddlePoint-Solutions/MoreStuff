@@ -81,7 +81,7 @@ class SchedulerImpl(
                 }
             }.also {
                 alarmManager.setExact(
-                    AlarmManager.RTC,
+                    AlarmManager.RTC_WAKEUP,
                     it.timeInMillis,
                     NotificationReceiver.createReviewPendingIntent(
                         context,
