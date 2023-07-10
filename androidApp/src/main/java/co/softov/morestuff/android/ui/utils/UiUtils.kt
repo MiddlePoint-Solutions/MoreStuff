@@ -8,7 +8,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import java.util.regex.Pattern
 
-const val URL_PATTERN_REGEX = "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[\\w-]+(\\.[\\w-]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
+const val URL_PATTERN_REGEX = "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[a-zA-Z0-9_-]+(\\.[a-zA-Z]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
 val urlPattern: Pattern = Pattern.compile(URL_PATTERN_REGEX, Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL)
 
 
