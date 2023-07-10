@@ -1,19 +1,16 @@
 package co.softov.morestuff.android.app
 
 import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
 import androidx.work.*
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createCancelReviewPendingIntent
 import co.softov.morestuff.android.app.receiver.createReviewIntent
 import co.softov.morestuff.android.app.receiver.createReviewPendingIntent
-import co.softov.morestuff.android.app.receiver.getReviewIntentRequestCode
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.SmartReminderWorker
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.service.Scheduler
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
@@ -62,70 +59,39 @@ class SchedulerImpl(
         }
     }
 
-    override fun scheduleReviews() {
+    override fun scheduleNextReview() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        val morningIntent =
-            NotificationReceiver.createReviewIntent(context, ReviewNotification.Morning)
-
-        var pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
+        val reviewIntent = NotificationReceiver.createReviewIntent(context)
+        val pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
             context,
-            morningIntent,
-            ReviewNotification.Morning
+            reviewIntent
         )
+
         if (pendingIntent == null) {
-            Timber.d("Morning review notification does not exist - creating...")
+            Timber.d("Review notification does not exist - creating...")
             Calendar.getInstance().apply {
-                timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 8)
-                set(Calendar.MINUTE, 50)
+                val hourOfDay = get(Calendar.HOUR_OF_DAY)
+                if (hourOfDay in 10..19) {
+                    set(Calendar.HOUR_OF_DAY, 20)
+                    set(Calendar.MINUTE, 0)
+                } else {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                    set(Calendar.HOUR_OF_DAY, 9)
+                    set(Calendar.MINUTE, 0)
+                }
             }.also {
-                alarmManager.setInexactRepeating(
-                    AlarmManager.RTC,
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
                     it.timeInMillis,
-                    AlarmManager.INTERVAL_DAY,
                     NotificationReceiver.createReviewPendingIntent(
                         context,
-                        morningIntent,
-                        ReviewNotification.Morning
+                        reviewIntent,
                     )
                 )
             }
         } else {
-            Timber.d("Morning Review exists")
+            Timber.d("Review exists")
         }
-
-        val eveningIntent =
-            NotificationReceiver.createReviewIntent(context, ReviewNotification.Evening)
-
-        pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
-            context,
-            eveningIntent,
-            ReviewNotification.Evening
-        )
-
-        if (pendingIntent == null) {
-            Timber.d("Evening review notification does not exist - creating...")
-            val calendar = Calendar.getInstance().apply {
-                timeInMillis = System.currentTimeMillis()
-                set(Calendar.HOUR_OF_DAY, 20)
-                set(Calendar.MINUTE, 0)
-            }
-
-            alarmManager.setInexactRepeating(
-                AlarmManager.RTC,
-                calendar.timeInMillis,
-                AlarmManager.INTERVAL_DAY,
-                NotificationReceiver.createReviewPendingIntent(
-                    context,
-                    eveningIntent,
-                    ReviewNotification.Evening
-                )
-            )
-        } else {
-            Timber.d("Evening Review already exists")
-        }
-
     }
 
     override fun cancelSchedule(scheduleId: Long) {

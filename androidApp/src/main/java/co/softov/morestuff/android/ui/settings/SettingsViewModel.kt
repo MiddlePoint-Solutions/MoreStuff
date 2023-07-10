@@ -1,11 +1,9 @@
 package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.service.Notifier
-import co.softov.morestuff.android.domain.service.Scheduler
 
 class SettingsViewModel(
     private val notifier: Notifier
@@ -28,6 +26,6 @@ class SettingsViewModel(
     }
 
     fun testReviewActivity() {
-        notifier.showReviewNotification(ReviewNotification.Evening)
+        notifier.showReviewNotification()
     }
 }

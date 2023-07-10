@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
@@ -16,13 +15,7 @@ sealed class NotificationAction : Action.FeatureAction() {
         val message: Message
     ) : NotificationAction()
 
-    internal data class ShowReminderNotificationsAction(
-        val messages: List<Message>
-    ) : NotificationAction()
-
-    internal data class ShowReviewNotification(
-        val reviewType: ReviewNotification
-    ) : NotificationAction()
+    internal object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
         val scheduleId: Long
@@ -30,7 +23,7 @@ sealed class NotificationAction : Action.FeatureAction() {
 }
 
 class NotificationMiddleware(
-    private val notifier: Notifier
+    private val notifier: Notifier,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -46,12 +39,8 @@ class NotificationMiddleware(
                 notifier.showReminderNotification(action.message)
             }
 
-            is ShowReminderNotificationsAction -> {
-                notifier.showReminderNotifications(action.messages)
-            }
-
             is ShowReviewNotification -> {
-                notifier.showReviewNotification(action.reviewType)
+                notifier.showReviewNotification()
             }
 
             is RemoveScheduleNotificationAction -> {
