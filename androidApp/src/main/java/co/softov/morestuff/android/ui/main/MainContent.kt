@@ -1,42 +1,26 @@
 package co.softov.morestuff.android.ui.main
 
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ProvidableCompositionLocal
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.Home
+import co.softov.morestuff.android.domain.nav.Screen.OnBoarding
 import co.softov.morestuff.android.domain.nav.Screen.Review
 import co.softov.morestuff.android.domain.nav.Screen.Settings
 import co.softov.morestuff.android.domain.nav.Screen.Share
 import co.softov.morestuff.android.domain.nav.Screen.TaskChat
-import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
-import co.softov.morestuff.android.ui.review.ReviewContent
+import co.softov.morestuff.android.ui.navigation.ChildStack
+import co.softov.morestuff.android.ui.onboarding.OnBoardingContent
 import co.softov.morestuff.android.ui.review.ReviewScreen
-import co.softov.morestuff.android.ui.schedule.ConfettiPopAnimation
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
-import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
-import com.arkivanov.decompose.router.stack.StackNavigationSource
-import com.arkivanov.decompose.router.stack.childStack
-import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
@@ -60,6 +44,9 @@ fun MainContent(
         animation = stackAnimation(fade() + scale()),
     ) { screen ->
         when (screen) {
+
+            OnBoarding -> OnBoardingContent()
+
             Home -> HomeScreen(
                 showSettings = { navigation.push(Settings) },
                 showReview = { navigation.push(Review) },
@@ -85,48 +72,6 @@ fun MainContent(
                     )
                 },
             )
-        }
-    }
-
-
-}
-
-val LocalComponentContext: ProvidableCompositionLocal<ComponentContext> =
-    staticCompositionLocalOf { error("Root component context was not provided") }
-
-@Composable
-fun ProvideComponentContext(
-    componentContext: ComponentContext,
-    content: @Composable () -> Unit
-) {
-    CompositionLocalProvider(LocalComponentContext provides componentContext, content = content)
-}
-
-@Composable
-inline fun <reified C : Parcelable> ChildStack(
-    source: StackNavigationSource<C>,
-    noinline initialStack: () -> List<C>,
-    modifier: Modifier = Modifier,
-    handleBackButton: Boolean = false,
-    animation: StackAnimation<C, ComponentContext>? = null,
-    noinline content: @Composable (C) -> Unit,
-) {
-    val componentContext = LocalComponentContext.current
-
-    Children(
-        stack = remember {
-            componentContext.childStack(
-                source = source,
-                initialStack = initialStack,
-                handleBackButton = handleBackButton,
-                childFactory = { _, childComponentContext -> childComponentContext },
-            )
-        },
-        modifier = modifier,
-        animation = animation,
-    ) { child ->
-        ProvideComponentContext(child.instance) {
-            content(child.configuration)
         }
     }
 }
