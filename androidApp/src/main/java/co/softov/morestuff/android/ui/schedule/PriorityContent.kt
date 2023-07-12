@@ -3,8 +3,6 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
@@ -31,9 +28,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,7 +40,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
@@ -56,14 +50,11 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
-import com.airbnb.lottie.LottieComposition
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieAnimatable
-import com.airbnb.lottie.compose.rememberLottieComposition
+import co.softov.morestuff.android.ui.utils.explode
 import kotlinx.coroutines.launch
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
+import nl.dionsegijn.konfetti.core.PartySystem
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
@@ -226,49 +217,18 @@ fun PriorityContent(
             }
         }
 
-        AnimatedVisibility(
-            showTaskCompleteAnimation > 0,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            if (showTaskCompleteAnimation > 0) {
-                ConfettiPopAnimation(
-                    showTaskCompleteAnimation,
-                    onAnimationEnd = { showTaskCompleteAnimation = 0 }
-                )
-            }
+        if (showTaskCompleteAnimation > 0) {
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = explode(),
+                updateListener = object : OnParticleSystemUpdateListener {
+                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                        if (activeSystems == 0) showTaskCompleteAnimation = 0
+                    }
+                }
+            )
         }
     }
-}
-
-@Composable
-fun ConfettiPopAnimation(
-    showTaskCompleteAnimation: Long,
-    onAnimationEnd: () -> Unit = {}
-) {
-    val composition1 by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.confetti))
-    val composition2 by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.done))
-    val composition by remember(showTaskCompleteAnimation) {
-        derivedStateOf {
-            if (showTaskCompleteAnimation % 2 == 0L) {
-                composition1
-            } else {
-                composition2
-            }
-        }
-    }
-
-    val progress by animateLottieCompositionAsState(composition, speed = 1f)
-    LottieAnimation(
-        composition = composition,
-        progress = {
-            if (progress == 1f) {
-                onAnimationEnd()
-            }
-            progress
-        },
-        contentScale = ContentScale.Fit,
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
