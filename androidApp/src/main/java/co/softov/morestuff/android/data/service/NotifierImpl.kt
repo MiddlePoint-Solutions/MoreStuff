@@ -34,16 +34,16 @@ import co.softov.morestuff.android.domain.service.Notifier.Companion.GROUP_KEY_R
 import co.softov.morestuff.android.domain.service.Notifier.Companion.REMINDERS_CHANNEL_ID
 import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_CHANNEL_ID
 import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_NOTIFICATION_ID
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
 class NotifierImpl(
     private val context: Context
-) : Notifier {
+) : Notifier, KoinComponent {
 
-    private val notificationManager: NotificationManagerCompat by lazy {
-        NotificationManagerCompat.from(context)
-    }
+    private val notificationManager: NotificationManagerCompat by inject()
 
     private val activeNotifications: Array<StatusBarNotification>
         get() = (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
