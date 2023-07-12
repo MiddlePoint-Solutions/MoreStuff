@@ -79,7 +79,12 @@ class ReviewViewModel(
     fun undo(item: ReviewItemUiModel) {
         Timber.d("undoTask: $item")
         roundEndDelayJob?.cancel()
-        dispatchAppStoreAction(PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore))
+        dispatchAppStoreAction(
+            PriorityAction.UndoTaskPriorityUpdateAction(
+                item.id,
+                item.priorityScore
+            )
+        )
         sendEvent(Undo(item))
     }
 
@@ -101,7 +106,7 @@ class ReviewViewModel(
 
         if (isLast) {
             roundEndDelayJob = viewModelScope.launch {
-                dispatchAppStoreAction(TaskAction.UpdatePlannedTasksPriorityScore)
+                dispatchAppStoreAction(PriorityAction.UpdatePlannedTasksPriorityScore)
                 delay(500)
                 sendEvent(SetupRound(Final))
             }

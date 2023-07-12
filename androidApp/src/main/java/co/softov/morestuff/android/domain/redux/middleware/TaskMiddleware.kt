@@ -39,14 +39,12 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority
     ) : TaskAction()
 
-    object UpdatePlannedTasksPriorityScore : TaskAction()
 }
 
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
-    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -80,10 +78,6 @@ class TaskMiddleware(
                 with(action) {
                     setTaskCompleteUseCase(taskIds, complete)
                 }
-            }
-
-            is UpdatePlannedTasksPriorityScore -> scope.launch {
-                updatePlannedTasksPriorityUseCase()
             }
 
             else -> NoOp

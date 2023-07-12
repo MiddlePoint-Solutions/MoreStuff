@@ -11,6 +11,7 @@ import co.softov.morestuff.android.data.mapper.mapCompleteTaskData
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
@@ -180,7 +181,9 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>> {
-        return taskQueries.selectActiveTasksWithSchedule(mapper = mapTaskWithScheduleData)
-            .executeAsList().right()
+        return taskQueries.selectActiveTasksWithSchedule(
+            schedule_type = listOf(ScheduleType.OneTime),
+            mapper = mapTaskWithScheduleData
+        ).executeAsList().right()
     }
 }

@@ -3,9 +3,9 @@ package co.softov.morestuff.android.domain.service
 interface Scheduler {
 
     fun scheduleAtExact(scheduleId: Long, scheduleTime: String)
-    fun scheduleSmartReminder()
+    fun schedulePlannedPriorityUpdate()
     fun cancelSchedule(scheduleId: Long)
-    fun cancelSmartReminder()
+    fun cancelPlannedPriorityUpdate()
     fun scheduleNextReview()
 
 }

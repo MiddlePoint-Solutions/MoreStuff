@@ -8,7 +8,7 @@ import co.softov.morestuff.android.app.receiver.createCancelReviewPendingIntent
 import co.softov.morestuff.android.app.receiver.createReviewIntent
 import co.softov.morestuff.android.app.receiver.createReviewPendingIntent
 import co.softov.morestuff.android.app.work.ScheduleWorker
-import co.softov.morestuff.android.app.work.SmartReminderWorker
+import co.softov.morestuff.android.app.work.PlannedPriorityUpdateWorker
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -44,15 +44,15 @@ class SchedulerImpl(
         workManager.enqueue(work)
     }
 
-    override fun scheduleSmartReminder() {
-        PeriodicWorkRequestBuilder<SmartReminderWorker>(
+    override fun schedulePlannedPriorityUpdate() {
+        PeriodicWorkRequestBuilder<PlannedPriorityUpdateWorker>(
             repeatInterval = 1,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
             flexTimeInterval = 15,
             flexTimeIntervalUnit = TimeUnit.MINUTES
         ).build().also { request ->
             workManager.enqueueUniquePeriodicWork(
-                SMART_REMINDER_WORK,
+                PLANNED_PRIORITY_WORK,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
             )
@@ -98,14 +98,14 @@ class SchedulerImpl(
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))
     }
 
-    override fun cancelSmartReminder() {
-        workManager.cancelAllWorkByTag(SMART_REMINDER_WORK)
+    override fun cancelPlannedPriorityUpdate() {
+        workManager.cancelAllWorkByTag(PLANNED_PRIORITY_WORK)
     }
 
     private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
     companion object {
-        private const val SMART_REMINDER_WORK = "SmartReminder"
+        private const val PLANNED_PRIORITY_WORK = "SmartReminder"
         private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }

@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Stable
 import com.arkivanov.decompose.ComponentContext
 
 @Composable
