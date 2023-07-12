@@ -217,6 +217,7 @@ dependencies {
     implementation(libs.navigationCompose)
     implementation(libs.activityCompose)
     implementation(libs.lottiCompose)
+    implementation(libs.konfettiCompose)
     testImplementation(libs.testCore)
     testImplementation(libs.testRules)
     testImplementation(libs.espressoCore)
