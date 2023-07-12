@@ -1,45 +1,33 @@
 package co.softov.morestuff.android.ui.onboarding
 
-import android.os.Parcelable
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import co.softov.morestuff.android.domain.nav.OnBoarding
 import co.softov.morestuff.android.ui.navigation.ChildPages
-import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen.*
 import co.softov.morestuff.android.ui.priority.PriorityButton
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.selectNext
-import com.arkivanov.essenty.parcelable.Parcelize
 import timber.log.Timber
-
-
-sealed class OnBoardingScreen : Parcelable {
-
-    @Parcelize
-    object Welcome : OnBoardingScreen()
-
-    @Parcelize
-    object NotificationPermission : OnBoardingScreen()
-}
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
-fun OnBoardingContent() {
+fun OnBoardingContent(
+    onBoardingComplete: () -> Unit,
+) {
 
-    val navigation = remember { PagesNavigation<OnBoardingScreen>() }
-    val pages = remember { listOf(Welcome, NotificationPermission) }
+    val navigation = remember { PagesNavigation<OnBoarding>() }
+    val pages = remember { listOf(OnBoarding.Welcome, OnBoarding.NotificationPermission) }
 
     ChildPages(
         source = navigation,
@@ -49,7 +37,7 @@ fun OnBoardingContent() {
         }
     ) { screen ->
         when (screen) {
-            Welcome -> {
+            OnBoarding.Welcome -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -66,7 +54,6 @@ fun OnBoardingContent() {
                     PriorityButton(
                         onSelected = {
                             navigation.selectNext()
-                            Timber.d("onSelected")
                         },
                         modifier = Modifier.align(Alignment.BottomCenter),
                         text = "Next"
@@ -74,12 +61,26 @@ fun OnBoardingContent() {
                 }
             }
 
-            NotificationPermission -> {
-                Box(modifier = Modifier.fillMaxSize()) {
+            OnBoarding.NotificationPermission -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            bottom = 30.dp
+                        )
+                ) {
                     Text(
                         text = "NotificationPermission!!!",
                         modifier = Modifier.align(Alignment.Center),
                         color = Color.White
+                    )
+
+                    PriorityButton(
+                        onSelected = {
+                            onBoardingComplete()
+                        },
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        text = "Finish"
                     )
                 }
             }

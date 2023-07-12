@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.main
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.Home
@@ -24,6 +25,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -33,19 +35,32 @@ fun MainContent(
     viewModel: MainViewModel = koinViewModel(),
 ) {
 
+    val scope = rememberCoroutineScope()
+
     LifecycleEventsObserver(
         onResume = { viewModel.onResume() }
     )
 
+    val model = viewModel.model
+
     ChildStack(
         source = navigation,
-        initialStack = { initialScreen?.let { listOf(Home, it) } ?: listOf(Home) },
+        initialStack = {
+            when {
+                model.showOnBoarding -> listOf(OnBoarding)
+                else -> initialScreen?.let { listOf(Home, it) } ?: listOf(Home)
+            }
+        },
         handleBackButton = true,
         animation = stackAnimation(fade() + scale()),
     ) { screen ->
         when (screen) {
 
-            OnBoarding -> OnBoardingContent()
+            OnBoarding -> OnBoardingContent(
+                onBoardingComplete = {
+                    scope.launch { navigation.replaceCurrent(Home) }
+                }
+            )
 
             Home -> HomeScreen(
                 showSettings = { navigation.push(Settings) },
