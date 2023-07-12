@@ -12,13 +12,16 @@ import co.softov.morestuff.android.domain.redux.middleware.NotificationAction
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
+import org.koin.core.component.inject
 import timber.log.Timber
 
 class NotificationReceiver : BroadcastReceiver(), KoinComponent {
 
+    private val workManager: WorkManager by inject()
+
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
-            ACTION_NOTIFICATION_REPLY -> onNotificationReply(context, intent)
+            ACTION_NOTIFICATION_REPLY -> onNotificationReply(intent)
             ACTION_NOTIFICATION_REVIEW -> onReviewNotification()
         }
     }
@@ -30,14 +33,14 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
         }
     }
 
-    private fun onNotificationReply(context: Context, intent: Intent) {
+    private fun onNotificationReply(intent: Intent) {
         intent.getReplyIntentExtras()?.let {
             val work = OneTimeWorkRequestBuilder<NotificationResponseWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                 setInputData(NotificationResponseWorker.createWorkerData(it.scheduleId, it.type))
                 addTag(NotificationResponseWorker.createWorkerTag(it.scheduleId))
             }.build()
-            WorkManager.getInstance(context).enqueue(work)
+            workManager.enqueue(work)
         } ?: Timber.w("!!! Notification Reply missing extras !!!")
     }
 

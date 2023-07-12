@@ -13,16 +13,17 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SchedulerImpl(
     private val context: Context,
-    private val timeManager: TimeManager
+    private val timeManager: TimeManager,
 ) : Scheduler, KoinComponent {
 
-    private val workManager = WorkManager.getInstance(context)
+    private val workManager: WorkManager by inject()
 
     override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
         val data = ScheduleWorker.createWorkerData(scheduleId)

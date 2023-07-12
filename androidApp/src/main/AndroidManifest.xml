@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:name=".MsApplication"
         android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -29,9 +28,16 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".app.receiver.NotificationReceiver"
-            android:exported="false" />
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="co.softov.morestuff.android.app.startup.KoinInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
 
         <receiver
             android:name=".app.receiver.BootReceiver"
@@ -57,6 +63,10 @@
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".app.receiver.NotificationReceiver"
+            android:exported="false" />
 
         <service
             android:name=".app.service.NotificationService"
