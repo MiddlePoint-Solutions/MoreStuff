@@ -5,6 +5,10 @@ import kotlinx.android.parcel.Parcelize
 
 
 sealed class Screen : Parcelable {
+
+    @Parcelize
+    object OnBoarding : Screen()
+
     @Parcelize
     object Home : Screen()
 

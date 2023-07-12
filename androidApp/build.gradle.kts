@@ -158,8 +158,6 @@ dependencies {
     implementation (libs.extensionsComposeJetpack)
     implementation (libs.parcelable)
     implementation (libs.accompanistInsetsUi)
-    implementation (libs.accompanistPager)
-    implementation (libs.accompanistPagerIndicators)
     implementation (libs.accompanistPermissions)
     implementation (libs.accompanistSystemUiController)
     implementation (libs.kotlinStdlib)
