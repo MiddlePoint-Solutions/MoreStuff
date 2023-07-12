@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import co.softov.morestuff.android.domain.redux.AppStore
-import co.softov.morestuff.android.domain.redux.middleware.ReminderAction
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
-class SmartReminderWorker(
+class PlannedPriorityUpdateWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params), KoinComponent {
@@ -16,7 +17,9 @@ class SmartReminderWorker(
     private val store: AppStore by inject()
 
     override suspend fun doWork(): Result {
-        // tODO: use this for updating plan priority score instead
+        Timber.d("Work: Dispatching UpdatePlannedTasksPriorityScore")
+        store.dispatchSuspend(PriorityAction.UpdatePlannedTasksPriorityScore)
+        Timber.d("Work: Done")
         return Result.success()
     }
 }
