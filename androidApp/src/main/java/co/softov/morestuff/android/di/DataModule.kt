@@ -2,7 +2,12 @@ package co.softov.morestuff.android.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import androidx.work.Configuration
+import androidx.work.WorkManager
+import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
@@ -52,6 +57,11 @@ val dataModule = module {
     // Database
     single { createDatabase(androidApplication()) }
 
+    // WorkManager
+    single {
+        WorkManager.getInstance(androidApplication())
+    }
+    single { NotificationManagerCompat.from(androidApplication()) }
 
     //Time
     single<TimeFormatter> { TimeFormatterImpl() }
