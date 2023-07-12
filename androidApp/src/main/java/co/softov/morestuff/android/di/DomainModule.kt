@@ -87,8 +87,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesW
 import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNextReviewNotificationsUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNextReviewNotificationsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
@@ -254,7 +254,7 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::GetReviewSchedulesUseCaseImpl) bind GetReviewSchedulesUseCase::class
-    factoryOf(::ScheduleNextReviewNotificationsUseCaseImpl) bind ScheduleNextReviewNotificationsUseCase::class
+    factoryOf(::ScheduleNotificationsAndWorkUseCaseImpl) bind ScheduleNotificationsAndWorkUseCase::class
     factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
 }
 

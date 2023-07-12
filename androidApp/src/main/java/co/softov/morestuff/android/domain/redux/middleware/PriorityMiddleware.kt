@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.TaskPriorityUpdateAction
-import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.UndoTaskPriorityUpdateAction
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -28,6 +28,8 @@ sealed class PriorityAction : Action.FeatureAction() {
         val actionType: PriorityActionType
     ) : PriorityAction()
 
+    object UpdatePlannedTasksPriorityScore : PriorityAction()
+
 }
 
 class PriorityMiddleware(
@@ -35,6 +37,7 @@ class PriorityMiddleware(
     private val decrementTaskPriorityScoreUseCase: DecrementTaskPriorityScoreUseCase,
     private val incrementTaskPriorityScoreUseCase: IncrementTaskPriorityScoreUseCase,
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
+    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -66,6 +69,10 @@ class PriorityMiddleware(
 
             is UndoTaskPriorityUpdateAction -> scope.launch {
                 updateTaskPriorityScoreUseCase(action.taskId, action.score)
+            }
+
+            is UpdatePlannedTasksPriorityScore -> scope.launch {
+                updatePlannedTasksPriorityUseCase()
             }
 
             else -> NoOp
