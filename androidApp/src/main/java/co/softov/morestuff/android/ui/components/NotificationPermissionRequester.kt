@@ -17,7 +17,7 @@ import com.google.accompanist.permissions.shouldShowRationale
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionRequester() {
+fun NotificationPermissionRequester() {
 
     // Camera permission state
     val permissionState = rememberPermissionState(

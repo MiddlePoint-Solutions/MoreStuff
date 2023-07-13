@@ -27,13 +27,15 @@ val ColorScheme.appChatItem: Color
     get() = Indigo200
 
 private val darkColors = darkColorScheme(
-    primary = BlueGray600,
+    primary = Color(73, 69, 79),
     primaryContainer = BlueGray900,
     onPrimary = Color.White,
     secondary = Orange500,
     secondaryContainer = Orange600,
     onSecondary = Color.White,
     error = Red200,
+    background = Color(30, 31, 45),
+    surface = Color(39, 40, 53)
 )
 
 @Composable

@@ -22,13 +22,6 @@ fun PrioritySelector(
     onPrioritySelected: (PriorityUI) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
-    val priorityButtons = remember {
-        listOf(
-            Now, Later, Plan
-        )
-    }
-
     Surface(
         modifier = modifier,
         shadowElevation = 8.dp

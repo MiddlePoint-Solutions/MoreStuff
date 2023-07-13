@@ -39,6 +39,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -147,8 +148,11 @@ fun PriorityContent(
             contentPadding = PaddingValues(bottom = 130.dp),
             horizontalAlignment = Alignment.End
         ) {
-            items(viewModel.tasks, key = { it.id }) { task ->
-                val item by rememberUpdatedState(task)
+            items(
+                items = viewModel.tasks,
+                key = { task -> task.id }
+            ) {
+                val task by rememberUpdatedState(it)
 
                 val dismissState = rememberNoFlingDismissState(
                     positionalThreshold = { 130.dp.toPx() },
@@ -156,12 +160,12 @@ fun PriorityContent(
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                taskOptions = item
+                                taskOptions = task
                                 false
                             }
 
                             DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(item)
+                                viewModel.toggleReminder(task)
                                 false
                             }
                         }
@@ -186,15 +190,15 @@ fun PriorityContent(
                     }
                 })
 
-                ReorderableItem(state, key = item.id) { isDragging ->
+                ReorderableItem(state, key = task.id) { isDragging ->
                     NoFlingSwipeToDismiss(
                         state = dismissState,
-                        background = { SwipeBackground(dismissState, item.hasReminder) },
+                        background = { SwipeBackground(dismissState, task.hasReminder) },
                         dismissContent = {
                             PriorityItem(
-                                task = item,
+                                task = task,
                                 onClick = showTaskChat,
-                                if (!item.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
                                 isDragging = isDragging
                             )
                         }
@@ -205,8 +209,9 @@ fun PriorityContent(
                         modifier = Modifier.align(Alignment.BottomEnd)
                     ) {
                         Divider(
-                            thickness = 0.7.dp,
-                            modifier = Modifier.fillMaxWidth(0.8f)
+                            thickness = 0.5.dp,
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                            color = Color.Black.copy(alpha = 0.7f)
                         )
                     }
 
