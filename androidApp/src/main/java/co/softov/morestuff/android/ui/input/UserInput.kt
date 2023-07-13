@@ -6,9 +6,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.ui.components.PermissionRequester
-import co.softov.morestuff.android.ui.priority.PriorityInput
-import org.koin.androidx.compose.koinViewModel
+import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 
 @Composable
 fun UserInput(
@@ -19,12 +17,10 @@ fun UserInput(
     onSubmitInput: (String) -> Unit = {},
 ) {
     Column(modifier.imePadding()) {
-
         priorityContent()
-
         Surface(shadowElevation = 9.dp) {
             Column(modifier = modifier) {
-                PermissionRequester()
+                NotificationPermissionRequester()
                 UserTextInput(
                     initialValue = initialValue,
                     listAction = showTaskLists,

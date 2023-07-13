@@ -33,7 +33,6 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.list.ListsContent
 import co.softov.morestuff.android.ui.priority.PriorityInput
-import co.softov.morestuff.android.ui.schedule.ConfettiPopAnimation
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
@@ -97,74 +96,72 @@ fun HomeContent(
         )
     }
 
-    Surface {
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxSize()
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        PriorityContent(
+            snackBarHostState = snackbarHostState,
+            showTaskChat = showTaskChat,
+            modifier = Modifier.fillMaxSize(),
+            listState = priorityScrollState,
+            onItemDragging = { visibleState.targetState = !it }
+        )
+
+        SlideAnimation(
+            visibleState = visibleState,
         ) {
+            Box {
 
-            PriorityContent(
-                snackBarHostState = snackbarHostState,
-                showTaskChat = showTaskChat,
-                modifier = Modifier.fillMaxSize(),
-                listState = priorityScrollState,
-                onItemDragging = { visibleState.targetState = !it }
-            )
-
-            SlideAnimation(
-                visibleState = visibleState,
-            ) {
-                Box {
-
-                    val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-                        bottomSheetState = rememberStandardBottomSheetState(
-                            skipHiddenState = true
-                        )
+                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
+                    bottomSheetState = rememberStandardBottomSheetState(
+                        skipHiddenState = true
                     )
+                )
 
-                    ConstraintLayout {
-                        val (bottomSheet, userInput) = createRefs()
+                ConstraintLayout {
+                    val (bottomSheet, userInput) = createRefs()
 
-                        Box(
-                            modifier = Modifier
-                                .constrainAs(bottomSheet) { bottom.linkTo(userInput.top) }
-                                .fillMaxSize(),
-                        ) {
-                            BottomSheetScaffold(
-                                scaffoldState = bottomSheetScaffoldState,
-                                sheetContent = {
-                                    Messages(
-                                        messages = messages,
-                                        actions = chatActions,
-                                        modifier = modifier,
-                                        scrollState = chatScrollState
-                                    )
-                                },
-                                sheetPeekHeight = 30.dp
-                            ) {}
-                        }
-
-                        UserInput(
-                            modifier = Modifier
-                                .constrainAs(userInput) { bottom.linkTo(parent.bottom) }
-                                .imePadding(),
-                            priorityContent = {
-                                PriorityInput(
-                                    priority = userInputViewModel.priorityModel,
-                                    planModel = userInputViewModel.planModel,
-                                    onPriorityChange = userInputViewModel::priorityChanged,
-                                    onTimeChange = userInputViewModel::updatePlanTime,
-                                    onDateChange = userInputViewModel::updatePlanDate,
+                    Box(
+                        modifier = Modifier
+                            .constrainAs(bottomSheet) { bottom.linkTo(userInput.top) }
+                            .fillMaxSize(),
+                    ) {
+                        BottomSheetScaffold(
+                            scaffoldState = bottomSheetScaffoldState,
+                            sheetContent = {
+                                Messages(
+                                    messages = messages,
+                                    actions = chatActions,
+                                    modifier = modifier,
+                                    scrollState = chatScrollState
                                 )
                             },
-                            showTaskLists = { showTaskLists = true },
-                            onSubmitInput = {
-                                userInputViewModel.createNewTask(it)
-                                scope.launch {
-                                    delay(200)
-                                    priorityScrollState.animateScrollToItem(index = 0)
-                                }
-                            })
+                            sheetPeekHeight = 30.dp
+                        ) {}
                     }
+
+                    UserInput(
+                        modifier = Modifier
+                            .constrainAs(userInput) { bottom.linkTo(parent.bottom) }
+                            .imePadding(),
+                        priorityContent = {
+                            PriorityInput(
+                                priority = userInputViewModel.priorityModel,
+                                planModel = userInputViewModel.planModel,
+                                onPriorityChange = userInputViewModel::priorityChanged,
+                                onTimeChange = userInputViewModel::updatePlanTime,
+                                onDateChange = userInputViewModel::updatePlanDate,
+                            )
+                        },
+                        showTaskLists = { showTaskLists = true },
+                        onSubmitInput = {
+                            userInputViewModel.createNewTask(it)
+                            scope.launch {
+                                delay(200)
+                                priorityScrollState.animateScrollToItem(index = 0)
+                            }
+                        })
                 }
             }
         }
