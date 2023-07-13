@@ -73,7 +73,6 @@ fun UserTextInput(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primary)
                 .semantics {
                     contentDescription = a11ylabel
                 },

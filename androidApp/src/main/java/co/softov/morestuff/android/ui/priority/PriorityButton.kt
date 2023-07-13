@@ -52,9 +52,10 @@ fun PriorityButton(
     val backgroundColor by animateColorAsState(
         targetValue = when (selected) {
             true -> MaterialTheme.colorScheme.secondaryContainer
-            else -> MaterialTheme.colorScheme.primary
+            else -> MaterialTheme.colorScheme.surface
         },
-        animationSpec = tween(300, easing = FastOutSlowInEasing)
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Background Color Animation"
     )
 
     val textColor by animateColorAsState(
@@ -62,7 +63,8 @@ fun PriorityButton(
             true -> MaterialTheme.colorScheme.onSecondary
             else -> MaterialTheme.colorScheme.onPrimary
         },
-        animationSpec = tween(300, easing = FastOutSlowInEasing)
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Text Color Animation"
     )
 
     Button(
