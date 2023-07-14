@@ -47,9 +47,9 @@ class SchedulerImpl(
 
     override fun schedulePlannedPriorityUpdate() {
         PeriodicWorkRequestBuilder<PlannedPriorityUpdateWorker>(
-            repeatInterval = 1,
-            repeatIntervalTimeUnit = TimeUnit.HOURS,
-            flexTimeInterval = 15,
+            repeatInterval = 20,
+            repeatIntervalTimeUnit = TimeUnit.MINUTES,
+            flexTimeInterval = 2,
             flexTimeIntervalUnit = TimeUnit.MINUTES
         ).build().also { request ->
             workManager.enqueueUniquePeriodicWork(

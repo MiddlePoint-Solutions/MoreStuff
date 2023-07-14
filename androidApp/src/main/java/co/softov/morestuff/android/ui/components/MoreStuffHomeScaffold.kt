@@ -2,6 +2,8 @@ package co.softov.morestuff.android.ui.components
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,6 +14,7 @@ import co.softov.morestuff.android.ui.drawer.DrawerLayout
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
@@ -25,6 +28,13 @@ fun MoreStuffHomeScaffold(
     val closeDrawer: () -> Unit = remember {
         { scope.launch { drawerState.close() } }
     }
+
+    val dismissSnackbarState = rememberDismissState(
+        confirmValueChange = { _ ->
+            snackbarHostState.currentSnackbarData?.dismiss()
+            true
+        }
+    )
 
     BackHandler(enabled = drawerState.isOpen) {
         if (drawerState.isOpen) {
@@ -47,7 +57,17 @@ fun MoreStuffHomeScaffold(
         content = {
             Scaffold(
                 modifier = Modifier.systemBarsPadding(),
-                snackbarHost = { SnackbarHost(snackbarHostState) },
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState) { data ->
+                        SwipeToDismiss(
+                            state = dismissSnackbarState,
+                            background = {},
+                            dismissContent = { Snackbar(snackbarData = data) },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                        )
+                    }
+                },
                 topBar = {
                     MoreStuffTopBar(
                         openDrawer = { scope.launch { drawerState.open() } },
