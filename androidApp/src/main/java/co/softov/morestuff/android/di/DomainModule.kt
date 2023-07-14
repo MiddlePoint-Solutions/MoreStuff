@@ -276,7 +276,7 @@ val messageUseCases = module {
     factory<HandleImagesUseCase> { HandleImagesUseCaseImpl(messageRepository = get(), timeManager = get()) }
     factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
-    factoryOf (::CreateMessageWithImageUseCaseImpl) bind CreateMessageWithImageUseCase::class
+    factoryOf (::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
 }
 
 

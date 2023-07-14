@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.task
 
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -71,7 +72,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -100,11 +100,11 @@ import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonNull.content
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @Composable
 fun ProvideLocalViewModelStoreOwner(
@@ -165,14 +165,15 @@ private fun TaskChatContent(
             openBottomSheet = false
         }
     }
-    val context = LocalContext.current
+
 
     ///// -->> https://developer.android.com/training/data-storage/shared/photopicker
-    val pickMultipleMedia =
+    val pickImage =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uris ->
             if (uris != null) {
+                Timber.d("\"IMAGE\", \"Image URIs: $uris\"")
                 scope.launch {
-                    viewModel.sendImageMessageForTask(content, uris, context)
+                    viewModel.sendImageMessageForTask( uris)
                 }
             }
         }
@@ -235,7 +236,7 @@ private fun TaskChatContent(
                         ) {
                             TaskMessageTextField(
                                 sendMessageForTask = viewModel::sendMessageForTask,
-                                pickImages = { pickMultipleMedia.launch(PickVisualMediaRequest( ////<<<------
+                                pickImages = { pickImage.launch(PickVisualMediaRequest( ////<<<------
                                     ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }  ////<<<------
                             )
                         }
@@ -563,6 +564,7 @@ fun TaskMessageTextField(
             onValueChange = { newText -> messageText = newText },
             enabled = true,
             modifier = Modifier
+                .weight(8f)
                 .fillMaxWidth(0.88f)
                 .defaultMinSize(minHeight = 46.dp)
                 .padding(
@@ -604,7 +606,7 @@ fun TaskMessageTextField(
 
         IconButton(
             onClick = pickImages,
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
         ) {
             Icon(Icons.Filled.PhotoLibrary, contentDescription = "select images")
         }
@@ -616,7 +618,7 @@ fun TaskMessageTextField(
                     messageText = ""
                 }
             },
-            modifier = Modifier.align(Alignment.CenterVertically)
+            modifier = Modifier.align(Alignment.CenterVertically).weight(1f).padding(end = 8.dp, start = 3.dp)
         ) {
             Icon(Icons.Filled.Send, contentDescription = "send mensaje")
         }

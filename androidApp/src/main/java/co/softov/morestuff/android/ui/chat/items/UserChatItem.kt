@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,7 +35,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
@@ -45,19 +44,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
-import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageWithData
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import coil.imageLoader
+import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import java.io.File
+import timber.log.Timber
 
 @Composable
 fun UserChatItem(
@@ -112,16 +111,31 @@ fun UserChatItem(
                         showMenu = true
                     }
             ) {
-                if (message.imagePath != null) {
-                    ImageWithCoilCompose(
-                        dataForMessage = message.imagePath,
+                LaunchedEffect(Unit) {
+                    Timber.d("IMAGE: message: $message")
+                }
+                if (message.messageWithData?.filePath != null) {
+                    LaunchedEffect(Unit) {
+                        Timber.d("IMAGE %s", "Displaying image: ${message.messageWithData.filePath}")
+                    }
+                    Surface(
+                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        color = MaterialTheme.colorScheme.userChatItem,
+                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                         modifier = Modifier
-                            .fillMaxSize()
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp)),
-                        message,
-                        actions
-                    )
+                            .size(200.dp)  // Size of image
+                            .padding(2.dp)  // Padding for border
+                            .aspectRatio(1F)
+                    ) {
+                        ShowImage(
+                            messageWithData = message.messageWithData,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                        )
+                    }
+
                 } else {
                     Surface(
                         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
@@ -152,101 +166,53 @@ fun UserChatItem(
                         }
                     }
                 }
-            }
 
-            if (openGraphResult?.title != null && openGraphResult.description != null) {
-                OpenGraphPreview(openGraphResult)
-            }
+                if (openGraphResult?.title != null && openGraphResult.description != null) {
+                    OpenGraphPreview(openGraphResult)
+                }
 
-            ShowContextMenu(
-                message,
-                onCopyMessage = actions.copyMessage,
-                onDeleteMessage = actions.deleteMessage,
-                showMenu = showMenu,
-                onClose = {
-                    showMenu = false
-                },
-                modifier = Modifier.padding(top = 20.dp)
-            )
+                ShowContextMenu(
+                    message,
+                    onCopyMessage = actions.copyMessage,
+                    onDeleteMessage = actions.deleteMessage,
+                    showMenu = showMenu,
+                    onClose = {
+                        showMenu = false
+                    },
+                    modifier = Modifier.padding(top = 20.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-fun ImageWithCoilCompose(
-    dataForMessage: DataForMessage,
+fun ShowImage(
+    messageWithData: MessageWithData,
     modifier: Modifier = Modifier,
-    message: Message,
-    actions: ChatActions,
 ) {
-    val context = LocalContext.current
-    val imagePainter = rememberAsyncImagePainter(dataForMessage.filePath)
-    var showMenu by remember { mutableStateOf(false) }
-    var showImage by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val haptic = LocalHapticFeedback.current
+    val uri: Uri = Uri.parse(messageWithData.filePath)
+    Timber.d("IMAGE show", "Attempting to load image from: $uri")
 
-    var pressJob: Job? = null
 
     Image(
-        painter = imagePainter,
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = uri).apply(block = fun ImageRequest.Builder.() {
+                crossfade(true)
+            }).build(), imageLoader = LocalContext.current.imageLoader
+        ),
         contentDescription = null,
         modifier = modifier
+            .aspectRatio(1f)
+            .size(200.dp)
             .rotate(90F)
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = { offset ->
-                        pressJob = scope.launch {
-                            delay(500)
-                            showMenu = true
-                        }
-                        val success = tryAwaitRelease()
-                        pressJob?.cancel()
-
-                        if (success && !showMenu) {
-                            val uri = FileProvider.getUriForFile(
-                                context,
-                                "${context.packageName}.fileprovider",
-                                File(dataForMessage.filePath)
-                            )
-                            val intent = Intent(Intent.ACTION_VIEW).apply {
-                                setDataAndType(uri, "image/*")
-                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            }
-                            context.startActivity(intent)
-                            showImage = true
-                        }
-                    }
-                )
-            }
+            .border(2.dp, MaterialTheme.colorScheme.userChatItem, RoundedCornerShape(8.dp))
     )
-
-    if (showMenu) {
-        ShowContextMenu(
-            message,
-            onCopyMessage = actions.copyMessage,
-            onDeleteMessage = actions.deleteMessage,
-            showMenu = showMenu,
-            onClose = {
-                showMenu = false
-            },
-            modifier = Modifier.padding(top = 20.dp)
-        )
-    }
-
-    LaunchedEffect(key1 = showMenu, block = {
-        if (showMenu) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
-    })
-
-    LaunchedEffect(key1 = showImage, block = {
-        if (showImage) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            showImage = false
-        }
-    })
 }
+
+
+
+
 
 
 @Composable

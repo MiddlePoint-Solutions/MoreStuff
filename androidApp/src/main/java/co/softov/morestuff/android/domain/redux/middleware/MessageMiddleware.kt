@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import android.content.Context
 import android.net.Uri
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
@@ -12,8 +11,8 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateS
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.CreateMessageWithImageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
@@ -24,8 +23,7 @@ sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
-    internal data class CreateImageMessageAction(val taskId: Long, val content: String, val uris: Uri, val context: Context) :
-        MessageAction()
+    internal data class CreateImageMessageAction(val taskId: Long, val filePath: Uri) : MessageAction()
 }
 
 class MessageMiddleware(
@@ -33,9 +31,9 @@ class MessageMiddleware(
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
-    private val createMessageWithImageUseCase: CreateMessageWithImageUseCase,
+    private val createImageMessageUseCase: CreateImageMessageUseCase,
 
-) : Middleware<AppState> {
+    ) : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
@@ -57,17 +55,21 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE)
+                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, messageWithData = null)
             }
             is MessageAction.CreateImageMessageAction -> scope.launch {
-                createMessageWithImageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, 0, action.uris, action.context)
+                createImageMessageUseCase(action.taskId, scheduleId = 0,
+                    contentType = ContentType.TASK_MESSAGE, filePath = action.filePath,
+                    )
             }
+
 
             is TaskAction.TaskCreatedAction -> scope.launch {
                 createMessageUseCase(
                     action.task.id,
                     title = action.task.title,
-                    contentType = ContentType.USER_NEW_TASK
+                    contentType = ContentType.USER_NEW_TASK,
+                    messageWithData = null
                 )
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }

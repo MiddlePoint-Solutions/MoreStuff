@@ -16,6 +16,7 @@ import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
+import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
@@ -84,7 +85,9 @@ val dataModule = module {
             selectMasterMessagesMapper = SelectMasterMessagesMapper(timeFormatter = get()),
             selectMessageByTaskIdMapper = SelectMessageByTaskIdMapper(timeFormatter = get()),
             selectMessageByIdMapper = SelectMessageByIdMapper(timeFormatter = get()),
-            timeManager = get()
+            imageMessageDataMapper = makeMessageWithDataMapper(),
+            timeManager = get(),
+            context = get()
         )
     }
 

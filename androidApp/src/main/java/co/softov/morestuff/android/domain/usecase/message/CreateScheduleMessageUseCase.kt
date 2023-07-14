@@ -18,7 +18,7 @@ class CreateScheduleMessageUseCaseImpl(
     override suspend fun invoke(scheduleId: Long): Either<Failure,Message> {
         return getTaskForScheduleUseCase(scheduleId).fold(
             ifRight = { task ->
-                createMessageUseCase(task.id, task.title, ContentType.TASK_REMINDER, scheduleId)
+                createMessageUseCase(task.id, task.title, ContentType.TASK_REMINDER, messageWithData = null, scheduleId)
             },
             ifLeft = {
                 Either.Left(it)

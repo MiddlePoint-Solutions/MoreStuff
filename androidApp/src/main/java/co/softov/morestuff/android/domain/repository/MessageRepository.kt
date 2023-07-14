@@ -1,15 +1,14 @@
 package co.softov.morestuff.android.domain.repository
 
 
-import android.content.Context
 import android.net.Uri
 import arrow.core.Either
-import co.softov.morestuff.android.domain.model.DataForMessage
+import co.softov.morestuff.android.domain.model.MessageWithData
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
@@ -20,14 +19,17 @@ interface MessageRepository {
 
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
+
     fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>>
 
     fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>>
+
 
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
+        messageWithData: MessageWithData?,
         content: String,
     ): Either<Failure, Message>
 
@@ -41,9 +43,13 @@ interface MessageRepository {
 
     suspend fun insertUrlMetadata(url: String, openGraphResult: OpenGraphResult, messageId: Long)
 
-    suspend fun insertMessageData(dataForMessage: DataForMessage)
+    suspend fun insertMessageData(messageWithData: MessageWithData)
 
-    suspend fun handleImages(uris: Uri, context: Context, timeManager: TimeManager, id: Long)
+    suspend fun handleImages(
+        uris: Uri,
+        timeManager: TimeManager,
+        id: Long,
+    ): MessageWithData
 
     suspend fun deleteMessage(messageId: Long)
 

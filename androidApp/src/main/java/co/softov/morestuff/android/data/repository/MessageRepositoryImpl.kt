@@ -6,6 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import co.softov.morestuff.android.data.mapper.ImageMessageDataMapper
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
 import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
@@ -13,13 +16,15 @@ import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
 import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.model.DataForMessage
+import co.softov.morestuff.android.domain.enums.MessageDataType
+import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageWithData
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
@@ -30,6 +35,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
+import timber.log.Timber
 import java.io.FileOutputStream
 import java.nio.file.Path
 
@@ -40,7 +46,9 @@ class MessageRepositoryImpl(
     private val selectMasterMessagesMapper: SelectMasterMessagesMapper,
     private val selectMessageByTaskIdMapper: SelectMessageByTaskIdMapper,
     private val selectMessageByIdMapper: SelectMessageByIdMapper,
+    private val imageMessageDataMapper: ImageMessageDataMapper,
     private val timeManager: TimeManager,
+    private val context: Context,
 ) : MessageRepository {
 
     private val messageQueries = database.messageQueries
@@ -61,6 +69,38 @@ class MessageRepositoryImpl(
         ).asFlow().mapToList().map { mapList(it, mapMessageTaskChatDb) }
     }
 
+
+/*   override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
+       val mapper = makeMessageWithDataMapper()
+       return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
+           .asFlow()
+           .mapToList()
+           .map { messages ->
+               messages.map { message ->
+                   mapper(
+                       message.id,
+                       message.task_id,
+                       message.schedule_id,
+                       ContentType.valueOf(message.content_type.toString()),
+                       message.create_time,
+                       message.seen_time,
+                       message.content,
+                       ReplyType.valueOf(message.reply_type.toString()),
+                       message.reply_content,
+                       message.reply_time,
+                       message.json_data,
+                       message.id,
+                       message.data_type,
+                       message.creation_time,
+                       MessageDataType.valueOf(message.data_type.toString())
+                   )
+               }
+           }
+   }*/
+
+
+
+
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, selectMessageByTaskIdMapper) }
@@ -72,31 +112,58 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
-        return when (val message =
-            messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
-            null -> Either.Left(MessageDoesNotExist)
-            else -> Either.Right(selectMessageByIdMapper(message))
+        return when (val message = messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
+            null -> MessageDoesNotExist.left()
+            else -> imageMessageDataMapper(
+                message.id,
+                message.task_id,
+                message.schedule_id,
+                ContentType.valueOf(message.content_type.toString()),
+                message.create_time,
+                message.seen_time,
+                message.content,
+                ReplyType.valueOf(message.reply_type.toString()),
+                message.reply_content,
+                message.reply_time,
+                message.json_data,
+                message.id,
+                message.data_type,
+                message.creation_time,
+                MessageDataType.valueOf(message.data_type.toString())
+
+            ).right()
         }
     }
+
+
 
     override suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
+        messageWithData: MessageWithData?,
         content: String,
-    ): Either<Failure, Message> {
-        val messageId: Long = messageQueries.transactionWithResult {
-            messageQueries.insertMessage(
-                task_id = taskId,
-                schedule_id = scheduleId,
-                create_time = timeManager.getCreateTime(),
-                content_type = contentType,
-                content = content
+    ): Either<Failure, Message> = messageQueries.transactionWithResult {
+        messageQueries.insertMessage(
+            task_id = taskId,
+            schedule_id = scheduleId,
+            create_time = timeManager.getCreateTime(),
+            content_type = contentType,
+            content = content
+        )
+        val messageId = lastInsertId
+        messageWithData?.let {
+            messageDataQueries.insertMessageData(
+                message_id = messageId,
+                file_path = messageWithData.filePath,
+                creation_time = timeManager.getCreateTime(),
+                data_type = messageWithData.messageType.name
             )
-            lastInsertId
         }
-        return getMessage(messageId)
-    }
+        messageQueries.selectMessageById(messageId).executeAsOneOrNull()
+    }?.let { Either.Right(selectMessageByIdMapper(it)) }
+        ?: Either.Left(MessageDoesNotExist)
+
 
     override suspend fun addUserReplyMessage(
         taskId: Long,
@@ -197,40 +264,55 @@ class MessageRepositoryImpl(
         )
     }
 
-    override suspend fun insertMessageData(dataForMessage: DataForMessage) {
-        val dataForMessageJson = Json.encodeToString(dataForMessage)
+    override suspend fun insertMessageData(messageWithData: MessageWithData) {
         messageDataQueries.insertMessageData(
-            dataForMessage.id,
-            dataForMessage.fileName,
-            dataForMessage.filePath,
-            dataForMessage.creationTime,
-            json_data_message = dataForMessageJson
+            messageWithData.id,
+            messageWithData.filePath,
+            messageWithData.creationTime,
+            messageWithData.messageType.name
         )
     }
-    override suspend fun handleImages(uris: Uri, context: Context, timeManager: TimeManager, id: Long) {
 
-            val contentResolver = context.contentResolver
-            val inputStream = contentResolver.openInputStream(uris)
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
-
-            val imageFile = createImageFile(timeManager).toFile()
-
-            val outputStream = FileOutputStream(imageFile)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+    override suspend fun handleImages(
+        uris: Uri,
+        timeManager: TimeManager,
+        id: Long,
+    ): MessageWithData {
+        Timber.d("handleImages", "Received URI: $uris")
+        val contentResolver = context.contentResolver
+        val inputStream = contentResolver.openInputStream(uris)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
+        if (bitmap == null) {
+            Timber.e("Failed to decode image stream.")
+        }
+        val imageFile = createImageFile(timeManager).toFile()
+        Timber.d("Created image file: ${imageFile.name}")
+        val outputStream = withContext(Dispatchers.IO) {
+            FileOutputStream(imageFile)
+        }
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
             outputStream.close()
 
-            val path = imageFile.absolutePath
-            val fileName = path.split("/").last()
-            val creationTime = System.currentTimeMillis().toString()
-            val dataForMessage = DataForMessage(id, fileName, path, creationTime)
-            insertMessageData(dataForMessage)
+        Timber.d("handleImages", "Image compressed and saved to: ${imageFile.absolutePath}")
 
+        val path = imageFile.absolutePath
+        val messageWithData = MessageWithData(
+            id,
+            path,
+            creationTime = timeManager.getCreateTime(),
+            messageType = MessageDataType.Image
+        )
+        insertMessageData(messageWithData)
+        Timber.d("MessageRepositoryImpl", "Created MessageWithData: $messageWithData")
+        return messageWithData
     }
+
 
     fun createImageFile(timeManager: TimeManager): Path {
         val currentMoment = timeManager.nowLocalDateTime
-        val timeStamp = "${currentMoment.year}${currentMoment.monthNumber}${currentMoment.dayOfMonth}_${currentMoment.hour}${currentMoment.minute}${currentMoment.second}"
+        val timeStamp =
+            "${currentMoment.year}${currentMoment.monthNumber}${currentMoment.dayOfMonth}_${currentMoment.hour}${currentMoment.minute}${currentMoment.second}"
         val imageFileName = "JPEG_" + timeStamp + "_"
         return kotlin.io.path.createTempFile(prefix = imageFileName, suffix = ".jpg")
     }

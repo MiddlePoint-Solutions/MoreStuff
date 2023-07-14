@@ -1,13 +1,14 @@
 package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.DataForMessage
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.db.SelectTaskMessagesByContentType
 import kotlinx.serialization.json.Json
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageWithData
 
 typealias SelectTaskMessagesByContentTypeMapper = (SelectTaskMessagesByContentType) -> Message
 
@@ -20,7 +21,17 @@ fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByC
     val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
     val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
     val openGraphResult = input.json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
-    val dataForMessage = input.json_data_message?.let {Json.decodeFromString<DataForMessage>(it)}
+    val messageWithData = if (input.file_path != null) {
+        MessageWithData(
+            id = input.id ,
+            filePath = input.file_path,
+            creationTime = createTime?: "",
+            messageType = MessageDataType.Image
+        )
+    } else {
+        null
+    }
+
     return Message(
         id = input.id,
         taskId = input.task_id,
@@ -33,6 +44,6 @@ fun mapSelectTaskMessagesByContentTypeToMessageData(input: SelectTaskMessagesByC
         replyContent = input.reply_content,
         replyTime = replyTime,
         openGraphResult = openGraphResult,
-        imagePath = dataForMessage
+        messageWithData = messageWithData
     )
 }

@@ -1,24 +1,32 @@
 package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageWithData
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.db.SelectMessageById
 import kotlinx.serialization.json.Json
 
 typealias SelectMessageByIdMapper = (SelectMessageById) -> Message
 
-fun SelectMessageByIdMapper(timeFormatter: TimeFormatter): (SelectMessageById) -> Message = { SelectMessageById ->
-    mapSelectMessageByIdMessageData(SelectMessageById, timeFormatter)
+fun SelectMessageByIdMapper(timeFormatter: TimeFormatter, ): (SelectMessageById) -> Message = { SelectMessageById ->
+    mapSelectMessageByIdMessageData(SelectMessageById, timeFormatter, )
 }
 
-fun mapSelectMessageByIdMessageData(input: SelectMessageById, timeFormatter: TimeFormatter): Message {
+fun mapSelectMessageByIdMessageData(input: SelectMessageById, timeFormatter: TimeFormatter ): Message {
     val createTime = timeFormatter.formatTimeOnly(input.create_time)
     val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
     val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
     val openGraphResult = input.json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
+    val messageWithData = MessageWithData(
+        id = input.id ,
+        filePath = input.file_path?: "" ,
+        creationTime = createTime?: "",
+        messageType = MessageDataType.Image
+    )
     return Message(
         id = input.id,
         taskId = input.task_id,
@@ -31,6 +39,6 @@ fun mapSelectMessageByIdMessageData(input: SelectMessageById, timeFormatter: Tim
         replyContent = input.reply_content,
         replyTime = replyTime,
         openGraphResult = openGraphResult,
-        imagePath = null
+        messageWithData = messageWithData
     )
 }

@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 
 interface FetchOpenGraphMetadataUseCase {
     suspend operator fun invoke(inputUrl: String): OpenGraphResult?
