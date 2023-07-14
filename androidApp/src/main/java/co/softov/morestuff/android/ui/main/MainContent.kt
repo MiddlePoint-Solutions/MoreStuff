@@ -20,6 +20,7 @@ import co.softov.morestuff.android.ui.share.ShareScreen
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
@@ -52,7 +53,7 @@ fun MainContent(
             }
         },
         handleBackButton = true,
-        animation = stackAnimation(fade() + scale()),
+        animation = stackAnimation(slide() + fade()),
     ) { screen ->
         when (screen) {
 
