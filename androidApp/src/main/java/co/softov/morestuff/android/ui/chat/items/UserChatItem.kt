@@ -193,7 +193,7 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Preview
 @Composable
 fun UserChatItemPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }

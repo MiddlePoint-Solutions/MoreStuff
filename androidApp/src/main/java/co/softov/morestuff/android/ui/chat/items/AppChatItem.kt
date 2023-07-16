@@ -98,7 +98,7 @@ fun TaskReminderItem(message: Message, actions: ChatActions) {
 @Composable
 fun AppChatItemPreview() {
 
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         AppChatItem(
             message = MockData.Message.userNewTask.copy(contentType = ContentType.TASK_REMINDER),
             chatActions = ChatActions()

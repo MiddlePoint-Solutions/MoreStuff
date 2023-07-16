@@ -142,7 +142,7 @@ fun PriorityItemPreview() {
 @Preview
 @Composable
 fun PriorityItemPreviewDark() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         PriorityItem(task = TaskDomain(title = "Buy milk & bread"), onClick = {})
     }
 }

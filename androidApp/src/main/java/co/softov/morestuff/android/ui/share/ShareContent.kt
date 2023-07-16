@@ -152,7 +152,7 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
 @Preview
 @Composable
 fun ShareContentPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         ShareContent(
             shareable = Shareable.Text,
             content = "",

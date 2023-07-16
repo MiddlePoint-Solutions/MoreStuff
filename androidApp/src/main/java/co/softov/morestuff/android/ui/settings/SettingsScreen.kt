@@ -1,9 +1,6 @@
 package co.softov.morestuff.android.ui.settings
 
-import android.app.Activity
-import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,12 +10,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.SmartButton
-import androidx.compose.material.icons.filled.SmartScreen
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -28,89 +25,71 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGE
 import co.softov.morestuff.android.data.Constants.KEY_ENABLED_STATE_SNOOZE_LIMIT
-import co.softov.morestuff.android.data.Constants.KEY_KEEP_DEVICE_SCREEN_ON
 import co.softov.morestuff.android.data.Constants.KEY_REMINDER_DEBUGGING_DELAY_STATE
 import co.softov.morestuff.android.data.Constants.KEY_REMINDER_DEBUGGING_SWITCH_STATE
 import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_ENABLED
 import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_STORAGE
 import co.softov.morestuff.android.data.Constants.KEY_USER_SNOOZE_LIMIT
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.AppTheme
 import com.alorma.compose.settings.storage.base.rememberBooleanSettingState
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.rememberKoinInject
-
 
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
-    viewModel: SettingsViewModel = koinViewModel(),
-    devTools: DevTools = rememberKoinInject(),
+    viewModel: SettingsViewModel = koinViewModel()
 ) {
-    SettingsContent(
-        onBack = onBack,
-        onSnoozeLimit = viewModel::onSnoozeLimitChanged,
-        onClearActiveMessages = viewModel::clearPendingMessages,
-        onTestReviewActivity = viewModel::testReviewActivity,
-        onSmartReminder = viewModel::smartReminderEnabled,
-        devTools = devTools // TODO: This is better moved into the settings ViewModel
-    )
-}
 
-@Composable
-private fun SettingsContent(
-    scrollState: ScrollState = rememberScrollState(),
-    onBack: () -> Unit,
-    onSnoozeLimit: (Int) -> Unit,
-    onClearActiveMessages: () -> Unit,
-    onTestReviewActivity: () -> Unit,
-    onSmartReminder: (Boolean) -> Unit,
-    devTools: DevTools,
-) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        SettingsTopBar(navigateBackSettings = onBack)
+    val scrollState = rememberScrollState()
 
+    Scaffold(
+        topBar = { SettingsTopBar(navigateBackSettings = onBack) }
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
+                .padding(it)
                 .verticalScroll(scrollState)
         ) {
-            SelectTheme()
-            SelectSnoozeLimit(onSnoozeLimitChanged = onSnoozeLimit)
+            SelectTheme(themeSelected = viewModel::selectAppTheme)
+            SelectSnoozeLimit(onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             DeveloperSettings(
-                clearPendingMessages = onClearActiveMessages,
-                testReviewActivity = onTestReviewActivity,
+                clearPendingMessages = viewModel::clearPendingMessages,
+                testReviewActivity = viewModel::testReviewNotification,
             )
             DebugMessageSwitch()
             Notification()
-            KeepDeviceScreenOn(devTools = devTools)
-            ReminderDebugging(devTools = devTools)
-            SmartReminder(onSmartReminder = onSmartReminder)
+//            ReminderDebugging(devTools = viewModel)
+            SmartReminder(onSmartReminder = viewModel::smartReminderEnabled)
             Divider(
                 color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
             )
             About()
         }
     }
+
+
 }
 
 @Composable
 fun DebugMessageSwitch() {
-    val memoryStorage =
-        rememberMultiplatformBooleanSettingState(KEY_DEBUG_MESSAGE, false)
+    val memoryStorage = rememberMultiplatformBooleanSettingState(KEY_DEBUG_MESSAGE, false)
 
     Row(
         modifier = Modifier
@@ -124,7 +103,9 @@ fun DebugMessageSwitch() {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Message,
-                    contentDescription = "Debug Messages") },
+                    contentDescription = "Debug Messages"
+                )
+            },
             title = {
                 Text(
                     text = "Debug Messages",
@@ -146,20 +127,17 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
     TopAppBar(
         title = {
             Text(
-                text = "Settings",
+                text = stringResource(id = R.string.settings),
                 fontSize = 25.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 98.dp)
             )
         },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
         navigationIcon = {
             IconButton(onClick = navigateBackSettings) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(id = R.string.cd_navigate_back),
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -168,28 +146,31 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
 }
 
 @Composable
-fun SelectTheme() {
+fun SelectTheme(
+    themeSelected: (AppTheme) -> Unit
+) {
     val enabledState = rememberBooleanSettingState(true)
-    val themeOptions = listOf("Light", "Dark", "System")
+    val themeOptions = listOf("System", "Light", "Dark")
+
     Row {
         SettingsList(
             enabled = enabledState.value,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.SelectAll,
-                    contentDescription = "Select Theme") },
-            title = {
-                Text(
-                    text = "Select Theme",
-
-                    )
+                    imageVector = Icons.Default.ColorLens,
+                    contentDescription = stringResource(R.string.cd_select_theme)
+                )
             },
+            title = {
+                Text(text = stringResource(R.string.select_theme))
+            },
+            useSelectedValueAsSubtitle = false,
             items = themeOptions,
             onItemSelected = { index, _ ->
                 when (index) {
-                    0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                    0 -> themeSelected(AppTheme.MODE_AUTO)
+                    1 -> themeSelected(AppTheme.MODE_DAY)
+                    2 -> themeSelected(AppTheme.MODE_NIGHT)
                 }
             })
     }
@@ -199,10 +180,10 @@ fun SelectTheme() {
 @Composable
 fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
     val settingSnoozeLimit = rememberMultiplatformPreferenceFloatSettingState(
-        KEY_USER_SNOOZE_LIMIT,  0F
+        KEY_USER_SNOOZE_LIMIT, 0F
     )
     val enabledState = rememberMultiplatformBooleanSettingState(
-        KEY_ENABLED_STATE_SNOOZE_LIMIT,  true
+        KEY_ENABLED_STATE_SNOOZE_LIMIT, true
     )
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -213,7 +194,9 @@ fun SelectSnoozeLimit(onSnoozeLimitChanged: (Int) -> Unit) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Snooze,
-                    contentDescription = "Snooze Limit") },
+                    contentDescription = "Snooze Limit"
+                )
+            },
             title = {
                 Text(
                     text = "Snooze Limit   ${settingSnoozeLimit.value.toInt()}",
@@ -301,51 +284,13 @@ fun Notification() {
 }
 
 @Composable
-fun KeepDeviceScreenOn(devTools: DevTools) {
-    val memoryStorage = rememberMultiplatformBooleanSettingState(KEY_KEEP_DEVICE_SCREEN_ON, false)
-    val enabledState = rememberBooleanSettingState(true)
-    val context = LocalContext.current
-    LaunchedEffect(memoryStorage.value) {
-        devTools.keepScreenOn = memoryStorage.value
-    }
-    Column(
-        horizontalAlignment = Alignment.Start
-    ) {
-        SettingsSwitch(enabled = enabledState.value,
-            state = memoryStorage,
-            modifier = Modifier.padding(end = 16.dp),
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.SmartScreen,
-                    contentDescription = "Keep device screen on") },
-            title = {
-                Text(
-                    text = "Keep device screen on",
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-            },
-            onCheckedChange = { newValue ->
-                when (newValue) {
-                    true -> (context as? Activity)?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    false -> (context as? Activity)?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                }
-                memoryStorage.value = newValue
-                devTools.keepScreenOn = newValue
-            })
-    }
-}
-
-
-@Composable
 fun ReminderDebugging(devTools: DevTools) {
-    val switchState = rememberMultiplatformBooleanSettingState(KEY_REMINDER_DEBUGGING_SWITCH_STATE, false)
-    val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState(KEY_REMINDER_DEBUGGING_DELAY_STATE, 60f)
+    val switchState =
+        rememberMultiplatformBooleanSettingState(KEY_REMINDER_DEBUGGING_SWITCH_STATE, false)
     LaunchedEffect(switchState.value) {
         devTools.debugReminders = switchState.value
     }
-    LaunchedEffect(reminderDelayState.value) {
-        devTools.todayDebugTime = reminderDelayState.value.toInt()
-    }
+
     Column {
         SettingsSwitch(
             enabled = true,
@@ -353,7 +298,9 @@ fun ReminderDebugging(devTools: DevTools) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.Alarm,
-                    contentDescription = "Reminder Debugging") },
+                    contentDescription = "Reminder Debugging"
+                )
+            },
             title = {
                 Text(
 
@@ -365,12 +312,23 @@ fun ReminderDebugging(devTools: DevTools) {
                 devTools.debugReminders = isChecked
             })
         if (switchState.value) {
+
+            val reminderDelayState = rememberMultiplatformPreferenceFloatSettingState(
+                KEY_REMINDER_DEBUGGING_DELAY_STATE,
+                60f
+            )
+            LaunchedEffect(reminderDelayState.value) {
+                devTools.todayDebugTime = reminderDelayState.value.toInt()
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
+
                 Column {
                     Text(
                         text = "Today reminder delay ${reminderDelayState.value.toInt()}",
@@ -395,7 +353,8 @@ fun ReminderDebugging(devTools: DevTools) {
 fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
     val memoryStorage =
         rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_STORAGE, false)
-    val enabledState = rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
+    val enabledState =
+        rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
 
     Column(
         horizontalAlignment = Alignment.Start,
@@ -407,7 +366,9 @@ fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
             icon = {
                 Icon(
                     imageVector = Icons.Default.SmartButton,
-                    contentDescription = "Smart Reminder") },
+                    contentDescription = "Smart Reminder"
+                )
+            },
             title = {
                 Text(
                     text = "Smart Reminder",
@@ -523,7 +484,7 @@ fun About() {
 @Preview
 @Composable
 private fun SettingsPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         SettingsScreen()
     }
 }*/

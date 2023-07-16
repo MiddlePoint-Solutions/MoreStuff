@@ -11,23 +11,30 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
+import co.softov.morestuff.android.app.util.LifecycleEventsObserver
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
-import co.softov.morestuff.android.domain.nav.Screen.*
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
@@ -38,20 +45,37 @@ class MainActivity : AppCompatActivity() {
         showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        val initialScreen = handleLaunchIntent(intent)
+
         val rootComponentContext = defaultComponentContext()
+
         setContent {
 
+            val viewModel: MainViewModel = koinViewModel()
             val navigation = remember { StackNavigation<Screen>() }
 
+            LifecycleEventsObserver(
+                onResume = { viewModel.onResume() }
+            )
+
+            val model by viewModel.model.collectAsState()
+            val initialScreen = if (model.showOnBoarding) {
+                Screen.OnBoarding
+            } else {
+                handleLaunchIntent(intent)
+            }
+
             TransparentSystemBars()
-            MoreStuffTheme {
-                Surface {
-                    ProvideComponentContext(rootComponentContext) {
-                        MainContent(
-                            initialScreen = initialScreen,
-                            navigation = navigation
-                        )
+
+            CompositionLocalProvider(LocalTheme provides model.theme) {
+                MoreStuffTheme {
+                    Surface {
+                        ProvideComponentContext(rootComponentContext) {
+                            MainContent(
+                                initialScreen = initialScreen,
+                                navigation = navigation,
+                                shareContent = viewModel::shareTextToTask
+                            )
+                        }
                     }
                 }
             }
@@ -62,7 +86,7 @@ class MainActivity : AppCompatActivity() {
                     Timber.d("onNewIntent: $screen")
                     if (screen != null) {
                         navigation.navigate {
-                            listOf(Home, screen)
+                            listOf(Screen.Home, screen)
                         }
                     }
                 }
@@ -90,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         Intent.ACTION_SEND -> {
             if ("text/plain" == intent.type) {
                 intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                    Share(Shareable.Text, it)
+                    Screen.Share(Shareable.Text, it)
                 }
             } else if (intent.type?.startsWith("image/") == true) {
                 TODO("Implement image sharing")
@@ -98,11 +122,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         ACTION_NOTIFICATION_REMINDER -> {
-            TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
+            Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
         }
 
         ACTION_NOTIFICATION_REVIEW -> {
-            Review
+            Screen.Review
         }
 
         else -> null
@@ -129,3 +153,5 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
     }
 }
+
+val LocalTheme = compositionLocalOf { AppTheme.MODE_AUTO }

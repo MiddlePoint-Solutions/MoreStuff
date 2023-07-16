@@ -19,7 +19,6 @@ import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -33,23 +32,18 @@ import org.koin.androidx.compose.koinViewModel
 fun MainContent(
     initialScreen: Screen?,
     navigation: StackNavigation<Screen>,
-    viewModel: MainViewModel = koinViewModel(),
+    shareContent: (taskId: Long, content: String) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
 
-    LifecycleEventsObserver(
-        onResume = { viewModel.onResume() }
-    )
-
-    val model = viewModel.model
-
     ChildStack(
         source = navigation,
         initialStack = {
-            when {
-                model.showOnBoarding -> listOf(OnBoarding)
-                else -> initialScreen?.let { listOf(Home, it) } ?: listOf(Home)
+            when (initialScreen) {
+                OnBoarding -> listOf(OnBoarding)
+                null -> listOf(Home)
+                else -> listOf(Home, initialScreen)
             }
         },
         handleBackButton = true,
@@ -84,7 +78,7 @@ fun MainContent(
                 shareToExistingTask = { taskId ->
                     navigation.replaceCurrent(
                         TaskChat(taskId),
-                        onComplete = { viewModel.shareTextToTask(taskId, screen.content) }
+                        onComplete = { shareContent(taskId, screen.content) }
                     )
                 },
             )

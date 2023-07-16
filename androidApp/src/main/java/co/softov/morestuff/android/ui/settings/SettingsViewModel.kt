@@ -1,12 +1,13 @@
 package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.service.Notifier
 
 class SettingsViewModel(
-    private val notifier: Notifier
+    private val devTools: DevTools,
 ) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
 
     override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
@@ -25,7 +26,11 @@ class SettingsViewModel(
         dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
     }
 
-    fun testReviewActivity() {
-        notifier.showReviewNotification()
+    fun testReviewNotification() {
+        devTools.testReviewNotification()
+    }
+
+    fun selectAppTheme(theme: AppTheme) {
+        dispatchAppStoreAction(SettingAction.SetAppTheme(theme))
     }
 }

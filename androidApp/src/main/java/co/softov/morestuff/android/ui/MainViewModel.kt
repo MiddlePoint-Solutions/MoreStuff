@@ -1,24 +1,28 @@
-package co.softov.morestuff.android.ui.main
+package co.softov.morestuff.android.ui
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
+import co.softov.morestuff.android.ui.main.MainModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class MainViewModel : NoStateViewModel() {
 
-    var model by mutableStateOf(MainModel())
-        private set
+    val model: MutableStateFlow<MainModel> = MutableStateFlow(MainModel())
 
     init {
         loadData()
     }
 
     override fun onAppStateChange(state: AppState) {
-        model = model.copy(showOnBoarding = state.settingState.isFirstTime)
+        model.update {
+            it.copy(
+                showOnBoarding = state.settingState.isFirstTime,
+                theme = state.settingState.appTheme
+            )
+        }
     }
 
     fun onResume() {

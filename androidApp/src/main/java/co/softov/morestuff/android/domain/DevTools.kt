@@ -5,4 +5,6 @@ interface DevTools {
     var todayDebugTime: Int
     var keepScreenOn: Boolean
     fun getDebugMessageSwitchState(): Boolean
+
+    fun testReviewNotification()
 }

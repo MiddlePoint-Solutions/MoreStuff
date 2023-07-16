@@ -7,7 +7,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
-
+import co.softov.morestuff.android.LocalTheme
+import co.softov.morestuff.android.domain.enums.AppTheme
 
 
 private val lightColors = lightColorScheme(
@@ -40,9 +41,14 @@ private val darkColors = darkColorScheme(
 
 @Composable
 fun MoreStuffTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (LocalTheme.current) {
+        AppTheme.MODE_AUTO  -> isSystemInDarkTheme()
+        AppTheme.MODE_DAY   -> false
+        AppTheme.MODE_NIGHT -> true
+    }
+
     MaterialTheme(
         colorScheme = if (darkTheme) darkColors else lightColors,
         typography = Typography(),

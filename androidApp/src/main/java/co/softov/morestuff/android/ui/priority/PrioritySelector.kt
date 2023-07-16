@@ -62,7 +62,7 @@ fun PrioritySelector(
 @Preview
 @Composable
 fun UserPriorityInputPreviewDark() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         PrioritySelector(
             priority = Now,
             onPrioritySelected = {}
