@@ -6,7 +6,3 @@ import co.softov.morestuff.android.domain.nav.Screen
 data class AppState(
     val settingState: AppSettingsState = AppSettingsState(),
 )
-
-// Settings
-val AppState.dailySnoozeLimit: Int get() = settingState.settings.snoozeLimit
-val AppState.smartReminderEnabled: Boolean get() = settingState.settings.smartReminderEnabled

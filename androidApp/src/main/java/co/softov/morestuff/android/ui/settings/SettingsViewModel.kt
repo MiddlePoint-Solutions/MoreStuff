@@ -1,25 +1,44 @@
 package co.softov.morestuff.android.ui.settings
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class SettingsViewModel(
     private val devTools: DevTools,
-) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
+) : NoStateViewModel() {
 
-    override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
-        return state
+    val model = MutableStateFlow(
+        with(store.state.value.settingState) {
+            SettingsViewState(
+                appThemeIndex = appTheme.ordinal,
+                snoozeLimit = snoozeLimit,
+            )
+        }
+    )
+
+    init {
+        loadData()
     }
 
-    fun onSnoozeLimitChanged(limit: Int) {
-        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
+    override fun onAppStateChange(state: AppState) {
+        model.update {
+            it.copy(
+                appThemeIndex = state.settingState.appTheme.ordinal,
+                snoozeLimit = state.settingState.snoozeLimit,
+            )
+        }
     }
 
-    fun smartReminderEnabled(enable: Boolean) {
-        dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
+    fun onSnoozeLimitChanged(limit: Float) {
+        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit.toInt()))
     }
 
     fun clearPendingMessages() {
@@ -30,7 +49,7 @@ class SettingsViewModel(
         devTools.testReviewNotification()
     }
 
-    fun selectAppTheme(theme: AppTheme) {
-        dispatchAppStoreAction(SettingAction.SetAppTheme(theme))
+    fun selectAppTheme(index: Int) {
+        dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
     }
 }

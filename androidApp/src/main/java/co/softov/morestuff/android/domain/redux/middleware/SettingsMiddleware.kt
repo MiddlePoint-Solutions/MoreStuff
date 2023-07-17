@@ -1,24 +1,21 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
+import co.softov.morestuff.android.domain.redux.state.SettingAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
-    private val checkFirstTimeUseCase: CheckFirstTimeUseCase,
-    private val getUserSettingsUseCase: GetUserSettingsUseCase,
-    private val saveUserSettingsUseCase: SaveUserSettingsUseCase
+    private val getAppSettingsUseCase: GetAppSettingsUseCase,
+    private val saveUserSettingUseCase: SaveUserSettingUseCase
 
 ) : Middleware<AppState> {
 
@@ -31,15 +28,17 @@ class SettingsMiddleware(
     ): Action {
         when (action) {
             is InitStoreAction -> scope.launch {
-                val firstTime = checkFirstTimeUseCase()
-                val settings = getUserSettingsUseCase()
-                dispatch(InitSettings(firstTime, settings))
+                dispatch(InitSettings(getAppSettingsUseCase()))
             }
 
-            is SettingAction.SetSnoozeLimit -> scope.launch {
-                val updatedSettings = AppSettings(snoozeLimit = action.limit)
-                saveUserSettingsUseCase(updatedSettings)
+            is SetSnoozeLimit -> scope.launch {
+                saveUserSettingUseCase(AppSetting.SnoozeLimit, action.amount)
             }
+
+            is SetAppTheme -> scope.launch {
+                saveUserSettingUseCase(AppSetting.AppTheme, action.theme.name)
+            }
+
             else -> NoOp
         }
 

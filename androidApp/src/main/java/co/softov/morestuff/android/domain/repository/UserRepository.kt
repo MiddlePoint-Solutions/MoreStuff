@@ -1,11 +1,15 @@
 package co.softov.morestuff.android.domain.repository
 
+import co.softov.morestuff.android.domain.enums.AppSetting
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.model.AppSettings
 
 interface UserRepository {
-    suspend fun isFirstTime(): Boolean
-    suspend fun setSnoozeLimit(limit: Int)
-    suspend fun getUserSettings(default: AppSettings): AppSettings
 
+    suspend fun <T> saveAppSetting(setting: AppSetting, settingValue: T)
+
+    suspend fun getAppSettings(default: AppSettings): AppSettings
+
+    fun getAppTheme(): AppTheme
 
 }

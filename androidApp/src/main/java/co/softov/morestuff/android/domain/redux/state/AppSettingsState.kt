@@ -2,22 +2,20 @@ package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.model.Defaults
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.state.SettingAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 
 data class AppSettingsState(
     val isFirstTime: Boolean = false,
-    val appTheme: AppTheme = AppTheme.MODE_AUTO,
-    val settings: AppSettings = AppSettings()
+    val appTheme: AppTheme = AppTheme.System,
+    val snoozeLimit: Int = Defaults.DEFAULT_SNOOZE_LIMIT,
 )
 
 sealed class SettingAction : Action.FeatureAction() {
-    data class InitSettings(val firstTime: Boolean, val settings: AppSettings) : SettingAction()
-    data class SetSnoozeLimit(val limit: Int) : SettingAction()
-    data class EnableSmartReminder(val enable: Boolean) : SettingAction()
-
+    data class InitSettings(val settings: AppSettings) : SettingAction()
+    data class SetSnoozeLimit(val amount: Int) : SettingAction()
     data class SetAppTheme(val theme: AppTheme) : SettingAction()
 
 }
@@ -31,21 +29,21 @@ fun AppState.reduceSettingState(action: Action): AppState {
 
 fun AppSettingsState.reduce(action: Action): AppSettingsState {
     return when (action) {
-        is InitSettings -> with(action) {
-            copy(
-                isFirstTime = isFirstTime,
-                settings = settings
-            )
-        }
-
-        is SetSnoozeLimit -> copy(settings = settings.copy(snoozeLimit = action.limit))
-        is EnableSmartReminder -> copy(settings = settings.copy(smartReminderEnabled = action.enable))
-
+        is InitSettings -> init(action.settings)
+        is SetSnoozeLimit -> copy(snoozeLimit = action.amount)
         is SetAppTheme -> copy(appTheme = action.theme)
-
         else -> this
     }
 }
+
+private fun init(settings: AppSettings) =
+    with(settings) {
+        AppSettingsState(
+            isFirstTime = isFirstTime,
+            snoozeLimit = snoozeLimit,
+            appTheme = appTheme,
+        )
+    }
 
 
 

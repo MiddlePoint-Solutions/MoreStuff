@@ -1,11 +1,15 @@
 package co.softov.morestuff.android.domain.enums
 
 enum class AppTheme {
-    MODE_AUTO,
-    MODE_DAY,
-    MODE_NIGHT;
+    System,
+    Light,
+    Dark;
 
     companion object {
         fun fromOrdinal(ordinal: Int) = values()[ordinal]
+
+        fun listValues() = values().toList()
+        operator fun get(index: Int): AppTheme = values()[index]
     }
 }
+

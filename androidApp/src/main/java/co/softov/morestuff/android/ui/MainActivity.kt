@@ -1,4 +1,4 @@
-package co.softov.morestuff.android
+package co.softov.morestuff.android.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -27,7 +27,6 @@ import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.main.MainContent
-import co.softov.morestuff.android.ui.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.defaultComponentContext
@@ -66,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
             TransparentSystemBars()
 
-            CompositionLocalProvider(LocalTheme provides model.theme) {
+            CompositionLocalProvider(LocalTheme provides viewModel.appTheme) {
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
@@ -154,4 +153,4 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-val LocalTheme = compositionLocalOf { AppTheme.MODE_AUTO }
+val LocalTheme = compositionLocalOf { AppTheme.System }

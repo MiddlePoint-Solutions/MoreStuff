@@ -15,7 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
-import co.softov.morestuff.android.MainActivity
+import co.softov.morestuff.android.ui.MainActivity
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.extensions.isAtLeastVersion
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
