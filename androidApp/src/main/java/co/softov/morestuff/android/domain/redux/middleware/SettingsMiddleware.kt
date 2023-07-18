@@ -39,6 +39,10 @@ class SettingsMiddleware(
                 saveUserSettingUseCase(AppSetting.AppTheme, action.theme.name)
             }
 
+            is EnableConfetti -> scope.launch {
+                saveUserSettingUseCase(AppSetting.Confetti, action.enable)
+            }
+
             else -> NoOp
         }
 

@@ -1,34 +1,36 @@
 package co.softov.morestuff.android.ui.settings
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.domain.enums.AppSetting
 import com.alorma.compose.settings.storage.base.SettingValueState
 
 @Composable
-fun rememberFloatAppSettingState(
-    defaultValue: () -> Float = { 0f },
-    valueChanged: (Float) -> Unit = {}
-): FloatAppSettingValueState {
+fun <T> rememberAppSettingState(
+    defaultValue: () -> T,
+    valueChanged: (T) -> Unit,
+): AppSettingValueState<T> {
     return remember {
-        FloatAppSettingValueState(
+        AppSettingValueState(
             defaultValue = defaultValue,
             valueChanged = valueChanged,
         )
     }
 }
 
-class FloatAppSettingValueState(
-    private val defaultValue: () -> Float = { 0f },
-    private val valueChanged: (Float) -> Unit = {}
-) : SettingValueState<Float> {
+class AppSettingValueState<T>(
+    private val defaultValue: () -> T,
+    private val valueChanged: (T) -> Unit,
+) : SettingValueState<T> {
 
-    private var _value by mutableFloatStateOf(defaultValue())
+    private var _value by mutableStateOf(defaultValue())
 
-    override var value: Float
+    override var value: T
         set(value) {
             valueChanged(value)
             _value = value

@@ -4,7 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
@@ -20,7 +19,7 @@ class MainViewModel(
     var appTheme by mutableStateOf(getAppThemeUseCase())
         private set
 
-    val model: MutableStateFlow<MainModel> = with(store.state.value.settingState) {
+    val model: MutableStateFlow<MainModel> = with(store.state.value.settings) {
         MutableStateFlow(
             MainModel(
                 showOnBoarding = isFirstTime,
@@ -34,11 +33,11 @@ class MainViewModel(
     }
 
     override fun onAppStateChange(state: AppState) {
-        appTheme = state.settingState.appTheme
+        appTheme = state.settings.appTheme
         model.update {
             it.copy(
-                showOnBoarding = state.settingState.isFirstTime,
-                theme = state.settingState.appTheme
+                showOnBoarding = state.settings.isFirstTime,
+                theme = state.settings.appTheme
             )
         }
     }

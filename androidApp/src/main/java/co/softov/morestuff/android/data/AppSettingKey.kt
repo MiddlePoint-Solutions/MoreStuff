@@ -8,4 +8,5 @@ val AppSetting.key: String
         FirstTime -> Constants.KEY_FIRST_TIME
         AppTheme -> Constants.KEY_APP_THEME
         SnoozeLimit -> Constants.KEY_USER_SNOOZE_LIMIT
+        Confetti -> Constants.KEY_ENABLE_CONFETTI
     }

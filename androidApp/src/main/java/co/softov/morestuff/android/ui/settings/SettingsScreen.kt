@@ -2,12 +2,14 @@ package co.softov.morestuff.android.ui.settings
 
 import android.content.res.Resources
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.Message
@@ -17,8 +19,8 @@ import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,25 +29,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGE
-import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_ENABLED
-import co.softov.morestuff.android.data.Constants.KEY_USER_SMART_REMINDER_STORAGE
-import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.darkSurface
+import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
+import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
+import com.mikepenz.aboutlibraries.ui.compose.LibraryColors
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    showLibraries: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
 
@@ -55,44 +64,61 @@ fun SettingsScreen(
     Scaffold(
         topBar = { SettingsTopBar(navigateBackSettings = onBack) }
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .verticalScroll(scrollState)
-        ) {
-            SelectTheme(
-                themeSelected = viewModel::selectAppTheme,
-                defaultValue = { model.appThemeIndex }
-            )
-            SelectSnoozeLimit(
-                onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged,
-                defaultValue = { model.snoozeLimit.toFloat() }
-            )
-            Divider(
-                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
-            )
-            DeveloperSettings(
-                clearPendingMessages = viewModel::clearPendingMessages,
-                testReviewActivity = viewModel::testReviewNotification,
-            )
-            DebugMessageSwitch()
-            Notification()
-//            ReminderDebugging(devTools = viewModel)
-            SmartReminder(onSmartReminder = {})
-            Divider(
-                color = Color.Gray, thickness = 1.dp, modifier = Modifier.fillMaxWidth()
-            )
-            About()
+
+        MoreStuffSettingTheme {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .verticalScroll(scrollState)
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                ) {
+                    SelectTheme(
+                        themeSelected = viewModel::selectAppTheme,
+                        defaultValue = { model.appThemeIndex }
+                    )
+                    SettingsDivider()
+
+                    SettingsGroup(title = { Text(text = "Test") }) {
+                        SelectSnoozeLimit(
+                            onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged,
+                            defaultValue = { model.snoozeLimit.toFloat() }
+                        )
+                    }
+
+                    SettingsDivider()
+                    EnableConfetti(
+                        defaultValue = { model.confettiEnabled },
+                        valueChanged = viewModel::enableConfetti,
+                    )
+                    SettingsDivider()
+                }
+
+                About(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    showLibraries = showLibraries
+                )
+            }
         }
     }
+}
 
-
+@Composable
+private fun SettingsDivider() {
+    Divider(color = darkSurface, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }
 
 @Composable
 fun DebugMessageSwitch() {
-    val memoryStorage = rememberMultiplatformBooleanSettingState(KEY_DEBUG_MESSAGE, false)
+
+    val state = rememberAppSettingState(
+        defaultValue = { false },
+        valueChanged = {},
+    )
 
     Row(
         modifier = Modifier
@@ -102,7 +128,7 @@ fun DebugMessageSwitch() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         SettingsSwitch(
-            state = memoryStorage,
+            state = state,
             icon = {
                 Icon(
                     imageVector = Icons.Default.Message,
@@ -117,9 +143,6 @@ fun DebugMessageSwitch() {
                 )
             },
             modifier = Modifier.padding(end = 16.dp),
-            onCheckedChange = { newValue ->
-                memoryStorage.value = newValue
-            }
         )
     }
 }
@@ -131,9 +154,7 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
         title = {
             Text(
                 text = stringResource(id = R.string.settings),
-                fontSize = 25.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 98.dp)
+                style = MaterialTheme.typography.titleLarge,
             )
         },
         navigationIcon = {
@@ -141,7 +162,6 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.cd_navigate_back),
-                    tint = MaterialTheme.colorScheme.onSurface
                 )
             }
         },
@@ -160,27 +180,28 @@ fun SelectTheme(
         AppTheme.values().map { it.displayTitle(resources) }
     }
 
-    val state = rememberIntAppSettingState(
+    val state = rememberAppSettingState(
         defaultValue = defaultValue,
         valueChanged = themeSelected,
     )
 
-    Row {
-        SettingsList(
-            state = state,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.ColorLens,
-                    contentDescription = stringResource(R.string.cd_select_theme)
-                )
-            },
-            title = {
-                Text(text = stringResource(R.string.select_theme))
-            },
-            useSelectedValueAsSubtitle = false,
-            items = themeOptions
-        )
-    }
+    SettingsList(
+        state = state,
+        title = {
+            Text(
+                text = stringResource(R.string.select_theme),
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        items = themeOptions,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.ColorLens,
+                contentDescription = stringResource(R.string.cd_select_theme)
+            )
+        },
+        useSelectedValueAsSubtitle = false,
+    )
 }
 
 private fun AppTheme.displayTitle(res: Resources): String = when (this) {
@@ -195,7 +216,7 @@ fun SelectSnoozeLimit(
     onSnoozeLimitChanged: (Float) -> Unit,
     defaultValue: () -> Float
 ) {
-    val state = rememberFloatAppSettingState(
+    val state = rememberAppSettingState(
         defaultValue = defaultValue,
         valueChanged = onSnoozeLimitChanged
     )
@@ -267,35 +288,6 @@ fun DeveloperSettings(
     }
 }
 
-@Composable
-fun Notification() {
-    //val onClick = { TODO() }
-    Row(
-        modifier = Modifier.padding(15.dp),
-        verticalAlignment = Alignment.CenterVertically
-
-    ) {
-        Icon(
-            imageVector = Icons.Default.Notifications,
-            contentDescription = "Notifications",
-            modifier = Modifier
-                .padding(end = 18.dp)
-        )
-        Text(
-
-            text = "Notification",
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-
-    Box(
-        modifier = Modifier
-            .padding(top = 8.dp)
-            .fillMaxWidth()
-        //.clickable(onClick = onClick)
-    )
-}
-
 //@Composable
 //fun ReminderDebugging(devTools: DevTools) {
 //    val switchState =
@@ -363,84 +355,44 @@ fun Notification() {
 //}
 
 @Composable
-fun SmartReminder(onSmartReminder: (Boolean) -> Unit) {
-    val memoryStorage =
-        rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_STORAGE, false)
-    val enabledState =
-        rememberMultiplatformBooleanSettingState(KEY_USER_SMART_REMINDER_ENABLED, true)
+fun EnableConfetti(
+    defaultValue: () -> Boolean,
+    valueChanged: (Boolean) -> Unit,
+) {
+
+    val state = rememberAppSettingState(
+        defaultValue = defaultValue,
+        valueChanged = valueChanged
+    )
 
     Column(
         horizontalAlignment = Alignment.Start,
     ) {
         SettingsSwitch(
-            enabled = enabledState.defaultValue,
-            state = memoryStorage,
+            state = state,
             modifier = Modifier.padding(end = 16.dp),
             icon = {
                 Icon(
-                    imageVector = Icons.Default.SmartButton,
-                    contentDescription = "Smart Reminder"
+                    imageVector = Icons.Default.Celebration,
+                    contentDescription = stringResource(R.string.enable_confetti)
                 )
             },
             title = {
                 Text(
-                    text = "Smart Reminder",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
+                    text = stringResource(R.string.enable_confetti),
+                    style = MaterialTheme.typography.titleMedium
                 )
-            },
-            onCheckedChange = { newValue ->
-                onSmartReminder(newValue)
-                memoryStorage.value = newValue
             },
         )
     }
 }
 
 @Composable
-fun Reset() {
-    //val onClick = { TODO() }
-    Column(modifier = Modifier.padding(16.dp)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Reset",
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Box(
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-            //.clickable(onClick = onClick)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = "Reset All Notifications",
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
-                )
-                Text(
-                    text = "Clear all pending notification messages",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
-                )
-            }
-        }
-    }
-}
-
-
-@Composable
-fun About() {
-    Column(modifier = Modifier.padding(16.dp)) {
+fun About(
+    modifier: Modifier = Modifier,
+    showLibraries: () -> Unit,
+) {
+    Column(modifier = modifier.padding(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -465,6 +417,18 @@ fun About() {
                 fontSize = 16.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 190.dp, end = 16.dp)
+            )
+        }
+
+
+
+        Row(
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text(
+                text = "Version",
+                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                modifier = Modifier.clickable(onClick = showLibraries)
             )
         }
 

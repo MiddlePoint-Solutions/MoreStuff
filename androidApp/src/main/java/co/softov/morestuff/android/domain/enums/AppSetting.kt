@@ -4,4 +4,5 @@ enum class AppSetting {
     FirstTime,
     AppTheme,
     SnoozeLimit,
+    Confetti,
 }

@@ -1,9 +1,7 @@
 package co.softov.morestuff.android.ui.settings
 
-import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
@@ -16,7 +14,7 @@ class SettingsViewModel(
 ) : NoStateViewModel() {
 
     val model = MutableStateFlow(
-        with(store.state.value.settingState) {
+        with(store.state.value.settings) {
             SettingsViewState(
                 appThemeIndex = appTheme.ordinal,
                 snoozeLimit = snoozeLimit,
@@ -31,8 +29,9 @@ class SettingsViewModel(
     override fun onAppStateChange(state: AppState) {
         model.update {
             it.copy(
-                appThemeIndex = state.settingState.appTheme.ordinal,
-                snoozeLimit = state.settingState.snoozeLimit,
+                appThemeIndex = state.settings.appTheme.ordinal,
+                snoozeLimit = state.settings.snoozeLimit,
+                confettiEnabled = state.settings.enableConfetti
             )
         }
     }
@@ -51,5 +50,9 @@ class SettingsViewModel(
 
     fun selectAppTheme(index: Int) {
         dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
+    }
+
+    fun enableConfetti(enable: Boolean) {
+        dispatchAppStoreAction(SettingAction.EnableConfetti(enable))
     }
 }

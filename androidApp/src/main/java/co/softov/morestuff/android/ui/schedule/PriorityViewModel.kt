@@ -8,6 +8,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
@@ -16,8 +17,10 @@ import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -29,15 +32,17 @@ class PriorityViewModel(
     override val enableDebug: Boolean
         get() = false
 
-    init {
-        loadData()
-    }
-
     var tasks: List<TaskDomain> by mutableStateOf(listOf())
         private set
 
     var notification: NotificationState by mutableStateOf(None)
         private set
+
+    val model = MutableStateFlow(PriorityViewState())
+
+    init {
+        loadData()
+    }
 
     private var lastChange = 0 to 0
     private var lastCompleted: TaskDomain? = null
@@ -48,6 +53,11 @@ class PriorityViewModel(
             .launchIn(viewModelScope)
     }
 
+    override fun onAppStateChange(state: AppState) {
+        model.update {
+            it.copy(enableConfetti = state.settings.enableConfetti)
+        }
+    }
 
     fun updateTaskOrder(fromPosition: Int, toPosition: Int) {
         tasks = tasks.toMutableList().apply {

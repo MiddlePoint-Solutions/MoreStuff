@@ -27,6 +27,9 @@ val ColorScheme.userChatItem: Color
 val ColorScheme.appChatItem: Color
     get() = Indigo200
 
+val darkBlue = Color(30, 31, 45)
+val darkSurface = Color(39, 40, 53)
+
 private val darkColors = darkColorScheme(
     primary = Color(73, 69, 79),
     primaryContainer = BlueGray900,
@@ -35,8 +38,8 @@ private val darkColors = darkColorScheme(
     secondaryContainer = Orange600,
     onSecondary = Color.White,
     error = Red200,
-    background = Color(30, 31, 45),
-    surface = Color(39, 40, 53)
+    background = darkBlue,
+    surface = darkSurface
 )
 
 @Composable
@@ -44,13 +47,33 @@ fun MoreStuffTheme(
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (LocalTheme.current) {
-        AppTheme.System  -> isSystemInDarkTheme()
-        AppTheme.Light   -> false
+        AppTheme.System -> isSystemInDarkTheme()
+        AppTheme.Light -> false
         AppTheme.Dark -> true
     }
 
     MaterialTheme(
         colorScheme = if (darkTheme) darkColors else lightColors,
+        typography = Typography(),
+    ) {
+        CustomSelectionColor(darkTheme) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun MoreStuffSettingTheme(
+    content: @Composable () -> Unit
+) {
+    val darkTheme = when (LocalTheme.current) {
+        AppTheme.System -> isSystemInDarkTheme()
+        AppTheme.Light -> false
+        AppTheme.Dark -> true
+    }
+
+    MaterialTheme(
+        colorScheme = if (darkTheme) darkColors.copy(surface = darkBlue) else lightColors,
         typography = Typography(),
     ) {
         CustomSelectionColor(darkTheme) {
@@ -67,10 +90,12 @@ fun CustomSelectionColor(darkTheme: Boolean, content: @Composable () -> Unit) {
     } else {
         BlueLight
     }
-    CompositionLocalProvider(LocalTextSelectionColors provides TextSelectionColors(
-        handleColor = customSelectionColor,
-        backgroundColor = customSelectionColor.copy(alpha = 0.5f)
-    )) {
+    CompositionLocalProvider(
+        LocalTextSelectionColors provides TextSelectionColors(
+            handleColor = customSelectionColor,
+            backgroundColor = customSelectionColor.copy(alpha = 0.5f)
+        )
+    ) {
         content()
     }
 }

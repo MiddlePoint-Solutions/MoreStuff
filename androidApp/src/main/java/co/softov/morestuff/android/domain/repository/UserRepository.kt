@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.repository
 
 import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppTheme
-import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.redux.state.AppSettings
 
 interface UserRepository {
 
