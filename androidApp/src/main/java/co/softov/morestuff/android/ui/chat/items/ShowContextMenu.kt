@@ -7,7 +7,6 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -27,7 +26,7 @@ fun ShowContextMenu(
     onClose: () -> Unit,
     modifier: Modifier,
 ) {
-    val contextMenuItems = if (message.messageWithData?.filePath != null) {
+    val contextMenuItems = if (message.messageData?.filePath != null) {
         listOf(
             ContextMenuItem("Delete", Icons.Default.Delete) {
                 onDeleteMessage(message)

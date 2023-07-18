@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.repository
 
 import android.net.Uri
 import arrow.core.Either
-import co.softov.morestuff.android.domain.model.MessageWithData
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Message
@@ -29,7 +29,7 @@ interface MessageRepository {
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
-        messageWithData: MessageWithData?,
+        messageData: MessageData?,
         content: String,
     ): Either<Failure, Message>
 
@@ -43,13 +43,13 @@ interface MessageRepository {
 
     suspend fun insertUrlMetadata(url: String, openGraphResult: OpenGraphResult, messageId: Long)
 
-    suspend fun insertMessageData(messageWithData: MessageWithData)
+    suspend fun insertMessageData(messageData: MessageData)
 
     suspend fun handleImages(
         uris: Uri,
         timeManager: TimeManager,
         id: Long,
-    ): MessageWithData
+    ): MessageData
 
     suspend fun deleteMessage(messageId: Long)
 

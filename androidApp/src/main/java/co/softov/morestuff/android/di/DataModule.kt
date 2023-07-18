@@ -2,30 +2,32 @@ package co.softov.morestuff.android.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import androidx.work.Configuration
 import androidx.work.WorkManager
-import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
-import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
-import co.softov.morestuff.android.data.mapper.makeSelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.android.data.repository.*
+import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
+import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
+import co.softov.morestuff.android.data.repository.PreferenceRepositoryImpl
+import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
+import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
+import co.softov.morestuff.android.data.repository.UserRepositoryImpl
 import co.softov.morestuff.android.data.service.NotifierImpl
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.repository.*
+import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.domain.repository.PreferenceRepository
+import co.softov.morestuff.android.domain.repository.ScheduleRepository
+import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
@@ -35,7 +37,9 @@ import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
 import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
-import com.russhwolf.settings.*
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.SharedPreferencesSettings
 import com.squareup.sqldelight.EnumColumnAdapter
 import com.squareup.sqldelight.android.AndroidSqliteDriver
 import org.koin.android.ext.koin.androidApplication
@@ -81,11 +85,8 @@ val dataModule = module {
         MessageRepositoryImpl(
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
-            mapMessageTaskChatDb = makeSelectTaskMessagesByContentTypeMapper(timeFormatter = get()),
             selectMasterMessagesMapper = SelectMasterMessagesMapper(timeFormatter = get()),
-            selectMessageByTaskIdMapper = SelectMessageByTaskIdMapper(timeFormatter = get()),
-            selectMessageByIdMapper = SelectMessageByIdMapper(timeFormatter = get()),
-            imageMessageDataMapper = makeMessageWithDataMapper(),
+            messageDataMapper = makeMessageWithDataMapper(),
             timeManager = get(),
             context = get()
         )

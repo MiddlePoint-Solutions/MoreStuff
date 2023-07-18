@@ -31,6 +31,6 @@ fun mapSelectMasterMessagesToMessageData(input: SelectMasterMessages, timeFormat
         replyContent = input.reply_content,
         replyTime = replyTime,
         openGraphResult = openGraphResult,
-        messageWithData = null
+        messageData = null
     )
 }

@@ -32,7 +32,7 @@ class CreateImageMessageUseCaseImpl(
     ): Either<Failure, Message> {
         val messageWithData = handleImagesUseCase(filePath, taskId)
         Timber.d("CreateImageMessageUseCaseImpl", "Resulting MessageWithData: $messageWithData")
-        return messageRepository.createMessage(taskId, scheduleId, contentType.value, content = message,  messageWithData = messageWithData,)
+        return messageRepository.createMessage(taskId, scheduleId, contentType.value, content = message,  messageData = messageWithData,)
     }
 }
 

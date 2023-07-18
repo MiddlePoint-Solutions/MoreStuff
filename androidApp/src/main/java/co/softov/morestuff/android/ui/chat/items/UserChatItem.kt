@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.MessageWithData
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -113,7 +113,7 @@ fun UserChatItem(
                     }
             ) {
 
-                if (message.messageWithData?.filePath != null) {
+                if (message.messageData?.filePath != null) {
                     Surface(
                         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
                         color = MaterialTheme.colorScheme.userChatItem,
@@ -141,11 +141,11 @@ fun UserChatItem(
                                 )
                             }
                             ShowImage(
-                                messageWithData = message.messageWithData,
+                                messageData = message.messageData,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
                                     .clickable {
-                                        onImageSelected(message.messageWithData.filePath)
+                                        onImageSelected(message.messageData.filePath)
                                     }
                             )
                         }
@@ -202,10 +202,10 @@ fun UserChatItem(
 
 @Composable
 fun ShowImage(
-    messageWithData: MessageWithData,
+    messageData: MessageData,
     modifier: Modifier = Modifier,
 ) {
-    val uri: Uri = Uri.parse(messageWithData.filePath)
+    val uri: Uri = Uri.parse(messageData.filePath)
 
     Image(
         painter = rememberAsyncImagePainter(

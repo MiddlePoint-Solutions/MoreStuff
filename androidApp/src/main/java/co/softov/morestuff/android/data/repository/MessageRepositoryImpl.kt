@@ -8,19 +8,15 @@ import android.net.Uri
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import co.softov.morestuff.android.data.mapper.ImageMessageDataMapper
+import co.softov.morestuff.android.data.mapper.MessageDataMapper
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
 import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
-import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
 import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.MessageDataType
-import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.MessageWithData
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
@@ -41,11 +37,8 @@ import java.nio.file.Path
 class MessageRepositoryImpl(
     database: StuffDb,
     private val mapMessageDb: MessageDbMapper,
-    private val mapMessageTaskChatDb: SelectTaskMessagesByContentTypeMapper,
     private val selectMasterMessagesMapper: SelectMasterMessagesMapper,
-    private val selectMessageByTaskIdMapper: SelectMessageByTaskIdMapper,
-    private val selectMessageByIdMapper: SelectMessageByIdMapper,
-    private val imageMessageDataMapper: ImageMessageDataMapper,
+    private val messageDataMapper: MessageDataMapper,
     private val timeManager: TimeManager,
     private val context: Context,
 ) : MessageRepository {
@@ -56,7 +49,6 @@ class MessageRepositoryImpl(
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
-//        return messageQueries.selectAll().asFlow().mapToList()
         return messageQueries.selectMasterMessages().asFlow().mapToList()
             .map { mapList(it, selectMasterMessagesMapper) }
     }
@@ -64,13 +56,14 @@ class MessageRepositoryImpl(
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectTaskMessagesByContentType(
             taskId,
-            ContentType.TASK_MESSAGE.value
-        ).asFlow().mapToList().map { mapList(it, mapMessageTaskChatDb) }
+            ContentType.TASK_MESSAGE.value,
+            mapper = messageDataMapper
+        ).asFlow().mapToList()
     }
 
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByTaskId(taskId)
-            .asFlow().mapToList().map { mapList(it, selectMessageByTaskIdMapper) }
+        return messageQueries.selectMessageByTaskId(taskId, mapper = messageDataMapper)
+            .asFlow().mapToList()
     }
 
     override suspend fun getActiveReminderMessages(): List<Message> {
@@ -79,27 +72,13 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
-        return when (val message =
-            messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
+        val message = messageQueries.selectMessageById(
+            id = messageId,
+            mapper = messageDataMapper
+        ).executeAsOneOrNull()
+        return when (message) {
             null -> MessageDoesNotExist.left()
-            else -> imageMessageDataMapper(
-                message.id,
-                message.task_id,
-                message.schedule_id,
-                ContentType.valueOf(message.content_type.toString()),
-                message.create_time,
-                message.seen_time,
-                message.content,
-                ReplyType.valueOf(message.reply_type.toString()),
-                message.reply_content,
-                message.reply_time,
-                message.json_data,
-                message.id,
-                message.data_type,
-                message.creation_time,
-                MessageDataType.valueOf(message.data_type.toString())
-
-            ).right()
+            else -> message.right()
         }
     }
 
@@ -108,7 +87,7 @@ class MessageRepositoryImpl(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
-        messageWithData: MessageWithData?,
+        messageData: MessageData?,
         content: String,
     ): Either<Failure, Message> = messageQueries.transactionWithResult {
         messageQueries.insertMessage(
@@ -119,18 +98,19 @@ class MessageRepositoryImpl(
             content = content
         )
         val messageId = lastInsertId
-        messageWithData?.let {
+        messageData?.let {
             messageDataQueries.insertMessageData(
                 message_id = messageId,
-                file_path = messageWithData.filePath,
+                file_path = messageData.filePath,
                 creation_time = timeManager.getCreateTime(),
-                data_type = messageWithData.messageType.name,
+                data_type = messageData.messageType.name,
             )
         }
-        messageQueries.selectMessageById(messageId).executeAsOneOrNull()
-    }?.let { Either.Right(selectMessageByIdMapper(it)) }
-        ?: Either.Left(MessageDoesNotExist)
-
+        messageQueries.selectMessageById(
+            id = messageId,
+            mapper = messageDataMapper
+        ).executeAsOne().right()
+    }
 
     override suspend fun addUserReplyMessage(
         taskId: Long,
@@ -231,12 +211,12 @@ class MessageRepositoryImpl(
         )
     }
 
-    override suspend fun insertMessageData(messageWithData: MessageWithData) {
+    override suspend fun insertMessageData(messageData: MessageData) {
         messageDataQueries.insertMessageData(
-            messageWithData.id,
-            messageWithData.filePath,
-            messageWithData.creationTime,
-            messageWithData.messageType.name
+            messageData.id,
+            messageData.filePath,
+            messageData.creationTime,
+            messageData.messageType.name
         )
     }
 
@@ -244,7 +224,7 @@ class MessageRepositoryImpl(
         uris: Uri,
         timeManager: TimeManager,
         id: Long,
-    ): MessageWithData {
+    ): MessageData {
 
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(uris)
@@ -263,15 +243,15 @@ class MessageRepositoryImpl(
 
 
         val path = imageFile.absolutePath
-        val messageWithData = MessageWithData(
+        val messageData = MessageData(
             id,
             path,
             creationTime = timeManager.getCreateTime(),
             messageType = MessageDataType.Image
         )
-        insertMessageData(messageWithData)
+        insertMessageData(messageData)
 
-        return messageWithData
+        return messageData
     }
 
 

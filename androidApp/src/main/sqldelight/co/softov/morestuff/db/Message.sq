@@ -39,9 +39,10 @@ WHERE message.id = ?;
 
 
 selectMessageByTaskId:
-SELECT message.*, url_metadata.json_data
+SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE task_id = ?
 ORDER BY datetime(create_time) DESC;
 

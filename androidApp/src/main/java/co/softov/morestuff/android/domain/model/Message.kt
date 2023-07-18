@@ -15,6 +15,6 @@ data class Message(
     val replyContent: String?,
     val replyTime: String?,
     val openGraphResult: OpenGraphResult?,
-    val messageWithData: MessageWithData?
+    val messageData: MessageData?
 )
 

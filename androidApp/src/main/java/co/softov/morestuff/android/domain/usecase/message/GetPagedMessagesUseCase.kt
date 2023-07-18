@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import androidx.paging.PagingSource
-import co.softov.morestuff.android.data.mapper.MessageData
+import co.softov.morestuff.android.data.mapper.MessageDb
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.android.paging3.QueryPagingSource
 
@@ -9,7 +9,7 @@ interface GetPagedMessagesUseCase {
     operator fun invoke(): PagedMessagesResult
 }
 
-typealias PagedMessagesResult = PagingSource<Long, MessageData>
+typealias PagedMessagesResult = PagingSource<Long, MessageDb>
 
 class GetPagedMessagesUseCaseImpl(
     private val database: StuffDb

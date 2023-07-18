@@ -55,7 +55,7 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, messageWithData = null)
+                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, messageData = null)
             }
             is MessageAction.CreateImageMessageAction -> scope.launch {
                 createImageMessageUseCase(action.taskId, scheduleId = 0,
@@ -69,7 +69,7 @@ class MessageMiddleware(
                     action.task.id,
                     title = action.task.title,
                     contentType = ContentType.USER_NEW_TASK,
-                    messageWithData = null
+                    messageData = null
                 )
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
