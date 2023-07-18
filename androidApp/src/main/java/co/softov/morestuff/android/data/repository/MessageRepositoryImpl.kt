@@ -247,7 +247,7 @@ class MessageRepositoryImpl(
         )
         insertMessageData(messageData)
 
-        return messageData
+        messageData
     }
 
 
