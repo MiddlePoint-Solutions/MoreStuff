@@ -23,6 +23,9 @@ import co.softov.morestuff.android.domain.usecase.message.ClearActivePendingMess
 import co.softov.morestuff.android.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCaseImpl
+
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
@@ -43,6 +46,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
@@ -269,14 +274,11 @@ val messageUseCases = module {
     factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
-
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
-
-    //factoryOf(::HandleImagesUseCaseImpl) bind HandleImagesUseCaseImpl::class
-    factory<HandleImagesUseCase> { HandleImagesUseCaseImpl(messageRepository = get(), timeManager = get()) }
+    factoryOf(::HandleImagesUseCaseImpl) bind HandleImagesUseCase::class
     factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
-    factoryOf (::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
+    factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
 }
 
 
