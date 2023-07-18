@@ -54,15 +54,6 @@ LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE message.task_id = ? AND message.content_type = ?
 ORDER BY datetime(message.create_time) DESC;
 
-
-selectCurrentTaskMessage:
-SELECT message.*, url_metadata.json_data
-FROM message
-LEFT JOIN url_metadata ON message.id = url_metadata.message_id
-WHERE task_id = ?
-ORDER BY id DESC LIMIT 1;
-
-
 selectTaskMessage:
 SELECT message.id, url_metadata.json_data
 FROM message
