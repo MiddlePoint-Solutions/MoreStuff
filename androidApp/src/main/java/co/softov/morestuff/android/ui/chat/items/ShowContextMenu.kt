@@ -7,6 +7,7 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -24,19 +25,34 @@ fun ShowContextMenu(
     onDeleteMessage: (Message) -> Unit,
     showMenu: Boolean,
     onClose: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier,
 ) {
-    val contextMenuItems = listOf(
-        ContextMenuItem("Copy", Icons.Default.ContentCopy) {
-            onCopyMessage(message)
-            onClose()
-        },
-        ContextMenuItem("Delete", Icons.Default.Delete) {
-            onDeleteMessage(message)
-            onClose()
-        }
-
-    )
+    val contextMenuItems = if (message.messageWithData?.filePath != null) {
+        listOf(
+            ContextMenuItem("Delete", Icons.Default.Delete) {
+                onDeleteMessage(message)
+                onClose()
+            },
+            ContextMenuItem("Copy", Icons.Default.ContentCopy) {
+                onCopyMessage(message)
+                onClose()
+            },
+           /* ContextMenuItem("Share", Icons.Default.Share) {
+                onClose()
+            }*/
+        )
+    } else {
+        listOf(
+            ContextMenuItem("Copy", Icons.Default.ContentCopy) {
+                onCopyMessage(message)
+                onClose()
+            },
+            ContextMenuItem("Delete", Icons.Default.Delete) {
+                onDeleteMessage(message)
+                onClose()
+            }
+        )
+    }
 
     DropdownMenu(
         expanded = showMenu,
@@ -53,5 +69,6 @@ fun ShowContextMenu(
         }
     }
 }
+
 
 

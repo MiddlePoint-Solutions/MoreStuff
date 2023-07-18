@@ -15,6 +15,7 @@ interface CreateImageMessageUseCase {
         scheduleId: Long = 0,
         contentType: ContentType,
         filePath: Uri,
+        message: String
     ): Either<Failure, Message>
 }
 
@@ -27,10 +28,11 @@ class CreateImageMessageUseCaseImpl(
         scheduleId: Long,
         contentType: ContentType,
         filePath: Uri,
+        message: String
     ): Either<Failure, Message> {
         val messageWithData = handleImagesUseCase(filePath, taskId)
         Timber.d("CreateImageMessageUseCaseImpl", "Resulting MessageWithData: $messageWithData")
-        return messageRepository.createMessage(taskId, scheduleId, contentType.value, content = "",  messageWithData = messageWithData)
+        return messageRepository.createMessage(taskId, scheduleId, contentType.value, content = message,  messageWithData = messageWithData,)
     }
 }
 

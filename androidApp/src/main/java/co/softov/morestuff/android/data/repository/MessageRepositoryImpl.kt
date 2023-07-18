@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jsoup.Jsoup
-import timber.log.Timber
 import java.io.FileOutputStream
 import java.nio.file.Path
 
@@ -69,38 +68,6 @@ class MessageRepositoryImpl(
         ).asFlow().mapToList().map { mapList(it, mapMessageTaskChatDb) }
     }
 
-
-/*   override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
-       val mapper = makeMessageWithDataMapper()
-       return messageQueries.selectTaskMessagesByContentType(taskId, ContentType.TASK_MESSAGE.value)
-           .asFlow()
-           .mapToList()
-           .map { messages ->
-               messages.map { message ->
-                   mapper(
-                       message.id,
-                       message.task_id,
-                       message.schedule_id,
-                       ContentType.valueOf(message.content_type.toString()),
-                       message.create_time,
-                       message.seen_time,
-                       message.content,
-                       ReplyType.valueOf(message.reply_type.toString()),
-                       message.reply_content,
-                       message.reply_time,
-                       message.json_data,
-                       message.id,
-                       message.data_type,
-                       message.creation_time,
-                       MessageDataType.valueOf(message.data_type.toString())
-                   )
-               }
-           }
-   }*/
-
-
-
-
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectMessageByTaskId(taskId)
             .asFlow().mapToList().map { mapList(it, selectMessageByTaskIdMapper) }
@@ -112,7 +79,8 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
-        return when (val message = messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
+        return when (val message =
+            messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
             null -> MessageDoesNotExist.left()
             else -> imageMessageDataMapper(
                 message.id,
@@ -136,7 +104,6 @@ class MessageRepositoryImpl(
     }
 
 
-
     override suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
@@ -157,7 +124,7 @@ class MessageRepositoryImpl(
                 message_id = messageId,
                 file_path = messageWithData.filePath,
                 creation_time = timeManager.getCreateTime(),
-                data_type = messageWithData.messageType.name
+                data_type = messageWithData.messageType.name,
             )
         }
         messageQueries.selectMessageById(messageId).executeAsOneOrNull()
@@ -278,23 +245,22 @@ class MessageRepositoryImpl(
         timeManager: TimeManager,
         id: Long,
     ): MessageWithData {
-        Timber.d("handleImages", "Received URI: $uris")
+
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(uris)
         val bitmap = BitmapFactory.decodeStream(inputStream)
         inputStream?.close()
-        if (bitmap == null) {
-            Timber.e("Failed to decode image stream.")
-        }
+
         val imageFile = createImageFile(timeManager).toFile()
-        Timber.d("Created image file: ${imageFile.name}")
+
         val outputStream = withContext(Dispatchers.IO) {
             FileOutputStream(imageFile)
         }
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+        withContext(Dispatchers.IO) {
             outputStream.close()
+        }
 
-        Timber.d("handleImages", "Image compressed and saved to: ${imageFile.absolutePath}")
 
         val path = imageFile.absolutePath
         val messageWithData = MessageWithData(
@@ -304,7 +270,7 @@ class MessageRepositoryImpl(
             messageType = MessageDataType.Image
         )
         insertMessageData(messageWithData)
-        Timber.d("MessageRepositoryImpl", "Created MessageWithData: $messageWithData")
+
         return messageWithData
     }
 

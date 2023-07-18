@@ -17,18 +17,18 @@ typealias ImageMessageDataMapper = (
     id: Long,
     taskId: Long,
     scheduleId: Long,
-    contentType: ContentType,//Cambiar a string?
+    contentType: ContentType,
     createTime: String,
     seenTime: String?,
     content: String,
-    replyType: ReplyType?,//Cambiar a string
+    replyType: ReplyType?,
     replyContent: String?,
     replyTime: String?,
     json_data: String?,
     message_with_data_id: Long?,
     message_with_data_file_path: String?,
     message_with_data_creation_time: String?,
-    message_with_data_message_type: MessageDataType?,//cambiar a string?
+    message_with_data_message_type: MessageDataType?,
 ) -> Message
 
 fun makeMessageWithDataMapper(): ImageMessageDataMapper = ::mapMessageData

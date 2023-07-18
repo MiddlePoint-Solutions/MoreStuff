@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -56,12 +57,12 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 @Composable
 fun UserChatItem(
     message: Message,
     actions: ChatActions,
+    onImageSelected: (String) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
@@ -111,31 +112,44 @@ fun UserChatItem(
                         showMenu = true
                     }
             ) {
-                LaunchedEffect(Unit) {
-                    Timber.d("IMAGE: message: $message")
-                }
+
                 if (message.messageWithData?.filePath != null) {
-                    LaunchedEffect(Unit) {
-                        Timber.d("IMAGE %s", "Displaying image: ${message.messageWithData.filePath}")
-                    }
                     Surface(
                         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                         modifier = Modifier
-                            .size(200.dp)  // Size of image
-                            .padding(2.dp)  // Padding for border
-                            .aspectRatio(1F)
+                            .padding(2.dp)
+                            .fillMaxWidth()
+                            .wrapContentSize()
                     ) {
-                        ShowImage(
-                            messageWithData = message.messageWithData,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
+                        Column(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            if (message.content.isNotEmpty()) {
+                                Text(
+                                    text = message.content,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .padding(end = 15.dp),
+                                    style = LocalTextStyle.current.copy(
+                                        color = Color.White,
+                                        fontSize = 16.sp
+                                    )
+                                )
+                            }
+                            ShowImage(
+                                messageWithData = message.messageWithData,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable {
+                                        onImageSelected(message.messageWithData.filePath)
+                                    }
+                            )
+                        }
                     }
-
                 } else {
                     Surface(
                         shape = RoundedCornerShape(corner = CornerSize(8.dp)),
@@ -143,32 +157,32 @@ fun UserChatItem(
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .padding(end = 15.dp)
-                                .run {
-                                    urls?.let {
-                                        clickable {
-                                            coroutineScope.launch {
-                                                uriHandler.openUri(it)
-                                            }
-                                        }
-                                    } ?: this
-                                }
+
                         ) {
                             Text(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .padding(end = 15.dp)
+                                    .run {
+                                        urls?.let {
+                                            clickable {
+                                                coroutineScope.launch {
+                                                    uriHandler.openUri(it)
+                                                }
+                                            }
+                                        } ?: this
+                                    },
                                 text = content,
                                 style = LocalTextStyle.current.copy(
                                     color = Color.White,
                                     fontSize = 16.sp
                                 )
                             )
+                            if (openGraphResult?.title != null && openGraphResult.description != null) {
+                                OpenGraphPreview(openGraphResult)
+                            }
                         }
                     }
-                }
-
-                if (openGraphResult?.title != null && openGraphResult.description != null) {
-                    OpenGraphPreview(openGraphResult)
                 }
 
                 ShowContextMenu(
@@ -192,14 +206,13 @@ fun ShowImage(
     modifier: Modifier = Modifier,
 ) {
     val uri: Uri = Uri.parse(messageWithData.filePath)
-    Timber.d("IMAGE show", "Attempting to load image from: $uri")
-
 
     Image(
         painter = rememberAsyncImagePainter(
-            ImageRequest.Builder(LocalContext.current).data(data = uri).apply(block = fun ImageRequest.Builder.() {
-                crossfade(true)
-            }).build(), imageLoader = LocalContext.current.imageLoader
+            ImageRequest.Builder(LocalContext.current).data(data = uri)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                }).build(), imageLoader = LocalContext.current.imageLoader
         ),
         contentDescription = null,
         modifier = modifier
@@ -209,9 +222,6 @@ fun ShowImage(
             .border(2.dp, MaterialTheme.colorScheme.userChatItem, RoundedCornerShape(8.dp))
     )
 }
-
-
-
 
 
 
@@ -258,6 +268,6 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme() {
-        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+        UserChatItem(message = MockData.Message.userNewTask, ChatActions(),  onImageSelected = {})
     }
 }

@@ -5,12 +5,22 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,10 +38,12 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -39,6 +51,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Replay
@@ -63,6 +76,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -70,8 +84,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -98,6 +119,9 @@ import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
@@ -109,7 +133,7 @@ import timber.log.Timber
 @Composable
 fun ProvideLocalViewModelStoreOwner(
     localViewModelStoreOwner: ViewModelStoreOwner,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalViewModelStoreOwner provides localViewModelStoreOwner,
@@ -165,20 +189,16 @@ private fun TaskChatContent(
             openBottomSheet = false
         }
     }
+    var selectImageFromGallery by remember { mutableStateOf<String?>(null) }
+    var selectedImage by remember { mutableStateOf<String?>(null) }
 
-
-    ///// -->> https://developer.android.com/training/data-storage/shared/photopicker
     val pickImage =
         rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uris ->
             if (uris != null) {
                 Timber.d("\"IMAGE\", \"Image URIs: $uris\"")
-                scope.launch {
-                    viewModel.sendImageMessageForTask( uris)
-                }
+                selectImageFromGallery = uris.toString()
             }
         }
-
-//////
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -190,57 +210,312 @@ private fun TaskChatContent(
 
     var isExpanded by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBarTaskChat(
-                viewModel,
-                setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
-                onBackPressed = onBack,
-                isExpanded = isExpanded
-            )
-        },
-        modifier = modifier
-    ) {
+    when {
+        selectedImage != null -> {
+            AnimatedVisibility(
+                visible = selectedImage != null,
+                enter = fadeIn(animationSpec = tween(durationMillis = 2000)) + slideInHorizontally(
+                    animationSpec = tween(durationMillis = 2000)
+                ),
+                exit = fadeOut(animationSpec = tween(durationMillis = 1000)) + slideOutHorizontally(
+                    animationSpec = tween(durationMillis = 1000)
+                )
+            ) {
+                BackHandler {
+                    selectedImage = null
+                }
+                ImageScreen(
+                    imagePath = selectedImage!!,
+                    cancel = {
+                        selectedImage = null
+                    }
+                )
+            }
+        }
 
-        Box(Modifier.fillMaxSize()) {
-            Surface {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .navigationBarsPadding()
-                        .imePadding(),
-                ) {
-                    TaskChatTopBarEditTask(
-                        taskId = taskId,
-                        isExpanded = isExpanded,
-                        setIsExpanded = { value -> isExpanded = value },
+        selectImageFromGallery != null -> {
+            AnimatedVisibility(
+                visible = selectImageFromGallery != null,
+                enter = fadeIn() + slideInHorizontally(),
+                exit = fadeOut() + slideOutHorizontally()
+            ) {
+                BackHandler {
+                    selectImageFromGallery = null
+                }
+                ImagePreviewScreen(
+                    imagePath = selectImageFromGallery!!,
+                    send = { message ->
+                        val uri = Uri.parse(selectImageFromGallery)
+                        viewModel.sendImageMessageForTask(uri, message)
+                        selectImageFromGallery = null
+                    },
+                    cancel = {
+                        selectImageFromGallery = null
+                    }
+                )
+            }
+        }
+
+        else -> {
+            Scaffold(
+                topBar = {
+                    TopAppBarTaskChat(
+                        viewModel,
+                        setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
+                        onBackPressed = onBack,
+                        isExpanded = isExpanded
                     )
+                },
+                modifier = modifier
+            ) {
 
-
-                    Messages(
-                        messages = messages,
-                        actions = chatActions,
-                        modifier = modifier.weight(1f),
-                        scrollState = scrollState
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .imePadding()
-                    ) {
-                        Box(
+                Box(Modifier.fillMaxSize()) {
+                    Surface {
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = MaterialTheme.colorScheme.primary)
+                                .fillMaxSize()
+                                .navigationBarsPadding()
+                                .imePadding(),
                         ) {
-                            TaskMessageTextField(
-                                sendMessageForTask = viewModel::sendMessageForTask,
-                                pickImages = { pickImage.launch(PickVisualMediaRequest( ////<<<------
-                                    ActivityResultContracts.PickVisualMedia.ImageAndVideo)) }  ////<<<------
+                            TaskChatTopBarEditTask(
+                                taskId = taskId,
+                                isExpanded = isExpanded,
+                                setIsExpanded = { value -> isExpanded = value },
+                            )
+
+
+                            Messages(
+                                messages = messages,
+                                actions = chatActions,
+                                modifier = modifier.weight(1f),
+                                scrollState = scrollState,
+                                onImageSelected = { imagePath ->
+                                    selectedImage = imagePath
+                                }
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .imePadding()
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(color = MaterialTheme.colorScheme.primary)
+                                ) {
+                                    TaskMessageTextField(
+                                        sendMessageForTask = viewModel::sendMessageForTask,
+                                        pickImages = {
+                                            pickImage.launch(
+                                                PickVisualMediaRequest(
+                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+    }
+}
+
+@Composable
+fun ImagePreviewScreen(
+    imagePath: String,
+    send: (String) -> Unit,
+    cancel: () -> Unit,
+) {
+    var messageText by remember { mutableStateOf("") }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize().navigationBarsPadding()
+                .imePadding(),
+        ) {
+            val imageUri = Uri.parse(imagePath)
+            Image(
+                painter = rememberAsyncImagePainter(model = imageUri),
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .weight(1f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            BasicTextField(
+                value = messageText,
+                onValueChange = { messageText = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp)
+                    .defaultMinSize(minHeight = 46.dp),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(onDone = {
+                    if (messageText.isNotBlank()) {
+                        send(messageText.trim())
+                        messageText = ""
+                    }
+                }),
+                maxLines = Int.MAX_VALUE,
+                cursorBrush = SolidColor(LocalContentColor.current),
+                textStyle = LocalTextStyle.current.copy(
+                    color = LocalContentColor.current,
+                    fontSize = 18.sp
+                ),
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (messageText.isEmpty()) {
+                            Text(
+                                text = "Enter message",
+                                fontSize = 18.sp,
+                                color = Color.Gray
                             )
                         }
+                        innerTextField()
                     }
+                }
+            )
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = cancel,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel",
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                IconButton(
+                    onClick = {
+                        send(messageText.trim())
+                        messageText = ""
+                    },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Send",
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ImageScreen(
+    imagePath: String,
+    cancel: () -> Unit,
+) {
+    var scale by remember { mutableFloatStateOf(1.3f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+        if (scale * zoomChange >= 1.3f) {
+            scale *= zoomChange
+            offset += offsetChange
+        }
+    }
+
+    val scope = rememberCoroutineScope()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .pointerInput(Unit) {
+                detectTapGestures(onDoubleTap = {
+                    scope.launch {
+                        scale = 1.3f
+                        offset = Offset.Zero
+                    }
+                })
+            }
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val imageUri = Uri.parse(imagePath)
+            Image(
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current).data(data = imageUri)
+                        .apply(block = fun ImageRequest.Builder.() {
+                            crossfade(true)
+                        }).build(), imageLoader = LocalContext.current.imageLoader
+                ),
+                contentDescription = "Selected Image",
+
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .weight(1f)
+                    .rotate(90F)
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = if (scale > 1.3f) offset.x else 0f,
+                        translationY = if (scale > 1.3f) offset.y else 0f
+                    )
+                    .transformable(state = state),
+
+                )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .weight(0.1f)
+                    .padding(bottom = 50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(
+                    onClick = cancel,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Cancel",
+                        modifier = Modifier.size(36.dp),
+                        tint = Color.White
+                    )
                 }
             }
         }
@@ -550,7 +825,7 @@ fun TopAppBarTaskChat(
 @Composable
 fun TaskMessageTextField(
     sendMessageForTask: (String) -> Unit,
-    pickImages: () -> Unit
+    pickImages: () -> Unit,
 ) {
     var messageText by remember { mutableStateOf("") }
 
@@ -618,7 +893,8 @@ fun TaskMessageTextField(
                     messageText = ""
                 }
             },
-            modifier = Modifier.align(Alignment.CenterVertically).weight(1f).padding(end = 8.dp, start = 3.dp)
+            modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
+                .padding(end = 8.dp, start = 3.dp)
         ) {
             Icon(Icons.Filled.Send, contentDescription = "send mensaje")
         }

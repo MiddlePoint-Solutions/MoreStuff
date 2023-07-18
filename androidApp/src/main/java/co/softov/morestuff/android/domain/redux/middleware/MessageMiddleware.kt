@@ -23,7 +23,7 @@ sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
-    internal data class CreateImageMessageAction(val taskId: Long, val filePath: Uri) : MessageAction()
+    internal data class CreateImageMessageAction(val taskId: Long, val filePath: Uri, val message: String) : MessageAction()
 }
 
 class MessageMiddleware(
@@ -59,7 +59,7 @@ class MessageMiddleware(
             }
             is MessageAction.CreateImageMessageAction -> scope.launch {
                 createImageMessageUseCase(action.taskId, scheduleId = 0,
-                    contentType = ContentType.TASK_MESSAGE, filePath = action.filePath,
+                    contentType = ContentType.TASK_MESSAGE, filePath = action.filePath, action.message
                     )
             }
 

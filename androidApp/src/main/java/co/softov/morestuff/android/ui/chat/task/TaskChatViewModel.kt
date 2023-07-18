@@ -24,7 +24,6 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
-import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -139,8 +138,8 @@ class TaskChatViewModel(
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
-    fun sendImageMessageForTask(uris: Uri) {
-        store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris))
+    fun sendImageMessageForTask(uris: Uri, message: String) {
+        store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 
 

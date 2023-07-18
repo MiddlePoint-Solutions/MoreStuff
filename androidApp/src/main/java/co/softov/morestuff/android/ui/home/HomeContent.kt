@@ -87,6 +87,8 @@ fun HomeContent(
     val visibleState = remember {
         MutableTransitionState(true)
     }
+    var selectedImage by remember { mutableStateOf<String?>(null) }
+
 
     if (showTaskLists) {
         ModalBottomSheet(
@@ -133,7 +135,10 @@ fun HomeContent(
                                     messages = messages,
                                     actions = chatActions,
                                     modifier = modifier,
-                                    scrollState = chatScrollState
+                                    scrollState = chatScrollState,
+                                    onImageSelected = { imagePath ->
+                                        selectedImage = imagePath
+                                    }
                                 )
                             },
                             sheetPeekHeight = 30.dp
