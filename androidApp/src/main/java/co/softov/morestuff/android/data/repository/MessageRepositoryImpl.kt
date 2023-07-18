@@ -223,7 +223,7 @@ class MessageRepositoryImpl(
         uris: Uri,
         timeManager: TimeManager,
         id: Long,
-    ): MessageData {
+    ): MessageData = withContext(Dispatchers.IO) {
 
         val contentResolver = context.contentResolver
         val inputStream = contentResolver.openInputStream(uris)
@@ -236,10 +236,7 @@ class MessageRepositoryImpl(
             FileOutputStream(imageFile)
         }
         bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-        withContext(Dispatchers.IO) {
-            outputStream.close()
-        }
-
+        outputStream.close()
 
         val path = imageFile.absolutePath
         val messageData = MessageData(
