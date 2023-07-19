@@ -5,6 +5,7 @@ import co.softov.morestuff.android.domain.createMessageForTest
 import co.softov.morestuff.android.domain.createScheduleForTest
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.usecase.task.GetTaskForScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -28,6 +29,7 @@ class CreateScheduleMessageUseCaseImplTest {
         val schedule = createScheduleForTest()
         val task = createTaskForTest()
         val message = createMessageForTest()
+        val messageData: MessageData? = null
 
         coEvery { getScheduleTaskUseCase(scheduleId) } returns Either.Right(task)
         coEvery {
@@ -35,7 +37,9 @@ class CreateScheduleMessageUseCaseImplTest {
                 taskId,
                 task.title,
                 ContentType.TASK_REMINDER,
-                scheduleId
+                messageData,
+                scheduleId,
+
             )
         } returns message.right()
 

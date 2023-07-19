@@ -8,7 +8,6 @@ import androidx.work.WorkManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
-import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
@@ -85,10 +84,8 @@ val dataModule = module {
         MessageRepositoryImpl(
             database = get(),
             mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
-            selectMasterMessagesMapper = SelectMasterMessagesMapper(timeFormatter = get()),
             messageDataMapper = makeMessageWithDataMapper(),
             timeManager = get(),
-            context = get()
         )
     }
 

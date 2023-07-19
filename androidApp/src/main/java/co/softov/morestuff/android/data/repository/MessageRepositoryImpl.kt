@@ -1,19 +1,12 @@
 package co.softov.morestuff.android.data.repository
 
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.MessageDataMapper
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
-import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
-import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.MessageData
@@ -24,23 +17,15 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jsoup.Jsoup
-import java.io.FileOutputStream
-import java.nio.file.Path
 
 class MessageRepositoryImpl(
     database: StuffDb,
     private val mapMessageDb: MessageDbMapper,
-    private val selectMasterMessagesMapper: SelectMasterMessagesMapper,
     private val messageDataMapper: MessageDataMapper,
     private val timeManager: TimeManager,
-    private val context: Context,
 ) : MessageRepository {
 
     private val messageQueries = database.messageQueries
@@ -49,8 +34,9 @@ class MessageRepositoryImpl(
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
-        return messageQueries.selectMasterMessages().asFlow().mapToList()
-            .map { mapList(it, selectMasterMessagesMapper) }
+        return messageQueries.selectMasterMessages(mapper = messageDataMapper)
+            .asFlow()
+            .mapToList()
     }
 
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
@@ -148,55 +134,6 @@ class MessageRepositoryImpl(
         ).executeAsOneOrNull()?.let { Either.Right(it.id) } ?: Either.Left(MessageDoesNotExist)
 
 
-    override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
-        withContext(Dispatchers.IO) {
-            try {
-                val userAgent = "Mozilla"
-                val referrer = "http://www.google.com"
-                val timeout = 10000
-                val docSelectQuery = "meta[property^=og:]"
-                val openGraphKey = "content"
-                val property = "property"
-                val ogImage = "og:image"
-                val ogDescription = "og:description"
-                val ogUrl = "og:url"
-                val ogTitle = "og:title"
-                val ogSiteName = "og:site_name"
-                val ogType = "og:type"
-                var url = inputUrl
-
-                if (!url.contains("http")) {
-                    url = "http://$url"
-                }
-
-                val response = Jsoup.connect(url).ignoreContentType(true).userAgent(userAgent)
-                    .referrer(referrer).timeout(timeout).followRedirects(true).execute()
-
-                val doc = response.parse()
-
-                val ogTags = doc.select(docSelectQuery)
-
-                var openGraphResult = OpenGraphResult()
-
-                ogTags.forEach { tag ->
-                    openGraphResult = when (tag.attr(property)) {
-                        ogImage -> openGraphResult.copy(image = tag.attr(openGraphKey))
-                        ogDescription -> openGraphResult.copy(description = tag.attr(openGraphKey))
-                        ogUrl -> openGraphResult.copy(url = tag.attr(openGraphKey))
-                        ogTitle -> openGraphResult.copy(title = tag.attr(openGraphKey))
-                        ogSiteName -> openGraphResult.copy(siteName = tag.attr(openGraphKey))
-                        ogType -> openGraphResult.copy(type = tag.attr(openGraphKey))
-                        else -> openGraphResult
-                    }
-                }
-
-                return@withContext openGraphResult
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return@withContext null
-            }
-        }
-
     override suspend fun insertUrlMetadata(
         url: String,
         openGraphResult: OpenGraphResult,
@@ -218,47 +155,6 @@ class MessageRepositoryImpl(
             messageData.messageType.name
         )
     }
-
-    override suspend fun handleImages(
-        uris: Uri,
-        timeManager: TimeManager,
-        id: Long,
-    ): MessageData = withContext(Dispatchers.IO) {
-
-        val contentResolver = context.contentResolver
-        val inputStream = contentResolver.openInputStream(uris)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        inputStream?.close()
-
-        val imageFile = createImageFile(timeManager).toFile()
-
-        val outputStream = withContext(Dispatchers.IO) {
-            FileOutputStream(imageFile)
-        }
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-        outputStream.close()
-
-        val path = imageFile.absolutePath
-        val messageData = MessageData(
-            id,
-            path,
-            creationTime = timeManager.getCreateTime(),
-            messageType = MessageDataType.Image
-        )
-        insertMessageData(messageData)
-
-        messageData
-    }
-
-
-    fun createImageFile(timeManager: TimeManager): Path {
-        val currentMoment = timeManager.nowLocalDateTime
-        val timeStamp =
-            "${currentMoment.year}${currentMoment.monthNumber}${currentMoment.dayOfMonth}_${currentMoment.hour}${currentMoment.minute}${currentMoment.second}"
-        val imageFileName = "JPEG_" + timeStamp + "_"
-        return kotlin.io.path.createTempFile(prefix = imageFileName, suffix = ".jpg")
-    }
-
 
     override suspend fun deleteMessage(messageId: Long) {
         messageQueries.deleteMessage(messageId)

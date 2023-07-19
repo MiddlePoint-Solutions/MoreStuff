@@ -1,23 +1,16 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import android.net.Uri
-import co.softov.morestuff.android.domain.model.MessageData
-import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.domain.service.TimeManager
-import timber.log.Timber
+import co.softov.morestuff.android.domain.service.ImageHandlerInterface
 
 interface HandleImagesUseCase {
-    suspend operator fun invoke(uris: Uri, id: Long): MessageData
+    suspend operator fun invoke(uris: Uri, id: Long): String
 }
 
 class HandleImagesUseCaseImpl(
-    private val messageRepository: MessageRepository,
-    private val timeManager: TimeManager
+    private val imageHandlerInterface: ImageHandlerInterface
 ) : HandleImagesUseCase {
-    override suspend fun invoke(uris: Uri, id: Long): MessageData {
-        Timber.d("IMAGE", "Received image URIs: $uris")
-        val messageWithData = messageRepository.handleImages(uris, timeManager, id)
-        Timber.d("HandleImagesUseCaseImpl", "Resulting MessageWithData: $messageWithData")
-       return messageWithData
+    override suspend fun invoke(uris: Uri, id: Long): String {
+        return imageHandlerInterface.handleImages(uris, id)
     }
 }

@@ -2,6 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParser
 import co.softov.morestuff.android.data.service.ClipboardHandlerImpl
+import co.softov.morestuff.android.data.service.ImageHandler
+import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.DevMiddleware
@@ -15,6 +17,8 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ImageHandlerInterface
+import co.softov.morestuff.android.domain.service.OpenGraphInterface
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import co.softov.morestuff.android.domain.usecase.message.CheckForUrlMetadataUseCase
@@ -25,7 +29,6 @@ import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMes
 import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCaseImpl
-
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
@@ -174,6 +177,8 @@ val serviceModule = module {
 
 val featuresModule = module {
     factoryOf(::VoiceToTextParser) bind VoiceToTextInterface::class
+    factoryOf(::ImageHandler) bind ImageHandlerInterface::class
+    factoryOf(::OpenGraph) bind OpenGraphInterface::class
 }
 
 
