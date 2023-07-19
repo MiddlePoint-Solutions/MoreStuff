@@ -1,9 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import arrow.core.Either
-import arrow.core.left
 import arrow.core.right
-import co.softov.morestuff.android.domain.model.TaskReorderFailure
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import io.mockk.coEvery
 import io.mockk.coVerify

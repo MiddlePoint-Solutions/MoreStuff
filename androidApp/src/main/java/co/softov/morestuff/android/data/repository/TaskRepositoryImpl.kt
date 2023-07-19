@@ -4,8 +4,9 @@ import arrow.core.Either
 import arrow.core.Either.Left
 import arrow.core.Either.Right
 import arrow.core.right
+import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.data.mapper.TaskWithScheduleDataMapper
-import co.softov.morestuff.android.data.mapper.TaskData
+import co.softov.morestuff.android.data.mapper.TaskDb
 import co.softov.morestuff.android.data.mapper.TaskDataMapper
 import co.softov.morestuff.android.data.mapper.mapCompleteTaskData
 import co.softov.morestuff.android.data.mapper.mapList
@@ -47,39 +48,28 @@ class TaskRepositoryImpl(
             )
             taskQueries.insertTask(data)
             val taskId = getLastInsertedRowId()
-            mapTaskData(data).copy(id = taskId)
+            taskQueries.selectTaskById(taskId, mapper = mapTaskData).executeAsOne()
         }
     }
 
-    override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> {
-        return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
-            null -> Left(TaskDoesNotExist)
-            else -> Right(mapTaskData(taskDb))
-        }
-    }
+    override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> =
+        taskQueries.selectTaskById(id = taskId, mapper = mapTaskData).executeAsOneOrNull()
+            .rightIfNotNull { TaskDoesNotExist }
 
-    override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
-        return taskQueries.selectTaskById(id = taskId).asFlow().mapToOne().map { mapTaskData(it) }
-    }
+    override fun getTaskFlow(taskId: Long): Flow<TaskDomain> =
+        taskQueries.selectTaskById(id = taskId, mapper = mapTaskData).asFlow().mapToOne()
 
-    override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectAllActive(mapper = mapTaskWithScheduleData).asFlow().mapToList()
-    }
+    override fun getActiveTasksFlow(): Flow<List<TaskDomain>> =
+        taskQueries.selectAllActive(mapper = mapTaskWithScheduleData).asFlow().mapToList()
 
-    override fun getNowTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectHighestPriorityTasks().asFlow().mapToList()
-            .map { mapList(it, mapTaskData) }
-    }
+    override fun getNowTasksFlow(): Flow<List<TaskDomain>> =
+        taskQueries.selectHighestPriorityTasks(mapper = mapTaskData).asFlow().mapToList()
 
-    override fun getLaterTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectLowestPriorityTasks().asFlow().mapToList()
-            .map { mapList(it, mapTaskData) }
-    }
+    override fun getLaterTasksFlow(): Flow<List<TaskDomain>> =
+        taskQueries.selectLowestPriorityTasks(mapper = mapTaskData).asFlow().mapToList()
 
-    override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> {
-        return taskQueries.selectAllComplete().asFlow().mapToList()
-            .map { mapList(it, ::mapCompleteTaskData) }
-    }
+    override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
+        taskQueries.selectAllComplete(mapper = mapTaskData).asFlow().mapToList()
 
     override suspend fun getHighestPriorityScore(): Long = taskQueries
         .selectHighestPriorityScore().executeAsOne().max ?: 0
@@ -113,7 +103,7 @@ class TaskRepositoryImpl(
         title: String,
         priorityScore: Long,
         taskType: TaskType,
-    ) = TaskData(
+    ) = TaskDb(
         id = 0,
         uuid = UUID.randomUUID().toString(),
         title = title,
@@ -124,26 +114,41 @@ class TaskRepositoryImpl(
     )
 
     override suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
-        return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
-            null -> Left(TaskDoesNotExist)
-            else -> taskQueries.transactionWithResult {
-                val newPriorityScore = taskDb.priority_score + 1
-                taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
-                Right(newPriorityScore)
+        return taskQueries.transactionWithResult {
+            when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+                null -> Left(TaskDoesNotExist)
+                else -> {
+                    val newPriorityScore = taskDb.priority_score + 1
+                    taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
+                    Right(newPriorityScore)
+                }
             }
         }
     }
 
-
     override suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
-        return when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
-            null -> Left(TaskDoesNotExist)
-            else -> taskQueries.transactionWithResult {
-                val newPriorityScore = taskDb.priority_score - 1
-                taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
-                Right(newPriorityScore)
+        return taskQueries.transactionWithResult {
+            when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+                null -> Left(TaskDoesNotExist)
+                else -> {
+                    val newPriorityScore = taskDb.priority_score - 1
+                    taskQueries.updateTaskPriorityScore(newPriorityScore, taskId)
+                    Right(newPriorityScore)
+                }
             }
         }
+    }
+
+    override suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain> {
+        return taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapTaskData)
+            .executeAsOneOrNull()
+            .rightIfNotNull { TaskDoesNotExist }
+    }
+
+    override suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain> {
+        return taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapTaskData)
+            .executeAsOneOrNull()
+            .rightIfNotNull { TaskDoesNotExist }
     }
 
     override suspend fun reorderTaskByAdding(
@@ -151,7 +156,7 @@ class TaskRepositoryImpl(
         priorityScore: Long
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
-            taskQueries.incrementTaskPriorityScore(priorityScore)
+            taskQueries.incrementTasksPriorityScore(priorityScore)
             taskQueries.updateTaskPriorityScore(priorityScore, taskId)
             Right(priorityScore)
         }
@@ -162,7 +167,7 @@ class TaskRepositoryImpl(
         priorityScore: Long
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
-            taskQueries.decrementTaskPriorityScore(priorityScore)
+            taskQueries.decrementTasksPriorityScore(priorityScore)
             taskQueries.updateTaskPriorityScore(priorityScore, taskId)
             Right(priorityScore)
         }
@@ -176,9 +181,10 @@ class TaskRepositoryImpl(
         return Right(priorityScore)
     }
 
-    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> {
-        return taskQueries.getActiveTaskWhithoutSchedule().executeAsList().map(mapTaskData).right()
-    }
+    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> =
+        taskQueries.getActiveTaskWhithoutSchedule(mapper = mapTaskData)
+            .executeAsList()
+            .right()
 
     override suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>> {
         return taskQueries.selectActiveTasksWithSchedule(
