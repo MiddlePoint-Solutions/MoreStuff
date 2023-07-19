@@ -32,6 +32,9 @@ interface TaskRepository {
     suspend fun getLowestPriorityScore(): Long
     suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Long>
     suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Long>
+    suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
+    suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
+
     suspend fun reorderTaskByAdding(
         taskId: Long,
         priorityScore: Long,
