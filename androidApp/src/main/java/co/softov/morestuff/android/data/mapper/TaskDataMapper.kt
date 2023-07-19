@@ -9,8 +9,16 @@ import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.db.SelectAllComplete
 
-typealias TaskData = co.softov.morestuff.db.Task
-typealias TaskDataMapper = (TaskData) -> TaskDomain
+typealias TaskDb = co.softov.morestuff.db.Task
+typealias TaskDataMapper = (
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+) -> TaskDomain
 
 typealias TaskWithScheduleDataMapper = (
     id: Long,
@@ -70,19 +78,25 @@ fun mapTaskWithScheduleData(
     )
 }
 
-fun makeTaskDbMapper(): TaskDataMapper = { task ->
-    mapTaskData(task)
-}
+fun makeTaskDbMapper(): TaskDataMapper = ::mapTaskData
 
-fun mapTaskData(input: TaskData): TaskDomain {
+fun mapTaskData(
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+): TaskDomain {
     return TaskDomain(
-        id = input.id,
-        uuid = input.uuid,
-        createTime = input.create_time,
-        completeTime = input.complete_time,
-        title = input.title,
-        priorityScore = input.priority_score,
-        taskType = input.task_type
+        id = id,
+        uuid = uuid,
+        createTime = create_time,
+        completeTime = complete_time,
+        title = title,
+        priorityScore = priority_score,
+        taskType = task_type
     )
 }
 

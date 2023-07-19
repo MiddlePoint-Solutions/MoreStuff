@@ -106,12 +106,32 @@ UPDATE task
 SET priority_score = :priority_score
 WHERE id = :task_id;
 
-decrementTaskPriorityScore:
+decrementTasksPriorityScore:
 UPDATE task
 SET priority_score = priority_score - 1
 WHERE priority_score <= :priority_score;
 
-incrementTaskPriorityScore:
+incrementTasksPriorityScore:
 UPDATE task
 SET priority_score = priority_score + 1
 WHERE priority_score >= :priority_score;
+
+selectAbovePriorityScore:
+SELECT task.* FROM task
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM task
+          WHERE complete_time IS NULL AND priority_score > :current_score
+          ORDER BY priority_score ASC LIMIT 1
+      )
+LIMIT 1;
+
+selectBelowPriorityScore:
+SELECT task.* FROM task
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM task
+          WHERE complete_time IS NULL AND priority_score < :current_score
+          ORDER BY priority_score DESC LIMIT 1
+      )
+LIMIT 1;

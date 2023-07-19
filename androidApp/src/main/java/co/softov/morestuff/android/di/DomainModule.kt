@@ -45,8 +45,12 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
-import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetTaskBelowPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetTaskBelowPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.UpdateTaskReviewPriorityUseCase
+import co.softov.morestuff.android.domain.usecase.priority.UpdateTaskReviewPriorityUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.BootCompleteSchedulerUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.BootCompleteSchedulerUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
@@ -91,10 +95,10 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotifications
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
@@ -218,6 +222,9 @@ val taskUseCases = module {
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
 
     // Task priority score
+    factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
+    factoryOf(::GetTaskAbovePriorityScoreUseCaseImpl) bind GetTaskAbovePriorityScoreUseCase::class
+    factoryOf(::GetTaskBelowPriorityScoreUseCaseImpl) bind GetTaskBelowPriorityScoreUseCase::class
     factoryOf(::GetPlanPriorityScoreUseCaseImpl) bind GetPlanPriorityScoreUseCase::class
     factoryOf(::GetHighestPriorityScoreUseCaseImpl) bind GetHighestPriorityScoreUseCase::class
     factoryOf(::GetLowestPriorityScoreUseCaseImpl) bind GetLowestPriorityScoreUseCase::class
@@ -253,7 +260,6 @@ val scheduleUseCases = module {
     factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
-    factoryOf(::GetReviewSchedulesUseCaseImpl) bind GetReviewSchedulesUseCase::class
     factoryOf(::ScheduleNotificationsAndWorkUseCaseImpl) bind ScheduleNotificationsAndWorkUseCase::class
     factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
 }
