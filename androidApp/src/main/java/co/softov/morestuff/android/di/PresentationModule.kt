@@ -5,7 +5,7 @@ import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import co.softov.morestuff.android.ui.home.MainChatViewModel
 import co.softov.morestuff.android.ui.list.SchedulePageViewModel
 import co.softov.morestuff.android.ui.input.UserInputViewModel
-import co.softov.morestuff.android.ui.main.MainViewModel
+import co.softov.morestuff.android.ui.MainViewModel
 import co.softov.morestuff.android.ui.model.PageType
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.priority.PlanViewModel

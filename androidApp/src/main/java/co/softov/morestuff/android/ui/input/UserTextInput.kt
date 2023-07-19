@@ -144,7 +144,7 @@ fun UserTextInput(
 @Preview
 @Composable
 private fun ChatInputPreviewDark() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         UserTextInput(
             sendAction = {},
             listAction = {},

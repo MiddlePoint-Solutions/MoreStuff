@@ -84,7 +84,7 @@ fun PriorityButton(
 @Preview
 @Composable
 fun PriorityButtonPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
 
     }
 }

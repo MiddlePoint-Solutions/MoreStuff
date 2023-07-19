@@ -28,6 +28,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -44,6 +45,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.ui.MaterialColors
 import co.softov.morestuff.android.app.ui.get
@@ -74,6 +76,8 @@ fun PriorityContent(
 ) {
 
     val scope = rememberCoroutineScope()
+    val model by viewModel.model.collectAsStateWithLifecycle()
+
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
 
@@ -222,7 +226,7 @@ fun PriorityContent(
             }
         }
 
-        if (showTaskCompleteAnimation > 0) {
+        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
             KonfettiView(
                 modifier = Modifier.fillMaxSize(),
                 parties = explode(),

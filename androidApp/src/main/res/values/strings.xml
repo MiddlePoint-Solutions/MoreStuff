@@ -101,5 +101,11 @@
     <string name="cd_move_to_top">Move task to top</string>
     <string name="move_to_bottom">Move to Bottom</string>
     <string name="cd_move_task_to_bottom">Move task to bottom</string>
+    <string name="select_theme">Select Theme</string>
+    <string name="cd_select_theme">Select Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="enable_confetti">Enable Confetti</string>
 
 </resources>

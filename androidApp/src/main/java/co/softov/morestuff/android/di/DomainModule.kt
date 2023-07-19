@@ -91,12 +91,12 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotifications
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeImplUseCase
-import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetUserSettingsUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCase
-import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
@@ -148,8 +148,8 @@ import org.koin.dsl.module
 
 val domainModules
     get() = buildList {
-        add(serviceModule) // TODO: is this still being used?
         add(storeModule)
+        add(serviceModule) // TODO: is this still being used?
         addAll(useCaseModules)
         add(timeManagerModule)
         add(timeFormatterModule)
@@ -175,7 +175,7 @@ val featuresModule = module {
 val storeModule = module {
     // Store
 
-    single {
+    single(createdAtStart = true) {
         AppStore(
             logger = get(),
             devMiddleware = get(),
@@ -277,9 +277,9 @@ val messageUseCases = module {
 
 
 val settingsUseCases = module {
-    factoryOf(::GetUserSettingsUseCaseImpl) bind GetUserSettingsUseCase::class
-    factoryOf(::SaveUserSettingsUseCaseImpl) bind SaveUserSettingsUseCase::class
-    factoryOf(::CheckFirstTimeImplUseCase) bind CheckFirstTimeUseCase::class
+    factoryOf(::GetAppSettingsUseCaseImpl) bind GetAppSettingsUseCase::class
+    factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
+    factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
 }
 
 val timeManagerModule = module {
