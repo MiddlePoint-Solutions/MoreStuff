@@ -73,7 +73,7 @@ class PriorityViewModel(
             val scoreAbove = tasks.getOrNull(toPosition - 1)?.priorityScore
             val scoreBelow = tasks.getOrNull(toPosition + 1)?.priorityScore
             viewModelScope.launch {
-                reorderTaskUseCase(task.id, task.priorityScore, scoreAbove, scoreBelow)
+                reorderTaskUseCase(task.id, scoreAbove, scoreBelow)
             }
         }
     }

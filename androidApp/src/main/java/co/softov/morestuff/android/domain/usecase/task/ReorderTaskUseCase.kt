@@ -11,7 +11,6 @@ val NA: Nothing? = null
 interface ReorderTaskUseCase {
     suspend operator fun invoke(
         taskId: Long,
-        currentScore: Long,
         aboveScore: Long? = NA,
         belowScore: Long? = NA,
     ): Either<Failure, Long>
@@ -23,7 +22,6 @@ class ReorderTaskUseCaseImpl(
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
         taskId: Long,
-        currentScore: Long,
         aboveScore: Long?,
         belowScore: Long?,
     ): Either<Failure, Long> = when {

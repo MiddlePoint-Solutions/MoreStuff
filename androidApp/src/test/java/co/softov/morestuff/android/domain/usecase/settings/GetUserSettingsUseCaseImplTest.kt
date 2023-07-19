@@ -1,8 +1,9 @@
 package co.softov.morestuff.android.domain.usecase.settings
 
-import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.redux.state.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,7 +22,7 @@ class GetUserSettingsUseCaseImplTest {
 
         getUserSettingsUseCase.invoke()
 
-        coEvery { userRepository.getAppSettings(expectedSettings) }
+        coVerify { userRepository.getAppSettings(expectedSettings) }
     }
 
     @Test

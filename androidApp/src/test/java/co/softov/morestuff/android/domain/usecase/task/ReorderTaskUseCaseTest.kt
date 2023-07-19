@@ -32,7 +32,7 @@ class ReorderTaskUseCaseImplTest {
 
     @Test
     fun `when no above or below score, should return failure`() = runBlocking {
-        val result = reorderTaskUseCase.invoke(1,)
+        val result = reorderTaskUseCase.invoke(1)
         assertTrue(result.isLeft())
     }
 
@@ -40,7 +40,7 @@ class ReorderTaskUseCaseImplTest {
     fun `when only below score, should update task with below score + 1`() = runBlocking {
         coEvery { updateTaskPriorityScoreUseCase(1, 6) } returns 6L.right()
 
-        val result = reorderTaskUseCase.invoke(1,, NA, 5)
+        val result = reorderTaskUseCase.invoke(1, NA, 5)
         assertTrue(result.isRight())
         assertEquals(6, result.orNull())
 
@@ -51,7 +51,7 @@ class ReorderTaskUseCaseImplTest {
     fun `when only above score, should update task with above score - 1`() = runBlocking {
         coEvery { updateTaskPriorityScoreUseCase(1, 4) } returns 4L.right()
 
-        val result = reorderTaskUseCase.invoke(1,, 5, NA)
+        val result = reorderTaskUseCase.invoke(1, 5, NA)
         assertTrue(result.isRight())
         assertEquals(4, result.orNull())
 
@@ -62,7 +62,7 @@ class ReorderTaskUseCaseImplTest {
     fun `when both scores and above equals average, should reorder by adding`() = runBlocking {
         coEvery { taskRepository.reorderTaskByAdding(1, 5) } returns 5L.right()
 
-        val result = reorderTaskUseCase.invoke(1,, 5, 5)
+        val result = reorderTaskUseCase.invoke(1, 5, 5)
         assertTrue(result.isRight())
         assertEquals(5, result.orNull())
 
@@ -73,7 +73,7 @@ class ReorderTaskUseCaseImplTest {
     fun `when both scores and below equals average, should reorder by subtracting`() = runBlocking {
         coEvery { taskRepository.reorderTaskBySubtracting(1, 5) } returns 5L.right()
 
-        val result = reorderTaskUseCase.invoke(1,, 6, 5)
+        val result = reorderTaskUseCase.invoke(1, 6, 5)
         assertTrue(result.isRight())
         assertEquals(5, result.orNull())
 
@@ -84,7 +84,7 @@ class ReorderTaskUseCaseImplTest {
     fun `when both scores are different, should update task with average score`() = runBlocking {
         coEvery { updateTaskPriorityScoreUseCase(1, 5) } returns 5L.right()
 
-        val result = reorderTaskUseCase.invoke(1,, 6, 4)
+        val result = reorderTaskUseCase.invoke(1, 6, 4)
         assertTrue(result.isRight())
         assertEquals(5, result.orNull())
 

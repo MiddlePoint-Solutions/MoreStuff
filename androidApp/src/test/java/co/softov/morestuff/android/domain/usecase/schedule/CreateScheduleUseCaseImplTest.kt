@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import arrow.core.right
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.createScheduleUseCaseTest
@@ -20,9 +21,9 @@ import org.junit.jupiter.api.Test
 import org.koin.test.inject
 
 
-class CreateScheduleUseCaseImplTest : DomainKoinTest {
+class CreateScheduleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val timeManager by inject<TimeManager>()
+    private val timeManager = TimeManagerImpl()
     private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>()
 
     private val createTime =
