@@ -70,8 +70,9 @@ fun MoreStuffHomeScaffold(
                 },
                 topBar = {
                     MoreStuffTopBar(
-                        openDrawer = { scope.launch { drawerState.open() } },
-                        showReview = showReview,
+                        reviewSelected = showReview,
+                        settingsSelected = showSettings,
+                        searchSelected = {}
                     )
                 },
                 content = content,
