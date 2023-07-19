@@ -24,4 +24,7 @@ sealed class Screen : Parcelable {
     @Parcelize
     data class Share(val shareable: Shareable, val content: String) : Screen()
 
+    @Parcelize
+    object AboutLibraries : Screen()
+
 }

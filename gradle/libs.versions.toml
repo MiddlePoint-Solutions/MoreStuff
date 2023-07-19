@@ -71,8 +71,7 @@ koinPlugin = "3.2.0"
 lottiCompose = "6.0.1"
 androidAppStartup = "1.1.1"
 konfettiCompose = "2.0.2"
-
-
+aboutLibrariesVersion = "10.8.3"
 
 [plugins]
 androidPlugin = { id = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
@@ -83,14 +82,19 @@ sqldelightPlugin = { id = "com.squareup.sqldelight", version.ref = "sqldelightPl
 googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 koinPlugin = { id = "org.koin.koin-gradle-plugin", version.ref = "koinPlugin" }
+aboutLibrariesPlugin = { id = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibrariesVersion" }
 
 [libraries]
 gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
 sqldelightPlugin = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqldelightPlugin" }
 firebaseCrashlyticsPlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
+aboutLibrariesPlugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibrariesVersion" }
 koinPlugin = { module = "io.insert-koin:koin-gradle-plugin", version.ref = "koinPlugin" }
 moleculePlugin = { module = "app.cash.molecule:molecule-gradle-plugin", version.ref = "moleculeGradlePlugin" }
+
+aboutLibrariesCore = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibrariesVersion" }
+aboutLibrariesCompose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibrariesVersion" }
 androidxCoreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidxLifecycleRuntimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidxActivityCompose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }

@@ -580,7 +580,7 @@ fun TaskMessageTextField(
 @Preview
 @Composable
 fun TaskChatTopBarPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         TaskChatTopBarEditTask(
             taskId = 1,
             isExpanded = true,
@@ -593,7 +593,7 @@ fun TaskChatTopBarPreview() {
 //@Preview
 //@Composable
 //fun TaskChatPreview() {
-//    MoreStuffTheme(darkTheme = true) {
+//    MoreStuffTheme() {
 //        TaskChatContent(
 //            taskId = 1,
 //            onBack = {}

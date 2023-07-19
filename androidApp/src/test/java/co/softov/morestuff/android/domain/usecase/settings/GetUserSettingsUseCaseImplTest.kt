@@ -12,22 +12,22 @@ import org.junit.jupiter.api.Test
 class GetUserSettingsUseCaseImplTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val getUserSettingsUseCase = GetUserSettingsUseCaseImpl(userRepository)
+    private val getUserSettingsUseCase = GetAppSettingsUseCaseImpl(userRepository)
 
     @Test
     fun `should call getUserSettings with correct params`(): Unit = runBlocking {
         val expectedSettings = AppSettings()
-        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
+        coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
         getUserSettingsUseCase.invoke()
 
-        coEvery { userRepository.getUserSettings(expectedSettings) }
+        coEvery { userRepository.getAppSettings(expectedSettings) }
     }
 
     @Test
     fun `should return AppSettings `() = runBlocking {
         val expectedSettings = AppSettings()
-        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
+        coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
         val result = getUserSettingsUseCase.invoke()
 

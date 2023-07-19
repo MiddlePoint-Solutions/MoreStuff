@@ -1,31 +1,58 @@
 package co.softov.morestuff.android.ui.settings
 
-import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.service.Notifier
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class SettingsViewModel(
-    private val notifier: Notifier
-) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
+    private val devTools: DevTools,
+) : NoStateViewModel() {
 
-    override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
-        return state
+    val model = MutableStateFlow(
+        with(store.state.value.settings) {
+            SettingsViewState(
+                appThemeIndex = appTheme.ordinal,
+                snoozeLimit = snoozeLimit,
+            )
+        }
+    )
+
+    init {
+        loadData()
     }
 
-    fun onSnoozeLimitChanged(limit: Int) {
-        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
+    override fun onAppStateChange(state: AppState) {
+        model.update {
+            it.copy(
+                appThemeIndex = state.settings.appTheme.ordinal,
+                snoozeLimit = state.settings.snoozeLimit,
+                confettiEnabled = state.settings.enableConfetti
+            )
+        }
     }
 
-    fun smartReminderEnabled(enable: Boolean) {
-        dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
+    fun onSnoozeLimitChanged(limit: Float) {
+        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit.toInt()))
     }
 
     fun clearPendingMessages() {
         dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
     }
 
-    fun testReviewActivity() {
-        notifier.showReviewNotification()
+    fun testReviewNotification() {
+        devTools.testReviewNotification()
+    }
+
+    fun selectAppTheme(index: Int) {
+        dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
+    }
+
+    fun enableConfetti(enable: Boolean) {
+        dispatchAppStoreAction(SettingAction.EnableConfetti(enable))
     }
 }

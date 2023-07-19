@@ -46,7 +46,7 @@ fun MoreStuffTopBar(
 @Preview
 @Composable
 fun MoreStuffTopBarPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         MoreStuffTopBar(
             openDrawer = {},
             showReview = {},

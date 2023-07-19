@@ -474,7 +474,7 @@ private fun RoundInfo(
 @Preview
 @Composable
 fun TaskCardPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         TaskCard(
             modifier = Modifier.aspectRatio(1f),
             task = ReviewItemUiModel(
@@ -492,7 +492,7 @@ fun TaskCardPreview() {
 @Preview
 @Composable
 fun ReviewSwipeControlsPreview() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         ReviewSwipeControls({ null }, { null }, {})
     }
 }

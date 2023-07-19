@@ -123,7 +123,7 @@ fun DrawerPreview() {
 @Composable
 @Preview
 fun DrawerPreviewDark() {
-    MoreStuffTheme(darkTheme = true) {
+    MoreStuffTheme() {
         Surface {
             DrawerLayout(closeDrawer = {})
         }

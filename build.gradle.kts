@@ -2,6 +2,9 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://plugins.gradle.org/m2/")
+        }
     }
 
     dependencies {
@@ -13,6 +16,7 @@ buildscript {
         classpath(libs.kotlinSerialization)
         classpath(libs.koinPlugin)
         classpath(libs.moleculePlugin)
+        classpath(libs.aboutLibrariesPlugin)
     }
 }
 group = "co.softov.morestuff"

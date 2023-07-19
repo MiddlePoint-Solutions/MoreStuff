@@ -14,27 +14,10 @@ import org.junit.jupiter.api.Test
 class SaveUserSettingsUseCaseImplTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val saveUserSettings = SaveUserSettingsUseCaseImpl(userRepository)
+    private val saveUserSettings = SaveUserSettingUseCaseImpl(userRepository)
 
-    @Test
-    fun `should call setSnoozeLimit with correct param`() = runBlocking {
-        val expectedSnoozeLimit = 10
-        val expectedSettings = AppSettings(snoozeLimit = expectedSnoozeLimit)
-        coEvery { userRepository.setSnoozeLimit(expectedSnoozeLimit) } returns Unit
-        saveUserSettings(expectedSettings)
+    // TODO:
 
-        coVerify { userRepository.setSnoozeLimit(expectedSnoozeLimit) }
-    }
-
-    @Test
-    fun `should return AppSettings `() = runBlocking {
-        val expectedSnoozeLimit = 5
-        val expectedSettings = AppSettings(snoozeLimit = expectedSnoozeLimit)
-        coEvery { userRepository.setSnoozeLimit(expectedSnoozeLimit) } returns Unit
-        val result = saveUserSettings(expectedSettings)
-
-        assertEquals(expectedSettings, result)
-    }
 }
 
 

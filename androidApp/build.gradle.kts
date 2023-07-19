@@ -12,6 +12,7 @@ plugins {
     id("koin")
     id("app.cash.molecule")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.mikepenz.aboutlibraries.plugin")
 }
 
 group = "io.middlepoint.morestuff"
@@ -218,6 +219,10 @@ dependencies {
     implementation(libs.activityCompose)
     implementation(libs.lottiCompose)
     implementation(libs.konfettiCompose)
+
+    implementation(libs.aboutLibrariesCore)
+    implementation(libs.aboutLibrariesCompose)
+
     testImplementation(libs.testCore)
     testImplementation(libs.testRules)
     testImplementation(libs.espressoCore)
@@ -225,5 +230,7 @@ dependencies {
     testImplementation(libs.koinTestJunit)
     testImplementation(libs.junit)
     testImplementation(libs.extJUnit)
+
+
 
 }
