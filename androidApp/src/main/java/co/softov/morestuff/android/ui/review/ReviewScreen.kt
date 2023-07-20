@@ -6,7 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.*
@@ -16,12 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +31,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
-import co.softov.morestuff.android.app.util.rememberRandomColor
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.chat.task.ProvideLocalViewModelStoreOwner
@@ -68,70 +67,62 @@ fun ReviewContent(
         viewModel.loadData()
     }
 
-    Surface {
-        Box(
-            modifier = Modifier
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+
+        val model by viewModel.uiModel.collectAsState()
+
+        BoxWithConstraints(
+            modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            Color(0xfff68084),
-                            Color(0xffa6c0fe),
-                        )
-                    )
-                )
-                .systemBarsPadding()
+                .background(MaterialTheme.colorScheme.background)
         ) {
 
-            val model by viewModel.uiModel.collectAsState()
+            when (model.round) {
+                ReviewRound.Review -> {
 
-            Box {
+                    PriorityReviewTopBar(navigateUp = onBack)
 
-                when (model.round) {
-                    ReviewRound.Review -> {
+                    val states =
+                        model.items.map { it to rememberSwipeableCardState(model.round) }
 
-                        Column {
-                            PriorityReviewTopBar(navigateUp = onBack)
-                            RoundInfo(model)
-                        }
-
-                        val states =
-                            model.items.map { it to rememberSwipeableCardState(model.round) }
-
-                        val visibleState = remember(model.round) {
-                            MutableTransitionState(false)
-                        }
-
-                        TaskPrioritySwipe(
-                            modifier = modifier.align(Alignment.Center),
-                            states = states,
-                            onSwiped = { schedule, direction, isLast ->
-                                viewModel.onTaskSwiped(schedule, direction, isLast)
-                            },
-                            onComplete = viewModel::completeTask
-                        )
-
-                        SlideAnimation(
-                            visibleState = visibleState,
-                            modifier = modifier.align(Alignment.BottomCenter),
-                        ) {
-                            ReviewSwipeControls(
-                                lastItemSwiped = { states.lastSwipedItem() },
-                                firstVisibleState = { states.firstVisibleStateOrNull() },
-                                undoAction = viewModel::undo,
-                                modifier = modifier.align(Alignment.BottomCenter)
-                            )
-                        }
-
-                        LaunchedEffect(key1 = model.round) {
-                            visibleState.targetState = true
-                        }
+                    val visibleState = remember(model.round) {
+                        MutableTransitionState(false)
                     }
 
-                    ReviewRound.Final -> {
-                        LaunchedEffect(Unit) {
-                            onBack()
-                        }
+                    SlideAnimation(
+                        visibleState = visibleState,
+                        modifier = modifier
+                            .fillMaxHeight(0.30f)
+                            .align(Alignment.BottomCenter),
+                    ) {
+                        ReviewSwipeControls(
+                            lastItemSwiped = { states.lastSwipedItem() },
+                            firstVisibleState = { states.firstVisibleStateOrNull() },
+                            undoAction = viewModel::undo,
+                        )
+                    }
+
+                    TaskPrioritySwipe(
+                        modifier = modifier
+                            .offset(y = 64.dp)
+                            .fillMaxHeight(0.7f),
+                        states = states,
+                        onSwiped = viewModel::onTaskSwiped,
+                        onComplete = viewModel::completeTask
+                    )
+
+                    LaunchedEffect(key1 = model.round) {
+                        visibleState.targetState = true
+                    }
+                }
+
+                ReviewRound.Final -> {
+                    LaunchedEffect(Unit) {
+                        onBack()
                     }
                 }
             }
@@ -153,17 +144,13 @@ private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateO
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
+    modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
 ) {
-    CenterAlignedTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 text = stringResource(id = R.string.priority_review),
-                modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                textAlign = TextAlign.Center
             )
         },
         navigationIcon = {
@@ -174,9 +161,6 @@ private fun PriorityReviewTopBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent
-        )
     )
 }
 
@@ -224,40 +208,46 @@ private fun ReviewSwipeControls(
         }
     }
 
-
     Column(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        Box(Modifier.align(Alignment.CenterHorizontally)) {
-            CircleButton(
-                onClick = undoLastAction,
-                icon = Icons.Rounded.Undo
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
+        ) {
+            MainReviewButton(
+                onClick = lowAction,
+                icon = Icons.Rounded.Remove
+
+            )
+            MainReviewButton(
+                onClick = highAction,
+                icon = Icons.Rounded.Add
             )
         }
 
         Row(
-            Modifier
-                .padding(horizontal = 24.dp, vertical = 32.dp)
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
         ) {
-            CircleButton(
-                onClick = lowAction,
-                icon = Icons.Rounded.ThumbDown
-            )
-            CircleButton(
+
+            SecondaryReviewButton(
                 onClick = laterAction,
-                icon = Icons.Rounded.Close
+                icon = ImageVector.vectorResource(id = R.drawable.ic_review_later_24px)
             )
-            CircleButton(
+
+            SecondaryReviewButton(
+                onClick = undoLastAction,
+                icon = ImageVector.vectorResource(id = R.drawable.ic_review_undo_24px)
+            )
+
+            SecondaryReviewButton(
                 onClick = doneAction,
-                icon = Icons.Rounded.Done
+                icon = ImageVector.vectorResource(id = R.drawable.ic_review_now_24px)
             )
-            CircleButton(
-                onClick = highAction,
-                icon = Icons.Rounded.ThumbUp
-            )
+
+
         }
     }
 }
@@ -265,42 +255,31 @@ private fun ReviewSwipeControls(
 @Composable
 @OptIn(ExperimentalSwipeableCardApi::class)
 private fun TaskPrioritySwipe(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
 ) {
-
     Box(
-        modifier
-            .padding(24.dp)
-            .fillMaxSize()
+        modifier = modifier.padding(20.dp)
     ) {
-        states.forEachIndexed { index, (task, state) ->
+        states.forEach { (task, state) ->
             if (state.swipedDirection == null) {
 
-                val selectedState = remember(task.id) { MutableTransitionState(false) }
-                val selectedTransition = updateTransition(selectedState, "Selected Transition")
-                val ratio by selectedTransition.animateFloat(label = "AspectRatio") {
-                    if (it) 0.8f else 1f
-                }
+                val isVisible = state == states.firstVisibleOrNull()?.second
 
                 TaskCard(
-                    modifier = modifier
+                    modifier = Modifier
                         .layoutId(task.id)
-                        .fillMaxSize()
-                        .clickable {
-                            selectedState.targetState = !selectedState.currentState
-                        }
-                        .aspectRatio(ratio)
                         .swipableCard(state = state),
                     task = task,
-                    onComplete = onComplete
+                    onComplete = onComplete,
+                    isVisible = isVisible
                 )
             }
             LaunchedEffect(task, state.swipedDirection) {
-                state.swipedDirection?.let {
-                    onSwiped(task, it, states.first().first == task)
+                state.swipedDirection?.let { direction ->
+                    onSwiped(task, direction, states.first().first == task)
                 }
             }
         }
@@ -308,95 +287,53 @@ private fun TaskPrioritySwipe(
 }
 
 @Composable
-private fun CircleButton(
+private fun MainReviewButton(
     onClick: () -> Unit,
     icon: ImageVector,
 ) {
+
+    val shape = RoundedCornerShape(42.dp)
+
     IconButton(
         modifier = Modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary)
-            .size(56.dp)
-            .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape),
+            .size(width = 140.dp, height = 48.dp)
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, Color(92, 94, 116), shape),
         onClick = onClick
     ) {
         Icon(
-            icon, null,
-            tint = MaterialTheme.colorScheme.onPrimary
+            icon,
+            null,
+            modifier = Modifier.size(32.dp),
+            tint = Color(140, 152, 255)
         )
     }
 }
 
 @Composable
-private fun TaskCard(
-    modifier: Modifier = Modifier,
-    task: ReviewItemUiModel,
-    onComplete: (ReviewItemUiModel) -> Unit,
+private fun SecondaryReviewButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
 ) {
-    val visibleState = remember { mutableStateOf(true) }
 
-    AnimatedVisibility(
-        visible = visibleState.value,
-        exit = fadeOut(animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing))
+    val shape = RoundedCornerShape(42.dp)
+
+    IconButton(
+        modifier = Modifier
+            .size(width = 90.dp, height = 48.dp)
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface),
+        onClick = onClick
     ) {
-        Card(
-            modifier = modifier,
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 5.dp
-            )
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            listOf(
-                                rememberRandomColor(),
-                                rememberRandomColor(),
-                            )
-                        )
-                    )
-            ) {
-                Column(Modifier.align(Alignment.Center)) {
-                    Text(
-                        text = task.title,
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        textAlign = TextAlign.Center,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(10.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(16.dp)
-                    ) {
-                        Button(
-                            onClick = {
-                                onComplete(task)
-                                visibleState.value = false
-                            },
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .padding(16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background)
-                        ) {
-                            Text(
-                                text = "Done",
-                                color = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        Icon(
+            icon,
+            null,
+            modifier = Modifier.size(24.dp),
+            tint = Color(92, 94, 116)
+        )
     }
 }
-
 
 @Composable
 private fun RoundInfo(
@@ -466,25 +403,6 @@ private fun RoundInfo(
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-
-@Preview
-@Composable
-fun TaskCardPreview() {
-    MoreStuffTheme() {
-        TaskCard(
-            modifier = Modifier.aspectRatio(1f),
-            task = ReviewItemUiModel(
-                title = "Hellooooo there",
-                createTime = "",
-                id = 0,
-                priorityScore = 0,
-                isCompleted = false
-            ),
-            onComplete = {}
-        )
     }
 }
 
