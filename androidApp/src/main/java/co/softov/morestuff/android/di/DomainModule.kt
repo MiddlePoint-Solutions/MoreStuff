@@ -2,7 +2,7 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParser
 import co.softov.morestuff.android.data.service.ClipboardHandlerImpl
-import co.softov.morestuff.android.data.service.ImageHandler
+import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -17,7 +17,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHandler
-import co.softov.morestuff.android.domain.service.ImageHandlerInterface
+import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.OpenGraphInterface
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
@@ -177,7 +177,7 @@ val serviceModule = module {
 
 val featuresModule = module {
     factoryOf(::VoiceToTextParser) bind VoiceToTextInterface::class
-    factoryOf(::ImageHandler) bind ImageHandlerInterface::class
+    factoryOf(::ImageHandlerImpl) bind ImageHandler::class
     factoryOf(::OpenGraph) bind OpenGraphInterface::class
 }
 
