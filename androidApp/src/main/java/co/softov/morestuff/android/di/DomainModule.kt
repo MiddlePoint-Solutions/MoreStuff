@@ -99,10 +99,10 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotifications
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
-import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl

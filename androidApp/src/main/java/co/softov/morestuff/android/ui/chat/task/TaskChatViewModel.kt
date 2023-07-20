@@ -20,6 +20,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ShareImageInterface
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
@@ -47,6 +48,7 @@ class TaskChatViewModel(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val clipboardHandler: ClipboardHandler,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val imageInterface: ShareImageInterface,
     private val taskId: Long,
     private val timeManager: TimeManager,
     devTools: DevTools,
@@ -199,4 +201,11 @@ class TaskChatViewModel(
             deleteMessageUseCase(messageId)
         }
     }
+
+    fun shareImage(imagePath: String){
+        viewModelScope.launch {
+            imageInterface.shareImage(imagePath)
+        }
+    }
+
 }

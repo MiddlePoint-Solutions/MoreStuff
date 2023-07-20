@@ -36,9 +36,6 @@ fun ShowContextMenu(
                 onCopyMessage(message)
                 onClose()
             },
-           /* ContextMenuItem("Share", Icons.Default.Share) {
-                onClose()
-            }*/
         )
     } else {
         listOf(

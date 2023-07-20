@@ -21,6 +21,7 @@ import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.android.data.repository.UserRepositoryImpl
 import co.softov.morestuff.android.data.service.NotifierImpl
+import co.softov.morestuff.android.data.service.ShareImage
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.repository.PreferenceRepository
@@ -29,6 +30,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
+import co.softov.morestuff.android.domain.service.ShareImageInterface
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
@@ -45,10 +47,14 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val dataModule = module {
+
+    single<String>(named("applicationId")) { androidContext().packageName }
+    single<ShareImageInterface> { ShareImage(get(), get(named("applicationId"))) }
 
     // Debugging
     single<ObservableSettings> {

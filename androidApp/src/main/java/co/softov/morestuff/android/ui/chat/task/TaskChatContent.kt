@@ -17,7 +17,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
@@ -51,12 +50,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -80,12 +79,12 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -109,6 +108,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
+import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
@@ -169,6 +169,9 @@ private fun TaskChatContent(
     val scrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
+    val shareImage = rememberUpdatedState<(String) -> Unit> { imagePath ->
+        viewModel.shareImage(imagePath)
+    }
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
         copyMessage = { message ->
@@ -224,12 +227,18 @@ private fun TaskChatContent(
                 BackHandler {
                     selectedImage = null
                 }
-                ImageScreen(
-                    imagePath = selectedImage!!,
-                    cancel = {
-                        selectedImage = null
-                    }
-                )
+                messages.find { it.messageData?.filePath == selectedImage }?.let {
+                    ImageScreen(
+                        imagePath = selectedImage!!,
+                        cancel = {
+                            selectedImage = null
+                        },
+                        onSendImage = { imagePath ->
+                            shareImage.value.invoke(imagePath)
+                        },
+                        message = it,
+                    )
+                }
             }
         }
 
@@ -327,6 +336,7 @@ private fun TaskChatContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImagePreviewScreen(
     imagePath: String,
@@ -346,6 +356,19 @@ fun ImagePreviewScreen(
             modifier = Modifier.fillMaxSize().navigationBarsPadding()
                 .imePadding(),
         ) {
+            TopAppBar(
+            title = { Text("Select image") },
+            navigationIcon = {
+                IconButton(onClick = cancel) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
+                }
+            },
+
+        )
             val imageUri = Uri.parse(imagePath)
             Image(
                 painter = rememberAsyncImagePainter(model = imageUri),
@@ -395,25 +418,12 @@ fun ImagePreviewScreen(
 
             Row(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(bottom = 50.dp),
+                    .align(Alignment.End)
+                    .padding(bottom = 50.dp, end = 15.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = cancel,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel",
-                        modifier = Modifier.size(36.dp),
-                        tint = Color.White
-                    )
-                }
+
                 Spacer(modifier = Modifier.width(32.dp))
                 IconButton(
                     onClick = {
@@ -421,15 +431,18 @@ fun ImagePreviewScreen(
                         messageText = ""
                     },
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(55.dp)
                         .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+
+
                 ) {
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = "Send",
-                        modifier = Modifier.size(36.dp),
-                        tint = Color.White
+                        modifier = Modifier.size(36.dp)
+                            .align(Alignment.CenterVertically),
+                        tint = Color.Black
                     )
                 }
             }
@@ -438,15 +451,18 @@ fun ImagePreviewScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageScreen(
     imagePath: String,
+    message: Message,
     cancel: () -> Unit,
+    onSendImage: (String) -> Unit,
 ) {
-    var scale by remember { mutableFloatStateOf(1.3f) }
+    var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        if (scale * zoomChange >= 1.3f) {
+        if (scale * zoomChange >= 1f) {
             scale *= zoomChange
             offset += offsetChange
         }
@@ -457,20 +473,35 @@ fun ImageScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
-            .pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = {
-                    scope.launch {
-                        scale = 1.3f
-                        offset = Offset.Zero
-                    }
-                })
-            }
+
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize()
         ) {
+            TopAppBar(
+                title = { Text("") },
+                navigationIcon = {
+                    IconButton(onClick = cancel) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Cancel",
+                            tint = Color.White
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onSendImage(imagePath) }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share",
+                            tint = Color.White
+                        )
+                    }
+                },
+            )
+
             val imageUri = Uri.parse(imagePath)
             Image(
                 painter = rememberAsyncImagePainter(
@@ -483,41 +514,35 @@ fun ImageScreen(
 
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .weight(1f)
-                    .rotate(90F)
+                    .weight(0.8f)
                     .graphicsLayer(
                         scaleX = scale,
                         scaleY = scale,
                         translationX = if (scale > 1.3f) offset.x else 0f,
                         translationY = if (scale > 1.3f) offset.y else 0f
                     )
-                    .transformable(state = state),
-
-                )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
+                    .transformable(state = state)
+                    .pointerInput(Unit) {
+                        detectTapGestures(onDoubleTap = {
+                            scope.launch {
+                                scale = 1f
+                                offset = Offset.Zero
+                            }
+                        })
+                    },
+            )
+            Text(
+                text = message.content,
                 modifier = Modifier
-                    .weight(0.1f)
-                    .padding(bottom = 50.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = cancel,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .border(2.dp, Color.White, CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Cancel",
-                        modifier = Modifier.size(36.dp),
-                        tint = Color.White
-                    )
-                }
-            }
+                    .weight(0.3f)
+                    .padding(4.dp)
+                    .padding(start = 15.dp, end = 15.dp)
+                    .align(Alignment.CenterHorizontally),
+                style = LocalTextStyle.current.copy(
+                    color = Color.White,
+                    fontSize = 16.sp
+                )
+            )
         }
     }
 }
