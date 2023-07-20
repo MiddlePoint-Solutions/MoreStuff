@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.domain.model
 
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.ReplyType
 
 data class Message(
@@ -17,4 +18,18 @@ data class Message(
     val openGraphResult: OpenGraphResult?,
     val messageData: MessageData?
 )
+
+sealed class MessageData2 {
+
+    object Empty : MessageData2()
+
+    data class Image(
+        val id: Long,
+        val filePath: String,
+        val creationTime: String,
+        val messageType: MessageDataType
+    ) : MessageData2()
+
+}
+
 

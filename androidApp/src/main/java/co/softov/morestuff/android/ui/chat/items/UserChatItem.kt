@@ -66,7 +66,6 @@ import kotlinx.coroutines.launch
 fun UserChatItem(
     message: Message,
     actions: ChatActions,
-    onImageSelected: (String) -> Unit,
 ) {
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
@@ -151,13 +150,13 @@ fun UserChatItem(
                                     )
                                 )
                             }
-                            ShowImage(
+                            ChatImageMessage(
                                 messageData = message.messageData,
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
                                     .combinedClickable(
                                         onClick = {
-                                            onImageSelected(message.messageData.filePath)
+                                            actions.onImageSelected(message)
                                         },
                                         onLongClick = { showMenu = true }
                                     )
@@ -217,7 +216,7 @@ fun UserChatItem(
 }
 
 @Composable
-fun ShowImage(
+private fun ChatImageMessage(
     messageData: MessageData,
     modifier: Modifier = Modifier,
 ) {
@@ -240,9 +239,8 @@ fun ShowImage(
 }
 
 
-
 @Composable
-fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
+private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
     Column(
         modifier = Modifier
             .padding(8.dp)
@@ -284,6 +282,6 @@ fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme() {
-        UserChatItem(message = MockData.Message.userNewTask, ChatActions(),  onImageSelected = {})
+        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }

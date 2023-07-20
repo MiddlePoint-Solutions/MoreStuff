@@ -136,9 +136,6 @@ fun HomeContent(
                                     actions = chatActions,
                                     modifier = modifier,
                                     scrollState = chatScrollState,
-                                    onImageSelected = { imagePath ->
-                                        selectedImage = imagePath
-                                    }
                                 )
                             },
                             sheetPeekHeight = 30.dp

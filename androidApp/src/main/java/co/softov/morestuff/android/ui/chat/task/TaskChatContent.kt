@@ -4,22 +4,13 @@ import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
+import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,12 +28,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -55,7 +44,6 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,7 +55,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -75,23 +62,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -119,16 +98,11 @@ import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import coil.compose.rememberAsyncImagePainter
-import coil.imageLoader
-import coil.request.ImageRequest
 import com.google.accompanist.insets.ui.Scaffold
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @Composable
 fun ProvideLocalViewModelStoreOwner(
@@ -158,7 +132,6 @@ fun TaskChatScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskChatContent(
     taskId: Long,
@@ -167,11 +140,16 @@ private fun TaskChatContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
     val shareImage = rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
+
+    val messages by viewModel.messages.collectAsState()
+
+    var selectImageFromGallery by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageMessage by remember { mutableStateOf<Message?>(null) }
+
     val chatActions = ChatActions(
         scheduleAction = viewModel::scheduleResponse,
         copyMessage = { message ->
@@ -179,90 +157,49 @@ private fun TaskChatContent(
         },
         deleteMessage = { message ->
             viewModel.deleteMessage(messageId = message.id)
+        },
+        onImageSelected = {
+            selectedImageMessage = it
         }
     )
 
-    val messages by viewModel.messages.collectAsState()
-
-    var openBottomSheet by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState()
-
-    val bottomSheetDismissAction: () -> Unit = {
-        scope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-            openBottomSheet = false
-        }
-    }
-    var selectImageFromGallery by remember { mutableStateOf<String?>(null) }
-    var selectedImage by remember { mutableStateOf<String?>(null) }
-
-    val pickImage =
-        rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uris ->
-            if (uris != null) {
-                Timber.d("\"IMAGE\", \"Image URIs: $uris\"")
-                selectImageFromGallery = uris.toString()
-            }
-        }
-
-    BackHandler(bottomSheetState.isVisible) {
-        scope.launch {
-            bottomSheetState.hide()
-        }.invokeOnCompletion {
-            openBottomSheet = false
-        }
+    val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
+        selectImageFromGallery = uri
     }
 
     var isExpanded by remember { mutableStateOf(false) }
 
     when {
-        selectedImage != null -> {
-            AnimatedVisibility(
-                visible = selectedImage != null,
-                enter = fadeIn(animationSpec = tween(durationMillis = 2000)) + slideInHorizontally(
-                    animationSpec = tween(durationMillis = 2000)
-                ),
-                exit = fadeOut(animationSpec = tween(durationMillis = 1000)) + slideOutHorizontally(
-                    animationSpec = tween(durationMillis = 1000)
-                )
-            ) {
-                BackHandler {
-                    selectedImage = null
-                }
-                messages.find { it.messageData?.filePath == selectedImage }?.let {
-                    ImageScreen(
-                        imagePath = selectedImage!!,
-                        cancel = {
-                            selectedImage = null
-                        },
-                        onSendImage = { imagePath ->
-                            shareImage.value.invoke(imagePath)
-                        },
-                        message = it,
-                    )
-                }
+        selectedImageMessage != null -> selectedImageMessage?.let {
+            BackHandler {
+                selectedImageMessage = null
             }
+            ImagePreviewScreen(
+                imagePath = it.messageData?.filePath ?: "",
+                cancel = {
+                    selectedImageMessage = null
+                },
+                onSendImage = { imagePath ->
+                    shareImage.value.invoke(imagePath)
+                },
+                message = it,
+            )
         }
 
-        selectImageFromGallery != null -> {
-            AnimatedVisibility(
-                visible = selectImageFromGallery != null,
-                enter = fadeIn() + slideInHorizontally(),
-                exit = fadeOut() + slideOutHorizontally()
-            ) {
-                BackHandler {
+        selectImageFromGallery != null -> selectImageFromGallery?.let {
+            BackHandler {
+                selectImageFromGallery = null
+            }
+            ImageImportScreen(
+                imageUri = it,
+                send = { message ->
+                    viewModel.sendImageMessageForTask(it, message)
+                    selectImageFromGallery = null
+                },
+                cancel = {
                     selectImageFromGallery = null
                 }
-                ImagePreviewScreen(
-                    imagePath = selectImageFromGallery!!,
-                    send = { message ->
-                        val uri = Uri.parse(selectImageFromGallery)
-                        viewModel.sendImageMessageForTask(uri, message)
-                        selectImageFromGallery = null
-                    },
-                    cancel = {
-                        selectImageFromGallery = null
-                    }
-                )
-            }
+            )
         }
 
         else -> {
@@ -298,9 +235,6 @@ private fun TaskChatContent(
                                 actions = chatActions,
                                 modifier = modifier.weight(1f),
                                 scrollState = scrollState,
-                                onImageSelected = { imagePath ->
-                                    selectedImage = imagePath
-                                }
                             )
 
                             Box(
@@ -318,7 +252,7 @@ private fun TaskChatContent(
                                         pickImages = {
                                             pickImage.launch(
                                                 PickVisualMediaRequest(
-                                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                                    PickVisualMedia.ImageOnly
                                                 )
                                             )
                                         }
@@ -326,223 +260,9 @@ private fun TaskChatContent(
                                 }
                             }
                         }
-
                     }
-
                 }
             }
-
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ImagePreviewScreen(
-    imagePath: String,
-    send: (String) -> Unit,
-    cancel: () -> Unit,
-) {
-    var messageText by remember { mutableStateOf("") }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize().navigationBarsPadding()
-                .imePadding(),
-        ) {
-            TopAppBar(
-            title = { Text("Select image") },
-            navigationIcon = {
-                IconButton(onClick = cancel) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            },
-
-        )
-            val imageUri = Uri.parse(imagePath)
-            Image(
-                painter = rememberAsyncImagePainter(model = imageUri),
-                contentDescription = "Selected Image",
-                modifier = Modifier
-                    .weight(1f)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BasicTextField(
-                value = messageText,
-                onValueChange = { messageText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp)
-                    .defaultMinSize(minHeight = 46.dp),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (messageText.isNotBlank()) {
-                        send(messageText.trim())
-                        messageText = ""
-                    }
-                }),
-                maxLines = Int.MAX_VALUE,
-                cursorBrush = SolidColor(LocalContentColor.current),
-                textStyle = LocalTextStyle.current.copy(
-                    color = LocalContentColor.current,
-                    fontSize = 18.sp
-                ),
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (messageText.isEmpty()) {
-                            Text(
-                                text = "Enter message",
-                                fontSize = 18.sp,
-                                color = Color.Gray
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(bottom = 50.dp, end = 15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Spacer(modifier = Modifier.width(32.dp))
-                IconButton(
-                    onClick = {
-                        send(messageText.trim())
-                        messageText = ""
-                    },
-                    modifier = Modifier
-                        .size(55.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send",
-                        modifier = Modifier.size(36.dp)
-                            .align(Alignment.CenterVertically),
-                        tint = Color.Black
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ImageScreen(
-    imagePath: String,
-    message: Message,
-    cancel: () -> Unit,
-    onSendImage: (String) -> Unit,
-) {
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        if (scale * zoomChange >= 1f) {
-            scale *= zoomChange
-            offset += offsetChange
-        }
-    }
-
-    val scope = rememberCoroutineScope()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            TopAppBar(
-                title = { Text("") },
-                navigationIcon = {
-                    IconButton(onClick = cancel) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Cancel",
-                            tint = Color.White
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { onSendImage(imagePath) }) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                            tint = Color.White
-                        )
-                    }
-                },
-            )
-
-            val imageUri = Uri.parse(imagePath)
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = imageUri)
-                        .apply(block = fun ImageRequest.Builder.() {
-                            crossfade(true)
-                        }).build(), imageLoader = LocalContext.current.imageLoader
-                ),
-                contentDescription = "Selected Image",
-
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .weight(0.8f)
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        translationX = if (scale > 1.3f) offset.x else 0f,
-                        translationY = if (scale > 1.3f) offset.y else 0f
-                    )
-                    .transformable(state = state)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onDoubleTap = {
-                            scope.launch {
-                                scale = 1f
-                                offset = Offset.Zero
-                            }
-                        })
-                    },
-            )
-            Text(
-                text = message.content,
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(4.dp)
-                    .padding(start = 15.dp, end = 15.dp)
-                    .align(Alignment.CenterHorizontally),
-                style = LocalTextStyle.current.copy(
-                    color = Color.White,
-                    fontSize = 16.sp
-                )
-            )
         }
     }
 }
@@ -906,7 +626,9 @@ fun TaskMessageTextField(
 
         IconButton(
             onClick = pickImages,
-            modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
         ) {
             Icon(Icons.Filled.PhotoLibrary, contentDescription = "select images")
         }
@@ -918,7 +640,9 @@ fun TaskMessageTextField(
                     messageText = ""
                 }
             },
-            modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
                 .padding(end = 8.dp, start = 3.dp)
         ) {
             Icon(Icons.Filled.Send, contentDescription = "send mensaje")
