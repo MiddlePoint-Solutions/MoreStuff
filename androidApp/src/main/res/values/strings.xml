@@ -107,5 +107,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
     <string name="enable_confetti">Enable Confetti</string>
+    <string name="delete">Delete</string>
+    <string name="copy">Copy</string>
 
 </resources>

@@ -30,7 +30,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.service.ShareImageInterface
+import co.softov.morestuff.android.domain.service.ShareImage
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
@@ -52,7 +52,7 @@ import org.koin.dsl.module
 
 val dataModule = module {
 
-    single<ShareImageInterface> { ShareImageImpl(get()) }
+    single<ShareImage> { ShareImageImpl(get()) }
 
     // Debugging
     single<ObservableSettings> {

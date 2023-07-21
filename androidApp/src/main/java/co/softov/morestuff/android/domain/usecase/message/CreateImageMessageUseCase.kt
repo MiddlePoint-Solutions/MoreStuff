@@ -6,7 +6,7 @@ import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.MessageData
-import co.softov.morestuff.android.domain.model.NoImagePathFailure
+import co.softov.morestuff.android.domain.model.SaveImageFailure
 import co.softov.morestuff.android.domain.service.TimeManager
 
 
@@ -36,7 +36,7 @@ class CreateImageMessageUseCaseImpl(
 
         return when (val imageResult = saveUserImageUseCase(filePath, taskId)) {
             is Either.Left -> {
-                Either.Left(NoImagePathFailure(imageResult.value))
+                Either.Left(SaveImageFailure(imageResult.value))
             }
             is Either.Right -> {
                 val imagePath = imageResult.value

@@ -13,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ContextMenuItem
 import co.softov.morestuff.android.domain.model.Message
 
@@ -28,22 +30,22 @@ fun ShowContextMenu(
 ) {
     val contextMenuItems = if (message.messageData?.filePath != null) {
         listOf(
-            ContextMenuItem("Delete", Icons.Default.Delete) {
+            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete) {
                 onDeleteMessage(message)
                 onClose()
             },
-            ContextMenuItem("Copy", Icons.Default.ContentCopy) {
+            ContextMenuItem(stringResource(R.string.copy), Icons.Default.ContentCopy) {
                 onCopyMessage(message)
                 onClose()
             },
         )
     } else {
         listOf(
-            ContextMenuItem("Copy", Icons.Default.ContentCopy) {
+            ContextMenuItem(stringResource(R.string.copy), Icons.Default.ContentCopy) {
                 onCopyMessage(message)
                 onClose()
             },
-            ContextMenuItem("Delete", Icons.Default.Delete) {
+            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete) {
                 onDeleteMessage(message)
                 onClose()
             }
