@@ -193,7 +193,7 @@ private fun TaskChatContent(
             ImageImportScreen(
                 imageUri = it,
                 send = { message ->
-                    viewModel.sendImageMessageForTask(it, message)
+                    viewModel.sendImageMessageForTask(it.toString(), message)
                     selectImageFromGallery = null
                 },
                 cancel = {

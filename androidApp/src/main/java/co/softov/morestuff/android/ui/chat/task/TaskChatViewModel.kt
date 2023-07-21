@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.chat.task
 
 
-import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -140,7 +139,7 @@ class TaskChatViewModel(
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
-    fun sendImageMessageForTask(uris: Uri, message: String) {
+    fun sendImageMessageForTask(uris: String, message: String) {
         store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 

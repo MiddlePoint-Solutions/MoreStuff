@@ -49,8 +49,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCase
-import co.softov.morestuff.android.domain.usecase.message.HandleImagesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
+import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetReviewSchedulesUseCase
@@ -280,7 +280,7 @@ val messageUseCases = module {
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
-    factoryOf(::HandleImagesUseCaseImpl) bind HandleImagesUseCase::class
+    factoryOf(::SaveUserImageUseCaseImpl) bind SaveUserImageUseCase::class
     factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
     factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class

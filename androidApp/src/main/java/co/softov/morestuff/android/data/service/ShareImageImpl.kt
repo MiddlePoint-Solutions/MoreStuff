@@ -6,12 +6,13 @@ import androidx.core.content.FileProvider
 import co.softov.morestuff.android.domain.service.ShareImageInterface
 import java.io.File
 
-class ShareImage(private val context: Context, private val applicationId: String) :
+class ShareImageImpl(private val context: Context) :
     ShareImageInterface {
 
     override fun shareImage(imagePath: String) {
+        val packageName = context.packageName
         val file = File(imagePath)
-        val contentUri = FileProvider.getUriForFile(context, "$applicationId.fileprovider", file)
+        val contentUri = FileProvider.getUriForFile(context, "$packageName.fileprovider", file)
 
         val intent = Intent().apply {
             action = Intent.ACTION_SEND

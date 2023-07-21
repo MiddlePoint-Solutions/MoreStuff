@@ -5,57 +5,63 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
-import android.net.Uri
+import androidx.core.net.toUri
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.FileOutputStream
-import java.io.InputStream
 import java.nio.file.Path
 
 class ImageHandlerImpl(
     private val context: Context,
     private val timeManager: TimeManager
 ) : ImageHandler {
-
-    override suspend fun handleImages(uris: Uri, id: Long): String? = withContext(Dispatchers.IO) {
-
-        var inputStream: InputStream?
+    override suspend fun handleImages(uris: String, id: Long): String? = withContext(Dispatchers.IO) {
         var outputStream: FileOutputStream?
 
         val savedImagePath = try {
             val contentResolver = context.contentResolver
-            inputStream = contentResolver.openInputStream(uris)
-            inputStream?.let {
-                val bitmap = BitmapFactory.decodeStream(inputStream)
+            val uri = uris.toUri()
 
-                val exifInterface = ExifInterface(inputStream)
-                val orientation = exifInterface.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_NORMAL
-                )
 
-                inputStream.close()
-
-                val rotatedBitmap = when (orientation) {
-                    ExifInterface.ORIENTATION_ROTATE_90 -> bitmap.rotate(90f)
-                    ExifInterface.ORIENTATION_ROTATE_180 -> bitmap.rotate(180f)
-                    ExifInterface.ORIENTATION_ROTATE_270 -> bitmap.rotate(270f)
-                    else -> bitmap
+            val exifInterface = uri.let { uri ->
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    ExifInterface(inputStream)
                 }
-
-                val imageFile = createImageFile(timeManager).toFile()
-
-                outputStream = withContext(Dispatchers.IO) {
-                    FileOutputStream(imageFile)
-                }
-
-                rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
-                outputStream?.close()
-                imageFile.absolutePath
             }
+            val orientation = exifInterface?.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            ) ?: ExifInterface.ORIENTATION_NORMAL
+
+
+            val bitmap = uri.let { uri ->
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    BitmapFactory.decodeStream(inputStream)
+                }
+            }
+
+
+            val rotatedBitmap = bitmap?.let {
+                when (orientation) {
+                    ExifInterface.ORIENTATION_ROTATE_90 -> it.rotate(90f)
+                    ExifInterface.ORIENTATION_ROTATE_180 -> it.rotate(180f)
+                    ExifInterface.ORIENTATION_ROTATE_270 -> it.rotate(270f)
+                    else -> it
+                }
+            }
+
+            val imageFile = createImageFile(timeManager).toFile()
+
+            outputStream = withContext(Dispatchers.IO) {
+                FileOutputStream(imageFile)
+            }
+
+            rotatedBitmap?.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
+            outputStream?.close()
+            imageFile.absolutePath
         } catch (e: Exception) {
             Timber.e(e, "Error handling image")
             ""

@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import android.net.Uri
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.displayTitle
@@ -23,7 +22,7 @@ sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
-    internal data class CreateImageMessageAction(val taskId: Long, val filePath: Uri, val message: String) : MessageAction()
+    internal data class CreateImageMessageAction(val taskId: Long, val filePath: String, val message: String) : MessageAction()
 }
 
 class MessageMiddleware(
