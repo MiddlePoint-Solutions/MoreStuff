@@ -27,9 +27,11 @@ import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
@@ -65,8 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             TransparentSystemBars()
+            NotificationPermissionRequester()
 
-            CompositionLocalProvider(LocalTheme provides viewModel.appTheme) {
+            ProvideAppTheme(viewModel.appTheme) {
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
@@ -156,5 +159,3 @@ class MainActivity : AppCompatActivity() {
         const val EXTRA_PRIORITY_REVIEW = "EXTRA_PRIORITY_REVIEW"
     }
 }
-
-val LocalTheme = compositionLocalOf { AppTheme.System }

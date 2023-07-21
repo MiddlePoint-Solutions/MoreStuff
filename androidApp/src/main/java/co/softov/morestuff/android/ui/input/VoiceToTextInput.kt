@@ -48,44 +48,59 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import co.softov.morestuff.android.app.features.VoiceToTextParserState
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import org.koin.compose.koinInject
 
-
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
     voiceToText: VoiceToTextInterface = koinInject()
 ) {
 
-    var canRecord by remember { mutableStateOf(false) }
     val recordingState by voiceToText.state.collectAsState()
+
+    VoiceToTextInputContent(
+        onUpdateValue = onUpdateValue,
+        startListening = { voiceToText.startListening("en") },
+        stopListening = voiceToText::stopListening,
+        recordingState = recordingState,
+    )
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun VoiceToTextInputContent(
+    onUpdateValue: (String) -> Unit,
+    startListening: () -> Unit,
+    stopListening: () -> Unit,
+    recordingState: VoiceToTextParserState = VoiceToTextParserState()
+) {
+
+    var canRecord by remember { mutableStateOf(false) }
     val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     var showPermissionDialog by remember { mutableStateOf(false) }
     val showDialog = remember { mutableStateOf(false) }
 
     if (recordingState.isSpeaking) {
         LaunchedEffect(Unit) {
-            voiceToText.state.collect { newState ->
-                onUpdateValue(newState.spokenText)
-            }
+            onUpdateValue(recordingState.spokenText)
         }
     }
 
     val onRecord = {
         if (!recordingState.isSpeaking) {
             if (canRecord) {
-                voiceToText.startListening("en")
+                startListening()
                 showDialog.value = true
             } else {
                 showPermissionDialog = true
             }
         } else {
-            voiceToText.stopListening()
+            stopListening()
             showDialog.value = false
         }
     }
@@ -157,7 +172,7 @@ fun VoiceToTextInput(
     if (showDialog.value) {
         Dialog(onDismissRequest = {
             showDialog.value = false
-            voiceToText.stopListening()
+            stopListening()
         }) {
             Card(shape = RectangleShape, modifier = Modifier.size(200.dp)) {
                 Column(

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import androidx.compose.runtime.Immutable
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -124,6 +125,7 @@ class VoiceToTextParser(
 
 }
 
+@Immutable
 data class VoiceToTextParserState(
     val spokenText: String = "",
     val isSpeaking: Boolean = false,

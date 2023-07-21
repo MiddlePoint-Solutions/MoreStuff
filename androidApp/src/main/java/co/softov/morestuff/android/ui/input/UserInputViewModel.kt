@@ -27,6 +27,9 @@ class UserInputViewModel(
     var planModel by mutableStateOf(createPlanModel())
         private set
 
+    var userInput by mutableStateOf("")
+        private set
+
     val currentPriority
         get() = when (priorityModel) {
             PriorityUI.Now -> Priority.Now()
@@ -64,7 +67,6 @@ class UserInputViewModel(
             epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
         )
         Timber.d("updatePlanDate: $planModel")
-
     }
 
     fun createNewTask(title: String) {
@@ -73,6 +75,10 @@ class UserInputViewModel(
 
     fun priorityChanged(priority: PriorityUI) {
         priorityModel = priority
+    }
+
+    fun updateUserInput(input: String) {
+        userInput = input
     }
 
 }

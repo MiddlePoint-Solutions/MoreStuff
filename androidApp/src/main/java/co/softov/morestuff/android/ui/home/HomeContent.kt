@@ -19,8 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -30,6 +32,8 @@ import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
+import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.list.ListsContent
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
@@ -89,6 +93,10 @@ fun HomeContent(
     }
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
+
+    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+    }
 
     if (showTaskLists) {
         ModalBottomSheet(
@@ -155,14 +163,26 @@ fun HomeContent(
                                 onDateChange = userInputViewModel::updatePlanDate,
                             )
                         },
-                        showTaskLists = { showTaskLists = true },
-                        onSubmitInput = {
-                            userInputViewModel.createNewTask(it)
-                            scope.launch {
-                                delay(200)
-                                priorityScrollState.animateScrollToItem(index = 0)
-                            }
-                        })
+                        textContent = {
+                            UserTextInput(
+                                value = userInputValue,
+                                onValueChange = { userInputValue = it },
+                                sendAction = {
+                                    userInputViewModel.createNewTask(it)
+                                    userInputValue = userInputValue.copy("")
+                                    scope.launch {
+                                        delay(200)
+                                        priorityScrollState.animateScrollToItem(index = 0)
+                                    }
+                                },
+                                actionsContent = {
+                                    VoiceToTextInput(
+                                        onUpdateValue = userInputViewModel::updateUserInput
+                                    )
+                                }
+                            )
+                        },
+                    )
                 }
             }
         }
