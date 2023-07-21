@@ -2,60 +2,54 @@ package co.softov.morestuff.android.data.repository
 
 
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import co.softov.morestuff.android.data.mapper.MessageDataMapper
 import co.softov.morestuff.android.data.mapper.MessageDbMapper
-import co.softov.morestuff.android.data.mapper.SelectMasterMessagesMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByIdMapper
-import co.softov.morestuff.android.data.mapper.SelectMessageByTaskIdMapper
-import co.softov.morestuff.android.data.mapper.SelectTaskMessagesByContentTypeMapper
-import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageData
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
 import co.softov.morestuff.db.StuffDb
 import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jsoup.Jsoup
 
 class MessageRepositoryImpl(
     database: StuffDb,
     private val mapMessageDb: MessageDbMapper,
-    private val mapMessageTaskChatDb: SelectTaskMessagesByContentTypeMapper,
-    private val selectMasterMessagesMapper: SelectMasterMessagesMapper,
-    private val selectMessageByTaskIdMapper: SelectMessageByTaskIdMapper,
-    private val selectMessageByIdMapper: SelectMessageByIdMapper,
+    private val messageDataMapper: MessageDataMapper,
     private val timeManager: TimeManager,
 ) : MessageRepository {
 
     private val messageQueries = database.messageQueries
     private val urlMetadataQueries = database.urlMetadataQueries
+    private val messageDataQueries = database.messageDataQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
-//        return messageQueries.selectAll().asFlow().mapToList()
-        return messageQueries.selectMasterMessages().asFlow().mapToList()
-            .map { mapList(it, selectMasterMessagesMapper) }
+        return messageQueries.selectMasterMessages(mapper = messageDataMapper)
+            .asFlow()
+            .mapToList()
     }
 
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
         return messageQueries.selectTaskMessagesByContentType(
             taskId,
-            ContentType.TASK_MESSAGE.value
-        ).asFlow().mapToList().map { mapList(it, mapMessageTaskChatDb) }
+            ContentType.TASK_MESSAGE.value,
+            mapper = messageDataMapper
+        ).asFlow().mapToList()
     }
 
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByTaskId(taskId)
-            .asFlow().mapToList().map { mapList(it, selectMessageByTaskIdMapper) }
+        return messageQueries.selectMessageByTaskId(taskId, mapper = messageDataMapper)
+            .asFlow().mapToList()
     }
 
     override suspend fun getActiveReminderMessages(): List<Message> {
@@ -64,10 +58,13 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
-        return when (val message =
-            messageQueries.selectMessageById(messageId).executeAsOneOrNull()) {
-            null -> Either.Left(MessageDoesNotExist)
-            else -> Either.Right(selectMessageByIdMapper(message))
+        val message = messageQueries.selectMessageById(
+            id = messageId,
+            mapper = messageDataMapper
+        ).executeAsOneOrNull()
+        return when (message) {
+            null -> MessageDoesNotExist.left()
+            else -> message.right()
         }
     }
 
@@ -75,21 +72,30 @@ class MessageRepositoryImpl(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
+        messageData: MessageData?,
         content: String,
-    ): Either<Failure, Message> {
-        val messageId: Long = messageQueries.transactionWithResult {
-            messageQueries.insertMessage(
-                task_id = taskId,
-                schedule_id = scheduleId,
-                create_time = timeManager.getCreateTime(),
-                content_type = contentType,
-                content = content
+    ): Either<Failure, Message> = messageQueries.transactionWithResult {
+        messageQueries.insertMessage(
+            task_id = taskId,
+            schedule_id = scheduleId,
+            create_time = timeManager.getCreateTime(),
+            content_type = contentType,
+            content = content
+        )
+        val messageId = lastInsertId
+        messageData?.let {
+            messageDataQueries.insertMessageData(
+                message_id = messageId,
+                file_path = messageData.filePath,
+                creation_time = timeManager.getCreateTime(),
+                data_type = messageData.messageType.name,
             )
-            lastInsertId
         }
-        return getMessage(messageId)
+        messageQueries.selectMessageById(
+            id = messageId,
+            mapper = messageDataMapper
+        ).executeAsOne().right()
     }
-
 
     override suspend fun addUserReplyMessage(
         taskId: Long,
@@ -128,55 +134,6 @@ class MessageRepositoryImpl(
         ).executeAsOneOrNull()?.let { Either.Right(it.id) } ?: Either.Left(MessageDoesNotExist)
 
 
-    override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
-        withContext(Dispatchers.IO) {
-            try {
-                val userAgent = "Mozilla"
-                val referrer = "http://www.google.com"
-                val timeout = 10000
-                val docSelectQuery = "meta[property^=og:]"
-                val openGraphKey = "content"
-                val property = "property"
-                val ogImage = "og:image"
-                val ogDescription = "og:description"
-                val ogUrl = "og:url"
-                val ogTitle = "og:title"
-                val ogSiteName = "og:site_name"
-                val ogType = "og:type"
-                var url = inputUrl
-
-                if (!url.contains("http")) {
-                    url = "http://$url"
-                }
-
-                val response = Jsoup.connect(url).ignoreContentType(true).userAgent(userAgent)
-                    .referrer(referrer).timeout(timeout).followRedirects(true).execute()
-
-                val doc = response.parse()
-
-                val ogTags = doc.select(docSelectQuery)
-
-                var openGraphResult = OpenGraphResult()
-
-                ogTags.forEach { tag ->
-                    openGraphResult = when (tag.attr(property)) {
-                        ogImage -> openGraphResult.copy(image = tag.attr(openGraphKey))
-                        ogDescription -> openGraphResult.copy(description = tag.attr(openGraphKey))
-                        ogUrl -> openGraphResult.copy(url = tag.attr(openGraphKey))
-                        ogTitle -> openGraphResult.copy(title = tag.attr(openGraphKey))
-                        ogSiteName -> openGraphResult.copy(siteName = tag.attr(openGraphKey))
-                        ogType -> openGraphResult.copy(type = tag.attr(openGraphKey))
-                        else -> openGraphResult
-                    }
-                }
-
-                return@withContext openGraphResult
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return@withContext null
-            }
-        }
-
     override suspend fun insertUrlMetadata(
         url: String,
         openGraphResult: OpenGraphResult,
@@ -187,6 +144,15 @@ class MessageRepositoryImpl(
             url = url,
             json_data = openGraphResultJson,
             message_id = messageId
+        )
+    }
+
+    override suspend fun insertMessageData(messageData: MessageData) {
+        messageDataQueries.insertMessageData(
+            messageData.id,
+            messageData.filePath,
+            messageData.creationTime,
+            messageData.messageType.name
         )
     }
 

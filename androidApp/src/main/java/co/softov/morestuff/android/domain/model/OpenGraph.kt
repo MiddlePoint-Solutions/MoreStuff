@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.chat.items
+package co.softov.morestuff.android.domain.model
 
 import kotlinx.serialization.Serializable
 

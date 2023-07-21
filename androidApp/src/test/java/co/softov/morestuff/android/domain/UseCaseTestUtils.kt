@@ -7,9 +7,11 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.ScheduleType
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import kotlinx.datetime.*
 import java.util.UUID
 
@@ -145,7 +147,9 @@ fun createMessageForTest(
     replyType: ReplyType = ReplyType.DONE,
     replyContent: String = "",
     replyTime: String = "",
-    openGraphResult: OpenGraphResult = OpenGraphResult()
+    openGraphResult: OpenGraphResult = OpenGraphResult(),
+    messageData: MessageData = MessageData(id = 1L, filePath = "", creationTime = "", messageType = MessageDataType.Image)
+
 ): Message {
     return Message(
         id,
@@ -158,6 +162,7 @@ fun createMessageForTest(
         replyType,
         replyContent,
         replyTime,
-        openGraphResult
+        openGraphResult,
+        messageData
     )
 }

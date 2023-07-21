@@ -5,7 +5,8 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.MessageData
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
@@ -16,14 +17,17 @@ interface MessageRepository {
 
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
+
     fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>>
 
     fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>>
+
 
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,
         contentType: Int,
+        messageData: MessageData?,
         content: String,
     ): Either<Failure, Message>
 
@@ -32,8 +36,11 @@ interface MessageRepository {
     suspend fun clearActiveReminderMessages()
 
     suspend fun countActiveReminderMessages(): Int
-    suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult?
+
     suspend fun insertUrlMetadata(url: String, openGraphResult: OpenGraphResult, messageId: Long)
+
+    suspend fun insertMessageData(messageData: MessageData)
+
     suspend fun deleteMessage(messageId: Long)
 
 }

@@ -5,8 +5,9 @@ import co.softov.morestuff.android.domain.model.Message
 
 
 data class ChatActions(
-    val scheduleAction: (scheduleId: Long, ReplyType) -> Unit = {_, _ ->},
+    val scheduleAction: (scheduleId: Long, ReplyType) -> Unit = { _, _ -> },
     val taskChatAction: (taskId: Long) -> Unit = {},
     val copyMessage: (Message) -> Unit = {},
     val deleteMessage: (Message) -> Unit = {},
+    val onImageSelected: (Message) -> Unit = {}
 )

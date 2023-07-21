@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.task
 
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,7 +11,6 @@ import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -19,6 +19,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserRe
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
@@ -46,6 +47,7 @@ class TaskChatViewModel(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val clipboardHandler: ClipboardHandler,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val shareImage: ImageHandler,
     private val taskId: Long,
     private val timeManager: TimeManager,
     devTools: DevTools,
@@ -137,6 +139,11 @@ class TaskChatViewModel(
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
+    fun sendImageMessageForTask(uris: String, message: String) {
+        store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
+    }
+
+
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PlanModel(
             planTime = this,
@@ -184,7 +191,6 @@ class TaskChatViewModel(
         planModel = createPlanModel()
     }
 
-
     fun copyToClipboard(text: String) {
         clipboardHandler.copyToClipboard(text)
     }
@@ -194,4 +200,11 @@ class TaskChatViewModel(
             deleteMessageUseCase(messageId)
         }
     }
+
+    fun shareImage(imagePath: String){
+        viewModelScope.launch {
+            shareImage.shareImage(imagePath)
+        }
+    }
+
 }

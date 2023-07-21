@@ -30,7 +30,8 @@ class CreateTaskConfirmationMessageUseCaseImpl(
         createMessageUseCase(
             taskId,
             title = confirmTitle,
-            contentType = ContentType.CONFIRM_NEW_TASK
+            contentType = ContentType.CONFIRM_NEW_TASK,
+            messageData = null
         )
         return Either.Right(true)
     }
