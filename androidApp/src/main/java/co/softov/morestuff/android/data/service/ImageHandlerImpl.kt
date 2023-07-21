@@ -1,16 +1,19 @@
 package co.softov.morestuff.android.data.service
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Path
 
@@ -18,7 +21,7 @@ class ImageHandlerImpl(
     private val context: Context,
     private val timeManager: TimeManager
 ) : ImageHandler {
-    override suspend fun handleImages(uris: String, id: Long): String? = withContext(Dispatchers.IO) {
+    override suspend fun saveImages(uris: String, id: Long): String? = withContext(Dispatchers.IO) {
         var outputStream: FileOutputStream?
 
         val savedImagePath = try {
@@ -84,4 +87,24 @@ class ImageHandlerImpl(
         val imageFileName = "JPEG_" + timeStamp + "_"
         return kotlin.io.path.createTempFile(prefix = imageFileName, suffix = ".jpg")
     }
+
+    override fun shareImage(imagePath: String) {
+        val packageName = context.packageName
+        val file = File(imagePath)
+        val contentUri = FileProvider.getUriForFile(context, "$packageName.fileprovider", file)
+
+        val intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_STREAM, contentUri)
+            type = "image/jpg"
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val chooserIntent = Intent.createChooser(intent, null).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        context.startActivity(chooserIntent)
+    }
+
+
 }

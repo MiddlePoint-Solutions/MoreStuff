@@ -20,17 +20,17 @@ import co.softov.morestuff.android.data.repository.PreferenceRepositoryImpl
 import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.android.data.repository.UserRepositoryImpl
+import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.NotifierImpl
-import co.softov.morestuff.android.data.service.ShareImageImpl
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.repository.PreferenceRepository
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.repository.UserRepository
+import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.service.ShareImage
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
@@ -52,7 +52,7 @@ import org.koin.dsl.module
 
 val dataModule = module {
 
-    single<ShareImage> { ShareImageImpl(get()) }
+    single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
 
     // Debugging
     single<ObservableSettings> {

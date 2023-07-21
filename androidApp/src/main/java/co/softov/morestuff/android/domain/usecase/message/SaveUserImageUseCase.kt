@@ -13,7 +13,7 @@ class SaveUserImageUseCaseImpl(
 
     override suspend fun invoke(uris: String, id: Long): Either<String, String> {
         return try {
-            val result = imageHandler.handleImages(uris, id)
+            val result = imageHandler.saveImages(uris, id)
             result?.let { Either.Right(it) } ?: Either.Left("No image path returned")
         } catch (e: Exception) {
             Either.Left("Error in SaveUserImageUseCase")
