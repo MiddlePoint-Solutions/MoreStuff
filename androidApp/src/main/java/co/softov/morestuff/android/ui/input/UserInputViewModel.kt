@@ -5,40 +5,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
-import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.enums.TaskType
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.TaskParams
-import co.softov.morestuff.android.ui.home.PlanModel
-import co.softov.morestuff.android.ui.home.PriorityUI
-import timber.log.Timber
+import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.home.mapToDomain
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class UserInputViewModel(
     private val timeManager: TimeManager,
 ) : NoStateViewModel() {
 
-    var priorityModel by mutableStateOf(PriorityUI.Now)
-        private set
-
-    var planModel by mutableStateOf(createPlanModel())
+    var priorityModel = MutableStateFlow<PriorityModel>(PriorityModel.Now)
         private set
 
     var userInput by mutableStateOf("")
         private set
 
-    val currentPriority
-        get() = when (priorityModel) {
-            PriorityUI.Now -> Priority.Now()
-            PriorityUI.Later -> Priority.Later()
-            PriorityUI.Plan -> Priority.Plan(planModel.planTime.toString())
-        }
-
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        PlanModel(
+        PriorityModel.Plan(
             planTime = timeManager.getDefaultPlanTime(),
             hour = hour,
             minute = minute,
@@ -46,39 +31,64 @@ class UserInputViewModel(
         )
     }
 
-
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.planTime, hour, minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            hour = hour,
-            minute = minute,
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
+        priorityModel.update { model ->
+            (model as? PriorityModel.Plan)?.let { plan ->
+                val updatedTime = timeManager.localDateTime(plan.planTime, hour, minute)
+                plan.copy(
+                    planTime = updatedTime,
+                    hour = hour,
+                    minute = minute,
+                    epochMs = updatedTime.currentTimeZoneInstant.toEpochMilliseconds()
+                )
+            } ?: model
+        }
     }
 
     fun updatePlanDate(dateMillis: Long) {
-        Timber.d("updatePlanDate: $dateMillis")
-        val updatedPlanTime =
-            timeManager.epochMillisToLocalDateTime(dateMillis, planModel.hour, planModel.minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            relativeDisplay = timeManager.getRelativeDate(updatedPlanTime.toString()),
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
-        Timber.d("updatePlanDate: $planModel")
+        priorityModel.update { model ->
+            (model as? PriorityModel.Plan)?.let { plan ->
+                val updatedTime = timeManager.epochMillisToLocalDateTime(
+                    dateMillis,
+                    plan.hour,
+                    plan.minute
+                )
+                plan.copy(
+                    planTime = updatedTime,
+                    relativeDisplay = timeManager.getRelativeDate(updatedTime.toString()),
+                    epochMs = updatedTime.currentTimeZoneInstant.toEpochMilliseconds()
+                )
+            } ?: model
+        }
     }
 
     fun createNewTask(title: String) {
-        store.dispatch(TaskAction.CreateUserTaskAction(title, currentPriority))
+        store.dispatch(
+            TaskAction.CreateUserTaskAction(
+                title,
+                priorityModel.value.mapToDomain()
+            )
+        )
     }
 
-    fun priorityChanged(priority: PriorityUI) {
-        priorityModel = priority
+    fun setNowPriority() {
+        priorityChanged(PriorityModel.Now)
+    }
+
+    fun setLaterPriority() {
+        priorityChanged(PriorityModel.Later)
+    }
+
+    fun setPlanPriority() {
+        priorityChanged(createPlanModel())
     }
 
     fun updateUserInput(input: String) {
         userInput = input
+    }
+
+    private fun priorityChanged(priority: PriorityModel) {
+        priorityModel.update { priority }
     }
 
 }

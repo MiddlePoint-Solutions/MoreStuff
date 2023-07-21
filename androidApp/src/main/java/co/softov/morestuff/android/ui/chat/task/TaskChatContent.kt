@@ -91,7 +91,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
@@ -285,6 +285,8 @@ fun TaskChatTopBarEditTask(
     val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
 
 
+
+
     val task by viewModel.task.collectAsState()
     val focusManager = LocalFocusManager.current
     val onBackPressed = {
@@ -386,7 +388,7 @@ fun TaskChatTopBarEditTask(
                             if (!expanded) {
                                 ScheduleButton(
                                     modifier = Modifier.alpha(if (isExpanded) 0f else 1f),
-                                    planModel = viewModel.planModel,
+                                    priorityModel = viewModel.planModel,
                                     onTimeChange = viewModel::updatePlanTime,
                                     onDateChange = viewModel::updatePlanDate,
                                     onCreatePlanAndReschedule = viewModel::createOneTimeSchedule,
@@ -410,7 +412,7 @@ fun TaskChatTopBarEditTask(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleButton(
-    planModel: PlanModel,
+    priorityModel: PriorityModel.Plan,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
     timeFormatter: TimeFormatter = koinInject(),
@@ -431,7 +433,7 @@ fun ScheduleButton(
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planModel.epochMs
+            initialSelectedDateMillis = priorityModel.epochMs
         )
 
         PriorityDatePicker(
@@ -450,8 +452,8 @@ fun ScheduleButton(
 
     if (showTimePickerDialog) {
         val timePickerState = rememberTimePickerState(
-            initialHour = planModel.hour,
-            initialMinute = planModel.minute
+            initialHour = priorityModel.hour,
+            initialMinute = priorityModel.minute
         )
         PriorityTimePicker(
             dismissTimePicker = { onShowTimePickerDialogChange(false) },
@@ -477,10 +479,10 @@ fun ScheduleButton(
 
         val buttonText = when {
             schedule == null -> stringResource(id = R.string.task_chat_schedule_reminder)
-            planModel.relativeDisplay == RelativeDateDisplay.Today -> stringResource(id = R.string.relative_today) + " " + (time
+            priorityModel.relativeDisplay == RelativeDateDisplay.Today -> stringResource(id = R.string.relative_today) + " " + (time
                 ?: "")
 
-            else -> getRelativeDate(planModel, timeFormatter) + " " + (time ?: "")
+            else -> getRelativeDate(priorityModel, timeFormatter) + " " + (time ?: "")
         }
 
 

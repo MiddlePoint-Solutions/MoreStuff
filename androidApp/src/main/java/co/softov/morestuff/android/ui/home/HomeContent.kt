@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
@@ -146,9 +147,11 @@ fun HomeContent(
                                     scrollState = chatScrollState,
                                 )
                             },
-                            sheetPeekHeight = 30.dp
+                            sheetPeekHeight = 0.dp
                         ) {}
                     }
+
+                    val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
 
                     UserInput(
                         modifier = Modifier
@@ -156,9 +159,10 @@ fun HomeContent(
                             .imePadding(),
                         priorityContent = {
                             PriorityInput(
-                                priority = userInputViewModel.priorityModel,
-                                planModel = userInputViewModel.planModel,
-                                onPriorityChange = userInputViewModel::priorityChanged,
+                                model = priorityModel,
+                                onNowSelected = userInputViewModel::setNowPriority,
+                                onLaterSelected = userInputViewModel::setLaterPriority,
+                                onPlanSelected = userInputViewModel::setPlanPriority,
                                 onTimeChange = userInputViewModel::updatePlanTime,
                                 onDateChange = userInputViewModel::updatePlanDate,
                             )

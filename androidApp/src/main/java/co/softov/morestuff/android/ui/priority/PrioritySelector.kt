@@ -4,24 +4,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.home.PriorityUI
-import co.softov.morestuff.android.ui.home.PriorityUI.*
+import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 
 @Composable
 fun PrioritySelector(
-    priority: PriorityUI,
-    onPrioritySelected: (PriorityUI) -> Unit,
+    priority: PriorityModel,
     modifier: Modifier = Modifier,
+    onNowSelected: () -> Unit = {},
+    onLaterSelected: () -> Unit = {},
+    onPlanSelected: () -> Unit = {},
 ) {
+
     Surface(
         modifier = modifier,
         shadowElevation = 8.dp
@@ -32,8 +33,8 @@ fun PrioritySelector(
                 modifier = Modifier
                     .weight(0.34f)
                     .height(50.dp),
-                selected = Now == priority,
-                onSelected = { onPrioritySelected(Now) },
+                selected = priority is PriorityModel.Now,
+                onSelected = onNowSelected,
                 text = stringResource(id = R.string.priority_now)
             )
 
@@ -41,8 +42,8 @@ fun PrioritySelector(
                 modifier = Modifier
                     .weight(0.34f)
                     .height(50.dp),
-                selected = Later == priority,
-                onSelected = { onPrioritySelected(Later) },
+                selected = priority is PriorityModel.Later,
+                onSelected = onLaterSelected,
                 text = stringResource(id = R.string.priority_later)
             )
 
@@ -50,8 +51,8 @@ fun PrioritySelector(
                 modifier = Modifier
                     .weight(0.34f)
                     .height(50.dp),
-                selected = Plan == priority,
-                onSelected = { onPrioritySelected(Plan) },
+                selected = priority is PriorityModel.Plan,
+                onSelected = onPlanSelected,
                 text = stringResource(id = R.string.priority_plan)
             )
 
@@ -62,11 +63,12 @@ fun PrioritySelector(
 @Preview
 @Composable
 fun UserPriorityInputPreviewDark() {
-    MoreStuffTheme() {
-        PrioritySelector(
-            priority = Now,
-            onPrioritySelected = {}
-        )
+    ProvideAppTheme(theme = AppTheme.Dark) {
+        MoreStuffTheme() {
+            PrioritySelector(
+                priority = PriorityModel.Now,
+            )
+        }
     }
 }
 
@@ -75,8 +77,7 @@ fun UserPriorityInputPreviewDark() {
 fun UserPriorityInputPreview() {
     MoreStuffTheme {
         PrioritySelector(
-            priority = Now,
-            onPrioritySelected = {}
+            priority = PriorityModel.Now,
         )
     }
 }

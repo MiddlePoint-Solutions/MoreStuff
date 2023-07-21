@@ -27,7 +27,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.PriorityModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -107,7 +107,7 @@ class TaskChatViewModel(
     private fun createPlanModelForScheduleVal(scheduleDomain: ScheduleDomain) {
         if (scheduleDomain.scheduleLocalTime != null) {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-            planModel = PlanModel(
+            planModel = PriorityModel.Plan(
                 planTime = localTime,
                 relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
                 hour = localTime.hour,
@@ -145,7 +145,7 @@ class TaskChatViewModel(
 
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        PlanModel(
+        PriorityModel.Plan(
             planTime = this,
             hour = hour,
             minute = minute,
