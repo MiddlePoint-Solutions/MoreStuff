@@ -2,6 +2,8 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParser
 import co.softov.morestuff.android.data.service.ClipboardHandlerImpl
+import co.softov.morestuff.android.data.service.ImageHandlerImpl
+import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.DevMiddleware
@@ -15,6 +17,8 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ImageHandler
+import co.softov.morestuff.android.domain.service.OpenGraphInterface
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import co.softov.morestuff.android.domain.usecase.message.CheckForUrlMetadataUseCase
@@ -23,6 +27,8 @@ import co.softov.morestuff.android.domain.usecase.message.ClearActivePendingMess
 import co.softov.morestuff.android.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
@@ -43,6 +49,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
+import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
@@ -173,6 +181,8 @@ val serviceModule = module {
 
 val featuresModule = module {
     factoryOf(::VoiceToTextParser) bind VoiceToTextInterface::class
+    factoryOf(::ImageHandlerImpl) bind ImageHandler::class
+    factoryOf(::OpenGraph) bind OpenGraphInterface::class
 }
 
 
@@ -275,10 +285,11 @@ val messageUseCases = module {
     factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
-
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
+    factoryOf(::SaveUserImageUseCaseImpl) bind SaveUserImageUseCase::class
     factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
+    factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
 }
 
 

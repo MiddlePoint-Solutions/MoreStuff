@@ -1,20 +1,27 @@
 package co.softov.morestuff.android.ui.chat.items
 
+import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Surface
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -27,9 +34,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.TextStyle
@@ -39,15 +49,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageData
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
+import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
     message: Message,
@@ -94,65 +108,139 @@ fun UserChatItem(
             modifier = Modifier
                 .padding(end = 10.dp, top = 4.dp, bottom = 4.dp)
         ) {
-            Surface(
-                shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                color = MaterialTheme.colorScheme.userChatItem,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+            Box(
                 modifier = Modifier
                     .padding(end = 5.dp, bottom = 4.dp)
                     .clickable {
                         showMenu = true
                     }
-
             ) {
-                Column(
-                    modifier = Modifier
-                        .padding(end = 5.dp, bottom = 4.dp)
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .padding(end = 15.dp)
-                            .run {
-                                urls?.let {
-                                    clickable {
-                                        coroutineScope.launch {
-                                            uriHandler.openUri(it)
-                                        }
-                                    }
-                                } ?: this
-                            },
-                        text = content,
-                        style = LocalTextStyle.current.copy(
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
-                    )
 
-
-                    if (openGraphResult?.title != null && openGraphResult.description != null) {
-                        OpenGraphPreview(openGraphResult)
+                if (message.messageData?.filePath != null) {
+                    Surface(
+                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        color = MaterialTheme.colorScheme.userChatItem,
+                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                        modifier = if (message.content.isEmpty()) {
+                            Modifier
+                                .padding(2.dp)
+                                .wrapContentWidth()
+                                .wrapContentHeight()
+                        } else {
+                            Modifier
+                                .padding(2.dp)
+                                .fillMaxWidth()
+                        }
+                    ) {
+                        Column(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            if (message.content.isNotEmpty()) {
+                                Text(
+                                    text = message.content,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .padding(end = 15.dp)
+                                        .align(Alignment.Start),
+                                    style = LocalTextStyle.current.copy(
+                                        color = Color.White,
+                                        fontSize = 16.sp
+                                    )
+                                )
+                            }
+                            ChatImageMessage(
+                                messageData = message.messageData,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .combinedClickable(
+                                        onClick = {
+                                            actions.onImageSelected(message)
+                                        },
+                                        onLongClick = { showMenu = true }
+                                    )
+                                    .aspectRatio(1f)
+                                    .size(200.dp)
+                            )
+                        }
                     }
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        color = MaterialTheme.colorScheme.userChatItem,
+                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                    ) {
+                        Column(
 
-                    ShowContextMenu(
-                        message,
-                        onCopyMessage = actions.copyMessage,
-                        onDeleteMessage = actions.deleteMessage,
-                        showMenu = showMenu,
-                        onClose = {
-                            showMenu = false
-                        },
-                        modifier = Modifier.padding(top = 20.dp)
-                    )
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .padding(end = 15.dp)
+                                    .run {
+                                        urls?.let {
+                                            clickable {
+                                                coroutineScope.launch {
+                                                    uriHandler.openUri(it)
+                                                }
+                                            }
+                                        } ?: this
+                                    },
+                                text = content,
+                                style = LocalTextStyle.current.copy(
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                )
+                            )
+                            if (openGraphResult?.title != null && openGraphResult.description != null) {
+                                OpenGraphPreview(openGraphResult)
+                            }
+                        }
+                    }
                 }
+
+                ShowContextMenu(
+                    message,
+                    onCopyMessage = actions.copyMessage,
+                    onDeleteMessage = actions.deleteMessage,
+                    showMenu = showMenu,
+                    onClose = {
+                        showMenu = false
+                    },
+                    modifier = Modifier.padding(top = 20.dp),
+                )
             }
         }
     }
 }
 
+@Composable
+private fun ChatImageMessage(
+    messageData: MessageData,
+    modifier: Modifier = Modifier,
+) {
+    val uri: Uri = Uri.parse(messageData.filePath)
+
+    Image(
+        painter = rememberAsyncImagePainter(
+            ImageRequest.Builder(LocalContext.current).data(data = uri)
+                .apply(block = fun ImageRequest.Builder.() {
+                    crossfade(true)
+                }).build(), imageLoader = LocalContext.current.imageLoader
+        ),
+        contentDescription = null,
+        modifier = modifier
+            .aspectRatio(1f)
+            .size(200.dp)
+            .border(2.dp, MaterialTheme.colorScheme.userChatItem, RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.Crop
+    )
+}
+
 
 @Composable
-fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
+private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
     Column(
         modifier = Modifier
             .padding(8.dp)

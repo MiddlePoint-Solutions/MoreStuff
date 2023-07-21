@@ -10,11 +10,10 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateS
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.message.CountActiveReminderMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
-import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -23,6 +22,7 @@ sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
+    internal data class CreateImageMessageAction(val taskId: Long, val filePath: String, val message: String) : MessageAction()
 }
 
 class MessageMiddleware(
@@ -30,9 +30,9 @@ class MessageMiddleware(
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
-    private val countActiveReminderMessagesUseCase: CountActiveReminderMessagesUseCase,
-    private val getActiveScheduleMessages: GetActiveScheduleMessages,
-) : Middleware<AppState> {
+    private val createImageMessageUseCase: CreateImageMessageUseCase,
+
+    ) : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
@@ -41,7 +41,6 @@ class MessageMiddleware(
         next: Next<AppState>,
         scope: CoroutineScope,
     ): Action {
-
         when (action) {
             is CreateScheduleMessageAction -> scope.launch {
                 createScheduleMessageUseCase(action.scheduleId).map { message ->
@@ -55,14 +54,21 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE)
+                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, messageData = null)
             }
+            is MessageAction.CreateImageMessageAction -> scope.launch {
+                createImageMessageUseCase(action.taskId, scheduleId = 0,
+                    contentType = ContentType.TASK_MESSAGE, filePath = action.filePath, action.message
+                    )
+            }
+
 
             is TaskAction.TaskCreatedAction -> scope.launch {
                 createMessageUseCase(
                     action.task.id,
                     title = action.task.title,
-                    contentType = ContentType.USER_NEW_TASK
+                    contentType = ContentType.USER_NEW_TASK,
+                    messageData = null
                 )
                 createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }

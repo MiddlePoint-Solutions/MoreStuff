@@ -1,18 +1,18 @@
 package co.softov.morestuff.android.domain.usecase.message
 
-import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.ui.chat.items.OpenGraphResult
+import co.softov.morestuff.android.domain.model.OpenGraphResult
+import co.softov.morestuff.android.domain.service.OpenGraphInterface
 
 interface FetchOpenGraphMetadataUseCase {
     suspend operator fun invoke(inputUrl: String): OpenGraphResult?
 }
 
 class FetchOpenGraphMetadataUseCaseImpl(
-    private val messageRepository: MessageRepository,
+    private val openGraphInterface: OpenGraphInterface
 ) : FetchOpenGraphMetadataUseCase {
     override suspend fun invoke(inputUrl: String): OpenGraphResult? {
 
-        return messageRepository.fetchOpenGraphMetadata(inputUrl)
+        return openGraphInterface.fetchOpenGraphMetadata(inputUrl)
     }
 }
 
