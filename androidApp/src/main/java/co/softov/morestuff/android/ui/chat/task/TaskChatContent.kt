@@ -91,12 +91,11 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
-import co.softov.morestuff.android.ui.priority.getRelativeDate
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import org.koin.androidx.compose.getViewModel
@@ -282,7 +281,7 @@ fun TaskChatTopBarEditTask(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
     val planModel = viewModel.planModel
-    val displayTime by remember(planModel) { mutableStateOf(planModel.planTime) }
+    val displayTime by remember(planModel) { mutableStateOf(planModel.localDateTime) }
 
 
 
@@ -412,7 +411,7 @@ fun TaskChatTopBarEditTask(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleButton(
-    priorityModel: PriorityModel.Plan,
+    priorityModel: PlanModel,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
     timeFormatter: TimeFormatter = koinInject(),

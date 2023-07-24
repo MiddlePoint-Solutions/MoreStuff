@@ -108,7 +108,7 @@ class TaskChatViewModel(
         if (scheduleDomain.scheduleLocalTime != null) {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
             planModel = PriorityModel.Plan(
-                planTime = localTime,
+                localDateTime = localTime,
                 relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
                 hour = localTime.hour,
                 minute = localTime.minute,
@@ -146,7 +146,7 @@ class TaskChatViewModel(
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PriorityModel.Plan(
-            planTime = this,
+            localDateTime = this,
             hour = hour,
             minute = minute,
             epochMs = currentTimeZoneInstant.toEpochMilliseconds()
@@ -158,15 +158,15 @@ class TaskChatViewModel(
             ScheduleAction.RescheduleTaskAction(
                 taskId,
                 ScheduleType.OneTime,
-                planModel.planTime.toString()
+                planModel.localDateTime.toString()
             )
         )
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.planTime, hour, minute)
+        val updatedPlanTime = timeManager.localDateTime(planModel.localDateTime, hour, minute)
         planModel = planModel.copy(
-            planTime = updatedPlanTime,
+            localDateTime = updatedPlanTime,
             hour = hour,
             minute = minute,
             epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
@@ -178,7 +178,7 @@ class TaskChatViewModel(
         val updatedPlanTime =
             timeManager.epochMillisToLocalDateTime(dateMillis, planModel.hour, planModel.minute)
         planModel = planModel.copy(
-            planTime = updatedPlanTime,
+            localDateTime = updatedPlanTime,
             relativeDisplay = timeManager.getRelativeDate(updatedPlanTime.toString()),
             epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
         )

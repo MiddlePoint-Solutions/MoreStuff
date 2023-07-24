@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -121,73 +122,45 @@ fun HomeContent(
         SlideAnimation(
             visibleState = visibleState,
         ) {
-            Box {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
 
-                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-                    bottomSheetState = rememberStandardBottomSheetState(
-                        skipHiddenState = true
-                    )
-                )
-
-                ConstraintLayout {
-                    val (bottomSheet, userInput) = createRefs()
-
-                    Box(
-                        modifier = Modifier
-                            .constrainAs(bottomSheet) { bottom.linkTo(userInput.top) }
-                            .fillMaxSize(),
-                    ) {
-                        BottomSheetScaffold(
-                            scaffoldState = bottomSheetScaffoldState,
-                            sheetContent = {
-                                Messages(
-                                    messages = messages,
-                                    actions = chatActions,
-                                    modifier = modifier,
-                                    scrollState = chatScrollState,
-                                )
-                            },
-                            sheetPeekHeight = 0.dp
-                        ) {}
-                    }
-
-                    val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
-
-                    UserInput(
-                        modifier = Modifier
-                            .constrainAs(userInput) { bottom.linkTo(parent.bottom) }
-                            .imePadding(),
-                        priorityContent = {
-                            PriorityInput(
-                                model = priorityModel,
-                                onNowSelected = userInputViewModel::setNowPriority,
-                                onLaterSelected = userInputViewModel::setLaterPriority,
-                                onPlanSelected = userInputViewModel::setPlanPriority,
-                                onTimeChange = userInputViewModel::updatePlanTime,
-                                onDateChange = userInputViewModel::updatePlanDate,
-                            )
-                        },
-                        textContent = {
-                            UserTextInput(
-                                value = userInputValue,
-                                onValueChange = { userInputValue = it },
-                                sendAction = {
-                                    userInputViewModel.createNewTask(it)
-                                    userInputValue = userInputValue.copy("")
-                                    scope.launch {
-                                        delay(200)
-                                        priorityScrollState.animateScrollToItem(index = 0)
-                                    }
-                                },
-                                actionsContent = {
-                                    VoiceToTextInput(
-                                        onUpdateValue = userInputViewModel::updateUserInput
-                                    )
+                UserInput(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .imePadding(),
+                    priorityContent = {
+                        PriorityInput(
+                            model = priorityModel,
+                            onNowSelected = userInputViewModel::setNowPriority,
+                            onLaterSelected = userInputViewModel::setLaterPriority,
+                            onPlanSelected = userInputViewModel::setPlanPriority,
+                            onTimeChange = userInputViewModel::updatePlanTime,
+                            onDateChange = userInputViewModel::updatePlanDate,
+                        )
+                    },
+                    textContent = {
+                        UserTextInput(
+                            value = userInputValue,
+                            onValueChange = { userInputValue = it },
+                            sendAction = {
+                                userInputViewModel.createNewTask(it)
+                                userInputValue = userInputValue.copy("")
+                                scope.launch {
+                                    delay(200)
+                                    priorityScrollState.animateScrollToItem(index = 0)
                                 }
-                            )
-                        },
-                    )
-                }
+                            },
+                            actionsContent = {
+                                VoiceToTextInput(
+                                    onUpdateValue = userInputViewModel::updateUserInput
+                                )
+                            }
+                        )
+                    },
+                )
             }
         }
     }

@@ -30,8 +30,10 @@ import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
+import co.softov.morestuff.android.ui.theme.LocalTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.ProvideAppTheme
+import co.softov.morestuff.android.ui.theme.isDark
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
@@ -66,10 +68,10 @@ class MainActivity : AppCompatActivity() {
                 handleLaunchIntent(intent)
             }
 
-            TransparentSystemBars()
             NotificationPermissionRequester()
 
             ProvideAppTheme(viewModel.appTheme) {
+                TransparentSystemBars()
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
@@ -102,7 +104,7 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun TransparentSystemBars() {
         val systemUiController = rememberSystemUiController()
-        val useDarkIcons = !isSystemInDarkTheme()
+        val useDarkIcons = !LocalTheme.current.isDark()
 
         DisposableEffect(systemUiController, useDarkIcons) {
             systemUiController.setSystemBarsColor(

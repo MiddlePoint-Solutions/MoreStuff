@@ -63,8 +63,7 @@ fun MoreStuffHomeScaffold(
                             state = dismissSnackbarState,
                             background = {},
                             dismissContent = { Snackbar(snackbarData = data) },
-                            modifier = Modifier
-                                .fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 },
