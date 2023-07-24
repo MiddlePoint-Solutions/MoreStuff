@@ -65,44 +65,42 @@ fun SettingsScreen(
         topBar = { SettingsTopBar(navigateBackSettings = onBack) }
     ) {
 
-        MoreStuffSettingTheme {
-            Box(
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .verticalScroll(scrollState)
+        ) {
+
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .verticalScroll(scrollState)
+                    .align(Alignment.TopCenter)
             ) {
+                SelectTheme(
+                    themeSelected = viewModel::selectAppTheme,
+                    defaultValue = { model.appThemeIndex }
+                )
+                SettingsDivider()
 
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                ) {
-                    SelectTheme(
-                        themeSelected = viewModel::selectAppTheme,
-                        defaultValue = { model.appThemeIndex }
+                SettingsGroup(title = { Text(text = "Test") }) {
+                    SelectSnoozeLimit(
+                        onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged,
+                        defaultValue = { model.snoozeLimit.toFloat() }
                     )
-                    SettingsDivider()
-
-                    SettingsGroup(title = { Text(text = "Test") }) {
-                        SelectSnoozeLimit(
-                            onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged,
-                            defaultValue = { model.snoozeLimit.toFloat() }
-                        )
-                    }
-
-                    SettingsDivider()
-                    EnableConfetti(
-                        defaultValue = { model.confettiEnabled },
-                        valueChanged = viewModel::enableConfetti,
-                    )
-                    SettingsDivider()
                 }
 
-                About(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    showLibraries = showLibraries
+                SettingsDivider()
+                EnableConfetti(
+                    defaultValue = { model.confettiEnabled },
+                    valueChanged = viewModel::enableConfetti,
                 )
+                SettingsDivider()
             }
+
+            About(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                showLibraries = showLibraries
+            )
         }
     }
 }

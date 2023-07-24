@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.schedule
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.scaleIn
@@ -71,7 +72,13 @@ fun PriorityItem(
                 .padding(12.dp),
             maxLines = 2,
             color = MaterialTheme.colorScheme.onSurface,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 23.8.sp,
+                fontWeight = FontWeight(700),
+                color = Color(0xFFFFFFFF),
+            )
         )
 
         AnimatedVisibility(
@@ -131,18 +138,17 @@ private fun TaskProfile(task: TaskDomain) {
     }
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun PriorityItemPreview() {
     MoreStuffTheme {
-        PriorityItem(task = TaskDomain(title = "Buy milk & bread"), onClick = {})
-    }
-}
-
-@Preview
-@Composable
-fun PriorityItemPreviewDark() {
-    MoreStuffTheme() {
         PriorityItem(task = TaskDomain(title = "Buy milk & bread"), onClick = {})
     }
 }
