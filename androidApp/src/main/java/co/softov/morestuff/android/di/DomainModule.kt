@@ -151,8 +151,8 @@ import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUs
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
+import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind

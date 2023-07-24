@@ -17,13 +17,9 @@ fun UserInput(
     textContent: @Composable () -> Unit = {},
 ) {
     Column(
-        modifier.imePadding()
+        modifier = modifier.imePadding()
     ) {
-        Surface(
-            color = Color.Transparent
-        ) {
-            priorityContent()
-        }
+        priorityContent()
         Surface(shadowElevation = 9.dp) {
             textContent()
         }

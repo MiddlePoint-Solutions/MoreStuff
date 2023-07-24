@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.priority
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -51,7 +50,7 @@ fun TaskPriorityBottomSheet(
                     LocalMinimumInteractiveComponentEnforcement provides false,
                 ) {
                     PriorityButton(
-                        onSelected = confirmationAction,
+                        onClick = confirmationAction,
                         modifier = Modifier
                             .height(60.dp)
                             .fillMaxWidth(),

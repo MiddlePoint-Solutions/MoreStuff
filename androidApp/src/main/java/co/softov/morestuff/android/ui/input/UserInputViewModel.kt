@@ -7,7 +7,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.home.PlanModel
@@ -39,7 +39,8 @@ class UserInputViewModel(
         time: LocalDateTime = timeManager.getDefaultPlanTime()
     ) = PlanModel(
         localDateTime = time,
-        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error"
+        displayDate = timeFormatter.formatToDateTime(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--"
     )
 
     fun updatePlanTime(hour: Int, minute: Int) {
@@ -59,8 +60,10 @@ class UserInputViewModel(
             (model.priority as? PriorityModel.Plan)?.let { plan ->
                 val updatedTime = timeManager.epochMillisToLocalDateTime(dateMillis, hour, minute)
                 val priority = plan.copy(localDateTime = updatedTime)
-                val planTime = model.planTime.copy(
+                val planTime = PlanModel(
                     localDateTime = updatedTime,
+                    displayDate = timeFormatter.formatToDateTime(updatedTime.toString()) ?: "Error",
+                    displayTime = timeFormatter.formatTimeOnly(updatedTime.toString()) ?: "--:--",
                     hour = hour,
                     minute = minute,
                     epochMs = updatedTime.currentTimeZoneInstant.toEpochMilliseconds()

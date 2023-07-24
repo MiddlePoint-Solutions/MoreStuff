@@ -28,7 +28,6 @@ import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 @Composable
 fun PrioritySelector(
     priority: PriorityModel,
-    modifier: Modifier = Modifier,
     onNowSelected: () -> Unit = {},
     onLaterSelected: () -> Unit = {},
     onPlanSelected: () -> Unit = {},

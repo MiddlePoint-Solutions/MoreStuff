@@ -16,6 +16,7 @@ sealed class PriorityModel {
 data class PlanModel(
     val localDateTime: LocalDateTime,
     val displayDate: String,
+    val displayTime: String,
     val hour: Int = localDateTime.hour,
     val minute: Int = localDateTime.minute,
     val epochMs: Long = localDateTime.currentTimeZoneInstant.toEpochMilliseconds(),

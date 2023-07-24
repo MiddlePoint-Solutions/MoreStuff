@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitle
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetLaterTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetNowTaskUseCase
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.PageType
 import co.softov.morestuff.android.ui.model.ScheduleListItemViewModel
 import co.softov.morestuff.android.ui.model.TaskListItemViewModel

@@ -5,7 +5,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -24,14 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.AppTheme
-import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.Orange600
 import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 
 @Composable
 fun PriorityButton(
-    onSelected: () -> Unit,
+    onClick: () -> Unit,
     text: String,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
@@ -40,7 +38,7 @@ fun PriorityButton(
     shape: Shape = CircleShape,
 ) {
     PriorityButton(
-        onClick = onSelected,
+        onClick = onClick,
         modifier = modifier.layoutId(text),
         selected = selected,
         enabled = enabled,

@@ -86,9 +86,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
-import co.softov.morestuff.android.domain.enums.RelativeDateDisplay
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.home.PlanModel
@@ -284,8 +283,6 @@ fun TaskChatTopBarEditTask(
     val displayTime by remember(planModel) { mutableStateOf(planModel.localDateTime) }
 
 
-
-
     val task by viewModel.task.collectAsState()
     val focusManager = LocalFocusManager.current
     val onBackPressed = {
@@ -478,15 +475,12 @@ fun ScheduleButton(
 
         val buttonText = when {
             schedule == null -> stringResource(id = R.string.task_chat_schedule_reminder)
-            priorityModel.relativeDisplay == RelativeDateDisplay.Today -> stringResource(id = R.string.relative_today) + " " + (time
-                ?: "")
-
-            else -> getRelativeDate(priorityModel, timeFormatter) + " " + (time ?: "")
+            else -> priorityModel.displayDate + " " + (time ?: "")
         }
 
 
         PriorityButton(
-            onSelected = { onShowDatePickerDialogChange(true) },
+            onClick = { onShowDatePickerDialogChange(true) },
             text = buttonText,
             shape = RoundedCornerShape(percent = 50),
         )
