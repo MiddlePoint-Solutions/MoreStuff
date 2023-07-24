@@ -2,9 +2,15 @@ package co.softov.morestuff.android.ui.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.nav.Screen
-import co.softov.morestuff.android.domain.nav.Screen.*
+import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
+import co.softov.morestuff.android.domain.nav.Screen.Home
+import co.softov.morestuff.android.domain.nav.Screen.OnBoarding
+import co.softov.morestuff.android.domain.nav.Screen.Review
+import co.softov.morestuff.android.domain.nav.Screen.Settings
+import co.softov.morestuff.android.domain.nav.Screen.Share
+import co.softov.morestuff.android.domain.nav.Screen.TaskChat
+import co.softov.morestuff.android.ui.ShareableContent
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.navigation.ChildStack
@@ -22,13 +28,12 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainContent(
     initialScreen: Screen?,
     navigation: StackNavigation<Screen>,
-    shareContent: (taskId: Long, content: String) -> Unit
+    shareContent: (taskId: Long, content: ShareableContent) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -71,17 +76,18 @@ fun MainContent(
                 onBack = navigation::pop
             )
 
-            is Share -> ShareScreen(
-                onBack = navigation::pop,
-                shareable = screen.shareable,
-                content = screen.content,
-                shareToExistingTask = { taskId ->
+            is Share -> {
+                ShareScreen(
+                    onBack = navigation::pop,
+                    shareable = screen.shareable,
+                    content = screen.content,
+                ) { taskId, shareableContent ->
                     navigation.replaceCurrent(
                         TaskChat(taskId),
-                        onComplete = { shareContent(taskId, screen.content) }
+                        onComplete = { shareContent(taskId, shareableContent) }
                     )
-                },
-            )
+                }
+            }
 
             is AboutLibraries -> AboutLibrariesScreen(onBack = navigation::pop)
         }

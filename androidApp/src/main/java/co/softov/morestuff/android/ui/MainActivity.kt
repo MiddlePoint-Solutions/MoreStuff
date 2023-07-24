@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.compose.setContent
@@ -33,6 +34,7 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -72,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                             MainContent(
                                 initialScreen = initialScreen,
                                 navigation = navigation,
-                                shareContent = viewModel::shareTextToTask
+                                shareContent = viewModel::shareContentToTask
                             )
                         }
                     }
@@ -109,26 +111,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLaunchIntent(intent: Intent): Screen? = when (intent.action) {
-        Intent.ACTION_SEND -> {
-            if ("text/plain" == intent.type) {
-                intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                    Screen.Share(Shareable.Text, it)
-                }
-            } else if (intent.type?.startsWith("image/") == true) {
-                TODO("Implement image sharing")
-            } else null
-        }
+    private fun handleLaunchIntent(intent: Intent): Screen? = runBlocking {
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                        Screen.Share(Shareable.Text, it)
+                    }
+                } else if (intent.type?.startsWith("image/") == true) {
+                    (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { it ->
+                        Timber.d("URI: $it")
+                        Screen.Share(Shareable.Image, it.toString())
+                    }
+                } else null
+            }
 
-        ACTION_NOTIFICATION_REMINDER -> {
-            Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
-        }
+            ACTION_NOTIFICATION_REMINDER -> {
+                Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
+            }
 
-        ACTION_NOTIFICATION_REVIEW -> {
-            Screen.Review
-        }
+            ACTION_NOTIFICATION_REVIEW -> {
+                Screen.Review
+            }
 
-        else -> null
+            else -> null
+        }
     }
 
 
