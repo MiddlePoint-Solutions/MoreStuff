@@ -115,7 +115,7 @@ private val DarkColors = darkColorScheme(
 fun MoreStuffTheme(
     content: @Composable () -> Unit
 ) {
-    val darkTheme = LocalTheme.current.isDark()
+    val darkTheme = isDarkTheme()
 
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
@@ -131,7 +131,7 @@ fun MoreStuffTheme(
 fun MoreStuffSettingTheme(
     content: @Composable () -> Unit
 ) {
-    val darkTheme = LocalTheme.current.isDark()
+    val darkTheme = isDarkTheme()
 
     MaterialTheme(
         colorScheme = if (darkTheme) darkColors.copy(surface = darkBlue) else lightColors,
@@ -144,7 +144,7 @@ fun MoreStuffSettingTheme(
 }
 
 @Composable
-fun AppTheme.isDark(): Boolean {
+fun isDarkTheme(): Boolean {
     val darkTheme = when (LocalTheme.current) {
         AppTheme.System -> isSystemInDarkTheme()
         AppTheme.Light -> false
