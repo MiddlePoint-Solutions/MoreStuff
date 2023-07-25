@@ -21,7 +21,7 @@ class ImageHandlerImpl(
     private val context: Context,
     private val timeManager: TimeManager
 ) : ImageHandler {
-    override suspend fun saveImages(uris: String, id: Long): String? = withContext(Dispatchers.IO) {
+    override suspend fun saveImages(uris: String): String? = withContext(Dispatchers.IO) {
         var outputStream: FileOutputStream?
 
         val savedImagePath = try {

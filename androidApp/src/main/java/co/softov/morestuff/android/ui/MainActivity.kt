@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
+import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
@@ -72,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                             MainContent(
                                 initialScreen = initialScreen,
                                 navigation = navigation,
-                                shareContent = viewModel::shareTextToTask
+                                shareContent = viewModel::shareContentToTask
                             )
                         }
                     }
@@ -109,27 +110,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLaunchIntent(intent: Intent): Screen? = when (intent.action) {
-        Intent.ACTION_SEND -> {
-            if ("text/plain" == intent.type) {
-                intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                    Screen.Share(Shareable.Text, it)
-                }
-            } else if (intent.type?.startsWith("image/") == true) {
-                TODO("Implement image sharing")
-            } else null
-        }
+    private fun handleLaunchIntent(intent: Intent) =
+        when (intent.action) {
+            Intent.ACTION_SEND -> {
+                if ("text/plain" == intent.type) {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                        Screen.Share(Shareable.Text(it), it)
+                    }
+                } else if (intent.type?.startsWith("image/") == true) {
+                    intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+                        Screen.Share(Shareable.Image(it.toString(),""), it.toString())
+                    }
+                } else null
+            }
 
-        ACTION_NOTIFICATION_REMINDER -> {
-            Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
-        }
+            ACTION_NOTIFICATION_REMINDER -> {
+                Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
+            }
 
-        ACTION_NOTIFICATION_REVIEW -> {
-            Screen.Review
-        }
+            ACTION_NOTIFICATION_REVIEW -> {
+                Screen.Review
+            }
 
-        else -> null
-    }
+            else -> null
+        }
 
 
     @SuppressLint("BatteryLife")
