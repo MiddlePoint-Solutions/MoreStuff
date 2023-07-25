@@ -25,10 +25,9 @@ data class PlanModel(
 fun PriorityInputModel.mapToDomain() = when (priority) {
     PriorityModel.Later -> Priority.Later()
     PriorityModel.Now -> Priority.Now()
-    is PriorityModel.Plan -> Priority.Plan(planTime.toString())
+    is PriorityModel.Plan -> Priority.Plan(priority.localDateTime.toString())
 }
 
-// TODO: use this
 @Immutable
 data class PriorityInputModel(
     val priority: PriorityModel,
