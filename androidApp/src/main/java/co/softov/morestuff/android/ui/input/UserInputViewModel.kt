@@ -39,7 +39,7 @@ class UserInputViewModel(
         time: LocalDateTime = timeManager.getDefaultPlanTime()
     ) = PlanModel(
         localDateTime = time,
-        displayDate = timeFormatter.formatToDateTime(time.toString()) ?: "Error",
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--"
     )
 
@@ -60,14 +60,7 @@ class UserInputViewModel(
             (model.priority as? PriorityModel.Plan)?.let { plan ->
                 val updatedTime = timeManager.epochMillisToLocalDateTime(dateMillis, hour, minute)
                 val priority = plan.copy(localDateTime = updatedTime)
-                val planTime = PlanModel(
-                    localDateTime = updatedTime,
-                    displayDate = timeFormatter.formatToDateTime(updatedTime.toString()) ?: "Error",
-                    displayTime = timeFormatter.formatTimeOnly(updatedTime.toString()) ?: "--:--",
-                    hour = hour,
-                    minute = minute,
-                    epochMs = updatedTime.currentTimeZoneInstant.toEpochMilliseconds()
-                )
+                val planTime = createPlanTime(updatedTime)
                 PriorityInputModel(priority, planTime)
             } ?: model
         }
@@ -76,7 +69,7 @@ class UserInputViewModel(
     fun createNewTask(title: String) {
         store.dispatch(
             TaskAction.CreateUserTaskAction(
-                title,
+                title.trim(),
                 priorityModel.value.mapToDomain()
             )
         )
