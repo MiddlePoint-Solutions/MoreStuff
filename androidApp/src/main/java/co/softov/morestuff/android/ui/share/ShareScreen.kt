@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.Shareable
-import co.softov.morestuff.android.ui.ShareableContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,11 +26,11 @@ fun ShareScreen(
     onBack: () -> Unit,
     shareable: Shareable,
     content: String,
-    shareToExistingTask: (taskId: Long, shareableContent: ShareableContent) -> Unit,
+    shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
     val shareableContent = when (shareable) {
-        Shareable.Text -> ShareableContent.TextContent(content)
-        Shareable.Image -> ShareableContent.ImageContent(content, "")
+        is Shareable.Text -> Shareable.Text(content)
+        is Shareable.Image -> Shareable.Image(content, "")
     }
     Scaffold(
         topBar = {

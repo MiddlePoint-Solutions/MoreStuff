@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
@@ -11,7 +12,6 @@ import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
 import co.softov.morestuff.android.ui.main.MainModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 
 class MainViewModel(
     getAppThemeUseCase: GetAppThemeUseCase,
@@ -52,13 +52,12 @@ class MainViewModel(
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
-    fun shareContentToTask(taskId: Long, content: ShareableContent) {
+    fun shareContentToTask(taskId: Long, content: Shareable) {
         when (content) {
-            is ShareableContent.TextContent -> {
+            is Shareable.Text -> {
                 store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content.content))
             }
-            is ShareableContent.ImageContent -> {
-                Timber.d("URI in shareContentToTask: ${content.uris}")
+            is Shareable.Image -> {
                 store.dispatch(MessageAction.CreateImageMessageAction(taskId, content.uris, content.message))
             }
         }
@@ -67,7 +66,3 @@ class MainViewModel(
 
 }
 
-sealed class ShareableContent {
-    data class TextContent(val content: String) : ShareableContent()
-    data class ImageContent(val uris: String, val message: String) : ShareableContent()
-}

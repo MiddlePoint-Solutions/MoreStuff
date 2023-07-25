@@ -154,7 +154,7 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
 fun ShareContentPreview() {
     MoreStuffTheme() {
         ShareContent(
-            shareable = Shareable.Text,
+            shareable = Shareable.Text(""),
             content = "",
             shareToTask = {},
         )

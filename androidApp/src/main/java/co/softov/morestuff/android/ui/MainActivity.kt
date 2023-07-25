@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.compose.setContent
@@ -21,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
+import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
@@ -34,7 +34,6 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.runBlocking
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -111,17 +110,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun handleLaunchIntent(intent: Intent): Screen? = runBlocking {
+    private fun handleLaunchIntent(intent: Intent) =
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 if ("text/plain" == intent.type) {
                     intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                        Screen.Share(Shareable.Text, it)
+                        Screen.Share(Shareable.Text(it), it)
                     }
                 } else if (intent.type?.startsWith("image/") == true) {
-                    (intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri)?.let { it ->
-                        Timber.d("URI: $it")
-                        Screen.Share(Shareable.Image, it.toString())
+                    intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+                        Screen.Share(Shareable.Image(it.toString(),""), it.toString())
                     }
                 } else null
             }
@@ -136,7 +134,6 @@ class MainActivity : AppCompatActivity() {
 
             else -> null
         }
-    }
 
 
     @SuppressLint("BatteryLife")

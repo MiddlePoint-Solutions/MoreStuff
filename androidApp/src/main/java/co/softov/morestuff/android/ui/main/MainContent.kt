@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.nav.Screen.Review
 import co.softov.morestuff.android.domain.nav.Screen.Settings
 import co.softov.morestuff.android.domain.nav.Screen.Share
 import co.softov.morestuff.android.domain.nav.Screen.TaskChat
-import co.softov.morestuff.android.ui.ShareableContent
+import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.navigation.ChildStack
@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 fun MainContent(
     initialScreen: Screen?,
     navigation: StackNavigation<Screen>,
-    shareContent: (taskId: Long, content: ShareableContent) -> Unit
+    shareContent: (taskId: Long, content: Shareable) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
