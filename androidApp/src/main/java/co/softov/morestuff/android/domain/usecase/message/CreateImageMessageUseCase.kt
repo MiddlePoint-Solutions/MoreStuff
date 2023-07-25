@@ -34,7 +34,7 @@ class CreateImageMessageUseCaseImpl(
         message: String,
     ): Either<Failure, Message> {
 
-        return when (val imageResult = saveUserImageUseCase(filePath, /*taskId*/)) {
+        return when (val imageResult = saveUserImageUseCase(filePath)) {
             is Either.Left -> {
                 Either.Left(SaveImageFailure(imageResult.value))
             }
