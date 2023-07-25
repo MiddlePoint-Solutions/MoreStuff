@@ -80,7 +80,6 @@ fun MainContent(
                 ShareScreen(
                     onBack = navigation::pop,
                     shareable = screen.shareable,
-                    content = screen.content,
                 ) { taskId, shareableContent ->
                     navigation.replaceCurrent(
                         TaskChat(taskId),
