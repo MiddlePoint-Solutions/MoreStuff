@@ -27,6 +27,7 @@ import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -123,7 +124,7 @@ fun PlanPrioritySelector(
 @Composable
 private fun Preview() {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    ProvideAppTheme(theme = AppTheme.System) {
+    MoreStuffTheme {
         PlanPrioritySelector(
             PriorityInputModel(
                 priority = PriorityModel.Now,

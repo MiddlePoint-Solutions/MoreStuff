@@ -64,7 +64,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,43 +79,40 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
+import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
+import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-
-@Composable
-fun ProvideLocalViewModelStoreOwner(
-    localViewModelStoreOwner: ViewModelStoreOwner,
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(
-        LocalViewModelStoreOwner provides localViewModelStoreOwner,
-        content = content
-    )
-}
+import timber.log.Timber
 
 @Composable
 fun TaskChatScreen(
@@ -139,15 +138,16 @@ private fun TaskChatContent(
     viewModel: TaskChatViewModel,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberLazyListState()
 
-    val shareImage = rememberUpdatedState<(String) -> Unit> { imagePath ->
+    val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
 
-    val messages by viewModel.messages.collectAsState()
+    val messages by viewModel.messages.collectAsStateWithLifecycle()
 
     var selectImageFromGallery by remember { mutableStateOf<Uri?>(null) }
+    val imagePicked by rememberUpdatedState<(Uri) -> Unit> { selectImageFromGallery = it }
+
     var selectedImageMessage by remember { mutableStateOf<Message?>(null) }
 
     val chatActions = ChatActions(
@@ -163,12 +163,6 @@ private fun TaskChatContent(
         }
     )
 
-    val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-        selectImageFromGallery = uri
-    }
-
-    var isExpanded by remember { mutableStateOf(false) }
-
     when {
         selectedImageMessage != null -> selectedImageMessage?.let {
             BackHandler {
@@ -180,7 +174,7 @@ private fun TaskChatContent(
                     selectedImageMessage = null
                 },
                 onSendImage = { imagePath ->
-                    shareImage.value.invoke(imagePath)
+                    shareImage(imagePath)
                 },
                 message = it,
             )
@@ -203,63 +197,124 @@ private fun TaskChatContent(
         }
 
         else -> {
-            Scaffold(
-                topBar = {
-                    TopAppBarTaskChat(
-                        viewModel,
-                        setTaskComplete = { complete -> viewModel.setTaskComplete(complete) },
-                        onBackPressed = onBack,
-                        isExpanded = isExpanded
-                    )
-                },
-                modifier = modifier
+            TaskChat(
+                viewModel,
+                onBack,
+                modifier,
+                taskId,
+                messages,
+                chatActions,
+                imagePicked
+            )
+        }
+    }
+}
+
+@Composable
+private fun TaskChat(
+    viewModel: TaskChatViewModel,
+    onBack: () -> Unit = {},
+    modifier: Modifier,
+    taskId: Long,
+    messages: List<Message>,
+    chatActions: ChatActions,
+    imagePicked: (Uri) -> Unit = {}
+) {
+
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+
+    var isExpanded by remember { mutableStateOf(false) }
+
+    val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
+        if (uri != null) {
+            imagePicked(uri)
+        } else {
+            Timber.d("Image picker uri is NULL!")
+        }
+    }
+
+    var userInputValue by rememberSaveable(
+        key = taskId.toString(),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(TextFieldValue())
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBarTaskChat(
+                onBackPressed = onBack,
+            )
+        },
+        modifier = modifier
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .navigationBarsPadding()
+                    .imePadding(),
             ) {
+                TaskChatTopBarEditTask(
+                    taskId = taskId,
+                    isExpanded = isExpanded,
+                    setIsExpanded = { value -> isExpanded = value },
+                )
 
-                Box(Modifier.fillMaxSize()) {
-                    Surface {
-                        Column(
+                Messages(
+                    messages = messages,
+                    actions = chatActions,
+                    modifier = modifier.weight(1f),
+                    scrollState = scrollState,
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Surface(
+                        tonalElevation = 5.dp
+                    ) {
+                        UserInput(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .navigationBarsPadding()
+                                .align(Alignment.BottomCenter)
                                 .imePadding(),
-                        ) {
-                            TaskChatTopBarEditTask(
-                                taskId = taskId,
-                                isExpanded = isExpanded,
-                                setIsExpanded = { value -> isExpanded = value },
-                            )
-
-
-                            Messages(
-                                messages = messages,
-                                actions = chatActions,
-                                modifier = modifier.weight(1f),
-                                scrollState = scrollState,
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .imePadding()
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(color = MaterialTheme.colorScheme.primary)
-                                ) {
-                                    TaskMessageTextField(
-                                        sendMessageForTask = viewModel::sendMessageForTask,
-                                        pickImages = {
-                                            pickImage.launch(
-                                                PickVisualMediaRequest(
-                                                    PickVisualMedia.ImageOnly
+                            textContent = {
+                                UserTextInput(
+                                    value = userInputValue,
+                                    onValueChange = { userInputValue = it },
+                                    sendAction = {
+                                        viewModel.sendTaskChatMessage(it)
+                                        userInputValue = userInputValue.copy("")
+                                        scope.launch {
+                                            delay(200)
+                                            scrollState.animateScrollToItem(index = 0)
+                                        }
+                                    },
+                                    actionsContent = {
+                                        IconButton(
+                                            onClick = {
+                                                pickImage.launch(
+                                                    PickVisualMediaRequest(
+                                                        PickVisualMedia.ImageOnly
+                                                    )
                                                 )
+                                            },
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.PhotoLibrary,
+                                                contentDescription = "select images"
                                             )
                                         }
-                                    )
-                                }
-                            }
-                        }
+                                    }
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -272,7 +327,8 @@ private fun TaskChatContent(
 fun TaskChatTopBarEditTask(
     taskId: Long,
     isExpanded: Boolean,
-    setIsExpanded: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    setIsExpanded: (Boolean) -> Unit = {},
 ) {
 
     // TODO: hoist state out of toolbar
@@ -281,6 +337,7 @@ fun TaskChatTopBarEditTask(
     }
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
+
     val planModel = viewModel.planModel
     val displayTime by remember(planModel) { mutableStateOf(planModel.localDateTime) }
 
@@ -296,19 +353,20 @@ fun TaskChatTopBarEditTask(
     BackHandler(isExpanded, onBackPressed)
 
     Surface(
-        modifier = Modifier
-            .animateContentSize(animationSpec = snap())
-            .then(
-                if (isExpanded) {
-                    Modifier.fillMaxHeight()
-                } else {
-                    Modifier.height(IntrinsicSize.Min)
-                }
-            ),
-        color = MaterialTheme.colorScheme.primaryContainer,
-        tonalElevation = 10.dp,
+        modifier = modifier,
+        tonalElevation = 5.dp,
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .animateContentSize(animationSpec = tween())
+                .then(
+                    if (isExpanded) {
+                        Modifier.fillMaxHeight()
+                    } else {
+                        Modifier.height(IntrinsicSize.Min)
+                    }
+                ),
+        ) {
             Column(Modifier.align(Alignment.TopStart)) {
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onSurface
@@ -508,145 +566,23 @@ fun ScheduleButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarTaskChat(
-    viewModel: TaskChatViewModel,
-    setTaskComplete: (Boolean) -> Unit,
     onBackPressed: () -> Unit,
-    isExpanded: Boolean,
 ) {
-
-    val task by viewModel.task.collectAsState()
-    val alphaValue by animateFloatAsState(
-        targetValue = if (isExpanded) 0.3f else 1f,
-        animationSpec = tween(durationMillis = 500),
-        label = "Task chat top bar alpha animation"
-    )
-
     TopAppBar(
         title = { },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        actions = {
-            if (!isExpanded) {
-                when (task.isComplete) {
-                    true -> {
-                        IconButton(onClick = { setTaskComplete(false) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Replay,
-                                contentDescription = stringResource(R.string.cd_task_complete),
-                                modifier = Modifier.alpha(alphaValue)
-                            )
-                        }
-                    }
-
-                    false -> {
-                        IconButton(onClick = { setTaskComplete(true) }) {
-                            Icon(
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = stringResource(R.string.cd_task_complete),
-                                modifier = Modifier.alpha(alphaValue)
-                            )
-                        }
-                    }
-                }
-            }
-        },
         navigationIcon = {
-            if (!isExpanded) {
-                IconButton(onClick = onBackPressed) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back)
-                    )
-                }
+            IconButton(onClick = onBackPressed) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_navigate_back)
+                )
             }
         }
     )
 }
-
-@Composable
-fun TaskMessageTextField(
-    sendMessageForTask: (String) -> Unit,
-    pickImages: () -> Unit,
-) {
-    var messageText by remember { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BasicTextField(
-            value = messageText,
-            onValueChange = { newText -> messageText = newText },
-            enabled = true,
-            modifier = Modifier
-                .weight(8f)
-                .fillMaxWidth(0.88f)
-                .defaultMinSize(minHeight = 46.dp)
-                .padding(
-                    start = 16.dp,
-                    top = 8.dp,
-                    bottom = 8.dp,
-                    end = 4.dp
-                )
-                .onFocusChanged {},
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(onDone = {
-                if (messageText.isNotBlank()) {
-                    sendMessageForTask(messageText.trim())
-                    messageText = ""
-                }
-            }),
-            maxLines = Int.MAX_VALUE,
-            cursorBrush = SolidColor(LocalContentColor.current),
-            textStyle = LocalTextStyle.current.copy(
-                color = LocalContentColor.current,
-                fontSize = 18.sp
-            ),
-            decorationBox = { innerTextField ->
-                Box {
-                    if (messageText.isEmpty()) {
-                        Text(
-                            text = "Write something...",
-                            fontSize = 18.sp
-                        )
-                    }
-                    innerTextField()
-                }
-            }
-        )
-
-        IconButton(
-            onClick = pickImages,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
-        ) {
-            Icon(Icons.Filled.PhotoLibrary, contentDescription = "select images")
-        }
-
-        IconButton(
-            onClick = {
-                if (messageText.isNotBlank()) {
-                    sendMessageForTask(messageText.trim())
-                    messageText = ""
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
-                .padding(end = 8.dp, start = 3.dp)
-        ) {
-            Icon(Icons.Filled.Send, contentDescription = "send mensaje")
-        }
-    }
-}
-
 
 @Preview
 @Composable

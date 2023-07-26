@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.priority
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -93,21 +94,16 @@ fun PrioritySelector(
     }
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun UserPriorityInputPreviewDark() {
-    ProvideAppTheme(theme = AppTheme.Dark) {
-        MoreStuffTheme() {
-            PrioritySelector(
-                priority = PriorityModel.Now,
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-fun UserPriorityInputPreview() {
     MoreStuffTheme {
         PrioritySelector(
             priority = PriorityModel.Now,

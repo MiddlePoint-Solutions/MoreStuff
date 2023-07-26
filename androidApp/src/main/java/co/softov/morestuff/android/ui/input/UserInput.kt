@@ -27,9 +27,7 @@ fun UserInput(
     ) {
         Column {
             priorityContent()
-            Surface(shadowElevation = 9.dp) {
-                textContent()
-            }
+            textContent()
         }
     }
 }

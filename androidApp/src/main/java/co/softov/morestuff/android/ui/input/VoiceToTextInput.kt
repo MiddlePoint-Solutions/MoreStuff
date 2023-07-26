@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.app.features.VoiceToTextParserState
 import co.softov.morestuff.android.domain.service.VoiceToTextInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -61,7 +62,7 @@ fun VoiceToTextInput(
     voiceToText: VoiceToTextInterface = koinInject()
 ) {
 
-    val recordingState by voiceToText.state.collectAsState()
+    val recordingState by voiceToText.state.collectAsStateWithLifecycle()
 
     VoiceToTextInputContent(
         onUpdateValue = onUpdateValue,

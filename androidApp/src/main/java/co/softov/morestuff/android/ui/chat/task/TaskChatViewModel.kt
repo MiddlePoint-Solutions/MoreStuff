@@ -129,7 +129,7 @@ class TaskChatViewModel(
         store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
     }
 
-    fun sendMessageForTask(content: String) {
+    fun sendTaskChatMessage(content: String) {
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 

@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.input
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,11 +27,18 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.components.SendIcon
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.ProvideAppTheme
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun UserTextInput(
@@ -60,7 +68,6 @@ fun UserTextInput(
             Row(
                 modifier = Modifier
                     .defaultMinSize(minHeight = 46.dp)
-                    .weight(0.88f)
                     .align(Alignment.CenterVertically)
             ) {
                 BasicTextField(
@@ -69,7 +76,7 @@ fun UserTextInput(
                     enabled = true,
                     modifier = Modifier
                         .clearFocusOnKeyboardDismiss()
-                        .fillMaxWidth()
+                        .weight(0.88f)
                         .align(Alignment.CenterVertically)
                         .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
                     keyboardOptions = KeyboardOptions(
@@ -94,22 +101,22 @@ fun UserTextInput(
                         }
                     }
                 )
-            }
 
-            Box(
-                modifier = Modifier
-                    .weight(0.12f)
-                    .height(IntrinsicSize.Min)
-            ) {
-                when {
-                    value.text.isBlank() -> {
-                        actionsContent()
-                    }
+                Box(
+                    modifier = Modifier
+                        .weight(0.12f)
+                        .height(IntrinsicSize.Min)
+                ) {
+                    when {
+                        value.text.isBlank() -> {
+                            actionsContent()
+                        }
 
-                    else -> {
-                        SendIcon(
-                            onClick = { sendAction(value.text) }
-                        )
+                        else -> {
+                            SendIcon(
+                                onClick = { sendAction(value.text) }
+                            )
+                        }
                     }
                 }
             }
@@ -117,24 +124,20 @@ fun UserTextInput(
     }
 }
 
-//@Preview
-//@Composable
-//private fun ChatInputPreviewDark() {
-//    MoreStuffTheme {
-//        UserTextInput(
-//            sendAction = {},
-//            listAction = {},
-//        )
-//    }
-//}
-//
-//@Preview
-//@Composable
-//private fun ChatInputPreview() {
-//    MoreStuffTheme {
-//        UserTextInput(
-//            sendAction = {},
-//            listAction = {},
-//        )
-//    }
-//}
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        UserTextInput(
+            value = TextFieldValue(text = ""),
+            onValueChange = {},
+        )
+    }
+}
