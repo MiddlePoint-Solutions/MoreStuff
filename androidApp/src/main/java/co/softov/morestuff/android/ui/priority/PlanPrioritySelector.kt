@@ -72,7 +72,7 @@ fun PlanPrioritySelector(
 
     Surface(
         modifier = modifier.padding(horizontal = 20.dp),
-        tonalElevation = 5.dp,
+        tonalElevation = 10.dp,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
     ) {
         Row(

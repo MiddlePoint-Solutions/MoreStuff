@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
 
@@ -80,7 +81,7 @@ private fun PriorityInputContent(
     }
 
     Surface(
-        shadowElevation = 12.dp,
+        modifier = Modifier.zIndex(3f),
         tonalElevation = 5.dp,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
     ) {
