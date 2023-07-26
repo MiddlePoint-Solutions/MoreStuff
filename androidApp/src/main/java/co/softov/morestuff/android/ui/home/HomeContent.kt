@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +44,9 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     showTaskChat: (taskId: Long) -> Unit,
     showSettings: () -> Unit,
-    showReview: () -> Unit
+    showReview: () -> Unit,
+    isSearching: MutableState<Boolean>,
+    searchText: MutableState<String>
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -51,6 +54,9 @@ fun HomeScreen(
         snackbarHostState = snackbarHostState,
         showSettings = showSettings,
         showReview = showReview,
+        isSearching = isSearching,
+        showTaskChat= showTaskChat ,
+        searchText = searchText,
         content = {
             Box(Modifier.padding(top = it.calculateTopPadding())) {
                 HomeContent(
@@ -152,15 +158,17 @@ fun HomeContent(
     }
 }
 
-@Preview
+/*@Preview
 @Composable
 fun MainContentPreview() {
     MoreStuffTheme {
         HomeScreen(
             showTaskChat = {},
             showSettings = {},
-            showReview = {}
+            showReview = {},
+            isSearching = {},
+            searchText = {}
         )
     }
-}
+}*/
 

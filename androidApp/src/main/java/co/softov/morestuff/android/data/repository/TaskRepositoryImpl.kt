@@ -192,4 +192,7 @@ class TaskRepositoryImpl(
             mapper = mapTaskWithScheduleData
         ).executeAsList().right()
     }
+
+    override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
+        taskQueries.searchTasks(searchText, mapper = mapTaskData).asFlow().mapToList()
 }

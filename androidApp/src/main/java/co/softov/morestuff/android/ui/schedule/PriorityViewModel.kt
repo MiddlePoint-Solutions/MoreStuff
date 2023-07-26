@@ -1,9 +1,11 @@
 package co.softov.morestuff.android.ui.schedule
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.ScheduleType
@@ -13,7 +15,10 @@ import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
@@ -27,6 +32,9 @@ import timber.log.Timber
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
+    private val searchTasksUseCase: SearchTasksUseCase,
+    private val getCompletedTasksUseCase: GetCompletedTasksUseCase,
+    private val getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase,
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
@@ -123,6 +131,60 @@ class PriorityViewModel(
 
     fun resetNotification() {
         notification = None
+    }
+
+
+    val searchResults: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
+
+    fun searchTasks(searchText: String) {
+        if (searchText.isEmpty()) {
+            searchResults.value = listOf()
+        } else {
+            searchTasksUseCase(searchText)
+                .onEach { results -> searchResults.value = results }
+                .launchIn(viewModelScope)
+        }
+    }
+
+
+    val completedTasks: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
+    fun loadCompletedTasks() {
+        viewModelScope.launch {
+            getCompletedTasksUseCase()
+                .collect { results ->
+                    completedTasks.value = results
+                    searchResults.value = results
+                }
+        }
+    }
+
+    val activeTasksWithSchedule: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
+
+    fun loadActiveTasksWithSchedule() {
+        viewModelScope.launch {
+            val result = getActiveTasksWithScheduleUseCase()
+            if (result is Either.Right) {
+                activeTasksWithSchedule.value = result.value.filter {
+                    it.activeSchedule?.scheduleType == ScheduleType.OneTime && it.activeSchedule.active
+                }
+                searchResults.value = activeTasksWithSchedule.value
+            }
+        }
+    }
+
+
+    val activeTasksWithReminder: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
+    fun loadTasksWithReminder() {
+        viewModelScope.launch {
+            val result = getActiveTasksWithScheduleUseCase()
+            if (result is Either.Right) {
+                activeTasksWithReminder.value = result.value.filter {
+                    it.activeSchedule?.scheduleType == ScheduleType.Reminder && it.activeSchedule.active
+                }
+                searchResults.value = activeTasksWithReminder.value
+
+            }
+        }
     }
 
 }
