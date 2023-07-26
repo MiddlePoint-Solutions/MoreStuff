@@ -26,18 +26,6 @@ val presentationModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
 
-    viewModel { (page: PageType) ->
-        SchedulePageViewModel(
-            page = page,
-            getCompleteTasks = get(),
-            timeFormatter = get(),
-            timeManager = get(),
-            getLaterTaskUseCase = get(),
-            getNowTaskUseCase = get(),
-            getSchedules = get()
-        )
-    }
-
     viewModelOf(::ReviewViewModel)
     viewModelOf(::PriorityViewModel)
     viewModelOf(::TaskChatViewModel)
