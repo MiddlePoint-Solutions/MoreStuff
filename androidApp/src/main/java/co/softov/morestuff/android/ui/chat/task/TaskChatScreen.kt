@@ -1,36 +1,36 @@
 package co.softov.morestuff.android.ui.chat.task
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -39,28 +39,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,13 +66,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -89,7 +86,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
@@ -98,19 +95,14 @@ import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
-import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
-import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
-import co.softov.morestuff.android.ui.priority.SchedulePermissionRequester
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
@@ -224,7 +216,7 @@ private fun TaskChat(
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
 
-    var isExpanded by remember { mutableStateOf(false) }
+    val task by viewModel.task.collectAsStateWithLifecycle()
 
     val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -243,28 +235,45 @@ private fun TaskChat(
 
     Scaffold(
         topBar = {
-            TopAppBarTaskChat(
+            TaskChatTopAppBar(
                 onBackPressed = onBack,
             )
         },
-        modifier = modifier
-    ) {
+        modifier = modifier.navigationBarsPadding()
+    ) { scaffoldPadding ->
         Box(
             Modifier
                 .fillMaxSize()
+                .padding(top = scaffoldPadding.calculateTopPadding())
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .navigationBarsPadding()
-                    .imePadding(),
+                modifier = Modifier.fillMaxSize()
             ) {
-                TaskChatTopBarEditTask(
-                    taskId = taskId,
-                    isExpanded = isExpanded,
-                    setIsExpanded = { value -> isExpanded = value },
-                )
+                TaskChatEditor(
+                    isComplete = task.isComplete,
+                    taskTitle = { viewModel.taskTitle },
+                    onTitleChange = viewModel::updateTaskTitle,
+                    toggleTaskComplete = viewModel::toggleTaskComplete,
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.Schedule,
+                            contentDescription = stringResource(R.string.cd_schedule_icon),
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        ScheduleButton(
+                            planModel = viewModel.planModel,
+                            schedule = task.activeSchedule,
+                            onTimeChange = viewModel::updatePlanTime,
+                            onDateChange = viewModel::updatePlanDate,
+                            createPlanSchedule = viewModel::createOneTimeSchedule,
+                            cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                        )
+                    }
+                }
 
                 Messages(
                     messages = messages,
@@ -282,8 +291,7 @@ private fun TaskChat(
                     ) {
                         UserInput(
                             modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .imePadding(),
+                                .align(Alignment.BottomCenter),
                             textContent = {
                                 UserTextInput(
                                     value = userInputValue,
@@ -322,35 +330,33 @@ private fun TaskChat(
     }
 }
 
-
 @Composable
-fun TaskChatTopBarEditTask(
-    taskId: Long,
-    isExpanded: Boolean,
+fun TaskChatEditor(
+    isComplete: Boolean,
+    taskTitle: () -> String,
+    onTitleChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    setIsExpanded: (Boolean) -> Unit = {},
+    toggleTaskComplete: () -> Unit = {},
+    scheduleOptions: @Composable ColumnScope.() -> Unit = {},
 ) {
-
-    // TODO: hoist state out of toolbar
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
-    var showDatePickerDialog by remember { mutableStateOf(false) }
-    var showTimePickerDialog by remember { mutableStateOf(false) }
-
-    val planModel = viewModel.planModel
-    val displayTime by remember(planModel) { mutableStateOf(planModel.localDateTime) }
-
-
-    val task by viewModel.task.collectAsState()
+    var isEditing by remember { mutableStateOf(false) }
+    val isKeyboardOpen by keyboardAsState()
     val focusManager = LocalFocusManager.current
-    val onBackPressed = {
-        if (isExpanded) {
+
+
+    LaunchedEffect(isKeyboardOpen) {
+        if (!isKeyboardOpen) {
             focusManager.clearFocus()
-            setIsExpanded(false)
+            isEditing = false
         }
     }
-    BackHandler(isExpanded, onBackPressed)
+
+    BackHandler(isEditing) {
+        if (isEditing) {
+            focusManager.clearFocus()
+            isEditing = false
+        }
+    }
 
     Surface(
         modifier = modifier,
@@ -358,148 +364,146 @@ fun TaskChatTopBarEditTask(
     ) {
         Box(
             modifier = Modifier
+                .padding(vertical = 16.dp)
                 .animateContentSize(animationSpec = tween())
                 .then(
-                    if (isExpanded) {
-                        Modifier.fillMaxHeight()
+                    if (isEditing) {
+                        Modifier.fillMaxHeight(0.7f)
                     } else {
                         Modifier.height(IntrinsicSize.Min)
                     }
                 ),
         ) {
-            Column(Modifier.align(Alignment.TopStart)) {
-                CompositionLocalProvider(
-                    LocalContentColor provides MaterialTheme.colorScheme.onSurface
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(top = 45.dp)
-                            .windowInsetsPadding(
-                                WindowInsets.safeContent.union(WindowInsets.ime)
-                            )
-                            .weight(1f)
+
+            val toggleModifier by rememberUpdatedState(
+                Modifier.then(
+                    if (isEditing) {
+                        Modifier.alpha(0.5f)
+                    } else {
+                        Modifier
+                            .alpha(1f)
+                            .clickable(onClick = toggleTaskComplete)
+                    }
+                )
+            )
+
+            Column(
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+
+                Row {
+
+                    Box(
+                        Modifier
+                            .padding(start = 12.dp, top = 4.dp, end = 18.dp)
+                            .size(32.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 15.dp)
-                                .onFocusChanged { focusState ->
-                                    setIsExpanded(focusState.isFocused)
-                                },
+                        AnimatedContent(
+                            targetState = isComplete,
+                            label = "Complete toggle animation",
+                            transitionSpec = { scaleIn() togetherWith scaleOut() },
+                            modifier = Modifier.align(Alignment.Center)
                         ) {
-                            BasicTextField(
-                                value = viewModel.taskTitle,
-                                onValueChange = viewModel::updateTaskTitle,
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .fillMaxWidth()
-                                    .onFocusChanged { focusState ->
-                                        if (!task.isComplete) {
-                                            setIsExpanded(focusState.isFocused)
-                                        } else {
-                                            focusManager.clearFocus()
-                                        }
-                                    },
-                                readOnly = task.isComplete,
-                                keyboardOptions = KeyboardOptions(
-                                    capitalization = KeyboardCapitalization.Sentences,
-                                    autoCorrect = false,
-                                    imeAction = ImeAction.Done
-                                ),
-                                keyboardActions = KeyboardActions {
-                                    focusManager.clearFocus()
-                                },
-                                maxLines = 4,
-                                textStyle = MaterialTheme.typography.headlineMedium.copy(
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    textDecoration = when (task.isComplete) {
-                                        true -> TextDecoration.LineThrough
-                                        false -> null
-                                    }
-                                ),
-                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                            )
-                            LaunchedEffect(task.isComplete) {
-                                if (task.isComplete) {
-                                    focusManager.clearFocus()
+                            when (it) {
+                                true -> {
+                                    Icon(
+                                        imageVector = Icons.Filled.CheckCircle,
+                                        contentDescription = stringResource(R.string.cd_schedule_icon),
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .then(toggleModifier)
+                                    )
+                                }
+
+                                false -> {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Circle,
+                                        contentDescription = stringResource(R.string.cd_schedule_icon),
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .then(toggleModifier)
+                                    )
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.Schedule,
-                            contentDescription = stringResource(R.string.cd_schedule_icon),
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .alpha(if (isExpanded) 0f else 1f)
-                        )
-
-                        Spacer(modifier = Modifier.width(20.dp))
-
-                        Crossfade(targetState = isExpanded, label = "") { expanded ->
-                            if (!expanded) {
-                                ScheduleButton(
-                                    modifier = Modifier.alpha(if (isExpanded) 0f else 1f),
-                                    priorityModel = viewModel.planModel,
-                                    onTimeChange = viewModel::updatePlanTime,
-                                    onDateChange = viewModel::updatePlanDate,
-                                    onCreatePlanAndReschedule = viewModel::createOneTimeSchedule,
-                                    cancelActiveSchedule = viewModel::cancelActiveSchedule,
-                                    taskId = taskId,
-                                    showDatePickerDialog = showDatePickerDialog,
-                                    showTimePickerDialog = showTimePickerDialog,
-                                    onShowDatePickerDialogChange = { showDatePickerDialog = it },
-                                    onShowTimePickerDialogChange = { showTimePickerDialog = it },
-                                    displayTime = displayTime.toString()
-                                )
+                    BasicTextField(
+                        value = taskTitle(),
+                        onValueChange = onTitleChange,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                isEditing = focusState.isFocused
+                            },
+                        enabled = !isComplete,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Sentences,
+                            autoCorrect = false,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions {
+                            focusManager.clearFocus()
+                        },
+                        maxLines = 4,
+                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textDecoration = when (isComplete) {
+                                true -> TextDecoration.LineThrough
+                                false -> null
                             }
-                        }
-                    }
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AnimatedVisibility(
+                    visible = !isEditing,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    scheduleOptions()
                 }
             }
         }
     }
 }
 
+@Composable
+fun keyboardAsState(): State<Boolean> {
+    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    return rememberUpdatedState(isImeVisible)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleButton(
-    priorityModel: PlanModel,
+    planModel: PlanModel,
+    schedule: ScheduleDomain?,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
-    timeFormatter: TimeFormatter = koinInject(),
     modifier: Modifier = Modifier,
-    onCreatePlanAndReschedule: () -> Unit,
+    createPlanSchedule: () -> Unit,
     cancelActiveSchedule: () -> Unit,
-    taskId: Long,
-    showDatePickerDialog: Boolean,
-    showTimePickerDialog: Boolean,
-    onShowDatePickerDialogChange: (Boolean) -> Unit,
-    onShowTimePickerDialogChange: (Boolean) -> Unit,
-    displayTime: String,
 ) {
-    val viewModel = getViewModel<TaskChatViewModel>(key = "TaskChatVM") {
-        parametersOf(taskId)
-    }
-    val schedule by viewModel.schedule.collectAsState()
+
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    var showTimePickerDialog by remember { mutableStateOf(false) }
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = priorityModel.epochMs
+            initialSelectedDateMillis = planModel.epochMs
         )
 
         PriorityDatePicker(
-            dismissDialog = { onShowDatePickerDialogChange(false) },
+            dismissDialog = { showDatePickerDialog = false },
             onDateChange = {
                 datePickerState.selectedDateMillis?.let {
                     onDateChange(it)
                 }
-                onShowDatePickerDialogChange(false)
-                onShowTimePickerDialogChange(true)
+                showDatePickerDialog = false
+                showTimePickerDialog = true
 
             },
             state = datePickerState,
@@ -508,18 +512,18 @@ fun ScheduleButton(
 
     if (showTimePickerDialog) {
         val timePickerState = rememberTimePickerState(
-            initialHour = priorityModel.hour,
-            initialMinute = priorityModel.minute
+            initialHour = planModel.hour,
+            initialMinute = planModel.minute
         )
         PriorityTimePicker(
-            dismissTimePicker = { onShowTimePickerDialogChange(false) },
+            dismissTimePicker = { showTimePickerDialog = false },
             onTimeChange = {
                 onTimeChange(
                     timePickerState.hour,
                     timePickerState.minute
                 )
-                onCreatePlanAndReschedule()
-                onShowTimePickerDialogChange(false)
+                createPlanSchedule()
+                showTimePickerDialog = false
             },
             state = timePickerState
         )
@@ -527,52 +531,73 @@ fun ScheduleButton(
 
     Row(modifier = modifier) {
 
-        val time by remember(displayTime) {
-            derivedStateOf {
-                timeFormatter.formatTimeOnly(displayTime)
+        AnimatedContent(targetState = schedule, label = "") {
+            when (it) {
+                null -> {
+                    PriorityButton(
+                        onClick = { showDatePickerDialog = true },
+                        text = stringResource(id = R.string.task_chat_schedule_reminder),
+                        shape = RoundedCornerShape(percent = 50),
+                    )
+                }
+
+                else -> {
+                    PriorityButton(
+                        onClick = { showDatePickerDialog = true },
+                    ) {
+                        Text(
+                            text = planModel.displayDate,
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 28.sp,
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFFFFFFFF),
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    PriorityButton(
+                        onClick = { showTimePickerDialog = true },
+                    ) {
+                        Text(
+                            text = planModel.displayTime,
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 28.sp,
+                                fontWeight = FontWeight(400),
+                                color = Color(0xFFFFFFFF),
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    IconButton(
+                        onClick = { cancelActiveSchedule() },
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Cancel,
+                            contentDescription = "Cancel",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         }
-
-        val buttonText = when {
-            schedule == null -> stringResource(id = R.string.task_chat_schedule_reminder)
-            else -> priorityModel.displayDate + " " + (time ?: "")
-        }
-
-
-        PriorityButton(
-            onClick = { onShowDatePickerDialogChange(true) },
-            text = buttonText,
-            shape = RoundedCornerShape(percent = 50),
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-
-        if (schedule != null) {
-            IconButton(
-                onClick = { cancelActiveSchedule() },
-                modifier = Modifier
-                    .padding(start = 5.dp)
-            ) {
-                Icon(
-                    Icons.Default.Cancel,
-                    contentDescription = "Cancel",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-        SchedulePermissionRequester()
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBarTaskChat(
+private fun TaskChatTopAppBar(
     onBackPressed: () -> Unit,
 ) {
     TopAppBar(
         title = { },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(
@@ -584,26 +609,21 @@ fun TopAppBarTaskChat(
     )
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun TaskChatTopBarPreview() {
-    MoreStuffTheme() {
-        TaskChatTopBarEditTask(
-            taskId = 1,
-            isExpanded = true,
-            setIsExpanded = {}
-
+    MoreStuffTheme {
+        TaskChatEditor(
+            isComplete = false,
+            taskTitle = { "Hello There this should be a very long text so that we can test how it looks" },
+            onTitleChange = {}
         )
     }
 }
-
-//@Preview
-//@Composable
-//fun TaskChatPreview() {
-//    MoreStuffTheme() {
-//        TaskChatContent(
-//            taskId = 1,
-//            onBack = {}
-//        )
-//    }
-//}

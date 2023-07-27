@@ -89,7 +89,7 @@ class TaskChatViewModel(
     val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
             .map { it.orNull() }
-            .onEach { it?.let { createPlanModelForScheduleVal(it) } }
+            .onEach { it?.let { createPlanModelForSchedule(it) } }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -105,7 +105,7 @@ class TaskChatViewModel(
         }
     }
 
-    private fun createPlanModelForScheduleVal(scheduleDomain: ScheduleDomain) {
+    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain) {
         if (scheduleDomain.scheduleLocalTime != null) {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
             planModel = createPlanTime(localTime)
@@ -125,8 +125,8 @@ class TaskChatViewModel(
         }
     }
 
-    fun setTaskComplete(complete: Boolean) {
-        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
+    fun toggleTaskComplete() {
+        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, !task.value.isComplete))
     }
 
     fun sendTaskChatMessage(content: String) {
