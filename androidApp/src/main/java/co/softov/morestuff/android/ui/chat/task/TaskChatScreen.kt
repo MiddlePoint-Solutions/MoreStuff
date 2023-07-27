@@ -266,7 +266,6 @@ private fun TaskChat(
 
                         ScheduleButton(
                             planModel = viewModel.planModel,
-                            schedule = task.activeSchedule,
                             onTimeChange = viewModel::updatePlanTime,
                             onDateChange = viewModel::updatePlanDate,
                             createPlanSchedule = viewModel::createOneTimeSchedule,
@@ -479,8 +478,7 @@ fun keyboardAsState(): State<Boolean> {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleButton(
-    planModel: PlanModel,
-    schedule: ScheduleDomain?,
+    planModel: PlanModel?,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -491,62 +489,61 @@ fun ScheduleButton(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
-    if (showDatePickerDialog) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planModel.epochMs
-        )
-
-        PriorityDatePicker(
-            dismissDialog = { showDatePickerDialog = false },
-            onDateChange = {
-                datePickerState.selectedDateMillis?.let {
-                    onDateChange(it)
-                }
-                showDatePickerDialog = false
-                showTimePickerDialog = true
-
-            },
-            state = datePickerState,
-        )
-    }
-
-    if (showTimePickerDialog) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = planModel.hour,
-            initialMinute = planModel.minute
-        )
-        PriorityTimePicker(
-            dismissTimePicker = { showTimePickerDialog = false },
-            onTimeChange = {
-                onTimeChange(
-                    timePickerState.hour,
-                    timePickerState.minute
+    AnimatedContent(targetState = planModel, label = "") { plan ->
+        when (plan) {
+            null -> {
+                PriorityButton(
+                    onClick = createPlanSchedule,
+                    text = stringResource(id = R.string.task_chat_schedule_reminder),
+                    shape = RoundedCornerShape(percent = 50),
                 )
-                createPlanSchedule()
-                showTimePickerDialog = false
-            },
-            state = timePickerState
-        )
-    }
+            }
 
-    Row(modifier = modifier) {
+            else -> {
+                Row {
+                    if (showDatePickerDialog) {
+                        val datePickerState = rememberDatePickerState(
+                            initialSelectedDateMillis = plan.epochMs
+                        )
 
-        AnimatedContent(targetState = schedule, label = "") {
-            when (it) {
-                null -> {
-                    PriorityButton(
-                        onClick = { showDatePickerDialog = true },
-                        text = stringResource(id = R.string.task_chat_schedule_reminder),
-                        shape = RoundedCornerShape(percent = 50),
-                    )
-                }
+                        PriorityDatePicker(
+                            dismissDialog = { showDatePickerDialog = false },
+                            onDateChange = {
+                                datePickerState.selectedDateMillis?.let {
+                                    onDateChange(it)
+                                }
+                                showDatePickerDialog = false
+                                showTimePickerDialog = true
 
-                else -> {
+                            },
+                            state = datePickerState,
+                        )
+                    }
+
+                    if (showTimePickerDialog) {
+                        val timePickerState = rememberTimePickerState(
+                            initialHour = plan.hour,
+                            initialMinute = plan.minute
+                        )
+                        PriorityTimePicker(
+                            dismissTimePicker = { showTimePickerDialog = false },
+                            onTimeChange = {
+                                onTimeChange(
+                                    timePickerState.hour,
+                                    timePickerState.minute
+                                )
+                                createPlanSchedule()
+                                showTimePickerDialog = false
+                            },
+                            state = timePickerState
+                        )
+                    }
+
                     PriorityButton(
                         onClick = { showDatePickerDialog = true },
                     ) {
                         Text(
-                            text = planModel.displayDate,
+                            text = plan.displayDate,
                             style = TextStyle(
                                 fontSize = 12.sp,
                                 lineHeight = 28.sp,
@@ -562,7 +559,7 @@ fun ScheduleButton(
                         onClick = { showTimePickerDialog = true },
                     ) {
                         Text(
-                            text = planModel.displayTime,
+                            text = plan.displayTime,
                             style = TextStyle(
                                 fontSize = 12.sp,
                                 lineHeight = 28.sp,

@@ -74,7 +74,6 @@ class TaskChatViewModel(
         initialValue = listOf()
     )
 
-
     val task: StateFlow<TaskDomain> =
         getTaskFlow(taskId)
             .stateIn(
@@ -83,13 +82,13 @@ class TaskChatViewModel(
                 initialValue = TaskDomain()
             )
 
-    var planModel by mutableStateOf(createPlanTime())
+    var planModel by mutableStateOf<PlanModel?>(null)
         private set
 
-    val schedule: StateFlow<ScheduleDomain?> =
+    private val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
             .map { it.orNull() }
-            .onEach { it?.let { createPlanModelForSchedule(it) } }
+            .onEach { createPlanModelForSchedule(it) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -105,10 +104,10 @@ class TaskChatViewModel(
         }
     }
 
-    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain) {
-        if (scheduleDomain.scheduleLocalTime != null) {
+    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain?) {
+        planModel = scheduleDomain?.scheduleLocalTime?.let {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-            planModel = createPlanTime(localTime)
+            createPlanTime(localTime)
         }
     }
 
@@ -147,23 +146,24 @@ class TaskChatViewModel(
     )
 
     fun createOneTimeSchedule() {
-        dispatchAppStoreAction(
-            ScheduleAction.RescheduleTaskAction(
-                taskId,
-                ScheduleType.OneTime,
-                planModel.localDateTime.toString()
+        createPlanTime().run {
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(
+                    taskId,
+                    ScheduleType.OneTime,
+                    localDateTime.toString()
+                )
             )
-        )
+        }
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.localDateTime, hour, minute)
-        TODO("updatePlanTime")
+//        val updatedPlanTime = timeManager.localDateTime(planModel.localDateTime, hour, minute)
     }
 
     fun updatePlanDate(dateMillis: Long) {
         Timber.d("updatePlanDate: $dateMillis")
-        TODO("updatePlanDate")
+//        TODO("updatePlanDate")
         Timber.d("updatePlanDate: $planModel")
     }
 
