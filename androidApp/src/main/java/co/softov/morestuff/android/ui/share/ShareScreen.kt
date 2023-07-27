@@ -34,18 +34,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.ui.home.mapToDomain
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
+import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -159,10 +165,16 @@ private fun ShareContent(
 
     if (showUserInput) {
 
-        val contentTitle = when(shareable) {
+        val contentTitle = when (shareable) {
             is Shareable.Image -> ""
             is Shareable.Text -> shareable.content
         }
+
+        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(text = contentTitle))
+        }
+
+        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
 
         ModalBottomSheet(
             onDismissRequest = { showUserInput = false },
@@ -171,20 +183,32 @@ private fun ShareContent(
             shape = RoundedCornerShape(0),
             content = {
                 UserInput(
-                    initialValue = contentTitle,
                     priorityContent = {
                         PriorityInput(
-                            priority = userInputViewModel.priorityModel,
-                            planModel = userInputViewModel.planModel,
-                            onPriorityChange = userInputViewModel::priorityChanged,
+                            model = priorityModel,
+                            onNowSelected = userInputViewModel::setNowPriority,
+                            onLaterSelected = userInputViewModel::setLaterPriority,
+                            onPlanSelected = userInputViewModel::setPlanPriority,
                             onTimeChange = userInputViewModel::updatePlanTime,
                             onDateChange = userInputViewModel::updatePlanDate,
                         )
                     },
-                    onSubmitInput = { newTaskContent = it to userInputViewModel.currentPriority }
+                    textContent = {
+                        UserTextInput(
+                            value = userInputValue,
+                            onValueChange = { userInputValue = it },
+                            sendAction = {
+                                newTaskContent = it to priorityModel.mapToDomain()
+                            },
+                            actionsContent = {
+                                VoiceToTextInput(
+                                    onUpdateValue = userInputViewModel::updateUserInput
+                                )
+                            }
+                        )
+                    },
                 )
-            }
-        )
+            })
     }
 }
 

@@ -33,8 +33,8 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
+import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
@@ -72,7 +72,7 @@ val dataModule = module {
     single { NotificationManagerCompat.from(androidApplication()) }
 
     //Time
-    single<TimeFormatter> { TimeFormatterImpl() }
+    single<TimeFormatter> { TimeFormatterImpl(androidApplication()) }
 
     // Repositories
     single<TaskRepository> {

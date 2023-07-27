@@ -4,7 +4,6 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,7 +32,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
-import co.softov.morestuff.android.ui.chat.task.ProvideLocalViewModelStoreOwner
+import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*

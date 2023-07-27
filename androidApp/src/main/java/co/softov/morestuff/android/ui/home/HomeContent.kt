@@ -7,30 +7,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.ui.chat.ChatActions
-import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
-import co.softov.morestuff.android.ui.list.ListsContent
+import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -76,7 +77,6 @@ fun HomeContent(
     val scope = rememberCoroutineScope()
 
     val messages by mainChatViewModel.messages.collectAsState()
-    var showTaskLists by remember { mutableStateOf(false) }
 
     val chatActions = remember {
         ChatActions(
@@ -90,11 +90,8 @@ fun HomeContent(
     var selectedImage by remember { mutableStateOf<String?>(null) }
 
 
-    if (showTaskLists) {
-        ModalBottomSheet(
-            onDismissRequest = { showTaskLists = false },
-            content = { ListsContent(itemAction = showTaskChat) }
-        )
+    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
     }
 
     BoxWithConstraints(
@@ -111,59 +108,45 @@ fun HomeContent(
 
         SlideAnimation(
             visibleState = visibleState,
+            modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            Box {
+            val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
 
-                val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
-                    bottomSheetState = rememberStandardBottomSheetState(
-                        skipHiddenState = true
-                    )
-                )
-
-                ConstraintLayout {
-                    val (bottomSheet, userInput) = createRefs()
-
-                    Box(
-                        modifier = Modifier
-                            .constrainAs(bottomSheet) { bottom.linkTo(userInput.top) }
-                            .fillMaxSize(),
-                    ) {
-                        BottomSheetScaffold(
-                            scaffoldState = bottomSheetScaffoldState,
-                            sheetContent = {
-                                Messages(
-                                    messages = messages,
-                                    actions = chatActions,
-                                    modifier = modifier,
-                                    scrollState = chatScrollState,
-                                )
+            Surface(
+                tonalElevation = 5.dp,
+                color = Color.Transparent
+            ) {
+                UserInput(
+                    priorityContent = {
+                        PriorityInput(
+                            model = priorityModel,
+                            onNowSelected = userInputViewModel::setNowPriority,
+                            onLaterSelected = userInputViewModel::setLaterPriority,
+                            onPlanSelected = userInputViewModel::setPlanPriority,
+                            onTimeChange = userInputViewModel::updatePlanTime,
+                            onDateChange = userInputViewModel::updatePlanDate,
+                        )
+                    },
+                    textContent = {
+                        UserTextInput(
+                            value = userInputValue,
+                            onValueChange = { userInputValue = it },
+                            sendAction = {
+                                userInputViewModel.createNewTask(it)
+                                userInputValue = userInputValue.copy("")
+                                scope.launch {
+                                    delay(200)
+                                    priorityScrollState.animateScrollToItem(index = 0)
+                                }
                             },
-                            sheetPeekHeight = 30.dp
-                        ) {}
-                    }
-
-                    UserInput(
-                        modifier = Modifier
-                            .constrainAs(userInput) { bottom.linkTo(parent.bottom) }
-                            .imePadding(),
-                        priorityContent = {
-                            PriorityInput(
-                                priority = userInputViewModel.priorityModel,
-                                planModel = userInputViewModel.planModel,
-                                onPriorityChange = userInputViewModel::priorityChanged,
-                                onTimeChange = userInputViewModel::updatePlanTime,
-                                onDateChange = userInputViewModel::updatePlanDate,
-                            )
-                        },
-                        showTaskLists = { showTaskLists = true },
-                        onSubmitInput = {
-                            userInputViewModel.createNewTask(it)
-                            scope.launch {
-                                delay(200)
-                                priorityScrollState.animateScrollToItem(index = 0)
+                            actionsContent = {
+                                VoiceToTextInput(
+                                    onUpdateValue = userInputViewModel::updateUserInput
+                                )
                             }
-                        })
-                }
+                        )
+                    },
+                )
             }
         }
     }

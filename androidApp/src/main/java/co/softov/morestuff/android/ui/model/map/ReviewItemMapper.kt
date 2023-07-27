@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.model.map
 
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 
 class ReviewItemMapper(

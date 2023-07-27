@@ -214,8 +214,7 @@ fun PriorityContent(
                     ) {
                         Divider(
                             thickness = 0.5.dp,
-                            modifier = Modifier.fillMaxWidth(0.8f),
-                            color = Color.Black.copy(alpha = 0.7f)
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
 

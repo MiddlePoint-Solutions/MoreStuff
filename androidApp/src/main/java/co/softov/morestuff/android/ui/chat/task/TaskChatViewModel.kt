@@ -6,8 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
-import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
@@ -27,6 +25,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.home.PlanModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
@@ -50,6 +50,7 @@ class TaskChatViewModel(
     private val shareImage: ImageHandler,
     private val taskId: Long,
     private val timeManager: TimeManager,
+    private val timeFormatter: TimeFormatter,
     devTools: DevTools,
 ) : NoStateViewModel() {
 
@@ -82,13 +83,13 @@ class TaskChatViewModel(
                 initialValue = TaskDomain()
             )
 
-    var planModel by mutableStateOf(createPlanModel())
+    var planModel by mutableStateOf(createPlanTime())
         private set
 
     val schedule: StateFlow<ScheduleDomain?> =
         getActiveScheduleFlow(taskId)
             .map { it.orNull() }
-            .onEach { it?.let { createPlanModelForScheduleVal(it) } }
+            .onEach { it?.let { createPlanModelForSchedule(it) } }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -104,17 +105,10 @@ class TaskChatViewModel(
         }
     }
 
-    private fun createPlanModelForScheduleVal(scheduleDomain: ScheduleDomain) {
+    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain) {
         if (scheduleDomain.scheduleLocalTime != null) {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-            planModel = PlanModel(
-                planTime = localTime,
-                relativeDisplay = timeManager.getRelativeDate(scheduleDomain.scheduleLocalTime),
-                hour = localTime.hour,
-                minute = localTime.minute,
-                epochMs = scheduleDomain.scheduleLocalTime.inEpochMilliseconds
-            )
-            Timber.d("planplan: $planModel")
+            planModel = createPlanTime(localTime)
         }
     }
 
@@ -131,11 +125,11 @@ class TaskChatViewModel(
         }
     }
 
-    fun setTaskComplete(complete: Boolean) {
-        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
+    fun toggleTaskComplete() {
+        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, !task.value.isComplete))
     }
 
-    fun sendMessageForTask(content: String) {
+    fun sendTaskChatMessage(content: String) {
         store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
@@ -144,51 +138,37 @@ class TaskChatViewModel(
     }
 
 
-    private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        PlanModel(
-            planTime = this,
-            hour = hour,
-            minute = minute,
-            epochMs = currentTimeZoneInstant.toEpochMilliseconds()
-        )
-    }
+    private fun createPlanTime(
+        time: LocalDateTime = timeManager.getDefaultPlanTime()
+    ) = PlanModel(
+        localDateTime = time,
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
+    )
 
     fun createOneTimeSchedule() {
         dispatchAppStoreAction(
             ScheduleAction.RescheduleTaskAction(
                 taskId,
                 ScheduleType.OneTime,
-                planModel.planTime.toString()
+                planModel.localDateTime.toString()
             )
         )
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.planTime, hour, minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            hour = hour,
-            minute = minute,
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
+        val updatedPlanTime = timeManager.localDateTime(planModel.localDateTime, hour, minute)
+        TODO("updatePlanTime")
     }
 
     fun updatePlanDate(dateMillis: Long) {
         Timber.d("updatePlanDate: $dateMillis")
-        val updatedPlanTime =
-            timeManager.epochMillisToLocalDateTime(dateMillis, planModel.hour, planModel.minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            relativeDisplay = timeManager.getRelativeDate(updatedPlanTime.toString()),
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
+        TODO("updatePlanDate")
         Timber.d("updatePlanDate: $planModel")
-
     }
 
     fun cancelActiveSchedule() {
         store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
-        planModel = createPlanModel()
     }
 
     fun copyToClipboard(text: String) {
@@ -201,7 +181,7 @@ class TaskChatViewModel(
         }
     }
 
-    fun shareImage(imagePath: String){
+    fun shareImage(imagePath: String) {
         viewModelScope.launch {
             shareImage.shareImage(imagePath)
         }
