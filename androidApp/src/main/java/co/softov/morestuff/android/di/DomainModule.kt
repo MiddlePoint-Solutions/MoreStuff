@@ -115,6 +115,10 @@ import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScore
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithOneTimeScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithOneTimeScheduleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithReminderScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithReminderScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
@@ -249,6 +253,8 @@ val taskUseCases = module {
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
+    factoryOf(::GetActiveTasksWithOneTimeScheduleUseCaseImpl) bind GetActiveTasksWithOneTimeScheduleUseCase::class
+    factoryOf(::GetActiveTasksWithReminderScheduleUseCaseImpl) bind GetActiveTasksWithReminderScheduleUseCase::class
 }
 
 

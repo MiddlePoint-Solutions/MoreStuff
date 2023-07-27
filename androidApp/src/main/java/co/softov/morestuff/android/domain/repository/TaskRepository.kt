@@ -48,6 +48,8 @@ interface TaskRepository {
     suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
     suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
     suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>>
+    suspend fun getActiveTasksWithOneTimeSchedule(): Either<Failure, List<TaskDomain>>
+    suspend fun getActiveTasksWithReminderSchedule(): Either<Failure, List<TaskDomain>>
     fun searchTasks(searchText: String): Flow<List<TaskDomain>>
 }
 

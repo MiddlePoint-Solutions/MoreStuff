@@ -46,7 +46,7 @@ FROM task
 INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
 WHERE task.complete_time IS NULL AND schedule_type IN :schedule_type;
 
-getActiveTaskWhithoutSchedule:
+getActiveTaskWhithoutPlanSchedule:
 SELECT *
 FROM task
 WHERE complete_time IS NULL AND id NOT IN (
@@ -138,5 +138,35 @@ LIMIT 1;
 
 searchTasks:
 SELECT * FROM task
-WHERE title LIKE '%' || :searchText || '%' AND complete_time IS NULL ;
+WHERE title LIKE '%' || :searchText || '%';
 
+searchTaskOneTimeShedule:
+SELECT
+    task.*,
+    schedule.id AS schedule_id,
+    schedule.task_id AS schedule_task_id,
+    schedule.active AS schedule_active,
+    schedule.create_time AS schedule_create_time,
+    schedule.timezone AS schedule_timezone,
+    schedule.schedule_time_utc,
+    schedule.schedule_time_local,
+    schedule.schedule_type
+FROM task
+INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
+WHERE task.complete_time IS NULL AND schedule.schedule_type = 'OneTime';
+
+
+searchTaskReminderShedule:
+SELECT
+    task.*,
+    schedule.id AS schedule_id,
+    schedule.task_id AS schedule_task_id,
+    schedule.active AS schedule_active,
+    schedule.create_time AS schedule_create_time,
+    schedule.timezone AS schedule_timezone,
+    schedule.schedule_time_utc,
+    schedule.schedule_time_local,
+    schedule.schedule_type
+FROM task
+INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
+WHERE task.complete_time IS NULL AND schedule.schedule_type = 'Reminder';
