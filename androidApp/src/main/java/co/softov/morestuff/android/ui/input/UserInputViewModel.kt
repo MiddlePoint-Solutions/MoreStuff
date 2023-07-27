@@ -5,74 +5,101 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.currentTimeZoneInstant
-import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.enums.TaskType
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.TaskParams
+import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.home.PriorityInputModel
+import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.home.PlanModel
-import co.softov.morestuff.android.ui.home.PriorityUI
-import timber.log.Timber
+import co.softov.morestuff.android.ui.home.mapToDomain
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDateTime
 
 class UserInputViewModel(
     private val timeManager: TimeManager,
+    private val timeFormatter: TimeFormatter,
 ) : NoStateViewModel() {
 
-    var priorityModel by mutableStateOf(PriorityUI.Now)
-        private set
+    val priorityModel = MutableStateFlow(
+        PriorityInputModel(
+            priority = PriorityModel.Now,
+            planTime = createPlanTime()
+        )
+    )
 
-    var planModel by mutableStateOf(createPlanModel())
+    var userInput by mutableStateOf("")
         private set
-
-    val currentPriority
-        get() = when (priorityModel) {
-            PriorityUI.Now -> Priority.Now()
-            PriorityUI.Later -> Priority.Later()
-            PriorityUI.Plan -> Priority.Plan(planModel.planTime.toString())
-        }
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        PlanModel(
-            planTime = timeManager.getDefaultPlanTime(),
-            hour = hour,
-            minute = minute,
-            epochMs = currentTimeZoneInstant.toEpochMilliseconds()
-        )
+        PriorityModel.Plan(localDateTime = timeManager.getDefaultPlanTime())
     }
 
+    private fun createPlanTime(
+        time: LocalDateTime = timeManager.getDefaultPlanTime()
+    ) = PlanModel(
+        localDateTime = time,
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--"
+    )
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.planTime, hour, minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            hour = hour,
-            minute = minute,
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
+        with(priorityModel.value.planTime) {
+            updatePlan(hour, minute, epochMs)
+        }
     }
 
     fun updatePlanDate(dateMillis: Long) {
-        Timber.d("updatePlanDate: $dateMillis")
-        val updatedPlanTime =
-            timeManager.epochMillisToLocalDateTime(dateMillis, planModel.hour, planModel.minute)
-        planModel = planModel.copy(
-            planTime = updatedPlanTime,
-            relativeDisplay = timeManager.getRelativeDate(updatedPlanTime.toString()),
-            epochMs = updatedPlanTime.currentTimeZoneInstant.toEpochMilliseconds()
-        )
-        Timber.d("updatePlanDate: $planModel")
+        with(priorityModel.value.planTime) {
+            updatePlan(hour, minute, dateMillis)
+        }
+    }
 
+    private fun updatePlan(hour: Int, minute: Int, dateMillis: Long) {
+        priorityModel.update { model ->
+            (model.priority as? PriorityModel.Plan)?.let { plan ->
+                val updatedTime = timeManager.epochMillisToLocalDateTime(dateMillis, hour, minute)
+                val priority = plan.copy(localDateTime = updatedTime)
+                val planTime = createPlanTime(updatedTime)
+                PriorityInputModel(priority, planTime)
+            } ?: model
+        }
     }
 
     fun createNewTask(title: String) {
-        store.dispatch(TaskAction.CreateUserTaskAction(title, currentPriority))
+        store.dispatch(
+            TaskAction.CreateUserTaskAction(
+                title.trim(),
+                priorityModel.value.mapToDomain()
+            )
+        )
     }
 
-    fun priorityChanged(priority: PriorityUI) {
-        priorityModel = priority
+    fun setNowPriority() {
+        priorityChanged(PriorityModel.Now)
+    }
+
+    fun setLaterPriority() {
+        priorityChanged(PriorityModel.Later)
+    }
+
+    fun setPlanPriority() {
+        priorityChanged(createPlanModel())
+    }
+
+    fun updateUserInput(input: String) {
+        userInput = input
+    }
+
+    private fun priorityChanged(priority: PriorityModel) {
+        priorityModel.update {
+            PriorityInputModel(
+                priority = priority,
+                planTime = (priority as? PriorityModel.Plan)?.let { plan ->
+                    createPlanTime(plan.localDateTime)
+                } ?: it.planTime,
+            )
+        }
     }
 
 }

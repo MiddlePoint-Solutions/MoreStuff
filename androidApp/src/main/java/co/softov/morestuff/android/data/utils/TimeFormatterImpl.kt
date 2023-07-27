@@ -1,19 +1,19 @@
-package co.softov.morestuff.android.domain.usecase.time
+package co.softov.morestuff.android.data.utils
 
+import android.content.Context
+import android.text.format.DateFormat.is24HourFormat
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-interface TimeFormatter {
-    fun formatTime(timeString: String?, pattern: String): String?
-    fun formatTimeOnly(timeString: String?): String?
-    fun formatTimeDayAndMonth(timeString: String?): String?
-    fun formatToDateTime(timeString: String?): String?
+class TimeFormatterImpl(
+    private val context: Context,
+) : TimeFormatter {
 
-}
-
-
-class TimeFormatterImpl : TimeFormatter {
+    private val is24HourFormat
+        get() = is24HourFormat(context)
 
     override fun formatTime(timeString: String?, pattern: String): String? {
         return timeString?.let {
@@ -27,7 +27,7 @@ class TimeFormatterImpl : TimeFormatter {
     }
 
     override fun formatTimeOnly(timeString: String?): String? {
-        return formatTime(timeString, "HH:mm")
+        return formatTime(timeString, "HH:mm ${if (is24HourFormat) "a" else ""}")
     }
 
     override fun formatTimeDayAndMonth(timeString: String?): String? {
@@ -35,7 +35,7 @@ class TimeFormatterImpl : TimeFormatter {
     }
 
     override fun formatToDateTime(timeString: String?): String? {
-        return formatTime(timeString, "dd/MM/yyyy HH:mm")
+        return formatTime(timeString, "dd/MM/yyyy HH:mm ${if (is24HourFormat) "a" else ""}")
     }
 
 }

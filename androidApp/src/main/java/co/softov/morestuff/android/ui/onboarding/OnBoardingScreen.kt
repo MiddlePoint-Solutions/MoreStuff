@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,7 +17,6 @@ import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.selectNext
-import timber.log.Timber
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -52,7 +50,7 @@ fun OnBoardingContent(
                     )
 
                     PriorityButton(
-                        onSelected = {
+                        onClick = {
                             navigation.selectNext()
                         },
                         modifier = Modifier.align(Alignment.BottomCenter),
@@ -76,7 +74,7 @@ fun OnBoardingContent(
                     )
 
                     PriorityButton(
-                        onSelected = {
+                        onClick = {
                             onBoardingComplete()
                         },
                         modifier = Modifier.align(Alignment.BottomCenter),

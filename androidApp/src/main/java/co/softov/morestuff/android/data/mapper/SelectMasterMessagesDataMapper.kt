@@ -3,7 +3,7 @@ package co.softov.morestuff.android.data.mapper
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.db.SelectMasterMessages
 import kotlinx.serialization.json.Json

@@ -1,32 +1,41 @@
 package co.softov.morestuff.android.ui.input
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
+import androidx.compose.ui.zIndex
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun UserInput(
     modifier: Modifier = Modifier,
-    initialValue: String = "",
     priorityContent: @Composable () -> Unit = {},
-    showTaskLists: () -> Unit = {},
-    onSubmitInput: (String) -> Unit = {},
+    textContent: @Composable () -> Unit = {},
 ) {
-    Column(modifier.imePadding()) {
-        priorityContent()
-        Surface(shadowElevation = 9.dp) {
-            Column(modifier = modifier) {
-                NotificationPermissionRequester()
-                UserTextInput(
-                    initialValue = initialValue,
-                    listAction = showTaskLists,
-                    sendAction = onSubmitInput,
-                )
-            }
+    Surface(
+        modifier = modifier
+            .imePadding()
+            .zIndex(1f),
+        color = Color.Transparent,
+    ) {
+        Column {
+            priorityContent()
+            textContent()
         }
+    }
+}
+
+@Preview
+@Composable
+fun UserInputPreview() {
+    MoreStuffTheme {
+        UserInput()
     }
 }

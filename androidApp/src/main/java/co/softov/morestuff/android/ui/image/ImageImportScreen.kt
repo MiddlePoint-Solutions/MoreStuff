@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.chat.task
+package co.softov.morestuff.android.ui.image
 
 import android.net.Uri
 import androidx.compose.foundation.Image
