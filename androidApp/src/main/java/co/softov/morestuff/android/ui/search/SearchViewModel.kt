@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.components
+package co.softov.morestuff.android.ui.search
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue

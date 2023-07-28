@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.components
+package co.softov.morestuff.android.ui.search
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +34,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.Filter
-import co.softov.morestuff.android.ui.schedule.PriorityItem
 import org.koin.androidx.compose.getViewModel
 
 
@@ -190,7 +189,7 @@ fun CustomSearchBar(
                 )
             } else {
                 for (task in viewModel.searchResults.value) {
-                    PriorityItem(
+                    SearchPriorityItem(
                         task = task,
                         onClick = { taskId ->
                             showTaskChat(taskId)

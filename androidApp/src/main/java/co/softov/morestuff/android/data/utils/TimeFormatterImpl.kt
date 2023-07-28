@@ -6,7 +6,6 @@ import co.softov.morestuff.android.domain.util.TimeFormatter
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 class TimeFormatterImpl(
     private val context: Context,
@@ -32,6 +31,10 @@ class TimeFormatterImpl(
 
     override fun formatTimeDayAndMonth(timeString: String?): String? {
         return formatTime(timeString, "EEEE, MMMM d")
+    }
+
+    override fun formatTimeDayMonthHour(timeString: String?): String? {
+        return formatTime(timeString, "EEEE d MMMM, HH:mm")
     }
 
     override fun formatToDateTime(timeString: String?): String? {

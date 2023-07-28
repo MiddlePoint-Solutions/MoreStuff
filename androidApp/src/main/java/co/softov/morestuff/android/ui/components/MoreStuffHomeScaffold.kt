@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.ui.drawer.DrawerLayout
+import co.softov.morestuff.android.ui.search.CustomSearchBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
