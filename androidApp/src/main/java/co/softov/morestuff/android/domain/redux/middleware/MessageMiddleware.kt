@@ -14,6 +14,7 @@ import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseC
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -22,7 +23,14 @@ sealed class MessageAction : Action.FeatureAction() {
     internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
-    internal data class CreateImageMessageAction(val taskId: Long, val filePath: String, val message: String) : MessageAction()
+
+    internal data class CreateImageMessageAction(
+        val taskId: Long,
+        val filePath: String,
+        val message: String
+    ) : MessageAction()
+
+    data class DeleteMessageAction(val messageId: Long) : MessageAction()
 }
 
 class MessageMiddleware(
@@ -31,8 +39,8 @@ class MessageMiddleware(
     private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
     private val createImageMessageUseCase: CreateImageMessageUseCase,
-
-    ) : Middleware<AppState> {
+    private val deleteMessageUseCase: DeleteMessageUseCase,
+) : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
@@ -54,14 +62,27 @@ class MessageMiddleware(
             }
 
             is MessageAction.CreateUserTaskMessageAction -> scope.launch {
-                createMessageUseCase(action.taskId, action.content, ContentType.TASK_MESSAGE, messageData = null)
-            }
-            is MessageAction.CreateImageMessageAction -> scope.launch {
-                createImageMessageUseCase(action.taskId, scheduleId = 0,
-                    contentType = ContentType.TASK_MESSAGE, filePath = action.filePath, action.message
-                    )
+                createMessageUseCase(
+                    action.taskId,
+                    action.content,
+                    ContentType.TASK_MESSAGE,
+                    messageData = null
+                )
             }
 
+            is MessageAction.CreateImageMessageAction -> scope.launch {
+                createImageMessageUseCase(
+                    action.taskId,
+                    scheduleId = 0,
+                    contentType = ContentType.TASK_MESSAGE,
+                    filePath = action.filePath,
+                    action.message
+                )
+            }
+
+            is MessageAction.DeleteMessageAction -> scope.launch {
+                deleteMessageUseCase(action.messageId)
+            }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
                 createMessageUseCase(
@@ -89,6 +110,7 @@ class MessageMiddleware(
                     setScheduleResponseMessage(it, "Done", ReplyType.DONE)
                 }
             }
+
 
             else -> NoOp
         }

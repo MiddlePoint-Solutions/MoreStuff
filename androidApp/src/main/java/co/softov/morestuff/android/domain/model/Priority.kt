@@ -1,11 +1,12 @@
 package co.softov.morestuff.android.domain.model
 
 import co.softov.morestuff.android.domain.enums.ReplyType
+import kotlinx.datetime.LocalDateTime
 
 sealed class Priority {
     data class Now(val option: PriorityOption = DefaultOption.Auto) : Priority()
     data class Later(val option: PriorityOption = DefaultOption.Auto) : Priority()
-    data class Plan(val localTime: String) : Priority()
+    data class Plan(val localTime: LocalDateTime) : Priority()
 }
 
 val Priority.replyWithTitle: Pair<String, ReplyType>

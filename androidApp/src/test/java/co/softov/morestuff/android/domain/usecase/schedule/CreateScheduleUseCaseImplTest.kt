@@ -38,11 +38,11 @@ class CreateScheduleUseCaseImplTest {
     @Test
     fun `creates schedule`() = runBlocking {
         val taskId = 1L
-        val localTime = timeManager.nowLocalDateTimeString
+        val localTime = timeManager.nowLocalDateTime
         val priority = Priority.Plan(localTime)
         val schedule = createScheduleUseCaseTest(
             createTime = createTime,
-            scheduleTimeLocal = localTime,
+            scheduleTimeLocal = localTime.toString(),
             scheduleTimeUtc = timeManager.nowUtcInstantString,
             timeZone = TimeZone.currentSystemDefault().id
         )

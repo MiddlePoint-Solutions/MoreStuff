@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.domain.service
 
-interface ClipboardHandler {
+interface ClipboardHelper {
     fun copyToClipboard(text: String)
 
 }

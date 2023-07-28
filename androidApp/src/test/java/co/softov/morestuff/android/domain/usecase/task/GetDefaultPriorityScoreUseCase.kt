@@ -49,7 +49,7 @@ class GetDefaultPriorityScoreUseCaseTest {
     fun `default "Plan" priority score for should be the lowest score available`() = runBlocking {
         coEvery { getLowestPriorityScoreUseCase() } returns 42
         coEvery { getHighestPriorityScoreUseCase() } returns 84
-        val scheduleLocalTime = timeManager.todayLocalDateTimeByAdding(hour = 1).toString()
+        val scheduleLocalTime = timeManager.todayLocalDateTimeByAdding(hour = 1)
         val result = getDefaultPriorityScoreUseCase(Priority.Plan(scheduleLocalTime))
         Assertions.assertEquals(42, result)
     }
