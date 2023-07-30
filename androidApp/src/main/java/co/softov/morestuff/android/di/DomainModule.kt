@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParser
-import co.softov.morestuff.android.data.service.ClipboardHandlerImpl
+import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
@@ -16,7 +16,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ReminderMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
-import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.OpenGraphInterface
 import co.softov.morestuff.android.domain.service.TimeManager
@@ -287,7 +287,7 @@ val messageUseCases = module {
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
     factoryOf(::SaveUserImageUseCaseImpl) bind SaveUserImageUseCase::class
-    factoryOf(::ClipboardHandlerImpl) bind ClipboardHandler::class
+    factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
     factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
 }

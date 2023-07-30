@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.task
 
+import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
 
@@ -22,7 +23,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
                 val scheduleDomain = task.activeSchedule
                 if (scheduleDomain?.scheduleLocalTime != null) {
                     val newPriorityScore = getPlanPriorityScoreUseCase(
-                        scheduleTimeLocal = scheduleDomain.scheduleLocalTime.toString(),
+                        scheduleTimeLocal = scheduleDomain.scheduleLocalTime.toLocalDateTime(),
                         taskCreateTimeUtc = task.createTime
                     )
                     updateTaskPriorityScoreUseCase(task.id, newPriorityScore)

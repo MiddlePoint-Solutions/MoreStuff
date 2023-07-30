@@ -46,6 +46,10 @@ class TimeManagerImpl : TimeManager {
         return time.toLocalDateTime().toInstant(currentTimeZone)
     }
 
+    override fun localDateTimeToUtc(localDateTime: LocalDateTime): Instant {
+        return localDateTime.toInstant(currentTimeZone)
+    }
+
     override fun isToday(localTime: String): Boolean {
         return localTime.toLocalDateTime().date == nowLocalDateTime.date
     }

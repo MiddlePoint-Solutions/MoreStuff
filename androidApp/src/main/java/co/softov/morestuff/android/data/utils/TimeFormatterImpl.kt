@@ -12,7 +12,7 @@ class TimeFormatterImpl(
     private val context: Context,
 ) : TimeFormatter {
 
-    private val is24HourFormat
+    override val is24HourFormat
         get() = is24HourFormat(context)
 
     override fun formatTime(timeString: String?, pattern: String): String? {
@@ -27,7 +27,7 @@ class TimeFormatterImpl(
     }
 
     override fun formatTimeOnly(timeString: String?): String? {
-        return formatTime(timeString, "HH:mm ${if (is24HourFormat) "a" else ""}")
+        return formatTime(timeString, "HH:mm${addAmPm()}")
     }
 
     override fun formatTimeDayAndMonth(timeString: String?): String? {
@@ -35,7 +35,9 @@ class TimeFormatterImpl(
     }
 
     override fun formatToDateTime(timeString: String?): String? {
-        return formatTime(timeString, "dd/MM/yyyy HH:mm ${if (is24HourFormat) "a" else ""}")
+        return formatTime(timeString, "dd/MM/yyyy HH:mm${addAmPm()}")
     }
+
+    private fun addAmPm() = if (is24HourFormat) "a" else ""
 
 }

@@ -16,15 +16,13 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.service.ClipboardHandler
+import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
-import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.home.PlanModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,17 +38,15 @@ import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
 class TaskChatViewModel(
+    private val taskId: Long,
+    private val clipboardHelper: ClipboardHelper,
+    private val imageHandler: ImageHandler,
+    private val timeManager: TimeManager,
+    private val timeFormatter: TimeFormatter,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
-    private val getTaskFlow: GetTaskFlowUseCase,
-    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
-    private val clipboardHandler: ClipboardHandler,
-    private val deleteMessageUseCase: DeleteMessageUseCase,
-    private val shareImage: ImageHandler,
-    private val taskId: Long,
-    private val timeManager: TimeManager,
-    private val timeFormatter: TimeFormatter,
+    getTaskFlow: GetTaskFlowUseCase,
     devTools: DevTools,
 ) : NoStateViewModel() {
 
@@ -74,7 +70,6 @@ class TaskChatViewModel(
         initialValue = listOf()
     )
 
-
     val task: StateFlow<TaskDomain> =
         getTaskFlow(taskId)
             .stateIn(
@@ -83,18 +78,8 @@ class TaskChatViewModel(
                 initialValue = TaskDomain()
             )
 
-    var planModel by mutableStateOf(createPlanTime())
+    var planModel by mutableStateOf<PlanModel?>(null)
         private set
-
-    val schedule: StateFlow<ScheduleDomain?> =
-        getActiveScheduleFlow(taskId)
-            .map { it.orNull() }
-            .onEach { it?.let { createPlanModelForSchedule(it) } }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = null
-            )
 
     var taskTitle by mutableStateOf("")
         private set
@@ -103,12 +88,21 @@ class TaskChatViewModel(
         viewModelScope.launch {
             taskTitle = getTaskFlow(taskId = taskId).first().title
         }
+
+        getActiveScheduleFlow(taskId)
+            .map { it.orNull() }
+            .onEach { createPlanModelForSchedule(it) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = null
+            )
     }
 
-    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain) {
-        if (scheduleDomain.scheduleLocalTime != null) {
+    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain?) {
+        planModel = scheduleDomain?.scheduleLocalTime?.let {
             val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-            planModel = createPlanTime(localTime)
+            createPlanTime(localTime)
         }
     }
 
@@ -119,9 +113,7 @@ class TaskChatViewModel(
     fun updateTaskTitle(title: String) {
         taskTitle = title
         if (title.isNotEmpty()) {
-            viewModelScope.launch {
-                updateTaskTitleUseCase(taskId, title)
-            }
+            dispatchAppStoreAction(TaskAction.UpdateTaskTitleAction(taskId, title))
         }
     }
 
@@ -147,24 +139,30 @@ class TaskChatViewModel(
     )
 
     fun createOneTimeSchedule() {
-        dispatchAppStoreAction(
-            ScheduleAction.RescheduleTaskAction(
-                taskId,
-                ScheduleType.OneTime,
-                planModel.localDateTime.toString()
+        createPlanTime().run {
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, localDateTime)
             )
-        )
+        }
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        val updatedPlanTime = timeManager.localDateTime(planModel.localDateTime, hour, minute)
-        TODO("updatePlanTime")
+        planModel?.let {
+            val updatedPlanTime = timeManager.localDateTime(it.localDateTime, hour, minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
     }
 
     fun updatePlanDate(dateMillis: Long) {
-        Timber.d("updatePlanDate: $dateMillis")
-        TODO("updatePlanDate")
-        Timber.d("updatePlanDate: $planModel")
+        planModel?.let {
+            val updatedPlanTime =
+                timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
     }
 
     fun cancelActiveSchedule() {
@@ -172,19 +170,15 @@ class TaskChatViewModel(
     }
 
     fun copyToClipboard(text: String) {
-        clipboardHandler.copyToClipboard(text)
+        clipboardHelper.copyToClipboard(text)
     }
 
     fun deleteMessage(messageId: Long) {
-        viewModelScope.launch {
-            deleteMessageUseCase(messageId)
-        }
+        dispatchAppStoreAction(MessageAction.DeleteMessageAction(messageId))
     }
 
     fun shareImage(imagePath: String) {
-        viewModelScope.launch {
-            shareImage.shareImage(imagePath)
-        }
+        imageHandler.shareImage(imagePath)
     }
 
 }

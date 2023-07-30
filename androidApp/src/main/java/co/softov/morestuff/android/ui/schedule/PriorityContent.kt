@@ -154,7 +154,7 @@ fun PriorityContent(
         ) {
             items(
                 items = viewModel.tasks,
-                key = { task -> task.id }
+//                key = { task -> task.id }
             ) {
                 val task by rememberUpdatedState(it)
 

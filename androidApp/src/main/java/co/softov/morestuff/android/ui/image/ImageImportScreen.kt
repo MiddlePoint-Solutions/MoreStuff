@@ -54,7 +54,7 @@ import coil.compose.rememberAsyncImagePainter
 fun ImageImportScreen(
     imageUri: Uri,
     send: (String) -> Unit,
-    cancel: () -> Unit,
+    onBack: () -> Unit,
 ) {
     var messageText by remember { mutableStateOf("") }
 
@@ -74,7 +74,7 @@ fun ImageImportScreen(
             TopAppBar(
                 title = { Text("Select image") },
                 navigationIcon = {
-                    IconButton(onClick = cancel) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back",

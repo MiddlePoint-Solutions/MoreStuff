@@ -109,5 +109,6 @@
     <string name="enable_confetti">Enable Confetti</string>
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
+    <string name="cd_cancel_schedule">Cancel Schedule</string>
 
 </resources>
