@@ -97,9 +97,6 @@
         android:name="android.permission.SCHEDULE_EXACT_ALARM"
         android:maxSdkVersion="32" /> <!-- Allow the app to disable battery optimizations -->
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-feature android:name="android.hardware.camera.any" android:required="true" />
-    <uses-permission android:name="android.permission.CAMERA" />
 
 </manifest>
