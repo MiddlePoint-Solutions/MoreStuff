@@ -9,6 +9,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.LocalDateTime
 import org.junit.jupiter.api.Test
 
 
@@ -45,7 +46,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
         coEvery { getActiveTasksWithScheduleUseCase() } returns tasks.right()
         coEvery { getPlanPriorityScoreUseCase(any(), any()) } answers {
-            val scheduleTimeLocal = firstArg<String>()
+            val scheduleTimeLocal = firstArg<LocalDateTime>().toString()
 
             if (scheduleTimeLocal.endsWith("01:00:00")) {
                 10L

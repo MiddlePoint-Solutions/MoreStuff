@@ -10,8 +10,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,14 +19,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -38,11 +37,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.icons.sharp.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,7 +53,6 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,10 +66,11 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -86,22 +85,35 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.util.LifecycleViewModelStoreOwner
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
+import co.softov.morestuff.android.ui.compose.keyboardAsState
 import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -112,111 +124,109 @@ fun TaskChatScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val navigation = remember { StackNavigation<ChatScreen>() }
+
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
-        TaskChatContent(
-            taskId = taskId,
-            onBack = onBack,
-            viewModel = koinViewModel { parametersOf(taskId) },
-            modifier = modifier
-        )
+
+        val viewModel: TaskChatViewModel = koinViewModel { parametersOf(taskId) }
+
+        val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
+            viewModel.shareImage(imagePath)
+        }
+
+        ChildStack(
+            source = navigation,
+            initialStack = { listOf(ChatScreen.TaskChat) },
+            handleBackButton = true,
+            animation = stackAnimation(scale() + fade()),
+        ) { screen ->
+            when (screen) {
+                is ChatScreen.TaskChat -> {
+
+                    val task by viewModel.task.collectAsStateWithLifecycle()
+                    val messages by viewModel.messages.collectAsStateWithLifecycle()
+
+                    val chatActions = ChatActions(
+                        scheduleAction = viewModel::scheduleResponse,
+                        copyMessage = { message ->
+                            viewModel.copyToClipboard(message.content)
+                        },
+                        deleteMessage = { message ->
+                            viewModel.deleteMessage(messageId = message.id)
+                        },
+                        onImageSelected = {
+                            val path = it.messageData?.filePath ?: ""
+                            val title = it.content
+                            navigation.push(ChatScreen.ImagePreview(path, title))
+                        }
+                    )
+
+                    TaskChatContent(
+                        task = task,
+                        planModel = { viewModel.planModel },
+                        messages = messages,
+                        chatActions = chatActions,
+                        modifier = modifier,
+                        onBack = onBack,
+                        sendTaskMessage = viewModel::sendTaskChatMessage,
+                        updateTaskTitle = viewModel::updateTaskTitle,
+                        toggleTaskComplete = viewModel::toggleTaskComplete,
+                        updatePlanTime = viewModel::updatePlanTime,
+                        updatePlanDate = viewModel::updatePlanDate,
+                        createPlanSchedule = viewModel::createOneTimeSchedule,
+                        cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                        imagePicked = {
+                            navigation.push(ChatScreen.ImageImport(it.toString()))
+                        }
+                    )
+                }
+
+                is ChatScreen.ImageImport -> {
+                    ImageImportScreen(
+                        imageUri = Uri.parse(screen.uri),
+                        send = { message ->
+                            viewModel.sendImageMessageForTask(screen.uri, message)
+                            navigation.pop()
+                        },
+                        onBack = navigation::pop
+                    )
+                }
+
+                is ChatScreen.ImagePreview -> {
+                    ImagePreviewScreen(
+                        imagePath = screen.imagePath,
+                        onBack = navigation::pop,
+                        onSendImage = shareImage,
+                        title = screen.title,
+                    )
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun TaskChatContent(
-    taskId: Long,
-    onBack: () -> Unit,
-    viewModel: TaskChatViewModel,
-    modifier: Modifier = Modifier,
-) {
-
-    val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
-        viewModel.shareImage(imagePath)
-    }
-
-    val messages by viewModel.messages.collectAsStateWithLifecycle()
-
-    var selectImageFromGallery by remember { mutableStateOf<Uri?>(null) }
-    val imagePicked by rememberUpdatedState<(Uri) -> Unit> { selectImageFromGallery = it }
-
-    var selectedImageMessage by remember { mutableStateOf<Message?>(null) }
-
-    val chatActions = ChatActions(
-        scheduleAction = viewModel::scheduleResponse,
-        copyMessage = { message ->
-            viewModel.copyToClipboard(message.content)
-        },
-        deleteMessage = { message ->
-            viewModel.deleteMessage(messageId = message.id)
-        },
-        onImageSelected = {
-            selectedImageMessage = it
-        }
-    )
-
-    when {
-        selectedImageMessage != null -> selectedImageMessage?.let {
-            BackHandler {
-                selectedImageMessage = null
-            }
-            ImagePreviewScreen(
-                imagePath = it.messageData?.filePath ?: "",
-                cancel = {
-                    selectedImageMessage = null
-                },
-                onSendImage = { imagePath ->
-                    shareImage(imagePath)
-                },
-                message = it,
-            )
-        }
-
-        selectImageFromGallery != null -> selectImageFromGallery?.let {
-            BackHandler {
-                selectImageFromGallery = null
-            }
-            ImageImportScreen(
-                imageUri = it,
-                send = { message ->
-                    viewModel.sendImageMessageForTask(it.toString(), message)
-                    selectImageFromGallery = null
-                },
-                cancel = {
-                    selectImageFromGallery = null
-                }
-            )
-        }
-
-        else -> {
-            TaskChat(
-                viewModel,
-                onBack,
-                modifier,
-                taskId,
-                messages,
-                chatActions,
-                imagePicked
-            )
-        }
-    }
-}
-
-@Composable
-private fun TaskChat(
-    viewModel: TaskChatViewModel,
-    onBack: () -> Unit = {},
-    modifier: Modifier,
-    taskId: Long,
+    task: TaskDomain,
+    planModel: () -> PlanModel?,
     messages: List<Message>,
     chatActions: ChatActions,
+    modifier: Modifier = Modifier,
+    onBack: () -> Unit = {},
+    sendTaskMessage: (String) -> Unit = {},
+    updateTaskTitle: (String) -> Unit = {},
+    toggleTaskComplete: () -> Unit = {},
+    updatePlanTime: (Int, Int) -> Unit = { _, _ -> },
+    updatePlanDate: (Long) -> Unit = {},
+    createPlanSchedule: () -> Unit = {},
+    cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {}
 ) {
 
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
-
-    val task by viewModel.task.collectAsStateWithLifecycle()
 
     val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -227,7 +237,7 @@ private fun TaskChat(
     }
 
     var userInputValue by rememberSaveable(
-        key = taskId.toString(),
+        key = task.id.toString(),
         stateSaver = TextFieldValue.Saver
     ) {
         mutableStateOf(TextFieldValue())
@@ -235,7 +245,7 @@ private fun TaskChat(
 
     Scaffold(
         topBar = {
-            TaskChatTopAppBar(
+            TaskTopAppBar(
                 onBackPressed = onBack,
             )
         },
@@ -252,25 +262,25 @@ private fun TaskChat(
             ) {
                 TaskChatEditor(
                     isComplete = task.isComplete,
-                    taskTitle = { viewModel.taskTitle },
-                    onTitleChange = viewModel::updateTaskTitle,
-                    toggleTaskComplete = viewModel::toggleTaskComplete,
+                    taskTitle = { task.title },
+                    onTitleChange = updateTaskTitle,
+                    toggleTaskComplete = toggleTaskComplete,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+
                         Icon(
-                            imageVector = Icons.Filled.Schedule,
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
                             contentDescription = stringResource(R.string.cd_schedule_icon),
                         )
 
-                        Spacer(modifier = Modifier.width(20.dp))
+                        Spacer(modifier = Modifier.width(13.dp))
 
-                        ScheduleButton(
-                            planModel = viewModel.planModel,
-                            schedule = task.activeSchedule,
-                            onTimeChange = viewModel::updatePlanTime,
-                            onDateChange = viewModel::updatePlanDate,
-                            createPlanSchedule = viewModel::createOneTimeSchedule,
-                            cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                        TaskSchedule(
+                            planModel = planModel(),
+                            onTimeChange = updatePlanTime,
+                            onDateChange = updatePlanDate,
+                            createPlanSchedule = createPlanSchedule,
+                            cancelActiveSchedule = cancelActiveSchedule,
                         )
                     }
                 }
@@ -297,7 +307,7 @@ private fun TaskChat(
                                     value = userInputValue,
                                     onValueChange = { userInputValue = it },
                                     sendAction = {
-                                        viewModel.sendTaskChatMessage(it)
+                                        sendTaskMessage(it)
                                         userInputValue = userInputValue.copy("")
                                         scope.launch {
                                             delay(200)
@@ -331,7 +341,7 @@ private fun TaskChat(
 }
 
 @Composable
-fun TaskChatEditor(
+private fun TaskChatEditor(
     isComplete: Boolean,
     taskTitle: () -> String,
     onTitleChange: (String) -> Unit,
@@ -352,10 +362,8 @@ fun TaskChatEditor(
     }
 
     BackHandler(isEditing) {
-        if (isEditing) {
-            focusManager.clearFocus()
-            isEditing = false
-        }
+        focusManager.clearFocus()
+        isEditing = false
     }
 
     Surface(
@@ -364,13 +372,14 @@ fun TaskChatEditor(
     ) {
         Box(
             modifier = Modifier
-                .padding(vertical = 16.dp)
                 .animateContentSize(animationSpec = tween())
+                .padding(vertical = 16.dp)
                 .then(
                     if (isEditing) {
-                        Modifier.fillMaxHeight(0.7f)
+                        Modifier
+                            .fillMaxHeight(0.7f)
                     } else {
-                        Modifier.height(IntrinsicSize.Min)
+                        Modifier.height(IntrinsicSize.Max)
                     }
                 ),
         ) {
@@ -401,7 +410,7 @@ fun TaskChatEditor(
                         AnimatedContent(
                             targetState = isComplete,
                             label = "Complete toggle animation",
-                            transitionSpec = { scaleIn() togetherWith scaleOut() },
+                            transitionSpec = { scaleIn() togetherWith fadeOut() },
                             modifier = Modifier.align(Alignment.Center)
                         ) {
                             when (it) {
@@ -445,6 +454,7 @@ fun TaskChatEditor(
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                         },
+                        minLines = 2,
                         maxLines = 4,
                         textStyle = MaterialTheme.typography.headlineMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
@@ -470,20 +480,12 @@ fun TaskChatEditor(
     }
 }
 
-@Composable
-fun keyboardAsState(): State<Boolean> {
-    val isImeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
-    return rememberUpdatedState(isImeVisible)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScheduleButton(
-    planModel: PlanModel,
-    schedule: ScheduleDomain?,
+private fun TaskSchedule(
+    planModel: PlanModel?,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
-    modifier: Modifier = Modifier,
     createPlanSchedule: () -> Unit,
     cancelActiveSchedule: () -> Unit,
 ) {
@@ -491,64 +493,65 @@ fun ScheduleButton(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
-    if (showDatePickerDialog) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planModel.epochMs
-        )
-
-        PriorityDatePicker(
-            dismissDialog = { showDatePickerDialog = false },
-            onDateChange = {
-                datePickerState.selectedDateMillis?.let {
-                    onDateChange(it)
-                }
-                showDatePickerDialog = false
-                showTimePickerDialog = true
-
-            },
-            state = datePickerState,
-        )
-    }
-
-    if (showTimePickerDialog) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = planModel.hour,
-            initialMinute = planModel.minute
-        )
-        PriorityTimePicker(
-            dismissTimePicker = { showTimePickerDialog = false },
-            onTimeChange = {
-                onTimeChange(
-                    timePickerState.hour,
-                    timePickerState.minute
+    AnimatedContent(
+        targetState = planModel,
+        label = "",
+        contentKey = { it != null }
+    ) { plan ->
+        when (plan) {
+            null -> {
+                PriorityButton(
+                    onClick = createPlanSchedule,
+                    text = stringResource(id = R.string.task_chat_schedule_reminder),
+                    shape = RoundedCornerShape(percent = 50),
                 )
-                createPlanSchedule()
-                showTimePickerDialog = false
-            },
-            state = timePickerState
-        )
-    }
+            }
 
-    Row(modifier = modifier) {
+            else -> {
+                Row {
+                    if (showDatePickerDialog) {
+                        val datePickerState = rememberDatePickerState(
+                            initialSelectedDateMillis = plan.epochMs
+                        )
 
-        AnimatedContent(targetState = schedule, label = "") {
-            when (it) {
-                null -> {
-                    PriorityButton(
+                        PriorityDatePicker(
+                            dismissDialog = { showDatePickerDialog = false },
+                            onDateChange = {
+                                datePickerState.selectedDateMillis?.let {
+                                    onDateChange(it)
+                                }
+                                showDatePickerDialog = false
+                            },
+                            state = datePickerState,
+                        )
+                    }
+
+                    if (showTimePickerDialog) {
+                        val timePickerState = rememberTimePickerState(
+                            initialHour = plan.hour,
+                            initialMinute = plan.minute
+                        )
+                        PriorityTimePicker(
+                            dismissTimePicker = { showTimePickerDialog = false },
+                            onTimeChange = {
+                                onTimeChange(
+                                    timePickerState.hour,
+                                    timePickerState.minute
+                                )
+                                showTimePickerDialog = false
+                            },
+                            state = timePickerState
+                        )
+                    }
+
+                    Button(
                         onClick = { showDatePickerDialog = true },
-                        text = stringResource(id = R.string.task_chat_schedule_reminder),
-                        shape = RoundedCornerShape(percent = 50),
-                    )
-                }
-
-                else -> {
-                    PriorityButton(
-                        onClick = { showDatePickerDialog = true },
+                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = planModel.displayDate,
+                            text = plan.displayDate,
                             style = TextStyle(
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
                                 lineHeight = 28.sp,
                                 fontWeight = FontWeight(400),
                                 color = Color(0xFFFFFFFF),
@@ -558,13 +561,14 @@ fun ScheduleButton(
 
                     Spacer(modifier = Modifier.width(10.dp))
 
-                    PriorityButton(
+                    Button(
                         onClick = { showTimePickerDialog = true },
+                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = planModel.displayTime,
+                            text = plan.displayTime,
                             style = TextStyle(
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
                                 lineHeight = 28.sp,
                                 fontWeight = FontWeight(400),
                                 color = Color(0xFFFFFFFF),
@@ -572,17 +576,15 @@ fun ScheduleButton(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(
                         onClick = { cancelActiveSchedule() },
                         modifier = Modifier
-                            .padding(start = 5.dp)
                     ) {
                         Icon(
-                            Icons.Default.Cancel,
-                            contentDescription = "Cancel",
-                            tint = MaterialTheme.colorScheme.primary
+                            Icons.Sharp.Close,
+                            contentDescription = stringResource(R.string.cd_cancel_schedule),
                         )
                     }
                 }
@@ -593,7 +595,7 @@ fun ScheduleButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TaskChatTopAppBar(
+private fun TaskTopAppBar(
     onBackPressed: () -> Unit,
 ) {
     TopAppBar(
@@ -624,6 +626,31 @@ fun TaskChatTopBarPreview() {
             isComplete = false,
             taskTitle = { "Hello There this should be a very long text so that we can test how it looks" },
             onTitleChange = {}
+        )
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+fun TaskSchedulePreview() {
+    MoreStuffTheme {
+        TaskSchedule(
+            planModel = PlanModel(
+                localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+                displayDate = "Saturday, July 29",
+                displayTime = "15:30"
+            ),
+            onDateChange = {},
+            onTimeChange = { _, _ -> },
+            cancelActiveSchedule = {},
+            createPlanSchedule = {}
         )
     }
 }

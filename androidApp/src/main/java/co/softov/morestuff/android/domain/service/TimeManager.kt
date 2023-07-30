@@ -72,6 +72,11 @@ interface TimeManager {
     fun localDateTimeStringToUtc(time: String): Instant
 
     /**
+    Converts a LocalDateTime string to UTC Instant.
+     */
+    fun localDateTimeToUtc(localDateTime: LocalDateTime): Instant
+
+    /**
     Checks if the given local time string is today.
      */
     fun isToday(localTime: String): Boolean

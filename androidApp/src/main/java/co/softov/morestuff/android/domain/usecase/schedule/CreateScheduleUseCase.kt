@@ -6,13 +6,14 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.service.TimeManager
+import kotlinx.datetime.LocalDateTime
 import timber.log.Timber
 
 interface CreateScheduleUseCase {
     suspend operator fun invoke(
         taskId: Long,
         scheduleType: ScheduleType,
-        localDateTime: String
+        localDateTime: LocalDateTime
     ): Either<Failure, ScheduleDomain>
 }
 
@@ -24,15 +25,15 @@ class CreateScheduleUseCaseImpl(
     override suspend fun invoke(
         taskId: Long,
         scheduleType: ScheduleType,
-        localDateTime: String
+        localDateTime: LocalDateTime
     ): Either<Failure, ScheduleDomain> {
         cancelActiveScheduleUseCase(taskId)
-        val utcTime = timeManager.localDateTimeStringToUtc(localDateTime).toString()
+        val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
         val schedule = ScheduleDomain(
             id = 0,
             taskId = taskId,
             createTime = timeManager.getCreateTime(),
-            scheduleLocalTime = localDateTime,
+            scheduleLocalTime = localDateTime.toString(),
             scheduleUtcTime = utcTime,
             timezone = timeManager.currentTimeZone.id,
             active = true,

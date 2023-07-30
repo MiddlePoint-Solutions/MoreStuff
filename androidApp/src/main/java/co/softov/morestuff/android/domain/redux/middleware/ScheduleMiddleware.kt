@@ -31,13 +31,14 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotifications
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
     data class RescheduleTaskAction(
         val taskId: Long,
         val scheduleType: ScheduleType,
-        val localDateTime: String
+        val localDateTime: LocalDateTime
     ) : ScheduleAction()
 
     data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
@@ -124,11 +125,7 @@ class ScheduleMiddleware(
                     LATER -> {}
                     TOMORROW -> {}
                     SNOOZE -> dispatch(
-                        RescheduleTaskAction(
-                            schedule.taskId,
-                            schedule.scheduleType,
-                            oneHourLater.toString()
-                        )
+                        RescheduleTaskAction(schedule.taskId, schedule.scheduleType, oneHourLater)
                     )
 
                     DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))

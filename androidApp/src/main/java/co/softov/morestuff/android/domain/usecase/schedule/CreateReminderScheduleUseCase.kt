@@ -22,7 +22,7 @@ class CreateReminderScheduleUseCaseImpl(
         return createScheduleUseCase(
             taskId = taskId,
             scheduleType = ScheduleType.Reminder,
-            localDateTime = timeManager.todayLocalDateTimeByAdding(hour = 1).toString()
+            localDateTime = timeManager.todayLocalDateTimeByAdding(hour = 1)
         )
     }
 }

@@ -16,6 +16,7 @@ import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScor
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,8 @@ sealed class TaskAction : Action.FeatureAction() {
     data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
     data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
+    data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
+
     internal data class TaskCreatedAction(
         val task: TaskDomain,
         val priority: Priority
@@ -45,6 +48,7 @@ sealed class TaskAction : Action.FeatureAction() {
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
+    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -78,6 +82,10 @@ class TaskMiddleware(
                 with(action) {
                     setTaskCompleteUseCase(taskIds, complete)
                 }
+            }
+
+            is UpdateTaskTitleAction -> scope.launch {
+                updateTaskTitleUseCase(action.taskId, action.title)
             }
 
             else -> NoOp

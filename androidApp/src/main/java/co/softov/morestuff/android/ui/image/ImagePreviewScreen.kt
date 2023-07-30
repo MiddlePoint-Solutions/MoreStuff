@@ -36,7 +36,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.domain.model.Message
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -44,15 +43,16 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// TODO: we should pass in MessageId and create a ViewModel for this screen.
 fun ImagePreviewScreen(
     imagePath: String,
-    message: Message,
-    cancel: () -> Unit,
+    title: String,
+    onBack: () -> Unit,
     onSendImage: (String) -> Unit,
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+    val state = rememberTransformableState { zoomChange, offsetChange, _ ->
         if (scale * zoomChange >= 1f) {
             scale *= zoomChange
             offset += offsetChange
@@ -74,7 +74,7 @@ fun ImagePreviewScreen(
             TopAppBar(
                 title = { Text("") },
                 navigationIcon = {
-                    IconButton(onClick = cancel) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Cancel",
@@ -123,7 +123,7 @@ fun ImagePreviewScreen(
                     },
             )
             Text(
-                text = message.content,
+                text = title,
                 modifier = Modifier
                     .weight(0.3f)
                     .padding(4.dp)
