@@ -1,8 +1,6 @@
 package co.softov.morestuff.android.ui.main
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
@@ -39,8 +37,6 @@ fun MainContent(
 ) {
 
     val scope = rememberCoroutineScope()
-    val isSearching = remember { mutableStateOf(false) }
-    val searchText = remember { mutableStateOf("") }
 
     ChildStack(
         source = navigation,
@@ -66,8 +62,6 @@ fun MainContent(
                 showSettings = { navigation.push(Settings) },
                 showReview = { navigation.push(Review) },
                 showTaskChat = { navigation.push(TaskChat(it)) },
-                isSearching = isSearching,
-                searchText = searchText
             )
 
             Review -> ReviewScreen(onBack = navigation::pop)

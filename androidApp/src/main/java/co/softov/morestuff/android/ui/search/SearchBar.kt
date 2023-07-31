@@ -23,7 +23,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,27 +33,27 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.Filter
+import co.softov.morestuff.android.ui.schedule.PriorityItem
 import org.koin.androidx.compose.getViewModel
 
 
 @ExperimentalMaterial3Api
 @Composable
 fun CustomSearchBar(
-    searchText: MutableState<String>,
-    isSearching: MutableState<Boolean>,
     onSearchClose: () -> Unit,
     modifier: Modifier = Modifier,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
-
     val viewModel: SearchViewModel = getViewModel()
-    var filterSelected by remember { mutableStateOf(Filter.None) }
+    val filterSelected by remember { mutableStateOf(Filter.None) }
     val searchBarFocusState = rememberSaveable { mutableStateOf(true) }
+    var searchText by remember { mutableStateOf("") }
+    var isSearching by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
         onDispose {
             if (!searchBarFocusState.value) {
-                viewModel.clearResults()
+                viewModel.currentFilter
             }
         }
     }
@@ -64,22 +63,23 @@ fun CustomSearchBar(
             .fillMaxWidth()
             .focusable(true)
             .onFocusChanged { searchBarFocusState.value = it.isFocused },
-        query = searchText.value,
+        query = searchText,
         onQueryChange = { newText ->
-            searchText.value = newText
-            viewModel.searchTasks(newText, filterSelected)
+            searchText = newText
+            viewModel.searchTasks(newText)
         },
-        onSearch = { _ -> isSearching.value = false },
-        active = isSearching.value,
+        onSearch = { _ -> isSearching = false },
+        active = isSearching,
         onActiveChange = { isActive ->
-            isSearching.value = isActive
+            isSearching = isActive
         },
         placeholder = { Text(text = "Search...") },
         trailingIcon = {
             IconButton(onClick = {
                 onSearchClose()
-                searchText.value = ""
+                searchText = ""
                 viewModel.searchResults.value = listOf()
+                viewModel.setFilter(Filter.None)
             }) {
                 Icon(Icons.Default.Close, contentDescription = "Close icon")
             }
@@ -100,15 +100,12 @@ fun CustomSearchBar(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 FilterChip(
-                    selected = filterSelected == Filter.Scheduled,
+                    selected = viewModel.currentFilter == Filter.Scheduled,
                     onClick = {
-                        if (filterSelected == Filter.Scheduled) {
-                            filterSelected = Filter.None
-                            viewModel.clearResults()
+                        if (viewModel.currentFilter == Filter.Scheduled) {
+                            viewModel.setFilter(Filter.None)
                         } else {
-                            filterSelected = Filter.Scheduled
-                            viewModel.clearResults()
-                            viewModel.loadActiveTasksWithOneTimeSchedule()
+                            viewModel.setFilter(Filter.Scheduled)
                         }
                     },
                     label = { Text("Scheduled") },
@@ -127,15 +124,12 @@ fun CustomSearchBar(
                 )
 
                 FilterChip(
-                    selected = filterSelected == Filter.Reminder,
+                    selected = viewModel.currentFilter == Filter.Reminder,
                     onClick = {
-                        if (filterSelected == Filter.Reminder) {
-                            filterSelected = Filter.None
-                            viewModel.clearResults()
+                        if (viewModel.currentFilter == Filter.Reminder) {
+                            viewModel.setFilter(Filter.None)
                         } else {
-                            filterSelected = Filter.Reminder
-                            viewModel.clearResults()
-                            viewModel.loadTasksWithReminderSchedule()
+                            viewModel.setFilter(Filter.Reminder)
                         }
                     },
                     label = { Text("Reminder") },
@@ -155,15 +149,12 @@ fun CustomSearchBar(
                 )
 
                 FilterChip(
-                    selected = filterSelected == Filter.Done,
+                    selected = viewModel.currentFilter == Filter.Done,
                     onClick = {
-                        if (filterSelected == Filter.Done) {
-                            filterSelected = Filter.None
-                            viewModel.clearResults()
+                        if (viewModel.currentFilter == Filter.Done) {
+                            viewModel.setFilter(Filter.None)
                         } else {
-                            filterSelected = Filter.Done
-                            viewModel.clearResults()
-                            viewModel.loadCompletedTasks()
+                            viewModel.setFilter(Filter.Done)
                         }
                     },
                     label = { Text("Done") },
@@ -180,7 +171,7 @@ fun CustomSearchBar(
                     shape = shape
                 )
             }
-            if (viewModel.searchResults.value.isEmpty() && searchText.value.isNotEmpty()) {
+            if (viewModel.searchResults.value.isEmpty() && searchText.isNotEmpty()) {
                 Text(
                     text = "Task not found",
                     style = MaterialTheme.typography.bodyMedium,
@@ -189,7 +180,7 @@ fun CustomSearchBar(
                 )
             } else {
                 for (task in viewModel.searchResults.value) {
-                    SearchPriorityItem(
+                    PriorityItem(
                         task = task,
                         onClick = { taskId ->
                             showTaskChat(taskId)

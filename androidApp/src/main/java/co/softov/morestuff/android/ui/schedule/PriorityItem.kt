@@ -1,10 +1,7 @@
 package co.softov.morestuff.android.ui.schedule
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,15 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,7 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
@@ -76,23 +73,43 @@ fun PriorityItem(
         ) {
 
             TaskProfile(task)
-
-            Text(
-                text = task.title,
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .fillMaxWidth(0.90f)
-                    .padding(12.dp),
-                maxLines = 2,
-                color = MaterialTheme.colorScheme.onSurface,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0xFFFFFFFF),
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = task.title,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth(0.90f)
+                        .padding(12.dp),
+                    maxLines = 2,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 18.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0xFFFFFFFF),
+                    )
                 )
-            )
+                task.completeTime?.let { completeTime ->
+                    if (task.isComplete) {
+
+                        Text(
+                            text = stringResource(R.string.completed) + " $completeTime",
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.padding(start = 25.dp, bottom = 8.dp)
+                                .align(Alignment.Start),
+                            style = TextStyle(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 12.sp,
+                            )
+                        )
+                    }
+                }
+            }
+
         }
 
         TaskBadges(
@@ -105,16 +122,19 @@ fun PriorityItem(
 @Composable
 private fun TaskBadges(
     task: TaskDomain,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-        Box(
+    CompositionLocalProvider(
+        LocalContentColor provides MaterialTheme.colorScheme.onSurface,
+    ) {
+
+        Column(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(12.dp)
         ) {
             Row(
-                modifier = Modifier.align(Alignment.TopEnd),
+                modifier = Modifier.align(Alignment.End),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
@@ -149,6 +169,19 @@ private fun TaskBadges(
                                 modifier = Modifier.size(16.dp),
                             )
                         }
+                    }
+                }
+                if (task.isComplete) {
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Done,
+                            contentDescription = stringResource(R.string.cd_task_done_icon),
+                            modifier = Modifier.size(16.dp),
+                        )
                     }
                 }
             }

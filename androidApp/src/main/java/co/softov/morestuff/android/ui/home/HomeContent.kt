@@ -4,14 +4,11 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -35,7 +31,6 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -45,18 +40,13 @@ fun HomeScreen(
     showTaskChat: (taskId: Long) -> Unit,
     showSettings: () -> Unit,
     showReview: () -> Unit,
-    isSearching: MutableState<Boolean>,
-    searchText: MutableState<String>
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         showSettings = showSettings,
         showReview = showReview,
-        isSearching = isSearching,
         showTaskChat= showTaskChat ,
-        searchText = searchText,
         content = {
             Box(Modifier.padding(top = it.calculateTopPadding())) {
                 HomeContent(
@@ -66,10 +56,8 @@ fun HomeScreen(
             }
         }
     )
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
