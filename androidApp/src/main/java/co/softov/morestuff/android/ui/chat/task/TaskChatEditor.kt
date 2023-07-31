@@ -5,9 +5,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -61,12 +64,11 @@ fun TaskChatEditor(
     onTitleChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     toggleTaskComplete: () -> Unit = {},
-    scheduleOptions: @Composable ColumnScope.() -> Unit = {},
+    taskOptions: @Composable ColumnScope.() -> Unit = {},
 ) {
     var isEditing by remember { mutableStateOf(false) }
     val isKeyboardOpen by keyboardAsState()
     val focusManager = LocalFocusManager.current
-
 
     LaunchedEffect(isKeyboardOpen) {
         if (!isKeyboardOpen) {
@@ -93,7 +95,7 @@ fun TaskChatEditor(
                         Modifier
                             .fillMaxHeight(0.7f)
                     } else {
-                        Modifier.height(IntrinsicSize.Max)
+                        Modifier.height(IntrinsicSize.Min)
                     }
                 ),
         ) {
@@ -184,10 +186,10 @@ fun TaskChatEditor(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 AnimatedVisibility(
-                    visible = !isEditing,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    visible = !isComplete && !isEditing,
+                    modifier = Modifier.padding(horizontal = 16.dp),
                 ) {
-                    scheduleOptions()
+                    taskOptions()
                 }
             }
         }
