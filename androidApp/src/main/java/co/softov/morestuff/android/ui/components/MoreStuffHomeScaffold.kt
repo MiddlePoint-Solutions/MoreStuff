@@ -6,6 +6,10 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
@@ -40,11 +44,10 @@ fun MoreStuffHomeScaffold(
     content: @Composable (PaddingValues) -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
-    val viewModel: SearchViewModel = getViewModel()
+
     var isSearching by remember { mutableStateOf(false) }
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
-    val offsetX by animateDpAsState(if (isSearching) 500.dp else 0.dp, label = "")
 
     val closeDrawer: () -> Unit = remember {
         { scope.launch { drawerState.close() } }
@@ -98,28 +101,13 @@ fun MoreStuffHomeScaffold(
 
                         AnimatedVisibility(
                             visible = isSearching,
-                            enter = slideInHorizontally(
-                                initialOffsetX = { fullWidth -> fullWidth },
-                                animationSpec = tween(
-                                    durationMillis = 500,
-                                    easing = FastOutSlowInEasing
-                                )
-                            ),
-                            exit = slideOutHorizontally(
-
-                                targetOffsetX = { fullWidth -> fullWidth },
-                                animationSpec = tween(
-                                    durationMillis = 200,
-                                    easing = LinearOutSlowInEasing
-                                )
-                            )
+                            enter = fadeIn() + expandVertically(),
+                            exit = fadeOut() + shrinkVertically(),
                         ) {
                             CustomSearchBar(
                                 onSearchClose = { isSearching = false },
                                 showTaskChat = showTaskChat,
-                                modifier = Modifier
-                                    .offset(x = offsetX)
-                                    .fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -131,8 +119,6 @@ fun MoreStuffHomeScaffold(
                         if (isSearching) {
                             BackHandler {
                                 isSearching = false
-                                viewModel.searchResults.value = listOf()
-                                viewModel.setFilter(Filter.None)
                             }
                         }
                     }

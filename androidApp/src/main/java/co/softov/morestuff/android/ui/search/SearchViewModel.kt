@@ -12,6 +12,7 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithReminde
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class SearchViewModel(
     private val timeFormatter: TimeFormatter,
 ) : NoStateViewModel() {
 
-    val searchResults: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
+    val searchResults = MutableStateFlow<List<TaskDomain>>(listOf())
     private val completedTasks: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
     private val activeTasksWithSchedule: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
     private val activeTasksWithReminder: MutableState<List<TaskDomain>> = mutableStateOf(listOf())
@@ -107,6 +108,11 @@ class SearchViewModel(
 
     private fun clearResults() {
         searchResults.value = listOf()
+    }
+
+    fun reset() {
+        clearResults()
+        setFilter(Filter.None)
     }
 }
 

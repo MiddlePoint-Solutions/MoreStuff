@@ -27,7 +27,6 @@ import timber.log.Timber
 class PriorityViewModel(
     private val getActiveTasksUseCase: GetActiveTasksUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
-
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean

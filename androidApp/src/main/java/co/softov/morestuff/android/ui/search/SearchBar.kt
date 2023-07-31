@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -32,29 +34,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.enums.Filter
 import co.softov.morestuff.android.ui.schedule.PriorityItem
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 
 @ExperimentalMaterial3Api
 @Composable
 fun CustomSearchBar(
     onSearchClose: () -> Unit,
-    modifier: Modifier = Modifier,
     showTaskChat: (taskId: Long) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val viewModel: SearchViewModel = getViewModel()
+
+    val viewModel: SearchViewModel = koinViewModel()
     val filterSelected by remember { mutableStateOf(Filter.None) }
     val searchBarFocusState = rememberSaveable { mutableStateOf(true) }
     var searchText by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
 
+    val searchResult by viewModel.searchResults.collectAsStateWithLifecycle()
+
     DisposableEffect(Unit) {
         onDispose {
-            if (!searchBarFocusState.value) {
-                viewModel.currentFilter
-            }
+            viewModel.reset()
         }
     }
 
@@ -171,7 +175,8 @@ fun CustomSearchBar(
                     shape = shape
                 )
             }
-            if (viewModel.searchResults.value.isEmpty() && searchText.isNotEmpty()) {
+
+            if (searchResult.isEmpty() && searchText.isNotEmpty()) {
                 Text(
                     text = "Task not found",
                     style = MaterialTheme.typography.bodyMedium,
@@ -179,13 +184,18 @@ fun CustomSearchBar(
                     color = Color.Red
                 )
             } else {
-                for (task in viewModel.searchResults.value) {
-                    PriorityItem(
-                        task = task,
-                        onClick = { taskId ->
-                            showTaskChat(taskId)
-                        }
-                    )
+
+                LazyColumn(
+
+                ) {
+                    items(searchResult) {
+                        PriorityItem(
+                            task = it,
+                            onClick = { taskId ->
+                                showTaskChat(taskId)
+                            }
+                        )
+                    }
                 }
             }
         }
