@@ -8,44 +8,44 @@ object ProfileColors {
 
     private val profileColors = listOf(
         listOf(
-            Color(98, 122, 246),
-            Color(157, 100, 249),
+            Color(0xFFEDA185),
+            Color(0xFFD86A41),
         ),
         listOf(
-            Color(255, 103, 103),
-            Color(194, 69, 71)
+            Color(0xFFEE95FD),
+            Color(0xFFC74BDB),
         ),
         listOf(
-            Color(229, 111, 248),
-            Color(247, 155, 115)
+            Color(0xFFA676F4),
+            Color(0xFF8853DF),
         ),
         listOf(
-            Color(60, 208, 36),
-            Color(59, 217, 160)
+            Color(0xFF909BFB),
+            Color(0xFF5967E3),
         ),
         listOf(
-            Color(240, 110, 50),
-            Color(163, 100, 52)
+            Color(0xFF77C9F8),
+            Color(0xFF2A85B9),
         ),
         listOf(
-            Color(20, 240, 240),
-            Color(32, 190, 227)
+            Color(0xFF88F9BC),
+            Color(0xFF23834F),
         ),
         listOf(
-            Color(130, 80, 200),
-            Color(92, 166, 200)
+            Color(0xFF99F070),
+            Color(0xFF448526),
         ),
         listOf(
-            Color(90, 50, 255),
-            Color(116, 42, 255)
+            Color(0xFFFCFF68),
+            Color(0xFF797B00),
         ),
         listOf(
-            Color(220, 120, 40),
-            Color(167, 34, 46)
+            Color(0xFFD2D2D2),
+            Color(0xFF6C6C6C),
         ),
         listOf(
-            Color(130, 220, 100),
-            Color(90, 230, 140)
+            Color(0xFFDA496C),
+            Color(0xFF7D293D),
         )
     )
 
