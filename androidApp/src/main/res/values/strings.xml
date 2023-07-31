@@ -119,5 +119,6 @@
     <string name="cd_filter_reminders_tasks">Filter reminders tasks</string>
     <string name="cd_filter_completed_tasks">Filter completed tasks</string>
     <string name="cd_cancel_schedule">Cancel Schedule</string>
+    <string name="cd_select_images">select images</string>
 
 </resources>
