@@ -249,9 +249,9 @@ private fun SwipeBackground(
 
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialColors.BlueGrey[500]
-            DismissValue.DismissedToEnd -> MaterialColors.Green[500]
-            DismissValue.DismissedToStart -> MaterialColors.Blue[700]
+            DismissValue.Default -> MaterialColors.DeepPurple[200]
+            DismissValue.DismissedToEnd -> MaterialColors.DeepPurple[400]
+            DismissValue.DismissedToStart -> MaterialColors.DeepPurple[400]
         }, label = "Color animation"
     )
     val alignment = when (direction) {
