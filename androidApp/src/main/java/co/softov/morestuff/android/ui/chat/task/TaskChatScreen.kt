@@ -165,6 +165,7 @@ fun TaskChatScreen(
 
                     TaskChatContent(
                         task = task,
+                        taskTitle = { viewModel.taskTitle },
                         planModel = { viewModel.planModel },
                         messages = messages,
                         chatActions = chatActions,
@@ -210,6 +211,7 @@ fun TaskChatScreen(
 @Composable
 private fun TaskChatContent(
     task: TaskDomain,
+    taskTitle: () -> String,
     planModel: () -> PlanModel?,
     messages: List<Message>,
     chatActions: ChatActions,
@@ -262,7 +264,7 @@ private fun TaskChatContent(
             ) {
                 TaskChatEditor(
                     isComplete = task.isComplete,
-                    taskTitle = { task.title },
+                    taskTitle = taskTitle,
                     onTitleChange = updateTaskTitle,
                     toggleTaskComplete = toggleTaskComplete,
                 ) {

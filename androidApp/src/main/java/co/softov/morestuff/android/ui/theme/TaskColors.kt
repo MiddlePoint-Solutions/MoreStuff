@@ -1,8 +1,8 @@
-package co.softov.morestuff.android.ui.utils
+package co.softov.morestuff.android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-object ProfileColors {
+object TaskColors {
 
     fun getProfileColorsForTask(title: String) = profileColors[taskTitleToNumber(title)]
 

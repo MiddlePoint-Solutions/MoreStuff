@@ -1,10 +1,12 @@
 package co.softov.morestuff.android.ui.review
 
+import android.content.res.Configuration
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -37,6 +39,7 @@ import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.reviewIconTint
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -291,21 +294,20 @@ private fun MainReviewButton(
     icon: ImageVector,
 ) {
 
-    val shape = RoundedCornerShape(42.dp)
-
-    IconButton(
+    Button(
         modifier = Modifier
-            .size(width = 140.dp, height = 48.dp)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surface)
-            .border(1.dp, Color(92, 94, 116), shape),
+            .size(width = 140.dp, height = 56.dp)
+            .clip(CircleShape),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         onClick = onClick
     ) {
         Icon(
             icon,
             null,
             modifier = Modifier.size(32.dp),
-            tint = Color(140, 152, 255)
+            tint = reviewIconTint
         )
     }
 }
@@ -316,20 +318,20 @@ private fun SecondaryReviewButton(
     icon: ImageVector,
 ) {
 
-    val shape = RoundedCornerShape(42.dp)
-
-    IconButton(
+    Button(
         modifier = Modifier
             .size(width = 90.dp, height = 48.dp)
-            .clip(shape)
-            .background(MaterialTheme.colorScheme.surface),
+            .clip(CircleShape),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         onClick = onClick
     ) {
         Icon(
             icon,
             null,
             modifier = Modifier.size(24.dp),
-            tint = Color(92, 94, 116)
+            tint = reviewIconTint
         )
     }
 }
@@ -405,7 +407,14 @@ private fun RoundInfo(
     }
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun ReviewSwipeControlsPreview() {
     MoreStuffTheme() {
