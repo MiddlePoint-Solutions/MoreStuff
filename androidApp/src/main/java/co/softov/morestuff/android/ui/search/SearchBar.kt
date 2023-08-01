@@ -69,8 +69,7 @@ fun CustomSearchBar(
     }
 
     SearchBar(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         query = searchText,
         onQueryChange = { newText ->
             searchText = newText
@@ -142,6 +141,7 @@ fun CustomSearchBar(
                             color = Color.Red
                         )
                     }
+
                     false -> {
                         Crossfade(
                             targetState = searchResult,

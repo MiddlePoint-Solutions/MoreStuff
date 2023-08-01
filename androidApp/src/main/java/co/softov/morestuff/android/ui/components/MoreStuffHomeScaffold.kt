@@ -105,10 +105,8 @@ fun MoreStuffHomeScaffold(
                     Box(modifier = Modifier.fillMaxSize()) {
                         content(PaddingValues(it.calculateTopPadding()))
 
-                        if (isSearching) {
-                            BackHandler {
-                                isSearching = false
-                            }
+                        BackHandler(isSearching) {
+                            isSearching = false
                         }
                     }
                 }

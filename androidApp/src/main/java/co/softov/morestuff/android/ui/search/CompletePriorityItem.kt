@@ -31,7 +31,7 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.schedule.PriorityItem
-import co.softov.morestuff.android.ui.schedule.TaskBadges
+import co.softov.morestuff.android.ui.schedule.TaskItemBadges
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
@@ -96,7 +96,7 @@ fun CompletePriorityItem(
 
         }
 
-        TaskBadges(
+        TaskItemBadges(
             task = task,
             modifier = Modifier.align(Alignment.BottomEnd)
         )

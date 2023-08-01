@@ -48,7 +48,7 @@ fun HomeScreen(
         snackbarHostState = snackbarHostState,
         showSettings = showSettings,
         showReview = showReview,
-        showTaskChat= showTaskChat ,
+        showTaskChat = showTaskChat,
         content = {
             Box(Modifier.padding(top = it.calculateTopPadding())) {
                 HomeContent(
