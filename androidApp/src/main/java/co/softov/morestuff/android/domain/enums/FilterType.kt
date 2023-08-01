@@ -1,5 +1,5 @@
 package co.softov.morestuff.android.domain.enums
 
-enum class FilterName {
+enum class FilterType {
     None, Scheduled, Reminder, Done
 }

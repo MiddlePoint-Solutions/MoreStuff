@@ -111,6 +111,13 @@
     <string name="enable_confetti">Enable Confetti</string>
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
+    <string name="search">Search...</string>
+    <string name="filter_scheduled">Scheduled</string>
+    <string name="filter_reminder">Reminder</string>
+    <string name="filter_done">Done</string>
+    <string name="cd_filter_schedules_tasks">Filter schedules tasks</string>
+    <string name="cd_filter_reminders_tasks">Filter reminders tasks</string>
+    <string name="cd_filter_completed_tasks">Filter completed tasks</string>
     <string name="cd_cancel_schedule">Cancel Schedule</string>
 
 </resources>

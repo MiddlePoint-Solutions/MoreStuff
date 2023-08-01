@@ -1,5 +1,9 @@
 package co.softov.morestuff.android.ui.search
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -26,15 +31,18 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import co.softov.morestuff.android.domain.enums.FilterName
+import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.enums.FilterType
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import org.koin.androidx.compose.koinViewModel
 
@@ -48,10 +56,10 @@ fun CustomSearchBar(
 ) {
 
     val viewModel: SearchViewModel = koinViewModel()
-    val filterNameSelected by remember { mutableStateOf(FilterName.None) }
     var searchText by remember { mutableStateOf("") }
     var isSearching by remember { mutableStateOf(false) }
-    val currentFilterName by viewModel.currentFilterName.collectAsStateWithLifecycle()
+
+    val selectedFilter by viewModel.filter.collectAsStateWithLifecycle()
     val searchResult by viewModel.searchResults.collectAsStateWithLifecycle()
 
     DisposableEffect(Unit) {
@@ -73,15 +81,16 @@ fun CustomSearchBar(
         onActiveChange = { isActive ->
             isSearching = isActive
         },
-        placeholder = { Text(text = "Search...") },
+        placeholder = { Text(text = stringResource(R.string.search)) },
         trailingIcon = {
             IconButton(onClick = {
-                onSearchClose()
                 searchText = ""
-                viewModel.searchResults.value = listOf()
-                viewModel.currentFilterName.value = FilterName.None
+                onSearchClose()
             }) {
-                Icon(Icons.Default.Close, contentDescription = "Close icon")
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = stringResource(id = R.string.cd_navigate_back)
+                )
             }
         },
         leadingIcon = {
@@ -92,10 +101,10 @@ fun CustomSearchBar(
         },
         colors = SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.background,
+        ),
+    ) {
 
-            ),
 
-        ) {
         Column {
             Row(
                 modifier = Modifier
@@ -103,113 +112,152 @@ fun CustomSearchBar(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                FilterChip(
-                    selected = currentFilterName == FilterName.Scheduled,
-                    onClick = {
-                        if (currentFilterName == FilterName.Scheduled) {
-                            viewModel.currentFilterName.value = FilterName.None
-                        } else {
-                            viewModel.currentFilterName.value = FilterName.Scheduled
-                        }
-                    },
-                    label = { Text("Scheduled") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            tint = if (filterNameSelected == FilterName.Scheduled) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFF8C98FF),
-                    ),
-                    modifier = Modifier.padding(end = 10.dp),
-                    shape = shape
+
+                SearchFilterChip(
+                    filter = FilterType.Scheduled,
+                    selectedFilter = selectedFilter,
+                    onFilterSelected = viewModel::setFilter
                 )
 
-                FilterChip(
-                    selected = currentFilterName == FilterName.Reminder,
-                    onClick = {
-                        if (currentFilterName == FilterName.Reminder) {
-                            viewModel.currentFilterName.value = FilterName.None
-                        } else {
-                            viewModel.currentFilterName.value = FilterName.Reminder
-                        }
-                    },
-                    label = { Text("Reminder") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Notifications,
-                            contentDescription = null,
-                            tint = if (filterNameSelected == FilterName.Reminder) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFF8C98FF),
-                    ),
-                    modifier = Modifier
-                        .padding(end = 10.dp),
-                    shape = shape
+                SearchFilterChip(
+                    filter = FilterType.Reminder,
+                    selectedFilter = selectedFilter,
+                    onFilterSelected = viewModel::setFilter
                 )
 
-                FilterChip(
-                    selected = currentFilterName == FilterName.Done,
-                    onClick = {
-                        if (currentFilterName == FilterName.Done) {
-                            viewModel.currentFilterName.value = FilterName.None
-                        } else {
-                            viewModel.currentFilterName.value = FilterName.Done
-                        }
-                    },
-                    label = { Text("Done") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Done,
-                            contentDescription = null,
-                            tint = if (filterNameSelected == FilterName.Done) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onSurface
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = Color(0xFF8C98FF),
-                    ),
-                    shape = shape
+                SearchFilterChip(
+                    filter = FilterType.Done,
+                    selectedFilter = selectedFilter,
+                    onFilterSelected = viewModel::setFilter
                 )
             }
 
-            if (searchResult.isEmpty() && searchText.isNotEmpty()) {
-                Text(
-                    text = "Task not found",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.Red
-                )
-            } else {
-
-                LazyColumn {
-                    items(searchResult) { task ->
-                        Divider(
-                            thickness = 0.5.dp,
-                            modifier = Modifier.fillMaxWidth(),
+            Crossfade(searchResult.isEmpty() && searchText.isNotEmpty(), label = "") {
+                when (it) {
+                    true -> {
+                        Text(
+                            text = "Task not found",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.Red
                         )
-                        if (task.isComplete) {
-                            CompletePriorityItem(
-                                task = task,
-                                onClick = { taskId ->
-                                    showTaskChat(taskId)
+                    }
+                    false -> {
+                        Crossfade(
+                            targetState = searchResult,
+                            label = "Search results fade"
+                        ) {
+                            LazyColumn {
+                                items(it) { task ->
+                                    Divider(
+                                        thickness = 0.5.dp,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                    if (task.isComplete) {
+                                        CompletePriorityItem(
+                                            task = task,
+                                            onClick = { taskId ->
+                                                showTaskChat(taskId)
+                                            }
+                                        )
+                                    } else {
+                                        PriorityItem(
+                                            task = task,
+                                            onClick = { taskId ->
+                                                showTaskChat(taskId)
+                                            }
+                                        )
+                                    }
                                 }
-                            )
-                        } else {
-                            PriorityItem(
-                                task = task,
-                                onClick = { taskId ->
-                                    showTaskChat(taskId)
-                                }
-                            )
+                            }
                         }
                     }
-
                 }
             }
         }
+    }
+}
+
+@ExperimentalMaterial3Api
+@Composable
+private fun SearchFilterChip(
+    filter: FilterType,
+    selectedFilter: FilterType,
+    onFilterSelected: (FilterType) -> Unit,
+) {
+
+    val isSelected by remember(selectedFilter) {
+        derivedStateOf { filter == selectedFilter }
+    }
+
+    val selectedColor by animateColorAsState(
+        targetValue = if (isSelected) {
+            Color(0xFF8C98FF)
+        } else {
+            Color.Transparent
+        },
+        animationSpec = tween(durationMillis = 200),
+        label = ""
+    )
+
+    val unselectedColor by animateColorAsState(
+        targetValue = if (!isSelected) {
+            Color.Transparent
+        } else {
+            Color(0xFF8C98FF)
+        },
+        animationSpec = tween(durationMillis = 200),
+        label = ""
+    )
+
+    FilterChip(
+        selected = filter == selectedFilter,
+        onClick = {
+            onFilterSelected(filter)
+        },
+        label = { filter.Title() },
+        leadingIcon = { filter.Icon() },
+        colors = FilterChipDefaults.filterChipColors(
+            containerColor = unselectedColor,
+            selectedContainerColor = selectedColor,
+        ),
+        modifier = Modifier.padding(end = 10.dp),
+        shape = CircleShape
+    )
+}
+
+@Composable
+private fun FilterType.Title() {
+    val title = when (this) {
+        FilterType.None -> ""
+        FilterType.Scheduled -> stringResource(R.string.filter_scheduled)
+        FilterType.Reminder -> stringResource(R.string.filter_reminder)
+        FilterType.Done -> stringResource(R.string.filter_done)
+    }
+    Text(text = title)
+}
+
+@Composable
+private fun FilterType.Icon() {
+    when (this) {
+        FilterType.None -> Icon(
+            imageVector = Icons.Default.Schedule,
+            contentDescription = "",
+        )
+
+        FilterType.Scheduled -> Icon(
+            imageVector = Icons.Default.Schedule,
+            contentDescription = stringResource(R.string.cd_filter_schedules_tasks),
+        )
+
+        FilterType.Reminder -> Icon(
+            imageVector = Icons.Default.Schedule,
+            contentDescription = stringResource(R.string.cd_filter_reminders_tasks),
+        )
+
+        FilterType.Done -> Icon(
+            imageVector = Icons.Default.Schedule,
+            contentDescription = stringResource(R.string.cd_filter_completed_tasks),
+        )
     }
 }
