@@ -120,5 +120,8 @@
     <string name="cd_filter_completed_tasks">Filter completed tasks</string>
     <string name="cd_cancel_schedule">Cancel Schedule</string>
     <string name="cd_select_images">select images</string>
+    <string name="open_source_libraries">Open Source Libraries</string>
+    <string name="about_morestuff">About MoreStuff</string>
+    <string name="privacy_policy">Privacy Policy</string>
 
 </resources>

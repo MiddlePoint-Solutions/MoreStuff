@@ -24,10 +24,11 @@ import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
+import co.softov.morestuff.android.ui.local.ProvideAppTheme
+import co.softov.morestuff.android.ui.local.ProvideAppNavigation
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 import co.softov.morestuff.android.ui.theme.isDarkTheme
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -70,11 +71,12 @@ class MainActivity : AppCompatActivity() {
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
-                             MainContent(
-                                 initialScreen = initialScreen,
-                                 navigation = navigation,
-                                 shareContent = viewModel::shareContentToTask
-                             )
+                            ProvideAppNavigation(navigation) {
+                                MainContent(
+                                    initialScreen = initialScreen,
+                                    shareContent = viewModel::shareContentToTask
+                                )
+                            }
                         }
                     }
                 }
@@ -119,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else if (intent.type?.startsWith("image/") == true) {
                     intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-                        Screen.Share(Shareable.Image(it.toString(),""), it.toString())
+                        Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
                     }
                 } else null
             }

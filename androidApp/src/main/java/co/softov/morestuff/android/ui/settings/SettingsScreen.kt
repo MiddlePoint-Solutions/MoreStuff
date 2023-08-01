@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.settings
 
+import android.content.res.Configuration
 import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,15 +13,16 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,31 +30,73 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.darkSurface
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.replaceAll
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
-    showLibraries: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel()
 ) {
 
+    val navigation = LocalAppNavigation.current
+    val model by viewModel.model.collectAsStateWithLifecycle()
+
+    val actions by rememberUpdatedState(
+        newValue = SettingsActions(
+            selectAppTheme = viewModel::selectAppTheme,
+            setSnoozeLimit = viewModel::onSnoozeLimitChanged,
+            enableConfetti = viewModel::enableConfetti,
+        )
+    )
+
+    SettingsContent(
+        onBack = navigation::pop,
+        model = model,
+        actions = actions,
+        showLibraries = { navigation.push(Screen.AboutLibraries) },
+        devTools = {
+            if (BuildConfig.DEBUG) {
+                DevSettings(
+                    devTools = viewModel.devTools,
+                    modifier = Modifier.padding(vertical = 20.dp)
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun SettingsContent(
+    onBack: () -> Unit,
+    showLibraries: () -> Unit,
+    model: SettingsModel,
+    actions: SettingsActions,
+    devTools: @Composable () -> Unit = {}
+) {
+
     val scrollState = rememberScrollState()
-    val model by viewModel.model.collectAsState()
 
     Scaffold(
-        topBar = { SettingsTopBar(navigateBackSettings = onBack) }
+        topBar = { SettingsTopBar(onBack = onBack) }
     ) {
 
         Box(
@@ -67,36 +111,44 @@ fun SettingsScreen(
                     .align(Alignment.TopCenter)
             ) {
                 SelectTheme(
-                    themeSelected = viewModel::selectAppTheme,
-                    defaultValue = { model.appThemeIndex }
+                    themeSelected = actions.selectAppTheme,
+                    defaultValue = { model.appTheme.ordinal }
                 )
                 SettingsDivider()
 
-                SettingsGroup(title = { Text(text = "Test") }) {
-                    SelectSnoozeLimit(
-                        onSnoozeLimitChanged = viewModel::onSnoozeLimitChanged,
-                        defaultValue = { model.snoozeLimit.toFloat() }
-                    )
-                }
+                SelectSnoozeLimit(
+                    onSnoozeLimitChanged = actions.setSnoozeLimit,
+                    defaultValue = { model.snoozeLimit.toFloat() }
+                )
 
                 SettingsDivider()
+
                 EnableConfetti(
                     defaultValue = { model.confettiEnabled },
-                    valueChanged = viewModel::enableConfetti,
+                    valueChanged = actions.enableConfetti,
                 )
                 SettingsDivider()
+
             }
 
-            About(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                showLibraries = showLibraries
-            )
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+
+                devTools()
+
+                SettingsDivider()
+
+                About(
+                    showLibraries = showLibraries
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun SettingsDivider() {
+fun SettingsDivider() {
     Divider(color = darkSurface, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }
 
@@ -137,7 +189,7 @@ fun DebugMessageSwitch() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopBar(navigateBackSettings: () -> Unit) {
+fun SettingsTopBar(onBack: () -> Unit) {
     TopAppBar(
         title = {
             Text(
@@ -146,7 +198,7 @@ fun SettingsTopBar(navigateBackSettings: () -> Unit) {
             )
         },
         navigationIcon = {
-            IconButton(onClick = navigateBackSettings) {
+            IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.cd_navigate_back),
@@ -201,12 +253,12 @@ private fun AppTheme.displayTitle(res: Resources): String = when (this) {
 
 @Composable
 fun SelectSnoozeLimit(
-    onSnoozeLimitChanged: (Float) -> Unit,
+    onSnoozeLimitChanged: (Int) -> Unit,
     defaultValue: () -> Float
 ) {
     val state = rememberAppSettingState(
         defaultValue = defaultValue,
-        valueChanged = onSnoozeLimitChanged
+        valueChanged = { onSnoozeLimitChanged(it.toInt()) }
     )
 
     Row(
@@ -381,15 +433,15 @@ fun About(
     showLibraries: () -> Unit,
 ) {
     Column(modifier = modifier.padding(16.dp)) {
+
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "About",
+                text = stringResource(R.string.about_morestuff),
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurface,
-
-                )
+            )
         }
 
         Row(
@@ -408,17 +460,17 @@ fun About(
             )
         }
 
+        Text(
+            text = stringResource(R.string.open_source_libraries),
+            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+            modifier = Modifier.clickable(onClick = showLibraries)
+        )
 
-
-        Row(
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(
-                text = "Version",
-                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                modifier = Modifier.clickable(onClick = showLibraries)
-            )
-        }
+        Text(
+            text = stringResource(R.string.privacy_policy),
+            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+            modifier = Modifier.clickable(onClick = showLibraries)
+        )
 
         Box(
             modifier = Modifier
@@ -430,26 +482,31 @@ fun About(
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = "Send feedback",
+                    text = "Follow us and join our community!",
                     color = MaterialTheme.colorScheme.onSurface,
-                )
-
-                Text(
-                    text = "Share your thoughts or whatever",
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 30.dp)
                 )
             }
         }
     }
 }
 
-/*
-@Preview
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 private fun SettingsPreview() {
-    MoreStuffTheme() {
-        SettingsScreen()
+    MoreStuffTheme {
+        SettingsContent(
+            onBack = {},
+            showLibraries = {},
+            model = SettingsModel(),
+            actions = SettingsActions()
+        )
     }
-}*/
+}

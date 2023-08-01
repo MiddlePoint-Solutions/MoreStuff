@@ -23,12 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.home.PlanModel
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

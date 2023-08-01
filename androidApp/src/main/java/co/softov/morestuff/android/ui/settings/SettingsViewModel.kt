@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 class SettingsViewModel(
-    private val devTools: DevTools,
+    val devTools: DevTools,
 ) : NoStateViewModel() {
 
     val model = MutableStateFlow(
         with(store.state.value.settings) {
-            SettingsViewState(
-                appThemeIndex = appTheme.ordinal,
+            SettingsModel(
+                appTheme = appTheme,
                 snoozeLimit = snoozeLimit,
             )
         }
@@ -28,16 +28,18 @@ class SettingsViewModel(
 
     override fun onAppStateChange(state: AppState) {
         model.update {
-            it.copy(
-                appThemeIndex = state.settings.appTheme.ordinal,
-                snoozeLimit = state.settings.snoozeLimit,
-                confettiEnabled = state.settings.enableConfetti
-            )
+            with(state.settings) {
+                it.copy(
+                    appTheme = appTheme,
+                    snoozeLimit = snoozeLimit,
+                    confettiEnabled = enableConfetti
+                )
+            }
         }
     }
 
-    fun onSnoozeLimitChanged(limit: Float) {
-        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit.toInt()))
+    fun onSnoozeLimitChanged(limit: Int) {
+        dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
     }
 
     fun clearPendingMessages() {

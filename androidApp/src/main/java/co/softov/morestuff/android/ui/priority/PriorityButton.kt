@@ -7,7 +7,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -22,10 +25,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.Orange600
-import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 
 @Composable
 fun PriorityButton(
@@ -99,56 +100,54 @@ fun PriorityButton(
 )
 @Composable
 private fun PriorityButtonPreviewDark() {
-    ProvideAppTheme(theme = AppTheme.System) {
-        MoreStuffTheme {
-            Column {
-                PriorityButton(
-                    modifier = Modifier.width(100.dp),
-                    selected = true,
-                    onClick = {},
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.priority_now),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFFFFFFFF),
-                        )
+    MoreStuffTheme {
+        Column {
+            PriorityButton(
+                modifier = Modifier.width(100.dp),
+                selected = true,
+                onClick = {},
+            ) {
+                Text(
+                    text = stringResource(id = R.string.priority_now),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
                     )
-                }
+                )
+            }
 
-                PriorityButton(
-                    modifier = Modifier.width(100.dp),
-                    selected = false,
-                    onClick = {},
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.priority_later),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFFFFFFFF),
-                        )
+            PriorityButton(
+                modifier = Modifier.width(100.dp),
+                selected = false,
+                onClick = {},
+            ) {
+                Text(
+                    text = stringResource(id = R.string.priority_later),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
                     )
-                }
+                )
+            }
 
-                PriorityButton(
-                    modifier = Modifier.width(100.dp),
-                    selected = false,
-                    onClick = {},
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.priority_plan),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFFFFFFFF),
-                        )
+            PriorityButton(
+                modifier = Modifier.width(100.dp),
+                selected = false,
+                onClick = {},
+            ) {
+                Text(
+                    text = stringResource(id = R.string.priority_plan),
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFFFFFFFF),
                     )
-                }
+                )
             }
         }
     }
