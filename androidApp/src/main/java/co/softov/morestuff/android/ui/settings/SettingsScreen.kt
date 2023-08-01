@@ -152,41 +152,6 @@ fun SettingsDivider() {
     Divider(color = darkSurface, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }
 
-@Composable
-fun DebugMessageSwitch() {
-
-    val state = rememberAppSettingState(
-        defaultValue = { false },
-        valueChanged = {},
-    )
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(color = Color(0xff2B3438)),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        SettingsSwitch(
-            state = state,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Message,
-                    contentDescription = "Debug Messages"
-                )
-            },
-            title = {
-                Text(
-                    text = "Debug Messages",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
-                )
-            },
-            modifier = Modifier.padding(end = 16.dp),
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsTopBar(onBack: () -> Unit) {

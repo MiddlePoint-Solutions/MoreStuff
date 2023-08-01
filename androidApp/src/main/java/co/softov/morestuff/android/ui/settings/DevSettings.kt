@@ -1,22 +1,31 @@
 package co.softov.morestuff.android.ui.settings
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.Message
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
+import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
 
 @Composable
@@ -53,5 +62,42 @@ fun DevSettings(
         )
         SettingsDivider()
 
+        DebugMessageSwitch()
+
+    }
+}
+
+@Composable
+private fun DebugMessageSwitch() {
+
+    val state = rememberAppSettingState(
+        defaultValue = { false },
+        valueChanged = {},
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .background(color = Color(0xff2B3438)),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SettingsSwitch(
+            state = state,
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Message,
+                    contentDescription = "Debug Messages"
+                )
+            },
+            title = {
+                Text(
+                    text = "Debug Messages",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            modifier = Modifier.padding(end = 16.dp),
+        )
     }
 }

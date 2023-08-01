@@ -56,8 +56,7 @@ class TaskChatViewModel(
 
     val messages: StateFlow<List<Message>> = flow {
         while (true) {
-            val showDebug = devTools.getDebugMessageSwitchState()
-            val messages = if (showDebug) {
+            val messages = if (devTools.showDebugMessages) {
                 getTaskMessagesFlowUseCase(taskId = taskId).first()
             } else {
                 getTaskChatMessagesUseCase(taskId = taskId).first()
