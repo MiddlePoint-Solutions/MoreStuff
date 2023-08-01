@@ -124,5 +124,4 @@ class PriorityViewModel(
     fun resetNotification() {
         notification = None
     }
-
 }

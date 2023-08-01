@@ -5,6 +5,7 @@ import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.DevMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ErrorMiddleware
@@ -143,6 +144,8 @@ import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScore
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteImpl
 import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
@@ -152,7 +155,6 @@ import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUs
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCaseImpl
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -230,6 +232,7 @@ val taskUseCases = module {
     factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
     factoryOf(::GetTasksWithoutScheduleUseCaseImpl) bind GetTasksWithoutScheduleUseCase::class
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
+    factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class

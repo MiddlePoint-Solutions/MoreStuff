@@ -5,6 +5,7 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import kotlinx.coroutines.flow.Flow
 
@@ -42,12 +43,13 @@ interface TaskRepository {
 
     suspend fun reorderTaskBySubtracting(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
     ): Either<Failure, Long>
 
     suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
     suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
-    suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>>
+    suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>>
+    fun searchTasks(searchText: String): Flow<List<TaskDomain>>
 }
 
 object TaskDoesNotExist : FeatureFailure

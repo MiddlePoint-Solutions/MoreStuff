@@ -93,10 +93,12 @@
     <string name="cd_search_chats">Search Chats</string>
     <string name="cd_scheduled_task_icon">Scheduled task icon</string>
     <string name="cd_task_reminder_icon">Task reminder icon</string>
+    <string name="cd_task_done_icon">Task done icon</string>
     <string name="create_new_chat">Create New Chat</string>
     <string name="write_something">Write something...</string>
     <string name="cd_complete_task">Complete task</string>
     <string name="complete">Complete</string>
+    <string name="completed">Completed</string>
     <string name="move_to_top">Move to Top</string>
     <string name="cd_move_to_top">Move task to top</string>
     <string name="move_to_bottom">Move to Bottom</string>
@@ -109,6 +111,13 @@
     <string name="enable_confetti">Enable Confetti</string>
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
+    <string name="search">Search...</string>
+    <string name="filter_scheduled">Scheduled</string>
+    <string name="filter_reminder">Reminder</string>
+    <string name="filter_done">Done</string>
+    <string name="cd_filter_schedules_tasks">Filter schedules tasks</string>
+    <string name="cd_filter_reminders_tasks">Filter reminders tasks</string>
+    <string name="cd_filter_completed_tasks">Filter completed tasks</string>
     <string name="cd_cancel_schedule">Cancel Schedule</string>
 
 </resources>

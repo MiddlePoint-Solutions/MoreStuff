@@ -5,6 +5,7 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.drawer.DrawerViewModel
 import co.softov.morestuff.android.ui.home.MainChatViewModel
 import co.softov.morestuff.android.ui.input.UserInputViewModel
+import co.softov.morestuff.android.ui.search.SearchViewModel
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.priority.PlanViewModel
 import co.softov.morestuff.android.ui.review.ReviewViewModel
@@ -28,6 +29,7 @@ val presentationModule = module {
     viewModelOf(::TaskChatViewModel)
     viewModelOf(::PlanViewModel)
     viewModelOf(::ShareViewModel)
+    viewModelOf(::SearchViewModel)
 
     factoryOf(::ReviewItemMapper)
 }

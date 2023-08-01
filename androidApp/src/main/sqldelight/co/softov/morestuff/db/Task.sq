@@ -46,7 +46,7 @@ FROM task
 INNER JOIN schedule ON task.id = schedule.task_id AND schedule.active = 1
 WHERE task.complete_time IS NULL AND schedule_type IN :schedule_type;
 
-getActiveTaskWhithoutSchedule:
+getActiveTaskWhithoutPlanSchedule:
 SELECT *
 FROM task
 WHERE complete_time IS NULL AND id NOT IN (
@@ -135,3 +135,8 @@ WHERE priority_score IN (
           ORDER BY priority_score DESC LIMIT 1
       )
 LIMIT 1;
+
+searchTasks:
+SELECT * FROM task
+WHERE title LIKE '%' || :searchText || '%';
+

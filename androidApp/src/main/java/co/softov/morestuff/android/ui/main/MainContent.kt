@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 fun MainContent(
     initialScreen: Screen?,
     navigation: StackNavigation<Screen>,
-    shareContent: (taskId: Long, content: Shareable) -> Unit
+    shareContent: (taskId: Long, content: Shareable) -> Unit,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -61,7 +61,7 @@ fun MainContent(
             Home -> HomeScreen(
                 showSettings = { navigation.push(Settings) },
                 showReview = { navigation.push(Review) },
-                showTaskChat = { navigation.push(TaskChat(it)) }
+                showTaskChat = { navigation.push(TaskChat(it)) },
             )
 
             Review -> ReviewScreen(onBack = navigation::pop)
