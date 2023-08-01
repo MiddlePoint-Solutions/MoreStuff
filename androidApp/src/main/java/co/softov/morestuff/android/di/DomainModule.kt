@@ -5,6 +5,7 @@ import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraph
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.DevMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ErrorMiddleware
@@ -115,10 +116,6 @@ import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScore
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithOneTimeScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithOneTimeScheduleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithReminderScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithReminderScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
@@ -158,7 +155,6 @@ import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUs
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCaseImpl
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
@@ -253,8 +249,6 @@ val taskUseCases = module {
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
-    factoryOf(::GetActiveTasksWithOneTimeScheduleUseCaseImpl) bind GetActiveTasksWithOneTimeScheduleUseCase::class
-    factoryOf(::GetActiveTasksWithReminderScheduleUseCaseImpl) bind GetActiveTasksWithReminderScheduleUseCase::class
 }
 
 

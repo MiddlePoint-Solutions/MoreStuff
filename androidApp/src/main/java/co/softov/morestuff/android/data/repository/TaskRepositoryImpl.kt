@@ -183,27 +183,12 @@ class TaskRepositoryImpl(
             .executeAsList()
             .right()
 
-    override suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>> {
+    override suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>> {
         return taskQueries.selectActiveTasksWithSchedule(
-            schedule_type = listOf(ScheduleType.OneTime),
+            schedule_type = scheduleTypes,
             mapper = mapTaskWithScheduleData
         ).executeAsList().right()
     }
-
-    override suspend fun getActiveTasksWithOneTimeSchedule(): Either<Failure, List<TaskDomain>> {
-        return taskQueries.selectActiveTasksWithSchedule(
-            schedule_type = listOf(ScheduleType.OneTime),
-            mapper = mapTaskWithScheduleData
-        ).executeAsList().right()
-    }
-
-    override suspend fun getActiveTasksWithReminderSchedule(): Either<Failure, List<TaskDomain>> {
-        return taskQueries.selectActiveTasksWithSchedule(
-            schedule_type = listOf(ScheduleType.Reminder),
-            mapper = mapTaskWithScheduleData
-        ).executeAsList().right()
-    }
-
 
     override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
         taskQueries.searchTasks(searchText, mapper = mapTaskData).asFlow().mapToList()

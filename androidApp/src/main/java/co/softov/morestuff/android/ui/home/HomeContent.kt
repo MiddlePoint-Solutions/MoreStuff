@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -31,6 +32,7 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -146,7 +148,7 @@ fun HomeContent(
     }
 }
 
-/*@Preview
+@Preview
 @Composable
 fun MainContentPreview() {
     MoreStuffTheme {
@@ -154,9 +156,7 @@ fun MainContentPreview() {
             showTaskChat = {},
             showSettings = {},
             showReview = {},
-            isSearching = {},
-            searchText = {}
         )
     }
-}*/
+}
 
