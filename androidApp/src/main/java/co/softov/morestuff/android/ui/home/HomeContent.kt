@@ -4,10 +4,8 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -43,14 +41,14 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen(
     showTaskChat: (taskId: Long) -> Unit,
     showSettings: () -> Unit,
-    showReview: () -> Unit
+    showReview: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         showSettings = showSettings,
         showReview = showReview,
+        showTaskChat = showTaskChat,
         content = {
             Box(Modifier.padding(top = it.calculateTopPadding())) {
                 HomeContent(
@@ -60,10 +58,8 @@ fun HomeScreen(
             }
         }
     )
-
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
@@ -159,7 +155,7 @@ fun MainContentPreview() {
         HomeScreen(
             showTaskChat = {},
             showSettings = {},
-            showReview = {}
+            showReview = {},
         )
     }
 }

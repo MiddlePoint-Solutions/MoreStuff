@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import kotlinx.datetime.toLocalDateTime
+import co.softov.morestuff.android.domain.model.ScheduleType
 import timber.log.Timber
 
 
@@ -16,7 +17,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
 
     override suspend fun invoke() {
         Timber.d("UpdatePlannedTasksPriorityUseCase")
-        getActiveTasksWithScheduleUseCase().map { tasks ->
+        getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map { tasks ->
             Timber.d("UpdatePlannedTasksPriorityUseCase tasks: ${tasks.size}")
             for (task in tasks) {
                 Timber.d("UpdatePlannedTasksPriorityUseCase task: ${task.title}")

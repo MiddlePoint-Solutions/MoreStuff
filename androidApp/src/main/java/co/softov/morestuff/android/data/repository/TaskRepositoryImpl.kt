@@ -8,8 +8,6 @@ import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.data.mapper.TaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.mapper.TaskDb
 import co.softov.morestuff.android.data.mapper.TaskDataMapper
-import co.softov.morestuff.android.data.mapper.mapCompleteTaskData
-import co.softov.morestuff.android.data.mapper.mapList
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScheduleType
@@ -22,7 +20,6 @@ import com.squareup.sqldelight.runtime.coroutines.asFlow
 import com.squareup.sqldelight.runtime.coroutines.mapToList
 import com.squareup.sqldelight.runtime.coroutines.mapToOne
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import java.util.UUID
 
 class TaskRepositoryImpl(
@@ -182,14 +179,17 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> =
-        taskQueries.getActiveTaskWhithoutSchedule(mapper = mapTaskData)
+        taskQueries.getActiveTaskWhithoutPlanSchedule(mapper = mapTaskData)
             .executeAsList()
             .right()
 
-    override suspend fun getTasksWithSchedule(): Either<Failure, List<TaskDomain>> {
+    override suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>> {
         return taskQueries.selectActiveTasksWithSchedule(
-            schedule_type = listOf(ScheduleType.OneTime),
+            schedule_type = scheduleTypes,
             mapper = mapTaskWithScheduleData
         ).executeAsList().right()
     }
+
+    override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
+        taskQueries.searchTasks(searchText, mapper = mapTaskData).asFlow().mapToList()
 }

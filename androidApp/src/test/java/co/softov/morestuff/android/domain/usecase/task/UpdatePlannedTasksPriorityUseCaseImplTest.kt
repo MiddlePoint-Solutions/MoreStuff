@@ -44,7 +44,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
             )
         }
 
-        coEvery { getActiveTasksWithScheduleUseCase() } returns tasks.right()
+        coEvery { getActiveTasksWithScheduleUseCase(any()) } returns tasks.right()
         coEvery { getPlanPriorityScoreUseCase(any(), any()) } answers {
             val scheduleTimeLocal = firstArg<LocalDateTime>().toString()
 
@@ -81,7 +81,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
         val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(activeSchedule = null) }
 
-        coEvery { getActiveTasksWithScheduleUseCase.invoke() } returns tasksWithoutSchedule.right()
+        coEvery { getActiveTasksWithScheduleUseCase(any()) } returns tasksWithoutSchedule.right()
 
         useCase.invoke()
 
