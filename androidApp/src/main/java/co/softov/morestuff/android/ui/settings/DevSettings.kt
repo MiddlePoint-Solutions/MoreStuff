@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.settings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +28,7 @@ import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
+import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
 
@@ -62,18 +66,22 @@ fun DevSettings(
         )
         SettingsDivider()
 
-        DebugMessageSwitch()
+        DebugMessageSwitch(
+            state = rememberAppSettingState(
+                defaultValue = { devTools.showDebugMessages },
+                valueChanged = { devTools.showDebugMessages = it },
+            )
+        )
+
+        SettingsDivider()
 
     }
 }
 
 @Composable
-private fun DebugMessageSwitch() {
-
-    val state = rememberAppSettingState(
-        defaultValue = { false },
-        valueChanged = {},
-    )
+private fun DebugMessageSwitch(
+    state: AppSettingValueState<Boolean>
+) {
 
     Row(
         modifier = Modifier
@@ -98,6 +106,52 @@ private fun DebugMessageSwitch() {
                 )
             },
             modifier = Modifier.padding(end = 16.dp),
+        )
+    }
+}
+
+@Composable
+private fun DebugRemindersSwitch(
+    enableState: AppSettingValueState<Boolean>,
+    timeState: AppSettingValueState<Float>
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min)
+                .background(color = Color(0xff2B3438)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SettingsSwitch(
+                state = enableState,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = ""
+                    )
+                },
+                title = {
+                    Text(
+                        text = "Debug Reminders",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Left
+                    )
+                },
+                modifier = Modifier.padding(end = 16.dp),
+            )
+        }
+
+        SettingsSlider(
+            state = timeState,
+            title = {
+                Text(
+                    text = "Reminder delay ${timeState.value.toInt()}",
+                )
+            },
+            steps = 60,
+            valueRange = 1F..60F,
+            modifier = Modifier.weight(1f),
         )
     }
 }

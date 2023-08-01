@@ -18,12 +18,6 @@ class DevToolsImpl(
             settings.putBoolean(KEY_DEBUG_MESSAGES, value)
         }
 
-    override var reminderDebugTime: Int
-        get() = settings.getInt(Constants.KEY_REMINDER_DEBUGGING_TIME, 5)
-        set(value) {
-            settings.putInt(Constants.KEY_REMINDER_DEBUGGING_TIME, value)
-        }
-
     override fun testReviewNotification() {
         notifier.showReviewNotification()
     }
