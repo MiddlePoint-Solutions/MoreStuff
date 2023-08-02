@@ -26,6 +26,7 @@ import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
+import co.softov.morestuff.android.ui.onboarding.OnBoardingContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.ProvideAppTheme
 import co.softov.morestuff.android.ui.theme.isDarkTheme
@@ -70,11 +71,12 @@ class MainActivity : AppCompatActivity() {
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
-                            MainContent(
-                                initialScreen = initialScreen,
-                                navigation = navigation,
-                                shareContent = viewModel::shareContentToTask
-                            )
+                            OnBoardingContent {}
+                            /* MainContent(
+                                 initialScreen = initialScreen,
+                                 navigation = navigation,
+                                 shareContent = viewModel::shareContentToTask
+                             )*/
                         }
                     }
                 }

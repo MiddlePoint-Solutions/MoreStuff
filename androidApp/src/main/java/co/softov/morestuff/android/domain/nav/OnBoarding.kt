@@ -11,5 +11,8 @@ sealed class OnBoarding : Parcelable {
 
     @Parcelize
     object NotificationPermission : OnBoarding()
+
+    @Parcelize
+    object WorkSpaceReady : OnBoarding()
 }
 
