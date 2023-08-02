@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.onboarding
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,11 +25,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.OnBoarding
 import co.softov.morestuff.android.ui.navigation.ChildPages
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
@@ -58,16 +61,16 @@ fun OnBoardingContent(
         }
     ) { screen ->
         when (screen) {
-            OnBoarding.Welcome -> WelcomeComposable(onNext = navigation::selectNext)
-            OnBoarding.NotificationPermission -> NotificationPermissionComposable(onNext = navigation::selectNext)
-            OnBoarding.WorkSpaceReady -> WorkSpaceReadyComposable(onFinish = onBoardingComplete)
+            OnBoarding.Welcome -> WelcomeScreen(onNext = navigation::selectNext)
+            OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
+            OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
         }
     }
 }
 
 
 @Composable
-fun WelcomeComposable(onNext: () -> Unit) {
+private fun WelcomeScreen(onNext: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -131,7 +134,8 @@ fun WelcomeComposable(onNext: () -> Unit) {
         }
 
         Row(
-            Modifier.padding(bottom = 56.dp)
+            Modifier
+                .padding(bottom = 56.dp)
                 .align(Alignment.CenterHorizontally)
 
         ) {
@@ -161,7 +165,7 @@ fun WelcomeComposable(onNext: () -> Unit) {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NotificationPermissionComposable(onNext: () -> Unit) {
+private fun NotificationPermissionScreen(onNext: () -> Unit) {
 
     val permissionState = rememberPermissionState(
         android.Manifest.permission.POST_NOTIFICATIONS
@@ -246,7 +250,8 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
         }
 
         Row(
-            Modifier.padding(bottom = 56.dp)
+            Modifier
+                .padding(bottom = 56.dp)
                 .align(Alignment.CenterHorizontally)
 
         ) {
@@ -297,7 +302,7 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
 }
 
 @Composable
-fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
+private fun ReadyScreen(onFinish: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -343,7 +348,8 @@ fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
         }
 
         Row(
-            Modifier.padding(bottom = 56.dp)
+            Modifier
+                .padding(bottom = 56.dp)
                 .align(Alignment.CenterHorizontally)
 
         ) {
@@ -368,6 +374,25 @@ fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
                 )
 
             }
+        }
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        Column {
+            WelcomeScreen {}
+            NotificationPermissionScreen {}
+            ReadyScreen {}
         }
     }
 }
