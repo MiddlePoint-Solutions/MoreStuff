@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.home
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
@@ -30,29 +32,27 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(
-    showTaskChat: (taskId: Long) -> Unit,
-    showSettings: () -> Unit,
-    showReview: () -> Unit,
-) {
+fun HomeScreen() {
+
+    val navigation = LocalAppNavigation.current
+
     val snackbarHostState = remember { SnackbarHostState() }
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
-        showSettings = showSettings,
-        showReview = showReview,
-        showTaskChat = showTaskChat,
         content = {
             Box(Modifier.padding(top = it.calculateTopPadding())) {
                 HomeContent(
-                    showTaskChat = showTaskChat,
+                    showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
                     snackbarHostState = snackbarHostState
                 )
             }
@@ -136,15 +136,18 @@ fun HomeContent(
     }
 }
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun MainContentPreview() {
     MoreStuffTheme {
-        HomeScreen(
-            showTaskChat = {},
-            showSettings = {},
-            showReview = {},
-        )
+        HomeScreen()
     }
 }
 

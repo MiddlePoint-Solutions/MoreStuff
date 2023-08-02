@@ -19,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import co.softov.morestuff.android.ui.drawer.DrawerLayout
-import co.softov.morestuff.android.ui.search.CustomSearchBar
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.search.SearchBar
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -28,11 +30,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
-    showSettings: () -> Unit,
-    showReview: () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
-    showTaskChat: (taskId: Long) -> Unit,
 ) {
+
+    val navigation = LocalAppNavigation.current
 
     var isSearching by remember { mutableStateOf(false) }
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -50,22 +51,14 @@ fun MoreStuffHomeScaffold(
     )
 
     BackHandler(enabled = drawerState.isOpen) {
-        if (drawerState.isOpen) {
-            closeDrawer()
-        }
+        closeDrawer()
     }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,
         drawerContent = {
-            ModalDrawerSheet {
-                DrawerLayout(
-                    closeDrawer = closeDrawer,
-                    showSettings = showSettings,
-                    showPriorityReview = showReview
-                )
-            }
+            ModalDrawerSheet {}
         },
         content = {
             Scaffold(
@@ -83,8 +76,8 @@ fun MoreStuffHomeScaffold(
                 topBar = {
                     Box {
                         MoreStuffTopBar(
-                            reviewSelected = showReview,
-                            settingsSelected = showSettings,
+                            reviewSelected = { navigation.push(Screen.Review) },
+                            settingsSelected = { navigation.push(Screen.Settings) },
                             searchSelected = { isSearching = true }
                         )
 
@@ -93,9 +86,9 @@ fun MoreStuffHomeScaffold(
                             enter = fadeIn() + expandVertically(),
                             exit = fadeOut() + shrinkVertically(),
                         ) {
-                            CustomSearchBar(
+                            SearchBar(
                                 onSearchClose = { isSearching = false },
-                                showTaskChat = showTaskChat,
+                                showTaskChat = { navigation.push(Screen.TaskChat(it)) },
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }

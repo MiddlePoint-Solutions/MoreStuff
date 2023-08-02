@@ -36,23 +36,25 @@ import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
+import com.arkivanov.decompose.router.stack.pop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable
 fun ReviewScreen(
-    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
         ReviewContent(
-            onBack = onBack,
+            onBack = navigation::pop,
             modifier = modifier
         )
     }
@@ -417,7 +419,7 @@ private fun RoundInfo(
 )
 @Composable
 fun ReviewSwipeControlsPreview() {
-    MoreStuffTheme() {
+    MoreStuffTheme {
         ReviewSwipeControls({ null }, { null }, {})
     }
 }

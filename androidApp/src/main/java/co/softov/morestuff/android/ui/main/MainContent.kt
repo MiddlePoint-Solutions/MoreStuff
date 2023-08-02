@@ -59,11 +59,7 @@ fun MainContent(
                 }
             )
 
-            Home -> HomeScreen(
-                showSettings = { navigation.push(Settings) },
-                showReview = { navigation.push(Review) },
-                showTaskChat = { navigation.push(TaskChat(it)) }
-            )
+            Home -> HomeScreen()
 
             Review -> ReviewScreen(onBack = navigation::pop)
 
