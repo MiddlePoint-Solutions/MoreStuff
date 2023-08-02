@@ -70,11 +70,11 @@ class MainActivity : AppCompatActivity() {
                 MoreStuffTheme {
                     Surface {
                         ProvideComponentContext(rootComponentContext) {
-                            MainContent(
-                                initialScreen = initialScreen,
-                                navigation = navigation,
-                                shareContent = viewModel::shareContentToTask
-                            )
+                             MainContent(
+                                 initialScreen = initialScreen,
+                                 navigation = navigation,
+                                 shareContent = viewModel::shareContentToTask
+                             )
                         }
                     }
                 }
