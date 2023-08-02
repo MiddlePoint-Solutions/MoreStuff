@@ -14,14 +14,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -74,7 +75,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFF272835)),
+            .background(color = MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -87,46 +88,40 @@ private fun WelcomeScreen(onNext: () -> Unit) {
             Image(
                 painter = painterResource(id = R.drawable.ic_on_boarding),
                 contentDescription = "app welcome image",
-                modifier = Modifier
-                    .shadow(
-                        elevation = 9.137930870056152.dp,
-                        spotColor = Color(0x6E000000),
-                        ambientColor = Color(0x6E000000)
-                    ),
                 contentScale = ContentScale.None
             )
 
             Text(
-                text = "Out goal ",
+                text = stringResource(R.string.out_goal),
                 style = TextStyle(
                     fontSize = 62.14.sp,
                     lineHeight = 88.77.sp,
                     fontWeight = FontWeight(900),
-                    color = Color(0xFF898BA8),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.62.sp,
                 )
             )
 
             Text(
-                text = "is to help you plan and",
+                text = stringResource(R.string.is_to_help_you_plan_and),
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.16.sp,
                 )
             )
 
             Text(
-                text = "fulfill your tasks.",
+                text = stringResource(R.string.fulfill_your_tasks),
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.16.sp,
                 )
@@ -147,7 +142,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
                 content = {
                     Text(
-                        text = "Start",
+                        text = stringResource(R.string.button_start),
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 28.sp,
@@ -174,70 +169,71 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFF272835)),
-        verticalArrangement = Arrangement.Center
+            .background(color = MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(top = 74.dp, bottom = 30.dp, start = 45.dp),
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Text(
-                text = "Notification",
+                text = stringResource(R.string.notification),
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
                     fontWeight = FontWeight(900),
-                    color = Color(0xFF898BA8),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.41.sp,
                 )
             )
             Text(
-                text = "permission ",
+                text = stringResource(R.string.permission),
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
                     fontWeight = FontWeight(900),
-                    color = Color(0xFF898BA8),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.41.sp,
                 )
             )
             Spacer(modifier = Modifier.padding(15.dp))
             Text(
-                text = "More Stuff requires Notification",
+                text = stringResource(R.string.more_stuff_requires_notification),
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.16.sp,
                 )
             )
 
             Text(
-                text = "permission to send you Task &",
+                text = stringResource(R.string.permission_to_send_you_task),
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.16.sp,
                 )
             )
 
             Text(
-                text = "Reminder notifications",
+                text = stringResource(R.string.reminder_notifications),
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
                     fontWeight = FontWeight(500),
-                    color = Color(0xFFFFFFFF),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.16.sp,
                 )
@@ -268,7 +264,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
                     content = {
                         Text(
-                            text = "Enable",
+                            text = stringResource(R.string.button_enable),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
@@ -287,7 +283,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9093B4)),
                     content = {
                         Text(
-                            text = "Skip",
+                            text = stringResource(R.string.button_skip),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
@@ -307,34 +303,35 @@ private fun ReadyScreen(onFinish: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color(0xFF272835)),
-        verticalArrangement = Arrangement.Center
+            .background(color = MaterialTheme.colorScheme.background),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(top = 74.dp, bottom = 30.dp, start = 2.dp, end = 2.dp),
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Text(
-                text = "Your workspace",
+                text = stringResource(R.string.your_workspace),
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
                     fontWeight = FontWeight(900),
-                    color = Color(0xFF898BA8),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.41.sp,
                 )
             )
             Text(
-                text = "is ready",
+                text = stringResource(R.string.is_ready),
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
                     fontWeight = FontWeight(900),
-                    color = Color(0xFF898BA8),
+                    color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
                     letterSpacing = 0.41.sp,
                 )
@@ -363,7 +360,7 @@ private fun ReadyScreen(onFinish: () -> Unit) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
                     content = {
                         Text(
-                            text = "Start",
+                            text = stringResource(R.string.button_start),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
