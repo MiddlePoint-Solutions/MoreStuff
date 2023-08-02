@@ -22,8 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -74,12 +72,13 @@ fun WelcomeComposable(onNext: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF272835)),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
-                .weight(1f)
-                .padding(top = 250.dp, bottom = 30.dp, start = 30.dp),
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
@@ -99,7 +98,6 @@ fun WelcomeComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 62.14.sp,
                     lineHeight = 88.77.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(900),
                     color = Color(0xFF898BA8),
                     textAlign = TextAlign.Center,
@@ -112,7 +110,6 @@ fun WelcomeComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFFFFFFF),
                     textAlign = TextAlign.Center,
@@ -125,7 +122,6 @@ fun WelcomeComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFFFFFFF),
                     textAlign = TextAlign.Center,
@@ -151,7 +147,6 @@ fun WelcomeComposable(onNext: () -> Unit) {
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 28.sp,
-                            fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                             fontWeight = FontWeight(700),
                             color = Color(0xFF272835),
                         )
@@ -190,7 +185,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(900),
                     color = Color(0xFF898BA8),
                     textAlign = TextAlign.Center,
@@ -202,7 +196,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(900),
                     color = Color(0xFF898BA8),
                     textAlign = TextAlign.Center,
@@ -215,7 +208,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFFFFFFF),
                     textAlign = TextAlign.Center,
@@ -228,7 +220,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFFFFFFF),
                     textAlign = TextAlign.Center,
@@ -240,7 +231,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                 style = TextStyle(
                     fontSize = 16.48.sp,
                     lineHeight = 23.55.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(500),
                     color = Color(0xFFFFFFFF),
                     textAlign = TextAlign.Center,
@@ -276,7 +266,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
-                                fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                                 fontWeight = FontWeight(700),
                                 color = Color(0xFF272835),
                             )
@@ -296,7 +285,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
-                                fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                                 fontWeight = FontWeight(700),
                                 color = Color(0xFF272835),
                             )
@@ -328,7 +316,6 @@ fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(900),
                     color = Color(0xFF898BA8),
                     textAlign = TextAlign.Center,
@@ -340,7 +327,6 @@ fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
                 style = TextStyle(
                     fontSize = 40.51.sp,
                     lineHeight = 44.38.sp,
-                    fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                     fontWeight = FontWeight(900),
                     color = Color(0xFF898BA8),
                     textAlign = TextAlign.Center,
@@ -374,7 +360,6 @@ fun WorkSpaceReadyComposable(onFinish: () -> Unit) {
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
-                                fontFamily = FontFamily(Font(R.font.montserrat_semibold)),
                                 fontWeight = FontWeight(700),
                                 color = Color(0xFF272835),
                             )
