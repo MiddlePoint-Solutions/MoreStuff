@@ -65,26 +65,15 @@ fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    mainChatViewModel: MainChatViewModel = koinViewModel(),
     userInputViewModel: UserInputViewModel = koinViewModel()
 ) {
     val priorityScrollState = rememberLazyListState()
-    val chatScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    val messages by mainChatViewModel.messages.collectAsState()
-
-    val chatActions = remember {
-        ChatActions(
-            taskChatAction = showTaskChat,
-        )
-    }
 
     val visibleState = remember {
         MutableTransitionState(true)
     }
-    var selectedImage by remember { mutableStateOf<String?>(null) }
-
 
     var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
@@ -93,7 +82,6 @@ fun HomeContent(
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-
         PriorityContent(
             snackBarHostState = snackbarHostState,
             showTaskChat = showTaskChat,
