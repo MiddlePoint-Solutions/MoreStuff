@@ -230,6 +230,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                     letterSpacing = 0.16.sp,
                 )
             )
+
             Text(
                 text = "Reminder notifications",
                 style = TextStyle(
