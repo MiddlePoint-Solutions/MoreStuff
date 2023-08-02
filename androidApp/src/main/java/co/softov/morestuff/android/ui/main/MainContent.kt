@@ -60,9 +60,7 @@ fun MainContent(
             )
 
             Home -> HomeScreen()
-
-            Review -> ReviewScreen(onBack = navigation::pop)
-
+            Review -> ReviewScreen()
             Settings -> SettingsScreen()
 
             is TaskChat -> TaskChatScreen(
@@ -74,15 +72,15 @@ fun MainContent(
                 ShareScreen(
                     onBack = navigation::pop,
                     shareable = screen.shareable,
-                ) { taskId, shareableContent ->
+                ) { taskId, shareable ->
                     navigation.replaceCurrent(
                         TaskChat(taskId),
-                        onComplete = { shareContent(taskId, shareableContent) }
+                        onComplete = { shareContent(taskId, shareable) }
                     )
                 }
             }
 
-            is AboutLibraries -> AboutLibrariesScreen(onBack = navigation::pop)
+            is AboutLibraries -> AboutLibrariesScreen()
         }
     }
 }

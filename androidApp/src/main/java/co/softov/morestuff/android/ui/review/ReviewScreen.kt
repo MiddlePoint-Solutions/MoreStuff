@@ -52,7 +52,7 @@ fun ReviewScreen(
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
+    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
         ReviewContent(
             onBack = navigation::pop,
             modifier = modifier

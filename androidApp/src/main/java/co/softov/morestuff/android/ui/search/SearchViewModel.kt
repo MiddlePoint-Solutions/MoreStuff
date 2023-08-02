@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.ui.search
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.FilterType
@@ -9,11 +12,10 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithSchedul
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -23,87 +25,88 @@ class SearchViewModel(
     private val timeFormatter: TimeFormatter,
 ) : NoStateViewModel() {
 
+    var query by mutableStateOf("")
+        private set
+    var filter by mutableStateOf(FilterType.None)
+        private set
+
     val searchResults = MutableStateFlow<List<TaskDomain>>(listOf())
-    val filter = MutableStateFlow(FilterType.None)
 
-    init {
-        viewModelScope.launch {
-            filter.collectLatest {
-                loadTasksByFilter()
-            }
-        }
+    private var searchJob: Job? = null
+
+    fun setSearchFilter(selected: FilterType) {
+        filter = if (filter != selected) selected else FilterType.None
+        loadTasksByFilter(query)
     }
 
-    fun setFilter(selected: FilterType) {
-        filter.update {
-            if (it != selected) selected else FilterType.None
-        }
+    fun setSearchQuery(searchQuery: String) {
+        this.query = searchQuery
+        loadTasksByFilter(searchQuery)
     }
 
-    fun searchTasks(searchText: String) {
-        loadTasksByFilter(searchText)
+    fun clearSearchQuery() {
+        setSearchQuery("")
+    }
+
+    fun reset() {
+        clearSearchQuery()
+        setSearchFilter(FilterType.None)
     }
 
     private fun loadTasksByFilter(searchText: String = "") {
-        viewModelScope.launch {
-            when (filter.value) {
-                FilterType.Done -> loadCompletedTasks(searchText)
-                FilterType.Reminder -> loadTasksWithReminderSchedule(searchText)
-                FilterType.Scheduled -> loadActiveTasksWithOneTimeSchedule(searchText)
-                FilterType.None -> {
-                    clearResults()
-                    if (searchText.isNotEmpty()) {
-                        searchTasksWithNoFilter(searchText)
-                    }
-                }
-            }
+        searchJob?.cancel()
+        when (filter) {
+            FilterType.Done -> loadCompletedTasks(searchText)
+            FilterType.Reminder -> loadTasksWithReminderSchedule(searchText)
+            FilterType.Scheduled -> loadActiveTasksWithOneTimeSchedule(searchText)
+            FilterType.None -> searchTasksWithNoFilter(searchText)
         }
     }
 
 
     private fun searchTasksWithNoFilter(searchText: String) {
-        searchTasksUseCase(searchText)
-            .onEach { results ->
-                searchResults.value = results
-            }.launchIn(viewModelScope)
+        searchJob = viewModelScope.launch {
+            searchTasksUseCase(searchText)
+                .onEach { results ->
+                    searchResults.value = results
+                }.launchIn(this)
+        }
     }
 
-    private suspend fun loadCompletedTasks(searchText: String) {
-        getCompletedTasksUseCase()
-            .collect { results ->
-                val formattedTasks = results.map { task ->
-                    task.copy(completeTime = timeFormatter.formatTimeDayMonthHour(task.completeTime))
-                }.filter { task ->
+    private fun loadCompletedTasks(searchText: String) {
+        searchJob = viewModelScope.launch {
+            getCompletedTasksUseCase()
+                .collect { results ->
+                    val formattedTasks = results.map { task ->
+                        task.copy(completeTime = timeFormatter.formatTimeDayMonthHour(task.completeTime))
+                    }.filter { task ->
+                        task.title.contains(searchText, ignoreCase = true)
+                    }
+                    searchResults.value = formattedTasks
+                }
+        }
+    }
+
+    private fun loadActiveTasksWithOneTimeSchedule(searchText: String) {
+        searchJob = viewModelScope.launch {
+            getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map {
+                searchResults.value = it.filter { task ->
                     task.title.contains(searchText, ignoreCase = true)
                 }
-                searchResults.value = formattedTasks
-            }
-    }
-
-    private suspend fun loadActiveTasksWithOneTimeSchedule(searchText: String) {
-        getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map {
-            searchResults.value = it.filter { task ->
-                task.title.contains(searchText, ignoreCase = true)
             }
         }
     }
 
-    private suspend fun loadTasksWithReminderSchedule(searchText: String) {
-        getActiveTasksWithScheduleUseCase(listOf(ScheduleType.Reminder)).map {
-            searchResults.value = it.filter { task ->
-                task.title.contains(searchText, ignoreCase = true)
+    private fun loadTasksWithReminderSchedule(searchText: String) {
+        searchJob = viewModelScope.launch {
+            getActiveTasksWithScheduleUseCase(listOf(ScheduleType.Reminder)).map {
+                searchResults.value = it.filter { task ->
+                    task.title.contains(searchText, ignoreCase = true)
+                }
             }
         }
     }
 
-    private fun clearResults() {
-        searchResults.value = listOf()
-    }
-
-    fun reset() {
-        clearResults()
-        filter.value = FilterType.None
-    }
 }
 
 

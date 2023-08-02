@@ -91,7 +91,7 @@ fun TaskChatScreen(
     val navigation = remember { StackNavigation<ChatScreen>() }
 
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    ProvideLocalViewModelStoreOwner(LifecycleViewModelStoreOwner(lifecycleOwner)) {
+    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
 
         val viewModel: TaskChatViewModel = koinViewModel { parametersOf(taskId) }
 

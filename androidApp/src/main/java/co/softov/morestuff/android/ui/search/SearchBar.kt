@@ -12,9 +12,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -26,15 +26,19 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
@@ -49,50 +53,51 @@ fun SearchBar(
     onSearchClose: () -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: SearchViewModel = koinViewModel()
 ) {
 
-    val viewModel: SearchViewModel = koinViewModel()
-    var searchText by remember { mutableStateOf("") }
-    var isSearching by remember { mutableStateOf(false) }
-
-    val selectedFilter by viewModel.filter.collectAsStateWithLifecycle()
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
     val searchResult by viewModel.searchResults.collectAsStateWithLifecycle()
+    val focusRequester = remember { FocusRequester() }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.reset()
-        }
+    LaunchedEffect(Unit) {
+        isSearchActive = true
+        focusRequester.requestFocus()
     }
 
     SearchBar(
-        modifier = Modifier.fillMaxWidth(),
-        query = searchText,
-        onQueryChange = { newText ->
-            searchText = newText
-            viewModel.searchTasks(newText)
-        },
-        onSearch = { _ -> isSearching = false },
-        active = isSearching,
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester),
+        query = viewModel.query,
+        onQueryChange = viewModel::setSearchQuery,
+        onSearch = { },
+        active = isSearchActive,
         onActiveChange = { isActive ->
-            isSearching = isActive
+            if (!isActive) {
+                onSearchClose()
+            }
         },
         placeholder = { Text(text = stringResource(R.string.search)) },
-        trailingIcon = {
+        leadingIcon = {
             IconButton(onClick = {
-                searchText = ""
                 onSearchClose()
             }) {
                 Icon(
-                    Icons.Default.Close,
+                    Icons.Default.ArrowBack,
                     contentDescription = stringResource(id = R.string.cd_navigate_back)
                 )
             }
         },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search icon"
-            )
+        trailingIcon = {
+            if (viewModel.query.isNotEmpty()) {
+                IconButton(onClick = viewModel::clearSearchQuery) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cd_clear_search_query)
+                    )
+                }
+            }
         },
         colors = SearchBarDefaults.colors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -110,31 +115,35 @@ fun SearchBar(
 
                 SearchFilterChip(
                     filter = FilterType.Scheduled,
-                    selectedFilter = selectedFilter,
-                    onFilterSelected = viewModel::setFilter
+                    selectedFilter = viewModel.filter,
+                    onFilterSelected = viewModel::setSearchFilter
                 )
 
                 SearchFilterChip(
                     filter = FilterType.Reminder,
-                    selectedFilter = selectedFilter,
-                    onFilterSelected = viewModel::setFilter
+                    selectedFilter = viewModel.filter,
+                    onFilterSelected = viewModel::setSearchFilter
                 )
 
                 SearchFilterChip(
                     filter = FilterType.Done,
-                    selectedFilter = selectedFilter,
-                    onFilterSelected = viewModel::setFilter
+                    selectedFilter = viewModel.filter,
+                    onFilterSelected = viewModel::setSearchFilter
                 )
             }
 
-            Crossfade(searchResult.isEmpty() && searchText.isNotEmpty(), label = "") {
+            Crossfade(
+                targetState = searchResult.isEmpty() && viewModel.query.isNotEmpty(),
+                label = "Search results fade animation"
+            ) {
                 when (it) {
                     true -> {
                         Text(
-                            text = "Task not found",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(16.dp),
-                            color = Color.Red
+                            text = stringResource(R.string.no_results_found),
+                            style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 30.dp),
                         )
                     }
 
@@ -142,28 +151,38 @@ fun SearchBar(
                         Crossfade(
                             targetState = searchResult,
                             label = "Search results fade"
-                        ) {
+                        ) { result ->
                             LazyColumn {
-                                items(it) { task ->
-                                    Divider(
-                                        thickness = 0.5.dp,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
-                                    if (task.isComplete) {
-                                        CompletePriorityItem(
+                                items(
+                                    items = result,
+                                    key = { item -> item.id },
+                                    contentType = { item ->
+                                        when (item.isComplete) {
+                                            true -> SearchContentType.Complete
+                                            false -> SearchContentType.Priority
+                                        }
+                                    }
+                                ) { task ->
+                                    when {
+                                        task.isComplete -> CompletePriorityItem(
                                             task = task,
                                             onClick = { taskId ->
                                                 showTaskChat(taskId)
                                             }
                                         )
-                                    } else {
-                                        PriorityItem(
+
+                                        else -> PriorityItem(
                                             task = task,
                                             onClick = { taskId ->
                                                 showTaskChat(taskId)
                                             }
                                         )
                                     }
+
+                                    Divider(
+                                        thickness = 0.5.dp,
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
                                 }
                             }
                         }
@@ -172,6 +191,10 @@ fun SearchBar(
             }
         }
     }
+}
+
+enum class SearchContentType {
+    Priority, Complete
 }
 
 @ExperimentalMaterial3Api

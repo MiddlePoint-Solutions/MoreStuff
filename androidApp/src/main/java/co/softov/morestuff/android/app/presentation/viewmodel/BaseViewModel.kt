@@ -64,6 +64,8 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
 
     protected open fun onLoadData() {}
 
+    protected open fun onLoadData(appState: AppState) {}
+
     protected open fun onAppStateChange(state: AppState) {}
 
     protected open fun onReduceState(event: ViewEvent): ViewState = state

@@ -45,7 +45,6 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen() {
 
     val navigation = LocalAppNavigation.current
-
     val snackbarHostState = remember { SnackbarHostState() }
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,

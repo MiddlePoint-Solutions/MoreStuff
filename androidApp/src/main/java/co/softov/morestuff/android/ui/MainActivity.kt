@@ -27,6 +27,7 @@ import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 import co.softov.morestuff.android.ui.local.ProvideAppTheme
 import co.softov.morestuff.android.ui.local.ProvideAppNavigation
 import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.isDarkTheme
