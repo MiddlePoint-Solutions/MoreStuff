@@ -1,9 +1,10 @@
-package co.softov.morestuff.android.ui
+package co.softov.morestuff.android.ui.main
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
@@ -13,12 +14,9 @@ import co.softov.morestuff.android.ui.main.MainModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class MainViewModel(
-    getAppThemeUseCase: GetAppThemeUseCase,
+class MainViewModel() : NoStateViewModel() {
 
-) : NoStateViewModel() {
-
-    var appTheme by mutableStateOf(getAppThemeUseCase())
+    var appTheme by mutableStateOf(store.state.value.settings.appTheme)
         private set
 
     val model: MutableStateFlow<MainModel> = with(store.state.value.settings) {
@@ -32,6 +30,10 @@ class MainViewModel(
 
     init {
         loadData()
+    }
+
+    override fun onLoadData(appState: AppState) {
+        appTheme = appState.settings.appTheme
     }
 
     override fun onAppStateChange(state: AppState) {
@@ -57,8 +59,15 @@ class MainViewModel(
             is Shareable.Text -> {
                 store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content.content))
             }
+
             is Shareable.Image -> {
-                store.dispatch(MessageAction.CreateImageMessageAction(taskId, content.uris, content.message))
+                store.dispatch(
+                    MessageAction.CreateImageMessageAction(
+                        taskId,
+                        content.uris,
+                        content.message
+                    )
+                )
             }
         }
     }

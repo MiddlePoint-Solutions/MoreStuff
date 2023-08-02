@@ -32,13 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
-import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.ProvideAppTheme
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun UserTextInput(

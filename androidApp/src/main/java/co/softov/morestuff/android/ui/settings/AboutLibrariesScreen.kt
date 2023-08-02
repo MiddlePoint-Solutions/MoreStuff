@@ -16,15 +16,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import com.arkivanov.decompose.router.stack.pop
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 
 @Composable
-fun AboutLibrariesScreen(
-    onBack: () -> Unit,
-) {
+fun AboutLibrariesScreen() {
+
+    val navigation = LocalAppNavigation.current
+
     Scaffold(
-        topBar = { AboutTopBar(onBack = onBack) }
+        topBar = { AboutTopBar(onBack = navigation::pop) }
     ) {
         LibrariesContainer(
             modifier = Modifier

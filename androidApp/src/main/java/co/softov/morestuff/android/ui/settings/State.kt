@@ -1,10 +1,21 @@
 package co.softov.morestuff.android.ui.settings
 
+import androidx.compose.runtime.Immutable
+import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
+import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
 
-data class SettingsViewState(
-    val appThemeIndex: Int = AppTheme.System.ordinal,
+@Immutable
+data class SettingsModel(
+    val appTheme: AppTheme = AppTheme.System,
     val snoozeLimit: Int = 0,
     val confettiEnabled: Boolean = true,
 ) : BaseViewState
+
+@Immutable
+data class SettingsActions(
+    val selectAppTheme: (Int) -> Unit = {},
+    val setSnoozeLimit: (Int) -> Unit = {},
+    val enableConfetti: (Boolean) -> Unit = {},
+)

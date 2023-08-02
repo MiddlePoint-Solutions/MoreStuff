@@ -1,9 +1,9 @@
 package co.softov.morestuff.android.di
 
-import co.softov.morestuff.android.ui.MainViewModel
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.drawer.DrawerViewModel
-import co.softov.morestuff.android.ui.home.MainChatViewModel
+import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.search.SearchViewModel
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
@@ -19,7 +19,7 @@ import org.koin.dsl.module
 val presentationModule = module {
 
     viewModelOf(::UserInputViewModel)
-    viewModelOf(::MainChatViewModel)
+    viewModelOf(::HomeViewModel)
     viewModelOf(::DrawerViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)

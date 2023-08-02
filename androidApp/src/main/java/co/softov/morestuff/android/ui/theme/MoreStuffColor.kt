@@ -25,6 +25,8 @@ val secondaryContainerLightTheme = Color(0xFF6A7493)
 
 val priorityAction = Color(0xFF5C5E74)
 
+val reviewIconTint = Color(140, 152, 255)
+
 
 
 
