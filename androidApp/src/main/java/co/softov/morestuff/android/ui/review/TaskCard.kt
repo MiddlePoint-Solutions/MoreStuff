@@ -1,15 +1,11 @@
 package co.softov.morestuff.android.ui.review
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.utils.ProfileColors
+import co.softov.morestuff.android.ui.theme.TaskColors
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -64,7 +60,7 @@ fun TaskCard(
     val selectedState = remember { MutableTransitionState(false) }
 
     val backgroundColors by remember {
-        derivedStateOf { ProfileColors.getProfileColorsForTask(task.title) }
+        derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
     }
 
     val elevationState = remember { MutableTransitionState(false) }
@@ -107,14 +103,15 @@ fun TaskCard(
                         .align(Alignment.TopCenter)
                         .fillMaxWidth()
                         .heightIn(min = 140.dp)
-                        .background(brush = topScrimBrush()),
+//                        .background(brush = topScrimBrush())
+                    ,
                     contentAlignment = Alignment.TopStart
                 ) {
                     Text(
                         text = task.title,
-                        color = Color(49, 50, 62),
+                        color = Color(0xFF1E1F2D),
                         textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.ExtraBold),
+                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 40.dp, vertical = 26.dp)
@@ -132,7 +129,8 @@ fun TaskCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 140.dp)
-                            .background(brush = bottomScrimBrush()),
+//                            .background(brush = bottomScrimBrush())
+                        ,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {
@@ -150,7 +148,7 @@ fun TaskCard(
                         ) {
                             Text(
                                 text = "Done",
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = Color.White
                             )
                         }
                     }
@@ -178,7 +176,14 @@ private fun bottomScrimBrush() = Brush.verticalGradient(
     )
 )
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
 fun TaskCardPreview() {
     MoreStuffTheme() {

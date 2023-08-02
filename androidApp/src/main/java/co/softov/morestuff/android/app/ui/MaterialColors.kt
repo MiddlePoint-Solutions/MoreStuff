@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName")
+
 package co.softov.morestuff.android.app.ui
 
 import androidx.compose.ui.graphics.Color

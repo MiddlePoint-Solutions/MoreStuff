@@ -75,8 +75,6 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
     }
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
         val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(activeSchedule = null) }

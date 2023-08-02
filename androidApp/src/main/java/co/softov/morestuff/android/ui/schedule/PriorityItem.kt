@@ -35,7 +35,7 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.utils.ProfileColors
+import co.softov.morestuff.android.ui.theme.TaskColors
 
 @Composable
 fun PriorityItem(
@@ -90,7 +90,7 @@ fun PriorityItem(
  fun TaskProfile(task: TaskDomain) {
 
     val profileColor by remember {
-        derivedStateOf { ProfileColors.getProfileColorsForTask(task.title) }
+        derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
     }
 
     Box(

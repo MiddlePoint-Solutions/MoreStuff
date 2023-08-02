@@ -17,10 +17,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import co.softov.morestuff.android.ui.drawer.DrawerLayout
-import co.softov.morestuff.android.ui.search.CustomSearchBar
+import androidx.compose.ui.platform.LocalView
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.search.SearchBar
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -28,17 +36,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
-    showSettings: () -> Unit,
-    showReview: () -> Unit,
     content: @Composable (PaddingValues) -> Unit,
-    showTaskChat: (taskId: Long) -> Unit,
 ) {
 
-    var isSearching by remember { mutableStateOf(false) }
+    val navigation = LocalAppNavigation.current
+
+    var isSearching by rememberSaveable { mutableStateOf(false) }
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope: CoroutineScope = rememberCoroutineScope()
 
-    val closeDrawer: () -> Unit = remember {
+    val closeDrawer = remember {
         { scope.launch { drawerState.close() } }
     }
 
@@ -50,68 +57,62 @@ fun MoreStuffHomeScaffold(
     )
 
     BackHandler(enabled = drawerState.isOpen) {
-        if (drawerState.isOpen) {
-            closeDrawer()
-        }
+        closeDrawer()
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        gesturesEnabled = drawerState.isOpen,
-        drawerContent = {
-            ModalDrawerSheet {
-                DrawerLayout(
-                    closeDrawer = closeDrawer,
-                    showSettings = showSettings,
-                    showPriorityReview = showReview
-                )
-            }
-        },
-        content = {
-            Scaffold(
-                modifier = Modifier.systemBarsPadding(),
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState) { data ->
-                        SwipeToDismiss(
-                            state = dismissSnackbarState,
-                            background = {},
-                            dismissContent = { Snackbar(snackbarData = data) },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                },
-                topBar = {
-                    Box {
-                        MoreStuffTopBar(
-                            reviewSelected = showReview,
-                            settingsSelected = showSettings,
-                            searchSelected = { isSearching = true }
-                        )
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
 
-                        AnimatedVisibility(
-                            visible = isSearching,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically(),
-                        ) {
-                            CustomSearchBar(
-                                onSearchClose = { isSearching = false },
-                                showTaskChat = showTaskChat,
-                                modifier = Modifier.fillMaxWidth()
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            gesturesEnabled = drawerState.isOpen,
+            drawerContent = {
+                ModalDrawerSheet {}
+            },
+            content = {
+                Scaffold(
+                    modifier = Modifier.systemBarsPadding(),
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState) { data ->
+                            SwipeToDismiss(
+                                state = dismissSnackbarState,
+                                background = {},
+                                dismissContent = { Snackbar(snackbarData = data) },
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
-                    }
-                },
-                content = {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        content(PaddingValues(it.calculateTopPadding()))
-
-                        BackHandler(isSearching) {
-                            isSearching = false
+                    },
+                    topBar = {
+                        Box {
+                            MoreStuffTopBar(
+                                reviewSelected = { navigation.push(Screen.Review) },
+                                settingsSelected = { navigation.push(Screen.Settings) },
+                                searchSelected = { isSearching = true }
+                            )
+                        }
+                    },
+                    content = {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            content(PaddingValues(it.calculateTopPadding()))
                         }
                     }
-                }
+                )
+            }
+        )
+
+        AnimatedVisibility(
+            visible = isSearching,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            SearchBar(
+                onSearchClose = { isSearching = false },
+                showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
-    )
+    }
 }
 

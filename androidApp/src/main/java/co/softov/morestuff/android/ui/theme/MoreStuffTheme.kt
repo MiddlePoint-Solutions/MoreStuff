@@ -13,6 +13,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.ui.local.LocalTheme
 
 
 private val lightColors = lightColorScheme(
@@ -169,11 +170,4 @@ fun CustomSelectionColor(darkTheme: Boolean, content: @Composable () -> Unit) {
     ) {
         content()
     }
-}
-
-val LocalTheme = compositionLocalOf { AppTheme.System }
-
-@Composable
-fun ProvideAppTheme(theme: AppTheme, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalTheme provides theme, content = content)
 }
