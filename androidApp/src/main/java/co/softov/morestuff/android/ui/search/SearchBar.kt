@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,7 +55,7 @@ fun SearchBar(
     onSearchClose: () -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = koinViewModel()
+    viewModel: SearchViewModel = koinViewModel(),
 ) {
 
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -247,7 +249,7 @@ private fun SearchFilterChip(
             containerColor = unselectedColor,
             selectedContainerColor = selectedColor,
         ),
-        modifier = Modifier.padding(end = 10.dp),
+        modifier = Modifier.padding(end = 7.dp),
         shape = CircleShape
     )
 }
@@ -277,12 +279,12 @@ private fun FilterType.Icon() {
         )
 
         FilterType.Reminder -> Icon(
-            imageVector = Icons.Default.Schedule,
+            imageVector = Icons.Default.Notifications,
             contentDescription = stringResource(R.string.cd_filter_reminders_tasks),
         )
 
         FilterType.Done -> Icon(
-            imageVector = Icons.Default.Schedule,
+            imageVector = Icons.Default.Done,
             contentDescription = stringResource(R.string.cd_filter_completed_tasks),
         )
     }
