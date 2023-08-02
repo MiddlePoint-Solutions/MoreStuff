@@ -35,6 +35,8 @@ import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.selectNext
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -162,8 +164,14 @@ fun WelcomeComposable(onNext: () -> Unit) {
 }
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun NotificationPermissionComposable(onNext: () -> Unit) {
+
+    val permissionState = rememberPermissionState(
+        android.Manifest.permission.POST_NOTIFICATIONS
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -254,7 +262,10 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
         ) {
             Column {
                 Button(
-                    onClick = { onNext() },
+                    onClick = {
+                        permissionState.launchPermissionRequest()
+                        onNext()
+                    },
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
@@ -293,8 +304,6 @@ fun NotificationPermissionComposable(onNext: () -> Unit) {
                     }
                 )
             }
-
-
         }
     }
 }
