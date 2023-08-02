@@ -34,6 +34,10 @@ class SearchViewModel(
 
     private var searchJob: Job? = null
 
+    init {
+        setSearchFilter(FilterType.None)
+    }
+
     fun setSearchFilter(selected: FilterType) {
         filter = if (filter != selected) selected else FilterType.None
         loadTasksByFilter(query)

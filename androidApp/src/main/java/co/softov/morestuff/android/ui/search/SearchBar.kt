@@ -31,6 +31,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -45,7 +46,6 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.FilterType
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import org.koin.androidx.compose.koinViewModel
-
 
 @ExperimentalMaterial3Api
 @Composable
@@ -65,6 +65,13 @@ fun SearchBar(
         focusRequester.requestFocus()
     }
 
+    val exitSearch by rememberUpdatedState(
+        newValue = {
+            onSearchClose()
+            viewModel.reset()
+        }
+    )
+
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,13 +82,13 @@ fun SearchBar(
         active = isSearchActive,
         onActiveChange = { isActive ->
             if (!isActive) {
-                onSearchClose()
+                exitSearch()
             }
         },
         placeholder = { Text(text = stringResource(R.string.search)) },
         leadingIcon = {
             IconButton(onClick = {
-                onSearchClose()
+                exitSearch()
             }) {
                 Icon(
                     Icons.Default.ArrowBack,
