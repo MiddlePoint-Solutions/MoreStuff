@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.chat.items
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -17,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material3.LocalTextStyle
@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
@@ -60,6 +61,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -72,6 +74,7 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
+    val timeFormatter: TimeFormatter = koinInject()
 
     val content by remember {
         derivedStateOf {
@@ -118,7 +121,12 @@ fun UserChatItem(
 
                 if (message.messageData?.filePath != null) {
                     Surface(
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        shape = RoundedCornerShape(
+                            topStart = 10.dp,
+                            topEnd = 10.dp,
+                            bottomEnd = 7.dp,
+                            bottomStart = 10.dp
+                        ),
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                         modifier = if (message.content.isEmpty()) {
@@ -150,24 +158,53 @@ fun UserChatItem(
                                     )
                                 )
                             }
-                            ChatImageMessage(
-                                messageData = message.messageData,
+                            Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .combinedClickable(
-                                        onClick = {
-                                            actions.onImageSelected(message)
-                                        },
-                                        onLongClick = { showMenu = true }
-                                    )
                                     .aspectRatio(1f)
                                     .size(200.dp)
-                            )
+                            ) {
+                                ChatImageMessage(
+                                    messageData = message.messageData,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .combinedClickable(
+                                            onClick = {
+                                                actions.onImageSelected(message)
+                                            },
+                                            onLongClick = { showMenu = true }
+                                        )
+                                        .aspectRatio(1f)
+                                        .size(200.dp),
+                                )
+                                timeFormatter.formatTimeOnly(message.createTime)?.let {
+                                    Text(
+                                        text = it,
+                                        style = TextStyle(fontSize = 12.sp, color = Color.Gray),
+                                        modifier = Modifier
+                                            .align(Alignment.BottomEnd)
+                                            .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                            .background(
+                                                MaterialTheme.colorScheme.background.copy(
+                                                    alpha = 0.5F
+                                                )
+                                            )
+                                            .padding(4.dp)
+                                    )
+                                }
+
+                            }
                         }
                     }
                 } else {
                     Surface(
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        shape = RoundedCornerShape(
+                            topStart = 14.dp,
+                            topEnd = 14.dp,
+                            bottomEnd = 5.dp,
+                            bottomStart = 14.dp
+                        ),
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                     ) {
@@ -176,8 +213,7 @@ fun UserChatItem(
                         ) {
                             Text(
                                 modifier = Modifier
-                                    .padding(8.dp)
-                                    .padding(end = 15.dp)
+                                    .padding(start = 8.dp, end = 15.dp, bottom = 5.dp)
                                     .run {
                                         urls?.let {
                                             combinedClickable(
@@ -196,6 +232,14 @@ fun UserChatItem(
                                     fontSize = 16.sp
                                 )
                             )
+                            timeFormatter.formatTimeOnly(message.createTime)?.let {
+                                Text(
+                                    text = it,
+                                    style = TextStyle(fontSize = 12.sp, color = Color.Gray),
+                                    modifier = Modifier.align(Alignment.End)
+                                        .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
+                                )
+                            }
                             if (openGraphResult?.title != null && openGraphResult.description != null) {
                                 OpenGraphPreview(openGraphResult)
                             }

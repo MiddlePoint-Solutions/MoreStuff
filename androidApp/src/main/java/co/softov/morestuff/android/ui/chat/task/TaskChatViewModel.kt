@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.MessageWithFormattedTime
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -55,6 +55,7 @@ class TaskChatViewModel(
         Timber.d("TaskChatViewModel: $taskId")
     }
 
+
     val task: StateFlow<TaskDomain> = getTaskFlow(taskId)
         .onEach { task ->
             scheduleModel = createModelForSchedule(task.schedule.firstOrNull { it.isOneTime() })
@@ -66,14 +67,21 @@ class TaskChatViewModel(
             initialValue = TaskDomain()
         )
 
-    val messages: StateFlow<List<Message>> = flow {
+    val messages: StateFlow<List<MessageWithFormattedTime>> = flow {
         while (true) {
             val messages = if (devTools.showDebugMessages) {
                 getTaskMessagesFlowUseCase(taskId = taskId).first()
             } else {
                 getTaskChatMessagesUseCase(taskId = taskId).first()
             }
-            emit(messages)
+
+            val formattedMessages = messages.map { message ->
+                val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
+                val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString())
+                MessageWithFormattedTime(message, formattedTime)
+            }
+
+            emit(formattedMessages)
         }
     }.stateIn(
         scope = viewModelScope,

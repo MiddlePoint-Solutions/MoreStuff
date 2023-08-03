@@ -45,7 +45,12 @@ fun PriorityButton(
         enabled = enabled,
         shape = shape,
     ) {
-        Text(text = text, softWrap = false, fontSize = fontSize)
+        Text(
+            text = text,
+            softWrap = false,
+            fontSize = fontSize,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 
@@ -56,7 +61,7 @@ fun PriorityButton(
     selected: Boolean = false,
     enabled: Boolean = true,
     shape: Shape = CircleShape,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
 
     val backgroundColor by animateColorAsState(

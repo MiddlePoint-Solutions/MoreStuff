@@ -34,18 +34,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.data.service.TimeManagerImpl
-import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.domain.model.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
@@ -61,7 +56,7 @@ private fun isAutoScrollingEnabled(
 
 @Composable
 fun Messages(
-    messages: List<Message>,
+    messages: List<MessageWithFormattedTime>,
     actions: ChatActions,
     modifier: Modifier = Modifier,
     scrollState: LazyListState,
@@ -70,9 +65,6 @@ fun Messages(
     var itemsCount by remember { mutableIntStateOf(0) }
     val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount, scrollState)
     itemsCount = messages.size
-    val timeManager: TimeManager = TimeManagerImpl()
-    val timeFormatter: TimeFormatter = TimeFormatterImpl(context = LocalContext.current)
-
 
     Box(modifier = modifier) {
         LazyColumn(
@@ -83,52 +75,53 @@ fun Messages(
         ) {
             itemsIndexed(
                 items = messages,
-                key = { _, item -> item.id }
+                key = { _, item -> item.message.id }
             ) { index, item ->
                 val nextMessage = if (index < messages.size - 1) messages[index + 1] else null
 
-                val currentMessageDateTime = timeManager.utcStringToLocalDateTime(item.createTime)
-                val nextMessageDateTime =
-                    nextMessage?.let { timeManager.utcStringToLocalDateTime(it.createTime) }
-
-                val isLastMessageOfDay = currentMessageDateTime.date != nextMessageDateTime?.date
+                val isLastMessageOfDay = item.formattedTime != nextMessage?.formattedTime
 
                 Column {
                     if (isLastMessageOfDay) {
                         Row(
                             modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 4.dp)
+                                .padding(horizontal = 16.dp, vertical = 36.dp)
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            timeFormatter.formatTimeWithDayMonthYear(
-                                currentMessageDateTime.toString(),
-                            )
-                                ?.let {
-                                    Text(
-                                        text = it,
-                                        modifier = Modifier
-                                            .background(
-                                                color = Color.Gray.copy(alpha = 0.5f),
-                                                shape = RoundedCornerShape(50)
-                                            )
-                                            .padding(horizontal = 8.dp, vertical = 4.dp),
-                                        fontSize = 17.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
+                            item.formattedTime?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier
+                                        .background(
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07F),
+                                            shape = RoundedCornerShape(38)
+                                        )
+                                        .padding(
+                                            start = 35.dp,
+                                            end = 35.dp,
+                                            bottom = 5.dp,
+                                            top = 5.dp
+                                        ),
+                                    fontSize = 14.sp,
+                                    color = Color(0xFF5C5E74),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
                     }
-                    when (item.contentType) {
-                        ContentType.USER_NEW_TASK -> UserChatItem(message = item, actions)
-                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item, actions)
+                    when (item.message.contentType) {
+                        ContentType.USER_NEW_TASK -> UserChatItem(message = item.message, actions)
+                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item.message, actions)
                         ContentType.TASK_REMINDER -> TaskReminderItem(
-                            message = item,
+                            message = item.message,
                             actions = actions
                         )
 
-                        ContentType.TASK_MESSAGE -> UserChatItem(message = item, actions = actions)
+                        ContentType.TASK_MESSAGE -> UserChatItem(
+                            message = item.message,
+                            actions = actions
+                        )
                     }
                 }
             }

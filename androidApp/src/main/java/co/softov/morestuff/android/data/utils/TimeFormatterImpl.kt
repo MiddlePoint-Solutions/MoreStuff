@@ -27,7 +27,7 @@ class TimeFormatterImpl(
     }
 
     override fun formatTimeOnly(timeString: String?): String? {
-        return formatTime(timeString, "HH:mm${addAmPm()}")
+        return formatTime(timeString, "HH:mm ${addAmPm()}")
     }
 
     override fun formatTimeDayAndMonth(timeString: String?): String? {
