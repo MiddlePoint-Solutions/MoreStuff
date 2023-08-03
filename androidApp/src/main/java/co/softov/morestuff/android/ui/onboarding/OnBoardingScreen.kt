@@ -25,7 +25,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,8 +73,7 @@ fun OnBoardingContent(
 private fun WelcomeScreen(onNext: () -> Unit) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -93,38 +91,14 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 
             Text(
                 text = stringResource(R.string.out_goal),
-                style = TextStyle(
-                    fontSize = 62.14.sp,
-                    lineHeight = 88.77.sp,
-                    fontWeight = FontWeight(900),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.62.sp,
-                )
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Text(
                 text = stringResource(R.string.is_to_help_you_plan_and),
-                style = TextStyle(
-                    fontSize = 16.48.sp,
-                    lineHeight = 23.55.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.16.sp,
-                )
-            )
-
-            Text(
-                text = stringResource(R.string.fulfill_your_tasks),
-                style = TextStyle(
-                    fontSize = 16.48.sp,
-                    lineHeight = 23.55.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.16.sp,
-                )
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
             )
         }
 
@@ -182,62 +156,16 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
 
             Text(
                 text = stringResource(R.string.notification),
-                style = TextStyle(
-                    fontSize = 40.51.sp,
-                    lineHeight = 44.38.sp,
-                    fontWeight = FontWeight(900),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.41.sp,
-                )
-            )
-            Text(
-                text = stringResource(R.string.permission),
-                style = TextStyle(
-                    fontSize = 40.51.sp,
-                    lineHeight = 44.38.sp,
-                    fontWeight = FontWeight(900),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.41.sp,
-                )
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.padding(15.dp))
             Text(
                 text = stringResource(R.string.more_stuff_requires_notification),
-                style = TextStyle(
-                    fontSize = 16.48.sp,
-                    lineHeight = 23.55.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.16.sp,
-                )
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
-            Text(
-                text = stringResource(R.string.permission_to_send_you_task),
-                style = TextStyle(
-                    fontSize = 16.48.sp,
-                    lineHeight = 23.55.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.16.sp,
-                )
-            )
-
-            Text(
-                text = stringResource(R.string.reminder_notifications),
-                style = TextStyle(
-                    fontSize = 16.48.sp,
-                    lineHeight = 23.55.sp,
-                    fontWeight = FontWeight(500),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.16.sp,
-                )
-            )
             Spacer(modifier = Modifier.padding(20.dp))
             Image(
                 painter = painterResource(id = R.drawable.permission_on_boarding),
@@ -316,25 +244,8 @@ private fun ReadyScreen(onFinish: () -> Unit) {
 
             Text(
                 text = stringResource(R.string.your_workspace),
-                style = TextStyle(
-                    fontSize = 40.51.sp,
-                    lineHeight = 44.38.sp,
-                    fontWeight = FontWeight(900),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.41.sp,
-                )
-            )
-            Text(
-                text = stringResource(R.string.is_ready),
-                style = TextStyle(
-                    fontSize = 40.51.sp,
-                    lineHeight = 44.38.sp,
-                    fontWeight = FontWeight(900),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    letterSpacing = 0.41.sp,
-                )
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
             Spacer(modifier = Modifier.padding(20.dp))

@@ -127,18 +127,14 @@
     <string name="cd_clear_search_query">Clear Search Query</string>
 
     <!--  onBoarding  -->
-    <string name="your_workspace">Your workspace</string>
     <string name="out_goal">"Out goal "</string>
-    <string name="is_to_help_you_plan_and">is to help you plan and</string>
-    <string name="fulfill_your_tasks">fulfill your tasks.</string>
+    <string name="is_to_help_you_plan_and">is to help you plan and \n fulfill your tasks.</string>
     <string name="button_start">Start</string>
-    <string name="notification">Notification</string>
-    <string name="permission">"permission "</string>
-    <string name="more_stuff_requires_notification">More Stuff requires Notification</string>
-    <string name="permission_to_send_you_task"><![CDATA[permission to send you Task &]]></string>
-    <string name="reminder_notifications">Reminder notifications</string>
+    <string name="notification">Notification \n permission </string>
+    <string name="more_stuff_requires_notification">More Stuff requires Notification \n permission to send you Task &amp; \n Reminder notifications  </string>
     <string name="button_enable">Enable</string>
     <string name="button_skip">Skip</string>
-    <string name="is_ready">is ready</string>
+    <string name="your_workspace">Your workspace \n is ready </string>
+
 
 </resources>
