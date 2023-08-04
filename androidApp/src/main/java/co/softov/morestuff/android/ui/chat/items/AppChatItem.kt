@@ -36,7 +36,7 @@ fun AppChatItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 15.dp, end = 45.dp)
+            .padding(start = 15.dp, end = 45.dp, bottom = 7.dp)
             .clickable { chatActions.taskChatAction(message.taskId) },
         horizontalArrangement = Arrangement.Start
     ) {
