@@ -1,11 +1,25 @@
+@file:Suppress("LocalVariableName")
+
 package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 
 typealias ScheduleData = co.softov.morestuff.db.Schedule
 typealias ScheduleDataMapper = (ScheduleData) -> ScheduleDomain
 typealias ScheduleDomainMapper = (ScheduleDomain) -> ScheduleData
+
+typealias ScheduleDbMapper = (
+    id: Long,
+    task_id: Long,
+    create_time: String,
+    schedule_time_local: String?,
+    schedule_time_utc: String?,
+    timezone: String,
+    active: Boolean,
+    schedule_type: ScheduleType
+) -> ScheduleDomain
 
 typealias ScheduleWithTitleDbMapper = (
     id: Long,
@@ -17,6 +31,8 @@ typealias ScheduleWithTitleDbMapper = (
 fun makeScheduleDataMapper(): ScheduleDataMapper = { schedule ->
     mapScheduleData(schedule)
 }
+
+fun makeScheduleDbMapper(): ScheduleDbMapper = ::mapScheduleDb
 
 fun makeScheduleDomainMapper(): ScheduleDomainMapper = { schedule ->
     mapScheduleDomain(schedule)
@@ -34,6 +50,28 @@ fun mapScheduleData(input: ScheduleData): ScheduleDomain {
         timezone = input.timezone,
         active = input.active,
         scheduleType = input.schedule_type
+    )
+}
+
+fun mapScheduleDb(
+    id: Long,
+    task_id: Long,
+    create_time: String,
+    schedule_time_local: String?,
+    schedule_time_utc: String?,
+    timezone: String,
+    active: Boolean,
+    schedule_type: ScheduleType
+): ScheduleDomain {
+    return ScheduleDomain(
+        id = id,
+        taskId = task_id,
+        createTime = create_time,
+        scheduleLocalTime = schedule_time_local,
+        scheduleUtcTime = schedule_time_utc,
+        timezone = timezone,
+        active = active,
+        scheduleType = schedule_type
     )
 }
 

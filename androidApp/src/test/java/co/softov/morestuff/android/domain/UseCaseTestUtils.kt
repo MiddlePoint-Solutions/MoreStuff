@@ -37,7 +37,10 @@ fun createTaskForTest(
     timeUtils: String = timeManager.nowLocalDateTimeString,
     priorityScore: Long = 0,
     taskType: TaskType = TaskType.System,
-    activeSchedule: ScheduleDomain = createScheduleForTest(taskId = id)
+    activeSchedule: ScheduleDomain = createScheduleForTest(
+        taskId = id,
+        scheduleType = ScheduleType.OneTime
+    )
 ): TaskDomain {
     return TaskDomain(
         id = id,
@@ -47,7 +50,7 @@ fun createTaskForTest(
         completeTime = null,
         priorityScore = priorityScore,
         taskType = taskType,
-        activeSchedule = activeSchedule
+        schedule = listOf(activeSchedule)
     )
 }
 
@@ -55,7 +58,9 @@ fun createTaskForTest(
 fun createListOfSchedulesForTest(amount: Long): List<ScheduleDomain> {
     return buildList {
         for (i in 1..amount) {
-            add(createScheduleForTest())
+            add(
+                createScheduleForTest(scheduleType = ScheduleType.OneTime)
+            )
         }
     }
 }
@@ -68,7 +73,7 @@ fun createScheduleForTest(
     scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
-    scheduleType: ScheduleType = ScheduleType.OneTime
+    scheduleType: ScheduleType
 ): ScheduleDomain {
     return ScheduleDomain(
         id,
@@ -148,7 +153,12 @@ fun createMessageForTest(
     replyContent: String = "",
     replyTime: String = "",
     openGraphResult: OpenGraphResult = OpenGraphResult(),
-    messageData: MessageData = MessageData(id = 1L, filePath = "", creationTime = "", messageType = MessageDataType.Image)
+    messageData: MessageData = MessageData(
+        id = 1L,
+        filePath = "",
+        creationTime = "",
+        messageType = MessageDataType.Image
+    )
 
 ): Message {
     return Message(

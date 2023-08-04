@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
+import arrow.core.right
 import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,13 +19,18 @@ class GetActiveScheduleImplTest {
     @Test
     fun `returns active schedule for a task`() = runBlocking {
         val taskId = 1L
-        val schedule = createScheduleForTest()
+        val schedule = listOf(createScheduleForTest(scheduleType = ScheduleType.OneTime))
 
-        coEvery { scheduleRepository.getActiveScheduleForTask(taskId) } returns Either.Right(schedule)
+        coEvery {
+            scheduleRepository.getActiveSchedulesForTask(
+                taskId,
+                listOf(ScheduleType.OneTime)
+            )
+        } returns schedule.right()
 
-        val result = getActiveScheduleImpl.invoke(taskId)
+        val result = getActiveScheduleImpl(taskId, listOf(ScheduleType.OneTime))
 
-        assertEquals(Either.Right(schedule), result)
-        coVerify { scheduleRepository.getActiveScheduleForTask(taskId) }
+        assertEquals(schedule.right(), result)
+        coVerify { scheduleRepository.getActiveSchedulesForTask(taskId, any()) }
     }
 }

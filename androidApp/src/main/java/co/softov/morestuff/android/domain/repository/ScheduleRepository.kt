@@ -5,6 +5,7 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.ScheduleWithTitle
 import kotlinx.coroutines.flow.Flow
 
@@ -48,9 +49,15 @@ interface ScheduleRepository {
 
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
 
-    suspend fun getActiveScheduleForTask(taskId: Long): Either<Failure, ScheduleDomain>
+    suspend fun getActiveSchedulesForTask(
+        taskId: Long,
+        scheduleType: List<ScheduleType>
+    ): Either<Failure, List<ScheduleDomain>>
 
-    fun getActiveScheduleForTaskFlow(taskId: Long): Flow<Either<Failure, ScheduleDomain>>
+    fun getActiveSchedulesForTaskFlow(
+        taskId: Long,
+        scheduleType: List<ScheduleType>
+    ): Flow<List<ScheduleDomain>>
 
     suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle>
 
@@ -59,14 +66,6 @@ interface ScheduleRepository {
         startTime: String,
         endTime: String
     ): Either<Failure, Int>
-
-    // TODO: remove these:
-
-    fun getTodayActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    fun getTomorrowActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    fun getLaterActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
 
 }
 

@@ -31,10 +31,10 @@ WHERE task_id = ?;
 selectActiveScheduleByTaskId:
 SELECT *
 FROM schedule
-WHERE task_id = ?
+WHERE task_id = :task_id
 AND active = 1
-ORDER BY id DESC
-LIMIT 1;
+AND schedule_type IN :schedule_types
+ORDER BY id DESC;
 
 selectActiveSchedules:
 SELECT *

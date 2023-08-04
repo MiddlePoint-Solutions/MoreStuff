@@ -113,9 +113,7 @@ class ScheduleMiddleware(
             }
 
             is ScheduleAction.CancelActiveScheduleAction -> scope.launch {
-                with(action) {
-                    cancelActiveScheduleUseCase(taskId)
-                }
+                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.OneTime))
             }
 
             is ScheduleReplyAction -> {
@@ -156,7 +154,7 @@ class ScheduleMiddleware(
             }
 
             is ScheduleAction.CancelReminderScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId)
+                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.Reminder))
             }
 
             else -> NoOp

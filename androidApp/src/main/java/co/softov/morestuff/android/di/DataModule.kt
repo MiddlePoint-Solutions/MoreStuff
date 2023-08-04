@@ -11,10 +11,11 @@ import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
+import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
+import co.softov.morestuff.android.data.mapper.mapScheduleDb
 import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
 import co.softov.morestuff.android.data.repository.PreferenceRepositoryImpl
 import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
@@ -79,7 +80,7 @@ val dataModule = module {
         TaskRepositoryImpl(
             database = get(),
             mapTaskData = makeTaskDbMapper(),
-            mapTaskWithScheduleData = makeTaskWithScheduleDataMapper(),
+            mapScheduleDb = makeScheduleDbMapper(),
             timeManager = get()
         )
     }
@@ -98,6 +99,7 @@ val dataModule = module {
             database = get(),
             mapScheduleData = makeScheduleDataMapper(),
             mapScheduleDomain = makeScheduleDomainMapper(),
+            mapScheduleDb = makeScheduleDbMapper(),
             mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
             timeManager = get()
         )

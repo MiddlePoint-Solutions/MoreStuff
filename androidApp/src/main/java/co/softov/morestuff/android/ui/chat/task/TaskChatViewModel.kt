@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -88,9 +87,10 @@ class TaskChatViewModel(
             taskTitle = getTaskFlow(taskId = taskId).first().title
         }
 
-        getActiveScheduleFlow(taskId)
-            .map { it.orNull() }
-            .onEach { createPlanModelForSchedule(it) }
+        getActiveScheduleFlow(taskId, listOf(ScheduleType.OneTime))
+            .onEach {
+                createPlanModelForSchedule(it.firstOrNull())
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,

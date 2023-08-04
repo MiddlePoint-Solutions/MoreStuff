@@ -47,7 +47,7 @@ class CreateScheduleUseCaseImplTest {
             timeZone = TimeZone.currentSystemDefault().id
         )
 
-        coEvery { cancelActiveScheduleUseCase(any()) } coAnswers { schedule.right() }
+        coEvery { cancelActiveScheduleUseCase(any()) } coAnswers { listOf(schedule).right() }
 
         coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
             Either.Right(schedule)

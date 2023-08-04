@@ -80,8 +80,6 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByP
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetLaterSchedulesWithTitleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleWithTitleUseCase
@@ -96,8 +94,6 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWith
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTomorrowSchedulesWithTitleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
@@ -261,10 +257,8 @@ val scheduleUseCases = module {
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class
     factoryOf(::GetSchedulesWithTitleImplUseCase) bind GetSchedulesWithTitleFlowUseCase::class
-    factoryOf(::GetLaterSchedulesWithTitleUseCaseImpl) bind GetLaterSchedulesWithTitleUseCase::class
     factoryOf(::GetTodaySchedulesWithTitleUseCaseImpl) bind GetTodaySchedulesWithTitleUseCase::class
     factoryOf(::GetTodaySchedulesWithTitleFlowUseCaseImpl) bind GetTodaySchedulesWithTitleFlowUseCase::class
-    factoryOf(::GetTomorrowSchedulesWithTitleUseCaseImpl) bind GetTomorrowSchedulesWithTitleUseCase::class
     factoryOf(::GetSchedulesWithTitleListImpl) bind GetSchedulesWithTitleUseCase::class
     factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
     factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
