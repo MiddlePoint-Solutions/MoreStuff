@@ -43,7 +43,7 @@ class TimeFormatterImpl(
         return formatTime(timeString, "dd/MM/yyyy HH:mm${addAmPm()}")
     }
 
-    private fun addAmPm() = if (is24HourFormat) "a" else ""
+    private fun addAmPm() = if (!is24HourFormat) "a" else ""
 
     override fun formatTimeWithDayMonthYear(timeString: String?): String? {
         return timeString?.let {

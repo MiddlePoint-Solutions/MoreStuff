@@ -146,17 +146,29 @@ fun UserChatItem(
                             horizontalAlignment = Alignment.End
                         ) {
                             if (message.content.isNotEmpty()) {
-                                Text(
-                                    text = message.content,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .padding(end = 15.dp)
-                                        .align(Alignment.Start),
-                                    style = LocalTextStyle.current.copy(
-                                        color = Color.White,
-                                        fontSize = 16.sp
+                                Column {
+                                    Text(
+                                        text = message.content,
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 14.dp,
+                                                end = 15.dp,
+                                                top = 8.dp,
+                                                bottom = 3.dp
+                                            )
+                                            .align(Alignment.Start),
+                                        style = LocalTextStyle.current.copy(
+                                            color = Color.White,
+                                            fontSize = 16.sp
+                                        )
                                     )
-                                )
+                                    Row(Modifier.align(Alignment.End)) {
+                                        DisplayMessageTime(
+                                            message.createTime,
+                                            timeFormatter,
+                                        )
+                                    }
+                                }
                             }
                             Box(
                                 modifier = Modifier
@@ -177,23 +189,24 @@ fun UserChatItem(
                                         .aspectRatio(1f)
                                         .size(200.dp),
                                 )
-                                timeFormatter.formatTimeOnly(message.createTime)?.let {
-                                    Text(
-                                        text = it,
-                                        style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-                                        modifier = Modifier
-                                            .align(Alignment.BottomEnd)
-                                            .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(
-                                                MaterialTheme.colorScheme.background.copy(
-                                                    alpha = 0.5F
+                                if (message.content.isEmpty()) {
+                                    timeFormatter.formatTimeOnly(message.createTime)?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
+                                            modifier = Modifier
+                                                .align(Alignment.BottomEnd)
+                                                .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(
+                                                    MaterialTheme.colorScheme.background.copy(
+                                                        alpha = 0.5F
+                                                    )
                                                 )
-                                            )
-                                            .padding(4.dp)
-                                    )
+                                                .padding(4.dp)
+                                        )
+                                    }
                                 }
-
                             }
                         }
                     }
@@ -208,12 +221,15 @@ fun UserChatItem(
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                     ) {
-                        Column(
-
-                        ) {
+                        Column {
                             Text(
                                 modifier = Modifier
-                                    .padding(start = 8.dp, end = 15.dp, bottom = 5.dp)
+                                    .padding(
+                                        start = 14.dp,
+                                        end = 15.dp,
+                                        top = 8.dp,
+                                        bottom = 3.dp
+                                    )
                                     .run {
                                         urls?.let {
                                             combinedClickable(
@@ -232,17 +248,16 @@ fun UserChatItem(
                                     fontSize = 16.sp
                                 )
                             )
-                            timeFormatter.formatTimeOnly(message.createTime)?.let {
-                                Text(
-                                    text = it,
-                                    style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-                                    modifier = Modifier.align(Alignment.End)
-                                        .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
-                                )
-                            }
                             if (openGraphResult?.title != null && openGraphResult.description != null) {
                                 OpenGraphPreview(openGraphResult)
                             }
+                            Row(Modifier.align(Alignment.End)) {
+                                DisplayMessageTime(
+                                    message.createTime,
+                                    timeFormatter,
+                                )
+                            }
+
                         }
                     }
                 }
@@ -260,6 +275,19 @@ fun UserChatItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DisplayMessageTime(time: String?, timeFormatter: TimeFormatter, modifier: Modifier = Modifier) {
+    timeFormatter.formatTimeOnly(time)?.let {
+        Text(
+            text = it,
+            style = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier
+                .padding(start = 15.dp, end = 12.dp, bottom = 5.dp)
+                .wrapContentWidth(Alignment.End)
+        )
     }
 }
 
