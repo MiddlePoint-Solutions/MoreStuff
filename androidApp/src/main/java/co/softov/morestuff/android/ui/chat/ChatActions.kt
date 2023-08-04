@@ -9,5 +9,6 @@ data class ChatActions(
     val taskChatAction: (taskId: Long) -> Unit = {},
     val copyMessage: (Message) -> Unit = {},
     val deleteMessage: (Message) -> Unit = {},
-    val onImageSelected: (Message) -> Unit = {}
+    val onImageSelected: (Message) -> Unit = {},
+    val shareImage: (imagePath: String) -> Unit = {},
 )

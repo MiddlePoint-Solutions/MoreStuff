@@ -209,6 +209,7 @@ fun UserChatItem(
                         showMenu = false
                     },
                     modifier = Modifier.padding(top = 20.dp),
+                    onShareImage = actions.shareImage
                 )
             }
         }

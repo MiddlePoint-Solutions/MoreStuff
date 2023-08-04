@@ -110,8 +110,9 @@
     <string name="theme_dark">Dark</string>
     <string name="enable_confetti">Enable Confetti</string>
     <string name="delete">Delete</string>
-    <string name="copy">Copy</string>
+    <string name="copy_message">Copy</string>
     <string name="search">Search</string>
+    <string name="share">Share</string>
     <string name="filter_scheduled">Scheduled</string>
     <string name="filter_reminder">Reminder</string>
     <string name="filter_done">Done</string>
