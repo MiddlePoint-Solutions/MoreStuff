@@ -180,11 +180,14 @@ fun UserChatItem(
                                     .padding(end = 15.dp)
                                     .run {
                                         urls?.let {
-                                            clickable {
-                                                coroutineScope.launch {
-                                                    uriHandler.openUri(it)
-                                                }
-                                            }
+                                            combinedClickable(
+                                                onClick = {
+                                                    coroutineScope.launch {
+                                                        uriHandler.openUri(it)
+                                                    }
+                                                },
+                                                onLongClick = { showMenu = true }
+                                            )
                                         } ?: this
                                     },
                                 text = content,
