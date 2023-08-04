@@ -43,6 +43,8 @@ interface MessageRepository {
 
     suspend fun deleteMessage(messageId: Long)
 
+    suspend fun deleteImageCacheFromMessage(messageId: Long)
+
 }
 
 object MessageDoesNotExist : FeatureFailure
