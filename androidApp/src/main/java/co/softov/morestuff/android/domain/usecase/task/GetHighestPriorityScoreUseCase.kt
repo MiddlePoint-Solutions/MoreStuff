@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.task
 
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetHighestPriorityScoreUseCase {
@@ -7,9 +8,9 @@ interface GetHighestPriorityScoreUseCase {
 }
 
 class GetHighestPriorityScoreUseCaseImpl(
-    private val taskRepository: TaskRepository
+    private val priorityRepository: PriorityRepository
 ) : GetHighestPriorityScoreUseCase {
     override suspend fun invoke(): Long {
-        return taskRepository.getHighestPriorityScore()
+        return priorityRepository.getHighestPriorityScore()
     }
 }

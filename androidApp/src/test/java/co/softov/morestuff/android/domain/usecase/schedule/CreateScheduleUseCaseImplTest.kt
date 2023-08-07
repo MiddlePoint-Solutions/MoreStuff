@@ -24,7 +24,7 @@ import org.koin.test.inject
 class CreateScheduleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
     private val timeManager = TimeManagerImpl()
-    private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>()
+    private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>(relaxed = true)
 
     private val createTime =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
@@ -47,7 +47,7 @@ class CreateScheduleUseCaseImplTest {
             timeZone = TimeZone.currentSystemDefault().id
         )
 
-        coEvery { cancelActiveScheduleUseCase(any()) } coAnswers { listOf(schedule).right() }
+        coEvery { cancelActiveScheduleUseCase(any(), any()) } coAnswers { listOf(schedule).right() }
 
         coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
             Either.Right(schedule)
@@ -57,7 +57,7 @@ class CreateScheduleUseCaseImplTest {
         Assertions.assertEquals(Either.Right(schedule.copy(id = 1)), result)
 
         coVerify {
-            cancelActiveScheduleUseCase(any())
+            cancelActiveScheduleUseCase(any(), any())
             scheduleRepository.createSchedule(any())
         }
 

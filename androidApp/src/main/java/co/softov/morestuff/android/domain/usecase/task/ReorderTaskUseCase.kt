@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.left
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskReorderFailure
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 val NA: Nothing? = null
@@ -17,7 +18,7 @@ interface ReorderTaskUseCase {
 }
 
 class ReorderTaskUseCaseImpl(
-    private val taskRepository: TaskRepository,
+    private val priorityRepository: PriorityRepository,
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
@@ -40,9 +41,9 @@ class ReorderTaskUseCaseImpl(
         else -> {
             val average = (aboveScore + belowScore) / 2
             if (aboveScore == average) {
-                taskRepository.reorderTaskByAdding(taskId, average)
+                priorityRepository.updateTasksPriorityScoreByAdding(taskId, average)
             } else if (belowScore == average) {
-                taskRepository.reorderTaskBySubtracting(taskId, average)
+                priorityRepository.updateTasksPriorityScoreBySubtracting(taskId, average)
             } else {
                 updateTaskPriorityScoreUseCase(taskId, average)
             }

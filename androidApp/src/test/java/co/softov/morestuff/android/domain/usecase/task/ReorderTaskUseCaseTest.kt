@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.right
-import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -15,14 +15,14 @@ import kotlinx.coroutines.runBlocking
 
 class ReorderTaskUseCaseImplTest {
 
-    private val taskRepository: TaskRepository = mockk()
+    private val priorityRepository: PriorityRepository = mockk()
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase = mockk()
 
     private lateinit var reorderTaskUseCase: ReorderTaskUseCaseImpl
 
     @BeforeEach
     fun setup() {
-        reorderTaskUseCase = ReorderTaskUseCaseImpl(taskRepository, updateTaskPriorityScoreUseCase)
+        reorderTaskUseCase = ReorderTaskUseCaseImpl(priorityRepository, updateTaskPriorityScoreUseCase)
     }
 
     @AfterEach
@@ -60,24 +60,24 @@ class ReorderTaskUseCaseImplTest {
 
     @Test
     fun `when both scores and above equals average, should reorder by adding`() = runBlocking {
-        coEvery { taskRepository.reorderTaskByAdding(1, 5) } returns 5L.right()
+        coEvery { priorityRepository.updateTasksPriorityScoreByAdding(1, 5) } returns 5L.right()
 
         val result = reorderTaskUseCase.invoke(1, 5, 5)
         assertTrue(result.isRight())
         assertEquals(5, result.orNull())
 
-        coVerify(exactly = 1) { taskRepository.reorderTaskByAdding(1, 5) }
+        coVerify(exactly = 1) { priorityRepository.updateTasksPriorityScoreByAdding(1, 5) }
     }
 
     @Test
     fun `when both scores and below equals average, should reorder by subtracting`() = runBlocking {
-        coEvery { taskRepository.reorderTaskBySubtracting(1, 5) } returns 5L.right()
+        coEvery { priorityRepository.updateTasksPriorityScoreBySubtracting(1, 5) } returns 5L.right()
 
         val result = reorderTaskUseCase.invoke(1, 6, 5)
         assertTrue(result.isRight())
         assertEquals(5, result.orNull())
 
-        coVerify(exactly = 1) { taskRepository.reorderTaskBySubtracting(1, 5) }
+        coVerify(exactly = 1) { priorityRepository.updateTasksPriorityScoreBySubtracting(1, 5) }
     }
 
     @Test

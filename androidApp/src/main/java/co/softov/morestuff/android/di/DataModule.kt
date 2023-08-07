@@ -18,6 +18,7 @@ import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
 import co.softov.morestuff.android.data.mapper.mapScheduleDb
 import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
 import co.softov.morestuff.android.data.repository.PreferenceRepositoryImpl
+import co.softov.morestuff.android.data.repository.PriorityRepositoryImpl
 import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.android.data.repository.UserRepositoryImpl
@@ -36,6 +37,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCas
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
@@ -119,6 +121,8 @@ val dataModule = module {
             settings = getSettings(androidContext()),
         )
     }
+
+    singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
 
     // Services
     singleOf(::SchedulerImpl) bind Scheduler::class
