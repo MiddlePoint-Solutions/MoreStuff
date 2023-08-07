@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.settings
 
 import android.content.res.Configuration
 import android.content.res.Resources
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,24 +10,17 @@ import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
-import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.DeveloperBoard
-import androidx.compose.material.icons.filled.Message
-import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,20 +28,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.darkSurface
-import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsList
-import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.decompose.router.stack.replaceAll
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -195,7 +183,6 @@ fun SelectTheme(
         title = {
             Text(
                 text = stringResource(R.string.select_theme),
-                style = MaterialTheme.typography.titleMedium
             )
         },
         items = themeOptions,
@@ -276,7 +263,6 @@ fun EnableConfetti(
             title = {
                 Text(
                     text = stringResource(R.string.enable_confetti),
-                    style = MaterialTheme.typography.titleMedium
                 )
             },
         )
