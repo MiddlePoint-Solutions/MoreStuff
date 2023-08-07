@@ -20,6 +20,7 @@ import com.squareup.sqldelight.runtime.coroutines.mapToList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 
 class MessageRepositoryImpl(
     database: StuffDb,
@@ -157,6 +158,19 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun deleteMessage(messageId: Long) {
+        val message = messageQueries.selectMessageById(
+            id = messageId,
+            mapper = messageDataMapper
+        ).executeAsOneOrNull()
+
+        val imagePath = message?.messageData?.filePath
+        imagePath?.let {
+            val file = File(it)
+            if (file.exists()) {
+                file.delete()
+            }
+        }
         messageQueries.deleteMessage(messageId)
     }
+
 }
