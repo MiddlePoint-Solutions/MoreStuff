@@ -19,10 +19,6 @@ data class Message(
     val messageData: MessageData?
 )
 
-data class MessageWithFormattedTime(
-    val message: Message,
-    val formattedTime: String?
-)
 
 sealed class MessageData2 {
 

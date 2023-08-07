@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.MessageWithFormattedTime
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -78,7 +77,8 @@ class TaskChatViewModel(
             val formattedMessages = messages.map { message ->
                 val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
                 val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString())
-                MessageWithFormattedTime(message, formattedTime)
+                val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString())
+                MessageWithFormattedTime(message, formattedTime, formattedTimeOnly)
             }
 
             emit(formattedMessages)

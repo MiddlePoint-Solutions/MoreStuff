@@ -21,18 +21,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.theme.appChatItem
-import org.koin.compose.koinInject
 
 @Composable
 fun AppChatItem(
-    message: Message,
+    messageWithFormattedTime: MessageWithFormattedTime,
     chatActions: ChatActions,
 ) {
-    val timeFormatter: TimeFormatter = koinInject()
+    val message = messageWithFormattedTime.message
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,8 +52,8 @@ fun AppChatItem(
                 Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
                 Row(Modifier.align(Alignment.End)) {
                     DisplayMessageTime(
-                        message.createTime,
-                        timeFormatter,
+                        formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                        modifier = Modifier,
                     )
                 }
             }
@@ -64,10 +62,10 @@ fun AppChatItem(
 }
 
 @Composable
-fun TaskReminderItem(message: Message, actions: ChatActions) {
+fun TaskReminderItem(messageWithFormattedTime: MessageWithFormattedTime, actions: ChatActions) {
     Column {
-        AppChatItem(message, actions)
-
+        AppChatItem(messageWithFormattedTime, actions)
+        val message = messageWithFormattedTime.message
         if (message.replyType == null) {
             Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
                 Button(onClick = {

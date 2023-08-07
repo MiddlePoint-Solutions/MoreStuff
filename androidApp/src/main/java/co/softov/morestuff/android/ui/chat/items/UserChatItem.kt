@@ -48,11 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
@@ -66,9 +66,10 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
-    message: Message,
+    messageWithFormattedTime: MessageWithFormattedTime,
     actions: ChatActions,
 ) {
+    val message = messageWithFormattedTime.message
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
@@ -164,8 +165,8 @@ fun UserChatItem(
                                     )
                                     Row(Modifier.align(Alignment.End)) {
                                         DisplayMessageTime(
-                                            message.createTime,
-                                            timeFormatter,
+                                            formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                           modifier = Modifier
                                         )
                                     }
                                 }
@@ -253,8 +254,8 @@ fun UserChatItem(
                             }
                             Row(Modifier.align(Alignment.End)) {
                                 DisplayMessageTime(
-                                    message.createTime,
-                                    timeFormatter,
+                                    formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                    modifier = Modifier
                                 )
                             }
 
@@ -279,8 +280,8 @@ fun UserChatItem(
 }
 
 @Composable
-fun DisplayMessageTime(time: String?, timeFormatter: TimeFormatter, modifier: Modifier = Modifier) {
-    timeFormatter.formatTimeOnly(time)?.let {
+fun DisplayMessageTime(formattedTimeOnly: String?, modifier: Modifier = Modifier) {
+    formattedTimeOnly?.let {
         Text(
             text = it,
             style = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
@@ -358,6 +359,6 @@ private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme() {
-        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+       // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }

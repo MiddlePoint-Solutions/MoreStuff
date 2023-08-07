@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.MessageWithFormattedTime
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions

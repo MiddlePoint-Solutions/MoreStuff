@@ -40,10 +40,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.model.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
+import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import kotlinx.coroutines.launch
 
 private val jumpToBottomThreshold = 56.dp
@@ -111,15 +111,15 @@ fun Messages(
                         }
                     }
                     when (item.message.contentType) {
-                        ContentType.USER_NEW_TASK -> UserChatItem(message = item.message, actions)
-                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(message = item.message, actions)
+                        ContentType.USER_NEW_TASK -> UserChatItem(messageWithFormattedTime = item, actions)
+                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(messageWithFormattedTime = item, actions)
                         ContentType.TASK_REMINDER -> TaskReminderItem(
-                            message = item.message,
+                            messageWithFormattedTime = item,
                             actions = actions
                         )
 
                         ContentType.TASK_MESSAGE -> UserChatItem(
-                            message = item.message,
+                            messageWithFormattedTime = item,
                             actions = actions
                         )
                     }
