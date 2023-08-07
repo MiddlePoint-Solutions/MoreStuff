@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.app.presentation.compose.modifier
+package co.softov.morestuff.android.app.presentation.extension
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets

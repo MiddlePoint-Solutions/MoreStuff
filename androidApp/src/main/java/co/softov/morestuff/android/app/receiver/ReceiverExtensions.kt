@@ -78,9 +78,6 @@ fun NotificationReceiver.Companion.createCancelReviewPendingIntent(
     PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
 )
 
-fun Intent.getScheduleIdExtra() = getLongExtra(KEY_SCHEDULE_ID, 0)
-fun Intent.setScheduleIdExtra(scheduleId: Long) = putExtra(KEY_SCHEDULE_ID, scheduleId)
-
 fun Intent.setReplayIntentExtras(scheduleId: Long, type: ReplyType) =
     putExtra(KEY_REPLY_EXTRA, ReplyIntentExtras(scheduleId, type))
 
