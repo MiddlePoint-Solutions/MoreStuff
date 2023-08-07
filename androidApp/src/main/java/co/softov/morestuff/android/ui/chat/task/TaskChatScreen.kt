@@ -10,13 +10,10 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -53,7 +50,7 @@ import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.UserInput
@@ -126,7 +123,8 @@ fun TaskChatScreen(
                     TaskChatContent(
                         task = task,
                         taskTitle = { viewModel.taskTitle },
-                        planModel = { viewModel.planModel },
+                        schedule = { viewModel.scheduleModel },
+                        reminder = { viewModel.reminderModel },
                         messages = messages,
                         chatActions = chatActions,
                         modifier = modifier,
@@ -172,11 +170,12 @@ fun TaskChatScreen(
 private fun TaskChatContent(
     task: TaskDomain,
     taskTitle: () -> String,
-    planModel: () -> PlanModel?,
     chatActions: ChatActions,
     modifier: Modifier = Modifier,
     messages: List<Message> = listOf(),
     onBack: () -> Unit = {},
+    schedule: () -> ScheduleUiModel? = { null },
+    reminder: () -> ScheduleUiModel? = { null },
     sendTaskMessage: (String) -> Unit = {},
     updateTaskTitle: (String) -> Unit = {},
     toggleTaskComplete: () -> Unit = {},
@@ -230,23 +229,38 @@ private fun TaskChatContent(
                     onTitleChange = updateTaskTitle,
                     toggleTaskComplete = toggleTaskComplete,
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                            contentDescription = stringResource(R.string.cd_schedule_icon),
-                        )
+                    TaskSchedule(
+                        model = schedule,
+                        actionText = stringResource(id = R.string.task_chat_schedule_action),
+                        icon = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                                contentDescription = stringResource(R.string.cd_schedule_icon),
+                            )
+                        },
+                        onTimeChange = updatePlanTime,
+                        onDateChange = updatePlanDate,
+                        createSchedule = createPlanSchedule,
+                        cancelSchedule = cancelActiveSchedule,
+                    )
 
-                        Spacer(modifier = Modifier.width(13.dp))
+                    // TODO: uncomment this when we have proper support for reminders
+                    /*TaskSchedule(
+                        model = reminder,
+                        actionText = stringResource(R.string.task_chat_reminder_action),
+                        icon = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
+                                contentDescription = stringResource(R.string.cd_reminder_icon),
+                            )
+                        },
+                        onTimeChange = updatePlanTime,
+                        onDateChange = updatePlanDate,
+                        createSchedule = createPlanSchedule,
+                        cancelSchedule = cancelActiveSchedule,
+                    )*/
 
-                        TaskSchedule(
-                            planModel = planModel(),
-                            onTimeChange = updatePlanTime,
-                            onDateChange = updatePlanDate,
-                            createPlanSchedule = createPlanSchedule,
-                            cancelActiveSchedule = cancelActiveSchedule,
-                        )
-                    }
                 }
 
                 Messages(
@@ -353,8 +367,8 @@ fun TaskChatPreview() {
         TaskChatContent(
             task = TaskDomain(),
             taskTitle = { "This is TaskChat!" },
-            planModel = {
-                PlanModel(
+            schedule = {
+                ScheduleUiModel(
                     localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                     displayDate = "Saturday, July 29",
                     displayTime = "15:30"

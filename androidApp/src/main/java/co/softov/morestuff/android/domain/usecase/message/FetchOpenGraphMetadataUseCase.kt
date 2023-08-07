@@ -1,18 +1,18 @@
 package co.softov.morestuff.android.domain.usecase.message
 
 import co.softov.morestuff.android.domain.model.OpenGraphResult
-import co.softov.morestuff.android.domain.service.OpenGraphInterface
+import co.softov.morestuff.android.domain.service.OpenGraphFetcher
 
 interface FetchOpenGraphMetadataUseCase {
     suspend operator fun invoke(inputUrl: String): OpenGraphResult?
 }
 
 class FetchOpenGraphMetadataUseCaseImpl(
-    private val openGraphInterface: OpenGraphInterface
+    private val openGraphFetcher: OpenGraphFetcher
 ) : FetchOpenGraphMetadataUseCase {
     override suspend fun invoke(inputUrl: String): OpenGraphResult? {
 
-        return openGraphInterface.fetchOpenGraphMetadata(inputUrl)
+        return openGraphFetcher.fetchOpenGraphMetadata(inputUrl)
     }
 }
 

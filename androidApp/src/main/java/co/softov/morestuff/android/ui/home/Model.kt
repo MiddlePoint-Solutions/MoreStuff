@@ -13,7 +13,7 @@ sealed class PriorityModel {
 }
 
 @Immutable
-data class PlanModel(
+data class ScheduleUiModel(
     val localDateTime: LocalDateTime,
     val displayDate: String,
     val displayTime: String,
@@ -31,6 +31,6 @@ fun PriorityInputModel.mapToDomain() = when (priority) {
 @Immutable
 data class PriorityInputModel(
     val priority: PriorityModel,
-    val planTime: PlanModel,
+    val planTime: ScheduleUiModel,
 )
 

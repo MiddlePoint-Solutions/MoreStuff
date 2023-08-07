@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
+import co.softov.morestuff.android.app.presentation.extension.clearFocusOnKeyboardDismiss
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 

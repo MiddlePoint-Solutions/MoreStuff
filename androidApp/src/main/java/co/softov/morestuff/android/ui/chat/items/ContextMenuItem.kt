@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.model
+package co.softov.morestuff.android.ui.chat.items
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

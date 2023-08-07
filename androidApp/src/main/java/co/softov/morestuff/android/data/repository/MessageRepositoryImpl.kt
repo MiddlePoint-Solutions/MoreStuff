@@ -53,11 +53,6 @@ class MessageRepositoryImpl(
             .asFlow().mapToList()
     }
 
-    override suspend fun getActiveReminderMessages(): List<Message> {
-        return messageQueries.selectActiveReminderMessages().executeAsList()
-            .map { mapMessageDb(it) }
-    }
-
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
         val message = messageQueries.selectMessageById(
             id = messageId,

@@ -1,4 +1,3 @@
-import co.softov.morestuff.android.domain.enums.TaskType;
 import co.softov.morestuff.android.domain.model.ScheduleType;
 
 CREATE TABLE schedule(
@@ -31,15 +30,21 @@ WHERE task_id = ?;
 selectActiveScheduleByTaskId:
 SELECT *
 FROM schedule
-WHERE task_id = ?
+WHERE task_id = :task_id
 AND active = 1
-ORDER BY id DESC
-LIMIT 1;
+AND schedule_type IN :schedule_types
+ORDER BY id DESC;
 
 selectActiveSchedules:
 SELECT *
 FROM schedule
 WHERE active = 1
+ORDER BY schedule_time_local;
+
+selectActiveSchedulesByTaskId:
+SELECT *
+FROM schedule
+WHERE active = 1 AND task_id = :task_id
 ORDER BY schedule_time_local;
 
 selectActiveSchedulesFromStartToEndTime:
@@ -48,52 +53,6 @@ FROM schedule
 WHERE active = 1
 AND schedule_time_local BETWEEN :startTime AND :endTime
 ORDER BY schedule_time_local;
-
-selectActiveScheduleWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
-FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-WHERE schedule.active = 1
-AND schedule.id = ?
-ORDER BY schedule_time_local DESC;
-
-selectActiveSchedulesWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
-FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-WHERE schedule.active = 1
-ORDER BY schedule_time_local DESC;
-
-selectActiveSchedulesWithTaskTitleByTime:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
-FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-WHERE active = 1
-AND schedule_time_local BETWEEN :start AND :end
-ORDER BY schedule.id DESC;
-
-selectActiveLaterSchedulesWithTaskTitle:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
-FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-WHERE active = 1
-AND schedule_time_local IS NULL
-ORDER BY schedule.id DESC;
-
-selectActiveSchedulesWithStaleReminders:
-SELECT schedule.id, schedule.task_id, schedule.schedule_time_local, task.title
-FROM schedule
-INNER JOIN task ON (task.id = task_id AND task.complete_time IS NULL)
-WHERE schedule.active = 1
-AND date(schedule_time_local) <= date(:end)
-OR (
-    SELECT message.schedule_id
-    FROM message
-    WHERE schedule.id = message.schedule_id
-    AND message.content_type = 200
-    AND message.reply_time IS NULL
-)
-ORDER BY schedule_time_local DESC;
 
 countTaskSchedulesByTime:
 SELECT COUNT(*)

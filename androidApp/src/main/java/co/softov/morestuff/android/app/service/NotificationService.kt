@@ -5,6 +5,7 @@ import co.softov.morestuff.android.app.receiver.getReplyIntentExtras
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import timber.log.Timber
 
+// TODO: this can be converted into a worker
 class NotificationService : BaseService(NotificationService::class.java.simpleName) {
 
     @Deprecated("Deprecated in Java")

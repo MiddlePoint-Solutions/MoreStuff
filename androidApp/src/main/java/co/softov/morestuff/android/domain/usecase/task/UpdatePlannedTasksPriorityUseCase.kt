@@ -19,12 +19,11 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
         Timber.d("UpdatePlannedTasksPriorityUseCase")
         getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map { tasks ->
             Timber.d("UpdatePlannedTasksPriorityUseCase tasks: ${tasks.size}")
-            for (task in tasks) {
+            tasks.forEach { task ->
                 Timber.d("UpdatePlannedTasksPriorityUseCase task: ${task.title}")
-                val scheduleDomain = task.activeSchedule
-                if (scheduleDomain?.scheduleLocalTime != null) {
+                task.getScheduleOrNull()?.scheduleLocalTime?.let { scheduleLocalTime ->
                     val newPriorityScore = getPlanPriorityScoreUseCase(
-                        scheduleTimeLocal = scheduleDomain.scheduleLocalTime.toLocalDateTime(),
+                        scheduleTimeLocal = scheduleLocalTime.toLocalDateTime(),
                         taskCreateTimeUtc = task.createTime
                     )
                     updateTaskPriorityScoreUseCase(task.id, newPriorityScore)

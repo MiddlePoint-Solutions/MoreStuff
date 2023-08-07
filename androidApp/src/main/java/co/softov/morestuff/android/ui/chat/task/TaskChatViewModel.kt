@@ -12,6 +12,8 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.model.isOneTime
+import co.softov.morestuff.android.domain.model.isReminder
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
@@ -24,12 +26,11 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -54,6 +55,17 @@ class TaskChatViewModel(
         Timber.d("TaskChatViewModel: $taskId")
     }
 
+    val task: StateFlow<TaskDomain> = getTaskFlow(taskId)
+        .onEach { task ->
+            scheduleModel = createModelForSchedule(task.schedule.firstOrNull { it.isOneTime() })
+            reminderModel = createModelForSchedule(task.schedule.firstOrNull { it.isReminder() })
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = TaskDomain()
+        )
+
     val messages: StateFlow<List<Message>> = flow {
         while (true) {
             val messages = if (devTools.showDebugMessages) {
@@ -69,15 +81,10 @@ class TaskChatViewModel(
         initialValue = listOf()
     )
 
-    val task: StateFlow<TaskDomain> =
-        getTaskFlow(taskId)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = TaskDomain()
-            )
+    var scheduleModel by mutableStateOf<ScheduleUiModel?>(null)
+        private set
 
-    var planModel by mutableStateOf<PlanModel?>(null)
+    var reminderModel by mutableStateOf<ScheduleUiModel?>(null)
         private set
 
     var taskTitle by mutableStateOf("")
@@ -86,22 +93,6 @@ class TaskChatViewModel(
     init {
         viewModelScope.launch {
             taskTitle = getTaskFlow(taskId = taskId).first().title
-        }
-
-        getActiveScheduleFlow(taskId)
-            .map { it.orNull() }
-            .onEach { createPlanModelForSchedule(it) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = null
-            )
-    }
-
-    private fun createPlanModelForSchedule(scheduleDomain: ScheduleDomain?) {
-        planModel = scheduleDomain?.scheduleLocalTime?.let {
-            val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
-            createPlanTime(localTime)
         }
     }
 
@@ -128,17 +119,8 @@ class TaskChatViewModel(
         store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 
-
-    private fun createPlanTime(
-        time: LocalDateTime = timeManager.getDefaultPlanTime()
-    ) = PlanModel(
-        localDateTime = time,
-        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
-    )
-
     fun createOneTimeSchedule() {
-        createPlanTime().run {
+        createScheduleModel().run {
             dispatchAppStoreAction(
                 ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, localDateTime)
             )
@@ -146,7 +128,7 @@ class TaskChatViewModel(
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
-        planModel?.let {
+        scheduleModel?.let {
             val updatedPlanTime = timeManager.localDateTime(it.localDateTime, hour, minute)
             dispatchAppStoreAction(
                 ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
@@ -155,7 +137,7 @@ class TaskChatViewModel(
     }
 
     fun updatePlanDate(dateMillis: Long) {
-        planModel?.let {
+        scheduleModel?.let {
             val updatedPlanTime =
                 timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
             dispatchAppStoreAction(
@@ -180,4 +162,18 @@ class TaskChatViewModel(
         imageHandler.shareImage(imagePath)
     }
 
+    private fun createModelForSchedule(scheduleDomain: ScheduleDomain?) =
+        scheduleDomain?.scheduleLocalTime?.let {
+            val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
+            createScheduleModel(localTime)
+        }
+
+
+    private fun createScheduleModel(
+        time: LocalDateTime = timeManager.getDefaultPlanTime()
+    ) = ScheduleUiModel(
+        localDateTime = time,
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
+    )
 }

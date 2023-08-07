@@ -112,14 +112,15 @@ fun CompletePriorityItem(
     name = "DefaultPreviewLight"
 )
 @Composable
-fun PriorityItemPreview() {
+fun CompletePriorityItem() {
     MoreStuffTheme {
         PriorityItem(
             task = TaskDomain(
                 title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                activeSchedule = ScheduleDomain(
-                    scheduleType = ScheduleType.OneTime
-                )
+                schedule = buildList {
+                    add(ScheduleDomain(scheduleType = ScheduleType.OneTime))
+                    add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
+                }
             ),
             onClick = {}
         )

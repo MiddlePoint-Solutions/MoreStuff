@@ -26,27 +26,11 @@ interface TaskRepository {
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
     fun getTaskFlow(taskId: Long): Flow<TaskDomain>
     fun getActiveTasksFlow(): Flow<List<TaskDomain>>
-    fun getNowTasksFlow(): Flow<List<TaskDomain>>
-    fun getLaterTasksFlow(): Flow<List<TaskDomain>>
     fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
-    suspend fun getHighestPriorityScore(): Long
-    suspend fun getLowestPriorityScore(): Long
-    suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Long>
-    suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Long>
+
     suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
     suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
 
-    suspend fun reorderTaskByAdding(
-        taskId: Long,
-        priorityScore: Long,
-    ): Either<Failure, Long>
-
-    suspend fun reorderTaskBySubtracting(
-        taskId: Long,
-        priorityScore: Long,
-    ): Either<Failure, Long>
-
-    suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
     suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
     suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>>
     fun searchTasks(searchText: String): Flow<List<TaskDomain>>

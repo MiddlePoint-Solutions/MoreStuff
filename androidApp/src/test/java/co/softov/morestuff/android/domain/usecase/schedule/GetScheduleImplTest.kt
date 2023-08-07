@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test
 class GetScheduleImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
     private val getScheduleImpl = GetScheduleImpl(scheduleRepository)
-    private val schedule = createScheduleForTest()
+    private val schedule = createScheduleForTest(scheduleType = ScheduleType.OneTime)
 
     @Test
     fun `returns schedule`() = runBlocking {

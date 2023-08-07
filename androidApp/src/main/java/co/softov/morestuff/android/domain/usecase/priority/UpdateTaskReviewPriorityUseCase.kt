@@ -38,17 +38,13 @@ class UpdateTaskReviewPriorityUseCaseImpl(
         }
 
         PriorityActionType.More -> getTaskUseCase(taskId).flatMap { task ->
-            Timber.d("Current task score: ${task.priorityScore}" )
             getTaskAbovePriorityScoreUseCase(task.priorityScore).flatMap { taskAbove ->
-                Timber.d("Above task score: ${taskAbove.priorityScore}" )
                 updateTaskPriorityScoreUseCase(taskId, taskAbove.priorityScore + 1)
             }
         }
 
         PriorityActionType.Less -> getTaskUseCase(taskId).flatMap { task ->
-            Timber.d("Current task score: ${task.priorityScore}" )
             getTaskBelowPriorityScoreUseCase(task.priorityScore).flatMap { taskBelow ->
-                Timber.d("Below task score: ${taskBelow.priorityScore}" )
                 updateTaskPriorityScoreUseCase(taskId, taskBelow.priorityScore - 1)
             }
         }

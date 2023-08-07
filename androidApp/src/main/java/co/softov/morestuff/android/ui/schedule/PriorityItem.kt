@@ -87,7 +87,7 @@ fun PriorityItem(
 }
 
 @Composable
- fun TaskProfile(task: TaskDomain) {
+fun TaskProfile(task: TaskDomain) {
 
     val profileColor by remember {
         derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
@@ -129,9 +129,10 @@ fun PriorityItemPreview() {
         PriorityItem(
             task = TaskDomain(
                 title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                activeSchedule = ScheduleDomain(
-                    scheduleType = ScheduleType.OneTime
-                )
+                schedule = buildList {
+                    add(ScheduleDomain(scheduleType = ScheduleType.OneTime))
+                    add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
+                }
             ),
             onClick = {}
         )
