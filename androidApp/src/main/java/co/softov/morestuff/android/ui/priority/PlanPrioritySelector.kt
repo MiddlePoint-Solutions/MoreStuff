@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -126,7 +126,7 @@ private fun Preview() {
         PlanPrioritySelector(
             PriorityInputModel(
                 priority = PriorityModel.Now,
-                planTime = PlanModel(time, "Jan, 31 2007", "00:00")
+                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00")
             )
         )
     }

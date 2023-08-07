@@ -189,7 +189,7 @@ fun TaskChatEditor(
                     visible = !isComplete && !isEditing,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 ) {
-                    taskOptions()
+                    Column(content = taskOptions)
                 }
             }
         }
