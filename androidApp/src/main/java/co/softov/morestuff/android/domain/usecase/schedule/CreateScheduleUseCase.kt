@@ -27,7 +27,7 @@ class CreateScheduleUseCaseImpl(
         scheduleType: ScheduleType,
         localDateTime: LocalDateTime
     ): Either<Failure, ScheduleDomain> {
-        cancelActiveScheduleUseCase(taskId)
+        cancelActiveScheduleUseCase(taskId, listOf(scheduleType))
         val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
         val schedule = ScheduleDomain(
             id = 0,

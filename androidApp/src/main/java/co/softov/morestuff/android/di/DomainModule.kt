@@ -66,8 +66,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleU
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderScheduleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
@@ -252,7 +252,7 @@ val scheduleUseCases = module {
     factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
-    factoryOf(::CreateReminderScheduleUseCaseImpl) bind CreateReminderScheduleUseCase::class
+    factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class

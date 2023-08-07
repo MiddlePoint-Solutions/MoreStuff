@@ -27,13 +27,7 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority
     ) : TaskAction()
 
-    data class CreateSystemTaskAction(
-        val title: String,
-        val priority: Priority
-    ) : TaskAction()
-
     data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
-    data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
     data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
@@ -67,20 +61,9 @@ class TaskMiddleware(
                 }
             }
 
-            is CreateSystemTaskAction -> scope.launch {
-//                val params = TaskParams(action.title, 0, TaskType.System)
-                TODO("Create system task")
-            }
-
             is CompleteTaskAction -> scope.launch {
                 with(action) {
                     setTaskCompleteUseCase(listOf(taskId), complete)
-                }
-            }
-
-            is CompleteTasksAction -> scope.launch {
-                with(action) {
-                    setTaskCompleteUseCase(taskIds, complete)
                 }
             }
 
