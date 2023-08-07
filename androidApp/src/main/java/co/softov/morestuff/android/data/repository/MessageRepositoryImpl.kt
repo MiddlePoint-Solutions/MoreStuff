@@ -158,10 +158,6 @@ class MessageRepositoryImpl(
     }
 
     override suspend fun deleteMessage(messageId: Long) {
-        messageQueries.deleteMessage(messageId)
-    }
-
-    override suspend fun deleteImageCacheFromMessage(messageId: Long) {
         val message = messageQueries.selectMessageById(
             id = messageId,
             mapper = messageDataMapper
@@ -174,6 +170,7 @@ class MessageRepositoryImpl(
                 file.delete()
             }
         }
+        messageQueries.deleteMessage(messageId)
     }
 
 }

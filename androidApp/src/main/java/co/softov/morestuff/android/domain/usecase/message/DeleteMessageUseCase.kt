@@ -11,7 +11,6 @@ class DeleteMessageUseCaseImpl(
     private val messageRepository: MessageRepository,
 ) : DeleteMessageUseCase {
     override suspend fun invoke(messageId: Long) {
-        messageRepository.deleteImageCacheFromMessage(messageId)
         messageRepository.deleteMessage(messageId)
     }
 }
