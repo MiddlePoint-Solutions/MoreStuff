@@ -52,14 +52,10 @@ val dataModule = module {
 
     single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
 
-    // Debugging
-    single<ObservableSettings> {
-        SharedPreferencesSettings(getSharedPreferences(androidContext()))
-    }
-
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
     singleOf(::DevToolsImpl) bind DevTools::class
+
     // Database
     single { createDatabase(androidApplication()) }
 

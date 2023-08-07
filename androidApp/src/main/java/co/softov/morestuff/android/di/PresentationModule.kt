@@ -17,19 +17,16 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 
 val presentationModule = module {
-
     viewModelOf(::UserInputViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::DrawerViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
-
     viewModelOf(::ReviewViewModel)
     viewModelOf(::PriorityViewModel)
     viewModelOf(::TaskChatViewModel)
     viewModelOf(::PlanViewModel)
     viewModelOf(::ShareViewModel)
     viewModelOf(::SearchViewModel)
-
     factoryOf(::ReviewItemMapper)
 }

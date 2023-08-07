@@ -3,7 +3,7 @@ package co.softov.morestuff.android.di
 import co.softov.morestuff.android.app.features.VoiceToTextParserImpl
 import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
-import co.softov.morestuff.android.data.service.OpenGraph
+import co.softov.morestuff.android.data.service.OpenGraphFetcherImpl
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -19,7 +19,7 @@ import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
-import co.softov.morestuff.android.domain.service.OpenGraphInterface
+import co.softov.morestuff.android.domain.service.OpenGraphFetcher
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import co.softov.morestuff.android.domain.usecase.message.CheckForUrlMetadataUseCase
@@ -164,7 +164,7 @@ val serviceModule = module {
 val featuresModule = module {
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     factoryOf(::ImageHandlerImpl) bind ImageHandler::class
-    factoryOf(::OpenGraph) bind OpenGraphInterface::class
+    factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
 }
 
 

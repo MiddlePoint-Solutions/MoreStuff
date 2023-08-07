@@ -17,7 +17,6 @@ val Priority.replyWithTitle: Pair<String, ReplyType>
     }
 
 
-// TODO: Classes implementing this interface should be sealed classes (for better use of kotlin)
 sealed interface PriorityOption
 
 enum class DefaultOption : PriorityOption {
