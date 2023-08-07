@@ -40,8 +40,6 @@ import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.message.GetActiveMessagesImpl
-import co.softov.morestuff.android.domain.usecase.message.GetActiveScheduleMessages
 import co.softov.morestuff.android.domain.usecase.message.GetMessageImpl
 import co.softov.morestuff.android.domain.usecase.message.GetMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
@@ -82,18 +80,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUse
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleWithTitleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleImplUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleListImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetSchedulesWithTitleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTodaySchedulesWithTitleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
@@ -249,11 +237,6 @@ val scheduleUseCases = module {
     factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
-    factoryOf(::GetScheduleWithTitleUseCaseImpl) bind GetScheduleWithTitleUseCase::class
-    factoryOf(::GetSchedulesWithTitleImplUseCase) bind GetSchedulesWithTitleFlowUseCase::class
-    factoryOf(::GetTodaySchedulesWithTitleUseCaseImpl) bind GetTodaySchedulesWithTitleUseCase::class
-    factoryOf(::GetTodaySchedulesWithTitleFlowUseCaseImpl) bind GetTodaySchedulesWithTitleFlowUseCase::class
-    factoryOf(::GetSchedulesWithTitleListImpl) bind GetSchedulesWithTitleUseCase::class
     factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
     factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
     factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
@@ -267,7 +250,6 @@ val scheduleUseCases = module {
 
 val messageUseCases = module {
     factoryOf(::GetMessagesUseCaseImpl) bind GetMessagesUseCase::class
-    factoryOf(::GetActiveMessagesImpl) bind GetActiveScheduleMessages::class
     factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
     factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
     factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class

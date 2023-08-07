@@ -29,24 +29,6 @@ interface ScheduleRepository {
         endTime: String
     ): Flow<List<ScheduleDomain>>
 
-    suspend fun getActiveSchedulesWithTitle(): Either<Failure, List<ScheduleWithTitle>>
-
-    fun getActiveSchedulesWithTitleFlow(): Flow<List<ScheduleWithTitle>>
-
-    suspend fun getActiveSchedulesWithTitleByTime(
-        startTime: String,
-        endTime: String
-    ): Either<Failure, List<ScheduleWithTitle>>
-
-    fun getActiveSchedulesWithTitleByTimeFlow(
-        startTime: String,
-        endTime: String
-    ): Flow<List<ScheduleWithTitle>>
-
-    suspend fun getActiveScheduleWithTitle(scheduleId: Long): Either<Failure, ScheduleWithTitle>
-
-    suspend fun getTodayActiveSchedulesWithTitle(): List<ScheduleWithTitle>
-
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
 
     suspend fun getActiveSchedulesForTask(
@@ -58,8 +40,6 @@ interface ScheduleRepository {
         taskId: Long,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>>
-
-    suspend fun getActiveSchedulesWithStaleReminders(): List<ScheduleWithTitle>
 
     suspend fun countTodayTaskSchedules(
         taskId: Long,
