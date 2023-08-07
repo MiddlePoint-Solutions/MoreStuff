@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.service.Scheduler
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
@@ -22,12 +23,12 @@ class CancelActiveScheduleUseCaseImplTest {
     fun `cancels schedule`() = runBlocking {
         val taskId = 1L
         val scheduleId = 2L
-        val createScheduleForTest = createScheduleForTest()
+        val schedules = listOf(createScheduleForTest(scheduleId, scheduleType = ScheduleType.OneTime))
 
-        coEvery { getActiveSchedule(taskId) } returns Either.Right(createScheduleForTest(scheduleId))
+        coEvery { getActiveSchedule(taskId, listOf(ScheduleType.OneTime)) } returns Either.Right(schedules)
         coEvery { scheduler.cancelSchedule(2) } just Runs
 
-        cancelActiveScheduleUseCaseImpl.invoke(taskId)
+        cancelActiveScheduleUseCaseImpl(taskId, listOf(ScheduleType.OneTime))
 
         coVerify { setScheduleFulfilled(scheduleId) }
         coVerify { scheduler.cancelSchedule(scheduleId) }

@@ -34,7 +34,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.app.features.VoiceToTextParserState
-import co.softov.morestuff.android.domain.service.VoiceToTextInterface
+import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
@@ -59,7 +58,7 @@ import org.koin.compose.koinInject
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
-    voiceToText: VoiceToTextInterface = koinInject()
+    voiceToText: VoiceToTextParser = koinInject()
 ) {
 
     val recordingState by voiceToText.state.collectAsStateWithLifecycle()

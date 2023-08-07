@@ -46,11 +46,11 @@ fun mapMessageData(
     replyType: Int?,
     replyContent: String?,
     replyTime: String?,
-    json_data: String?,
-    message_data_id: Long?,
-    message_data_file_path: String?,
-    message_data_creation_time: String?,
-    message_data_type: String?,
+    json_data: String? = null,
+    message_data_id: Long? = null,
+    message_data_file_path: String? = null,
+    message_data_creation_time: String? = null,
+    message_data_type: String? = null,
 ): Message {
 
     val openGraphResult = json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }

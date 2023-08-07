@@ -7,22 +7,22 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.compose.runtime.Immutable
-import co.softov.morestuff.android.domain.service.VoiceToTextInterface
+import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class VoiceToTextParser(
-    private val app: Application,
-) : RecognitionListener, VoiceToTextInterface {
+class VoiceToTextParserImpl(
+    private val context: Application,
+) : RecognitionListener, VoiceToTextParser {
     private val _state = MutableStateFlow(VoiceToTextParserState())
     override val state = _state.asStateFlow()
-    val recognizer = SpeechRecognizer.createSpeechRecognizer(app)
+    private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
 
     override fun startListening(languageCode: String) {
         _state.update { VoiceToTextParserState() }
 
-        if (!SpeechRecognizer.isRecognitionAvailable(app)) {
+        if (!SpeechRecognizer.isRecognitionAvailable(context)) {
             _state.update {
                 it.copy(
                     error = "Speech recognition is not available"

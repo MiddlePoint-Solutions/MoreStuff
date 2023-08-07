@@ -15,6 +15,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import timber.log.Timber
 
 @Composable
  fun TaskItemBadges(
@@ -39,28 +41,14 @@ import co.softov.morestuff.android.domain.model.TaskDomain
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                task.activeSchedule?.let { activeSchedule ->
-                    when (activeSchedule.scheduleType) {
+                task.schedule.forEach { schedule ->
+                    when (schedule.scheduleType) {
                         ScheduleType.OneTime -> {
-
                             Icon(
                                 imageVector = Icons.Default.Schedule,
                                 contentDescription = stringResource(R.string.cd_scheduled_task_icon),
                                 modifier = Modifier.size(16.dp),
                             )
-
-                            Icon(
-                                imageVector = Icons.Default.NotificationsActive,
-                                contentDescription = stringResource(R.string.cd_task_reminder_icon),
-                                modifier = Modifier.size(16.dp),
-                            )
-
-                            Icon(
-                                imageVector = Icons.Default.Notes,
-                                contentDescription = stringResource(R.string.cd_task_reminder_icon),
-                                modifier = Modifier.size(16.dp),
-                            )
-
                         }
 
                         ScheduleType.Reminder -> {

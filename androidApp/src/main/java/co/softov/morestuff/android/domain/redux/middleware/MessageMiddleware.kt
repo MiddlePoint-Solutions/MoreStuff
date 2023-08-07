@@ -105,12 +105,6 @@ class MessageMiddleware(
                 setScheduleResponseMessage(action.taskId, "Done", ReplyType.DONE)
             }
 
-            is TaskAction.CompleteTasksAction -> scope.launch {
-                action.taskIds.forEach {
-                    setScheduleResponseMessage(it, "Done", ReplyType.DONE)
-                }
-            }
-
 
             else -> NoOp
         }

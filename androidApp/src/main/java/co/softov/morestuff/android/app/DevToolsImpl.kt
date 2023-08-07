@@ -1,10 +1,8 @@
 package co.softov.morestuff.android.app
 
-import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.service.Notifier
-import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
 
 class DevToolsImpl(

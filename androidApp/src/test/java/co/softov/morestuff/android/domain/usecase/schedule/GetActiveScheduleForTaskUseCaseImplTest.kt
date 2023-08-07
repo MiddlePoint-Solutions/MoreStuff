@@ -1,7 +1,8 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
-import arrow.core.Either
+import arrow.core.right
 import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -11,19 +12,22 @@ import org.junit.jupiter.api.Test
 
 class GetActiveScheduleForTaskUseCaseTest {
     @Test
-    fun ` return schedule domain when schedule exists`() {
+    fun ` return schedule when schedule exists`() {
 
         val scheduleRepository = mockk<ScheduleRepository>()
         val useCase = GetActiveScheduleForTaskUseCaseImpl(scheduleRepository)
 
         val taskId = 12L
-        val scheduleDomain = createScheduleForTest()
-        coEvery { scheduleRepository.getActiveScheduleForTask(taskId) } returns Either.Right(
-            scheduleDomain
-        )
+        val schedule = listOf(createScheduleForTest(scheduleType = ScheduleType.OneTime))
+        coEvery {
+            scheduleRepository.getActiveSchedulesForTask(
+                taskId,
+                listOf(ScheduleType.OneTime)
+            )
+        } returns schedule.right()
 
-        val result = runBlocking { useCase.invoke(taskId) }
+        val result = runBlocking { useCase(taskId, listOf(ScheduleType.OneTime)) }
 
-        assertEquals(Either.Right(scheduleDomain), result)
+        assertEquals(schedule.right(), result)
     }
 }

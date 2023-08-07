@@ -1,15 +1,15 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 
 interface GetLowestPriorityScoreUseCase {
     suspend operator fun invoke(): Long
 }
 
 class GetLowestPriorityScoreUseCaseImpl(
-    private val taskRepository: TaskRepository
+    private val priorityRepository: PriorityRepository
 ) : GetLowestPriorityScoreUseCase {
     override suspend fun invoke(): Long {
-        return taskRepository.getLowestPriorityScore()
+        return priorityRepository.getLowestPriorityScore()
     }
 }

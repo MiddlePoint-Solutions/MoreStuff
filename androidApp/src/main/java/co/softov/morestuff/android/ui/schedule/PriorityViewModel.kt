@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
-import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
@@ -90,14 +89,10 @@ class PriorityViewModel(
         }
     }
 
-    fun toggleReminder(item: TaskDomain) {
-        when (val schedule = item.activeSchedule) {
-            null -> dispatchAppStoreAction(ScheduleAction.CreateReminderScheduleAction(item.id))
-            else -> {
-                if (schedule.scheduleType == ScheduleType.Reminder) {
-                    dispatchAppStoreAction(ScheduleAction.CancelReminderScheduleAction(item.id))
-                }
-            }
+    fun toggleReminder(task: TaskDomain) {
+        when (task.hasReminder) {
+            false -> dispatchAppStoreAction(ScheduleAction.CreateReminderScheduleAction(task.id))
+            true -> dispatchAppStoreAction(ScheduleAction.CancelReminderScheduleAction(task.id))
         }
     }
 

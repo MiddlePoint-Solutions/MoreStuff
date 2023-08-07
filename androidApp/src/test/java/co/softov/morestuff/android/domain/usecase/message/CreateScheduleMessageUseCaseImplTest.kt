@@ -26,7 +26,6 @@ class CreateScheduleMessageUseCaseImplTest {
         )
         val scheduleId = 1L
         val taskId = 1L
-        val schedule = createScheduleForTest()
         val task = createTaskForTest()
         val message = createMessageForTest()
         val messageData: MessageData? = null
@@ -39,7 +38,6 @@ class CreateScheduleMessageUseCaseImplTest {
                 ContentType.TASK_REMINDER,
                 messageData,
                 scheduleId,
-
             )
         } returns message.right()
 

@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.ContextMenuItem
 import co.softov.morestuff.android.domain.model.Message
 
 @Composable

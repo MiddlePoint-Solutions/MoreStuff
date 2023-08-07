@@ -42,10 +42,6 @@ class SettingsViewModel(
         dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
     }
 
-    fun clearPendingMessages() {
-        dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
-    }
-
     fun testReviewNotification() {
         devTools.testReviewNotification()
     }

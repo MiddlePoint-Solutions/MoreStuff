@@ -10,11 +10,13 @@ data class TaskDomain(
     val completeTime: String? = null,
     val priorityScore: Long = 0,
     val taskType: TaskType = TaskType.System,
-    val activeSchedule: ScheduleDomain? = null
+    val schedule: List<ScheduleDomain> = listOf(),
 ) {
 
     val isComplete: Boolean get() = completeTime != null
-    val hasSchedule: Boolean get() = activeSchedule?.isOneTime() ?: false
-    val hasReminder: Boolean get() = activeSchedule?.isReminder() ?: false
+    val hasSchedule: Boolean get() = schedule.any { it.isOneTime() }
+    val hasReminder: Boolean get() = schedule.any { it.isReminder() }
+    fun getScheduleOrNull() = schedule.firstOrNull { it.isOneTime() }
+    fun getReminderOrNull() = schedule.firstOrNull { it.isReminder() }
 
 }

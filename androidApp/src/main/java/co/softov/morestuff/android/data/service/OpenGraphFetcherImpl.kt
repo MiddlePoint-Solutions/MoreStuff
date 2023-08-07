@@ -1,12 +1,12 @@
 package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.domain.model.OpenGraphResult
-import co.softov.morestuff.android.domain.service.OpenGraphInterface
+import co.softov.morestuff.android.domain.service.OpenGraphFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
-class OpenGraph : OpenGraphInterface {
+class OpenGraphFetcherImpl : OpenGraphFetcher {
 
     override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
         withContext(Dispatchers.IO) {

@@ -13,8 +13,6 @@ interface MessageRepository {
 
     fun getAllMessages(): Flow<List<Message>>
 
-    suspend fun getActiveReminderMessages(): List<Message>
-
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
 
 

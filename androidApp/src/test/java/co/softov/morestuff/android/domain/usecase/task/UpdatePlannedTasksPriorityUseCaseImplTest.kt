@@ -3,11 +3,11 @@ package co.softov.morestuff.android.domain.usecase.task
 import arrow.core.right
 import co.softov.morestuff.android.domain.createListOfTasks
 import co.softov.morestuff.android.domain.createScheduleForTest
+import co.softov.morestuff.android.domain.model.ScheduleType
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDateTime
 import org.junit.jupiter.api.Test
@@ -32,15 +32,17 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
         val tasks = createListOfTasks(3).mapIndexed { index, task ->
             val schedule = createScheduleForTest(
                 taskId = task.id,
-                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00"
+                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00",
+                scheduleType = ScheduleType.OneTime
             )
-            task.copy(activeSchedule = schedule)
+            task.copy(schedule = listOf(schedule))
         }
 
         val schedules = tasks.mapIndexed { index, task ->
             createScheduleForTest(
                 taskId = task.id,
-                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00"
+                scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00",
+                scheduleType = ScheduleType.OneTime
             )
         }
 
@@ -77,7 +79,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
     @Test
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
-        val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(activeSchedule = null) }
+        val tasksWithoutSchedule = createListOfTasks(2).map { it.copy(schedule = listOf()) }
 
         coEvery { getActiveTasksWithScheduleUseCase(any()) } returns tasksWithoutSchedule.right()
 

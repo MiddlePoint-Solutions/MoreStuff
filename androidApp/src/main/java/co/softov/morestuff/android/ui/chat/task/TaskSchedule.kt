@@ -1,10 +1,10 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -21,16 +21,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.home.PlanModel
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
@@ -42,110 +45,114 @@ import kotlinx.datetime.toLocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskSchedule(
-    planModel: PlanModel?,
+    model: () -> ScheduleUiModel?,
+    actionText: String,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
-    createPlanSchedule: () -> Unit,
-    cancelActiveSchedule: () -> Unit,
+    createSchedule: () -> Unit,
+    cancelSchedule: () -> Unit,
+    icon: @Composable () -> Unit = {},
 ) {
 
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
-    AnimatedContent(
-        targetState = planModel,
-        label = "",
-        contentKey = { it != null }
-    ) { plan ->
-        when (plan) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        icon()
+
+        Spacer(modifier = Modifier.width(13.dp))
+
+        when (val schedule = model()) {
             null -> {
                 PriorityButton(
-                    onClick = createPlanSchedule,
-                    text = stringResource(id = R.string.task_chat_schedule_reminder),
+                    onClick = createSchedule,
+                    text = actionText,
                     shape = RoundedCornerShape(percent = 50),
                 )
             }
 
             else -> {
-                Row {
-                    if (showDatePickerDialog) {
-                        val datePickerState = rememberDatePickerState(
-                            initialSelectedDateMillis = plan.epochMs
-                        )
+                if (showDatePickerDialog) {
+                    val datePickerState = rememberDatePickerState(
+                        initialSelectedDateMillis = schedule.epochMs
+                    )
 
-                        PriorityDatePicker(
-                            dismissDialog = { showDatePickerDialog = false },
-                            onDateChange = {
-                                datePickerState.selectedDateMillis?.let {
-                                    onDateChange(it)
-                                }
-                                showDatePickerDialog = false
-                            },
-                            state = datePickerState,
-                        )
-                    }
+                    PriorityDatePicker(
+                        dismissDialog = { showDatePickerDialog = false },
+                        onDateChange = {
+                            datePickerState.selectedDateMillis?.let {
+                                onDateChange(it)
+                            }
+                            showDatePickerDialog = false
+                        },
+                        state = datePickerState,
+                    )
+                }
 
-                    if (showTimePickerDialog) {
-                        val timePickerState = rememberTimePickerState(
-                            initialHour = plan.hour,
-                            initialMinute = plan.minute
-                        )
-                        PriorityTimePicker(
-                            dismissTimePicker = { showTimePickerDialog = false },
-                            onTimeChange = {
-                                onTimeChange(
-                                    timePickerState.hour,
-                                    timePickerState.minute
-                                )
-                                showTimePickerDialog = false
-                            },
-                            state = timePickerState
-                        )
-                    }
-
-                    Button(
-                        onClick = { showDatePickerDialog = true },
-                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = plan.displayDate,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFFFFFFFF),
+                if (showTimePickerDialog) {
+                    val timePickerState = rememberTimePickerState(
+                        initialHour = schedule.hour,
+                        initialMinute = schedule.minute
+                    )
+                    PriorityTimePicker(
+                        dismissTimePicker = { showTimePickerDialog = false },
+                        onTimeChange = {
+                            onTimeChange(
+                                timePickerState.hour,
+                                timePickerState.minute
                             )
+                            showTimePickerDialog = false
+                        },
+                        state = timePickerState
+                    )
+                }
+
+                Button(
+                    onClick = { showDatePickerDialog = true },
+                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = schedule.displayDate,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFFFFFFFF),
                         )
-                    }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
-                    Button(
-                        onClick = { showTimePickerDialog = true },
-                        contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = plan.displayTime,
-                            style = TextStyle(
-                                fontSize = 14.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(400),
-                                color = Color(0xFFFFFFFF),
-                            )
+                Button(
+                    onClick = { showTimePickerDialog = true },
+                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = schedule.displayTime,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFFFFFFFF),
                         )
-                    }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                    IconButton(
-                        onClick = { cancelActiveSchedule() },
-                        modifier = Modifier
-                    ) {
-                        Icon(
-                            Icons.Sharp.Close,
-                            contentDescription = stringResource(R.string.cd_cancel_schedule),
-                        )
-                    }
+                IconButton(
+                    onClick = { cancelSchedule() },
+                    modifier = Modifier
+                ) {
+                    Icon(
+                        Icons.Sharp.Close,
+                        contentDescription = stringResource(R.string.cd_cancel_schedule),
+                    )
                 }
             }
         }
@@ -164,15 +171,24 @@ fun TaskSchedule(
 private fun TaskSchedulePreview() {
     MoreStuffTheme {
         TaskSchedule(
-            planModel = PlanModel(
-                localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                displayDate = "Saturday, July 29",
-                displayTime = "15:30"
-            ),
+            model = {
+                ScheduleUiModel(
+                    localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+                    displayDate = "Saturday, July 29",
+                    displayTime = "15:30"
+                )
+            },
+            icon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                    contentDescription = "",
+                )
+            },
+            actionText = "Schedule",
             onDateChange = {},
             onTimeChange = { _, _ -> },
-            cancelActiveSchedule = {},
-            createPlanSchedule = {}
+            cancelSchedule = {},
+            createSchedule = {},
         )
     }
 }

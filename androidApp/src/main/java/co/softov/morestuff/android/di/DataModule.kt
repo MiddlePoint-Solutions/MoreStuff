@@ -10,21 +10,20 @@ import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
 import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleDataMapper
+import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
 import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
 import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.android.data.mapper.makeTaskWithScheduleDataMapper
 import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
-import co.softov.morestuff.android.data.repository.PreferenceRepositoryImpl
+import co.softov.morestuff.android.data.repository.PriorityRepositoryImpl
 import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.android.data.repository.UserRepositoryImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.NotifierImpl
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.MessageRepository
-import co.softov.morestuff.android.domain.repository.PreferenceRepository
+import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.repository.UserRepository
@@ -34,7 +33,6 @@ import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
@@ -54,14 +52,10 @@ val dataModule = module {
 
     single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
 
-    // Debugging
-    single<ObservableSettings> {
-        SharedPreferencesSettings(getSharedPreferences(androidContext()))
-    }
-
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
     singleOf(::DevToolsImpl) bind DevTools::class
+
     // Database
     single { createDatabase(androidApplication()) }
 
@@ -79,7 +73,7 @@ val dataModule = module {
         TaskRepositoryImpl(
             database = get(),
             mapTaskData = makeTaskDbMapper(),
-            mapTaskWithScheduleData = makeTaskWithScheduleDataMapper(),
+            mapScheduleDb = makeScheduleDbMapper(),
             timeManager = get()
         )
     }
@@ -96,27 +90,18 @@ val dataModule = module {
     single<ScheduleRepository> {
         ScheduleRepositoryImpl(
             database = get(),
-            mapScheduleData = makeScheduleDataMapper(),
             mapScheduleDomain = makeScheduleDomainMapper(),
-            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            timeManager = get()
+            mapScheduleDb = makeScheduleDbMapper(),
         )
     }
-
-    single<PreferenceRepository> {
-        PreferenceRepositoryImpl(
-            getSharedPreferences(
-                androidContext()
-            )
-        )
-    }
-
 
     single<UserRepository> {
         UserRepositoryImpl(
             settings = getSettings(androidContext()),
         )
     }
+
+    singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
 
     // Services
     singleOf(::SchedulerImpl) bind Scheduler::class
