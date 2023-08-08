@@ -44,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -172,7 +171,7 @@ private fun TaskChatContent(
     taskTitle: () -> String,
     chatActions: ChatActions,
     modifier: Modifier = Modifier,
-    messages: List<Message> = listOf(),
+    messages: List<MessageWithFormattedTime> = listOf(),
     onBack: () -> Unit = {},
     schedule: () -> ScheduleUiModel? = { null },
     reminder: () -> ScheduleUiModel? = { null },
@@ -340,17 +339,19 @@ private fun TaskChatInput(
 private fun TaskTopAppBar(
     onBackPressed: () -> Unit,
 ) {
-    TopAppBar(
-        title = { },
-        navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_navigate_back)
-                )
+    Surface(tonalElevation = 5.dp) {
+        TopAppBar(
+            title = { },
+            navigationIcon = {
+                IconButton(onClick = onBackPressed) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_navigate_back)
+                    )
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 @Preview(

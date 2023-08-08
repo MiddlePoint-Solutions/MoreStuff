@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material3.LocalTextStyle
@@ -48,10 +47,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
+import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
@@ -60,18 +60,21 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
-    message: Message,
+    messageWithFormattedTime: MessageWithFormattedTime,
     actions: ChatActions,
 ) {
+    val message = messageWithFormattedTime.message
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
+    val timeFormatter: TimeFormatter = koinInject()
 
     val content by remember {
         derivedStateOf {
@@ -118,7 +121,12 @@ fun UserChatItem(
 
                 if (message.messageData?.filePath != null) {
                     Surface(
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        shape = RoundedCornerShape(
+                            topStart = 10.dp,
+                            topEnd = 10.dp,
+                            bottomEnd = 7.dp,
+                            bottomStart = 10.dp
+                        ),
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                         modifier = if (message.content.isEmpty()) {
@@ -138,46 +146,87 @@ fun UserChatItem(
                             horizontalAlignment = Alignment.End
                         ) {
                             if (message.content.isNotEmpty()) {
-                                Text(
-                                    text = message.content,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .padding(end = 15.dp)
-                                        .align(Alignment.Start),
-                                    style = LocalTextStyle.current.copy(
-                                        color = Color.White,
-                                        fontSize = 16.sp
+                                Column {
+                                    Text(
+                                        text = message.content,
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 14.dp,
+                                                end = 15.dp,
+                                                top = 8.dp,
+                                                bottom = 3.dp
+                                            )
+                                            .align(Alignment.Start),
+                                        style = LocalTextStyle.current.copy(
+                                            color = Color.White,
+                                            fontSize = 16.sp
+                                        )
                                     )
-                                )
+                                    Row(Modifier.align(Alignment.End)) {
+                                        DisplayMessageTime(
+                                            formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                            modifier = Modifier
+                                        )
+                                    }
+                                }
                             }
-                            ChatImageMessage(
-                                messageData = message.messageData,
+                            Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(8.dp))
-                                    .combinedClickable(
-                                        onClick = {
-                                            actions.onImageSelected(message)
-                                        },
-                                        onLongClick = { showMenu = true }
-                                    )
                                     .aspectRatio(1f)
                                     .size(200.dp)
-                            )
+                            ) {
+                                ChatImageMessage(
+                                    messageData = message.messageData,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .combinedClickable(
+                                            onClick = {
+                                                actions.onImageSelected(message)
+                                            },
+                                            onLongClick = { showMenu = true }
+                                        )
+                                        .aspectRatio(1f)
+                                        .size(200.dp),
+                                )
+                            }
+                            if (message.content.isEmpty()) {
+
+                                DisplayMessageTime(
+                                    formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                    modifier = Modifier
+                                        .align(Alignment.End)
+                                        .padding(
+                                            end = 12.dp,
+                                            start = 30.dp,
+                                            bottom = 5.dp,
+                                            top = 5.dp
+                                        ),
+                                )
+                            }
                         }
                     }
+
                 } else {
                     Surface(
-                        shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+                        shape = RoundedCornerShape(
+                            topStart = 14.dp,
+                            topEnd = 14.dp,
+                            bottomEnd = 5.dp,
+                            bottomStart = 14.dp
+                        ),
                         color = MaterialTheme.colorScheme.userChatItem,
                         contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
                     ) {
-                        Column(
-
-                        ) {
+                        Column {
                             Text(
                                 modifier = Modifier
-                                    .padding(8.dp)
-                                    .padding(end = 15.dp)
+                                    .padding(
+                                        start = 14.dp,
+                                        end = 15.dp,
+                                        top = 8.dp,
+                                        bottom = 3.dp
+                                    )
                                     .run {
                                         urls?.let {
                                             combinedClickable(
@@ -199,6 +248,13 @@ fun UserChatItem(
                             if (openGraphResult?.title != null && openGraphResult.description != null) {
                                 OpenGraphPreview(openGraphResult)
                             }
+                            Row(Modifier.align(Alignment.End)) {
+                                DisplayMessageTime(
+                                    formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                    modifier = Modifier
+                                )
+                            }
+
                         }
                     }
                 }
@@ -216,6 +272,22 @@ fun UserChatItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun DisplayMessageTime(
+    formattedTimeOnly: String?,
+    modifier: Modifier = Modifier,
+) {
+    formattedTimeOnly?.let {
+        Text(
+            text = it,
+            style = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
+            modifier = Modifier
+                .padding(start = 15.dp, end = 12.dp, bottom = 5.dp)
+                .wrapContentWidth(Alignment.End)
+        )
     }
 }
 
@@ -286,6 +358,6 @@ private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme() {
-        UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+        // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }

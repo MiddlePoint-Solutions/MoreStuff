@@ -5,12 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -89,7 +86,7 @@ fun TaskChatEditor(
         Box(
             modifier = Modifier
                 .animateContentSize(animationSpec = tween())
-                .padding(vertical = 16.dp)
+                .padding(vertical = 2.dp)
                 .then(
                     if (isEditing) {
                         Modifier
