@@ -19,6 +19,7 @@ data class Message(
     val messageData: MessageData?
 )
 
+
 sealed class MessageData2 {
 
     object Empty : MessageData2()

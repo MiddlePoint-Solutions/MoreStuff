@@ -9,5 +9,6 @@ interface TimeFormatter {
     fun formatTimeDayAndMonth(timeString: String?): String?
     fun formatTimeDayMonthHour(timeString: String?): String?
     fun formatToDateTime(timeString: String?): String?
+    fun formatTimeWithDayMonthYear(timeString: String?): String?
 
 }

@@ -18,53 +18,54 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.theme.appChatItem
 
 @Composable
 fun AppChatItem(
-    message: Message,
+    messageWithFormattedTime: MessageWithFormattedTime,
     chatActions: ChatActions,
 ) {
+    val message = messageWithFormattedTime.message
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(end = 45.dp)
+            .padding(start = 15.dp, end = 45.dp, bottom = 7.dp)
             .clickable { chatActions.taskChatAction(message.taskId) },
         horizontalArrangement = Arrangement.Start
     ) {
         Surface(
-            modifier = Modifier.padding(start = 10.dp, top = 4.dp, bottom = 4.dp),
-            shape = RoundedCornerShape(corner = CornerSize(8.dp)),
+            shape = RoundedCornerShape(
+                topStart = 14.dp,
+                topEnd = 14.dp,
+                bottomEnd = 14.dp,
+                bottomStart = 5.dp
+            ),
             color = MaterialTheme.colorScheme.appChatItem,
-            contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
+            contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
-                Text(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .align(Alignment.End),
-                    text = message.createTime,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.End
-                )
+                Row(Modifier.align(Alignment.End)) {
+                    DisplayMessageTime(
+                        formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                        modifier = Modifier,
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun TaskReminderItem(message: Message, actions: ChatActions) {
+fun TaskReminderItem(messageWithFormattedTime: MessageWithFormattedTime, actions: ChatActions) {
     Column {
-        AppChatItem(message, actions)
-
+        AppChatItem(messageWithFormattedTime, actions)
+        val message = messageWithFormattedTime.message
         if (message.replyType == null) {
             Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
                 Button(onClick = {
