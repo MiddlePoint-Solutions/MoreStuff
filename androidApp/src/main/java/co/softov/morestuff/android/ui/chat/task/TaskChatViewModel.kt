@@ -76,8 +76,8 @@ class TaskChatViewModel(
 
             val formattedMessages = messages.map { message ->
                 val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
-                val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString())
-                val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString())
+                val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?:""
+                val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString()) ?:""
                 MessageWithFormattedTime(message, formattedTime, formattedTimeOnly)
             }
 

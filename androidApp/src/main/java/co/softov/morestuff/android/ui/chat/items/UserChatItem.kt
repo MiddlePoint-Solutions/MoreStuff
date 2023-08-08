@@ -3,7 +3,6 @@ package co.softov.morestuff.android.ui.chat.items
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -166,7 +165,7 @@ fun UserChatItem(
                                     Row(Modifier.align(Alignment.End)) {
                                         DisplayMessageTime(
                                             formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
-                                           modifier = Modifier
+                                            modifier = Modifier
                                         )
                                     }
                                 }
@@ -190,27 +189,24 @@ fun UserChatItem(
                                         .aspectRatio(1f)
                                         .size(200.dp),
                                 )
-                                if (message.content.isEmpty()) {
-                                    timeFormatter.formatTimeOnly(message.createTime)?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-                                            modifier = Modifier
-                                                .align(Alignment.BottomEnd)
-                                                .padding(end = 12.dp, start = 30.dp, bottom = 5.dp)
-                                                .clip(RoundedCornerShape(8.dp))
-                                                .background(
-                                                    MaterialTheme.colorScheme.background.copy(
-                                                        alpha = 0.5F
-                                                    )
-                                                )
-                                                .padding(4.dp)
-                                        )
-                                    }
-                                }
+                            }
+                            if (message.content.isEmpty()) {
+
+                                DisplayMessageTime(
+                                    formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                    modifier = Modifier
+                                        .align(Alignment.End)
+                                        .padding(
+                                            end = 12.dp,
+                                            start = 30.dp,
+                                            bottom = 5.dp,
+                                            top = 5.dp
+                                        ),
+                                )
                             }
                         }
                     }
+
                 } else {
                     Surface(
                         shape = RoundedCornerShape(
@@ -280,7 +276,10 @@ fun UserChatItem(
 }
 
 @Composable
-fun DisplayMessageTime(formattedTimeOnly: String?, modifier: Modifier = Modifier) {
+fun DisplayMessageTime(
+    formattedTimeOnly: String?,
+    modifier: Modifier = Modifier,
+) {
     formattedTimeOnly?.let {
         Text(
             text = it,
@@ -359,6 +358,6 @@ private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme() {
-       // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+        // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }
