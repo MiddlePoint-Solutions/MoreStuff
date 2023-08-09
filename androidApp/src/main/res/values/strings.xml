@@ -64,9 +64,9 @@
     <string name="page_title_tomorrow">Tomorrow</string>
     <string name="page_title_later">Later</string>
     <string name="textfield_desc">Text Input</string>
-    <string name="priority_now">NOW</string>
-    <string name="priority_plan">PLAN</string>
-    <string name="priority_later">LATER</string>
+    <string name="priority_now">Now</string>
+    <string name="priority_plan">Plan</string>
+    <string name="priority_later">Later</string>
     <string name="done">Done</string>
     <string name="new_messages">Scroll Down</string>
     <string name="cd_navigate_back">Navigate Back</string>

@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +41,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
@@ -182,7 +182,7 @@ private fun TaskChatContent(
     updatePlanDate: (Long) -> Unit = {},
     createPlanSchedule: () -> Unit = {},
     cancelActiveSchedule: () -> Unit = {},
-    imagePicked: (Uri) -> Unit = {}
+    imagePicked: (Uri) -> Unit = {},
 ) {
 
     val scope = rememberCoroutineScope()
@@ -305,11 +305,9 @@ private fun TaskChatInput(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
-        Surface(
-            tonalElevation = 5.dp
-        ) {
+        Surface {
             UserInput(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 textContent = {
@@ -326,9 +324,11 @@ private fun TaskChatInput(
                                     contentDescription = stringResource(R.string.cd_select_images)
                                 )
                             }
-                        }
+                        },
+                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     )
-                }
+                },
+                backgroundColor = MaterialTheme.colorScheme.background,
             )
         }
     }
@@ -339,7 +339,7 @@ private fun TaskChatInput(
 private fun TaskTopAppBar(
     onBackPressed: () -> Unit,
 ) {
-    Surface(tonalElevation = 5.dp) {
+    Surface {
         TopAppBar(
             title = { },
             navigationIcon = {
@@ -349,7 +349,8 @@ private fun TaskTopAppBar(
                         contentDescription = stringResource(R.string.cd_navigate_back)
                     )
                 }
-            }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
         )
     }
 }

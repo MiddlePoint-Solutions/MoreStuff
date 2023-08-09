@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.settings
 
 import android.content.res.Configuration
 import android.content.res.Resources
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
@@ -32,7 +34,6 @@ import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.darkSurface
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -92,6 +93,7 @@ private fun SettingsContent(
                 .fillMaxSize()
                 .padding(it)
                 .verticalScroll(scrollState)
+                .background(color = MaterialTheme.colorScheme.background)
         ) {
 
             Column(
@@ -137,7 +139,7 @@ private fun SettingsContent(
 
 @Composable
 fun SettingsDivider() {
-    Divider(color = darkSurface, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+    Divider(color = MaterialTheme.colorScheme.background, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,6 +160,7 @@ fun SettingsTopBar(onBack: () -> Unit) {
                 )
             }
         },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor =Color.Transparent/*MaterialTheme.colorScheme.background*/)
     )
 }
 
@@ -193,6 +196,8 @@ fun SelectTheme(
             )
         },
         useSelectedValueAsSubtitle = false,
+
+
     )
 }
 
@@ -215,7 +220,6 @@ fun SelectSnoozeLimit(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
     ) {
         SettingsSlider(
             state = state,

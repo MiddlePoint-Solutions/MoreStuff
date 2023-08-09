@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowDown
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,7 +18,6 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -33,9 +29,6 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,13 +51,15 @@ fun TaskOptionsDialog(
                     text = stringResource(R.string.complete),
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             },
             icon = {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = stringResource(R.string.cd_complete_task)
+                    contentDescription = stringResource(R.string.cd_complete_task),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         )
@@ -76,7 +71,8 @@ fun TaskOptionsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    lineHeight = 31.sp
+                    lineHeight = 31.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
             },
             icon = {
@@ -84,6 +80,7 @@ fun TaskOptionsDialog(
                     imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_up_48px),
                     contentDescription = stringResource(R.string.cd_move_to_top),
                     modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         )
@@ -94,7 +91,9 @@ fun TaskOptionsDialog(
                     text = stringResource(R.string.move_to_bottom),
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+
                 )
             },
             icon = {
@@ -102,6 +101,7 @@ fun TaskOptionsDialog(
                     imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_down_48px),
                     contentDescription = stringResource(R.string.cd_move_task_to_bottom),
                     modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
         )
@@ -140,7 +140,7 @@ fun TaskOptionItem(
 private fun Preview() {
     MoreStuffTheme {
         TaskOptionItem(
-            onClick = {  },
+            onClick = { },
             title = {
                 Text(
                     text = stringResource(R.string.complete),
