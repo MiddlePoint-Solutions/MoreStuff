@@ -17,15 +17,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.home.PriorityInputModel
 import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
@@ -77,32 +76,30 @@ fun PlanPrioritySelector(
         Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
         ) {
-            PriorityButton(
+            SetSchedulePriorityButton(
                 onClick = { showDatePickerDialog = true },
             ) {
                 Text(
                     text = planTime.displayDate,
                     style = TextStyle(
-                        fontSize = 12.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp,
+                        fontWeight = FontWeight(500),
                     )
                 )
             }
 
             Spacer(modifier = Modifier.width(10.dp))
 
-            PriorityButton(
+            SetSchedulePriorityButton(
                 onClick = { showTimePickerDialog = true },
             ) {
                 Text(
                     text = planTime.displayTime,
                     style = TextStyle(
-                        fontSize = 12.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFFFFFFFF),
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp,
+                        fontWeight = FontWeight(500),
                     )
                 )
             }

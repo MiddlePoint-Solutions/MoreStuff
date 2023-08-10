@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -15,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import co.softov.morestuff.android.ui.home.PriorityInputModel
@@ -53,7 +53,7 @@ private fun PriorityInputContent(
     onDateChange: (Long) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.background(color = Color.Transparent)
+        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
     ) {
 
         val showPlanInput by remember(model.priority) {
@@ -82,8 +82,8 @@ private fun PriorityInputContent(
 
     Surface(
         modifier = Modifier.zIndex(3f),
-        tonalElevation = 5.dp,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         PrioritySelector(
             priority = model.priority,

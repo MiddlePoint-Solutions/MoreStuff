@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Snooze
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,11 +20,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
@@ -39,48 +42,57 @@ fun DevSettings(
 ) {
 
     val navigation = LocalAppNavigation.current
-
-    SettingsGroup(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
-                Spacer(modifier = Modifier.width(20.dp))
-                Text(text = "Developer Settings")
+    MoreStuffSettingTheme {
+        SettingsGroup(
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Text(
+                        text = "Developer Settings",
+                        style = TextStyle(
+                            fontSize = 22.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                    )
+                }
             }
-        },
-        modifier = modifier
-    ) {
+        ) {
 
-        SettingsMenuLink(
-            title = { Text(text = "Test OnBoarding") },
-            onClick = { navigation.replaceAll(Screen.OnBoarding) },
-        )
-        SettingsDivider()
-
-        SettingsMenuLink(
-            title = { Text(text = "Test Review Notification") },
-            onClick = devTools::testReviewNotification,
-        )
-        SettingsDivider()
-
-        DebugMessageSwitch(
-            state = rememberAppSettingState(
-                defaultValue = { devTools.showDebugMessages },
-                valueChanged = { devTools.showDebugMessages = it },
+            SettingsMenuLink(
+                title = { Text(text = "Test OnBoarding") },
+                onClick = { navigation.replaceAll(Screen.OnBoarding) },
             )
-        )
+            // SettingsDivider()
 
-        SettingsDivider()
+            SettingsMenuLink(
+                title = { Text(text = "Test Review Notification") },
+                onClick = devTools::testReviewNotification,
+            )
+            // SettingsDivider()
 
+            DebugMessageSwitch(
+                state = rememberAppSettingState(
+                    defaultValue = { devTools.showDebugMessages },
+                    valueChanged = { devTools.showDebugMessages = it },
+                )
+            )
+
+            // SettingsDivider()
+
+        }
     }
+
 }
 
 @Composable
 private fun DebugMessageSwitch(
-    state: AppSettingValueState<Boolean>
+    state: AppSettingValueState<Boolean>,
 ) {
 
     Row(
@@ -113,7 +125,7 @@ private fun DebugMessageSwitch(
 @Composable
 private fun DebugRemindersSwitch(
     enableState: AppSettingValueState<Boolean>,
-    timeState: AppSettingValueState<Float>
+    timeState: AppSettingValueState<Float>,
 ) {
     Column {
         Row(

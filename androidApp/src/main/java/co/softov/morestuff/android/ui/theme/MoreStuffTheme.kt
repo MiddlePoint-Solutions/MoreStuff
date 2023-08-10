@@ -134,7 +134,7 @@ fun MoreStuffSettingTheme(
     val darkTheme = isDarkTheme()
 
     MaterialTheme(
-        colorScheme = if (darkTheme) darkColors.copy(surface = darkBlue) else lightColors,
+        colorScheme = if (darkTheme) darkColors.copy(surface = md_theme_dark_background) else  lightColors.copy(surface = md_theme_light_background),
         typography = Typography(),
     ) {
         CustomSelectionColor(darkTheme) {

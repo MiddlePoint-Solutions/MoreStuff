@@ -109,9 +109,9 @@ fun TaskCard(
                 ) {
                     Text(
                         text = task.title,
-                        color = Color(0xFF1E1F2D),
+                        color = Color(0xFF1B1B1F),
                         textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight(400)),
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 40.dp, vertical = 26.dp)

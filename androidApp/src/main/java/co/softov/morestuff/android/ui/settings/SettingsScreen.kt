@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
@@ -31,8 +32,8 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.darkSurface
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -42,7 +43,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = koinViewModel()
+    viewModel: SettingsViewModel = koinViewModel(),
 ) {
 
     val navigation = LocalAppNavigation.current
@@ -78,7 +79,7 @@ private fun SettingsContent(
     showLibraries: () -> Unit,
     model: SettingsModel,
     actions: SettingsActions,
-    devTools: @Composable () -> Unit = {}
+    devTools: @Composable () -> Unit = {},
 ) {
 
     val scrollState = rememberScrollState()
@@ -86,58 +87,65 @@ private fun SettingsContent(
     Scaffold(
         topBar = { SettingsTopBar(onBack = onBack) }
     ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .verticalScroll(scrollState)
-        ) {
-
-            Column(
+        MoreStuffSettingTheme {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-            ) {
-                SelectTheme(
-                    themeSelected = actions.selectAppTheme,
-                    defaultValue = { model.appTheme.ordinal }
-                )
-                SettingsDivider()
+                    .fillMaxSize()
+                    .padding(it)
+                    .verticalScroll(scrollState)
 
-                SelectSnoozeLimit(
-                    onSnoozeLimitChanged = actions.setSnoozeLimit,
-                    defaultValue = { model.snoozeLimit.toFloat() }
-                )
-
-                SettingsDivider()
-
-                EnableConfetti(
-                    defaultValue = { model.confettiEnabled },
-                    valueChanged = actions.enableConfetti,
-                )
-                SettingsDivider()
-
-            }
-
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
 
-                devTools()
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                ) {
+                    SelectTheme(
+                        themeSelected = actions.selectAppTheme,
+                        defaultValue = { model.appTheme.ordinal }
+                    )
+                    // SettingsDivider()
 
-                SettingsDivider()
+                    SelectSnoozeLimit(
+                        onSnoozeLimitChanged = actions.setSnoozeLimit,
+                        defaultValue = { model.snoozeLimit.toFloat() }
+                    )
 
-                About(
-                    showLibraries = showLibraries
-                )
+                    // SettingsDivider()
+
+                    EnableConfetti(
+                        defaultValue = { model.confettiEnabled },
+                        valueChanged = actions.enableConfetti,
+                    )
+                    // SettingsDivider()
+
+                }
+
+                Column(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+
+                    devTools()
+
+                    // SettingsDivider()
+
+                    About(
+                        showLibraries = showLibraries
+                    )
+                }
             }
         }
+
     }
 }
 
 @Composable
 fun SettingsDivider() {
-    Divider(color = darkSurface, thickness = 1.dp, modifier = Modifier.fillMaxWidth())
+    Divider(
+        color = MaterialTheme.colorScheme.onBackground,
+        thickness = 1.dp,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,6 +166,7 @@ fun SettingsTopBar(onBack: () -> Unit) {
                 )
             }
         },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 }
 
@@ -193,7 +202,9 @@ fun SelectTheme(
             )
         },
         useSelectedValueAsSubtitle = false,
-    )
+
+
+        )
 }
 
 private fun AppTheme.displayTitle(res: Resources): String = when (this) {
@@ -206,7 +217,7 @@ private fun AppTheme.displayTitle(res: Resources): String = when (this) {
 @Composable
 fun SelectSnoozeLimit(
     onSnoozeLimitChanged: (Int) -> Unit,
-    defaultValue: () -> Float
+    defaultValue: () -> Float,
 ) {
     val state = rememberAppSettingState(
         defaultValue = defaultValue,
@@ -215,7 +226,6 @@ fun SelectSnoozeLimit(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
     ) {
         SettingsSlider(
             state = state,
@@ -274,62 +284,65 @@ fun About(
     modifier: Modifier = Modifier,
     showLibraries: () -> Unit,
 ) {
-    Column(modifier = modifier.padding(16.dp)) {
+    MoreStuffSettingTheme {
+        Column(modifier = modifier.padding(16.dp)) {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.about_morestuff),
-                fontSize = 20.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
-
-        Row(
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text(
-                text = "Version",
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-
-            Text(
-                text = " ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 190.dp, end = 16.dp)
-            )
-        }
-
-        Text(
-            text = stringResource(R.string.open_source_libraries),
-            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-            modifier = Modifier.clickable(onClick = showLibraries)
-        )
-
-        Text(
-            text = stringResource(R.string.privacy_policy),
-            style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-            modifier = Modifier.clickable(onClick = showLibraries)
-        )
-
-        Box(
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .fillMaxWidth()
-            //.clickable(onClick = { TODO() })
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Follow us and join our community!",
-                    color = MaterialTheme.colorScheme.onSurface,
+                    text = stringResource(R.string.about_morestuff),
+                    fontSize = 20.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
+            }
+
+            Row(
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text(
+                    text = "Version",
+                    color = MaterialTheme.colorScheme.onBackground,
+                )
+
+                Text(
+                    text = " ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(start = 190.dp, end = 16.dp)
+                )
+            }
+
+            Text(
+                text = stringResource(R.string.open_source_libraries),
+                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                modifier = Modifier.clickable(onClick = showLibraries)
+            )
+
+            Text(
+                text = stringResource(R.string.privacy_policy),
+                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                modifier = Modifier.clickable(onClick = showLibraries)
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .fillMaxWidth()
+                //.clickable(onClick = { TODO() })
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        text = "Follow us and join our community!",
+                        color = MaterialTheme.colorScheme.onBackground,
+                    )
+                }
             }
         }
     }
+
 }
 
 

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -59,15 +62,14 @@ fun CompletePriorityItem(
 
             TaskProfile(task)
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = task.title,
                     textAlign = TextAlign.Start,
                     modifier = Modifier
-                        .fillMaxWidth(0.90f)
-                        .padding(12.dp),
+                        .fillMaxWidth(0.90f),
                     maxLines = 2,
                     color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
@@ -83,7 +85,7 @@ fun CompletePriorityItem(
                         Text(
                             text = stringResource(R.string.completed) + " $completeTime",
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.padding(start = 25.dp, bottom = 8.dp)
+                            modifier = Modifier.padding(start = 13.dp, bottom = 8.dp)
                                 .align(Alignment.Start),
                             style = TextStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -93,7 +95,12 @@ fun CompletePriorityItem(
                     }
                 }
             }
-
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
+                contentDescription = stringResource(R.string.completed),
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(end = 18.dp)
+            )
         }
 
         TaskItemBadges(

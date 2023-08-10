@@ -81,12 +81,12 @@ fun TaskChatEditor(
 
     Surface(
         modifier = modifier,
-        tonalElevation = 5.dp,
+        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Box(
             modifier = Modifier
                 .animateContentSize(animationSpec = tween())
-                .padding(vertical = 2.dp)
+                .padding(vertical = 7.dp)
                 .then(
                     if (isEditing) {
                         Modifier

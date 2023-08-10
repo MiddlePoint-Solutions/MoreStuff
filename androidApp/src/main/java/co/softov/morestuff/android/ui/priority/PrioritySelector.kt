@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +46,7 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
-                    color = Color(0xFFFFFFFF),
+
                 )
             )
         }
@@ -64,7 +63,7 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
-                    color = Color(0xFFFFFFFF),
+
                 )
             )
         }
@@ -81,7 +80,6 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
-                    color = Color(0xFFFFFFFF),
                 )
             )
         }

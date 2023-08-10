@@ -92,13 +92,13 @@ private fun WelcomeScreen(onNext: () -> Unit) {
             Text(
                 text = stringResource(R.string.out_goal),
                 style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.primary,
             )
 
             Text(
                 text = stringResource(R.string.is_to_help_you_plan_and),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.secondary,
             )
         }
 
@@ -113,7 +113,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
                 modifier = Modifier
                     .width(287.dp)
                     .height(43.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 content = {
                     Text(
                         text = stringResource(R.string.button_start),
@@ -121,7 +121,7 @@ private fun WelcomeScreen(onNext: () -> Unit) {
                             fontSize = 16.sp,
                             lineHeight = 28.sp,
                             fontWeight = FontWeight(700),
-                            color = Color(0xFF272835),
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     )
                 }
@@ -157,18 +157,18 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
             Text(
                 text = stringResource(R.string.notification),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.padding(15.dp))
             Text(
                 text = stringResource(R.string.more_stuff_requires_notification),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.secondary,
             )
 
             Spacer(modifier = Modifier.padding(20.dp))
             Image(
-                painter = painterResource(id = R.drawable.permission_on_boarding),
+                painter = painterResource(id = R.drawable.notifications_on),
                 contentDescription = "notifications",
                 contentScale = ContentScale.FillBounds
             )
@@ -189,7 +189,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     content = {
                         Text(
                             text = stringResource(R.string.button_enable),
@@ -197,7 +197,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
                                 fontWeight = FontWeight(700),
-                                color = Color(0xFF272835),
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         )
                     }
@@ -208,7 +208,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9093B4)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     content = {
                         Text(
                             text = stringResource(R.string.button_skip),
@@ -216,7 +216,7 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
                                 fontWeight = FontWeight(700),
-                                color = Color(0xFF272835),
+                                color = MaterialTheme.colorScheme.secondary,
                             )
                         )
                     }
@@ -245,12 +245,12 @@ private fun ReadyScreen(onFinish: () -> Unit) {
             Text(
                 text = stringResource(R.string.your_workspace),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.primary,
             )
 
             Spacer(modifier = Modifier.padding(20.dp))
             Image(
-                painter = painterResource(id = R.drawable.final_on_boarding),
+                painter = painterResource(id = R.drawable.workspace_on),
                 contentDescription = "notifications",
                 contentScale = ContentScale.FillBounds
             )
@@ -268,7 +268,7 @@ private fun ReadyScreen(onFinish: () -> Unit) {
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFBC8C)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     content = {
                         Text(
                             text = stringResource(R.string.button_start),
@@ -276,7 +276,7 @@ private fun ReadyScreen(onFinish: () -> Unit) {
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
                                 fontWeight = FontWeight(700),
-                                color = Color(0xFF272835),
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         )
                     }
