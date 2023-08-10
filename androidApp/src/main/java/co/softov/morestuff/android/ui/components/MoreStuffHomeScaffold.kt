@@ -73,7 +73,6 @@ fun MoreStuffHomeScaffold(
             },
             content = {
                 Scaffold(
-                    modifier = Modifier.systemBarsPadding(),
                     containerColor = Color.Transparent,
                     snackbarHost = {
                         SnackbarHost(hostState = snackbarHostState) { data ->

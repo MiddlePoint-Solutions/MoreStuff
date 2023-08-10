@@ -325,10 +325,8 @@ private fun TaskChatInput(
                                 )
                             }
                         },
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     )
                 },
-                backgroundColor = MaterialTheme.colorScheme.background,
             )
         }
     }

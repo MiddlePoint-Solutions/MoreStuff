@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.ui.input
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -18,16 +20,14 @@ fun UserInput(
     textContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
 ) {
-    Surface(
+    Column(
         modifier = modifier
             .imePadding()
-            .zIndex(1f),
-        color = backgroundColor,
+            .navigationBarsPadding()
+            .background(color = backgroundColor)
     ) {
-        Column {
-            priorityContent()
-            textContent()
-        }
+        priorityContent()
+        textContent()
     }
 }
 

@@ -241,19 +241,22 @@ private fun SwipeBackground(
 
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialTheme.colorScheme.primary
-            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5F)
-            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5F)
+            DismissValue.Default -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5F)
+            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary
+            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.primary
         }, label = "Color animation"
     )
+
     val alignment = when (direction) {
         DismissDirection.StartToEnd -> Alignment.CenterStart
         DismissDirection.EndToStart -> Alignment.CenterEnd
     }
+
     val icon = when (direction) {
         DismissDirection.StartToEnd -> Icons.Default.Tune
         DismissDirection.EndToStart -> if (hasReminder) Icons.Default.NotificationsOff else Icons.Default.Notifications
     }
+
     val scale by animateFloatAsState(
         if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f,
         label = "Scale animation"
