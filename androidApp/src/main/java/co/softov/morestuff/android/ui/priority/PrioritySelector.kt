@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
@@ -36,7 +37,8 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(100.dp),
+                .width(97.dp)
+                .height(43.dp),
             selected = priority is PriorityModel.Now,
             onClick = onNowSelected,
         ) {
@@ -53,7 +55,8 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(100.dp),
+                .width(97.dp)
+                .height(43.dp),
             selected = priority is PriorityModel.Later,
             onClick = onLaterSelected,
         ) {
@@ -70,7 +73,8 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(100.dp),
+                .width(97.dp)
+                .height(43.dp),
             selected = priority is PriorityModel.Plan,
             onClick = onPlanSelected,
         ) {

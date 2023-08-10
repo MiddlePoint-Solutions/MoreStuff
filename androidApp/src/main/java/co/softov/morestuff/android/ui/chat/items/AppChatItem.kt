@@ -44,8 +44,8 @@ fun AppChatItem(
                 bottomEnd = 14.dp,
                 bottomStart = 5.dp
             ),
-            color = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = contentColorFor(MaterialTheme.colorScheme.onPrimaryContainer),
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = contentColorFor(MaterialTheme.colorScheme.onSecondaryContainer),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
@@ -93,7 +93,7 @@ fun TaskReminderItem(messageWithFormattedTime: MessageWithFormattedTime, actions
         } else if (message.replyContent.isNullOrBlank().not()) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
+                contentColor = contentColorFor(MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
             }

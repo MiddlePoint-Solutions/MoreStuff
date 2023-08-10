@@ -225,7 +225,7 @@ private fun SearchFilterChip(
 
     val unselectedColor by animateColorAsState(
         targetValue = if (!isSelected) {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.12F)
         } else {
             Color(0xFF8C98FF)
         },

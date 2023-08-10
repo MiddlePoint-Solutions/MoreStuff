@@ -80,7 +80,7 @@ fun UserTextInput(
                         .clearFocusOnKeyboardDismiss()
                         .weight(0.88f)
                         .align(Alignment.CenterVertically)
-                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+                        .padding(start = 16.dp, top = 13.dp, bottom = 10.dp, end = 4.dp),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         keyboardType = KeyboardType.Text
