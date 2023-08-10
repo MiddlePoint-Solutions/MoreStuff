@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
@@ -37,6 +38,7 @@ import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -78,7 +80,7 @@ fun ReviewContent(
         BoxWithConstraints(
             modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
 
             when (model.round) {
@@ -161,7 +163,7 @@ private fun PriorityReviewTopBar(
                 )
             }
         },
-       colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+       colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 }
 
