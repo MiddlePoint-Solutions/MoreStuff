@@ -243,7 +243,7 @@ class NotifierImpl(
         val (title, message) = "Review tasks" to "Take a minute to sort priorities"
 
         val builder = NotificationCompat.Builder(context, REVIEW_CHANNEL_ID)
-            .setSmallIcon(R.drawable.priority_48px)
+            .setSmallIcon(R.drawable.ic_notification)
             .setAutoCancel(true)
             .setContentTitle(title)
             .setContentText(message)
