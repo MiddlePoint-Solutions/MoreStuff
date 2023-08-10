@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -32,6 +30,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +41,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -82,8 +83,12 @@ fun ImageImportScreen(
                         )
                     }
                 },
-
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    titleContentColor = Color(0xFFC8C5CA)
                 )
+
+            )
             Image(
                 painter = rememberAsyncImagePainter(model = imageUri),
                 contentDescription = "Selected Image",
@@ -92,53 +97,54 @@ fun ImageImportScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            BasicTextField(
-                value = messageText,
-                onValueChange = { messageText = it },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp)
-                    .defaultMinSize(minHeight = 46.dp),
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    if (messageText.isNotBlank()) {
-                        send(messageText.trim())
-                        messageText = ""
-                    }
-                }),
-                maxLines = Int.MAX_VALUE,
-                cursorBrush = SolidColor(LocalContentColor.current),
-                textStyle = LocalTextStyle.current.copy(
-                    color = LocalContentColor.current,
-                    fontSize = 18.sp
-                ),
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (messageText.isEmpty()) {
-                            Text(
-                                text = "Enter message",
-                                fontSize = 18.sp,
-                                color = Color.Gray
-                            )
-                        }
-                        innerTextField()
-                    }
-                }
-            )
+
 
             Row(
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(bottom = 50.dp, end = 15.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Spacer(modifier = Modifier.width(32.dp))
+                BasicTextField(
+                    value = messageText,
+                    onValueChange = { messageText = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .defaultMinSize(minHeight = 46.dp),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (messageText.isNotBlank()) {
+                            send(messageText.trim())
+                            messageText = ""
+                        }
+                    }),
+                    maxLines = Int.MAX_VALUE,
+                    cursorBrush = SolidColor(LocalContentColor.current),
+                    textStyle = LocalTextStyle.current.copy(
+                        color = LocalContentColor.current,
+                        fontSize = 18.sp
+                    ),
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (messageText.isEmpty()) {
+                                Text(
+                                    text = "Add a caption...",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        lineHeight = 20.sp,
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0xFFC7C5D0),
+                                        letterSpacing = 0.16.sp,
+                                    )
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
                 IconButton(
                     onClick = {
                         send(messageText.trim())
@@ -147,7 +153,7 @@ fun ImageImportScreen(
                     modifier = Modifier
                         .size(55.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .background(MaterialTheme.colorScheme.tertiaryContainer)
 
 
                 ) {
@@ -157,7 +163,7 @@ fun ImageImportScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .align(Alignment.CenterVertically),
-                        tint = Color.Black
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer
                     )
                 }
             }

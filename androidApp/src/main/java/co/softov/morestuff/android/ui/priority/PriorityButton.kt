@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.Orange600
 
 @Composable
 fun PriorityButton(
@@ -38,10 +37,9 @@ fun PriorityButton(
     fontSize: TextUnit = 13.sp,
     shape: Shape = CircleShape,
 ) {
-    PriorityButton(
+    SetSchedulePriorityButton(
         onClick = onClick,
         modifier = modifier.layoutId(text),
-        selected = selected,
         enabled = enabled,
         shape = shape,
     ) {
@@ -66,18 +64,15 @@ fun PriorityButton(
 
     val backgroundColor by animateColorAsState(
         targetValue = when (selected) {
-            true -> Orange600
-            else -> MaterialTheme.colorScheme.secondaryContainer
+            true -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12F)
+            else -> Color.Transparent
         },
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Background Color Animation"
     )
 
     val textColor by animateColorAsState(
-        targetValue = when (selected) {
-            true -> MaterialTheme.colorScheme.onSecondary
-            else -> MaterialTheme.colorScheme.onPrimary
-        },
+        targetValue = MaterialTheme.colorScheme.onSecondary,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Text Color Animation"
     )
@@ -87,6 +82,42 @@ fun PriorityButton(
         shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
+            contentColor = textColor
+        ),
+        onClick = onClick,
+        enabled = enabled,
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun SetSchedulePriorityButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    shape: Shape = CircleShape,
+    content: @Composable () -> Unit,
+) {
+
+    val backgroundColor by animateColorAsState(
+        targetValue = MaterialTheme.colorScheme.primary.copy(alpha = 0.12F),
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Background Color Animation"
+    )
+
+    val textColor by animateColorAsState(
+        targetValue = MaterialTheme.colorScheme.primary,
+        animationSpec = tween(300, easing = FastOutSlowInEasing),
+        label = "Text Color Animation"
+    )
+
+    Button(
+        modifier = modifier,
+        shape = shape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = backgroundColor,
+            contentColor = textColor
         ),
         onClick = onClick,
         enabled = enabled,

@@ -72,10 +72,18 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             searchTasksUseCase(searchText)
                 .onEach { results ->
-                    searchResults.value = results
+                    val formattedTasks = results.map { task ->
+                        if (task.isComplete) {
+                            task.copy(completeTime = timeFormatter.formatTimeDayMonthHour(task.completeTime))
+                        } else {
+                            task
+                        }
+                    }
+                    searchResults.value = formattedTasks
                 }.launchIn(this)
         }
     }
+
 
     private fun loadCompletedTasks(searchText: String) {
         searchJob = viewModelScope.launch {

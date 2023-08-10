@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,13 +19,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.nav.Screen
-import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
@@ -64,7 +62,7 @@ fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    userInputViewModel: UserInputViewModel = koinViewModel()
+    userInputViewModel: UserInputViewModel = koinViewModel(),
 ) {
     val priorityScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -97,8 +95,9 @@ fun HomeContent(
 
             Surface(
                 tonalElevation = 5.dp,
-                color = Color.Transparent
-            ) {
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+
+                ) {
                 UserInput(
                     priorityContent = {
                         PriorityInput(

@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -19,16 +18,15 @@ import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,15 +38,12 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.ui.MaterialColors
-import co.softov.morestuff.android.app.ui.get
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
@@ -212,10 +207,7 @@ fun PriorityContent(
                         visible = !isDragging,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     ) {
-                        Divider(
-                            thickness = 0.5.dp,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+
                     }
 
                     LaunchedEffect(key1 = isDragging) {
@@ -243,15 +235,15 @@ fun PriorityContent(
 @Composable
 private fun SwipeBackground(
     dismissState: NoFlingDismissState,
-    hasReminder: Boolean
+    hasReminder: Boolean,
 ) {
     val direction = dismissState.dismissDirection ?: return
 
     val color by animateColorAsState(
         when (dismissState.targetValue) {
-            DismissValue.Default -> MaterialColors.DeepPurple[200]
-            DismissValue.DismissedToEnd -> MaterialColors.DeepPurple[400]
-            DismissValue.DismissedToStart -> MaterialColors.DeepPurple[400]
+            DismissValue.Default -> MaterialTheme.colorScheme.primary
+            DismissValue.DismissedToEnd -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5F)
+            DismissValue.DismissedToStart -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5F)
         }, label = "Color animation"
     )
     val alignment = when (direction) {

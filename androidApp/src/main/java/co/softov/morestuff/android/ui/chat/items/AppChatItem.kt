@@ -23,7 +23,6 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
-import co.softov.morestuff.android.ui.theme.appChatItem
 
 @Composable
 fun AppChatItem(
@@ -45,15 +44,16 @@ fun AppChatItem(
                 bottomEnd = 14.dp,
                 bottomStart = 5.dp
             ),
-            color = MaterialTheme.colorScheme.appChatItem,
-            contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+            color = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = contentColorFor(MaterialTheme.colorScheme.onPrimaryContainer),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
-                Row(Modifier.align(Alignment.End)) {
+                Row(Modifier.align(Alignment.End).padding(top = 3.dp)) {
                     DisplayMessageTime(
                         formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
                         modifier = Modifier,
+                        textColor = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }

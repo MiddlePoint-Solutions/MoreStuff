@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -82,6 +84,7 @@ fun ImagePreviewScreen(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
                     IconButton(onClick = { onSendImage(imagePath) }) {
                         Icon(
@@ -122,18 +125,22 @@ fun ImagePreviewScreen(
                         })
                     },
             )
-            Text(
-                text = title,
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(4.dp)
-                    .padding(start = 15.dp, end = 15.dp)
-                    .align(Alignment.CenterHorizontally),
-                style = LocalTextStyle.current.copy(
-                    color = Color.White,
-                    fontSize = 16.sp
+            Row(modifier = Modifier.align(Alignment.Start).padding(start = 16.dp, bottom = 23.dp)) {
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .padding(4.dp)
+                        .padding(start = 15.dp, end = 15.dp)
+                        .align(Alignment.CenterVertically),
+                    style = LocalTextStyle.current.copy(
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
                 )
-            )
+            }
+
         }
+
     }
 }

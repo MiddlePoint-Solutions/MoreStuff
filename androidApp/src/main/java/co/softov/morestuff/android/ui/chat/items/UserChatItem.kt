@@ -22,7 +22,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -49,18 +48,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
-import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.userChatItem
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -74,7 +70,6 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
-    val timeFormatter: TimeFormatter = koinInject()
 
     val content by remember {
         derivedStateOf {
@@ -127,8 +122,7 @@ fun UserChatItem(
                             bottomEnd = 7.dp,
                             bottomStart = 10.dp
                         ),
-                        color = MaterialTheme.colorScheme.userChatItem,
-                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                        color = MaterialTheme.colorScheme.primary,
                         modifier = if (message.content.isEmpty()) {
                             Modifier
                                 .padding(2.dp)
@@ -158,7 +152,7 @@ fun UserChatItem(
                                             )
                                             .align(Alignment.Start),
                                         style = LocalTextStyle.current.copy(
-                                            color = Color.White,
+                                            color = MaterialTheme.colorScheme.onPrimary,
                                             fontSize = 16.sp
                                         )
                                     )
@@ -215,8 +209,7 @@ fun UserChatItem(
                             bottomEnd = 5.dp,
                             bottomStart = 14.dp
                         ),
-                        color = MaterialTheme.colorScheme.userChatItem,
-                        contentColor = contentColorFor(MaterialTheme.colorScheme.primary),
+                        color = MaterialTheme.colorScheme.primary,
                     ) {
                         Column {
                             Text(
@@ -241,7 +234,7 @@ fun UserChatItem(
                                     },
                                 text = content,
                                 style = LocalTextStyle.current.copy(
-                                    color = Color.White,
+                                    color = MaterialTheme.colorScheme.onPrimary,
                                     fontSize = 16.sp
                                 )
                             )
@@ -279,11 +272,17 @@ fun UserChatItem(
 fun DisplayMessageTime(
     formattedTimeOnly: String?,
     modifier: Modifier = Modifier,
+    textColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     formattedTimeOnly?.let {
         Text(
             text = it,
-            style = TextStyle(fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface),
+            style = TextStyle(
+                fontSize = 10.sp,
+                lineHeight = 28.sp,
+                fontWeight = FontWeight(400),
+                color = textColor
+            ),
             modifier = Modifier
                 .padding(start = 15.dp, end = 12.dp, bottom = 5.dp)
                 .wrapContentWidth(Alignment.End)
@@ -309,7 +308,7 @@ private fun ChatImageMessage(
         modifier = modifier
             .aspectRatio(1f)
             .size(200.dp)
-            .border(2.dp, MaterialTheme.colorScheme.userChatItem, RoundedCornerShape(8.dp)),
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
         contentScale = ContentScale.Crop
     )
 }
@@ -331,7 +330,8 @@ private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
                 text = openGraphResult.title ?: "",
                 style = TextStyle(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
                 ),
                 modifier = Modifier.weight(1f)
             )
@@ -348,7 +348,8 @@ private fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
         Text(
             text = openGraphResult.description ?: "",
             fontSize = 9.sp,
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            color = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
