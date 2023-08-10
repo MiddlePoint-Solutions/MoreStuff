@@ -52,14 +52,14 @@ fun TaskOptionsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
             },
             icon = {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = stringResource(R.string.cd_complete_task),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         )
@@ -72,7 +72,7 @@ fun TaskOptionsDialog(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
                     lineHeight = 31.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
             },
             icon = {
@@ -80,7 +80,7 @@ fun TaskOptionsDialog(
                     imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_up_48px),
                     contentDescription = stringResource(R.string.cd_move_to_top),
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         )
@@ -92,16 +92,16 @@ fun TaskOptionsDialog(
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = MaterialTheme.colorScheme.primary,
 
-                )
+                    )
             },
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_down_48px),
                     contentDescription = stringResource(R.string.cd_move_task_to_bottom),
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
         )

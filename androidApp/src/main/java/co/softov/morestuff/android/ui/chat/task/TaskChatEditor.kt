@@ -86,7 +86,7 @@ fun TaskChatEditor(
         Box(
             modifier = Modifier
                 .animateContentSize(animationSpec = tween())
-                .padding(vertical = 2.dp)
+                .padding(vertical = 7.dp)
                 .then(
                     if (isEditing) {
                         Modifier

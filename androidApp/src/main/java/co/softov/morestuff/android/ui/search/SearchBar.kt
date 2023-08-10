@@ -14,13 +14,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FilterChipDefaults.filterChipBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -187,11 +187,6 @@ fun SearchBar(
                                             }
                                         )
                                     }
-
-                                    Divider(
-                                        thickness = 0.5.dp,
-                                        modifier = Modifier.fillMaxWidth(),
-                                    )
                                 }
                             }
                         }
@@ -230,12 +225,15 @@ private fun SearchFilterChip(
 
     val unselectedColor by animateColorAsState(
         targetValue = if (!isSelected) {
-            Color.Transparent
+            MaterialTheme.colorScheme.primaryContainer
         } else {
             Color(0xFF8C98FF)
         },
         animationSpec = tween(durationMillis = 200),
         label = ""
+    )
+    val transparentBorder = filterChipBorder(
+        borderColor = Color.Transparent,
     )
 
     FilterChip(
@@ -250,7 +248,9 @@ private fun SearchFilterChip(
             selectedContainerColor = selectedColor,
         ),
         modifier = Modifier.padding(end = 7.dp),
-        shape = CircleShape
+        shape = CircleShape,
+        border = transparentBorder
+
     )
 }
 
@@ -274,17 +274,17 @@ private fun FilterType.Icon() {
         )
 
         FilterType.Scheduled -> Icon(
-            imageVector = Icons.Default.Schedule,
+            imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
             contentDescription = stringResource(R.string.cd_filter_schedules_tasks),
         )
 
         FilterType.Reminder -> Icon(
-            imageVector = Icons.Default.Notifications,
+            imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
             contentDescription = stringResource(R.string.cd_filter_reminders_tasks),
         )
 
         FilterType.Done -> Icon(
-            imageVector = Icons.Default.Done,
+            imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
             contentDescription = stringResource(R.string.cd_filter_completed_tasks),
         )
     }

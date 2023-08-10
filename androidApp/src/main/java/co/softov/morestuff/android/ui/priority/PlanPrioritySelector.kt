@@ -82,9 +82,9 @@ fun PlanPrioritySelector(
                 Text(
                     text = planTime.displayDate,
                     style = TextStyle(
-                        fontSize = 12.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp,
+                        fontWeight = FontWeight(500),
                     )
                 )
             }
@@ -97,9 +97,9 @@ fun PlanPrioritySelector(
                 Text(
                     text = planTime.displayTime,
                     style = TextStyle(
-                        fontSize = 12.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
+                        fontSize = 11.sp,
+                        lineHeight = 16.sp,
+                        fontWeight = FontWeight(500),
                     )
                 )
             }

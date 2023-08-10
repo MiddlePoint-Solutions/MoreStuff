@@ -64,7 +64,7 @@ fun PriorityButton(
 
     val backgroundColor by animateColorAsState(
         targetValue = when (selected) {
-            true -> MaterialTheme.colorScheme.primaryContainer
+            true -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12F)
             else -> Color.Transparent
         },
         animationSpec = tween(300, easing = FastOutSlowInEasing),
@@ -101,13 +101,13 @@ fun SetSchedulePriorityButton(
 ) {
 
     val backgroundColor by animateColorAsState(
-        targetValue =MaterialTheme.colorScheme.primaryContainer,
+        targetValue = MaterialTheme.colorScheme.primary.copy(alpha = 0.12F),
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Background Color Animation"
     )
 
     val textColor by animateColorAsState(
-        targetValue = MaterialTheme.colorScheme.onSecondary,
+        targetValue = MaterialTheme.colorScheme.primary,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Text Color Animation"
     )
