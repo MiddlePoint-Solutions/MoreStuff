@@ -8,43 +8,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.ui.local.LocalTheme
-
-
-private val lightColors = lightColorScheme(
-    primary = primaryLightTheme,
-    primaryContainer = primaryContainerLightTheme,
-    onPrimary = Color.Black,
-    secondary = Orange500,
-    secondaryContainer = secondaryContainerLightTheme,
-    onSecondary = Color.Black,
-    error = Red200,
-)
-
-val ColorScheme.userChatItem: Color
-    get() = Indigo400
-
-val ColorScheme.appChatItem: Color
-    get() = Indigo200
-
-val darkBlue = Color(30, 31, 45)
-val darkSurface = Color(39, 40, 53)
-
-private val darkColors = darkColorScheme(
-    primary = Color(73, 69, 79),
-    primaryContainer = BlueGray900,
-    onPrimary = Color.White,
-    secondary = Orange500,
-    secondaryContainer = Orange600,
-    onSecondary = Color.White,
-    error = Red200,
-    background = darkBlue,
-    surface = darkSurface
-)
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -134,7 +104,9 @@ fun MoreStuffSettingTheme(
     val darkTheme = isDarkTheme()
 
     MaterialTheme(
-        colorScheme = if (darkTheme) darkColors.copy(surface = md_theme_dark_background) else  lightColors.copy(surface = md_theme_light_background),
+        colorScheme = if (darkTheme) DarkColors.copy(surface = md_theme_dark_background) else LightColors.copy(
+            surface = md_theme_light_background
+        ),
         typography = Typography(),
     ) {
         CustomSelectionColor(darkTheme) {
@@ -142,6 +114,14 @@ fun MoreStuffSettingTheme(
         }
     }
 }
+
+
+val ColorScheme.surfaceContainer: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+
+@Composable
+fun ColorScheme.surfaceContainer() = run { }
 
 @Composable
 fun isDarkTheme(): Boolean {

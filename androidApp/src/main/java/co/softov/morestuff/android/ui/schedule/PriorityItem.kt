@@ -36,6 +36,7 @@ import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.TaskColors
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 
 @Composable
 fun PriorityItem(
@@ -50,7 +51,6 @@ fun PriorityItem(
             .fillMaxWidth()
             .heightIn(max = 90.dp)
             .shadow(elevation = elevation)
-            .background(MaterialTheme.colorScheme.background)
     ) {
         Row(
             modifier = modifier
@@ -121,7 +121,9 @@ fun TaskProfile(task: TaskDomain) {
 )
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
+    name = "DefaultPreviewLight",
+    backgroundColor = 0xFFFFFF,
+    showBackground = true
 )
 @Composable
 fun PriorityItemPreview() {

@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.domain.nav.Screen
@@ -73,6 +74,7 @@ fun MoreStuffHomeScaffold(
             content = {
                 Scaffold(
                     modifier = Modifier.systemBarsPadding(),
+                    containerColor = Color.Transparent,
                     snackbarHost = {
                         SnackbarHost(hostState = snackbarHostState) { data ->
                             SwipeToDismiss(

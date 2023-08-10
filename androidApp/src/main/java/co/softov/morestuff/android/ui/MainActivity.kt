@@ -8,6 +8,7 @@ import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,6 +32,7 @@ import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.isDarkTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
@@ -68,9 +70,11 @@ class MainActivity : AppCompatActivity() {
             NotificationPermissionRequester()
 
             ProvideAppTheme(viewModel.appTheme) {
-                TransparentSystemBars()
                 MoreStuffTheme {
-                    Surface {
+                    TransparentSystemBars()
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceContainer
+                    ) {
                         ProvideComponentContext(rootComponentContext) {
                             ProvideAppNavigation(navigation) {
                                 MainContent(
@@ -102,13 +106,10 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun TransparentSystemBars() {
         val systemUiController = rememberSystemUiController()
-        val useDarkIcons = !isDarkTheme()
+        val isDarkTheme = isDarkTheme()
 
-        DisposableEffect(systemUiController, useDarkIcons) {
-            systemUiController.setSystemBarsColor(
-                color = Color.Transparent,
-                darkIcons = useDarkIcons
-            )
+        DisposableEffect(systemUiController, isDarkTheme) {
+            systemUiController.setSystemBarsColor(Color.Transparent)
             onDispose {}
         }
     }
