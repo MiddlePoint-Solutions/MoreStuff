@@ -37,8 +37,8 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(97.dp)
-                .height(43.dp),
+                .width(110.dp)
+                .height(47.dp),
             selected = priority is PriorityModel.Now,
             onClick = onNowSelected,
         ) {
@@ -49,14 +49,14 @@ fun PrioritySelector(
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
 
-                )
+                    )
             )
         }
 
         PriorityButton(
             modifier = Modifier
-                .width(97.dp)
-                .height(43.dp),
+                .width(110.dp)
+                .height(47.dp),
             selected = priority is PriorityModel.Later,
             onClick = onLaterSelected,
         ) {
@@ -67,14 +67,14 @@ fun PrioritySelector(
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
 
-                )
+                    )
             )
         }
 
         PriorityButton(
             modifier = Modifier
-                .width(97.dp)
-                .height(43.dp),
+                .width(110.dp)
+                .height(47.dp),
             selected = priority is PriorityModel.Plan,
             onClick = onPlanSelected,
         ) {
