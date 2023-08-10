@@ -308,7 +308,7 @@ private fun ChatImageMessage(
         modifier = modifier
             .aspectRatio(1f)
             .size(200.dp)
-            .border(2.dp, MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(8.dp)),
+            .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
         contentScale = ContentScale.Crop
     )
 }
