@@ -153,7 +153,7 @@ fun ImageImportScreen(
                     modifier = Modifier
                         .size(55.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.tertiaryContainer)
+                        .background(MaterialTheme.colorScheme.primary)
 
 
                 ) {
@@ -163,7 +163,7 @@ fun ImageImportScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onTertiaryContainer
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
             }
