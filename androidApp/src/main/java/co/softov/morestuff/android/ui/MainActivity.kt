@@ -69,9 +69,10 @@ class MainActivity : AppCompatActivity() {
 
             NotificationPermissionRequester()
 
+            TransparentSystemBars()
+
             ProvideAppTheme(viewModel.appTheme) {
                 MoreStuffTheme {
-                    TransparentSystemBars()
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         val isDarkTheme = isDarkTheme()
 
         DisposableEffect(systemUiController, isDarkTheme) {
-            systemUiController.setSystemBarsColor(Color.Transparent)
+            systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = !isDarkTheme)
             onDispose {}
         }
     }

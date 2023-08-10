@@ -4,10 +4,14 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -23,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
@@ -90,45 +96,48 @@ fun HomeContent(
 
         SlideAnimation(
             visibleState = visibleState,
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .zIndex(1f),
         ) {
             val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
 
-            Surface(
-                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                color = Color.Transparent
-            ) {
-                UserInput(
-                    priorityContent = {
-                        PriorityInput(
-                            model = priorityModel,
-                            onNowSelected = userInputViewModel::setNowPriority,
-                            onLaterSelected = userInputViewModel::setLaterPriority,
-                            onPlanSelected = userInputViewModel::setPlanPriority,
-                            onTimeChange = userInputViewModel::updatePlanTime,
-                            onDateChange = userInputViewModel::updatePlanDate,
-                        )
-                    },
-                    textContent = {
-                        UserTextInput(
-                            value = userInputValue,
-                            onValueChange = { userInputValue = it },
-                            sendAction = {
-                                userInputViewModel.createNewTask(it)
-                                userInputValue = userInputValue.copy("")
-                                scope.launch {
-                                    delay(200)
-                                    priorityScrollState.animateScrollToItem(index = 0)
-                                }
-                            },
-                            actionsContent = {
-                                VoiceToTextInput(
-                                    onUpdateValue = userInputViewModel::updateUserInput
-                                )
-                            }
-                        )
-                    },
+            Column {
+                PriorityInput(
+                    model = priorityModel,
+                    onNowSelected = userInputViewModel::setNowPriority,
+                    onLaterSelected = userInputViewModel::setLaterPriority,
+                    onPlanSelected = userInputViewModel::setPlanPriority,
+                    onTimeChange = userInputViewModel::updatePlanTime,
+                    onDateChange = userInputViewModel::updatePlanDate,
                 )
+
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    UserInput(
+                        textContent = {
+                            UserTextInput(
+                                value = userInputValue,
+                                onValueChange = { userInputValue = it },
+                                sendAction = {
+                                    userInputViewModel.createNewTask(it)
+                                    userInputValue = userInputValue.copy("")
+                                    scope.launch {
+                                        delay(200)
+                                        priorityScrollState.animateScrollToItem(index = 0)
+                                    }
+                                },
+                                actionsContent = {
+                                    VoiceToTextInput(
+                                        onUpdateValue = userInputViewModel::updateUserInput
+                                    )
+                                }
+                            )
+                        },
+                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                }
             }
         }
     }

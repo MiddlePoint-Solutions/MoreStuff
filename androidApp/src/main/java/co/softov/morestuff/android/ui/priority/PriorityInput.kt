@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import co.softov.morestuff.android.ui.home.PriorityInputModel
@@ -53,7 +54,7 @@ private fun PriorityInputContent(
     onDateChange: (Long) -> Unit = {},
 ) {
     Column(
-        modifier = modifier.background(color = MaterialTheme.colorScheme.background)
+        modifier = modifier.background(color = Color.Transparent)
     ) {
 
         val showPlanInput by remember(model.priority) {
@@ -62,12 +63,13 @@ private fun PriorityInputContent(
 
         AnimatedVisibility(
             showPlanInput,
+            modifier = modifier.background(color = Color.Transparent),
             enter = slideInVertically { it * 2 },
             exit = slideOutVertically { (it * 1.5).toInt() }
         ) {
 
             Box(
-                modifier = modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth().background(color = Color.Transparent)
             ) {
 
                 PlanPrioritySelector(

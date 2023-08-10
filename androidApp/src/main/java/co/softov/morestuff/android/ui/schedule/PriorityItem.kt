@@ -51,6 +51,7 @@ fun PriorityItem(
             .fillMaxWidth()
             .heightIn(max = 90.dp)
             .shadow(elevation = elevation)
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             modifier = modifier
@@ -122,8 +123,6 @@ fun TaskProfile(task: TaskDomain) {
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
     name = "DefaultPreviewLight",
-    backgroundColor = 0xFFFFFF,
-    showBackground = true
 )
 @Composable
 fun PriorityItemPreview() {
