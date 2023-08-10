@@ -42,14 +42,16 @@ class ScheduleRepositoryImpl(
 
 
     override suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>> {
+        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         return scheduleQueries
-            .selectActiveSchedules(mapScheduleDb)
+            .selectActiveSchedules(allScheduleTypes,mapScheduleDb)
             .executeAsList()
             .right()
     }
 
     override fun getActiveSchedulesFlow(): Flow<List<ScheduleDomain>> {
-        return scheduleQueries.selectActiveSchedules(mapScheduleDb)
+        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
+        return scheduleQueries.selectActiveSchedules(allScheduleTypes,mapScheduleDb)
             .asFlow()
             .mapToList()
     }
