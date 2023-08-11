@@ -204,8 +204,6 @@ fun SelectTheme(
             )
         },
         useSelectedValueAsSubtitle = false,
-
-
         )
 }
 

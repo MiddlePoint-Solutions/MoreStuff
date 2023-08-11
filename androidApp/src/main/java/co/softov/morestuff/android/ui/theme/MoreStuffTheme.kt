@@ -99,7 +99,7 @@ fun MoreStuffSettingTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(surface = Color.Transparent),
+        colorScheme = MaterialTheme.colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
         typography = Typography(),
     ) {
         content()
