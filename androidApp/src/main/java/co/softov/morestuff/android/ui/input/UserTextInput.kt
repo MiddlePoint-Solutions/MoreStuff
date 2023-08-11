@@ -46,6 +46,7 @@ fun UserTextInput(
     sendAction: (String) -> Unit = {},
     actionsContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
+    boxWeight: Float = 0.12f
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
@@ -111,7 +112,7 @@ fun UserTextInput(
 
                 Box(
                     modifier = Modifier
-                        .weight(0.12f)
+                        .weight(boxWeight)
                         .height(IntrinsicSize.Min)
                         .align(Alignment.Bottom)
                         .padding(4.dp).padding(end = 7.dp)

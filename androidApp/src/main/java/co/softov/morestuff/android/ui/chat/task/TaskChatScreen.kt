@@ -7,8 +7,10 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -54,7 +56,9 @@ import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
@@ -303,32 +307,48 @@ private fun TaskChatInput(
     pickImage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val userInputViewModel: UserInputViewModel = koinViewModel()
     Box(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        UserInput(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            backgroundColor = Color.Transparent,
-            textContent = {
-                UserTextInput(
-                    value = userInputValue,
-                    onValueChange = onValueChange,
-                    sendAction = sendTaskMessage,
-                    backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                    actionsContent = {
-                        IconButton(
-                            onClick = pickImage,
-                        ) {
-                            Icon(
-                                Icons.Filled.PhotoLibrary,
-                                contentDescription = stringResource(R.string.cd_select_images)
-                            )
-                        }
-                    },
+        Surface {
+            UserInput(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                backgroundColor = Color.Transparent,
+                textContent = {
+                    UserTextInput(
+                        value = userInputValue,
+                        onValueChange = onValueChange,
+                        sendAction = sendTaskMessage,
+                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer ,
+                        boxWeight = 0.25f,
+                        actionsContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start,
+                                modifier = Modifier.fillMaxWidth()
+                            ){
+                                IconButton(
+                                    onClick = pickImage,
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Icon(
+                                        Icons.Filled.PhotoLibrary,
+                                        contentDescription = stringResource(R.string.cd_select_images)
+                                    )
+                                }
+                                VoiceToTextInput(
+                                    onUpdateValue = userInputViewModel::updateUserInput,
+                                )
+                            }
+
+                        },
+                    )
+                },
+
                 )
-            },
-        )
+        }
     }
 }
 
