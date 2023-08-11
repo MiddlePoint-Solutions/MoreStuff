@@ -68,13 +68,11 @@ fun DevSettings(
                 title = { Text(text = "Test OnBoarding") },
                 onClick = { navigation.replaceAll(Screen.OnBoarding) },
             )
-            // SettingsDivider()
 
             SettingsMenuLink(
                 title = { Text(text = "Test Review Notification") },
                 onClick = devTools::testReviewNotification,
             )
-            // SettingsDivider()
 
             DebugMessageSwitch(
                 state = rememberAppSettingState(
@@ -82,8 +80,6 @@ fun DevSettings(
                     valueChanged = { devTools.showDebugMessages = it },
                 )
             )
-
-            // SettingsDivider()
 
         }
     }
@@ -98,8 +94,7 @@ private fun DebugMessageSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(color = Color(0xff2B3438)),
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SettingsSwitch(
