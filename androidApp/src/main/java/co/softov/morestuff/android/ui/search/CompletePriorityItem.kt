@@ -69,7 +69,8 @@ fun CompletePriorityItem(
                     text = task.title,
                     textAlign = TextAlign.Start,
                     modifier = Modifier
-                        .fillMaxWidth(0.90f),
+                        .fillMaxWidth(0.90f)
+                        .padding(top = 25.dp),
                     maxLines = 2,
                     color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
@@ -99,7 +100,9 @@ fun CompletePriorityItem(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
                 contentDescription = stringResource(R.string.completed),
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(end = 18.dp)
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(end = 18.dp)
             )
         }
 
