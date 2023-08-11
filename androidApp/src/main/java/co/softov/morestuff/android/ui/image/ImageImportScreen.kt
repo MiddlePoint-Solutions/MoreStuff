@@ -103,7 +103,7 @@ fun ImageImportScreen(
             ) {
                 BasicTextField(
                     value = messageText,
-                    onValueChange = { messageText = it },
+                    onValueChange = { text -> messageText = text },
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)

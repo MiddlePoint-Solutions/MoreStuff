@@ -19,6 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -38,6 +40,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.ui.components.NavigateBackIconButton
 import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.request.ImageRequest
@@ -62,27 +65,15 @@ fun ImagePreviewScreen(
     }
 
     val scope = rememberCoroutineScope()
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
 
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
+        topBar = {
             TopAppBar(
-                title = { Text("") },
+                title = { },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Cancel",
-                            tint = Color.White
-                        )
-                    }
+                    NavigateBackIconButton(onBack = onBack)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                 actions = {
@@ -95,17 +86,25 @@ fun ImagePreviewScreen(
                     }
                 },
             )
-
-            val imageUri = Uri.parse(imagePath)
+        },
+        containerColor = Color.Transparent
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current).data(data = imageUri)
+                    ImageRequest.Builder(LocalContext.current).data(data = imagePath)
                         .apply(block = fun ImageRequest.Builder.() {
                             crossfade(true)
-                        }).build(), imageLoader = LocalContext.current.imageLoader
+                        }).build(),
+                    imageLoader = LocalContext.current.imageLoader
                 ),
                 contentDescription = "Selected Image",
-
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .weight(0.8f)
@@ -125,22 +124,23 @@ fun ImagePreviewScreen(
                         })
                     },
             )
-            Row(modifier = Modifier.align(Alignment.Start).padding(start = 16.dp, bottom = 23.dp)) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(bottom = 23.dp)
+            ) {
                 Text(
                     text = title,
                     modifier = Modifier
                         .weight(0.3f)
                         .padding(4.dp)
-                        .padding(start = 15.dp, end = 15.dp)
-                        .align(Alignment.CenterVertically),
+                        .padding(start = 15.dp, end = 15.dp),
                     style = LocalTextStyle.current.copy(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 16.sp
                     )
                 )
             }
-
         }
-
     }
 }
