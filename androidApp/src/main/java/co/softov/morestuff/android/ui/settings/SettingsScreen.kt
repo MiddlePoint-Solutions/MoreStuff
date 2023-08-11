@@ -91,7 +91,8 @@ private fun SettingsContent(
     val scrollState = rememberScrollState()
 
     Scaffold(
-        topBar = { SettingsTopBar(onBack = onBack) }
+        topBar = { SettingsTopBar(onBack = onBack) },
+        containerColor = Color.Transparent
     ) {
         MoreStuffSettingTheme {
             Box(
@@ -110,20 +111,17 @@ private fun SettingsContent(
                         themeSelected = actions.selectAppTheme,
                         defaultValue = { model.appTheme.ordinal }
                     )
-                    // SettingsDivider()
 
                     SelectSnoozeLimit(
                         onSnoozeLimitChanged = actions.setSnoozeLimit,
                         defaultValue = { model.snoozeLimit.toFloat() }
                     )
 
-                    // SettingsDivider()
 
                     EnableConfetti(
                         defaultValue = { model.confettiEnabled },
                         valueChanged = actions.enableConfetti,
                     )
-                    // SettingsDivider()
 
                 }
 
@@ -132,8 +130,6 @@ private fun SettingsContent(
                 ) {
 
                     devTools()
-
-                    // SettingsDivider()
 
                     About(
                         showLibraries = showLibraries
@@ -208,8 +204,6 @@ fun SelectTheme(
             )
         },
         useSelectedValueAsSubtitle = false,
-
-
         )
 }
 

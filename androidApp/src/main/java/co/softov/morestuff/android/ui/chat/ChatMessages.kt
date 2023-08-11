@@ -75,10 +75,11 @@ fun Messages(
         ) {
             itemsIndexed(
                 items = messages,
-                key = { _, item -> item.message.id }
+                key = { _, item -> item.message.id },
+                contentType = { _, item -> /* TODO: after date item is created in ViewModel (with MessageUiModel) */ }
             ) { index, item ->
-                val nextMessage = if (index < messages.size - 1) messages[index + 1] else null
 
+                val nextMessage = messages.getOrNull(index + 1)
                 val isLastMessageOfDay = item.formattedTime != nextMessage?.formattedTime
 
                 Column {
@@ -89,25 +90,23 @@ fun Messages(
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            item.formattedTime?.let {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07F),
-                                            shape = RoundedCornerShape(38)
-                                        )
-                                        .padding(
-                                            start = 35.dp,
-                                            end = 35.dp,
-                                            bottom = 5.dp,
-                                            top = 5.dp
-                                        ),
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF5C5E74),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                            Text(
+                                text = item.formattedTime,
+                                modifier = Modifier
+                                    .background(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.07F),
+                                        shape = RoundedCornerShape(38)
+                                    )
+                                    .padding(
+                                        start = 35.dp,
+                                        end = 35.dp,
+                                        bottom = 5.dp,
+                                        top = 5.dp
+                                    ),
+                                fontSize = 14.sp,
+                                color = Color(0xFF5C5E74),
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
                     when (item.message.contentType) {

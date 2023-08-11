@@ -107,10 +107,14 @@ class MainActivity : AppCompatActivity() {
     @Composable
     private fun TransparentSystemBars() {
         val systemUiController = rememberSystemUiController()
-        val isDarkTheme = isDarkTheme()
+        val useDarkIcons = !isDarkTheme()
 
-        DisposableEffect(systemUiController, isDarkTheme) {
-            systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = !isDarkTheme)
+        DisposableEffect(systemUiController, useDarkIcons) {
+            systemUiController.setSystemBarsColor(
+                color = Color.Transparent,
+                darkIcons = useDarkIcons,
+                isNavigationBarContrastEnforced = false
+            )
             onDispose {}
         }
     }

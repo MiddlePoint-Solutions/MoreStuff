@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.FilterType
 import co.softov.morestuff.android.ui.schedule.PriorityItem
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
@@ -109,7 +110,7 @@ fun SearchBar(
             }
         },
         colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ),
     ) {
 

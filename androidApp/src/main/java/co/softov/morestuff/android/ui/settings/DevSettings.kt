@@ -42,52 +42,44 @@ fun DevSettings(
 ) {
 
     val navigation = LocalAppNavigation.current
-    MoreStuffSettingTheme {
-        SettingsGroup(
-            title = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Text(
-                        text = "Developer Settings",
-                        style = TextStyle(
-                            fontSize = 22.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
+    SettingsGroup(
+        title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
+                Spacer(modifier = Modifier.width(20.dp))
+                Text(
+                    text = "Developer Settings",
+                    style = TextStyle(
+                        fontSize = 22.sp,
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight(400),
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
-                }
-            }
-        ) {
-
-            SettingsMenuLink(
-                title = { Text(text = "Test OnBoarding") },
-                onClick = { navigation.replaceAll(Screen.OnBoarding) },
-            )
-            // SettingsDivider()
-
-            SettingsMenuLink(
-                title = { Text(text = "Test Review Notification") },
-                onClick = devTools::testReviewNotification,
-            )
-            // SettingsDivider()
-
-            DebugMessageSwitch(
-                state = rememberAppSettingState(
-                    defaultValue = { devTools.showDebugMessages },
-                    valueChanged = { devTools.showDebugMessages = it },
                 )
-            )
-
-            // SettingsDivider()
-
+            }
         }
-    }
+    ) {
 
+        SettingsMenuLink(
+            title = { Text(text = "Test OnBoarding") },
+            onClick = { navigation.replaceAll(Screen.OnBoarding) },
+        )
+
+        SettingsMenuLink(
+            title = { Text(text = "Test Review Notification") },
+            onClick = devTools::testReviewNotification,
+        )
+
+        DebugMessageSwitch(
+            state = rememberAppSettingState(
+                defaultValue = { devTools.showDebugMessages },
+                valueChanged = { devTools.showDebugMessages = it },
+            )
+        )
+    }
 }
 
 @Composable
@@ -98,8 +90,7 @@ private fun DebugMessageSwitch(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .background(color = Color(0xff2B3438)),
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SettingsSwitch(
