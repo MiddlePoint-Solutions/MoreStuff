@@ -144,8 +144,8 @@ fun TaskChatScreen(
                 is ChatScreen.ImageImport -> {
                     ImageImportScreen(
                         imageUri = Uri.parse(screen.uri),
-                        send = { message ->
-                            viewModel.sendImageMessageForTask(screen.uri, message)
+                        onImport = { title ->
+                            viewModel.sendImageMessageForTask(screen.uri, title)
                             navigation.pop()
                         },
                         onBack = navigation::pop
