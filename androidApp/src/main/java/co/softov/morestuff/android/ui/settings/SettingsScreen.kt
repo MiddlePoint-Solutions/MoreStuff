@@ -5,6 +5,7 @@ import android.content.res.Resources
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
@@ -20,8 +21,12 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +39,7 @@ import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -142,7 +148,7 @@ private fun SettingsContent(
 @Composable
 fun SettingsDivider() {
     Divider(
-        color = MaterialTheme.colorScheme.onBackground,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         thickness = 1.dp,
         modifier = Modifier.fillMaxWidth()
     )
@@ -285,64 +291,106 @@ fun About(
     showLibraries: () -> Unit,
 ) {
     MoreStuffSettingTheme {
-        Column(modifier = modifier.padding(16.dp)) {
+        Column(modifier = modifier.padding(16.dp).padding(bottom = 23.dp)) {
 
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(R.string.about_morestuff),
-                    fontSize = 20.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
+                SettingsDivider()
             }
 
             Row(
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
             ) {
                 Text(
                     text = "Version",
-                    color = MaterialTheme.colorScheme.onBackground,
-                )
-
-                Text(
-                    text = " ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                     fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(start = 190.dp, end = 16.dp)
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.privacy_policy),
+                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = showLibraries)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = stringResource(R.string.open_source_libraries),
+                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = showLibraries)
                 )
             }
 
             Text(
-                text = stringResource(R.string.open_source_libraries),
-                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                modifier = Modifier.clickable(onClick = showLibraries)
+                text = "Send Feedback and join our community!",
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(top = 16.dp)
             )
 
-            Text(
-                text = stringResource(R.string.privacy_policy),
-                style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                modifier = Modifier.clickable(onClick = showLibraries)
-            )
-
-            Box(
-                modifier = Modifier
-                    .padding(top = 16.dp)
-                    .fillMaxWidth()
-                //.clickable(onClick = { TODO() })
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(
-                    horizontalAlignment = Alignment.Start,
+                Button(
+                    onClick = { /* open Discord */ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                    shape = RoundedCornerShape(15.dp),
+                    modifier = Modifier.padding(end = 8.dp)
+
                 ) {
-                    Text(
-                        text = "Follow us and join our community!",
-                        color = MaterialTheme.colorScheme.onBackground,
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
+                        contentDescription = "Discord Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "Discord Server",
+                        style = TextStyle(
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.onSurface
+                        ))
+                }
+                Button(
+                    onClick = { /* open Telegram */ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
+                    shape = RoundedCornerShape(15.dp),
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_telegram),
+                        contentDescription = "Telegram Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Telegram Page",
+                        style = TextStyle(
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+
                 }
             }
+
         }
     }
-
 }
 
 

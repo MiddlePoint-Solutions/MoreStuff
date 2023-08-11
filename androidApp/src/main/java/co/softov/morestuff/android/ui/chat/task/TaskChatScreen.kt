@@ -287,7 +287,7 @@ private fun TaskChatContent(
                                     PickVisualMedia.ImageOnly
                                 )
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -305,16 +305,18 @@ private fun TaskChatInput(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
         Surface {
             UserInput(
                 modifier = Modifier.align(Alignment.BottomCenter),
+                backgroundColor = MaterialTheme.colorScheme.background,
                 textContent = {
                     UserTextInput(
                         value = userInputValue,
                         onValueChange = onValueChange,
                         sendAction = sendTaskMessage,
+                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer ,
                         actionsContent = {
                             IconButton(
                                 onClick = pickImage,
@@ -327,6 +329,7 @@ private fun TaskChatInput(
                         },
                     )
                 },
+
             )
         }
     }
