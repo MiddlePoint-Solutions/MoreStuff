@@ -135,7 +135,6 @@ fun HomeContent(
                                 }
                             )
                         },
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 }
             }

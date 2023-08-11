@@ -86,14 +86,11 @@ fun MoreStuffTheme(
     content: @Composable () -> Unit
 ) {
     val darkTheme = isDarkTheme()
-
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         typography = Typography,
     ) {
-        CustomSelectionColor(darkTheme) {
-            content()
-        }
+        content()
     }
 }
 
@@ -101,27 +98,17 @@ fun MoreStuffTheme(
 fun MoreStuffSettingTheme(
     content: @Composable () -> Unit
 ) {
-    val darkTheme = isDarkTheme()
-
     MaterialTheme(
-        colorScheme = if (darkTheme) DarkColors.copy(surface = md_theme_dark_background) else LightColors.copy(
-            surface = md_theme_light_background
-        ),
+        colorScheme = MaterialTheme.colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
         typography = Typography(),
     ) {
-        CustomSelectionColor(darkTheme) {
-            content()
-        }
+        content()
     }
 }
-
 
 val ColorScheme.surfaceContainer: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
-
-@Composable
-fun ColorScheme.surfaceContainer() = run { }
 
 @Composable
 fun isDarkTheme(): Boolean {

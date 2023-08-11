@@ -20,7 +20,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,54 +41,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.components.NavigateBackIconButton
 import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
     imageUri: Uri,
-    send: (String) -> Unit,
+    onImport: (String) -> Unit,
     onBack: () -> Unit,
 ) {
     var messageText by remember { mutableStateOf("") }
 
-    Box(
+    Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
+            .fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.import_image_title)) },
+                navigationIcon = {
+                    NavigateBackIconButton(onBack)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                )
+            )
+        },
+        containerColor = Color.Transparent
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
+                .padding(it)
                 .fillMaxSize()
                 .navigationBarsPadding()
                 .imePadding(),
         ) {
-            TopAppBar(
-                title = { Text("Select image") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    titleContentColor = Color(0xFFC8C5CA)
-                )
 
-            )
             Image(
                 painter = rememberAsyncImagePainter(model = imageUri),
                 contentDescription = "Selected Image",
@@ -97,15 +97,13 @@ fun ImageImportScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-
-
             Row(
                 modifier = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BasicTextField(
                     value = messageText,
-                    onValueChange = { messageText = it },
+                    onValueChange = { text -> messageText = text },
                     modifier = Modifier
                         .weight(1f)
                         .padding(end = 8.dp)
@@ -117,26 +115,25 @@ fun ImageImportScreen(
                     ),
                     keyboardActions = KeyboardActions(onDone = {
                         if (messageText.isNotBlank()) {
-                            send(messageText.trim())
-                            messageText = ""
+                            onImport(messageText.trim())
                         }
                     }),
                     maxLines = Int.MAX_VALUE,
-                    cursorBrush = SolidColor(LocalContentColor.current),
                     textStyle = LocalTextStyle.current.copy(
-                        color = LocalContentColor.current,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 18.sp
                     ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
                     decorationBox = { innerTextField ->
                         Box {
                             if (messageText.isEmpty()) {
                                 Text(
-                                    text = "Add a caption...",
+                                    text = stringResource(R.string.import_image_title_hint),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         lineHeight = 20.sp,
                                         fontWeight = FontWeight(400),
-                                        color = Color(0xFFC7C5D0),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         letterSpacing = 0.16.sp,
                                     )
                                 )
@@ -145,28 +142,27 @@ fun ImageImportScreen(
                         }
                     }
                 )
-                IconButton(
-                    onClick = {
-                        send(messageText.trim())
-                        messageText = ""
-                    },
-                    modifier = Modifier
-                        .size(55.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send",
-                        modifier = Modifier
-                            .size(36.dp)
-                            .align(Alignment.CenterVertically),
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
+                ImportConfirmButton(onClick = { onImport(messageText.trim()) })
             }
         }
+    }
+}
+
+@Composable
+private fun ImportConfirmButton(onClick: () -> Unit) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier
+            .size(55.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primary)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Send,
+            contentDescription = stringResource(id = R.string.cd_send),
+            modifier = Modifier
+                .size(36.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
