@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter
 internal class TimeFormatterImplTest {
 
     private val timeFormatter = spyk(TimeFormatterImpl(mockk())) {
-        every { is24HourFormat } returns false
+        every { is24HourFormat } returns true
     }
 
     @Test
@@ -62,7 +62,7 @@ internal class TimeFormatterImplTest {
     }
 
     @Test
-    fun `formatToDateTime should format input time string to dd MM yyyy HH mm format`() {
+    fun `formatToDateTime should format input time string to ddMMyyyyHHmm format`() {
         val timeString = "2023-03-27T12:00:00.000Z"
         val expectedFormattedString = ZonedDateTime.parse(timeString)
             .withZoneSameInstant(ZoneId.systemDefault())
