@@ -25,6 +25,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -145,7 +148,7 @@ private fun SettingsContent(
 @Composable
 fun SettingsDivider() {
     Divider(
-        color = MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         thickness = 1.dp,
         modifier = Modifier.fillMaxWidth()
     )
@@ -342,7 +345,7 @@ fun About(
                 Button(
                     onClick = { /* open Discord */ },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier.padding(end = 8.dp)
@@ -350,32 +353,45 @@ fun About(
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
-                        contentDescription = "Discord Icon"
+                        contentDescription = "Discord Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Discord Server")
+                    Text(text = "Discord Server",
+                        style = TextStyle(
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.onSurface
+                        ))
                 }
                 Button(
                     onClick = { /* open Telegram */ },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     shape = RoundedCornerShape(15.dp),
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_telegram),
-                        contentDescription = "Telegram Icon"
+                        contentDescription = "Telegram Icon",
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Telegram Page")
+                    Text(
+                        text = "Telegram Page",
+                        style = TextStyle(
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(400),
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+
                 }
             }
 
         }
     }
 }
-
-
 
 
 @Preview(

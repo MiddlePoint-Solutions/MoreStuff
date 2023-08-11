@@ -37,6 +37,7 @@ import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskItemBadges
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 
 @Composable
 fun CompletePriorityItem(
@@ -51,7 +52,7 @@ fun CompletePriorityItem(
             .fillMaxWidth()
             .heightIn(max = 90.dp)
             .shadow(elevation = elevation)
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             modifier = modifier
