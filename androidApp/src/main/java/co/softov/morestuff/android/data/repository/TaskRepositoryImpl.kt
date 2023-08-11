@@ -75,8 +75,8 @@ class TaskRepositoryImpl(
         val tasksFlow = taskQueries.selectAllActive(mapTaskData)
             .asFlow()
             .mapToList()
-
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(mapScheduleDb)
+        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
+        val schedulesFlow = scheduleQueries.selectActiveSchedules(allScheduleTypes, mapScheduleDb)
             .asFlow()
             .mapToList()
             .map { it.groupBy { schedule -> schedule.taskId } }
@@ -94,7 +94,7 @@ class TaskRepositoryImpl(
         taskQueries.selectAllComplete(mapper = mapTaskData).asFlow().mapToList()
 
     override suspend fun getTaskAbovePriorityScore(
-        priorityScore: Long
+        priorityScore: Long,
     ): Either<Failure, TaskDomain> = taskQueries.transactionWithResult {
         val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapTaskData)
             .executeAsOneOrNull()
@@ -137,7 +137,7 @@ class TaskRepositoryImpl(
 
     override suspend fun updateTaskTitle(
         taskId: Long,
-        title: String
+        title: String,
     ): Either<Failure, Boolean> {
         taskQueries.updateTaskTitle(title, taskId)
         return Right(true)
@@ -151,14 +151,14 @@ class TaskRepositoryImpl(
             .right()
 
     override suspend fun getTasksWithSchedule(
-        scheduleTypes: List<ScheduleType>
+        scheduleTypes: List<ScheduleType>,
     ): Either<Failure, List<TaskDomain>> {
 
         val tasksFlow = taskQueries.selectAllActive(mapTaskData)
             .asFlow()
             .mapToList()
 
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(mapScheduleDb)
+        val schedulesFlow = scheduleQueries.selectActiveSchedules(scheduleTypes, mapScheduleDb)
             .asFlow()
             .mapToList()
 

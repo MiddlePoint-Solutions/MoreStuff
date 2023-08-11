@@ -38,7 +38,7 @@ ORDER BY id DESC;
 selectActiveSchedules:
 SELECT *
 FROM schedule
-WHERE active = 1
+WHERE active = 1 AND schedule_type IN :schedule_types
 ORDER BY schedule_time_local;
 
 selectActiveSchedulesByTaskId:
