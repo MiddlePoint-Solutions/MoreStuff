@@ -8,7 +8,7 @@ plugins {
 }
 
 kotlin {
-    android()
+    androidTarget()
 
     val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
         if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
@@ -27,7 +27,7 @@ kotlin {
                 implementation("io.github.aakira:napier:1.5.0")
                 //Key-Value storage
                 //implementation("com.russhwolf:multiplatform-settings:1.0.0")
-                implementation("com.russhwolf:multiplatform-settings-no-arg:1.0.0")
+                implementation(libs.multiplatformSettingsNoArg)
 
                 val decompose = "2.1.0-compose-experimental-alpha-02"
 
@@ -45,15 +45,17 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 24
-        targetSdk = 33
+        minSdk = 26
+        targetSdk = 34
     }
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     namespace = "co.softov.morestuff.shared.android"
-}
-dependencies {
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
