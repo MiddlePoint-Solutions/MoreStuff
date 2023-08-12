@@ -35,9 +35,9 @@ android {
 
     defaultConfig {
         applicationId = "io.middlepoint.morestuff"
-        compileSdk = 33
+        compileSdk = 34
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 18
         versionName = "0.4.7"
         vectorDrawables {
