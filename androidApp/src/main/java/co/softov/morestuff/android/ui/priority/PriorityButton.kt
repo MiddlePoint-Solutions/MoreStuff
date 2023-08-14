@@ -71,18 +71,11 @@ fun PriorityButton(
         label = "Background Color Animation"
     )
 
-    val textColor by animateColorAsState(
-        targetValue = MaterialTheme.colorScheme.onSecondary,
-        animationSpec = tween(300, easing = FastOutSlowInEasing),
-        label = "Text Color Animation"
-    )
-
     Button(
         modifier = modifier,
         shape = shape,
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
-            contentColor = textColor
         ),
         onClick = onClick,
         enabled = enabled,
@@ -135,7 +128,7 @@ fun SetSchedulePriorityButton(
     name = "DefaultPreviewLight"
 )
 @Composable
-private fun PriorityButtonPreviewDark() {
+private fun PriorityButtonPreview() {
     MoreStuffTheme {
         Column {
             PriorityButton(
