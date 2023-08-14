@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.components
 
 import android.Manifest
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -19,10 +20,11 @@ import com.google.accompanist.permissions.shouldShowRationale
 @Composable
 fun NotificationPermissionRequester() {
 
-    // Camera permission state
-    val permissionState = rememberPermissionState(
-        Manifest.permission.POST_NOTIFICATIONS
-    )
+    val permissionState = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        rememberPermissionState(
+            Manifest.permission.POST_NOTIFICATIONS
+        )
+    } else return
 
     var dismiss by remember {
         mutableStateOf(false)
@@ -32,6 +34,7 @@ fun NotificationPermissionRequester() {
         PermissionStatus.Granted -> {
 
         }
+
         is PermissionStatus.Denied -> {
             if (!dismiss)
                 Dialog(onDismissRequest = { dismiss = true }) {
