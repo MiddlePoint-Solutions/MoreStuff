@@ -1,9 +1,12 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,31 +41,61 @@ import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.selectNext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
-fun OnBoardingContent(
+fun OnBoardingScreen(
     onBoardingComplete: () -> Unit,
 ) {
     val navigation = remember { PagesNavigation<OnBoarding>() }
     val pages = remember {
-        listOf(
-            OnBoarding.Welcome,
-            OnBoarding.NotificationPermission,
-            OnBoarding.WorkSpaceReady
-        )
+        buildList {
+            add(OnBoarding.Welcome)
+            if (requiresNotificationsPermission()) {
+                add(OnBoarding.NotificationPermission)
+                add(OnBoarding.WorkSpaceReady)
+            }
+        }
     }
 
     ChildPages(
         source = navigation,
         modifier = Modifier.fillMaxSize(),
-        initialPages = {
-            Pages(items = pages, selectedIndex = 0)
-        }
+        initialPages = { Pages(items = pages, selectedIndex = 0) }
     ) { screen ->
         when (screen) {
-            OnBoarding.Welcome -> WelcomeScreen(onNext = navigation::selectNext)
+            is OnBoarding.Welcome -> {
+                WelcomeScreen(
+                    nextButton = {
+                        Button(
+                            onClick = {
+                                if (requiresNotificationsPermission()) {
+                                    navigation.selectNext()
+                                } else {
+                                    onBoardingComplete()
+                                }
+                            },
+                            modifier = Modifier
+                                .width(287.dp)
+                                .height(43.dp),
+                            content = {
+                                Text(
+                                    text = stringResource(R.string.button_start),
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        lineHeight = 28.sp,
+                                        fontWeight = FontWeight(700),
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                    )
+                                )
+                            }
+                        )
+                    }
+                )
+            }
+
             OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
             OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
         }
@@ -70,7 +104,9 @@ fun OnBoardingContent(
 
 
 @Composable
-private fun WelcomeScreen(onNext: () -> Unit) {
+private fun WelcomeScreen(
+    nextButton: @Composable () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -102,31 +138,12 @@ private fun WelcomeScreen(onNext: () -> Unit) {
             )
         }
 
-        Row(
+        Box(
             Modifier
                 .padding(bottom = 56.dp)
                 .align(Alignment.CenterHorizontally)
-
         ) {
-            Button(
-                onClick = { onNext() },
-                modifier = Modifier
-                    .width(287.dp)
-                    .height(43.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                content = {
-                    Text(
-                        text = stringResource(R.string.button_start),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(700),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
-                    )
-                }
-            )
-
+            nextButton()
         }
     }
 }
@@ -136,14 +153,20 @@ private fun WelcomeScreen(onNext: () -> Unit) {
 @Composable
 private fun NotificationPermissionScreen(onNext: () -> Unit) {
 
-    val permissionState = rememberPermissionState(
-        android.Manifest.permission.POST_NOTIFICATIONS
-    )
+    val permissionState = if (requiresNotificationsPermission()) {
+        rememberPermissionState(
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ) { granted ->
+            if (granted) {
+                onNext()
+            }
+        }
+    } else {
+        error("VERSION.SDK_INT < TIRAMISU")
+    }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -184,12 +207,10 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
                 Button(
                     onClick = {
                         permissionState.launchPermissionRequest()
-                        onNext()
                     },
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     content = {
                         Text(
                             text = stringResource(R.string.button_enable),
@@ -226,12 +247,14 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
     }
 }
 
+private fun requiresNotificationsPermission() =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
 @Composable
 private fun ReadyScreen(onFinish: () -> Unit) {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background),
+            .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -268,7 +291,6 @@ private fun ReadyScreen(onFinish: () -> Unit) {
                     modifier = Modifier
                         .width(187.dp)
                         .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     content = {
                         Text(
                             text = stringResource(R.string.button_start),

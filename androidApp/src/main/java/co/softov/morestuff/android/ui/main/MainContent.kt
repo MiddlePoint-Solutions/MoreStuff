@@ -15,7 +15,7 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
-import co.softov.morestuff.android.ui.onboarding.OnBoardingContent
+import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
 import co.softov.morestuff.android.ui.review.ReviewScreen
 import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
@@ -24,9 +24,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kotlinx.coroutines.launch
 
@@ -53,7 +51,7 @@ fun MainContent(
     ) { screen ->
         when (screen) {
 
-            OnBoarding -> OnBoardingContent(
+            OnBoarding -> OnBoardingScreen(
                 onBoardingComplete = {
                     scope.launch { navigation.replaceCurrent(Home) }
                 }

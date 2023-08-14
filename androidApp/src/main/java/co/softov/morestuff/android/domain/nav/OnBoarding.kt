@@ -7,12 +7,12 @@ import com.arkivanov.essenty.parcelable.Parcelize
 sealed class OnBoarding : Parcelable {
 
     @Parcelize
-    object Welcome : OnBoarding()
+    data object Welcome : OnBoarding()
 
     @Parcelize
-    object NotificationPermission : OnBoarding()
+    data object NotificationPermission : OnBoarding()
 
     @Parcelize
-    object WorkSpaceReady : OnBoarding()
+    data object WorkSpaceReady : OnBoarding()
 }
 

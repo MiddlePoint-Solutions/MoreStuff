@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-
         val rootComponentContext = defaultComponentContext()
 
         setContent {
