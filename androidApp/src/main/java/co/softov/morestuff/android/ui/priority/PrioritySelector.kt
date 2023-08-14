@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -48,8 +50,8 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
-
-                    )
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
         }
 
@@ -66,8 +68,8 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
-
-                    )
+                    color = MaterialTheme.colorScheme.primary
+                )
             )
         }
 
@@ -84,6 +86,7 @@ fun PrioritySelector(
                     fontSize = 16.sp,
                     lineHeight = 28.sp,
                     fontWeight = FontWeight(400),
+                    color = MaterialTheme.colorScheme.primary
                 )
             )
         }
@@ -96,7 +99,8 @@ fun PrioritySelector(
 )
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
+    name = "DefaultPreviewLight",
+    backgroundColor = 0xFFFFFFFF
 )
 @Composable
 fun UserPriorityInputPreviewDark() {
