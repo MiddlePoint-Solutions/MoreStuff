@@ -5,8 +5,8 @@ import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.right
 import arrow.core.rightIfNotNull
-import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
-import co.softov.morestuff.android.data.mapper.ScheduleDomainMapper
+import co.softov.morestuff.android.data.mapper.DataMappers
+import co.softov.morestuff.android.data.mapper.mapScheduleDomain
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.ScheduleType
@@ -20,8 +20,7 @@ import kotlinx.coroutines.flow.firstOrNull
 
 class ScheduleRepositoryImpl(
     database: StuffDb,
-    private val mapScheduleDomain: ScheduleDomainMapper,
-    private val mapScheduleDb: ScheduleDbMapper,
+    private val mapper: DataMappers,
 ) : ScheduleRepository {
 
     private val scheduleQueries = database.scheduleQueries
@@ -36,7 +35,7 @@ class ScheduleRepositoryImpl(
     }
 
     override suspend fun getSchedule(scheduleId: Long): Either<Failure, ScheduleDomain> =
-        scheduleQueries.selectScheduleById(scheduleId, mapScheduleDb)
+        scheduleQueries.selectScheduleById(scheduleId, mapper.scheduleDbMapper)
             .executeAsOneOrNull()
             .rightIfNotNull { ScheduleDoesNotExist }
 
@@ -44,14 +43,14 @@ class ScheduleRepositoryImpl(
     override suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>> {
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         return scheduleQueries
-            .selectActiveSchedules(allScheduleTypes,mapScheduleDb)
+            .selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
             .executeAsList()
             .right()
     }
 
     override fun getActiveSchedulesFlow(): Flow<List<ScheduleDomain>> {
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        return scheduleQueries.selectActiveSchedules(allScheduleTypes,mapScheduleDb)
+        return scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
             .mapToList()
     }
@@ -67,7 +66,7 @@ class ScheduleRepositoryImpl(
         startTime: String,
         endTime: String
     ): Flow<List<ScheduleDomain>> = scheduleQueries
-        .selectActiveSchedulesFromStartToEndTime(startTime, endTime, mapScheduleDb)
+        .selectActiveSchedulesFromStartToEndTime(startTime, endTime, mapper.scheduleDbMapper)
         .asFlow()
         .mapToList()
 
@@ -82,7 +81,7 @@ class ScheduleRepositoryImpl(
         taskId: Long,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>> =
-        scheduleQueries.selectActiveScheduleByTaskId(taskId, scheduleType, mapper = mapScheduleDb)
+        scheduleQueries.selectActiveScheduleByTaskId(taskId, scheduleType, mapper = mapper.scheduleDbMapper)
             .asFlow()
             .mapToList()
 

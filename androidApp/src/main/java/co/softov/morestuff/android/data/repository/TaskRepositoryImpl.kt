@@ -5,8 +5,7 @@ import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import arrow.core.rightIfNotNull
-import co.softov.morestuff.android.data.mapper.ScheduleDbMapper
-import co.softov.morestuff.android.data.mapper.TaskDataMapper
+import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.data.mapper.TaskDb
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
@@ -28,8 +27,7 @@ import java.util.UUID
 
 class TaskRepositoryImpl(
     database: StuffDb,
-    private val mapTaskData: TaskDataMapper,
-    private val mapScheduleDb: ScheduleDbMapper,
+    private val mapper: DataMappers,
     private val timeManager: TimeManager,
 ) : TaskRepository {
 
@@ -50,7 +48,7 @@ class TaskRepositoryImpl(
             )
             taskQueries.insertTask(data)
             val taskId = lastInsertedRowId
-            taskQueries.selectTaskById(taskId, mapper = mapTaskData).executeAsOne()
+            taskQueries.selectTaskById(taskId, mapper = mapper.taskDbMapper).executeAsOne()
         }
     }
 
@@ -58,11 +56,11 @@ class TaskRepositoryImpl(
         getTaskFlow(taskId).firstOrNull().rightIfNotNull { TaskDoesNotExist }
 
     override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
-        val taskFlow = taskQueries.selectTaskById(taskId, mapTaskData)
+        val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)
             .asFlow()
             .mapToOne()
 
-        val schedulesFlow = scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapScheduleDb)
+        val schedulesFlow = scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
             .asFlow()
             .mapToList()
 
@@ -72,11 +70,11 @@ class TaskRepositoryImpl(
     }
 
     override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        val tasksFlow = taskQueries.selectAllActive(mapTaskData)
+        val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
             .mapToList()
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(allScheduleTypes, mapScheduleDb)
+        val schedulesFlow = scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
             .mapToList()
             .map { it.groupBy { schedule -> schedule.taskId } }
@@ -91,16 +89,16 @@ class TaskRepositoryImpl(
     }
 
     override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
-        taskQueries.selectAllComplete(mapper = mapTaskData).asFlow().mapToList()
+        taskQueries.selectAllComplete(mapper = mapper.taskDbMapper).asFlow().mapToList()
 
     override suspend fun getTaskAbovePriorityScore(
         priorityScore: Long,
     ): Either<Failure, TaskDomain> = taskQueries.transactionWithResult {
-        val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapTaskData)
+        val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapper.taskDbMapper)
             .executeAsOneOrNull()
 
         task?.let {
-            val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapScheduleDb)
+            val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
                 .executeAsList()
             task.copy(schedule = schedules).right()
         } ?: TaskDoesNotExist.left()
@@ -108,11 +106,11 @@ class TaskRepositoryImpl(
 
     override suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain> =
         taskQueries.transactionWithResult {
-            val task = taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapTaskData)
+            val task = taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDbMapper)
                 .executeAsOneOrNull()
 
             task?.let {
-                val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapScheduleDb)
+                val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
                     .executeAsList()
                 task.copy(schedule = schedules).right()
             } ?: TaskDoesNotExist.left()
@@ -146,7 +144,7 @@ class TaskRepositoryImpl(
     override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> =
         taskQueries.getActiveTaskWithoutSchedule(
             listOf(ScheduleType.OneTime),
-            mapper = mapTaskData
+            mapper = mapper.taskDbMapper
         ).executeAsList()
             .right()
 
@@ -154,11 +152,11 @@ class TaskRepositoryImpl(
         scheduleTypes: List<ScheduleType>,
     ): Either<Failure, List<TaskDomain>> {
 
-        val tasksFlow = taskQueries.selectAllActive(mapTaskData)
+        val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
             .mapToList()
 
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(scheduleTypes, mapScheduleDb)
+        val schedulesFlow = scheduleQueries.selectActiveSchedules(scheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
             .mapToList()
 
@@ -178,7 +176,7 @@ class TaskRepositoryImpl(
     }
 
     override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
-        taskQueries.searchTasks(searchText, mapper = mapTaskData).asFlow().mapToList()
+        taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper).asFlow().mapToList()
 
     private fun createTaskData(
         title: String,

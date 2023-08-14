@@ -8,11 +8,8 @@ import androidx.work.WorkManager
 import co.softov.morestuff.android.app.DevToolsImpl
 import co.softov.morestuff.android.app.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
-import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
-import co.softov.morestuff.android.data.mapper.makeMessageWithDataMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleDomainMapper
-import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
+import co.softov.morestuff.android.data.mapper.DataMappers
+import co.softov.morestuff.android.data.mapper.DataMappersImpl
 import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
 import co.softov.morestuff.android.data.repository.PriorityRepositoryImpl
 import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
@@ -36,7 +33,6 @@ import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
-import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
 import com.squareup.sqldelight.EnumColumnAdapter
@@ -54,6 +50,7 @@ val dataModule = module {
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
+    single<DataMappers> { DataMappersImpl(timeFormatter = get()) }
     singleOf(::DevToolsImpl) bind DevTools::class
 
     // Database
@@ -72,17 +69,16 @@ val dataModule = module {
     single<TaskRepository> {
         TaskRepositoryImpl(
             database = get(),
-            mapTaskData = makeTaskDbMapper(),
-            mapScheduleDb = makeScheduleDbMapper(),
-            timeManager = get()
+            timeManager = get(),
+            mapper = get(),
         )
     }
+
 
     single<MessageRepository> {
         MessageRepositoryImpl(
             database = get(),
-            mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
-            messageDataMapper = makeMessageWithDataMapper(),
+            mapper = get(),
             timeManager = get(),
         )
     }
@@ -90,8 +86,7 @@ val dataModule = module {
     single<ScheduleRepository> {
         ScheduleRepositoryImpl(
             database = get(),
-            mapScheduleDomain = makeScheduleDomainMapper(),
-            mapScheduleDb = makeScheduleDbMapper(),
+            mapper = get(),
         )
     }
 
