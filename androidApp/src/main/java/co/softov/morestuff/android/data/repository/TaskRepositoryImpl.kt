@@ -145,7 +145,7 @@ class TaskRepositoryImpl(
 
     override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> =
         taskQueries.getActiveTaskWithoutSchedule(
-            listOf(ScheduleType.OneTime),
+            (ScheduleType.OneTime),
             mapper = mapTaskData
         ).executeAsList()
             .right()
