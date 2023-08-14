@@ -35,10 +35,11 @@ class UpdateTaskReviewPriorityUseCaseTest {
         runBlocking {
             val priorityScore = 100L
             val taskId = 666L
+            val priority = Priority.Now()
 
-            coEvery { getDefaultPriorityScoreUseCase(any()) } returns priorityScore
+            coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
             useCase(taskId, PriorityActionType.Now)
-            coVerify { getDefaultPriorityScoreUseCase(any()) }
+            coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
     }
@@ -48,10 +49,11 @@ class UpdateTaskReviewPriorityUseCaseTest {
         runBlocking {
             val priorityScore = -100L
             val taskId = 666L
+            val priority = Priority.Later()
 
-            coEvery { getDefaultPriorityScoreUseCase(any()) } returns priorityScore
+            coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
             useCase(taskId, PriorityActionType.Later)
-            coVerify { getDefaultPriorityScoreUseCase(any()) }
+            coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
     }
