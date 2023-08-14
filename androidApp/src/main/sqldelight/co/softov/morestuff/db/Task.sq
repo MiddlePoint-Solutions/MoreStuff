@@ -27,7 +27,7 @@ FROM task
 WHERE complete_time IS NULL AND id NOT IN (
     SELECT task_id
     FROM schedule
-    WHERE active = 1 AND schedule_type NOT IN :schedule_types
+    WHERE active = 1 AND schedule_type IN :schedule_types
 );
 
 selectAllComplete:
