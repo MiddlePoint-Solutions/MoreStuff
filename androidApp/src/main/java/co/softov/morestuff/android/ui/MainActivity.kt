@@ -69,9 +69,8 @@ class MainActivity : AppCompatActivity() {
 
             NotificationPermissionRequester()
 
-            TransparentSystemBars()
-
             ProvideAppTheme(viewModel.appTheme) {
+                TransparentSystemBars()
                 MoreStuffTheme {
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainer
