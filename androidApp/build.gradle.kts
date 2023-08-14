@@ -3,16 +3,15 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("android")
-    id("com.android.application")
-    id("kotlin-parcelize")
-    id("com.squareup.sqldelight")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
-    id("koin")
-    id("app.cash.molecule")
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.mikepenz.aboutlibraries.plugin")
+    alias(libs.plugins.androidApplicationPlugin)
+    alias(libs.plugins.kotlinPlugin)
+    alias(libs.plugins.parcelizePlugin)
+    alias(libs.plugins.sqldelightPlugin)
+    alias(libs.plugins.googleServicesPlugin)
+    alias(libs.plugins.crashlyticsPlugin)
+    alias(libs.plugins.moleculePlugin)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.aboutLibrariesPlugin)
 }
 
 group = "io.middlepoint.morestuff"
@@ -35,9 +34,9 @@ android {
 
     defaultConfig {
         applicationId = "io.middlepoint.morestuff"
-        compileSdk = 33
+        compileSdk = 34
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 18
         versionName = "0.4.7"
         vectorDrawables {
@@ -64,23 +63,16 @@ android {
     }
 
     compileOptions {
-        isCoreLibraryDesugaringEnabled = true
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-
-    }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
-        viewBinding = true
         compose = true
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.1"
     }
 
     testOptions {
@@ -88,13 +80,12 @@ android {
             it.useJUnitPlatform()
         }
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
 }
-
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
@@ -116,22 +107,20 @@ tasks.withType<KotlinCompile>().configureEach {
             )
         }
     }
-
-
 }
 
 sqldelight {
-    database("StuffDb") {
-        packageName = "co.softov.morestuff.db"
-        schemaOutputDirectory = file("src/main/sqldelight/databases")
-
-        verifyMigrations = true
+    databases {
+        create("StuffDb") {
+            packageName.set("co.softov.morestuff.db")
+            schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
+            verifyMigrations.set(true)
+        }
     }
 }
 
 dependencies {
     implementation(project(":shared"))
-    coreLibraryDesugaring(libs.jdkDesugar)
     implementation(libs.androidxCoreKtx)
     implementation(libs.androidxLifecycleRuntimeKtx)
     implementation(libs.androidxActivityCompose)
@@ -176,8 +165,8 @@ dependencies {
     implementation(libs.okhttpLogging)
     implementation(libs.sqldelightAndroidDriver)
     implementation(libs.sqldelightCoroutinesJvmExt)
+    implementation(libs.sqldelightPrimitiveAdapters)
     implementation(libs.sqldelightAndroidPagingExt)
-    implementation(libs.sqldelightAndroidPaging3Ext)
     testImplementation(libs.sqldelightTestSqlDriver)
     implementation(platform(libs.firebaseBom))
     implementation(libs.firebaseCrashlytics)
@@ -192,7 +181,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.palette)
     implementation(libs.pagingKtx)
-    implementation(libs.preferenceKtx)
     implementation(libs.workKtx)
     implementation(libs.constraintLayout)
     implementation(libs.coreKtx)
@@ -215,10 +203,9 @@ dependencies {
     implementation(libs.composeMaterialIcons)
     implementation(libs.composeMaterialIconsExtended)
     implementation(libs.composeTooling)
-    implementation(libs.navigationCompose)
     implementation(libs.activityCompose)
-    implementation(libs.lottiCompose)
     implementation(libs.konfettiCompose)
+    implementation(libs.preferenceKtx)
 
     implementation(libs.aboutLibrariesCore)
     implementation(libs.aboutLibrariesCompose)
@@ -230,7 +217,4 @@ dependencies {
     testImplementation(libs.koinTestJunit)
     testImplementation(libs.junit)
     testImplementation(libs.extJUnit)
-
-
-
 }

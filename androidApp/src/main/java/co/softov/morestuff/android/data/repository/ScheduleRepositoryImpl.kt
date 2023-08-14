@@ -13,8 +13,9 @@ import co.softov.morestuff.android.domain.model.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -52,7 +53,7 @@ class ScheduleRepositoryImpl(
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         return scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
     }
 
     override suspend fun getActiveSchedulesByTime(
@@ -68,7 +69,7 @@ class ScheduleRepositoryImpl(
     ): Flow<List<ScheduleDomain>> = scheduleQueries
         .selectActiveSchedulesFromStartToEndTime(startTime, endTime, mapper.scheduleDbMapper)
         .asFlow()
-        .mapToList()
+        .mapToList(Dispatchers.IO)
 
     override suspend fun getActiveSchedulesForTask(
         taskId: Long,
@@ -83,7 +84,7 @@ class ScheduleRepositoryImpl(
     ): Flow<List<ScheduleDomain>> =
         scheduleQueries.selectActiveScheduleByTaskId(taskId, scheduleType, mapper = mapper.scheduleDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
 
     override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
         scheduleQueries.updateScheduleActive(false, scheduleId)

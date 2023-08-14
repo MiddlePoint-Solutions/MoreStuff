@@ -8,6 +8,12 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 include(":androidApp")
 include(":shared")
-enableFeaturePreview("VERSION_CATALOGS")
