@@ -153,7 +153,7 @@ private fun hasNotTravelledEnough(
     state: SwipeableCardState,
     offset: Offset,
 ): Boolean {
-    return abs(offset.x) < state.maxWidth / 4.5 &&
-            abs(offset.y) < state.maxHeight / 4.5
+    return abs(offset.x) < state.maxWidth / 5.5 &&
+            abs(offset.y) < state.maxHeight / 6.5
 }
 
