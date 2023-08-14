@@ -4,8 +4,7 @@ package co.softov.morestuff.android.data.repository
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
-import co.softov.morestuff.android.data.mapper.MessageDataMapper
-import co.softov.morestuff.android.data.mapper.MessageDbMapper
+import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Message
@@ -24,8 +23,7 @@ import java.io.File
 
 class MessageRepositoryImpl(
     database: StuffDb,
-    private val mapMessageDb: MessageDbMapper,
-    private val messageDataMapper: MessageDataMapper,
+    private val mapper: DataMappers,
     private val timeManager: TimeManager,
 ) : MessageRepository {
 
@@ -35,7 +33,7 @@ class MessageRepositoryImpl(
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
     override fun getAllMessages(): Flow<List<Message>> {
-        return messageQueries.selectMasterMessages(mapper = messageDataMapper)
+        return messageQueries.selectMasterMessages(mapper = mapper.messageDataMapper)
             .asFlow()
             .mapToList()
     }
@@ -44,19 +42,19 @@ class MessageRepositoryImpl(
         return messageQueries.selectTaskMessagesByContentType(
             taskId,
             ContentType.TASK_MESSAGE.value,
-            mapper = messageDataMapper
+            mapper = mapper.messageDataMapper
         ).asFlow().mapToList()
     }
 
     override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByTaskId(taskId, mapper = messageDataMapper)
+        return messageQueries.selectMessageByTaskId(taskId, mapper = mapper.messageDataMapper)
             .asFlow().mapToList()
     }
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
         val message = messageQueries.selectMessageById(
             id = messageId,
-            mapper = messageDataMapper
+            mapper = mapper.messageDataMapper
         ).executeAsOneOrNull()
         return when (message) {
             null -> MessageDoesNotExist.left()
@@ -89,7 +87,7 @@ class MessageRepositoryImpl(
         }
         messageQueries.selectMessageById(
             id = messageId,
-            mapper = messageDataMapper
+            mapper = mapper.messageDataMapper
         ).executeAsOne().right()
     }
 
@@ -155,7 +153,7 @@ class MessageRepositoryImpl(
     override suspend fun deleteMessage(messageId: Long) {
         val message = messageQueries.selectMessageById(
             id = messageId,
-            mapper = messageDataMapper
+            mapper = mapper.messageDataMapper
         ).executeAsOneOrNull()
 
         val imagePath = message?.messageData?.filePath
