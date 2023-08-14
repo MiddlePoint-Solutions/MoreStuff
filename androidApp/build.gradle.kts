@@ -113,11 +113,12 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 sqldelight {
-    database("StuffDb") {
-        packageName = "co.softov.morestuff.db"
-        schemaOutputDirectory = file("src/main/sqldelight/databases")
-
-        verifyMigrations = true
+    databases {
+        create("StuffDb") {
+            packageName.set("co.softov.morestuff.db")
+            schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
+            verifyMigrations.set(true)
+        }
     }
 }
 
@@ -167,7 +168,8 @@ dependencies {
     implementation(libs.okhttpLogging)
     implementation(libs.sqldelightAndroidDriver)
     implementation(libs.sqldelightCoroutinesJvmExt)
-    implementation(libs.sqldelightAndroidPaging3Ext)
+    implementation(libs.sqldelightPrimitiveAdapters)
+    implementation(libs.sqldelightAndroidPagingExt)
     testImplementation(libs.sqldelightTestSqlDriver)
     implementation(platform(libs.firebaseBom))
     implementation(libs.firebaseCrashlytics)

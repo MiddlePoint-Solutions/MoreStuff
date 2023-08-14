@@ -14,8 +14,9 @@ import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -32,24 +33,22 @@ class MessageRepositoryImpl(
     private val messageDataQueries = database.messageDataQueries
     private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
 
-    override fun getAllMessages(): Flow<List<Message>> {
-        return messageQueries.selectMasterMessages(mapper = mapper.messageDataMapper)
+    override fun getAllMessages(): Flow<List<Message>> =
+        messageQueries.selectMasterMessages(mapper = mapper.messageDataMapper)
             .asFlow()
-            .mapToList()
-    }
+            .mapToList(Dispatchers.IO)
 
-    override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectTaskMessagesByContentType(
+    override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> =
+        messageQueries.selectTaskMessagesByContentType(
             taskId,
             ContentType.TASK_MESSAGE.value,
             mapper = mapper.messageDataMapper
-        ).asFlow().mapToList()
-    }
+        ).asFlow().mapToList(Dispatchers.IO)
 
-    override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> {
-        return messageQueries.selectMessageByTaskId(taskId, mapper = mapper.messageDataMapper)
-            .asFlow().mapToList()
-    }
+    override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> =
+        messageQueries.selectMessageByTaskId(taskId, mapper = mapper.messageDataMapper)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
 
     override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
         val message = messageQueries.selectMessageById(
