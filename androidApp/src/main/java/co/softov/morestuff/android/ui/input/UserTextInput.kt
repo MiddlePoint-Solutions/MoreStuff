@@ -53,9 +53,14 @@ fun UserTextInput(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 15.dp ,end = 15.dp, bottom = 13.dp)
+            .padding(start = 15.dp, end = 15.dp, bottom = 13.dp)
             .animateContentSize(),
-        shape = RoundedCornerShape(topStart = 47.dp, topEnd = 47.dp, bottomEnd = 47.dp, bottomStart = 47.dp),
+        shape = RoundedCornerShape(
+            topStart = 47.dp,
+            topEnd = 47.dp,
+            bottomEnd = 47.dp,
+            bottomStart = 47.dp
+        ),
         color = backgroundColor
     ) {
         Row(
@@ -80,7 +85,7 @@ fun UserTextInput(
                         .clearFocusOnKeyboardDismiss()
                         .weight(0.88f)
                         .align(Alignment.CenterVertically)
-                        .padding(start = 16.dp, top = 13.dp, bottom = 10.dp, end = 4.dp),
+                        .padding(start = 20.dp, top = 13.dp, bottom = 13.dp, end = 4.dp),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         keyboardType = KeyboardType.Text
@@ -108,6 +113,8 @@ fun UserTextInput(
                     modifier = Modifier
                         .weight(0.12f)
                         .height(IntrinsicSize.Min)
+                        .align(Alignment.Bottom)
+                        .padding(4.dp).padding(end = 7.dp)
                 ) {
                     when {
                         value.text.isBlank() -> {
