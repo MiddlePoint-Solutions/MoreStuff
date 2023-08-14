@@ -67,7 +67,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-
     buildFeatures {
         compose = true
     }
@@ -108,8 +107,6 @@ tasks.withType<KotlinCompile>().configureEach {
             )
         }
     }
-
-
 }
 
 sqldelight {
@@ -184,7 +181,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.palette)
     implementation(libs.pagingKtx)
-    implementation(libs.preferenceKtx)
     implementation(libs.workKtx)
     implementation(libs.constraintLayout)
     implementation(libs.coreKtx)
@@ -207,9 +203,9 @@ dependencies {
     implementation(libs.composeMaterialIcons)
     implementation(libs.composeMaterialIconsExtended)
     implementation(libs.composeTooling)
-    implementation(libs.navigationCompose)
     implementation(libs.activityCompose)
     implementation(libs.konfettiCompose)
+    implementation(libs.preferenceKtx)
 
     implementation(libs.aboutLibrariesCore)
     implementation(libs.aboutLibrariesCompose)
@@ -221,7 +217,4 @@ dependencies {
     testImplementation(libs.koinTestJunit)
     testImplementation(libs.junit)
     testImplementation(libs.extJUnit)
-
-
-
 }
