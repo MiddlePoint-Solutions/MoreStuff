@@ -47,7 +47,7 @@ fun AppChatItem(
                 bottomEnd = 14.dp,
                 bottomStart = 5.dp
             ),
-            color = MaterialTheme.colorScheme.secondaryContainer,
+            tonalElevation = 10.dp,
             contentColor = contentColorFor(MaterialTheme.colorScheme.onSecondaryContainer),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
