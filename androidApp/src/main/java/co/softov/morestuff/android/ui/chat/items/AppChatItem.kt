@@ -18,7 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -44,16 +47,23 @@ fun AppChatItem(
                 bottomEnd = 14.dp,
                 bottomStart = 5.dp
             ),
-            color = MaterialTheme.colorScheme.secondaryContainer,
+            tonalElevation = 10.dp,
             contentColor = contentColorFor(MaterialTheme.colorScheme.onSecondaryContainer),
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
-                Text(text = message.content, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    text = message.content, style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 28.sp,
+                        fontWeight = FontWeight(400),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                )
                 Row(Modifier.align(Alignment.End).padding(top = 3.dp)) {
                     DisplayMessageTime(
                         formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
                         modifier = Modifier,
-                        textColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        textColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
                 }
             }
