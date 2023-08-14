@@ -25,7 +25,7 @@ class CreateNewTaskUseCaseTest {
         val taskParams = TaskParams("title", Priority.Now(), TaskType.User)
         val task = createTaskForTest()
         coEvery { taskRepository.createTask(any(), any(), any()) } returns task
-        coEvery { getDefaultPriorityScoreUseCase(any()) } returns 0
+        coEvery { getDefaultPriorityScoreUseCase(taskParams.priority) } returns 0
         val result = useCase.invoke(taskParams)
         assertEquals(task, result)
     }

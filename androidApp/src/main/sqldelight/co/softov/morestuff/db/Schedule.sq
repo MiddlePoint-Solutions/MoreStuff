@@ -1,4 +1,5 @@
 import co.softov.morestuff.android.domain.model.ScheduleType;
+import kotlin.Boolean;
 
 CREATE TABLE schedule(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,

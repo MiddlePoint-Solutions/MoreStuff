@@ -15,9 +15,10 @@ import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
-import com.squareup.sqldelight.runtime.coroutines.asFlow
-import com.squareup.sqldelight.runtime.coroutines.mapToList
-import com.squareup.sqldelight.runtime.coroutines.mapToOne
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -58,11 +59,11 @@ class TaskRepositoryImpl(
     override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
         val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)
             .asFlow()
-            .mapToOne()
+            .mapToOne(Dispatchers.IO)
 
         val schedulesFlow = scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
 
         return taskFlow.combine(schedulesFlow) { task, schedules ->
             task.copy(schedule = schedules)
@@ -72,11 +73,11 @@ class TaskRepositoryImpl(
     override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
         val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         val schedulesFlow = scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
             .map { it.groupBy { schedule -> schedule.taskId } }
 
         return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
@@ -89,7 +90,9 @@ class TaskRepositoryImpl(
     }
 
     override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
-        taskQueries.selectAllComplete(mapper = mapper.taskDbMapper).asFlow().mapToList()
+        taskQueries.selectAllComplete(mapper = mapper.taskDbMapper)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
 
     override suspend fun getTaskAbovePriorityScore(
         priorityScore: Long,
@@ -154,11 +157,11 @@ class TaskRepositoryImpl(
 
         val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
 
         val schedulesFlow = scheduleQueries.selectActiveSchedules(scheduleTypes,mapper.scheduleDbMapper)
             .asFlow()
-            .mapToList()
+            .mapToList(Dispatchers.IO)
 
         return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
             schedules
@@ -176,7 +179,9 @@ class TaskRepositoryImpl(
     }
 
     override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
-        taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper).asFlow().mapToList()
+        taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
 
     private fun createTaskData(
         title: String,

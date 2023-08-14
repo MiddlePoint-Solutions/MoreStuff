@@ -35,8 +35,10 @@ import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
-import com.squareup.sqldelight.EnumColumnAdapter
-import com.squareup.sqldelight.android.AndroidSqliteDriver
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import co.softov.morestuff.db.Message
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
@@ -127,6 +129,10 @@ internal fun createDatabase(context: Context): StuffDb {
         ),
         scheduleAdapter = Schedule.Adapter(
             schedule_typeAdapter = EnumColumnAdapter()
+        ),
+        messageAdapter = Message.Adapter(
+            content_typeAdapter = IntColumnAdapter,
+            reply_typeAdapter = IntColumnAdapter
         )
     )
 }
