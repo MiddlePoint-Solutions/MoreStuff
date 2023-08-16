@@ -40,18 +40,22 @@ class ScheduleRepositoryImpl(
             .executeAsOneOrNull()
             .rightIfNotNull { ScheduleDoesNotExist }
 
+    override suspend fun getSchedules(scheduleIds: List<Long>): Either<Failure, List<ScheduleDomain>> =
+        scheduleQueries.selectSchedulesById(scheduleIds, mapper.scheduleDbMapper)
+            .executeAsList()
+            .right()
 
     override suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>> {
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         return scheduleQueries
-            .selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
+            .selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
             .executeAsList()
             .right()
     }
 
     override fun getActiveSchedulesFlow(): Flow<List<ScheduleDomain>> {
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        return scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
+        return scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
             .asFlow()
             .mapToList(Dispatchers.IO)
     }
@@ -82,7 +86,11 @@ class ScheduleRepositoryImpl(
         taskId: Long,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>> =
-        scheduleQueries.selectActiveScheduleByTaskId(taskId, scheduleType, mapper = mapper.scheduleDbMapper)
+        scheduleQueries.selectActiveScheduleByTaskId(
+            taskId,
+            scheduleType,
+            mapper = mapper.scheduleDbMapper
+        )
             .asFlow()
             .mapToList(Dispatchers.IO)
 

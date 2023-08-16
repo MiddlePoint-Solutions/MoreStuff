@@ -94,6 +94,7 @@ import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
@@ -228,7 +229,7 @@ val taskUseCases = module {
     factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
-    factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCaseImpl::class
+    factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
 }
 
 

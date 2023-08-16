@@ -8,7 +8,9 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.*
+import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 sealed class NotificationAction : Action.FeatureAction() {
     internal data class ShowReminderNotificationAction(
@@ -24,6 +26,7 @@ sealed class NotificationAction : Action.FeatureAction() {
 
 class NotificationMiddleware(
     private val notifier: Notifier,
+    private val clearTaskNotificationsUseCase: ClearTaskNotificationsUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -52,8 +55,8 @@ class NotificationMiddleware(
             }
 
             is TaskAction.CompleteTaskAction -> {
-                if(action.complete) {
-
+                if (action.complete) scope.launch {
+                    clearTaskNotificationsUseCase(action.taskId)
                 }
             }
 
