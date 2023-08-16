@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.data.service
+package co.softov.morestuff.android.app.service
 
 import android.Manifest
 import android.annotation.SuppressLint

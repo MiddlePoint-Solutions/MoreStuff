@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.app
+package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import co.softov.morestuff.android.domain.DevTools
