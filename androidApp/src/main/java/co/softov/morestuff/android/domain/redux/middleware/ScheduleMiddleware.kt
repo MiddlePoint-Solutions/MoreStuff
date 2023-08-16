@@ -64,8 +64,9 @@ class ScheduleMiddleware(
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
 ) : Middleware<AppState> {
+
     val timeManager: TimeManager = TimeManagerImpl()
-    private val oneHourLater get() = timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
+
     override fun invoke(
         state: AppState,
         action: Action,
@@ -110,10 +111,28 @@ class ScheduleMiddleware(
             is ScheduleReplyAction -> with(action) {
                 when (replyType) {
                     LATER -> {}
-                    TOMORROW -> {}
-                    SNOOZE -> dispatch(
-                        RescheduleTaskAction(schedule.taskId, schedule.scheduleType, oneHourLater)
-                    )
+                    TOMORROW -> {
+                        val tomorrowTime = timeManager.tomorrowLocalDateTime(12)
+                        dispatch(
+                            RescheduleTaskAction(
+                                schedule.taskId,
+                                schedule.scheduleType,
+                                tomorrowTime
+                            )
+                        )
+                    }
+
+                    SNOOZE -> {
+                        val snoozeTime =
+                            timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
+                        dispatch(
+                            RescheduleTaskAction(
+                                schedule.taskId,
+                                schedule.scheduleType,
+                                snoozeTime
+                            )
+                        )
+                    }
 
                     DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }

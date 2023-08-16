@@ -35,15 +35,13 @@ import co.softov.morestuff.android.domain.service.Notifier.Companion.REMINDERS_C
 import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_CHANNEL_ID
 import co.softov.morestuff.android.domain.service.Notifier.Companion.REVIEW_NOTIFICATION_ID
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.*
 
 class NotifierImpl(
-    private val context: Context
+    private val context: Context,
+    private val notificationManager: NotificationManagerCompat,
 ) : Notifier, KoinComponent {
-
-    private val notificationManager: NotificationManagerCompat by inject()
 
     private val activeNotifications: Array<StatusBarNotification>
         get() = (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
@@ -83,23 +81,24 @@ class NotifierImpl(
 
     private fun createReminderNotification(message: Message): Notification {
         val scheduleId = message.scheduleId
-        val later = createReplyIntentWithTitle(scheduleId, LATER)
+        val tomorrow = createReplyIntentWithTitle(scheduleId, TOMORROW)
         val snooze = createReplyIntentWithTitle(scheduleId, SNOOZE)
         val done = createReplyIntentWithTitle(scheduleId, DONE)
 
         val style = NotificationCompat.MessagingStyle(appPerson)
             .addMessage(message.content, Calendar.getInstance().timeInMillis, appPerson)
 
-        return NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_chat_24dp)
             .setOnlyAlertOnce(true)
             .setGroup(GROUP_KEY_REMINDERS)
             .setContentIntent(createReminderContentIntent(message.taskId))
             .setStyle(style)
             .addAction(R.drawable.ic_send_24dp, snooze.first, snooze.second)
+            .addAction(R.drawable.ic_send_24dp, tomorrow.first, tomorrow.second)
             .addAction(R.drawable.ic_send_24dp, done.first, done.second)
-            .setDeleteIntent(snooze.second)
-            .build()
+
+        return builder.build()
     }
 
     private fun createReviewSummaryNotification(notificationCount: Int) =

@@ -112,6 +112,11 @@ interface TimeManager {
     fun tomorrowLocalDateTime(hour: Int = 0, minute: Int = 0): LocalDateTime
 
     /**
+    Returns a LocalDateTime object representing the start of tomorrow in the local time zone with the given hour and minute.
+     */
+    fun tomorrowLocalDateTimeByAdding(hour: Int = 0, minute: Int = 0): LocalDateTime
+
+    /**
     Returns a string representing the start of today in the local time zone with the given hour and minute.
      */
     fun todayLocalDateTimeString(hour: Int = 0, minute: Int = 0): String
