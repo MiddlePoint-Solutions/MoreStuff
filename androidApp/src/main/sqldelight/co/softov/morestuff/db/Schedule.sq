@@ -23,6 +23,11 @@ SELECT *
 FROM schedule
 WHERE id = ?;
 
+selectSchedulesById:
+SELECT *
+FROM schedule
+WHERE id IN :schedule_ids;
+
 selectSchedulesByTaskId:
 SELECT *
 FROM schedule

@@ -8,14 +8,16 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.Dispatch
 import co.softov.morestuff.android.domain.redux.Next
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.*
+import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 sealed class NotificationAction : Action.FeatureAction() {
     internal data class ShowReminderNotificationAction(
         val message: Message
     ) : NotificationAction()
 
-    internal object ShowReviewNotification : NotificationAction()
+    internal data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
         val scheduleId: Long
@@ -24,6 +26,7 @@ sealed class NotificationAction : Action.FeatureAction() {
 
 class NotificationMiddleware(
     private val notifier: Notifier,
+    private val clearTaskNotificationsUseCase: ClearTaskNotificationsUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -44,11 +47,17 @@ class NotificationMiddleware(
             }
 
             is RemoveScheduleNotificationAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
             }
 
             is ReminderAction.UserResponseAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
+            }
+
+            is TaskAction.CompleteTaskAction -> {
+                if (action.complete) scope.launch {
+                    clearTaskNotificationsUseCase(action.taskId)
+                }
             }
 
             else -> NoOp

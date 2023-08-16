@@ -7,9 +7,10 @@ interface Notifier {
     fun showReminderNotification(message: Message)
     fun showReminderNotifications(messages: List<Message>)
     fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>)
-    fun userInteractedWithNotification(scheduleId: Long)
+    fun clearScheduleNotification(scheduleId: Long)
     fun showReviewNotification()
     fun cancelReminderNotifications()
+    fun getActiveNotificationScheduleIds() : List<Long>
 
     companion object {
         const val REMINDERS_CHANNEL_ID = "ReminderNotifications"

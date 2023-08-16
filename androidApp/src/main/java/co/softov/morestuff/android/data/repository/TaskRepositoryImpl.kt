@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import java.util.UUID
 
 class TaskRepositoryImpl(
@@ -82,9 +81,7 @@ class TaskRepositoryImpl(
 
         return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
             tasks.map { task ->
-                task.copy(schedule = schedules[task.id] ?: listOf()).also {
-                    Timber.d("task schedules: ${it.schedule.size}")
-                }
+                task.copy(schedule = schedules[task.id] ?: listOf())
             }
         }
     }
@@ -120,7 +117,7 @@ class TaskRepositoryImpl(
         }
 
     override suspend fun updateTasksComplete(
-        taskIds: List<Long>,
+        taskId: Long,
         complete: Boolean,
     ): Either<Failure, Boolean> {
         val time = when (complete) {
@@ -129,9 +126,7 @@ class TaskRepositoryImpl(
         }
 
         return taskQueries.transactionWithResult {
-            taskIds.forEach {
-                taskQueries.updateTaskComplete(time, it)
-            }
+            taskQueries.updateTaskComplete(time, taskId)
             Right(true)
         }
     }
