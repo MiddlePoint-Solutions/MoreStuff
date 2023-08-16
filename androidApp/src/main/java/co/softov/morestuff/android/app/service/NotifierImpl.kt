@@ -224,16 +224,9 @@ class NotifierImpl(
     }
 
     private fun getActiveNotificationById(id: Int): Notification? =
-        when {
-            isAtLeastVersion(Build.VERSION_CODES.M) -> {
-                (context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager)
-                    .activeNotifications.firstOrNull { it.id == id }?.notification
-            }
+        activeNotifications.firstOrNull { it.id == id }?.notification
 
-            else -> null
-        }
-
-    override fun userInteractedWithNotification(scheduleId: Long) {
+    override fun clearScheduleNotification(scheduleId: Long) {
         notificationManager.cancel(scheduleId.toInt())
     }
 
@@ -256,6 +249,9 @@ class NotifierImpl(
     override fun cancelReminderNotifications() {
         notificationManager.cancelAll()
     }
+
+    override fun getActiveNotificationScheduleIds(): List<Long> =
+        activeNotifications.map { it.id.toLong() }
 
     private fun createNotificationChannels() {
         if (isAtLeastVersion(Build.VERSION_CODES.O)) {

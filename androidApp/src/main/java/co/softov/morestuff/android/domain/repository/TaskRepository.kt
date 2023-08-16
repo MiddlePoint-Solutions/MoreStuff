@@ -19,7 +19,7 @@ interface TaskRepository {
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
     suspend fun updateTasksComplete(
-        taskIds: List<Long>,
+        taskId: Long,
         complete: Boolean,
     ): Either<Failure, Boolean>
 

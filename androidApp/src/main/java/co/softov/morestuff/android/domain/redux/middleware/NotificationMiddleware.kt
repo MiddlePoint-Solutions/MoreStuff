@@ -15,7 +15,7 @@ sealed class NotificationAction : Action.FeatureAction() {
         val message: Message
     ) : NotificationAction()
 
-    internal object ShowReviewNotification : NotificationAction()
+    internal data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
         val scheduleId: Long
@@ -44,11 +44,17 @@ class NotificationMiddleware(
             }
 
             is RemoveScheduleNotificationAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
             }
 
             is ReminderAction.UserResponseAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
+            }
+
+            is TaskAction.CompleteTaskAction -> {
+                if(action.complete) {
+
+                }
             }
 
             else -> NoOp

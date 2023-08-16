@@ -14,16 +14,15 @@ class SetTaskCompleteImplTest {
     fun `invoke should return true when task is set as completed`() {
         val taskId = 1L
         val taskRepository: TaskRepository = mockk()
-        val taskIds = listOf(taskId)
-        val setTaskCompleteUseCase = SetTasksCompleteImpl(taskRepository)
+        val setTaskCompleteUseCase = SetTaskCompleteImpl(taskRepository)
 
-        coEvery { taskRepository.updateTasksComplete(taskIds, true) } returns Either.Right(
+        coEvery { taskRepository.updateTasksComplete(taskId, true) } returns Either.Right(
             true
         )
 
         runBlocking {
-            val result = setTaskCompleteUseCase(taskIds, true)
-            coVerify { taskRepository.updateTasksComplete(taskIds, true) }
+            val result = setTaskCompleteUseCase(taskId, true)
+            coVerify { taskRepository.updateTasksComplete(taskId, true) }
             assertTrue(result is Either.Right)
             result.map { assertTrue(it) }
         }
