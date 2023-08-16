@@ -78,6 +78,12 @@ class TimeManagerImpl : TimeManager {
                 LocalDateTime(year, month, dayOfMonth, hour, minute, 0, 0)
             }
 
+    override fun tomorrowLocalDateTimeByAdding(hour: Int, minute: Int): LocalDateTime =
+        (nowUtcInstant + 1.days).toLocalDateTime(TimeZone.currentSystemDefault())
+            .run {
+                LocalDateTime(year, month, dayOfMonth, this.hour + hour, this.minute + minute, 0, 0)
+            }
+
     override fun todayLocalDateTimeString(hour: Int, minute: Int): String =
         localDateTime(nowLocalDateTime, hour, minute).toString()
 

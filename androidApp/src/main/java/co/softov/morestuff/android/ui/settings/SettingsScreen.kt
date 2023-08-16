@@ -112,12 +112,6 @@ private fun SettingsContent(
                         defaultValue = { model.appTheme.ordinal }
                     )
 
-                    SelectSnoozeLimit(
-                        onSnoozeLimitChanged = actions.setSnoozeLimit,
-                        defaultValue = { model.snoozeLimit.toFloat() }
-                    )
-
-
                     EnableConfetti(
                         defaultValue = { model.confettiEnabled },
                         valueChanged = actions.enableConfetti,
@@ -204,47 +198,13 @@ fun SelectTheme(
             )
         },
         useSelectedValueAsSubtitle = false,
-        )
+    )
 }
 
 private fun AppTheme.displayTitle(res: Resources): String = when (this) {
     AppTheme.System -> res.getString(R.string.theme_system)
     AppTheme.Light -> res.getString(R.string.theme_light)
     AppTheme.Dark -> res.getString(R.string.theme_dark)
-}
-
-
-@Composable
-fun SelectSnoozeLimit(
-    onSnoozeLimitChanged: (Int) -> Unit,
-    defaultValue: () -> Float,
-) {
-    val state = rememberAppSettingState(
-        defaultValue = defaultValue,
-        valueChanged = { onSnoozeLimitChanged(it.toInt()) }
-    )
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        SettingsSlider(
-            state = state,
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Snooze,
-                    contentDescription = "Snooze Limit"
-                )
-            },
-            title = {
-                Text(
-                    text = "Snooze Limit   ${state.value.toInt()}",
-                )
-            },
-            steps = 9,
-            valueRange = 0F..10F,
-            modifier = Modifier.weight(1f),
-        )
-    }
 }
 
 @Composable
@@ -285,7 +245,9 @@ fun About(
     showLibraries: () -> Unit,
 ) {
     MoreStuffSettingTheme {
-        Column(modifier = modifier.padding(16.dp).padding(bottom = 23.dp)) {
+        Column(modifier = modifier
+            .padding(16.dp)
+            .padding(bottom = 23.dp)) {
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -295,7 +257,9 @@ fun About(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp)
             ) {
                 Text(
                     text = "Version",
@@ -311,7 +275,9 @@ fun About(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
             ) {
                 Text(
                     text = stringResource(R.string.privacy_policy),
@@ -351,12 +317,14 @@ fun About(
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "Discord Server",
+                    Text(
+                        text = "Discord Server",
                         style = TextStyle(
                             lineHeight = 28.sp,
                             fontWeight = FontWeight(400),
                             color = MaterialTheme.colorScheme.onSurface
-                        ))
+                        )
+                    )
                 }
                 Button(
                     onClick = { /* open Telegram */ },
