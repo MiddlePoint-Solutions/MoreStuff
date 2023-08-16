@@ -65,6 +65,11 @@ class ReviewViewModel(
             }
         )
 
+        is ReviewViewEvent.CompleteTask -> state.copy(
+            items = state.items.filter { it.id != event.item.id }
+        )
+
+
     }
 
     private fun setInitialState(round: ReviewRound = Review) {
@@ -91,7 +96,7 @@ class ReviewViewModel(
     fun onTaskSwiped(
         item: ReviewItemUiModel,
         direction: SwipeDirection,
-        isLast: Boolean
+        isLast: Boolean,
     ) {
         Timber.d("onTaskSwiped: $isLast")
         val reviewAction = when (direction) {
@@ -114,7 +119,10 @@ class ReviewViewModel(
     }
 
     fun completeTask(item: ReviewItemUiModel) {
+        item.isCompleted = true
         dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+        sendEvent(ReviewViewEvent.CompleteTask(item))
     }
+
 
 }

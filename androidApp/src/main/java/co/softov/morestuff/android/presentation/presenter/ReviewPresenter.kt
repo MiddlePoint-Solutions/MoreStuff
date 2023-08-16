@@ -26,6 +26,9 @@ sealed class ReviewViewEvent : BaseViewEvent {
     data class ItemReview(val item: ReviewItemUiModel, val action: PriorityActionType) : ReviewViewEvent()
 
     data class Undo(val item: ReviewItemUiModel) : ReviewViewEvent()
+
+    data class CompleteTask(val item: ReviewItemUiModel) : ReviewViewEvent()
+
 }
 
 
