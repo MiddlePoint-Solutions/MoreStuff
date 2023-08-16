@@ -13,6 +13,7 @@ interface ScheduleRepository {
     suspend fun createSchedule(schedule: ScheduleDomain): Either<Failure, ScheduleDomain>
 
     suspend fun getSchedule(scheduleId: Long): Either<Failure, ScheduleDomain>
+    suspend fun getSchedules(scheduleIds: List<Long>): Either<Failure, List<ScheduleDomain>>
 
     suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>>
 

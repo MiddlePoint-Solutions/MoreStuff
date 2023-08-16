@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.domain.nav.Screen
@@ -57,6 +58,9 @@ fun MoreStuffHomeScaffold(
         }
     )
 
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+
     BackHandler(enabled = drawerState.isOpen) {
         closeDrawer()
     }
@@ -73,6 +77,7 @@ fun MoreStuffHomeScaffold(
             },
             content = {
                 Scaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     containerColor = Color.Transparent,
                     snackbarHost = {
                         SnackbarHost(hostState = snackbarHostState) { data ->
@@ -89,7 +94,8 @@ fun MoreStuffHomeScaffold(
                             MoreStuffTopBar(
                                 reviewSelected = { navigation.push(Screen.Review) },
                                 settingsSelected = { navigation.push(Screen.Settings) },
-                                searchSelected = { isSearching = true }
+                                searchSelected = { isSearching = true },
+                                scrollBehavior = scrollBehavior,
                             )
                         }
                     },

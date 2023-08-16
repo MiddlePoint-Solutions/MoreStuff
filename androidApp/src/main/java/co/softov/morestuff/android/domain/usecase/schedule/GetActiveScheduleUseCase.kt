@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 interface GetActiveScheduleUseCase {
     suspend operator fun invoke(
         taskId: Long,
-        scheduleType: List<ScheduleType> = ScheduleType.values().asList()
+        scheduleType: List<ScheduleType> = ScheduleType.entries
     ): Either<Failure, List<ScheduleDomain>>
 }
 

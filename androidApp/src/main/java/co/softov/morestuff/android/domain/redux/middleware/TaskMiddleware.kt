@@ -10,12 +10,8 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
+import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
-import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -41,7 +37,7 @@ sealed class TaskAction : Action.FeatureAction() {
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
-    private val setTaskCompleteUseCase: SetTasksCompleteUseCase,
+    private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase
 ) : Middleware<AppState> {
 
@@ -63,7 +59,7 @@ class TaskMiddleware(
 
             is CompleteTaskAction -> scope.launch {
                 with(action) {
-                    setTaskCompleteUseCase(listOf(taskId), complete)
+                    setTaskCompleteUseCase(taskId, complete)
                 }
             }
 
