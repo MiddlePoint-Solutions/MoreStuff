@@ -19,38 +19,39 @@ fun MoreStuffTopBar(
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
     searchSelected: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    Surface {
-        TopAppBar(
-            title = { Text(text = stringResource(id = R.string.app_name)) },
-            actions = {
+    TopAppBar(
+        title = { Text(text = stringResource(id = R.string.app_name)) },
+        actions = {
 
-                IconButton(onClick = searchSelected) {
-                    Icon(
-                        imageVector = Icons.Rounded.Search,
-                        contentDescription = stringResource(R.string.cd_priority_review),
-                    )
-                }
+            IconButton(onClick = searchSelected) {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = stringResource(R.string.cd_priority_review),
+                )
+            }
 
-                IconButton(onClick = reviewSelected) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_review_new),
-                        contentDescription = stringResource(R.string.cd_priority_review),
-                    )
-                }
+            IconButton(onClick = reviewSelected) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_review_new),
+                    contentDescription = stringResource(R.string.cd_priority_review),
+                )
+            }
 
-                IconButton(onClick = settingsSelected) {
-                    Icon(
-                        imageVector = Icons.Rounded.Settings,
-                        contentDescription = stringResource(R.string.cd_priority_review),
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
-        )
-    }
+            IconButton(onClick = settingsSelected) {
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = stringResource(R.string.cd_priority_review),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        scrollBehavior = scrollBehavior
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "DefaultPreviewDark"
