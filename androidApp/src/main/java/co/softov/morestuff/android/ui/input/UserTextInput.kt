@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +39,9 @@ import co.softov.morestuff.android.app.presentation.extension.clearFocusOnKeyboa
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
+
+val LocalBoxWeight = compositionLocalOf { 0.12f }
+
 @Composable
 fun UserTextInput(
     value: TextFieldValue,
@@ -46,10 +50,13 @@ fun UserTextInput(
     sendAction: (String) -> Unit = {},
     actionsContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    boxWeight: Float = 0.12f
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
+
+    val boxWeight = LocalBoxWeight.current
+
+
 
     Surface(
         modifier = modifier

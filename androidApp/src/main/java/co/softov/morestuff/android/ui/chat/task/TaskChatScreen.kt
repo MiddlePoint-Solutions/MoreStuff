@@ -28,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,12 +56,14 @@ import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
+import co.softov.morestuff.android.ui.input.LocalBoxWeight
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -308,43 +311,49 @@ private fun TaskChatInput(
     modifier: Modifier = Modifier,
 ) {
     val userInputViewModel: UserInputViewModel = koinViewModel()
+    val isTextEmpty = remember { mutableStateOf(true) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Surface {
+        Surface(Modifier) {
             UserInput(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                backgroundColor = Color.Transparent,
+                backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                 textContent = {
-                    UserTextInput(
-                        value = userInputValue,
-                        onValueChange = onValueChange,
-                        sendAction = sendTaskMessage,
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer ,
-                        boxWeight = 0.25f,
-                        actionsContent = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start,
-                                modifier = Modifier.fillMaxWidth()
-                            ){
-                                IconButton(
-                                    onClick = pickImage,
-                                    modifier = Modifier.weight(1f)
+                    val weight = if (isTextEmpty.value) 0.30f else 0.12f
+                    CompositionLocalProvider(LocalBoxWeight provides weight) {
+                        UserTextInput(
+                            value = userInputValue,
+                            onValueChange = {
+                                onValueChange(it)
+                                isTextEmpty.value = it.text.isBlank()
+                            },
+                            sendAction = sendTaskMessage,
+                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                            actionsContent = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Start,
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Icon(
-                                        Icons.Filled.PhotoLibrary,
-                                        contentDescription = stringResource(R.string.cd_select_images)
+                                    IconButton(
+                                        onClick = pickImage,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.PhotoLibrary,
+                                            contentDescription = stringResource(R.string.cd_select_images)
+                                        )
+                                    }
+                                    VoiceToTextInput(
+                                        onUpdateValue = userInputViewModel::updateUserInput,
                                     )
                                 }
-                                VoiceToTextInput(
-                                    onUpdateValue = userInputViewModel::updateUserInput,
-                                )
-                            }
-
-                        },
-                    )
+                            },
+                        )
+                    }
                 },
 
                 )
