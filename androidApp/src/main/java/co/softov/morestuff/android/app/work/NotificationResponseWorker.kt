@@ -8,7 +8,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.data.service.NotifierImpl
+import co.softov.morestuff.android.app.service.NotifierImpl
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction

@@ -5,8 +5,8 @@ import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import androidx.work.WorkManager
-import co.softov.morestuff.android.app.DevToolsImpl
-import co.softov.morestuff.android.app.SchedulerImpl
+import co.softov.morestuff.android.data.service.DevToolsImpl
+import co.softov.morestuff.android.app.service.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
 import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.data.mapper.DataMappersImpl
@@ -16,7 +16,7 @@ import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
 import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
 import co.softov.morestuff.android.data.repository.UserRepositoryImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
-import co.softov.morestuff.android.data.service.NotifierImpl
+import co.softov.morestuff.android.app.service.NotifierImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.MessageRepository

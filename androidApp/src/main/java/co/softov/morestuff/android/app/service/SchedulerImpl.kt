@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.app
+package co.softov.morestuff.android.app.service
 
 import android.app.AlarmManager
 import android.content.Context
