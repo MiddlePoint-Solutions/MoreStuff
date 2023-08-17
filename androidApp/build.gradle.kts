@@ -118,104 +118,31 @@ sqldelight {
         }
     }
 }
-
 dependencies {
     implementation(project(":shared"))
-    implementation(libs.androidxCoreKtx)
-    implementation(libs.androidxLifecycleRuntimeKtx)
-    implementation(libs.androidxActivityCompose)
-    implementation(platform(libs.androidxComposeBom))
-    implementation(libs.androidxLegacySupportV4)
-    implementation(libs.androidxDrawerlayout)
-    implementation(libs.reorderable)
-    implementation(libs.settingsUiM3)
-    implementation(libs.settingsStoragePreferences)
-    implementation(libs.uiToolingPreview)
-    implementation(libs.uiTooling)
-    implementation(libs.sqliteJdbc)
-    implementation(libs.androidAppStartup)
 
-    testImplementation(libs.mockk)
-    testImplementation(libs.junitJupiter)
-    testImplementation(libs.junitPlatformCommons)
-    testImplementation(libs.kotlinxCoroutinesTest)
-    testImplementation(libs.turbine)
-    implementation(libs.multiplatformSettingsNoArg)
-    implementation(libs.jsoup)
-    implementation(libs.coilCompose)
-    implementation(libs.kotlinxSerializationJson)
-    implementation(libs.kotlinSerialization)
+    // AndroidX and Compose
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.compose)
+
+    // Testing
+    testImplementation(libs.bundles.testing)
+
+    // Networking
+    implementation(libs.bundles.networking)
+
+    // SQL Delight
+    implementation(libs.bundles.sqldelight)
+
+    // Firebase
+    implementation(libs.bundles.firebase)
+
+    // Utilities
+    implementation(libs.bundles.utils)
+
+    // About Libraries
+    implementation(libs.bundles.aboutLibraries)
+
+
     debugImplementation(libs.uiTestManifest)
-    implementation(libs.decompose)
-    implementation(libs.extensionsComposeJetpack)
-    implementation(libs.parcelable)
-    implementation(libs.accompanistInsetsUi)
-    implementation(libs.accompanistPermissions)
-    implementation(libs.accompanistSystemUiController)
-    implementation(libs.kotlinStdlib)
-    implementation(libs.kotlinSerialization)
-    implementation(libs.kotlinReflect)
-    implementation(platform(libs.arrowBom))
-    implementation(libs.arrowCore)
-    implementation(libs.kotlinxDatetime)
-    implementation(libs.coroutinesCore)
-    implementation(libs.coroutinesAndroid)
-    testImplementation(libs.coroutinesTest)
-    implementation(libs.okhttp)
-    implementation(libs.okhttpLogging)
-    implementation(libs.sqldelightAndroidDriver)
-    implementation(libs.sqldelightCoroutinesJvmExt)
-    implementation(libs.sqldelightPrimitiveAdapters)
-    implementation(libs.sqldelightAndroidPagingExt)
-    testImplementation(libs.sqldelightTestSqlDriver)
-    implementation(platform(libs.firebaseBom))
-    implementation(libs.firebaseCrashlytics)
-    implementation(libs.firebaseAnalytics)
-    implementation(libs.googleServices)
-    implementation(libs.googleMaterial)
-    implementation(libs.koinAndroid)
-    implementation(libs.koinAndroidCompat)
-    implementation(libs.koinAndroidxCompose)
-
-    implementation(libs.timber)
-    implementation(libs.appcompat)
-    implementation(libs.palette)
-    implementation(libs.pagingKtx)
-    implementation(libs.workKtx)
-    implementation(libs.constraintLayout)
-    implementation(libs.coreKtx)
-    implementation(libs.activityKtx)
-    implementation(libs.fragmentKtx)
-    implementation(libs.constraintLayoutCompose)
-    implementation(libs.runtimeKtx)
-    implementation(libs.runtimeCompose)
-    implementation(libs.viewModel)
-    implementation(libs.viewModelCompose)
-    implementation(libs.composeRuntime)
-    implementation(libs.composeFoundation)
-    implementation(libs.composeFoundationLayout)
-    implementation(libs.pagingCompose)
-    implementation(libs.composeUi)
-    implementation(libs.composeViewBinding)
-    implementation(libs.composeAnimation)
-    implementation(libs.composeMaterial3)
-    implementation(libs.constraintLayoutCompose)
-    implementation(libs.composeMaterialIcons)
-    implementation(libs.composeMaterialIconsExtended)
-    implementation(libs.composeTooling)
-    implementation(libs.activityCompose)
-    implementation(libs.konfettiCompose)
-    implementation(libs.preferenceKtx)
-    implementation(libs.telephoto)
-
-    implementation(libs.aboutLibrariesCore)
-    implementation(libs.aboutLibrariesCompose)
-
-    testImplementation(libs.testCore)
-    testImplementation(libs.testRules)
-    testImplementation(libs.espressoCore)
-    testImplementation(libs.koinTest)
-    testImplementation(libs.koinTestJunit)
-    testImplementation(libs.junit)
-    testImplementation(libs.extJUnit)
 }
