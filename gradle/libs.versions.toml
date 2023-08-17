@@ -215,7 +215,8 @@ compose = [
     "activityCompose",
     "constraintLayout",
     "googleMaterial",
-    "constraintLayoutCompose"
+    "constraintLayoutCompose",
+    "konfettiCompose"
 ]
 
 # Testing
