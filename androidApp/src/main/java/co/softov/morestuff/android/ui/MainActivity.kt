@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver.MimeTypeInfo
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.MimeTypeFilter
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
@@ -120,6 +122,7 @@ class MainActivity : AppCompatActivity() {
     private fun handleLaunchIntent(intent: Intent) =
         when (intent.action) {
             Intent.ACTION_SEND -> {
+                Timber.d("intent.type: ${intent.type}")
                 if ("text/plain" == intent.type) {
                     intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
                         Screen.Share(Shareable.Text(it), it)
