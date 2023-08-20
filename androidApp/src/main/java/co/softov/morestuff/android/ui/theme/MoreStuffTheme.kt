@@ -98,9 +98,11 @@ fun MoreStuffTheme(
 fun MoreStuffSettingTheme(
     content: @Composable () -> Unit
 ) {
+    val darkTheme = isDarkTheme()
+    val colorScheme =  if (darkTheme) DarkColors else LightColors
     MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
-        typography = Typography(),
+        colorScheme = colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
+        typography = Typography,
     ) {
         content()
     }

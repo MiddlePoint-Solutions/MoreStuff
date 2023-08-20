@@ -23,10 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.data.Constants.DISCORD_INVITE_LINK
+import co.softov.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
+import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
@@ -90,11 +95,11 @@ private fun SettingsContent(
 
     val scrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = { SettingsTopBar(onBack = onBack) },
-        containerColor = Color.Transparent
-    ) {
-        MoreStuffSettingTheme {
+    MoreStuffSettingTheme {
+        Scaffold(
+            topBar = { SettingsTopBar(onBack = onBack) },
+            containerColor = Color.Transparent
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -244,10 +249,15 @@ fun About(
     modifier: Modifier = Modifier,
     showLibraries: () -> Unit,
 ) {
-    MoreStuffSettingTheme {
-        Column(modifier = modifier
-            .padding(16.dp)
-            .padding(bottom = 23.dp)) {
+
+    val uriHandler = LocalUriHandler.current
+
+    Surface {
+        Column(
+            modifier = modifier
+                .padding(16.dp)
+                .padding(bottom = 23.dp)
+        ) {
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -282,7 +292,7 @@ fun About(
                 Text(
                     text = stringResource(R.string.privacy_policy),
                     style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                    modifier = Modifier.clickable(onClick = showLibraries)
+                    modifier = Modifier.clickable(onClick = { uriHandler.openUri(PRIVACY_POLICY_LINK) })
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
@@ -292,24 +302,26 @@ fun About(
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = "Send Feedback and join our community!",
+                text = "Join our community & Help shape MoreStuff! ",
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
             )
 
             Row(
-                modifier = Modifier.padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { /* open Discord */ },
+                    onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     shape = RoundedCornerShape(15.dp),
                     modifier = Modifier.padding(end = 8.dp)
-
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
@@ -327,7 +339,7 @@ fun About(
                     )
                 }
                 Button(
-                    onClick = { /* open Telegram */ },
+                    onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
@@ -350,7 +362,6 @@ fun About(
 
                 }
             }
-
         }
     }
 }
@@ -365,7 +376,7 @@ fun About(
     name = "DefaultPreviewLight"
 )
 @Composable
-private fun SettingsPreview() {
+private fun SettingsPreviewDark() {
     MoreStuffTheme {
         SettingsContent(
             onBack = {},
