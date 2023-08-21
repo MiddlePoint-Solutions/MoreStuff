@@ -101,5 +101,6 @@ LIMIT 1;
 
 searchTasks:
 SELECT * FROM task
-WHERE title LIKE '%' || :searchText || '%';
+WHERE title LIKE '%' || :searchText || '%'
+ORDER BY create_time DESC;
 
