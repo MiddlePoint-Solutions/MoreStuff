@@ -206,6 +206,7 @@ dependencies {
     implementation(libs.activityCompose)
     implementation(libs.konfettiCompose)
     implementation(libs.preferenceKtx)
+    implementation(libs.telephoto)
 
     implementation(libs.aboutLibrariesCore)
     implementation(libs.aboutLibrariesCompose)
