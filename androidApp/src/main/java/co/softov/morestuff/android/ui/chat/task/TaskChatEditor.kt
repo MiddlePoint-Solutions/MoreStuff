@@ -171,10 +171,6 @@ fun TaskChatEditor(
                         maxLines = 4,
                         textStyle = MaterialTheme.typography.headlineMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
-                            textDecoration = when (isComplete) {
-                                true -> TextDecoration.LineThrough
-                                false -> null
-                            }
                         ),
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                     )
