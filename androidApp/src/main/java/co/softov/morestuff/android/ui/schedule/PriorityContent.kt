@@ -144,8 +144,7 @@ fun PriorityContent(
             modifier = modifier
                 .fillMaxSize()
                 .reorderable(state),
-            contentPadding = PaddingValues(bottom = 130.dp),
-            horizontalAlignment = Alignment.End
+            contentPadding = PaddingValues(bottom = 180.dp),
         ) {
             items(
                 items = viewModel.tasks,
