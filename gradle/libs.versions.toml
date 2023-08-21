@@ -158,7 +158,6 @@ runtimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref 
 runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-composeBom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 composeRuntime = { module = "androidx.compose.runtime:runtime" }
 composeFoundation = { module = "androidx.compose.foundation:foundation" }
 composeFoundationLayout = { module = "androidx.compose.foundation:foundation-layout" }
@@ -178,3 +177,124 @@ espressoCore = { module = "androidx.test.espresso:espresso-core", version.ref = 
 androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref = "androidAppStartup" }
 konfettiCompose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfettiCompose" }
 telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
+
+
+[bundles]
+# AndroidX and Compose
+android = [
+    "androidxCoreKtx",
+    "androidxLegacySupportV4",
+    "androidxDrawerlayout",
+    "appcompat",
+    "palette",
+    "pagingKtx",
+    "workKtx",
+    "coreKtx",
+    "activityKtx",
+    "fragmentKtx",
+    "runtimeKtx",
+    "viewModel",
+]
+
+compose = [
+    "androidxActivityCompose",
+    "androidxComposeBom",
+    "runtimeCompose",
+    "viewModelCompose",
+    "composeRuntime",
+    "composeFoundation",
+    "composeFoundationLayout",
+    "pagingCompose",
+    "composeUi",
+    "composeViewBinding",
+    "composeAnimation",
+    "composeMaterial3",
+    "composeMaterialIcons",
+    "composeMaterialIconsExtended",
+    "composeTooling",
+    "activityCompose",
+    "constraintLayout",
+    "googleMaterial",
+    "constraintLayoutCompose",
+    "konfettiCompose"
+]
+
+# Testing
+testing = [
+    "uiToolingPreview",
+    "uiTooling",
+    "mockk",
+    "junitJupiter",
+    "junitPlatformCommons",
+    "kotlinxCoroutinesTest",
+    "turbine",
+    "koinTest",
+    "koinTestJunit",
+    "junit",
+    "testCore",
+    "testRules",
+    "extJUnit",
+    "espressoCore"
+]
+
+# Networking
+networking = [
+    "okhttp",
+    "okhttpLogging",
+    "coilCompose",
+    "kotlinxSerializationJson"
+]
+
+# SQL Delight
+sqldelight = [
+    "sqldelightAndroidDriver",
+    "sqldelightCoroutinesJvmExt",
+    "sqldelightPrimitiveAdapters",
+    "sqldelightAndroidPagingExt",
+    "sqldelightTestSqlDriver",
+    "sqliteJdbc",
+]
+
+# Firebase
+firebase = [
+    "firebaseBom",
+    "firebaseCrashlytics",
+    "firebaseAnalytics",
+    "googleServices"
+]
+
+# Utilities
+utils = [
+    "reorderable",
+    "preferenceKtx",
+    "settingsUiM3",
+    "settingsStoragePreferences",
+    "jsoup",
+    "decompose",
+    "extensionsComposeJetpack",
+    "parcelable",
+    "jdkDesugar",
+    "accompanistInsetsUi",
+    "accompanistPermissions",
+    "accompanistSystemUiController",
+    "kotlinStdlib",
+    "kotlinReflect",
+    "arrowBom",
+    "arrowCore",
+    "kotlinxDatetime",
+    "coroutinesCore",
+    "coroutinesAndroid",
+    "multiplatformSettingsNoArg",
+    "koinAndroid",
+    "koinAndroidCompat",
+    "koinAndroidxCompose",
+    "timber",
+    "telephoto",
+    "konfettiCompose",
+]
+
+# About Libraries
+aboutLibraries = [
+    "aboutLibrariesCore",
+    "aboutLibrariesCompose"
+]
