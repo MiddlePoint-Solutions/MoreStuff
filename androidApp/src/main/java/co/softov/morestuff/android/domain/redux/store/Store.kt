@@ -1,8 +1,6 @@
-package co.softov.morestuff.android.domain.redux
+package co.softov.morestuff.android.domain.redux.store
 
 import co.softov.morestuff.android.domain.redux.middleware.Middleware
-import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*

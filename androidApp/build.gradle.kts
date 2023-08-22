@@ -58,6 +58,11 @@ android {
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
 
     }
@@ -115,6 +120,7 @@ sqldelight {
             packageName.set("co.softov.morestuff.db")
             schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
             verifyMigrations.set(true)
+            dialect("app.cash.sqldelight:sqlite-3-18-dialect:2.0.0")
         }
     }
 }

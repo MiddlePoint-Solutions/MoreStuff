@@ -3,6 +3,8 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.redux.*
 import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber

@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        showBatteryOptimizationRequest()
+//        showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val rootComponentContext = defaultComponentContext()
@@ -67,8 +67,6 @@ class MainActivity : AppCompatActivity() {
             } else {
                 handleLaunchIntent(intent)
             }
-
-            NotificationPermissionRequester()
 
             ProvideAppTheme(viewModel.appTheme) {
                 TransparentSystemBars()

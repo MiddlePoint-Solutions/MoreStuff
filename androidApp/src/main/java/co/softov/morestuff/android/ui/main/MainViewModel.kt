@@ -4,13 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
-import co.softov.morestuff.android.ui.main.MainModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
@@ -34,6 +31,7 @@ class MainViewModel() : NoStateViewModel() {
 
     override fun onLoadData(appState: AppState) {
         appTheme = appState.settings.appTheme
+
     }
 
     override fun onAppStateChange(state: AppState) {
