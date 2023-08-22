@@ -4,8 +4,8 @@ import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.util.anyLog
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
 import kotlinx.coroutines.CoroutineScope
 
 class LoggerMiddleware : Middleware<AppState> {
