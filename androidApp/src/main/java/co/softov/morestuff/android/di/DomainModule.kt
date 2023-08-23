@@ -88,6 +88,10 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotifications
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
@@ -271,8 +275,10 @@ val messageUseCases = module {
 
 val settingsUseCases = module {
     factoryOf(::GetAppSettingsUseCaseImpl) bind GetAppSettingsUseCase::class
+    factoryOf(::GetAppSettingUseCaseImpl) bind GetAppSettingUseCase::class
     factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
     factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
+    factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
 }
 
 val timeManagerModule = module {

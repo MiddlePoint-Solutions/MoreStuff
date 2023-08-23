@@ -27,6 +27,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackA
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainContent(
@@ -34,6 +35,7 @@ fun MainContent(
     shareContent: (taskId: Long, content: Shareable) -> Unit
 ) {
 
+    val viewModel: MainViewModel = koinViewModel()
     val navigation = LocalAppNavigation.current
     val scope = rememberCoroutineScope()
 
@@ -53,7 +55,8 @@ fun MainContent(
 
             OnBoarding -> OnBoardingScreen(
                 onBoardingComplete = {
-                    scope.launch { navigation.replaceCurrent(Home) }
+                    navigation.replaceCurrent(Home)
+                    viewModel.onBoardingCompleted()
                 }
             )
 
