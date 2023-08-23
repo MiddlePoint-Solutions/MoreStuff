@@ -6,9 +6,11 @@ import co.softov.morestuff.android.domain.redux.state.AppSettings
 
 interface UserRepository {
 
-    suspend fun <T> saveAppSetting(setting: AppSetting, settingValue: T)
+    suspend fun <T> saveAppSetting(setting: AppSetting<T>, settingValue: T)
 
     suspend fun getAppSettings(default: AppSettings): AppSettings
+
+    fun <T> getAppSetting(setting: AppSetting<T>): T
 
     fun getAppTheme(): AppTheme
 

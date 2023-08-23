@@ -9,6 +9,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetpack.pages.PagesScrollAnimation
@@ -31,18 +32,20 @@ inline fun <reified C : Parcelable> ChildPages(
     val componentContext = LocalComponentContext.current
 
     Pages(
-        pages = componentContext.childPages(
-            source = source,
-            initialPages = initialPages,
-            handleBackButton = handleBackButton,
-            childFactory = { _, childComponentContext -> childComponentContext },
-        ),
+        pages = remember {
+            componentContext.childPages(
+                source = source,
+                initialPages = initialPages,
+                handleBackButton = handleBackButton,
+                childFactory = { _, childComponentContext -> childComponentContext },
+            )
+        } ,
         modifier = modifier,
         onPageSelected = { },
-        pager = { pageCount, modifier, state, key, pageContent ->
+        pager = { pageCount, m, state, key, pageContent ->
             HorizontalPager(
                 state = state,
-                modifier = modifier,
+                modifier = m,
                 key = key,
                 userScrollEnabled = false,
                 pageContent = pageContent,

@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui
 
 import android.annotation.SuppressLint
-import android.content.ContentResolver.MimeTypeInfo
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,23 +12,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.core.content.MimeTypeFilter
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.app.extensions.getParcelableExtraCompat
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import co.softov.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import co.softov.morestuff.android.app.util.LifecycleEventsObserver
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Shareable
-import co.softov.morestuff.android.ui.components.NotificationPermissionRequester
 import co.softov.morestuff.android.ui.local.ProvideAppTheme
 import co.softov.morestuff.android.ui.local.ProvideAppNavigation
 import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.main.MainStates
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -61,25 +59,33 @@ class MainActivity : AppCompatActivity() {
                 onResume = { viewModel.onResume() }
             )
 
-            val model by viewModel.model.collectAsState()
-            val initialScreen = if (model.showOnBoarding) {
-                Screen.OnBoarding
-            } else {
-                handleLaunchIntent(intent)
-            }
-
             ProvideAppTheme(viewModel.appTheme) {
                 TransparentSystemBars()
                 MoreStuffTheme {
+
+                    val stateModel by viewModel.states.collectAsStateWithLifecycle()
+
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
                         ProvideComponentContext(rootComponentContext) {
                             ProvideAppNavigation(navigation) {
-                                MainContent(
-                                    initialScreen = initialScreen,
-                                    shareContent = viewModel::shareContentToTask
-                                )
+
+                                when (val model = stateModel) {
+                                    MainStates.Idle -> {}
+                                    is MainStates.Ready -> {
+                                        val initialScreen = if (model.showOnBoarding) {
+                                            Screen.OnBoarding
+                                        } else {
+                                            handleLaunchIntent(intent)
+                                        }
+
+                                        MainContent(
+                                            initialScreen = initialScreen,
+                                            shareContent = viewModel::shareContentToTask
+                                        )
+                                    }
+                                }
                             }
                         }
                     }

@@ -2,6 +2,7 @@ package co.softov.morestuff.android.data.repository
 
 import co.softov.morestuff.android.data.key
 import co.softov.morestuff.android.domain.enums.AppSetting
+import co.softov.morestuff.android.domain.enums.AppSetting.*
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.state.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
@@ -14,32 +15,41 @@ class UserRepositoryImpl(
 
     override suspend fun getAppSettings(default: AppSettings) = with(default) {
         AppSettings(
-            isFirstTime = getSetting(AppSetting.FirstTime, isFirstTime),
-            appTheme = AppTheme.valueOf(getSetting(AppSetting.AppTheme, appTheme.name)),
-            snoozeLimit = getSetting(AppSetting.SnoozeLimit, snoozeLimit),
-            enableConfetti = getSetting(AppSetting.Confetti, enableConfetti)
+            isFirstTime = getSetting(FirstTime, isFirstTime),
+            appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
+            snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
+            enableConfetti = getSetting(Confetti, enableConfetti)
         )
     }
 
 
-    override suspend fun <T> saveAppSetting(setting: AppSetting, settingValue: T) {
+    override suspend fun <T> saveAppSetting(setting: AppSetting<T>, settingValue: T) {
         when (setting) {
-            AppSetting.FirstTime -> settings.putBoolean(setting.key, settingValue as Boolean)
-            AppSetting.AppTheme -> settings.putString(setting.key, settingValue as String)
-            AppSetting.SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
-            AppSetting.Confetti -> settings.putBoolean(setting.key, settingValue as Boolean)
+            FirstTime -> settings.putBoolean(setting.key, settingValue as Boolean)
+            Theme -> settings.putString(setting.key, settingValue as String)
+            SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
+            Confetti -> settings.putBoolean(setting.key, settingValue as Boolean)
         }
     }
 
-    override fun getAppTheme(): AppTheme =
-        AppTheme.valueOf(getSetting(AppSetting.AppTheme, AppTheme.System.name))
-
-    private inline fun <reified T> getSetting(setting: AppSetting, defaultValue: T): T =
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> getAppSetting(setting: AppSetting<T>): T =
         when (setting) {
-            AppSetting.FirstTime -> settings.getBoolean(setting.key, defaultValue as Boolean)
-            AppSetting.AppTheme -> settings.getString(setting.key, defaultValue as String)
-            AppSetting.SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
-            AppSetting.Confetti -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            FirstTime -> getSetting(setting, setting.defaultValue as Boolean)
+            Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
+            SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
+            Confetti -> getSetting(setting, setting.defaultValue as Boolean)
+        } as T
+
+    override fun getAppTheme(): AppTheme =
+        AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
+
+    private inline fun <reified T> getSetting(setting: AppSetting<*>, defaultValue: T): T =
+        when (setting) {
+            FirstTime -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            Theme -> settings.getString(setting.key, defaultValue as String)
+            SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
+            Confetti -> settings.getBoolean(setting.key, defaultValue as Boolean)
         } as T
 
 }

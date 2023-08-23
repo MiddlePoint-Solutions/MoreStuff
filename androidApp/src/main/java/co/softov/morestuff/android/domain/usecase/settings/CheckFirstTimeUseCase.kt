@@ -4,14 +4,14 @@ import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.repository.UserRepository
 
-interface GetAppThemeUseCase {
-    operator fun invoke(): AppTheme
+interface CheckFirstTimeUseCase {
+    operator fun invoke(): Boolean
 }
 
-class GetAppThemeUseCaseImpl(
+class CheckFirstTimeUseCaseImpl(
     private val getAppSetting: GetAppSettingUseCase
-) : GetAppThemeUseCase {
-    override fun invoke(): AppTheme = getAppSetting(AppSetting.Theme)
+) : CheckFirstTimeUseCase {
+    override fun invoke(): Boolean = getAppSetting(AppSetting.FirstTime)
 
 }
 

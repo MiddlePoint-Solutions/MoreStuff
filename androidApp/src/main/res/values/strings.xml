@@ -130,7 +130,7 @@
     <string name="task_chat_reminder_action">Reminder</string>
 
     <!--  onBoarding  -->
-    <string name="out_goal">"Out goal "</string>
+    <string name="our_goal">"Our goal"</string>
     <string name="is_to_help_you_plan_and">is to help you plan and\nfulfill your tasks.</string>
     <string name="button_start">Start</string>
     <string name="notification">Notification\npermission </string>

@@ -1,65 +1,67 @@
 package co.softov.morestuff.android.ui.main
 
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
+import co.softov.morestuff.android.ui.main.MainStates.Idle
+import co.softov.morestuff.android.ui.main.MainStates.Ready
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
-class MainViewModel() : NoStateViewModel() {
+class MainViewModel(
+    getAppThemeUseCase: GetAppThemeUseCase,
+    checkFirstTimeUseCase: CheckFirstTimeUseCase
+) : NoStateViewModel() {
 
-    var appTheme by mutableStateOf(store.state.value.settings.appTheme)
+    var appTheme by mutableStateOf(getAppThemeUseCase())
         private set
 
-    val model: MutableStateFlow<MainModel> = with(store.state.value.settings) {
-        MutableStateFlow(
-            MainModel(
-                showOnBoarding = isFirstTime,
-                theme = appTheme
-            )
+    val states: StateFlow<MainStates> = moleculeFlow(RecompositionMode.Immediate) {
+        val store by store.state.collectAsState()
+        Ready(
+            showOnBoarding = checkFirstTimeUseCase(),
+            theme = store.settings.appTheme
         )
-    }
-
-    init {
-        loadData()
-    }
-
-    override fun onLoadData(appState: AppState) {
-        appTheme = appState.settings.appTheme
-
-    }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Idle)
 
     override fun onAppStateChange(state: AppState) {
         appTheme = state.settings.appTheme
-        model.update {
-            it.copy(
-                showOnBoarding = state.settings.isFirstTime,
-                theme = state.settings.appTheme
-            )
-        }
     }
 
     fun onResume() {
-        store.dispatch(OnResumeAction)
+        dispatchAppStoreAction(OnResumeAction)
     }
 
     fun shareTextToTask(taskId: Long, content: String) {
-        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
+        dispatchAppStoreAction(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
     fun shareContentToTask(taskId: Long, content: Shareable) {
         when (content) {
             is Shareable.Text -> {
-                store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content.content))
+                dispatchAppStoreAction(
+                    MessageAction.CreateUserTaskMessageAction(
+                        taskId,
+                        content.content
+                    )
+                )
             }
 
             is Shareable.Image -> {
-                store.dispatch(
+                dispatchAppStoreAction(
                     MessageAction.CreateImageMessageAction(
                         taskId,
                         content.uris,
@@ -70,6 +72,8 @@ class MainViewModel() : NoStateViewModel() {
         }
     }
 
+    fun onBoardingCompleted() {
+        dispatchAppStoreAction(SettingAction.OnBoardingComplete)
+    }
 
 }
-

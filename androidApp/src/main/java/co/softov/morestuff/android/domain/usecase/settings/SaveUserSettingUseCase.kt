@@ -4,13 +4,13 @@ import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.repository.UserRepository
 
 interface SaveUserSettingUseCase {
-    suspend operator fun <T> invoke(setting: AppSetting, settingValue: T)
+    suspend operator fun <T> invoke(setting: AppSetting<T>, settingValue: T)
 }
 
 class SaveUserSettingUseCaseImpl(
     private val userRepository: UserRepository
 ) : SaveUserSettingUseCase {
-    override suspend fun <T> invoke(setting: AppSetting, settingValue: T) {
+    override suspend fun <T> invoke(setting: AppSetting<T>, settingValue: T) {
         userRepository.saveAppSetting(setting, settingValue)
     }
 }
