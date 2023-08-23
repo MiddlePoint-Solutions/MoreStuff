@@ -10,7 +10,7 @@ interface UserRepository {
 
     suspend fun getAppSettings(default: AppSettings): AppSettings
 
-    fun <T> getAppSetting(setting: AppSetting<T>): T
+    fun <T, R> getAppSetting(setting: AppSetting<T>): R
 
     fun getAppTheme(): AppTheme
 

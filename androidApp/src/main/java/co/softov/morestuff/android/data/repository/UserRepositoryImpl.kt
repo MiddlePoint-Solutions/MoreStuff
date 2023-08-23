@@ -33,13 +33,13 @@ class UserRepositoryImpl(
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> getAppSetting(setting: AppSetting<T>): T =
+    override fun <T, R> getAppSetting(setting: AppSetting<T>): R =
         when (setting) {
             FirstTime -> getSetting(setting, setting.defaultValue as Boolean)
             Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
             SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
             Confetti -> getSetting(setting, setting.defaultValue as Boolean)
-        } as T
+        } as R
 
     override fun getAppTheme(): AppTheme =
         AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))

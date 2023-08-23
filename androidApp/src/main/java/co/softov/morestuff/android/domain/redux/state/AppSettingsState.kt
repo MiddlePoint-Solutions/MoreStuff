@@ -15,7 +15,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 
 data class AppSettings(
     val isFirstTime: Boolean = FirstTime.defaultValue,
-    val appTheme: AppTheme = Theme.defaultValue,
+    val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
     val enableConfetti: Boolean = Confetti.defaultValue,
 )

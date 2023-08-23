@@ -36,7 +36,7 @@ class SettingsMiddleware(
             }
 
             is SetAppTheme -> scope.launch {
-                saveUserSettingUseCase(AppSetting.Theme, action.theme)
+                saveUserSettingUseCase(AppSetting.Theme, action.theme.name)
             }
 
             is EnableConfetti -> scope.launch {

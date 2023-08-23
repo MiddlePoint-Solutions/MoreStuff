@@ -37,6 +37,10 @@ class MainViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Idle)
 
+    init {
+        loadData()
+    }
+
     override fun onAppStateChange(state: AppState) {
         appTheme = state.settings.appTheme
     }

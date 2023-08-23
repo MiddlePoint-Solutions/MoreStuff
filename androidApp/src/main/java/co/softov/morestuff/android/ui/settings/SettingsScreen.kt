@@ -202,6 +202,7 @@ fun SelectTheme(
                 contentDescription = stringResource(R.string.cd_select_theme)
             )
         },
+        closeDialogDelay = 0,
         useSelectedValueAsSubtitle = false,
     )
 }
