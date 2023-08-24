@@ -29,11 +29,9 @@ class CreateMessageUseCaseImpl(
         messageData: MessageData?,
         scheduleId: Long,
     ): Either<Failure, Message> {
-        val messageResult = messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title)
-        messageResult.map { message ->
-            checkForUrlMetadataUseCase(title, message.id)
+        return messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title).tap {
+            checkForUrlMetadataUseCase(title, it.id)
         }
-        return messageResult
     }
 }
 
