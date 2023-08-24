@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.usecase.task
 import arrow.core.right
 import co.softov.morestuff.android.domain.createListOfTasks
 import co.softov.morestuff.android.domain.createScheduleForTest
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

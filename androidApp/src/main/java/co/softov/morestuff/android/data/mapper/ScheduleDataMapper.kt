@@ -3,7 +3,7 @@
 package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 
 typealias ScheduleData = co.softov.morestuff.db.Schedule
 typealias ScheduleDomainMapper = (ScheduleDomain) -> ScheduleData

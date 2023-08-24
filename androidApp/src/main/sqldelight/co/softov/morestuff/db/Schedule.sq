@@ -1,4 +1,4 @@
-import co.softov.morestuff.android.domain.model.ScheduleType;
+import co.softov.morestuff.android.domain.enums.ScheduleType;
 import kotlin.Boolean;
 
 CREATE TABLE schedule(
