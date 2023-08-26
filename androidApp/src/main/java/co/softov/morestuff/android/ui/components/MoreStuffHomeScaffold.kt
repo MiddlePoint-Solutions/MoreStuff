@@ -38,18 +38,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
+    topAppBarScrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     content: @Composable (PaddingValues) -> Unit,
 ) {
 
     val navigation = LocalAppNavigation.current
-
     var isSearching by rememberSaveable { mutableStateOf(false) }
-    val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope: CoroutineScope = rememberCoroutineScope()
-
-    val closeDrawer = remember {
-        { scope.launch { drawerState.close() } }
-    }
 
     val dismissSnackbarState = rememberDismissState(
         confirmValueChange = { _ ->
@@ -58,68 +52,39 @@ fun MoreStuffHomeScaffold(
         }
     )
 
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-
-
-    BackHandler(enabled = drawerState.isOpen) {
-        closeDrawer()
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            gesturesEnabled = drawerState.isOpen,
-            drawerContent = {
-                ModalDrawerSheet {}
-            },
-            content = {
-                Scaffold(
-                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                    containerColor = Color.Transparent,
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState) { data ->
-                            SwipeToDismiss(
-                                state = dismissSnackbarState,
-                                background = {},
-                                dismissContent = { Snackbar(snackbarData = data) },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-                    },
-                    topBar = {
-                        Box {
-                            MoreStuffTopBar(
-                                reviewSelected = { navigation.push(Screen.Review) },
-                                settingsSelected = { navigation.push(Screen.Settings) },
-                                searchSelected = { isSearching = true },
-                                scrollBehavior = scrollBehavior,
-                            )
-                        }
-                    },
-                    content = {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            content(PaddingValues(it.calculateTopPadding()))
-                        }
-                    }
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                SwipeToDismiss(
+                    state = dismissSnackbarState,
+                    background = {},
+                    dismissContent = { Snackbar(snackbarData = data) },
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
-        )
-
-        AnimatedVisibility(
-            visible = isSearching,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier.align(Alignment.TopCenter)
-        ) {
-            SearchBar(
-                onSearchClose = { isSearching = false },
-                showTaskChat = { navigation.push(Screen.TaskChat(it)) },
-                modifier = Modifier.fillMaxWidth()
+        },
+        topBar = {
+            MoreStuffTopBar(
+                reviewSelected = { navigation.push(Screen.Review) },
+                settingsSelected = { navigation.push(Screen.Settings) },
+                searchSelected = { isSearching = true },
+                scrollBehavior = topAppBarScrollBehavior,
             )
-        }
+        },
+        content = content
+    )
+
+    AnimatedVisibility(
+        visible = isSearching,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        SearchBar(
+            onSearchClose = { isSearching = false },
+            showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

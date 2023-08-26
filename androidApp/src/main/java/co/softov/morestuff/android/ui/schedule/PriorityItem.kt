@@ -37,6 +37,7 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.TaskColors
 import co.softov.morestuff.android.ui.theme.surfaceContainer
+import timber.log.Timber
 
 @Composable
 fun PriorityItem(
@@ -56,7 +57,10 @@ fun PriorityItem(
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .clickable { onClick(task.id) },
+                .clickable {
+                    Timber.d("Clicked on ${task.id}")
+                    onClick(task.id)
+                },
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
