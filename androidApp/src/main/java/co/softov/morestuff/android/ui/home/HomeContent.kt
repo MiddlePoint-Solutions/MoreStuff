@@ -55,6 +55,7 @@ import org.koin.androidx.compose.koinViewModel
 fun HomeScreen() {
 
     val navigation = LocalAppNavigation.current
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
@@ -63,12 +64,13 @@ fun HomeScreen() {
         topAppBarScrollBehavior = scrollBehavior,
         content = {
             HomeContent(
-                showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
+                showTaskChat = { taskId ->
+                    scope.launch {
+                        navigation.push(Screen.TaskChat(taskId))
+                    }
+                },
                 snackbarHostState = snackbarHostState,
-                modifier = Modifier
-                    .padding(top = it.calculateTopPadding())
-                    .nestedScroll(scrollBehavior.nestedScrollConnection)
-                ,
+                modifier = Modifier.padding(top = it.calculateTopPadding())
             )
         }
     )
@@ -93,13 +95,12 @@ fun HomeContent(
         mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
     }
 
-    BoxWithConstraints(
+    Box(
         modifier = modifier.fillMaxSize()
     ) {
         PriorityContent(
             snackBarHostState = snackbarHostState,
             showTaskChat = showTaskChat,
-            modifier = Modifier.fillMaxSize(),
             listState = priorityScrollState,
             onItemDragging = { visibleState.targetState = !it }
         )

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,14 +54,13 @@ fun PriorityItem(
             .height(80.dp)
             .shadow(elevation = elevation)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .clickable {
+                Timber.d("Clicked on ${task.id}")
+                onClick(task.id)
+            }
     ) {
         Row(
-            modifier = modifier
-                .fillMaxSize()
-                .clickable {
-                    Timber.d("Clicked on ${task.id}")
-                    onClick(task.id)
-                },
+            modifier = modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
@@ -68,7 +68,6 @@ fun PriorityItem(
 
             Text(
                 text = task.title,
-                textAlign = TextAlign.Start,
                 modifier = Modifier
                     .fillMaxWidth(0.90f)
                     .padding(12.dp),
@@ -80,6 +79,7 @@ fun PriorityItem(
                     lineHeight = 18.sp,
                     fontWeight = FontWeight(700),
                     color = Color(0xFFFFFFFF),
+                    textAlign = TextAlign.Start,
                 )
             )
         }
@@ -98,6 +98,10 @@ fun TaskProfile(task: TaskDomain) {
         derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
     }
 
+    val profileTitle by remember {
+        derivedStateOf { task.title[0].uppercase() }
+    }
+
     Box(
         modifier = Modifier
             .padding(start = 14.dp)
@@ -107,8 +111,8 @@ fun TaskProfile(task: TaskDomain) {
                 brush = Brush.verticalGradient(profileColor)
             )
     ) {
-        Text(
-            text = task.title[0].uppercase(),
+        BasicText(
+            text = profileTitle,
             modifier = Modifier.align(Alignment.Center),
             style = TextStyle(
                 fontSize = 24.sp,
