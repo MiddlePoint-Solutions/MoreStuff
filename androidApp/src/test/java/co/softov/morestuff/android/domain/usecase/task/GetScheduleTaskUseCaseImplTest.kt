@@ -4,7 +4,7 @@ import arrow.core.Either
 import arrow.core.right
 import co.softov.morestuff.android.domain.createScheduleForTest
 import co.softov.morestuff.android.domain.createTaskForTest
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk

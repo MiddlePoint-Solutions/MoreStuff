@@ -1,9 +1,10 @@
 package co.softov.morestuff.android.ui.schedule
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +28,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +73,7 @@ fun PriorityContent(
 ) {
 
     val scope = rememberCoroutineScope()
-    val model by viewModel.model.collectAsStateWithLifecycle()
+    val model by viewModel.model.collectAsState()
 
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
@@ -138,95 +140,87 @@ fun PriorityContent(
         )
     }
 
-    Box(modifier) {
-        LazyColumn(
-            state = state.listState,
-            modifier = modifier
-                .fillMaxSize()
-                .reorderable(state),
-            contentPadding = PaddingValues(bottom = 180.dp),
+    LazyColumn(
+        state = state.listState,
+        modifier = modifier
+            .fillMaxSize()
+            .reorderable(state),
+        contentPadding = PaddingValues(bottom = 180.dp),
+    ) {
+        items(
+            items = viewModel.tasks,
+            key = { task -> task.id }
         ) {
-            items(
-                items = viewModel.tasks,
-                key = { task -> task.id }
-            ) {
-                val task by rememberUpdatedState(it)
+            val task by rememberUpdatedState(it)
+            val itemClick by rememberUpdatedState(showTaskChat)
 
-                val dismissState = rememberNoFlingDismissState(
-                    positionalThreshold = { 130.dp.toPx() },
-                    confirmValueChange = { dismissValue ->
-                        when (dismissValue) {
-                            DismissValue.Default -> false
-                            DismissValue.DismissedToEnd -> {
-                                taskOptions = task
-                                false
-                            }
-
-                            DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(task)
-                                false
-                            }
-                        }
-                    }
-                )
-
-                var willDismissDirection: DismissDirection? by remember {
-                    mutableStateOf(null)
-                }
-
-                LaunchedEffect(key1 = Unit, block = {
-                    snapshotFlow { dismissState.dismissDirection }
-                        .collect { dismissDirection ->
-                            willDismissDirection = dismissDirection
-                        }
-                })
-
-                val haptic = LocalHapticFeedback.current
-                LaunchedEffect(key1 = willDismissDirection, block = {
-                    if (willDismissDirection != null) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
-                })
-
-                ReorderableItem(state, key = task.id) { isDragging ->
-                    NoFlingSwipeToDismiss(
-                        state = dismissState,
-                        background = { SwipeBackground(dismissState, task.hasReminder) },
-                        dismissContent = {
-                            PriorityItem(
-                                task = task,
-                                onClick = showTaskChat,
-                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
-                                isDragging = isDragging
-                            )
+            val dismissState = rememberNoFlingDismissState(
+                positionalThreshold = { 130.dp.toPx() },
+                confirmValueChange = { dismissValue ->
+                    when (dismissValue) {
+                        DismissValue.Default -> false
+                        DismissValue.DismissedToEnd -> {
+                            taskOptions = task
+                            false
                         }
 
-                    )
-                    AnimatedVisibility(
-                        visible = !isDragging,
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                    ) {
-
-                    }
-
-                    LaunchedEffect(key1 = isDragging) {
-                        onItemDragging(isDragging)
-                    }
-                }
-            }
-        }
-
-        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = explode(),
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                        if (activeSystems == 0) showTaskCompleteAnimation = 0
+                        DismissValue.DismissedToStart -> {
+                            viewModel.toggleReminder(task)
+                            false
+                        }
                     }
                 }
             )
+
+            var willDismissDirection: DismissDirection? by remember {
+                mutableStateOf(null)
+            }
+
+            LaunchedEffect(Unit) {
+                snapshotFlow { dismissState.dismissDirection }
+                    .collect { dismissDirection ->
+                        willDismissDirection = dismissDirection
+                    }
+            }
+
+            val haptic = LocalHapticFeedback.current
+            LaunchedEffect(willDismissDirection) {
+                if (willDismissDirection != null) {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            }
+
+            ReorderableItem(state, key = task.id) { isDragging ->
+                NoFlingSwipeToDismiss(
+                    state = dismissState,
+                    background = { SwipeBackground(dismissState, task.hasReminder) },
+                    dismissContent = {
+                        PriorityItem(
+                            task = task,
+                            onClick = itemClick,
+                            if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                            isDragging = isDragging
+                        )
+                    }
+                )
+
+                LaunchedEffect(key1 = isDragging) {
+                    onItemDragging(isDragging)
+                }
+            }
         }
+    }
+
+    if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+        KonfettiView(
+            modifier = Modifier.fillMaxSize(),
+            parties = explode(),
+            updateListener = object : OnParticleSystemUpdateListener {
+                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                    if (activeSystems == 0) showTaskCompleteAnimation = 0
+                }
+            }
+        )
     }
 }
 

@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +26,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,20 +50,28 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
 
     val navigation = LocalAppNavigation.current
+    val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
+        topAppBarScrollBehavior = scrollBehavior,
         content = {
-            Box(Modifier.padding(top = it.calculateTopPadding())) {
-                HomeContent(
-                    showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
-                    snackbarHostState = snackbarHostState
-                )
-            }
+            HomeContent(
+                showTaskChat = { taskId ->
+                    scope.launch {
+                        navigation.push(Screen.TaskChat(taskId))
+                    }
+                },
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.padding(top = it.calculateTopPadding())
+            )
         }
     )
 }
@@ -83,13 +95,12 @@ fun HomeContent(
         mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
     }
 
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
         PriorityContent(
             snackBarHostState = snackbarHostState,
             showTaskChat = showTaskChat,
-            modifier = Modifier.fillMaxSize(),
             listState = priorityScrollState,
             onItemDragging = { visibleState.targetState = !it }
         )

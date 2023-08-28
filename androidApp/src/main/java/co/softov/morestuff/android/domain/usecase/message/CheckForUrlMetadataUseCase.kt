@@ -44,7 +44,7 @@ class CheckForUrlMetadataUseCaseImpl(
         }
     }
 
-    fun findFirstUrl(content: String, urlPattern: Pattern): Pair<String, Boolean>? {
+    private fun findFirstUrl(content: String, urlPattern: Pattern): Pair<String, Boolean>? {
         val matcher = urlPattern.matcher(content)
         return if (matcher.find()) {
             var url = content.substring(matcher.start(), matcher.end())

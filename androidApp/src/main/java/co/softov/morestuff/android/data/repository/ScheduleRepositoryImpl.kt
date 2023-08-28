@@ -9,7 +9,7 @@ import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.data.mapper.mapScheduleDomain
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleDoesNotExist
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb

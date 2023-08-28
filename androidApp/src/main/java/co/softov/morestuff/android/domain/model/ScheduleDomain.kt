@@ -1,5 +1,7 @@
 package co.softov.morestuff.android.domain.model
 
+import co.softov.morestuff.android.domain.enums.ScheduleType
+
 data class ScheduleDomain(
     val id: Long = 0L,
     val taskId: Long = 0L,

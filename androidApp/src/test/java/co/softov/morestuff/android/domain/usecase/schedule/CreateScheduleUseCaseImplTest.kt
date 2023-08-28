@@ -3,11 +3,9 @@ package co.softov.morestuff.android.domain.usecase.schedule
 import arrow.core.Either
 import arrow.core.right
 import co.softov.morestuff.android.data.service.TimeManagerImpl
-import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.createScheduleUseCaseTest
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -18,7 +16,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.koin.test.inject
 
 
 class CreateScheduleUseCaseImplTest {

@@ -4,7 +4,7 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 
 interface CreateReminderUseCase {
     suspend operator fun invoke(taskId: Long): Either<Failure, ScheduleDomain>

@@ -9,7 +9,7 @@ import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.MessageData
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import kotlinx.datetime.*
 import java.util.UUID

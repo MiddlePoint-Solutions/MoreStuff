@@ -11,7 +11,6 @@ class FetchOpenGraphMetadataUseCaseImpl(
     private val openGraphFetcher: OpenGraphFetcher
 ) : FetchOpenGraphMetadataUseCase {
     override suspend fun invoke(inputUrl: String): OpenGraphResult? {
-
         return openGraphFetcher.fetchOpenGraphMetadata(inputUrl)
     }
 }

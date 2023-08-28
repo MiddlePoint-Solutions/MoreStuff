@@ -6,15 +6,27 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,17 +42,19 @@ import co.softov.morestuff.android.ui.main.MainContent
 import co.softov.morestuff.android.ui.main.MainStates
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
+import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.isDarkTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
+import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,13 +77,12 @@ class MainActivity : AppCompatActivity() {
                 TransparentSystemBars()
                 MoreStuffTheme {
 
-                    val stateModel by viewModel.states.collectAsStateWithLifecycle()
-
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
                         ProvideComponentContext(rootComponentContext) {
                             ProvideAppNavigation(navigation) {
+                                val stateModel by viewModel.states.collectAsStateWithLifecycle()
 
                                 when (val model = stateModel) {
                                     MainStates.Idle -> {}

@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.createScheduleForTest
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.service.Scheduler
 import io.mockk.*
 import kotlinx.coroutines.runBlocking

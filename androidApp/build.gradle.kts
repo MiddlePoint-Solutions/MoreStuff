@@ -77,7 +77,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
 
     testOptions {
@@ -129,6 +129,7 @@ dependencies {
 
     // AndroidX and Compose
     implementation(libs.bundles.android)
+    implementation(platform(libs.androidxComposeBom))
     implementation(libs.bundles.compose)
 
     // Testing
@@ -141,6 +142,7 @@ dependencies {
     implementation(libs.bundles.sqldelight)
 
     // Firebase
+    implementation(platform(libs.firebaseBom))
     implementation(libs.bundles.firebase)
 
     // Utilities

@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.main
 
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import co.softov.morestuff.android.domain.nav.Screen
@@ -17,6 +18,7 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
 import co.softov.morestuff.android.ui.review.ReviewScreen
+import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
@@ -25,6 +27,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -37,7 +40,8 @@ fun MainContent(
 
     val viewModel: MainViewModel = koinViewModel()
     val navigation = LocalAppNavigation.current
-    val scope = rememberCoroutineScope()
+
+    val priorityScrollState = rememberLazyListState()
 
     ChildStack(
         source = navigation,

@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.enums.ReplyType.LATER
 import co.softov.morestuff.android.domain.enums.ReplyType.SNOOZE
 import co.softov.morestuff.android.domain.enums.ReplyType.TOMORROW
 import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.store.Next

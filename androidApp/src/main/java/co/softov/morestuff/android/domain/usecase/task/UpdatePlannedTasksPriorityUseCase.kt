@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import kotlinx.datetime.toLocalDateTime
-import co.softov.morestuff.android.domain.model.ScheduleType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import timber.log.Timber
 
 
