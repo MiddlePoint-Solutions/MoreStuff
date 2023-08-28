@@ -1,24 +1,11 @@
 package co.softov.morestuff.android.data.utils
 
-import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.TaskDomain
 import kotlinx.datetime.*
 
-// Task
-val Task.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()
-val Task.completeLocalDateTime: LocalDateTime? get() = completeTime?.toLocalDateTime()
+val ScheduleDomain.scheduleLocalDateTime: LocalDateTime? get() = scheduleLocalTime?.toLocalDateTime()
 
-// Schedule
-val Schedule.createLocalDateTime: LocalDateTime get() = createTime.toLocalDateTime()
-val Schedule.createTimeInstant: Instant get() = createTime.toInstant()
-
-val Schedule.scheduleLocalDateTime: LocalDateTime? get() = scheduleLocalTime?.toLocalDateTime()
-val Schedule.scheduleTimeInstant: Instant?
-    get() = scheduleLocalTime?.toLocalDateTime()?.toInstant(TimeZone.of(timezone))
-
-// LocalDateTime
 val LocalDateTime.currentTimeZoneInstant: Instant get() = this.toInstant(TimeZone.currentSystemDefault())
-fun LocalDateTime.asCurrentTimeIn(tz: TimeZone): Instant = this.toInstant(tz)
 
-// String
 val String.inEpochMilliseconds: Long get() = this.toLocalDateTime().currentTimeZoneInstant.toEpochMilliseconds()

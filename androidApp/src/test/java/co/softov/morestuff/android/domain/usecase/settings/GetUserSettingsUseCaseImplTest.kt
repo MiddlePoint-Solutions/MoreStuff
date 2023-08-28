@@ -1,8 +1,9 @@
 package co.softov.morestuff.android.domain.usecase.settings
 
-import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.redux.state.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -12,22 +13,22 @@ import org.junit.jupiter.api.Test
 class GetUserSettingsUseCaseImplTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val getUserSettingsUseCase = GetUserSettingsUseCaseImpl(userRepository)
+    private val getUserSettingsUseCase = GetAppSettingsUseCaseImpl(userRepository)
 
     @Test
     fun `should call getUserSettings with correct params`(): Unit = runBlocking {
         val expectedSettings = AppSettings()
-        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
+        coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
         getUserSettingsUseCase.invoke()
 
-        coEvery { userRepository.getUserSettings(expectedSettings) }
+        coVerify { userRepository.getAppSettings(expectedSettings) }
     }
 
     @Test
     fun `should return AppSettings `() = runBlocking {
         val expectedSettings = AppSettings()
-        coEvery { userRepository.getUserSettings(expectedSettings) } returns expectedSettings
+        coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
         val result = getUserSettingsUseCase.invoke()
 

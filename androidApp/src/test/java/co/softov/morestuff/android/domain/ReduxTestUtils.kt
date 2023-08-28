@@ -2,9 +2,9 @@ package co.softov.morestuff.android.domain
 
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.middleware.Middleware
-import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.store.Next
 import kotlinx.coroutines.coroutineScope
 import org.junit.Assert
 

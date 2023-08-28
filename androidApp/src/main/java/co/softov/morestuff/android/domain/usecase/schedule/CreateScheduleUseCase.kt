@@ -1,40 +1,45 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
-import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.Failure
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.data.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import co.softov.morestuff.android.domain.service.TimeManager
+import kotlinx.datetime.LocalDateTime
 import timber.log.Timber
 
 interface CreateScheduleUseCase {
-    suspend operator fun invoke(taskId: Long, priority: Priority): Either<Failure, Schedule>
+    suspend operator fun invoke(
+        taskId: Long,
+        scheduleType: ScheduleType,
+        localDateTime: LocalDateTime
+    ): Either<Failure, ScheduleDomain>
 }
 
 class CreateScheduleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository,
-    private val getPriorityTimeUseCase: GetPriorityTimeUseCase,
     private val timeManager: TimeManager,
+    private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
 ) : CreateScheduleUseCase {
-    override suspend fun invoke(taskId: Long, priority: Priority): Either<Failure, Schedule> {
-        val localTime = getPriorityTimeUseCase(priority)
-        val utcTime =
-            localTime?.toLocalDateTime()?.toInstant(timeManager.currentTimeZone)?.toString()
-
-        val schedule = Schedule(
+    override suspend fun invoke(
+        taskId: Long,
+        scheduleType: ScheduleType,
+        localDateTime: LocalDateTime
+    ): Either<Failure, ScheduleDomain> {
+        cancelActiveScheduleUseCase(taskId, listOf(scheduleType))
+        val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
+        val schedule = ScheduleDomain(
             id = 0,
             taskId = taskId,
             createTime = timeManager.getCreateTime(),
-            scheduleLocalTime = localTime,
+            scheduleLocalTime = localDateTime.toString(),
             scheduleUtcTime = utcTime,
             timezone = timeManager.currentTimeZone.id,
-            active = true
+            active = true,
+            scheduleType = scheduleType,
         )
-        Timber.d("### Scheduling, task $taskId = {${priority.javaClass.simpleName} -> ${schedule.scheduleLocalTime}} ###")
+        Timber.d("### $scheduleType Scheduling, task $taskId = -> ${schedule.scheduleLocalTime}} ###")
         return scheduleRepository.createSchedule(schedule)
     }
 }

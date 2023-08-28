@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

@@ -1,53 +1,87 @@
 package co.softov.morestuff.android.ui.chat.task
 
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import arrow.core.getOrElse
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.enums.ScheduleType
+import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.model.isOneTime
+import co.softov.morestuff.android.domain.model.isReminder
+import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.domain.service.ClipboardHelper
+import co.softov.morestuff.android.domain.service.ImageHandler
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
-import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
+import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.home.ScheduleUiModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toLocalDateTime
+import timber.log.Timber
 
 class TaskChatViewModel(
+    private val taskId: Long,
+    private val clipboardHelper: ClipboardHelper,
+    private val imageHandler: ImageHandler,
+    private val timeManager: TimeManager,
+    private val timeFormatter: TimeFormatter,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
-    private val getTaskFlow: GetTaskFlowUseCase,
-    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
-    private val taskId: Long,
-    private val messageRepository: MessageRepository,
+    getTaskFlow: GetTaskFlowUseCase,
     devTools: DevTools,
 ) : NoStateViewModel() {
 
-    val messages: StateFlow<List<Message>> = flow {
+    init {
+        Timber.d("TaskChatViewModel: $taskId")
+    }
+
+
+    val task: StateFlow<TaskDomain> = getTaskFlow(taskId)
+        .onEach { task ->
+            scheduleModel = createModelForSchedule(task.schedule.firstOrNull { it.isOneTime() })
+            reminderModel = createModelForSchedule(task.schedule.firstOrNull { it.isReminder() })
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = TaskDomain()
+        )
+
+    val messages: StateFlow<List<MessageWithFormattedTime>> = flow {
         while (true) {
-            val showDebug = devTools.getDebugMessageSwitchState()
-            val messages = if (showDebug) {
+            val messages = if (devTools.showDebugMessages) {
                 getTaskMessagesFlowUseCase(taskId = taskId).first()
             } else {
                 getTaskChatMessagesUseCase(taskId = taskId).first()
             }
-            emit(messages)
+
+            val formattedMessages = messages.map { message ->
+                val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
+                val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?:""
+                val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString()) ?:""
+                MessageWithFormattedTime(message, formattedTime, formattedTimeOnly)
+            }
+
+            emit(formattedMessages)
         }
     }.stateIn(
         scope = viewModelScope,
@@ -55,23 +89,11 @@ class TaskChatViewModel(
         initialValue = listOf()
     )
 
+    var scheduleModel by mutableStateOf<ScheduleUiModel?>(null)
+        private set
 
-    val task: StateFlow<Task> =
-        getTaskFlow(taskId)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = Task.empty()
-            )
-
-    val schedule: StateFlow<Schedule?> =
-        getActiveScheduleFlow(taskId)
-            .map { it.getOrElse { null } }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = null
-            )
+    var reminderModel by mutableStateOf<ScheduleUiModel?>(null)
+        private set
 
     var taskTitle by mutableStateOf("")
         private set
@@ -89,29 +111,77 @@ class TaskChatViewModel(
     fun updateTaskTitle(title: String) {
         taskTitle = title
         if (title.isNotEmpty()) {
-            viewModelScope.launch {
-                updateTaskTitleUseCase(taskId, title)
-            }
+            dispatchAppStoreAction(TaskAction.UpdateTaskTitleAction(taskId, title))
         }
     }
 
-    fun setTaskComplete(complete: Boolean) {
-        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, complete))
+    fun toggleTaskComplete() {
+        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, !task.value.isComplete))
     }
 
-    fun sendMessageForTask(content: String) {
-        viewModelScope.launch {
-            messageRepository.createMessage(
-                taskId = taskId,
-                scheduleId = 0,
-                contentType = ContentType.TASK_MESSAGE.value,
-                content = content,
+    fun sendTaskChatMessage(content: String) {
+        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
+    }
+
+    fun sendImageMessageForTask(uris: String, message: String) {
+        store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
+    }
+
+    fun createOneTimeSchedule() {
+        createScheduleModel().run {
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, localDateTime)
             )
         }
     }
 
-
-    fun onBackPressed() {
-        router.exit()
+    fun updatePlanTime(hour: Int, minute: Int) {
+        scheduleModel?.let {
+            val updatedPlanTime = timeManager.localDateTime(it.localDateTime, hour, minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
     }
+
+    fun updatePlanDate(dateMillis: Long) {
+        scheduleModel?.let {
+            val updatedPlanTime =
+                timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
+    }
+
+    fun cancelActiveSchedule() {
+        store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
+    }
+
+    fun copyToClipboard(text: String) {
+        clipboardHelper.copyToClipboard(text)
+    }
+
+    fun deleteMessage(messageId: Long) {
+        dispatchAppStoreAction(MessageAction.DeleteMessageAction(messageId))
+    }
+
+    fun shareImage(imagePath: String) {
+        imageHandler.shareImage(imagePath)
+    }
+
+    private fun createModelForSchedule(scheduleDomain: ScheduleDomain?) =
+        scheduleDomain?.scheduleLocalTime?.let {
+            val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
+            createScheduleModel(localTime)
+        }
+
+
+    private fun createScheduleModel(
+        time: LocalDateTime = timeManager.getDefaultPlanTime()
+    ) = ScheduleUiModel(
+        localDateTime = time,
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
+    )
 }

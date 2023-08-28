@@ -1,3 +1,5 @@
+import kotlin.Int;
+
 CREATE TABLE message(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     task_id INTEGER NOT NULL,
@@ -18,43 +20,47 @@ FROM message
 ORDER BY datetime(create_time) DESC;
 
 selectMasterMessages:
-SELECT *
+SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE (content_type = 100 OR content_type = 101 OR (content_type = 200 AND reply_content IS NULL))
 ORDER BY datetime(create_time) DESC;
 
 -- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
 selectActiveReminderMessages:
-SELECT *
+SELECT message.*
 FROM message
 WHERE (content_type = 200 AND reply_time IS NULL);
 
 selectMessageById:
-SELECT *
+SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message
-WHERE id = ?;
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+LEFT JOIN message_data ON message.id = message_data.message_id
+WHERE message.id = ?;
+
 
 selectMessageByTaskId:
-SELECT *
+SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE task_id = ?
 ORDER BY datetime(create_time) DESC;
 
 selectTaskMessagesByContentType:
-SELECT *
+SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message
-WHERE task_id = ? AND content_type = ?
-ORDER BY datetime(create_time) DESC;
-
-selectCurrentTaskMessage:
-SELECT *
-FROM message
-WHERE task_id = ?
-ORDER BY id DESC LIMIT 1;
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
+LEFT JOIN message_data ON message.id = message_data.message_id
+WHERE message.task_id = ? AND message.content_type = ?
+ORDER BY datetime(message.create_time) DESC;
 
 selectTaskMessage:
-SELECT id
+SELECT message.id, url_metadata.json_data
 FROM message
+LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ? AND content_type = ?
 ORDER BY id DESC LIMIT 1;
 
@@ -85,5 +91,9 @@ ORDER BY id DESC
 LIMIT :limit OFFSET :offset;
 
 lastInsertRowId:
-SELECT last_insert_rowid()
-;
+SELECT last_insert_rowid();
+
+deleteMessage:
+DELETE FROM message
+WHERE id = ?;
+

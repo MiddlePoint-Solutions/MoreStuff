@@ -1,63 +1,83 @@
 package co.softov.morestuff.android.ui.main
 
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.PriorityOption
-import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.redux.state.PriorityAction
+import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.middleware.MessageAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
-import co.softov.morestuff.android.ui.Screens
-import kotlinx.coroutines.flow.MutableStateFlow
+import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
+import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
+import co.softov.morestuff.android.ui.main.MainStates.Idle
+import co.softov.morestuff.android.ui.main.MainStates.Ready
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 
 class MainViewModel(
-    private val getMessagesUseCase: GetMessagesUseCase,
+    getAppThemeUseCase: GetAppThemeUseCase,
+    checkFirstTimeUseCase: CheckFirstTimeUseCase
 ) : NoStateViewModel() {
 
-    private val _messages = MutableStateFlow<List<Message>>(listOf())
-    val messages: StateFlow<List<Message>> get() = _messages
+    var appTheme by mutableStateOf(getAppThemeUseCase())
+        private set
+
+    val states: StateFlow<MainStates> = moleculeFlow(RecompositionMode.Immediate) {
+        val store by store.state.collectAsState()
+        Ready(
+            showOnBoarding = checkFirstTimeUseCase(),
+            theme = store.settings.appTheme
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, Idle)
 
     init {
-        viewModelScope.launch {
-            getMessagesUseCase()
-                .onEach { _messages.value = it }
-                .launchIn(this)
-        }
+        loadData()
     }
 
-    fun addNewTask(title: String) {
-        store.dispatch(TaskAction.CreateTask(title))
-    }
-
-    fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
-        store.dispatch(UserResponseAction(scheduleId, replyType))
-    }
-
-    fun priorityChanged(priority: Priority) {
-        store.dispatch(PriorityAction.SetPriority(priority))
-    }
-
-    fun onPriorityOptionChanged(option: PriorityOption) {
-        store.dispatch(PriorityAction.SetCurrentPriorityOption(option))
+    override fun onAppStateChange(state: AppState) {
+        appTheme = state.settings.appTheme
     }
 
     fun onResume() {
-        store.dispatch(OnResumeAction)
+        dispatchAppStoreAction(OnResumeAction)
     }
 
-    fun showTaskList() {
-        router.showBottomSheet(Screens.taskLists)
+    fun shareTextToTask(taskId: Long, content: String) {
+        dispatchAppStoreAction(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
-    fun showTaskChat(taskId: Long) {
-        router.navigateTo(Screens.taskChat(taskId))
+    fun shareContentToTask(taskId: Long, content: Shareable) {
+        when (content) {
+            is Shareable.Text -> {
+                dispatchAppStoreAction(
+                    MessageAction.CreateUserTaskMessageAction(
+                        taskId,
+                        content.content
+                    )
+                )
+            }
+
+            is Shareable.Image -> {
+                dispatchAppStoreAction(
+                    MessageAction.CreateImageMessageAction(
+                        taskId,
+                        content.uris,
+                        content.message
+                    )
+                )
+            }
+        }
     }
+
+    fun onBoardingCompleted() {
+        dispatchAppStoreAction(SettingAction.OnBoardingComplete)
+    }
+
 }

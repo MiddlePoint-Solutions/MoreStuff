@@ -1,0 +1,17 @@
+package co.softov.morestuff.android.domain.model
+
+import co.softov.morestuff.android.domain.enums.ScheduleType
+
+data class ScheduleDomain(
+    val id: Long = 0L,
+    val taskId: Long = 0L,
+    val createTime: String = "",
+    val scheduleLocalTime: String? = null,
+    val scheduleUtcTime: String? = null,
+    val timezone: String = "",
+    val active: Boolean = false,
+    val scheduleType: ScheduleType,
+)
+
+fun ScheduleDomain.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
+fun ScheduleDomain.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime

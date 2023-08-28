@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.right
 import co.softov.morestuff.android.domain.createScheduleForTest
 import co.softov.morestuff.android.domain.createTaskForTest
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -17,13 +18,10 @@ class GetScheduleTaskUseCaseImplTest {
      fun `invoke should return task when schedule is found`() {
         val getScheduleUseCase: GetScheduleUseCase = mockk()
         val getTaskUseCase: GetTaskUseCase = mockk()
-        val getScheduleTaskUseCaseImpl = GetTaskForScheduleUseCaseImpl(
-            getScheduleUseCase,
-            getTaskUseCase
-        )
+
         val scheduleId = 1L
         val taskId = 1L
-        val schedule = createScheduleForTest()
+        val schedule = createScheduleForTest(scheduleType = ScheduleType.OneTime)
         val task = createTaskForTest()
 
         coEvery { getScheduleUseCase(scheduleId) } returns schedule.right()

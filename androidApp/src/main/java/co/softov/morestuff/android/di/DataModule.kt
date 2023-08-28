@@ -2,27 +2,43 @@ package co.softov.morestuff.android.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
-import co.softov.morestuff.android.app.DevToolsImpl
-import co.softov.morestuff.android.app.SchedulerImpl
+import androidx.work.WorkManager
+import co.softov.morestuff.android.data.service.DevToolsImpl
+import co.softov.morestuff.android.app.service.SchedulerImpl
 import co.softov.morestuff.android.data.Constants
-import co.softov.morestuff.android.data.mapper.makeMessageDbMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleDbMapper
-import co.softov.morestuff.android.data.mapper.makeScheduleWithTitleDbMapper
-import co.softov.morestuff.android.data.mapper.makeTaskDbMapper
-import co.softov.morestuff.android.data.repository.*
-import co.softov.morestuff.android.data.service.NotifierImpl
+import co.softov.morestuff.android.data.mapper.DataMappers
+import co.softov.morestuff.android.data.mapper.DataMappersImpl
+import co.softov.morestuff.android.data.repository.MessageRepositoryImpl
+import co.softov.morestuff.android.data.repository.PriorityRepositoryImpl
+import co.softov.morestuff.android.data.repository.ScheduleRepositoryImpl
+import co.softov.morestuff.android.data.repository.TaskRepositoryImpl
+import co.softov.morestuff.android.data.repository.UserRepositoryImpl
+import co.softov.morestuff.android.data.service.ImageHandlerImpl
+import co.softov.morestuff.android.app.service.NotifierImpl
+import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.DevTools
-import co.softov.morestuff.android.domain.repository.*
+import co.softov.morestuff.android.domain.repository.MessageRepository
+import co.softov.morestuff.android.domain.repository.PriorityRepository
+import co.softov.morestuff.android.domain.repository.ScheduleRepository
+import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.repository.UserRepository
+import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatter
-import co.softov.morestuff.android.domain.usecase.time.TimeFormatterImpl
+import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.db.Schedule
 import co.softov.morestuff.db.StuffDb
-import com.russhwolf.settings.*
-import com.squareup.sqldelight.android.AndroidSqliteDriver
+import co.softov.morestuff.db.Task
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.SharedPreferencesSettings
+import app.cash.sqldelight.EnumColumnAdapter
+import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import co.softov.morestuff.db.Message
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
@@ -32,60 +48,57 @@ import org.koin.dsl.module
 
 val dataModule = module {
 
-    // Debugging
-    single<ObservableSettings> {
-        SharedPreferencesSettings(getSharedPreferences(androidContext()))
-    }
+    single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
+    single<DataMappers> { DataMappersImpl(timeFormatter = get()) }
     singleOf(::DevToolsImpl) bind DevTools::class
+
     // Database
     single { createDatabase(androidApplication()) }
 
+    // WorkManager
+    single {
+        WorkManager.getInstance(androidApplication())
+    }
+    single { NotificationManagerCompat.from(androidApplication()) }
+
     //Time
-    single<TimeFormatter> { TimeFormatterImpl() }
+    single<TimeFormatter> { TimeFormatterImpl(androidApplication()) }
 
     // Repositories
     single<TaskRepository> {
         TaskRepositoryImpl(
             database = get(),
-            mapTaskDb = makeTaskDbMapper(),
-            timeManager = get()
+            timeManager = get(),
+            mapper = get(),
         )
     }
+
 
     single<MessageRepository> {
         MessageRepositoryImpl(
             database = get(),
-            mapMessageDb = makeMessageDbMapper(timeFormatter = get()),
-            timeManager = get()
+            mapper = get(),
+            timeManager = get(),
         )
     }
 
     single<ScheduleRepository> {
         ScheduleRepositoryImpl(
             database = get(),
-            mapScheduleDb = makeScheduleDbMapper(),
-            mapScheduleWithTitleDb = makeScheduleWithTitleDbMapper(),
-            timeManager = get()
+            mapper = get(),
         )
     }
-
-    single<PreferenceRepository> {
-        PreferenceRepositoryImpl(
-            getSharedPreferences(
-                androidContext()
-            )
-        )
-    }
-
 
     single<UserRepository> {
         UserRepositoryImpl(
             settings = getSettings(androidContext()),
         )
     }
+
+    singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
 
     // Services
     singleOf(::SchedulerImpl) bind Scheduler::class
@@ -110,6 +123,16 @@ internal fun createDatabase(context: Context): StuffDb {
             StuffDb.Schema,
             context,
             Constants.DATABASE_NAME
+        ),
+        taskAdapter = Task.Adapter(
+            task_typeAdapter = EnumColumnAdapter()
+        ),
+        scheduleAdapter = Schedule.Adapter(
+            schedule_typeAdapter = EnumColumnAdapter()
+        ),
+        messageAdapter = Message.Adapter(
+            content_typeAdapter = IntColumnAdapter,
+            reply_typeAdapter = IntColumnAdapter
         )
     )
 }

@@ -1,44 +1,47 @@
 package co.softov.morestuff.android.domain.redux.state
 
-import co.softov.morestuff.android.domain.model.AppSettings
+import co.softov.morestuff.android.domain.enums.AppSetting.Confetti
+import co.softov.morestuff.android.domain.enums.AppSetting.FirstTime
+import co.softov.morestuff.android.domain.enums.AppSetting.SnoozeLimit
+import co.softov.morestuff.android.domain.enums.AppSetting.Theme
+import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.state.SettingAction.*
+import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
+import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
+import co.softov.morestuff.android.domain.redux.state.SettingAction.OnBoardingComplete
+import co.softov.morestuff.android.domain.redux.state.SettingAction.SetAppTheme
+import co.softov.morestuff.android.domain.redux.state.SettingAction.SetSnoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
-import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 
-data class AppSettingsState(
-    val isFirstTime: Boolean = false,
-    val settings: AppSettings = AppSettings()
+data class AppSettings(
+    val isFirstTime: Boolean = FirstTime.defaultValue,
+    val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
+    val snoozeLimit: Int = SnoozeLimit.defaultValue,
+    val enableConfetti: Boolean = Confetti.defaultValue,
 )
 
 sealed class SettingAction : Action.FeatureAction() {
-    data class InitSettings(val firstTime: Boolean, val settings: AppSettings) : PriorityAction()
-    data class SetSnoozeLimit(val limit: Int) : PriorityAction()
-    data class EnableSmartReminder(val enable: Boolean) : PriorityAction()
+    data class InitSettings(val settings: AppSettings) : SettingAction()
+    data class SetSnoozeLimit(val amount: Int) : SettingAction()
+    data class SetAppTheme(val theme: AppTheme) : SettingAction()
+    data class EnableConfetti(val enable: Boolean) : SettingAction()
+    data object OnBoardingComplete : SettingAction()
 
 }
 
 fun AppState.reduceSettingState(action: Action): AppState {
     return when (action) {
-        is SettingAction -> copy(settingState = settingState.reduce(action))
+        is SettingAction -> copy(settings = settings.reduce(action))
         else -> this
     }
 }
 
-fun AppSettingsState.reduce(action: Action): AppSettingsState {
+fun AppSettings.reduce(action: SettingAction): AppSettings {
     return when (action) {
-        is InitSettings -> with(action) {
-            copy(
-                isFirstTime = isFirstTime,
-                settings = settings
-            )
-        }
-
-        is SetSnoozeLimit -> copy(settings = settings.copy(snoozeLimit = action.limit))
-        is EnableSmartReminder -> copy(settings = settings.copy(smartReminderEnabled = action.enable))
-        else -> this
+        is InitSettings -> action.settings
+        is SetSnoozeLimit -> copy(snoozeLimit = action.amount)
+        is SetAppTheme -> copy(appTheme = action.theme)
+        is EnableConfetti -> copy(enableConfetti = action.enable)
+        OnBoardingComplete -> copy(isFirstTime = false)
     }
 }
-
-
-

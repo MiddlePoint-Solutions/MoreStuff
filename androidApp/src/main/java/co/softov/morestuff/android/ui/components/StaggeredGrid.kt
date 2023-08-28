@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.main.input
+package co.softov.morestuff.android.ui.home.input
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.usecase.schedule
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.data.service.TimeManager
+import co.softov.morestuff.android.domain.service.TimeManager
 import timber.log.Timber
 
 interface GetTaskScheduleCountUseCase {

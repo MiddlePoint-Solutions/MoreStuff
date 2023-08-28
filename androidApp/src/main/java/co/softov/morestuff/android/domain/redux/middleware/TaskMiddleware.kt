@@ -1,42 +1,44 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.app.extensions.simpleName
+import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.SetTasksCompleteUseCase
+import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
+import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class TaskAction : Action.FeatureAction() {
 
-    data class CreateTask(val title: String) : TaskAction() {
-        override val log: String
-            get() = "${this.simpleName}(title=$title)"
-    }
+    data class CreateUserTaskAction(
+        val title: String,
+        val priority: Priority
+    ) : TaskAction()
 
     data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
-    data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
+
+    data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
     internal data class TaskCreatedAction(
-        val task: Task,
+        val task: TaskDomain,
         val priority: Priority
-    ) : TaskAction() {
-        override val log: String
-            get() = "${this.simpleName}($task,$priority)"
-    }
+    ) : TaskAction()
+
 }
+
 
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
-    private val setTaskCompleteUseCase: SetTasksCompleteUseCase
+    private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
+    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -47,24 +49,22 @@ class TaskMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is CreateTask -> scope.launch {
-                val params = TaskParams(action.title)
-                val priority = state.priorityState.current
-                createTaskUseCase(params).map { task ->
+            is CreateUserTaskAction -> scope.launch {
+                with(action) {
+                    val params = TaskParams(title, priority, TaskType.User)
+                    val task = createTaskUseCase(params)
                     dispatch(TaskCreatedAction(task, priority))
                 }
             }
 
             is CompleteTaskAction -> scope.launch {
                 with(action) {
-                    setTaskCompleteUseCase(listOf(taskId), complete)
+                    setTaskCompleteUseCase(taskId, complete)
                 }
             }
 
-            is CompleteTasksAction -> scope.launch {
-                with(action) {
-                    setTaskCompleteUseCase(taskIds, complete)
-                }
+            is UpdateTaskTitleAction -> scope.launch {
+                updateTaskTitleUseCase(action.taskId, action.title)
             }
 
             else -> NoOp

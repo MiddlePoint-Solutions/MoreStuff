@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.ui.input
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -19,13 +20,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -33,36 +31,49 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.presentation.compose.modifier.clearFocusOnKeyboardDismiss
-import co.softov.morestuff.android.ui.main.input.ListIcon
-import co.softov.morestuff.android.ui.main.input.SendIcon
-import timber.log.Timber
+import co.softov.morestuff.android.app.presentation.extension.clearFocusOnKeyboardDismiss
+import co.softov.morestuff.android.ui.components.SendIcon
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+
+
+val LocalBoxWeight = compositionLocalOf { 0.12f }
 
 @Composable
 fun UserTextInput(
-    sendAction: (String) -> Unit,
-    listAction: () -> Unit,
-
-    ) {
-    var value by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue())
-    }
-
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    sendAction: (String) -> Unit = {},
+    actionsContent: @Composable () -> Unit = {},
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
 
+    val boxWeight = LocalBoxWeight.current
+
+
+
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .animateContentSize()
+            .padding(start = 15.dp, end = 15.dp, bottom = 13.dp)
+            .animateContentSize(),
+        shape = RoundedCornerShape(
+            topStart = 47.dp,
+            topEnd = 47.dp,
+            bottomEnd = 47.dp,
+            bottomStart = 47.dp
+        ),
+        color = backgroundColor
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = MaterialTheme.colorScheme.primary)
                 .semantics {
                     contentDescription = a11ylabel
                 },
@@ -72,21 +83,17 @@ fun UserTextInput(
             Row(
                 modifier = Modifier
                     .defaultMinSize(minHeight = 46.dp)
-                    .weight(0.88f)
                     .align(Alignment.CenterVertically)
             ) {
                 BasicTextField(
                     value = value,
-                    onValueChange = { value = it },
+                    onValueChange = onValueChange,
                     enabled = true,
                     modifier = Modifier
                         .clearFocusOnKeyboardDismiss()
-                        .fillMaxWidth()
+                        .weight(0.88f)
                         .align(Alignment.CenterVertically)
-                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)
-                        .onFocusChanged {
-                            Timber.d("FocusState changed: $it")
-                        },
+                        .padding(start = 20.dp, top = 13.dp, bottom = 13.dp, end = 4.dp),
                     keyboardOptions = KeyboardOptions(
                         capitalization = KeyboardCapitalization.Sentences,
                         keyboardType = KeyboardType.Text
@@ -100,25 +107,33 @@ fun UserTextInput(
                     decorationBox = { innerTextField ->
                         Box {
                             if (value.text.isEmpty()) {
-                                Text(text = "Write something...", fontSize = 18.sp)
+                                Text(
+                                    text = stringResource(R.string.write_something),
+                                    fontSize = 18.sp
+                                )
                             }
                             innerTextField()
                         }
                     }
                 )
-            }
-            VoiceToTextInput { newText ->
-                value = value.copy(text = newText)
-            }
 
-            Box(
-                modifier = Modifier.weight(0.12f).height(IntrinsicSize.Min)
-            ) {
-                when {
-                    value.text.isBlank() -> ListIcon(listAction)
-                    else -> SendIcon {
-                        sendAction(value.text)
-                        value = value.copy(text = "")
+                Box(
+                    modifier = Modifier
+                        .weight(boxWeight)
+                        .height(IntrinsicSize.Min)
+                        .align(Alignment.Bottom)
+                        .padding(4.dp).padding(end = 7.dp)
+                ) {
+                    when {
+                        value.text.isBlank() -> {
+                            actionsContent()
+                        }
+
+                        else -> {
+                            SendIcon(
+                                onClick = { sendAction(value.text) }
+                            )
+                        }
                     }
                 }
             }
@@ -126,30 +141,20 @@ fun UserTextInput(
     }
 }
 
-
-/*
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
 @Composable
-private fun ChatInputPreviewDark() {
-    MoreStuffTheme(darkTheme = true) {
-        UserTextInput(
-            sendAction = {},
-            listAction = {},
-
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun ChatInputPreview() {
+private fun Preview() {
     MoreStuffTheme {
         UserTextInput(
-            sendAction = {},
-            listAction = {},
-            voiceToText = ,
-
+            value = TextFieldValue(text = ""),
+            onValueChange = {},
         )
     }
 }
-*/

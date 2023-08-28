@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.input
 
 import android.Manifest
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,10 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,7 +34,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,49 +47,67 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import co.softov.morestuff.android.domain.service.VoiceToTextInterface
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.app.features.VoiceToTextParserState
+import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import org.koin.compose.koinInject
 
-
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPermissionsApi::class)
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
+    voiceToText: VoiceToTextParser = koinInject()
 ) {
-    val voiceToText: VoiceToTextInterface = koinInject()
+
+    val recordingState by voiceToText.state.collectAsStateWithLifecycle()
+
+    VoiceToTextInputContent(
+        onUpdateValue = onUpdateValue,
+        startListening = { voiceToText.startListening("en") },
+        stopListening = voiceToText::stopListening,
+        recordingState = recordingState,
+    )
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun VoiceToTextInputContent(
+    onUpdateValue: (String) -> Unit,
+    startListening: () -> Unit,
+    stopListening: () -> Unit,
+    recordingState: VoiceToTextParserState = VoiceToTextParserState()
+) {
+
     var canRecord by remember { mutableStateOf(false) }
-    val state by voiceToText.state.collectAsState()
     val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
-    val showPermissionDialog = remember { mutableStateOf(false) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
     val showDialog = remember { mutableStateOf(false) }
 
-    LaunchedEffect(voiceToText.state) {
-        voiceToText.state.collect { newState ->
-            onUpdateValue(newState.spokenText)
+    if (recordingState.isSpeaking) {
+        LaunchedEffect(Unit) {
+            onUpdateValue(recordingState.spokenText)
         }
     }
 
-
     val onRecord = {
-        if (!state.isSpeaking) {
+        if (!recordingState.isSpeaking) {
             if (canRecord) {
-                voiceToText.startListening("en")
+                startListening()
                 showDialog.value = true
             } else {
-                showPermissionDialog.value = true
+                showPermissionDialog = true
             }
         } else {
-            voiceToText.stopListening()
+            stopListening()
             showDialog.value = false
         }
     }
 
     var dismissDialog by remember { mutableStateOf(false) }
 
-    if (recordAudioPermissionState.status is PermissionStatus.Denied && !dismissDialog && showPermissionDialog.value) {
+    if (recordAudioPermissionState.status is PermissionStatus.Denied && !dismissDialog && showPermissionDialog) {
         AlertDialog(
             onDismissRequest = { dismissDialog = true },
             title = { Text("Record Audio Permission") },
@@ -115,7 +131,6 @@ fun VoiceToTextInput(
                 }
             },
             shape = RoundedCornerShape(4.dp),
-            backgroundColor = MaterialTheme.colorScheme.primary
         )
     }
 
@@ -129,7 +144,10 @@ fun VoiceToTextInput(
         modifier = Modifier.height(IntrinsicSize.Min)
     ) {
         IconButton(onClick = onRecord) {
-            AnimatedContent(targetState = state.isSpeaking) { isSpeaking ->
+            AnimatedContent(
+                targetState = recordingState.isSpeaking,
+                label = "Voice recording animation"
+            ) { isSpeaking ->
                 if (isSpeaking) {
                     Icon(
                         imageVector = Icons.Filled.Stop,
@@ -144,8 +162,8 @@ fun VoiceToTextInput(
             }
         }
     }
-    LaunchedEffect(state.isSpeaking) {
-        if (!state.isSpeaking) {
+    LaunchedEffect(recordingState.isSpeaking) {
+        if (!recordingState.isSpeaking) {
             showDialog.value = false
         }
     }
@@ -153,7 +171,7 @@ fun VoiceToTextInput(
     if (showDialog.value) {
         Dialog(onDismissRequest = {
             showDialog.value = false
-            voiceToText.stopListening()
+            stopListening()
         }) {
             Card(shape = RectangleShape, modifier = Modifier.size(200.dp)) {
                 Column(
@@ -164,7 +182,7 @@ fun VoiceToTextInput(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    RecordingOverlay(isVisible = state.isSpeaking)
+                    RecordingOverlay(isVisible = recordingState.isSpeaking)
                     Text(
                         text = "Listening",
                         style = MaterialTheme.typography.bodyMedium,
@@ -179,14 +197,14 @@ fun VoiceToTextInput(
 
 @Composable
 fun RecordingOverlay(isVisible: Boolean) {
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "Voice infinite transition")
     val waveScale by infiniteTransition.animateFloat(
         initialValue = 0.9f,
         targetValue = 1.4f,
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        )
+        ), label = "Voice scale"
     )
     val waveAlpha by infiniteTransition.animateFloat(
         initialValue = 0.3f,
@@ -194,7 +212,7 @@ fun RecordingOverlay(isVisible: Boolean) {
         animationSpec = infiniteRepeatable(
             animation = tween(1000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        )
+        ), label = "Voice alpha"
     )
 
     if (isVisible) {

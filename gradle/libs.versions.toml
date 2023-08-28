@@ -1,0 +1,280 @@
+[versions]
+coreKtx = "1.10.1"
+lifecycleRuntimeKtx = "2.6.1"
+activityCompose = "1.7.2"
+composeBom = "2023.08.00"
+drawerlayout = "1.2.0"
+reorderable = "0.9.6"
+settingsUiM3 = "0.22.0"
+settingsStoragePreferences = "0.22.0"
+uiToolingPreview = "1.5.0"
+uiTooling = "1.5.0"
+mockk = "1.12.2"
+junitJupiter = "5.8.2"
+junitPlatformCommons = "1.8.2"
+turbine = "1.0.0"
+multiplatformSettingsNoArg = "1.0.0"
+jsoup = "1.13.1"
+coilCompose = "2.0.0-rc01"
+kotlinxSerializationJson = "1.5.1"
+decompose = "2.0.1"
+extensionsComposeJetpack = "2.0.1"
+parcelable = "1.1.0"
+androidGradlePlugin = "8.1.0"
+moleculeGradlePlugin = "1.2.0"
+accompanist = "0.32.0"
+kotlin = "1.9.0"
+arrow = "1.1.3"
+kotlinxDatetime = "0.4.0"
+coroutines = "1.7.3"
+okhttp = "4.9.3"
+sqldelight = "2.0.0"
+firebaseBom = "32.2.3"
+firebaseCrashlytics = "18.4.1"
+firebaseAnalytics = "21.3.0"
+firebaseCrashlyticsGradle = "2.9.2"
+googleServices = "4.3.15"
+material = "1.9.0"
+koin = "3.4.2"
+koinGradle = "3.2.0"
+koinCompose = "3.4.5"
+koinTest = "3.4.1"
+junit = "4.13.2"
+timber = "5.0.1"
+appcompat = "1.6.1"
+palette = "1.0.0"
+pagingKtx = "3.2.0"
+workKtx = "2.8.1"
+constraintLayout = "2.1.4"
+activityKtx = "1.7.2"
+fragmentKtx = "1.6.1"
+constraintLayoutCompose = "1.0.1"
+lifecycle = "2.6.1"
+material3 = "1.1.1"
+preferenceKtx = "1.2.1"
+testCore = "1.5.0"
+extJUnit = "1.1.5"
+espressoCore = "3.5.1"
+firebaseCrashlyticsPlugin = "2.9.9"
+sqldelightPlugin = "2.0.0"
+androidAppStartup = "1.1.1"
+konfettiCompose = "2.0.2"
+aboutLibrariesVersion = "10.8.3"
+telephotoVersion = "0.5.0"
+
+[plugins]
+kotlinPlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+parcelizePlugin = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
+androidApplicationPlugin = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+sqldelightPlugin = { id = "app.cash.sqldelight", version.ref = "sqldelightPlugin" }
+googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
+moleculePlugin = { id = "app.cash.molecule", version.ref = "moleculeGradlePlugin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+aboutLibrariesPlugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibrariesVersion" }
+
+[libraries]
+gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
+sqldelightPlugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelightPlugin" }
+firebaseCrashlyticsPlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
+aboutLibrariesPlugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibrariesVersion" }
+moleculePlugin = { module = "app.cash.molecule:molecule-gradle-plugin", version.ref = "moleculeGradlePlugin" }
+
+aboutLibrariesCore = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibrariesVersion" }
+aboutLibrariesCompose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibrariesVersion" }
+androidxCoreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidxLifecycleRuntimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidxActivityCompose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidxComposeBom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidxDrawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "drawerlayout" }
+reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "reorderable" }
+preferenceKtx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
+settingsUiM3 = { module = "com.github.alorma:compose-settings-ui-m3", version.ref = "settingsUiM3" }
+settingsStoragePreferences = { module = "com.github.alorma:compose-settings-storage-preferences", version.ref = "settingsStoragePreferences" }
+uiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
+uiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junitJupiter" }
+junitPlatformCommons = { module = "org.junit.platform:junit-platform-commons", version.ref = "junitPlatformCommons" }
+kotlinxCoroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+uiTestManifest = { module = "androidx.compose.ui:ui-test-manifest" }
+decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
+extensionsComposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "extensionsComposeJetpack" }
+parcelable = { module = "com.arkivanov.essenty:parcelable", version.ref = "parcelable" }
+accompanistPermissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+accompanistSystemUiController = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
+kotlinStdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+arrowBom = { module = "io.arrow-kt:arrow-stack", version.ref = "arrow" }
+arrowCore = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+coroutinesCore = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutinesAndroid = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+coroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttpLogging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+sqldelightAndroidDriver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
+sqldelightAndroidPagingExt = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
+sqldelightPrimitiveAdapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
+sqldelightCoroutinesJvmExt = { module = "app.cash.sqldelight:coroutines-extensions-jvm", version.ref = "sqldelight" }
+sqldelightTestSqlDriver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+firebaseBom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+firebaseAnalytics = { module = "com.google.firebase:firebase-analytics-ktx" }
+googleServices = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+koinAndroid = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koinAndroidCompat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin" }
+koinAndroidxCompose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinCompose" }
+koinTest = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
+koinTestJunit = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinTest" }
+junit = { module = "junit:junit", version.ref = "junit" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+palette = { module = "androidx.palette:palette", version.ref = "palette" }
+pagingKtx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingKtx" }
+workKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "workKtx" }
+coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+activityKtx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
+fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
+constraintLayoutCompose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintLayoutCompose" }
+runtimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+composeRuntime = { module = "androidx.compose.runtime:runtime" }
+composeFoundation = { module = "androidx.compose.foundation:foundation" }
+pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "pagingKtx" }
+composeUi = { module = "androidx.compose.ui:ui" }
+composeViewBinding = { module = "androidx.compose.ui:ui-viewbinding" }
+composeAnimation = { module = "androidx.compose.animation:animation" }
+composeMaterial3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+composeMaterial3WindowSizeClass = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "material3" }
+composeMaterialIcons = { module = "androidx.compose.material:material-icons-core" }
+composeMaterialIconsExtended = { module = "androidx.compose.material:material-icons-extended" }
+composeTooling = { module = "androidx.compose.ui:ui-tooling" }
+testCore = { module = "androidx.test:core", version.ref = "testCore" }
+testRules = { module = "androidx.test:rules", version.ref = "testCore" }
+extJUnit = { module = "androidx.test.ext:junit-ktx", version.ref = "extJUnit" }
+espressoCore = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
+androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref = "androidAppStartup" }
+konfettiCompose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfettiCompose" }
+telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
+
+
+[bundles]
+# AndroidX and Compose
+android = [
+    "androidxCoreKtx",
+    "androidxDrawerlayout",
+    "appcompat",
+    "palette",
+    "pagingKtx",
+    "workKtx",
+    "coreKtx",
+    "activityKtx",
+    "fragmentKtx",
+    "runtimeKtx",
+    "viewModel",
+]
+
+compose = [
+    "androidxActivityCompose",
+    "runtimeCompose",
+    "viewModelCompose",
+    "composeRuntime",
+    "composeFoundation",
+    "pagingCompose",
+    "composeUi",
+    "composeViewBinding",
+    "composeAnimation",
+    "composeMaterial3",
+    "composeMaterial3WindowSizeClass",
+    "composeMaterialIcons",
+    "composeMaterialIconsExtended",
+    "composeTooling",
+    "constraintLayoutCompose",
+    "konfettiCompose"
+]
+
+# Testing
+testing = [
+    "uiToolingPreview",
+    "uiTooling",
+    "mockk",
+    "junitJupiter",
+    "junitPlatformCommons",
+    "kotlinxCoroutinesTest",
+    "turbine",
+    "koinTest",
+    "koinTestJunit",
+    "junit",
+    "testCore",
+    "testRules",
+    "extJUnit",
+    "espressoCore"
+]
+
+# Networking
+networking = [
+    "okhttp",
+    "okhttpLogging",
+    "coilCompose",
+    "kotlinxSerializationJson"
+]
+
+# SQL Delight
+sqldelight = [
+    "sqldelightAndroidDriver",
+    "sqldelightCoroutinesJvmExt",
+    "sqldelightPrimitiveAdapters",
+    "sqldelightAndroidPagingExt",
+    "sqldelightTestSqlDriver",
+]
+
+# Firebase
+firebase = [
+    "firebaseCrashlytics",
+    "firebaseAnalytics",
+    "googleServices"
+]
+
+# Utilities
+utils = [
+    "reorderable",
+    "preferenceKtx",
+    "settingsUiM3",
+    "settingsStoragePreferences",
+    "jsoup",
+    "decompose",
+    "extensionsComposeJetpack",
+    "parcelable",
+    "accompanistPermissions",
+    "accompanistSystemUiController",
+    "kotlinStdlib",
+    "kotlinReflect",
+    "arrowBom",
+    "arrowCore",
+    "kotlinxDatetime",
+    "coroutinesCore",
+    "coroutinesAndroid",
+    "multiplatformSettingsNoArg",
+    "koinAndroid",
+    "koinAndroidCompat",
+    "koinAndroidxCompose",
+    "timber",
+    "telephoto",
+    "konfettiCompose",
+]
+
+# About Libraries
+aboutLibraries = [
+    "aboutLibrariesCore",
+    "aboutLibrariesCompose"
+]

@@ -1,7 +1,7 @@
-name: Master
+name: Test
 on:
-  pull_request_review:
-    types: [submitted]
+  pull_request:
+    branches: [ "morestuff-mvp", "master" ]
 
 jobs:
   test:
@@ -12,13 +12,13 @@ jobs:
       - name: JDK setup
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: corretto
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       # Execute unit tests
       - name: Unit Test
         run: ./gradlew testDebugUnitTest
-
-      - name: Android Test Report
-        uses: asadmansr/android-test-report-action@v1.2.0
-        if: ${{ always() }} # IMPORTANT: run Android Test Report regardless

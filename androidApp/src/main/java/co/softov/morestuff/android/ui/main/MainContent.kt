@@ -1,95 +1,91 @@
 package co.softov.morestuff.android.ui.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import app.cash.molecule.RecompositionClock
-import app.cash.molecule.launchMolecule
-import co.softov.morestuff.android.app.util.LifecycleEventsObserver
-import co.softov.morestuff.android.presentation.presenter.PriorityOptionsPresenter
-import co.softov.morestuff.android.presentation.presenter.PriorityPresenter
-import co.softov.morestuff.android.ui.chat.ChatActions
-import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.input.UserInput
-import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
+import co.softov.morestuff.android.domain.nav.Screen.Home
+import co.softov.morestuff.android.domain.nav.Screen.OnBoarding
+import co.softov.morestuff.android.domain.nav.Screen.Review
+import co.softov.morestuff.android.domain.nav.Screen.Settings
+import co.softov.morestuff.android.domain.nav.Screen.Share
+import co.softov.morestuff.android.domain.nav.Screen.TaskChat
+import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
+import co.softov.morestuff.android.ui.home.HomeScreen
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.navigation.ChildStack
+import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
+import co.softov.morestuff.android.ui.review.ReviewScreen
+import co.softov.morestuff.android.ui.schedule.PriorityContent
+import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
+import co.softov.morestuff.android.ui.settings.SettingsScreen
+import co.softov.morestuff.android.ui.share.ShareScreen
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.replaceCurrent
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainContent(
-    modifier: Modifier = Modifier,
+    initialScreen: Screen?,
+    shareContent: (taskId: Long, content: Shareable) -> Unit
 ) {
-    val scrollState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
 
-    val viewModel: MainViewModel = getViewModel()
+    val viewModel: MainViewModel = koinViewModel()
+    val navigation = LocalAppNavigation.current
 
-    LifecycleEventsObserver(
-        onResume = { viewModel.onResume() }
-    )
+    val priorityScrollState = rememberLazyListState()
 
-    val priority by scope.launchMolecule(clock = RecompositionClock.ContextClock) {
-        PriorityPresenter()
-    }.collectAsState()
+    ChildStack(
+        source = navigation,
+        initialStack = {
+            when (initialScreen) {
+                OnBoarding -> listOf(OnBoarding)
+                null -> listOf(Home)
+                else -> listOf(Home, initialScreen)
+            }
+        },
+        handleBackButton = true,
+        animation = stackAnimation(slide() + fade()),
+    ) { screen ->
+        when (screen) {
 
-    val priorityOptions by scope.launchMolecule(clock = RecompositionClock.ContextClock) {
-        PriorityOptionsPresenter()
-    }.collectAsState()
+            OnBoarding -> OnBoardingScreen(
+                onBoardingComplete = {
+                    navigation.replaceCurrent(Home)
+                    viewModel.onBoardingCompleted()
+                }
+            )
 
-    val chatActions = ChatActions(
-        scheduleAction = viewModel::scheduleResponse,
-        taskChatAction = viewModel::showTaskChat,
-    )
+            Home -> HomeScreen()
+            Review -> ReviewScreen()
+            Settings -> SettingsScreen()
 
+            is TaskChat -> TaskChatScreen(
+                taskId = screen.taskId,
+                onBack = navigation::pop
+            )
 
-    val messageItems = viewModel.messages.collectAsState()
-    Surface(modifier) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-
-                    Messages(
-                        messages = messageItems.value,
-                        actions = chatActions,
-                        modifier = Modifier.weight(1f),
-                        scrollState = scrollState
-                    )
-                    PriorityInput(
-                        model = priorityOptions,
-                        onPriorityChange = viewModel::priorityChanged,
-                        onPriorityOptionChange = viewModel::onPriorityOptionChanged
-                    )
-
-                    UserInput(
-                        modifier = Modifier.imePadding(),
-                        showTaskListAction = viewModel::showTaskList,
-                        onMessageSent = { content ->
-                            viewModel.addNewTask(content)
-                        },
-                        resetScroll = {
-                            scope.launch {
-                                //scrollState.scrollToItem(index = 0)
-                            }
-                        }
+            is Share -> {
+                ShareScreen(
+                    onBack = navigation::pop,
+                    shareable = screen.shareable,
+                ) { taskId, shareable ->
+                    navigation.replaceCurrent(
+                        TaskChat(taskId),
+                        onComplete = { shareContent(taskId, shareable) }
                     )
                 }
             }
+
+            is AboutLibraries -> AboutLibrariesScreen()
         }
     }
 }
-
