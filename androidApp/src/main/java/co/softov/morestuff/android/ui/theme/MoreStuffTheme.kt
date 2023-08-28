@@ -121,21 +121,3 @@ fun isDarkTheme(): Boolean {
     }
     return darkTheme
 }
-
-
-@Composable
-fun CustomSelectionColor(darkTheme: Boolean, content: @Composable () -> Unit) {
-    val customSelectionColor = if (!darkTheme) {
-        BlueDark
-    } else {
-        BlueLight
-    }
-    CompositionLocalProvider(
-        LocalTextSelectionColors provides TextSelectionColors(
-            handleColor = customSelectionColor,
-            backgroundColor = customSelectionColor.copy(alpha = 0.5f)
-        )
-    ) {
-        content()
-    }
-}
