@@ -140,6 +140,7 @@
     <string name="your_workspace">Your workspace\nis ready </string>
     <string name="import_image_title">Import image</string>
     <string name="import_image_title_hint">Add a caption…</string>
+    <string name="cd_share">Share</string>
 
 
 </resources>
