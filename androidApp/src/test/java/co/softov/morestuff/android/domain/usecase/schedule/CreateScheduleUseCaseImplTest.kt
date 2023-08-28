@@ -1,61 +1,62 @@
 package co.softov.morestuff.android.domain.usecase.schedule
 
 import arrow.core.Either
+import arrow.core.right
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.createScheduleUseCaseTest
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
-import co.softov.morestuff.android.data.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.time.GetPriorityTimeUseCase
-import io.mockk.*
-import junit.framework.TestCase.assertEquals
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 
 class CreateScheduleUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val timeManager = mockk<TimeManager>()
-    private val getPriorityTimeUseCase = mockk<GetPriorityTimeUseCase>()
+    private val timeManager = TimeManagerImpl()
+    private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>(relaxed = true)
 
     private val createTime =
         Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
 
     private val createScheduleUseCaseImpl = CreateScheduleUseCaseImpl(
         scheduleRepository,
-        getPriorityTimeUseCase,
-        timeManager
+        timeManager,
+        cancelActiveScheduleUseCase
     )
 
     @Test
     fun `creates schedule`() = runBlocking {
         val taskId = 1L
-        val priority = Priority.today
-        val localTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val localTime = timeManager.nowLocalDateTime
+        val priority = Priority.Plan(localTime)
         val schedule = createScheduleUseCaseTest(
             createTime = createTime,
             scheduleTimeLocal = localTime.toString(),
-            scheduleTimeUtc = localTime.toInstant(TimeZone.UTC).toString(),
+            scheduleTimeUtc = timeManager.nowUtcInstantString,
             timeZone = TimeZone.currentSystemDefault().id
         )
 
-        every { timeManager.currentTimeZone } returns TimeZone.currentSystemDefault()
-        every { getPriorityTimeUseCase(priority) } returns localTime.toString()
-        every { timeManager.getCreateTime() } returns createTime
-        every { timeManager.nowLocalDateTimeString } returns ""
+        coEvery { cancelActiveScheduleUseCase(any(), any()) } coAnswers { listOf(schedule).right() }
+
         coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
-            val createdSchedule = arg<Schedule>(0).copy(id = 1)
-            Either.Right(createdSchedule)
+            Either.Right(schedule)
         }
 
-        val result = createScheduleUseCaseImpl.invoke(taskId, priority)
+        val result = createScheduleUseCaseImpl.invoke(taskId, ScheduleType.OneTime, localTime)
+        Assertions.assertEquals(Either.Right(schedule.copy(id = 1)), result)
 
-        assertEquals(Either.Right(schedule.copy(id = 1)), result)
-        verify { getPriorityTimeUseCase(priority) }
-        coVerify { scheduleRepository.createSchedule(any()) }
+        coVerify {
+            cancelActiveScheduleUseCase(any(), any())
+            scheduleRepository.createSchedule(any())
+        }
+
     }
 }

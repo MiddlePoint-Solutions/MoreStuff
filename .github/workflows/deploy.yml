@@ -1,8 +1,7 @@
-name: Deploy to Alpha
+name: Alpha Deploy
 on:
   push:
-    branches:
-      - 'release/**'
+    branches: [ "release/**" ]
 
 env:
   ALIAS: release
@@ -10,22 +9,23 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
       - name: JDK setup
         uses: actions/setup-java@v3
         with:
-          java-version: 11
+          java-version: 17
           distribution: corretto
+          cache: gradle
 
-      - name: Build
-        run: ./gradlew build
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Assemble Release Bundle
         run: |
           ./gradlew bundleRelease
+
       - name: Sign Release
         uses: r0adkll/sign-android-release@v1
         with:
@@ -41,6 +41,7 @@ jobs:
           echo "Tagging release with tag $version_name"
           git tag $version_name release/$version_name
           git push origin --tags
+
       - name: Create service_account.json
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
 

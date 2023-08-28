@@ -1,21 +1,38 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.currentPriority
-import co.softov.morestuff.android.domain.redux.state.PriorityAction
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
+import co.softov.morestuff.android.domain.redux.middleware.PriorityAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsParams
-import co.softov.morestuff.android.domain.usecase.priority.GetPriorityOptionsUseCase
+import co.softov.morestuff.android.domain.usecase.priority.UpdateTaskReviewPriorityUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+sealed class PriorityAction : Action.FeatureAction() {
+
+    data class UndoTaskPriorityUpdateAction(
+        val taskId: Long,
+        val score: Long
+    ) : PriorityAction()
+
+    data class TaskPriorityUpdateAction(
+        val task: Long,
+        val actionType: PriorityActionType
+    ) : PriorityAction()
+
+    object UpdatePlannedTasksPriorityScore : PriorityAction()
+
+}
+
 class PriorityMiddleware(
-    private val getPriorityOptionsUseCase: GetPriorityOptionsUseCase,
+    private val updateTaskReviewPriorityUseCase: UpdateTaskReviewPriorityUseCase,
+    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
+    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -26,36 +43,22 @@ class PriorityMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            OnResumeAction -> {
-                getPriorityOptions(scope, state, state.currentPriority, dispatch)
+
+            is TaskPriorityUpdateAction -> scope.launch {
+                updateTaskReviewPriorityUseCase(action.task, action.actionType)
             }
-            is PriorityAction.SetPriority -> {
-                getPriorityOptions(scope, state, action.priority, dispatch)
+
+            is UndoTaskPriorityUpdateAction -> scope.launch {
+                updateTaskPriorityScoreUseCase(action.taskId, action.score)
             }
+
+            is UpdatePlannedTasksPriorityScore -> scope.launch {
+                updatePlannedTasksPriorityUseCase()
+            }
+
             else -> NoOp
         }
-        return next(state, action, dispatch)
-    }
 
-    private fun getPriorityOptions(
-        scope: CoroutineScope,
-        state: AppState,
-        nextPriority: Priority,
-        dispatch: Dispatch
-    ) {
-        scope.launch {
-            val params = GetPriorityOptionsParams(state.currentPriority, nextPriority)
-            getPriorityOptionsUseCase(params).fold(
-                ifLeft = { dispatch(ErrorAction(it)) },
-                ifRight = {
-                    dispatch(
-                        PriorityAction.SetPriorityOptions(
-                            priority = it.priority,
-                            options = it.options
-                        )
-                    )
-                }
-            )
-        }
+        return next(state, action, dispatch)
     }
 }

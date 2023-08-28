@@ -2,34 +2,33 @@ package co.softov.morestuff.android.presentation.presenter
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.android.ui.list.model.ScheduleListItemViewModel
+import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 
 enum class ReviewRound {
-    Priority, Final
+    Review, Final
 }
 
 data class ReviewModel(
-    val round: ReviewRound = ReviewRound.Priority,
-    val roundNumber: Int = 0,
-    val roundItems: List<ScheduleListItemViewModel> = listOf(),
-    val high: List<ScheduleListItemViewModel> = listOf(),
-    val low: List<ScheduleListItemViewModel> = listOf(),
-    val done: List<ScheduleListItemViewModel> = listOf(),
-    val tomorrow: List<ScheduleListItemViewModel> = listOf(),
+    val round: ReviewRound = ReviewRound.Review,
+    val items: List<ReviewItemUiModel> = listOf(),
+    val actions: List<Pair<ReviewItemUiModel, PriorityActionType>> = listOf()
 ) : BaseViewState
 
 sealed class ReviewViewEvent : BaseViewEvent {
     data class SetupInitialRound(
         val round: ReviewRound,
-        val items: List<ScheduleListItemViewModel>,
+        val items: List<ReviewItemUiModel>,
     ) : ReviewViewEvent()
 
     data class SetupRound(val round: ReviewRound) : ReviewViewEvent()
-    data class OnHighPriority(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnLowPriority(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnDone(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class OnTomorrow(val item: ScheduleListItemViewModel) : ReviewViewEvent()
-    data class Undo(val item: ScheduleListItemViewModel) : ReviewViewEvent()
+
+    data class ItemReview(val item: ReviewItemUiModel, val action: PriorityActionType) : ReviewViewEvent()
+
+    data class Undo(val item: ReviewItemUiModel) : ReviewViewEvent()
+
+    data class CompleteTask(val item: ReviewItemUiModel) : ReviewViewEvent()
+
 }
 
 

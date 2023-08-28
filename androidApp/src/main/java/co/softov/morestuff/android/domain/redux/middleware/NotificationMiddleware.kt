@@ -1,32 +1,23 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import co.softov.morestuff.android.domain.enums.ReviewNotification
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.service.Notifier
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationsAction
-import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderOverloadNotification
-import co.softov.morestuff.android.domain.redux.state.ReviewAction
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
+import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.*
+import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 sealed class NotificationAction : Action.FeatureAction() {
     internal data class ShowReminderNotificationAction(
         val message: Message
     ) : NotificationAction()
 
-    internal data class ShowReminderNotificationsAction(
-        val messages: List<Message>
-    ) : NotificationAction()
-
-    internal data class ShowReminderOverloadNotification(
-        val taskCount: Int
-    ) : NotificationAction()
+    internal data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
         val scheduleId: Long
@@ -34,7 +25,8 @@ sealed class NotificationAction : Action.FeatureAction() {
 }
 
 class NotificationMiddleware(
-    private val notifier: Notifier
+    private val notifier: Notifier,
+    private val clearTaskNotificationsUseCase: ClearTaskNotificationsUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -50,25 +42,22 @@ class NotificationMiddleware(
                 notifier.showReminderNotification(action.message)
             }
 
-            is ShowReminderNotificationsAction -> {
-                notifier.showReminderNotifications(action.messages)
-            }
-
-            is ShowReminderOverloadNotification -> {
-                notifier.cancelReminderNotifications()
-                notifier.showReviewNotification(ReviewNotification.Overload(action.taskCount))
+            is ShowReviewNotification -> {
+                notifier.showReviewNotification()
             }
 
             is RemoveScheduleNotificationAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
             }
 
             is ReminderAction.UserResponseAction -> {
-                notifier.userInteractedWithNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId)
             }
 
-            is ReviewAction.ScheduleReviewResults -> {
-                notifier.cancelReminderNotifications()
+            is TaskAction.CompleteTaskAction -> {
+                if (action.complete) scope.launch {
+                    clearTaskNotificationsUseCase(action.taskId)
+                }
             }
 
             else -> NoOp

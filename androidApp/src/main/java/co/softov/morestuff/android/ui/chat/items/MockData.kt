@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.chat.items
 
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.ChatActions
 
@@ -19,6 +20,8 @@ object MockData {
                 "The big bang",
                 null,
                 content = "Hello there!",
+                null,
+                null,
                 null,
                 null,
                 null

@@ -3,34 +3,63 @@ package co.softov.morestuff.android.domain
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.Message
-import co.softov.morestuff.android.domain.model.Schedule
-import co.softov.morestuff.android.domain.model.ScheduleWithTitle
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.data.service.TimeManagerImpl
+import co.softov.morestuff.android.domain.enums.MessageDataType
+import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.MessageData
+import co.softov.morestuff.android.domain.enums.ScheduleType
+import co.softov.morestuff.android.domain.model.OpenGraphResult
 import kotlinx.datetime.*
+import java.util.UUID
 
 val timeManager = TimeManagerImpl()
-fun createListOfTasks(amount: Long): List<Task> {
+fun createListOfTasks(amount: Long): List<TaskDomain> {
     return buildList {
         for (i in 1..amount) {
-            add(createTaskForTest())
+            add(
+                createTaskForTest(
+                    id = i,
+                    priorityScore = i,
+                    timeUtils = timeManager.nowLocalDateTimeString
+                )
+            )
         }
     }
 }
+
 
 fun createTaskForTest(
     id: Long = 1,
     title: String = "",
     timeUtils: String = timeManager.nowLocalDateTimeString,
-): Task {
-    return Task(id, title, timeUtils)
+    priorityScore: Long = 0,
+    taskType: TaskType = TaskType.System,
+    activeSchedule: ScheduleDomain = createScheduleForTest(
+        taskId = id,
+        scheduleType = ScheduleType.OneTime
+    )
+): TaskDomain {
+    return TaskDomain(
+        id = id,
+        uuid = UUID.randomUUID().toString(),
+        title = title,
+        createTime = timeUtils,
+        completeTime = null,
+        priorityScore = priorityScore,
+        taskType = taskType,
+        schedule = listOf(activeSchedule)
+    )
 }
 
 
-fun createListOfSchedulesForTest(amount: Long): List<Schedule> {
+fun createListOfSchedulesForTest(amount: Long): List<ScheduleDomain> {
     return buildList {
         for (i in 1..amount) {
-            add(createScheduleForTest())
+            add(
+                createScheduleForTest(scheduleType = ScheduleType.OneTime)
+            )
         }
     }
 }
@@ -43,8 +72,18 @@ fun createScheduleForTest(
     scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
-): Schedule {
-    return Schedule(id, taskId, createTime, scheduleTimeLocal, scheduleTimeUtc, timeZone, active)
+    scheduleType: ScheduleType
+): ScheduleDomain {
+    return ScheduleDomain(
+        id,
+        taskId,
+        createTime,
+        scheduleTimeLocal,
+        scheduleTimeUtc,
+        timeZone,
+        active,
+        scheduleType
+    )
 }
 
 fun createScheduleUseCaseTest(
@@ -55,32 +94,23 @@ fun createScheduleUseCaseTest(
     scheduleTimeUtc: String = "",
     timeZone: String = "",
     active: Boolean = true,
-): Schedule {
-    return Schedule(id, taskId, createTime, scheduleTimeLocal, scheduleTimeUtc, timeZone, active)
+    scheduleType: ScheduleType = ScheduleType.OneTime
+): ScheduleDomain {
+    return ScheduleDomain(
+        id,
+        taskId,
+        createTime,
+        scheduleTimeLocal,
+        scheduleTimeUtc,
+        timeZone,
+        active,
+        scheduleType
+    )
         .copy(
             scheduleUtcTime = LocalDateTime.parse(scheduleTimeLocal)
                 .toInstant(TimeZone.of(timeZone)).toString()
         )
 }
-
-
-fun createScheduleWithTitleList(amount: Long): List<ScheduleWithTitle> {
-    return buildList {
-        for (i in 1..amount) {
-            add(createScheduleWithTitle())
-        }
-    }
-}
-
-fun createScheduleWithTitle(
-    scheduleId: Long = 1,
-    taskId: Long = 1,
-    scheduleTime: String = "",
-    taskTitle: String = "",
-): ScheduleWithTitle {
-    return ScheduleWithTitle(scheduleId, taskId, scheduleTime, taskTitle)
-}
-
 
 fun createListOfMessages(amount: Long): List<Message> {
     return buildList {
@@ -102,6 +132,14 @@ fun createMessageForTest(
     replyType: ReplyType = ReplyType.DONE,
     replyContent: String = "",
     replyTime: String = "",
+    openGraphResult: OpenGraphResult = OpenGraphResult(),
+    messageData: MessageData = MessageData(
+        id = 1L,
+        filePath = "",
+        creationTime = "",
+        messageType = MessageDataType.Image
+    )
+
 ): Message {
     return Message(
         id,
@@ -113,6 +151,8 @@ fun createMessageForTest(
         content,
         replyType,
         replyContent,
-        replyTime
+        replyTime,
+        openGraphResult,
+        messageData
     )
 }

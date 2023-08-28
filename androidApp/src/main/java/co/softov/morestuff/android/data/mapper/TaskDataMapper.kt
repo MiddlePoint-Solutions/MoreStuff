@@ -1,20 +1,39 @@
+@file:Suppress("LocalVariableName")
+
 package co.softov.morestuff.android.data.mapper
 
-import co.softov.morestuff.android.domain.model.Task
+import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.TaskDomain
 
-typealias TaskData = co.softov.morestuff.db.Task
+typealias TaskDb = co.softov.morestuff.db.Task
+typealias TaskDataMapper = (
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+) -> TaskDomain
 
-typealias taskDbMapper = (TaskData) -> Task
+fun makeTaskDbMapper(): TaskDataMapper = ::mapTaskDb
 
-fun makeTaskDbMapper(): taskDbMapper = { task ->
-    mapTaskDb(task)
-}
-
-fun mapTaskDb(input: TaskData): Task {
-    return Task(
-        id = input.id,
-        createTime = input.create_time,
-        completeTime = input.complete_time,
-        title = input.title
+fun mapTaskDb(
+    id: Long,
+    uuid: String,
+    create_time: String,
+    complete_time: String?,
+    title: String,
+    priority_score: Long,
+    task_type: TaskType,
+): TaskDomain {
+    return TaskDomain(
+        id = id,
+        uuid = uuid,
+        createTime = create_time,
+        completeTime = complete_time,
+        title = title,
+        priorityScore = priority_score,
+        taskType = task_type
     )
 }

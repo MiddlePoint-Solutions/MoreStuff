@@ -1,8 +1,13 @@
+import co.softov.morestuff.android.domain.enums.TaskType;
+
 CREATE TABLE task(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT NOT NULL,
     create_time TEXT NOT NULL,
     complete_time TEXT,
-    title TEXT NOT NULL
+    title TEXT NOT NULL,
+    priority_score INTEGER NOT NULL,
+    task_type TEXT AS TaskType NOT NULL
     );
 
 selectAll:
@@ -13,7 +18,17 @@ ORDER BY datetime(create_time);
 selectAllActive:
 SELECT *
 FROM task
-WHERE complete_time IS NULL;
+WHERE task.complete_time IS NULL
+ORDER BY task.priority_score DESC;
+
+getActiveTaskWithoutSchedule:
+SELECT *
+FROM task
+WHERE complete_time IS NULL AND id NOT IN (
+    SELECT task_id
+    FROM schedule
+    WHERE active = 1 AND schedule_type IN :schedule_types
+);
 
 selectAllComplete:
 SELECT *
@@ -21,14 +36,20 @@ FROM task
 WHERE complete_time IS NOT NULL
 ORDER BY task.complete_time DESC;
 
+selectHighestPriorityScore:
+SELECT max(priority_score) FROM task;
+
+selectLowestPriorityScore:
+SELECT min(priority_score) FROM task;
+
 selectTaskById:
 SELECT *
 FROM task
 WHERE id = ?;
 
 insertTask:
-INSERT INTO task(create_time, title)
-VALUES (?,?);
+INSERT INTO task (uuid, create_time, complete_time, title, priority_score, task_type)
+VALUES ?;
 
 updateTaskComplete:
 UPDATE task
@@ -42,3 +63,44 @@ WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+updateTaskPriorityScore:
+UPDATE task
+SET priority_score = :priority_score
+WHERE id = :task_id;
+
+decrementTasksPriorityScore:
+UPDATE task
+SET priority_score = priority_score - 1
+WHERE priority_score <= :priority_score;
+
+incrementTasksPriorityScore:
+UPDATE task
+SET priority_score = priority_score + 1
+WHERE priority_score >= :priority_score;
+
+selectAbovePriorityScore:
+SELECT task.* FROM task
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM task
+          WHERE complete_time IS NULL AND priority_score > :current_score
+          ORDER BY priority_score ASC LIMIT 1
+      )
+LIMIT 1;
+
+selectBelowPriorityScore:
+SELECT task.* FROM task
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM task
+          WHERE complete_time IS NULL AND priority_score < :current_score
+          ORDER BY priority_score DESC LIMIT 1
+      )
+LIMIT 1;
+
+searchTasks:
+SELECT * FROM task
+WHERE title LIKE '%' || :searchText || '%'
+ORDER BY create_time DESC;
+

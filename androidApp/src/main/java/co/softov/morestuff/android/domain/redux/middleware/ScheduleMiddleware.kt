@@ -1,76 +1,90 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
-import arrow.core.Either
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.Priority.*
+import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.enums.ReplyType.*
-import co.softov.morestuff.android.domain.model.Schedule
+import co.softov.morestuff.android.domain.enums.ReplyType.DONE
+import co.softov.morestuff.android.domain.enums.ReplyType.LATER
+import co.softov.morestuff.android.domain.enums.ReplyType.SNOOZE
+import co.softov.morestuff.android.domain.enums.ReplyType.TOMORROW
+import co.softov.morestuff.android.domain.model.ScheduleDomain
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.Dispatch
-import co.softov.morestuff.android.domain.redux.Next
+import co.softov.morestuff.android.domain.redux.store.Dispatch
+import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.*
-import co.softov.morestuff.android.domain.redux.dailySnoozeLimit
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleCreatedAction
+import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.usecase.schedule.*
+import co.softov.morestuff.android.domain.redux.store.OnResumeAction
+import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.datetime.LocalDateTime
 
 sealed class ScheduleAction : Action.FeatureAction() {
     data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
-    data class RescheduleTaskAction(val taskId: Long, val priority: Priority) : ScheduleAction()
-
-    data class RescheduleTasksAction(
-        val taskIds: List<Long>,
-        val priority: Priority
+    data class RescheduleTaskAction(
+        val taskId: Long,
+        val scheduleType: ScheduleType,
+        val localDateTime: LocalDateTime
     ) : ScheduleAction()
 
-    internal data class ScheduleCreatedAction(val schedule: Schedule) : ScheduleAction()
+    data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
+
+    data class CreateReminderScheduleAction(val taskId: Long) : ScheduleAction()
+    data class CancelReminderScheduleAction(val taskId: Long) : ScheduleAction()
+
+    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain) : ScheduleAction()
 
     internal data class ScheduleReplyAction(
-        val schedule: Schedule,
-        val replyType: ReplyType
+        val schedule: ScheduleDomain,
+        val replyType: ReplyType,
     ) : ScheduleAction()
 
-    internal data class SmartRescheduleAction(
-        val taskIds: List<Long>,
-        val replyType: ReplyType
-    ) : ScheduleAction()
 }
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
-    private val scheduleReviewNotificationsUseCase: ScheduleReviewNotificationsUseCase,
+    private val scheduleNotificationsAndWorkUseCase: ScheduleNotificationsAndWorkUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
-    private val getTaskScheduleCountUseCase: GetTaskScheduleCountUseCase,
+    private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
+    private val createReminderUseCase: CreateReminderUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
-    private val rescheduleTaskUseCase: RescheduleTaskUseCase,
 ) : Middleware<AppState> {
+
+    val timeManager: TimeManager = TimeManagerImpl()
 
     override fun invoke(
         state: AppState,
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
 
+            is OnResumeAction,
+            is NotificationAction.ShowReviewNotification,
             is SettingAction.InitSettings -> {
-                if (action.firstTime) {
-                    scope.launch { scheduleReviewNotificationsUseCase() }
-                }
+                scheduleNotificationsAndWorkUseCase()
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {
                 with(action) {
-                    createScheduleUseCase(task.id, priority).map {
+                    createOneTimeScheduleUseCase(task.id, priority).map {
                         dispatch(ScheduleCreatedAction(it))
                     }
                 }
@@ -82,66 +96,45 @@ class ScheduleMiddleware(
                 }
             }
 
-            is TaskAction.CompleteTasksAction -> scope.launch {
-                if (action.complete) {
-                    action.taskIds.forEach {
-                        cancelActiveScheduleUseCase(it)
-                    }
-                }
-            }
-
             is RescheduleTaskAction -> scope.launch {
                 with(action) {
-                    val params = RescheduleTaskUseCaseParams(taskId, priority)
-                    rescheduleTaskUseCase(params).map {
+                    createScheduleUseCase(taskId, scheduleType, localDateTime).map {
                         dispatch(ScheduleCreatedAction(it))
                     }
                 }
             }
 
-            is RescheduleTasksAction -> scope.launch {
-                with(action) {
-                    action.taskIds.forEach {
-                        val params = RescheduleTaskUseCaseParams(it, priority)
-                        rescheduleTaskUseCase(params).map { schedule ->
-                            dispatch(ScheduleCreatedAction(schedule))
-                        }
-                    }
-                }
+            is CancelActiveScheduleAction -> scope.launch {
+                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.OneTime))
             }
 
-            is ScheduleReplyAction -> {
-                val replyType = action.replyType
-                val schedule = action.schedule
+            is ScheduleReplyAction -> with(action) {
                 when (replyType) {
-                    LATER -> dispatch(RescheduleTaskAction(schedule.taskId, Later()))
-                    SNOOZE -> if (state.dailySnoozeLimit > 0) {
-                        checkTaskSnoozeLimit(
-                            scope,
-                            schedule.taskId,
-                            state.dailySnoozeLimit,
-                            dispatch
+                    LATER -> {}
+                    TOMORROW -> {
+                        val tomorrowTime = timeManager.tomorrowLocalDateTime(12)
+                        dispatch(
+                            RescheduleTaskAction(
+                                schedule.taskId,
+                                schedule.scheduleType,
+                                tomorrowTime
+                            )
                         )
-                    } else {
-                        dispatch(RescheduleTaskAction(schedule.taskId, Today()))
                     }
-                    TOMORROW -> dispatch(RescheduleTaskAction(schedule.taskId, Tomorrow()))
-                    DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
-                }
-            }
 
-            is SmartRescheduleAction -> {
-                when (action.replyType) {
-                    LATER -> TODO()
-                    SNOOZE -> action.taskIds.forEach { taskId ->
-                        if (state.dailySnoozeLimit > 0) {
-                            checkTaskSnoozeLimit(scope, taskId, state.dailySnoozeLimit, dispatch)
-                        } else {
-                            dispatch(RescheduleTaskAction(taskId, Today()))
-                        }
+                    SNOOZE -> {
+                        val snoozeTime =
+                            timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
+                        dispatch(
+                            RescheduleTaskAction(
+                                schedule.taskId,
+                                schedule.scheduleType,
+                                snoozeTime
+                            )
+                        )
                     }
-                    TOMORROW -> TODO()
-                    DONE -> TODO()
+
+                    DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
                 }
             }
 
@@ -162,27 +155,19 @@ class ScheduleMiddleware(
                 }
             }
 
+            is CreateReminderScheduleAction -> scope.launch {
+                createReminderUseCase(action.taskId).map {
+                    dispatch(ScheduleCreatedAction(it))
+                }
+            }
+
+            is CancelReminderScheduleAction -> scope.launch {
+                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.Reminder))
+            }
+
             else -> NoOp
         }
 
         return next(state, action, dispatch)
-    }
-
-    private fun checkTaskSnoozeLimit(
-        scope: CoroutineScope,
-        taskId: Long,
-        snoozeLimit: Int,
-        dispatch: Dispatch
-    ) {
-        scope.launch {
-            val timeOption = when (val result = getTaskScheduleCountUseCase(taskId)) {
-                is Either.Right -> {
-                    Timber.d("### Today Schedule count, taskId: $taskId = ${result.value} ###")
-                    if (result.value > snoozeLimit) Tomorrow() else Today()
-                }
-                else -> Today()
-            }
-            dispatch(RescheduleTaskAction(taskId, timeOption))
-        }
     }
 }

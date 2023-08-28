@@ -1,0 +1,170 @@
+package co.softov.morestuff.android.ui.home
+
+import android.content.res.Configuration
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
+import co.softov.morestuff.android.ui.compose.SlideAnimation
+import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.input.UserInputViewModel
+import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.schedule.PriorityContent
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreen() {
+
+    val navigation = LocalAppNavigation.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
+    MoreStuffHomeScaffold(
+        snackbarHostState = snackbarHostState,
+        topAppBarScrollBehavior = scrollBehavior,
+        content = {
+            HomeContent(
+                showTaskChat = { taskId ->
+                    scope.launch {
+                        navigation.push(Screen.TaskChat(taskId))
+                    }
+                },
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.padding(top = it.calculateTopPadding())
+            )
+        }
+    )
+}
+
+@Composable
+fun HomeContent(
+    showTaskChat: (taskId: Long) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+    userInputViewModel: UserInputViewModel = koinViewModel(),
+) {
+    val priorityScrollState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+
+    val visibleState = remember {
+        MutableTransitionState(true)
+    }
+
+    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        PriorityContent(
+            snackBarHostState = snackbarHostState,
+            showTaskChat = showTaskChat,
+            listState = priorityScrollState,
+            onItemDragging = { visibleState.targetState = !it }
+        )
+
+        SlideAnimation(
+            visibleState = visibleState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .zIndex(1f),
+        ) {
+            val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
+
+            Column {
+                PriorityInput(
+                    model = priorityModel,
+                    onNowSelected = userInputViewModel::setNowPriority,
+                    onLaterSelected = userInputViewModel::setLaterPriority,
+                    onPlanSelected = userInputViewModel::setPlanPriority,
+                    onTimeChange = userInputViewModel::updatePlanTime,
+                    onDateChange = userInputViewModel::updatePlanDate,
+                )
+
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    UserInput(
+                        textContent = {
+                            UserTextInput(
+                                value = userInputValue,
+                                onValueChange = { userInputValue = it },
+                                sendAction = {
+                                    userInputViewModel.createNewTask(it)
+                                    userInputValue = userInputValue.copy("")
+                                    scope.launch {
+                                        delay(200)
+                                        priorityScrollState.animateScrollToItem(index = 0)
+                                    }
+                                },
+                                actionsContent = {
+                                    VoiceToTextInput(
+                                        onUpdateValue = userInputViewModel::updateUserInput
+                                    )
+                                }
+                            )
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+fun MainContentPreview() {
+    MoreStuffTheme {
+        HomeScreen()
+    }
+}
+

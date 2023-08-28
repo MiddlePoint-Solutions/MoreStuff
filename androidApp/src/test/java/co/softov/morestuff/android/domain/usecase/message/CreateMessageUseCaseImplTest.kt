@@ -3,6 +3,7 @@ package co.softov.morestuff.android.domain.usecase.message
 import arrow.core.right
 import co.softov.morestuff.android.domain.createMessageForTest
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -15,17 +16,20 @@ class CreateMessageUseCaseImplTest {
     @Test
     fun `should return created message`() {
         val messageRepository: MessageRepository = mockk()
-        val createMessageUseCaseImpl = CreateMessageUseCaseImpl(messageRepository)
+        val checkForUrlMetadataUseCase: CheckForUrlMetadataUseCase = mockk()
+        val createMessageUseCaseImpl = CreateMessageUseCaseImpl(messageRepository,checkForUrlMetadataUseCase )
         val taskId = 1L
         val scheduleId = 1L
         val title = "Test Message"
         val contentType = ContentType.CONFIRM_NEW_TASK
+        val messageData: MessageData? = null
         val expectedMessage = createMessageForTest()
 
-        coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value, title) } returns expectedMessage.right()
+        coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title) } returns expectedMessage.right()
+        coEvery { checkForUrlMetadataUseCase(title, any()) } returns Unit.right()
 
         runBlocking {
-            val result = createMessageUseCaseImpl.invoke(taskId, scheduleId, title, contentType)
+            val result = createMessageUseCaseImpl.invoke(taskId,title,   contentType,messageData, scheduleId)
             assertEquals(expectedMessage.right(), result)
         }
     }

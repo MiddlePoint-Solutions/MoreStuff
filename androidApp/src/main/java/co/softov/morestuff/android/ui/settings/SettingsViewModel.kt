@@ -1,51 +1,56 @@
 package co.softov.morestuff.android.ui.settings
 
-import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.enums.ReviewNotification
+import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.service.Notifier
-import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class SettingsViewModel(
-    private val notifier: Notifier,
-    private val getActiveTasksUseCase: GetActiveTasksUseCase
-) : BaseViewModel<SettingsViewState, SettingsViewEvent>(SettingsViewState()) {
+    val devTools: DevTools,
+) : NoStateViewModel() {
 
-    override fun onReduceState(event: SettingsViewEvent): SettingsViewState {
-        return state
-    }
+    val model = MutableStateFlow(
+        with(store.state.value.settings) {
+            SettingsModel(
+                appTheme = appTheme,
+                snoozeLimit = snoozeLimit,
+            )
+        }
+    )
 
     init {
-        viewModelScope.launch {
-            activeTasksForExport = getActiveTasksUseCase().first().map { it.title }
-        }
+        loadData()
     }
 
-    var activeTasksForExport: List<String> = listOf()
-        private set
+    override fun onAppStateChange(state: AppState) {
+        model.update {
+            with(state.settings) {
+                it.copy(
+                    appTheme = appTheme,
+                    snoozeLimit = snoozeLimit,
+                    confettiEnabled = enableConfetti
+                )
+            }
+        }
+    }
 
     fun onSnoozeLimitChanged(limit: Int) {
         dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
     }
 
-    fun smartReminderEnabled(enable: Boolean) {
-        dispatchAppStoreAction(SettingAction.EnableSmartReminder(enable))
+    fun testReviewNotification() {
+        devTools.testReviewNotification()
     }
 
-    fun navigateBackSettings() {
-        router.exit()
+    fun selectAppTheme(index: Int) {
+        dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
     }
 
-    fun clearPendingMessages() {
-        dispatchAppStoreAction(DevAction.ClearActiveReminderMessages)
-    }
-
-    fun testReviewActivity() {
-        notifier.showReviewNotification(ReviewNotification.Overload(99))
+    fun enableConfetti(enable: Boolean) {
+        dispatchAppStoreAction(SettingAction.EnableConfetti(enable))
     }
 }

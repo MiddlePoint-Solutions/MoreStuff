@@ -10,3 +10,11 @@ enum class ReplyType(val value: Int) {
         fun withValue(value: Int) = run { values().first { it.value == value } }
     }
 }
+
+val ReplyType.displayTitle: String
+    get() = when (this) {
+        ReplyType.LATER -> "Later"
+        ReplyType.SNOOZE -> "Snooze"
+        ReplyType.TOMORROW -> "Tomorrow"
+        ReplyType.DONE -> "Done"
+    }
