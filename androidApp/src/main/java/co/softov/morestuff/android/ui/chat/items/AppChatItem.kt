@@ -60,7 +60,7 @@ fun AppChatItem(
                     )
                 )
                 Row(Modifier.align(Alignment.End).padding(top = 3.dp)) {
-                    DisplayMessageTime(
+                    MessageTime(
                         formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
                         modifier = Modifier,
                         textColor = MaterialTheme.colorScheme.onSecondaryContainer

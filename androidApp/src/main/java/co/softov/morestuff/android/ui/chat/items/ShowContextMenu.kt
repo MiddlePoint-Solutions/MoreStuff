@@ -19,9 +19,9 @@ fun ShowContextMenu(
     message: Message,
     onCopyMessage: (Message) -> Unit,
     onDeleteMessage: (Message) -> Unit,
+    onShareImage: (String) -> Unit,
     showMenu: Boolean,
     onClose: () -> Unit,
-    onShareImage: (String) -> Unit,
     modifier: Modifier,
 ) {
     val contextMenuItems =
