@@ -23,7 +23,7 @@ import co.softov.morestuff.android.domain.model.OpenGraphResult
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
-fun OpenGraphPreview(openGraphResult: OpenGraphResult) {
+fun OpenGraphView(openGraphResult: OpenGraphResult) {
     Column(
         modifier = Modifier
             .padding(8.dp)

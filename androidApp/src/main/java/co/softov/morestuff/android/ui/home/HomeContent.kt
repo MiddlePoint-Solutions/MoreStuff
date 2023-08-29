@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -86,13 +87,8 @@ fun HomeContent(
     val priorityScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-
     val visibleState = remember {
         MutableTransitionState(true)
-    }
-
-    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
     }
 
     Box(
@@ -126,13 +122,22 @@ fun HomeContent(
                 Surface(
                     color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
+
+                    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+                    }
+
+                    LaunchedEffect(userInputViewModel.userInput) {
+                        userInputValue = userInputValue.copy(text = userInputViewModel.userInput)
+                    }
+
                     UserInput(
                         textContent = {
                             UserTextInput(
                                 value = userInputValue,
                                 onValueChange = { userInputValue = it },
                                 sendAction = {
-                                    userInputViewModel.createNewTask(it)
+                                    userInputViewModel.createNewTask(userInputValue.text)
                                     userInputValue = userInputValue.copy("")
                                     scope.launch {
                                         delay(200)

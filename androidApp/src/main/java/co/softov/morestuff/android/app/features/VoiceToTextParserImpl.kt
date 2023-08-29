@@ -42,28 +42,18 @@ class VoiceToTextParserImpl(
 
         recognizer.startListening(intent)
 
-        _state.update {
-            it.copy(
-                isSpeaking = true
-            )
-        }
+        _state.update { it.copy(isSpeaking = true) }
     }
 
     override fun stopListening() {
-        _state.update {
-            it.copy(
-                isSpeaking = false
-            )
-        }
+        _state.update { it.copy(isSpeaking = false) }
         recognizer.stopListening()
     }
 
 
     override fun onReadyForSpeech(params: Bundle?) {
         _state.update {
-            it.copy(
-                error = null
-            )
+            it.copy(error = null)
         }
     }
 
@@ -75,9 +65,7 @@ class VoiceToTextParserImpl(
 
     override fun onEndOfSpeech() {
         _state.update {
-            it.copy(
-                isSpeaking = false
-            )
+            it.copy(isSpeaking = false)
         }
     }
 

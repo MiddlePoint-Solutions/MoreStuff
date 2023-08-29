@@ -141,6 +141,9 @@
     <string name="import_image_title">Import image</string>
     <string name="import_image_title_hint">Add a caption…</string>
     <string name="cd_share">Share</string>
+    <string name="request_permission">Request permission</string>
+    <string name="record_audio_permission_title">Record Audio Permission</string>
+    <string name="record_audio_permission_description">Recording audio is required for this feature to be available.\nPlease grant the permission</string>
 
 
 </resources>

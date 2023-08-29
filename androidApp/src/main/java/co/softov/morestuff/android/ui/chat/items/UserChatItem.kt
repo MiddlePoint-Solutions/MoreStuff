@@ -3,21 +3,15 @@ package co.softov.morestuff.android.ui.chat.items
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -216,7 +210,7 @@ fun UserChatItem(
                             )
                         )
                         if (openGraphResult?.title != null && openGraphResult.description != null) {
-                            OpenGraphPreview(openGraphResult)
+                            OpenGraphView(openGraphResult)
                         }
                         Row(Modifier.align(Alignment.End)) {
                             MessageTime(
@@ -268,7 +262,7 @@ fun MessageTime(
 @Preview
 @Composable
 fun UserChatItemPreview() {
-    MoreStuffTheme() {
+    MoreStuffTheme {
         // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
     }
 }
