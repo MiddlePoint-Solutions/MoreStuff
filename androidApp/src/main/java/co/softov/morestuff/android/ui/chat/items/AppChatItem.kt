@@ -25,14 +25,14 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.ui.chat.ChatActions
-import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
+import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 
 @Composable
 fun AppChatItem(
-    messageWithFormattedTime: MessageWithFormattedTime,
+    messageUiModel: MessageUiModel,
     chatActions: ChatActions,
 ) {
-    val message = messageWithFormattedTime.message
+    val message = messageUiModel.message
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,7 +61,7 @@ fun AppChatItem(
                 )
                 Row(Modifier.align(Alignment.End).padding(top = 3.dp)) {
                     MessageTime(
-                        formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                        formattedTimeOnly = messageUiModel.formattedTimeOnly,
                         modifier = Modifier,
                         textColor = MaterialTheme.colorScheme.onSecondaryContainer
                     )
@@ -72,10 +72,10 @@ fun AppChatItem(
 }
 
 @Composable
-fun TaskReminderItem(messageWithFormattedTime: MessageWithFormattedTime, actions: ChatActions) {
+fun TaskReminderItem(messageUiModel: MessageUiModel, actions: ChatActions) {
     Column {
-        AppChatItem(messageWithFormattedTime, actions)
-        val message = messageWithFormattedTime.message
+        AppChatItem(messageUiModel, actions)
+        val message = messageUiModel.message
         if (message.replyType == null) {
             Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
                 Button(onClick = {

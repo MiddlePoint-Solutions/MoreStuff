@@ -41,7 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.ui.chat.ChatActions
-import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
+import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
@@ -54,10 +54,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UserChatItem(
-    messageWithFormattedTime: MessageWithFormattedTime,
+    messageUiModel: MessageUiModel,
     actions: ChatActions,
 ) {
-    val message = messageWithFormattedTime.message
+    val message = messageUiModel.message
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
@@ -164,7 +164,7 @@ fun UserChatItem(
                             }
                             Row(Modifier.align(Alignment.End)) {
                                 MessageTime(
-                                    formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                    formattedTimeOnly = messageUiModel.formattedTimeOnly,
                                     modifier = Modifier
                                 )
                             }
@@ -214,7 +214,7 @@ fun UserChatItem(
                         }
                         Row(Modifier.align(Alignment.End)) {
                             MessageTime(
-                                formattedTimeOnly = messageWithFormattedTime.formattedTimeOnly,
+                                formattedTimeOnly = messageUiModel.formattedTimeOnly,
                                 modifier = Modifier
                             )
                         }

@@ -66,7 +66,7 @@ class TaskChatViewModel(
             initialValue = TaskDomain()
         )
 
-    val messages: StateFlow<List<MessageWithFormattedTime>> = flow {
+    val messages: StateFlow<List<MessageUiModel>> = flow {
         while (true) {
             val messages = if (devTools.showDebugMessages) {
                 getTaskMessagesFlowUseCase(taskId = taskId).first()
@@ -78,7 +78,7 @@ class TaskChatViewModel(
                 val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
                 val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?:""
                 val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString()) ?:""
-                MessageWithFormattedTime(message, formattedTime, formattedTimeOnly)
+                MessageUiModel(message, formattedTime, formattedTimeOnly)
             }
 
             emit(formattedMessages)

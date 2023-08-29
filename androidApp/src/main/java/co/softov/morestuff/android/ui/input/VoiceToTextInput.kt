@@ -68,7 +68,6 @@ fun VoiceToTextInput(
 
     val recordingState by voiceToText.state.collectAsState()
     LaunchedEffect(recordingState.spokenText) {
-        Timber.d("Helloooo")
         onUpdateValue(recordingState.spokenText)
     }
 
@@ -174,7 +173,7 @@ private fun VoiceToTextInputContent(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Text(
-                        text = "Listening",
+                        text = stringResource(R.string.voice_to_text_listening),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
                     )
