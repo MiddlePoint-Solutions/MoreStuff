@@ -108,6 +108,9 @@ fun Modifier.swipableCard(
         translationY = state.offset.value.y
         rotationZ = (state.offset.value.x / 60).coerceIn(-40f, 40f)
         rotationY = state.flip.value
+        scaleX = state.scale.value.x
+        scaleY = state.scale.value.y
+        alpha = state.alpha.value
     }
 
 private fun isVelocitySwipe(velocity: Velocity): Boolean {

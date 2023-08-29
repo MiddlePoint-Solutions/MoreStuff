@@ -89,7 +89,6 @@ class UserInputViewModel(
     }
 
     fun updateUserInput(input: String) {
-        Timber.d("new user input: $input")
         userInput = input
     }
 
