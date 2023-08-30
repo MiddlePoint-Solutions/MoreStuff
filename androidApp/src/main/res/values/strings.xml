@@ -146,6 +146,7 @@
     <string name="record_audio_permission_description">Recording audio is required for this feature to be available.\nPlease grant the permission</string>
     <string name="voice_to_text_listening">Listening</string>
     <string name="empty_priority_list_cta">Let\'s Go! :)</string>
+    <string name="cd_share_to_new_task">Share to new task</string>
 
 
 </resources>

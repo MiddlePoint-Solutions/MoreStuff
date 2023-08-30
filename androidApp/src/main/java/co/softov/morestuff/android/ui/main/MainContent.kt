@@ -41,8 +41,6 @@ fun MainContent(
     val viewModel: MainViewModel = koinViewModel()
     val navigation = LocalAppNavigation.current
 
-    val priorityScrollState = rememberLazyListState()
-
     ChildStack(
         source = navigation,
         initialStack = {

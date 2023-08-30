@@ -5,17 +5,20 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
@@ -54,9 +57,12 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
+import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,14 +86,15 @@ fun ShareScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* TODO: search */ }) {
+                        // TODO: Uncomment below code when implementing search for share.
+                        /* IconButton(onClick = { *//* TODO: search *//* }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = stringResource(R.string.cd_search_chats),
                                 modifier = Modifier.size(32.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
-                        }
+                        }*/
                     }
                 )
             }
@@ -115,13 +122,6 @@ private fun ShareContent(
 
     val state = rememberLazyListState()
     var showUserInput by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
-    BackHandler(showUserInput) {
-        scope.launch {
-            showUserInput = false
-        }
-    }
 
     var newTaskContent by remember { mutableStateOf<Pair<String, Priority>?>(null) }
     LaunchedEffect(newTaskContent) {
@@ -149,7 +149,10 @@ private fun ShareContent(
                 )
             }
 
-            items(shareViewModel.tasks, key = { it.id }) { task ->
+            items(
+                shareViewModel.tasks,
+                key = { it.id }
+            ) { task ->
                 PriorityItem(
                     task = task,
                     onClick = shareToTask
@@ -217,11 +220,15 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.background)
             .heightIn(80.dp)
+            .padding(start = 14.dp)
             .clickable(onClick = showUserInput),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+
+        TaskProfile(title = "+")
+
         Text(
             text = stringResource(R.string.create_new_chat),
             textAlign = TextAlign.Start,

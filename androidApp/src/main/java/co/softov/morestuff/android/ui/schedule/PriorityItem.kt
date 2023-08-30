@@ -10,20 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -36,7 +28,6 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.TaskColors
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import timber.log.Timber
 
@@ -60,11 +51,11 @@ fun PriorityItem(
             }
     ) {
         Row(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize().padding(start = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            TaskProfile(task)
+            TaskProfile(task.title)
 
             Text(
                 text = task.title,
@@ -87,39 +78,6 @@ fun PriorityItem(
         TaskItemBadges(
             task = task,
             modifier = Modifier.align(Alignment.BottomEnd)
-        )
-    }
-}
-
-@Composable
-fun TaskProfile(task: TaskDomain) {
-
-    val profileColor by remember {
-        derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
-    }
-
-    val profileTitle by remember {
-        derivedStateOf { task.title[0].uppercase() }
-    }
-
-    Box(
-        modifier = Modifier
-            .padding(start = 14.dp)
-            .clip(CircleShape)
-            .size(50.dp)
-            .background(
-                brush = Brush.verticalGradient(profileColor)
-            )
-    ) {
-        BasicText(
-            text = profileTitle,
-            modifier = Modifier.align(Alignment.Center),
-            style = TextStyle(
-                fontSize = 24.sp,
-                lineHeight = 23.8.sp,
-                fontWeight = FontWeight(900),
-                color = Color(0xFFFFFFFF),
-            )
         )
     }
 }
