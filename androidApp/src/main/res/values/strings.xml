@@ -95,7 +95,7 @@
     <string name="cd_task_reminder_icon">Task reminder icon</string>
     <string name="cd_task_done_icon">Task done icon</string>
     <string name="create_new_chat">Create New Chat</string>
-    <string name="write_something">Write something...</string>
+    <string name="main_input_hint">Add something…</string>
     <string name="cd_complete_task">Complete task</string>
     <string name="complete">Complete</string>
     <string name="completed">Completed</string>
@@ -131,15 +131,21 @@
 
     <!--  onBoarding  -->
     <string name="our_goal">"Our goal"</string>
-    <string name="is_to_help_you_plan_and">is to help you plan and\nfulfill your tasks.</string>
+    <string name="is_to_help_you_plan_and">is to help you prioritize and\nfulfill your tasks.</string>
     <string name="button_start">Start</string>
     <string name="notification">Notification\npermission </string>
-    <string name="more_stuff_requires_notification">More Stuff requires Notification\npermission to send you Task &amp;\nReminder notifications  </string>
+    <string name="more_stuff_requires_notification">MoreStuff requires Notification\npermission to send you Task &amp;\nReminder notifications  </string>
     <string name="button_enable">Enable</string>
     <string name="button_skip">Skip</string>
     <string name="your_workspace">Your workspace\nis ready </string>
     <string name="import_image_title">Import image</string>
     <string name="import_image_title_hint">Add a caption…</string>
+    <string name="cd_share">Share</string>
+    <string name="request_permission">Request permission</string>
+    <string name="record_audio_permission_title">Record Audio Permission</string>
+    <string name="record_audio_permission_description">Recording audio is required for this feature to be available.\nPlease grant the permission</string>
+    <string name="voice_to_text_listening">Listening</string>
+    <string name="empty_priority_list_cta">Let\'s Go! :)</string>
 
 
 </resources>

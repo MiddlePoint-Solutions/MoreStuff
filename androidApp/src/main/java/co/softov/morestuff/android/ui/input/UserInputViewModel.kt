@@ -14,6 +14,7 @@ import co.softov.morestuff.android.ui.home.mapToDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalDateTime
+import timber.log.Timber
 
 class UserInputViewModel(
     private val timeManager: TimeManager,
@@ -72,6 +73,7 @@ class UserInputViewModel(
                 priorityModel.value.mapToDomain()
             )
         )
+        userInput = ""
     }
 
     fun setNowPriority() {

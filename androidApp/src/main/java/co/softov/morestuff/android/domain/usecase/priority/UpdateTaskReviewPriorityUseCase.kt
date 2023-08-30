@@ -49,5 +49,6 @@ class UpdateTaskReviewPriorityUseCaseImpl(
             }
         }
 
+        PriorityActionType.Done -> getTaskUseCase(taskId).map { it.priorityScore }
     }
 }

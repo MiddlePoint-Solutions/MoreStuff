@@ -11,7 +11,7 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PriorityViewModel(
-    private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val reorderTaskUseCase: ReorderTaskUseCase,
 ) : NoStateViewModel() {
 
@@ -47,7 +47,7 @@ class PriorityViewModel(
     private var lastCompleted: TaskDomain? = null
 
     override fun onLoadData() {
-        getActiveTasksUseCase()
+        getActiveTasksFlowUseCase()
             .onEach { tasks = it }
             .launchIn(viewModelScope)
     }

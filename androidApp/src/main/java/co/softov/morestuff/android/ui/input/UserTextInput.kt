@@ -21,8 +21,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
@@ -50,13 +53,11 @@ fun UserTextInput(
     sendAction: (String) -> Unit = {},
     actionsContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
+    focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
-
     val boxWeight = LocalBoxWeight.current
-
-
 
     Surface(
         modifier = modifier
@@ -91,6 +92,7 @@ fun UserTextInput(
                     enabled = true,
                     modifier = Modifier
                         .clearFocusOnKeyboardDismiss()
+                        .focusRequester(focusRequester)
                         .weight(0.88f)
                         .align(Alignment.CenterVertically)
                         .padding(start = 20.dp, top = 13.dp, bottom = 13.dp, end = 4.dp),
@@ -108,7 +110,7 @@ fun UserTextInput(
                         Box {
                             if (value.text.isEmpty()) {
                                 Text(
-                                    text = stringResource(R.string.write_something),
+                                    text = stringResource(R.string.main_input_hint),
                                     fontSize = 18.sp
                                 )
                             }

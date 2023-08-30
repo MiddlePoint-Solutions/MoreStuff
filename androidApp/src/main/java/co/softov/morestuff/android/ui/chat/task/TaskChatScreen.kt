@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -178,7 +179,7 @@ private fun TaskChatContent(
     taskTitle: () -> String,
     chatActions: ChatActions,
     modifier: Modifier = Modifier,
-    messages: List<MessageWithFormattedTime> = listOf(),
+    messages: List<MessageUiModel> = listOf(),
     onBack: () -> Unit = {},
     schedule: () -> ScheduleUiModel? = { null },
     reminder: () -> ScheduleUiModel? = { null },
@@ -201,13 +202,6 @@ private fun TaskChatContent(
         } else {
             Timber.d("Image picker uri is NULL!")
         }
-    }
-
-    var userInputValue by rememberSaveable(
-        key = task.id.toString(),
-        stateSaver = TextFieldValue.Saver
-    ) {
-        mutableStateOf(TextFieldValue())
     }
 
     Scaffold(
@@ -278,11 +272,8 @@ private fun TaskChatContent(
 
                 AnimatedVisibility(visible = !task.isComplete) {
                     TaskChatInput(
-                        userInputValue = userInputValue,
-                        onValueChange = { userInputValue = it },
                         sendTaskMessage = {
                             sendTaskMessage(it)
-                            userInputValue = userInputValue.copy("")
                             scope.launch {
                                 delay(200)
                                 scrollState.animateScrollToItem(index = 0)
@@ -304,14 +295,15 @@ private fun TaskChatContent(
 
 @Composable
 private fun TaskChatInput(
-    userInputValue: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
     sendTaskMessage: (String) -> Unit,
     pickImage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val userInputViewModel: UserInputViewModel = koinViewModel()
     val isTextEmpty = remember { mutableStateOf(true) }
+
+    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue())
+    }
 
     Box(
         modifier = Modifier
@@ -327,10 +319,13 @@ private fun TaskChatInput(
                         UserTextInput(
                             value = userInputValue,
                             onValueChange = {
-                                onValueChange(it)
+                                userInputValue = it
                                 isTextEmpty.value = it.text.isBlank()
                             },
-                            sendAction = sendTaskMessage,
+                            sendAction = {
+                                sendTaskMessage(it)
+                                userInputValue = userInputValue.copy(text = "")
+                            },
                             backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                             actionsContent = {
                                 Row(
@@ -348,15 +343,16 @@ private fun TaskChatInput(
                                         )
                                     }
                                     VoiceToTextInput(
-                                        onUpdateValue = userInputViewModel::updateUserInput,
+                                        onUpdateValue = {
+                                            userInputValue = userInputValue.copy(text = it)
+                                        }
                                     )
                                 }
                             },
                         )
                     }
                 },
-
-                )
+            )
         }
     }
 }

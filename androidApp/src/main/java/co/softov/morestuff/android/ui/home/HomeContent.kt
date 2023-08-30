@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -86,14 +88,11 @@ fun HomeContent(
     val priorityScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-
     val visibleState = remember {
         MutableTransitionState(true)
     }
 
-    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
-    }
+    val focusRequester = remember { FocusRequester() }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -101,6 +100,7 @@ fun HomeContent(
         PriorityContent(
             snackBarHostState = snackbarHostState,
             showTaskChat = showTaskChat,
+            onCallToAction = { focusRequester.requestFocus() },
             listState = priorityScrollState,
             onItemDragging = { visibleState.targetState = !it }
         )
@@ -126,13 +126,23 @@ fun HomeContent(
                 Surface(
                     color = MaterialTheme.colorScheme.secondaryContainer
                 ) {
+
+                    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+                    }
+
+                    LaunchedEffect(userInputViewModel.userInput) {
+                        userInputValue = userInputValue.copy(text = userInputViewModel.userInput)
+                    }
+
                     UserInput(
                         textContent = {
                             UserTextInput(
                                 value = userInputValue,
                                 onValueChange = { userInputValue = it },
+                                focusRequester = focusRequester,
                                 sendAction = {
-                                    userInputViewModel.createNewTask(it)
+                                    userInputViewModel.createNewTask(userInputValue.text)
                                     userInputValue = userInputValue.copy("")
                                     scope.launch {
                                         delay(200)

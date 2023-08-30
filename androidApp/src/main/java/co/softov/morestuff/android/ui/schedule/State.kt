@@ -3,8 +3,8 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.compose.runtime.Immutable
 
 sealed class NotificationState {
-    object None : NotificationState()
-    object Complete : NotificationState()
+    data object None : NotificationState()
+    data object Complete : NotificationState()
 }
 
 @Immutable
