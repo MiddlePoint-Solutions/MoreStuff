@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -91,12 +92,15 @@ fun HomeContent(
         MutableTransitionState(true)
     }
 
+    val focusRequester = remember { FocusRequester() }
+
     Box(
         modifier = modifier.fillMaxSize()
     ) {
         PriorityContent(
             snackBarHostState = snackbarHostState,
             showTaskChat = showTaskChat,
+            onCallToAction = { focusRequester.requestFocus() },
             listState = priorityScrollState,
             onItemDragging = { visibleState.targetState = !it }
         )
@@ -136,6 +140,7 @@ fun HomeContent(
                             UserTextInput(
                                 value = userInputValue,
                                 onValueChange = { userInputValue = it },
+                                focusRequester = focusRequester,
                                 sendAction = {
                                     userInputViewModel.createNewTask(userInputValue.text)
                                     userInputValue = userInputValue.copy("")
