@@ -61,7 +61,7 @@ fun CompletePriorityItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            TaskProfile(task)
+            TaskProfile(task.title)
             Column(
                 modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally
