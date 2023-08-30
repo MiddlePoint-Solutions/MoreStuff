@@ -137,7 +137,7 @@ fun TaskCard(
                         Button(
                             onClick = {
                                 onComplete(task)
-                                visibleState = false
+//                                visibleState = false
                             },
                             modifier = Modifier
                                 .widthIn(min = 140.dp)

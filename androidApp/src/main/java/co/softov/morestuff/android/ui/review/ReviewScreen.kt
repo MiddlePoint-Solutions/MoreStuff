@@ -65,6 +65,8 @@ fun ReviewContent(
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
 
+    val scope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         viewModel.loadData()
     }
@@ -114,7 +116,12 @@ fun ReviewContent(
                             .fillMaxHeight(0.7f),
                         states = states,
                         onSwiped = viewModel::onTaskSwiped,
-                        onComplete = viewModel::completeTask
+                        onComplete = {
+                            scope.launch {
+                                states.firstVisibleStateOrNull()?.onComplete()
+                                viewModel.completeTask(it)
+                            }
+                        }
                     )
 
                     LaunchedEffect(key1 = model.round) {
@@ -133,12 +140,15 @@ fun ReviewContent(
 }
 
 private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.lastSwipedItem() =
-    reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }?.run {
+    reversed().firstOrNull { firstVisibleItem(it) }?.run {
         getOrNull(indexOf(this) + 1)
     } ?: firstOrNull()
 
+private fun firstVisibleItem(it: Pair<ReviewItemUiModel, SwipeableCardState>) =
+    it.second.offset.value == Offset(0f, 0f) && !it.second.isSwiped
+
 private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull() =
-    reversed().firstOrNull { it.second.offset.value == Offset(0f, 0f) }
+    reversed().firstOrNull { firstVisibleItem(it) }
 
 private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
@@ -163,7 +173,7 @@ private fun PriorityReviewTopBar(
                 )
             }
         },
-       colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 }
 
@@ -260,7 +270,7 @@ private fun ReviewSwipeControls(
 private fun TaskPrioritySwipe(
     modifier: Modifier = Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
-    onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection, isLast: Boolean) -> Unit,
+    onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
 ) {
     Box(
@@ -282,7 +292,7 @@ private fun TaskPrioritySwipe(
             }
             LaunchedEffect(task, state.swipedDirection) {
                 state.swipedDirection?.let { direction ->
-                    onSwiped(task, direction, states.first().first == task)
+                    onSwiped(task, direction)
                 }
             }
         }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,92 +48,72 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.features.VoiceToTextParserState
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import org.koin.compose.koinInject
+import org.koin.compose.rememberKoinInject
+import timber.log.Timber
 
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
-    voiceToText: VoiceToTextParser = koinInject()
+    voiceToText: VoiceToTextParser = rememberKoinInject()
 ) {
 
-    val recordingState by voiceToText.state.collectAsStateWithLifecycle()
+    val recordingState by voiceToText.state.collectAsState()
+    LaunchedEffect(recordingState.spokenText) {
+        onUpdateValue(recordingState.spokenText)
+    }
 
     VoiceToTextInputContent(
-        onUpdateValue = onUpdateValue,
+        recordingState = recordingState,
         startListening = { voiceToText.startListening("en") },
         stopListening = voiceToText::stopListening,
-        recordingState = recordingState,
     )
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun VoiceToTextInputContent(
-    onUpdateValue: (String) -> Unit,
+    recordingState: VoiceToTextParserState,
     startListening: () -> Unit,
     stopListening: () -> Unit,
-    recordingState: VoiceToTextParserState = VoiceToTextParserState()
 ) {
 
     var canRecord by remember { mutableStateOf(false) }
     val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     var showPermissionDialog by remember { mutableStateOf(false) }
-    val showDialog = remember { mutableStateOf(false) }
-
-    if (recordingState.isSpeaking) {
-        LaunchedEffect(Unit) {
-            onUpdateValue(recordingState.spokenText)
-        }
-    }
+    var showDialog by remember { mutableStateOf(false) }
 
     val onRecord = {
         if (!recordingState.isSpeaking) {
             if (canRecord) {
                 startListening()
-                showDialog.value = true
+                showDialog = true
             } else {
                 showPermissionDialog = true
             }
         } else {
             stopListening()
-            showDialog.value = false
+            showDialog = false
         }
     }
 
     var dismissDialog by remember { mutableStateOf(false) }
 
     if (recordAudioPermissionState.status is PermissionStatus.Denied && !dismissDialog && showPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = { dismissDialog = true },
-            title = { Text("Record Audio Permission") },
-            text = {
-                Text(
-                    "Recording audio is required for this feature to be available. " +
-                            "Please grant the permission"
-                )
+        MicrophonePermissionDialog(
+            onConfirm = {
+                recordAudioPermissionState.launchPermissionRequest()
+                dismissDialog = true
             },
-            confirmButton = {
-                Button(onClick = {
-                    recordAudioPermissionState.launchPermissionRequest()
-                    dismissDialog = true
-                }) {
-                    Text("Request permission")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { dismissDialog = true }) {
-                    Text("Dismiss")
-                }
-            },
-            shape = RoundedCornerShape(4.dp),
+            onCancel = { dismissDialog = true }
         )
     }
 
@@ -164,27 +147,33 @@ private fun VoiceToTextInputContent(
     }
     LaunchedEffect(recordingState.isSpeaking) {
         if (!recordingState.isSpeaking) {
-            showDialog.value = false
+            showDialog = false
         }
     }
 
-    if (showDialog.value) {
-        Dialog(onDismissRequest = {
-            showDialog.value = false
-            stopListening()
-        }) {
-            Card(shape = RectangleShape, modifier = Modifier.size(200.dp)) {
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDialog = false
+                stopListening()
+            }
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.secondaryContainer
+            ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary)
+                        .size(width = 200.dp, height = 250.dp)
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    RecordingOverlay(isVisible = recordingState.isSpeaking)
+                    RecordingOverlay()
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
                     Text(
-                        text = "Listening",
+                        text = stringResource(R.string.voice_to_text_listening),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
                     )
@@ -194,15 +183,38 @@ private fun VoiceToTextInputContent(
     }
 }
 
+@Composable
+private fun MicrophonePermissionDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onCancel,
+        title = { Text(stringResource(R.string.record_audio_permission_title)) },
+        text = { Text(stringResource(R.string.record_audio_permission_description)) },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text(stringResource(R.string.request_permission))
+            }
+        },
+        dismissButton = {
+            Button(onClick = onCancel) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+        shape = RoundedCornerShape(4.dp),
+    )
+}
+
 
 @Composable
-fun RecordingOverlay(isVisible: Boolean) {
+fun RecordingOverlay() {
     val infiniteTransition = rememberInfiniteTransition(label = "Voice infinite transition")
     val waveScale by infiniteTransition.animateFloat(
         initialValue = 0.9f,
         targetValue = 1.4f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
+            animation = tween(3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ), label = "Voice scale"
     )
@@ -210,50 +222,39 @@ fun RecordingOverlay(isVisible: Boolean) {
         initialValue = 0.3f,
         targetValue = 0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
+            animation = tween(3000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ), label = "Voice alpha"
     )
 
-    if (isVisible) {
-        Box(
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .background(Color.Transparent),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(
             modifier = Modifier
-                .wrapContentSize()
-                .background(Color.Transparent),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(100.dp)
-                    .scale(waveScale)
-                    .alpha(waveAlpha),
-                strokeWidth = 4.dp,
-                color = Color.White
-            )
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .size(100.dp)
-                    .scale(waveScale * 0.8f)
-                    .alpha(waveAlpha * 0.9f),
-                strokeWidth = 4.dp,
-                color = Color.White
-            )
+                .size(100.dp)
+                .scale(waveScale)
+                .alpha(waveAlpha),
+            strokeWidth = 4.dp,
+            color = Color.White
+        )
+        CircularProgressIndicator(
+            modifier = Modifier
+                .size(100.dp)
+                .scale(waveScale * 0.8f)
+                .alpha(waveAlpha * 0.9f),
+            strokeWidth = 4.dp,
+        )
 
-            Surface(
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(CircleShape),
-                color = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Mic,
-                    contentDescription = "Recording",
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center),
-                    tint = Color.White
-                )
-            }
-        }
+        Icon(
+            imageVector = Icons.Filled.Mic,
+            contentDescription = "Recording",
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.Center),
+        )
     }
 }

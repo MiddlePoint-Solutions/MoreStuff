@@ -1,17 +1,25 @@
 package co.softov.morestuff.android.ui.review.swipeable
 
 import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleOut
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
 enum class SwipeDirection {
-    Left, Right, Up, Down
+     None , Left, Right, Up, Down
 }
 
 enum class FlipState {
@@ -42,6 +50,8 @@ class SwipeableCardState(
 ) {
     val offset = Animatable(offset(0f, 0f), Offset.VectorConverter)
     val flip = Animatable(0f, Float.VectorConverter)
+    val scale = Animatable(offset(1f, 1f), Offset.VectorConverter)
+    val alpha = Animatable(1f, Float.VectorConverter)
 
     /**
      * The [SwipeDirection] the card was swiped at.
@@ -66,10 +76,17 @@ class SwipeableCardState(
      */
     private var flipState: FlipState by mutableStateOf(FlipState.Front)
 
-    suspend fun reset(animationSpec: AnimationSpec<Offset> = tween(400)) {
+    suspend fun reset(animationSpec: AnimationSpec<Offset> = tween(400)) = coroutineScope {
         swipedDirection = null
-        offset.animateTo(offset(0f, 0f), animationSpec)
-        isSwiped = false
+        launch {
+            awaitAll(
+                async { offset.animateTo(offset(0f, 0f), animationSpec) },
+                async { scale.animateTo(offset(1f, 1f), animationSpec) },
+                async { alpha.animateTo(1f, tween(200)) }
+            )
+        }.invokeOnCompletion {
+            isSwiped = false
+        }
     }
 
     suspend fun undo() {
@@ -77,49 +94,79 @@ class SwipeableCardState(
         reset(tween(200))
     }
 
-    suspend fun fling(direction: SwipeDirection, velocity: Velocity) {
+    suspend fun fling(direction: SwipeDirection, velocity: Velocity) = coroutineScope {
         isSwiped = true
-        val endX = maxWidth * 1.1f
+        val endX = maxWidth * 1.2f
         val endY = maxHeight
 
-
-
-        when (direction) {
+        val animation = when (direction) {
             SwipeDirection.Left -> offset.animateTo(
                 offset(x = -endX),
-                initialVelocity = offset(x = velocity.x),
                 animationSpec = tween(250)
             )
+
             SwipeDirection.Right -> offset.animateTo(
                 offset(x = endX),
-                initialVelocity = offset(x = velocity.x),
-                animationSpec = spring()
+                animationSpec = tween(250)
             )
+
             SwipeDirection.Up -> offset.animateTo(
                 offset(y = -endY),
-                initialVelocity = offset(y = velocity.y),
                 animationSpec = tween(250)
             )
+
             SwipeDirection.Down -> offset.animateTo(
                 offset(y = endY),
-                initialVelocity = offset(y = velocity.y),
                 animationSpec = tween(250)
             )
+
+            SwipeDirection.None -> alpha.animateTo(0f, tween(250))
         }
-        swipedDirection = direction
+        launch {
+            awaitAll(
+                async { animation },
+                async { alpha.animateTo(0f, tween(200)) }
+            )
+        }.invokeOnCompletion {
+            swipedDirection = direction
+        }
     }
 
-    suspend fun swipe(direction: SwipeDirection, animationSpec: AnimationSpec<Offset> = tween(300)) {
+    suspend fun swipe(
+        direction: SwipeDirection,
+        animationSpec: AnimationSpec<Offset> = tween(300)
+    ) = coroutineScope {
         isSwiped = true
-        val endX = maxWidth * 1.5f
+        val endX = maxWidth * 1.2f
         val endY = maxHeight
-        when (direction) {
+        val animation = when (direction) {
             SwipeDirection.Left -> offset.animateTo(offset(x = -endX), animationSpec)
             SwipeDirection.Right -> offset.animateTo(offset(x = endX), animationSpec)
             SwipeDirection.Up -> offset.animateTo(offset(y = -endY), animationSpec)
             SwipeDirection.Down -> offset.animateTo(offset(y = endY), animationSpec)
+            SwipeDirection.None -> alpha.animateTo(0f, tween(250))
         }
-        swipedDirection = direction
+
+        launch {
+            awaitAll(
+                async { animation },
+                async { alpha.animateTo(0f, tween(300)) }
+            )
+        }.invokeOnCompletion {
+            swipedDirection = direction
+        }
+    }
+
+    suspend fun onComplete() = coroutineScope {
+        isSwiped = true
+        launch {
+            awaitAll(
+                async { scale.animateTo(offset(1.5f, 1.5f), tween(300)) },
+                async { alpha.animateTo(0f, tween(300)) }
+            )
+        }.invokeOnCompletion {
+            swipedDirection = SwipeDirection.None
+        }
     }
 
     private fun offset(x: Float = offset.value.x, y: Float = offset.value.y): Offset {

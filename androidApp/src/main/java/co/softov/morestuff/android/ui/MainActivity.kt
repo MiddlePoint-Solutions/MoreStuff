@@ -74,9 +74,7 @@ class MainActivity : ComponentActivity() {
             )
 
             ProvideAppTheme(viewModel.appTheme) {
-                TransparentSystemBars()
                 MoreStuffTheme {
-
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceContainer
                     ) {
@@ -118,21 +116,6 @@ class MainActivity : ComponentActivity() {
                 addOnNewIntentListener(listener)
                 onDispose { removeOnNewIntentListener(listener) }
             }
-        }
-    }
-
-    @Composable
-    private fun TransparentSystemBars() {
-        val systemUiController = rememberSystemUiController()
-        val useDarkIcons = !isDarkTheme()
-
-        DisposableEffect(systemUiController, useDarkIcons) {
-            systemUiController.setSystemBarsColor(
-                color = Color.Transparent,
-                darkIcons = useDarkIcons,
-                isNavigationBarContrastEnforced = false
-            )
-            onDispose {}
         }
     }
 

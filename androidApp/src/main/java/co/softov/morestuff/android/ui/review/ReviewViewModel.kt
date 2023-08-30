@@ -13,10 +13,7 @@ import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Review
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.ItemReview
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupInitialRound
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupRound
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.Undo
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.*
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
@@ -65,11 +62,6 @@ class ReviewViewModel(
             }
         )
 
-        is ReviewViewEvent.CompleteTask -> state.copy(
-            items = state.items.filter { it.id != event.item.id }
-        )
-
-
     }
 
     private fun setInitialState(round: ReviewRound = Review) {
@@ -82,34 +74,39 @@ class ReviewViewModel(
     }
 
     fun undo(item: ReviewItemUiModel) {
-        Timber.d("undoTask: $item")
         roundEndDelayJob?.cancel()
-        dispatchAppStoreAction(
-            PriorityAction.UndoTaskPriorityUpdateAction(
-                item.id,
-                item.priorityScore
-            )
-        )
+        state.actions.firstOrNull {
+            it.first.id == item.id
+        }?.let {
+            when (it.second) {
+                PriorityActionType.Done -> dispatchAppStoreAction(
+                    TaskAction.CompleteTaskAction(item.id, false)
+                )
+
+                else -> dispatchAppStoreAction(
+                    PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore)
+                )
+            }
+        }
         sendEvent(Undo(item))
     }
 
     fun onTaskSwiped(
         item: ReviewItemUiModel,
         direction: SwipeDirection,
-        isLast: Boolean,
     ) {
-        Timber.d("onTaskSwiped: $isLast")
         val reviewAction = when (direction) {
             SwipeDirection.Left -> PriorityActionType.Less
             SwipeDirection.Right -> PriorityActionType.More
             SwipeDirection.Up -> PriorityActionType.Now
             SwipeDirection.Down -> PriorityActionType.Later
+            SwipeDirection.None -> return
         }
 
         dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction))
         sendEvent(ItemReview(item, reviewAction))
 
-        if (isLast) {
+        if (state.items.first() == item) {
             roundEndDelayJob = viewModelScope.launch {
                 dispatchAppStoreAction(PriorityAction.UpdatePlannedTasksPriorityScore)
                 delay(500)
@@ -119,10 +116,8 @@ class ReviewViewModel(
     }
 
     fun completeTask(item: ReviewItemUiModel) {
-        item.isCompleted = true
+        sendEvent(ItemReview(item, PriorityActionType.Done))
         dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
-        sendEvent(ReviewViewEvent.CompleteTask(item))
     }
-
 
 }

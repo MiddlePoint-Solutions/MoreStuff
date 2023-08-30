@@ -104,8 +104,8 @@ import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
@@ -211,7 +211,7 @@ val taskUseCases = module {
     factoryOf(::GetTaskUseCaseImpl) bind GetTaskUseCase::class
     factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
     factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
-    factoryOf(::GetActiveTasksUseCaseImpl) bind GetActiveTasksUseCase::class
+    factoryOf(::GetActiveTasksFlowUseCaseImpl) bind GetActiveTasksFlowUseCase::class
     factoryOf(::GetCompletedTasksUseCaseImpl) bind GetCompletedTasksUseCase::class
     factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class

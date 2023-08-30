@@ -2,9 +2,7 @@ package co.softov.morestuff.android.ui.schedule
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,10 +23,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,8 +44,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
@@ -66,6 +67,7 @@ import org.koin.androidx.compose.koinViewModel
 fun PriorityContent(
     snackBarHostState: SnackbarHostState,
     showTaskChat: (taskId: Long) -> Unit,
+    onCallToAction: () -> Unit,
     modifier: Modifier = Modifier,
     onItemDragging: (Boolean) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
@@ -77,6 +79,7 @@ fun PriorityContent(
 
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
+    val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
 
     val state = rememberReorderableLazyListState(
         listState = listState,
@@ -222,6 +225,28 @@ fun PriorityContent(
             }
         )
     }
+
+    if (showEmptyState) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(
+                onClick = onCallToAction,
+            ) {
+                Text(
+                    stringResource(R.string.empty_priority_list_cta),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
+        }
+    }
+
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

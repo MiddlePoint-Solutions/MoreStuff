@@ -43,7 +43,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
-import co.softov.morestuff.android.ui.chat.task.MessageWithFormattedTime
+import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 import kotlinx.coroutines.launch
 
 private val jumpToBottomThreshold = 56.dp
@@ -56,7 +56,7 @@ private fun isAutoScrollingEnabled(
 
 @Composable
 fun Messages(
-    messages: List<MessageWithFormattedTime>,
+    messages: List<MessageUiModel>,
     actions: ChatActions,
     modifier: Modifier = Modifier,
     scrollState: LazyListState,
@@ -110,15 +110,15 @@ fun Messages(
                         }
                     }
                     when (item.message.contentType) {
-                        ContentType.USER_NEW_TASK -> UserChatItem(messageWithFormattedTime = item, actions)
-                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(messageWithFormattedTime = item, actions)
+                        ContentType.USER_NEW_TASK -> UserChatItem(messageUiModel = item, actions)
+                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(messageUiModel = item, actions)
                         ContentType.TASK_REMINDER -> TaskReminderItem(
-                            messageWithFormattedTime = item,
+                            messageUiModel = item,
                             actions = actions
                         )
 
                         ContentType.TASK_MESSAGE -> UserChatItem(
-                            messageWithFormattedTime = item,
+                            messageUiModel = item,
                             actions = actions
                         )
                     }

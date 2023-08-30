@@ -124,30 +124,26 @@ class TimeManagerImpl : TimeManager {
         val now = nowLocalDateTime
         val minutes = now.minute
         val nextHour: Int
-        val nextQuarterHour: Int = when {
+        val nextQuarterHour: Int
+        when {
             minutes < 10 -> {
                 nextHour = now.hour
-                15
+                nextQuarterHour = 15
             }
 
-            minutes < 25 -> {
+            minutes < 20 -> {
                 nextHour = now.hour
-                30
+                nextQuarterHour = 30
             }
 
-            minutes < 40 -> {
+            minutes < 35 -> {
                 nextHour = now.hour
-                45
-            }
-
-            minutes < 55 -> {
-                nextHour = now.hour + 1
-                0
+                nextQuarterHour = 45
             }
 
             else -> {
-                nextHour = now.hour + 1
-                15
+                nextHour = if(now.hour < 23) now.hour + 1 else 0
+                nextQuarterHour = 0
             }
         }
         return LocalDateTime(now.year, now.month, now.dayOfMonth, nextHour, nextQuarterHour, 0, 0)

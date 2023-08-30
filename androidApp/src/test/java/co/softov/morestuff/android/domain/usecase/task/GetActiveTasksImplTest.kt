@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 class GetActiveTasksUseCaseTest {
 
     private val mockTaskRepository: TaskRepository = mockk()
-    private val getActiveTasksImpl = GetActiveTasksUseCaseImpl(mockTaskRepository)
+    private val getActiveTasksImpl = GetActiveTasksFlowUseCaseImpl(mockTaskRepository)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

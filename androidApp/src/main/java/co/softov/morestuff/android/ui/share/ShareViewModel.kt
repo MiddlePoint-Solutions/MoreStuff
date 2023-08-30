@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.ui.schedule.NotificationState
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class ShareViewModel(
-    private val getActiveTasksUseCase: GetActiveTasksUseCase,
+    private val getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val createTaskUseCase: CreateTaskUseCase,
 ) : NoStateViewModel() {
 
@@ -36,7 +36,7 @@ class ShareViewModel(
         private set
 
     override fun onLoadData() {
-        getActiveTasksUseCase()
+        getActiveTasksFlowUseCase()
             .onEach { tasks = it }
             .launchIn(viewModelScope)
     }
