@@ -7,6 +7,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -102,6 +103,7 @@ fun TaskChatScreen(
         ChildStack(
             source = navigation,
             initialStack = { listOf(ChatScreen.TaskChat) },
+            key = remember { "TaskChatStack$taskId" },
             handleBackButton = true,
             animation = stackAnimation(scale() + fade()),
         ) { screen ->
@@ -270,7 +272,10 @@ private fun TaskChatContent(
                     scrollState = scrollState,
                 )
 
-                AnimatedVisibility(visible = !task.isComplete) {
+                AnimatedVisibility(
+                    visible = !task.isComplete,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
                     TaskChatInput(
                         sendTaskMessage = {
                             sendTaskMessage(it)
@@ -286,6 +291,9 @@ private fun TaskChatContent(
                                 )
                             )
                         },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
                     )
                 }
             }
@@ -306,54 +314,51 @@ private fun TaskChatInput(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
     ) {
-        Surface(Modifier) {
-            UserInput(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                textContent = {
-                    val weight = if (isTextEmpty.value) 0.30f else 0.12f
-                    CompositionLocalProvider(LocalBoxWeight provides weight) {
-                        UserTextInput(
-                            value = userInputValue,
-                            onValueChange = {
-                                userInputValue = it
-                                isTextEmpty.value = it.text.isBlank()
-                            },
-                            sendAction = {
-                                sendTaskMessage(it)
-                                userInputValue = userInputValue.copy(text = "")
-                            },
-                            backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                            actionsContent = {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Start,
-                                    modifier = Modifier.fillMaxWidth()
+        UserInput(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            backgroundColor = Color.Transparent,
+            textContent = {
+                val weight = if (isTextEmpty.value) 0.30f else 0.12f
+                CompositionLocalProvider(LocalBoxWeight provides weight) {
+                    UserTextInput(
+                        value = userInputValue,
+                        onValueChange = {
+                            userInputValue = it
+                            isTextEmpty.value = it.text.isBlank()
+                        },
+                        sendAction = {
+                            sendTaskMessage(it)
+                            userInputValue = userInputValue.copy(text = "")
+                        },
+                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                        actionsContent = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                IconButton(
+                                    onClick = pickImage,
+                                    modifier = Modifier.weight(1f)
                                 ) {
-                                    IconButton(
-                                        onClick = pickImage,
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.PhotoLibrary,
-                                            contentDescription = stringResource(R.string.cd_select_images)
-                                        )
-                                    }
-                                    VoiceToTextInput(
-                                        onUpdateValue = {
-                                            userInputValue = userInputValue.copy(text = it)
-                                        }
+                                    Icon(
+                                        Icons.Filled.PhotoLibrary,
+                                        contentDescription = stringResource(R.string.cd_select_images)
                                     )
                                 }
-                            },
-                        )
-                    }
-                },
-            )
-        }
+                                VoiceToTextInput(
+                                    onUpdateValue = {
+                                        userInputValue = userInputValue.copy(text = it)
+                                    }
+                                )
+                            }
+                        },
+                    )
+                }
+            },
+        )
     }
 }
 

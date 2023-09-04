@@ -15,6 +15,7 @@ inline fun <reified C : Parcelable> ChildStack(
     source: StackNavigationSource<C>,
     noinline initialStack: () -> List<C>,
     modifier: Modifier = Modifier,
+    key: String = "DefaultChildStack",
     handleBackButton: Boolean = false,
     animation: StackAnimation<C, ComponentContext>? = null,
     noinline content: @Composable (C) -> Unit,
@@ -26,6 +27,7 @@ inline fun <reified C : Parcelable> ChildStack(
             componentContext.childStack(
                 source = source,
                 initialStack = initialStack,
+                key = key,
                 handleBackButton = handleBackButton,
                 childFactory = { _, childComponentContext -> childComponentContext },
             )
