@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -116,10 +117,12 @@ private fun WelcomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_on_boarding),
+                painter = painterResource(id = R.drawable.logo),
                 contentDescription = "app welcome image",
                 contentScale = ContentScale.None
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
 
             Text(
                 text = stringResource(R.string.our_goal),
@@ -187,9 +190,8 @@ private fun NotificationPermissionScreen(onNext: () -> Unit) {
 
             Spacer(modifier = Modifier.padding(20.dp))
             Image(
-                painter = painterResource(id = R.drawable.notifications_on),
-                contentDescription = "notifications",
-                contentScale = ContentScale.FillBounds
+                painter = painterResource(id = R.drawable.notification_permission),
+                contentDescription = "Notifications permission image",
             )
         }
 
@@ -269,7 +271,7 @@ private fun ReadyScreen(onFinish: () -> Unit) {
 
             Spacer(modifier = Modifier.padding(20.dp))
             Image(
-                painter = painterResource(id = R.drawable.workspace_on),
+                painter = painterResource(id = R.drawable.onboarding_workspace),
                 contentDescription = "notifications",
                 contentScale = ContentScale.FillBounds
             )
