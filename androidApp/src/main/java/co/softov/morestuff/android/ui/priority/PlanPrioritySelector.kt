@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.priority
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -75,6 +76,7 @@ fun PlanPrioritySelector(
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
             SetSchedulePriorityButton(
                 onClick = { showDatePickerDialog = true },
@@ -82,7 +84,7 @@ fun PlanPrioritySelector(
                 Text(
                     text = planTime.displayDate,
                     style = TextStyle(
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         lineHeight = 16.sp,
                         fontWeight = FontWeight(500),
                     )
@@ -97,7 +99,7 @@ fun PlanPrioritySelector(
                 Text(
                     text = planTime.displayTime,
                     style = TextStyle(
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         lineHeight = 16.sp,
                         fontWeight = FontWeight(500),
                     )
