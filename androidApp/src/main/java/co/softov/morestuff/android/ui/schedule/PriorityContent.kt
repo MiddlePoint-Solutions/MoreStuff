@@ -69,7 +69,6 @@ fun PriorityContent(
     showTaskChat: (taskId: Long) -> Unit,
     onCallToAction: () -> Unit,
     modifier: Modifier = Modifier,
-    onItemDragging: (Boolean) -> Unit = {},
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
@@ -143,110 +142,107 @@ fun PriorityContent(
         )
     }
 
-    LazyColumn(
-        state = state.listState,
-        modifier = modifier
-            .fillMaxSize()
-            .reorderable(state),
-        contentPadding = PaddingValues(bottom = 180.dp),
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        items(
-            items = viewModel.tasks,
-            key = { task -> task.id }
+        LazyColumn(
+            state = state.listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .reorderable(state),
         ) {
-            val task by rememberUpdatedState(it)
-            val itemClick by rememberUpdatedState(showTaskChat)
+            items(
+                items = viewModel.tasks,
+                key = { task -> task.id }
+            ) {
+                val task by rememberUpdatedState(it)
+                val itemClick by rememberUpdatedState(showTaskChat)
 
-            val dismissState = rememberNoFlingDismissState(
-                positionalThreshold = { 130.dp.toPx() },
-                confirmValueChange = { dismissValue ->
-                    when (dismissValue) {
-                        DismissValue.Default -> false
-                        DismissValue.DismissedToEnd -> {
-                            taskOptions = task
-                            false
-                        }
+                val dismissState = rememberNoFlingDismissState(
+                    positionalThreshold = { 130.dp.toPx() },
+                    confirmValueChange = { dismissValue ->
+                        when (dismissValue) {
+                            DismissValue.Default -> false
+                            DismissValue.DismissedToEnd -> {
+                                taskOptions = task
+                                false
+                            }
 
-                        DismissValue.DismissedToStart -> {
-                            viewModel.toggleReminder(task)
-                            false
+                            DismissValue.DismissedToStart -> {
+                                viewModel.toggleReminder(task)
+                                false
+                            }
                         }
+                    }
+                )
+
+                var willDismissDirection: DismissDirection? by remember {
+                    mutableStateOf(null)
+                }
+
+                LaunchedEffect(Unit) {
+                    snapshotFlow { dismissState.dismissDirection }
+                        .collect { dismissDirection ->
+                            willDismissDirection = dismissDirection
+                        }
+                }
+
+                val haptic = LocalHapticFeedback.current
+                LaunchedEffect(willDismissDirection) {
+                    if (willDismissDirection != null) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                }
+
+                ReorderableItem(state, key = task.id) { isDragging ->
+                    NoFlingSwipeToDismiss(
+                        state = dismissState,
+                        background = { SwipeBackground(dismissState, task.hasReminder) },
+                        dismissContent = {
+                            PriorityItem(
+                                task = task,
+                                onClick = itemClick,
+                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                                isDragging = isDragging
+                            )
+                        }
+                    )
+                }
+            }
+        }
+
+        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = explode(),
+                updateListener = object : OnParticleSystemUpdateListener {
+                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                        if (activeSystems == 0) showTaskCompleteAnimation = 0
                     }
                 }
             )
-
-            var willDismissDirection: DismissDirection? by remember {
-                mutableStateOf(null)
-            }
-
-            LaunchedEffect(Unit) {
-                snapshotFlow { dismissState.dismissDirection }
-                    .collect { dismissDirection ->
-                        willDismissDirection = dismissDirection
-                    }
-            }
-
-            val haptic = LocalHapticFeedback.current
-            LaunchedEffect(willDismissDirection) {
-                if (willDismissDirection != null) {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            }
-
-            ReorderableItem(state, key = task.id) { isDragging ->
-                NoFlingSwipeToDismiss(
-                    state = dismissState,
-                    background = { SwipeBackground(dismissState, task.hasReminder) },
-                    dismissContent = {
-                        PriorityItem(
-                            task = task,
-                            onClick = itemClick,
-                            if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
-                            isDragging = isDragging
-                        )
-                    }
-                )
-
-                LaunchedEffect(key1 = isDragging) {
-                    onItemDragging(isDragging)
-                }
-            }
         }
-    }
 
-    if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-        KonfettiView(
-            modifier = Modifier.fillMaxSize(),
-            parties = explode(),
-            updateListener = object : OnParticleSystemUpdateListener {
-                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                    if (activeSystems == 0) showTaskCompleteAnimation = 0
-                }
-            }
-        )
-    }
-
-    if (showEmptyState) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 180.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            TextButton(
-                onClick = onCallToAction,
+        if (showEmptyState) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 180.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    stringResource(R.string.empty_priority_list_cta),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
+                TextButton(
+                    onClick = onCallToAction,
+                ) {
+                    Text(
+                        stringResource(R.string.empty_priority_list_cta),
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     )
-                )
+                }
             }
         }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
