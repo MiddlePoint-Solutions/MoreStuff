@@ -7,8 +7,8 @@ import kotlinx.datetime.LocalDateTime
 
 @Immutable
 sealed class PriorityModel {
-    object Now : PriorityModel()
-    object Later : PriorityModel()
+    data object Now : PriorityModel()
+    data object Later : PriorityModel()
     data class Plan(val localDateTime: LocalDateTime) : PriorityModel()
 }
 

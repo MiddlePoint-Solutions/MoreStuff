@@ -53,9 +53,7 @@ private fun PriorityInputContent(
     onTimeChange: (Int, Int) -> Unit = { _, _ -> },
     onDateChange: (Long) -> Unit = {},
 ) {
-    Column(
-        modifier = modifier.background(color = Color.Transparent)
-    ) {
+    Column {
 
         val showPlanInput by remember(model.priority) {
             derivedStateOf { model.priority is PriorityModel.Plan }
@@ -63,18 +61,18 @@ private fun PriorityInputContent(
 
         AnimatedVisibility(
             showPlanInput,
-            modifier = modifier.background(color = Color.Transparent),
+            modifier = modifier.fillMaxWidth(),
             enter = slideInVertically { it * 2 },
             exit = slideOutVertically { (it * 1.5).toInt() }
         ) {
 
             Box(
-                modifier = modifier.fillMaxWidth().background(color = Color.Transparent)
+                contentAlignment = Alignment.Center
             ) {
 
                 PlanPrioritySelector(
                     model = model,
-                    modifier = Modifier.align(Alignment.CenterEnd),
+                    modifier = Modifier.fillMaxWidth(),
                     onDateChange = onDateChange,
                     onTimeChange = onTimeChange
                 )
