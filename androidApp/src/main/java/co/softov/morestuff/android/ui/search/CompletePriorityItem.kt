@@ -53,25 +53,24 @@ fun CompletePriorityItem(
             .heightIn(max = 90.dp)
             .shadow(elevation = elevation)
             .background(MaterialTheme.colorScheme.surfaceContainer)
+            .clickable { onClick(task.id) }
     ) {
         Row(
             modifier = modifier
                 .fillMaxSize()
-                .clickable { onClick(task.id) },
+                .padding(start = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
             TaskProfile(task.title)
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.padding(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = task.title,
                     textAlign = TextAlign.Start,
-                    modifier = Modifier
-                        .fillMaxWidth(0.90f)
-                        .padding(top = 25.dp),
+                    modifier = Modifier.fillMaxWidth(0.90f),
                     maxLines = 2,
                     color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
@@ -87,8 +86,7 @@ fun CompletePriorityItem(
                         Text(
                             text = stringResource(R.string.completed) + " $completeTime",
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.padding(start = 13.dp, bottom = 8.dp)
-                                .align(Alignment.Start),
+                            modifier = Modifier.align(Alignment.Start),
                             style = TextStyle(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 12.sp,
@@ -125,13 +123,14 @@ fun CompletePriorityItem(
 @Composable
 fun CompletePriorityItem() {
     MoreStuffTheme {
-        PriorityItem(
+        CompletePriorityItem(
             task = TaskDomain(
                 title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
                 schedule = buildList {
                     add(ScheduleDomain(scheduleType = ScheduleType.OneTime))
                     add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
-                }
+                },
+                completeTime = ""
             ),
             onClick = {}
         )
