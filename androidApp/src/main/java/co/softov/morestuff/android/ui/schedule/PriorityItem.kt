@@ -45,10 +45,7 @@ fun PriorityItem(
             .height(80.dp)
             .shadow(elevation = elevation)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .clickable {
-                Timber.d("Clicked on ${task.id}")
-                onClick(task.id)
-            }
+            .clickable { onClick(task.id) }
     ) {
         Row(
             modifier = modifier.fillMaxSize().padding(start = 14.dp),
