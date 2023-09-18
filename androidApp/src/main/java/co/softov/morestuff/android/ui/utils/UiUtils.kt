@@ -16,7 +16,7 @@ val urlPattern: Pattern = Pattern.compile(
 )
 
 
-fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern) {
+fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern, urlColor: Color) {
     val matcher = urlPattern.matcher(content)
     var lastEnd = 0
 
@@ -36,7 +36,7 @@ fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pat
         withStyle(
             style = SpanStyle(
                 textDecoration = TextDecoration.Underline,
-                color = Color.White,
+                color = urlColor,
                 fontSize = 16.sp
             )
         ) {

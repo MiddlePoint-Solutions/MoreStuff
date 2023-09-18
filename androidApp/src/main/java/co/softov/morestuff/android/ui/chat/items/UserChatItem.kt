@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,11 +64,12 @@ fun UserChatItem(
     val coroutineScope = rememberCoroutineScope()
     val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
+    val urlColor = rememberUpdatedState(MaterialTheme.colorScheme.onPrimary)
 
     val content by remember {
         derivedStateOf {
             buildAnnotatedString {
-                appendUrlsWithStyle(message.content, urlPattern)
+                appendUrlsWithStyle(message.content, urlPattern, urlColor.value)
             }
         }
     }
