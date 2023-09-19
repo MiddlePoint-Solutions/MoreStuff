@@ -62,7 +62,6 @@ fun UserChatItem(
     var showMenu by remember { mutableStateOf(false) }
     val uriHandler = LocalUriHandler.current
     val coroutineScope = rememberCoroutineScope()
-    val urlPattern = urlPattern
     val openGraphResult = message.openGraphResult
     val urlColor = rememberUpdatedState(MaterialTheme.colorScheme.onPrimary)
 
