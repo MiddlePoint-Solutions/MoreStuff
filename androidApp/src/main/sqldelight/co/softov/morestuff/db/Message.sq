@@ -57,6 +57,12 @@ LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE message.task_id = ? AND message.content_type = ?
 ORDER BY datetime(message.create_time) DESC;
 
+selectMessageFromTask:
+SELECT message.*
+FROM message
+WHERE message.content_type = ?
+ORDER BY datetime(create_time) DESC;
+
 selectTaskMessage:
 SELECT message.id, url_metadata.json_data
 FROM message
@@ -97,12 +103,6 @@ deleteMessage:
 DELETE FROM message
 WHERE id = ?;
 
-selectTaskMessagesOfType:
-SELECT message.*, url_metadata.json_data, message_data.data_id, message_data.file_path, message_data.creation_time, message_data.data_type
-FROM message
-LEFT JOIN url_metadata ON message.id = url_metadata.message_id
-LEFT JOIN message_data ON message.id = message_data.message_id
-WHERE message.content_type = 201
-ORDER BY datetime(create_time) DESC;
+
 
 
