@@ -39,6 +39,13 @@ import co.softov.morestuff.android.domain.model.TaskDomain
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
+                if (task.hasMessages) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.extra_details),
+                        contentDescription = stringResource(R.string.cd_task_message_icon),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
                 task.schedule.forEach { schedule ->
                     when (schedule.scheduleType) {
                         ScheduleType.OneTime -> {

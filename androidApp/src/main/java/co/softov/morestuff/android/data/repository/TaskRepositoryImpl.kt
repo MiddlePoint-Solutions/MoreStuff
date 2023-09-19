@@ -33,6 +33,7 @@ class TaskRepositoryImpl(
 
     private val taskQueries = database.taskQueries
     private val scheduleQueries = database.scheduleQueries
+    private val messageQueries = database.messageQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(
@@ -79,9 +80,17 @@ class TaskRepositoryImpl(
             .mapToList(Dispatchers.IO)
             .map { it.groupBy { schedule -> schedule.taskId } }
 
+        val messagesFlow = messageQueries.selectTaskMessagesOfType(mapper.messageDataMapper)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .map { it.map { message -> message.taskId }.toSet() }
         return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
             tasks.map { task ->
                 task.copy(schedule = schedules[task.id] ?: listOf())
+            }
+        }.combine(messagesFlow) { tasksWithSchedules, messageTaskIds ->
+            tasksWithSchedules.map { task ->
+                task.copy(taskMessages = messageTaskIds.contains(task.id))
             }
         }
     }
