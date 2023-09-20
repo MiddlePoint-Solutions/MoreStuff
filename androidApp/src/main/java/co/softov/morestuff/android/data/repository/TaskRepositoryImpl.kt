@@ -83,7 +83,7 @@ class TaskRepositoryImpl(
                 .mapToList(Dispatchers.IO)
                 .map { it.groupBy { schedule -> schedule.taskId } }
 
-        val messagesFlow = messageQueries.selectMessageFromTask(ContentType.TASK_MESSAGE.value)
+        val messagesFlow = messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map { messages ->

@@ -57,11 +57,18 @@ LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE message.task_id = ? AND message.content_type = ?
 ORDER BY datetime(message.create_time) DESC;
 
-selectMessageFromTask:
-SELECT message.*
-FROM message
-WHERE message.content_type = ?
-ORDER BY datetime(create_time) DESC;
+selectFirstTaskMessageWithType:
+WITH LatestMessage AS (
+    SELECT task_id, MAX(datetime(create_time)) AS latest_time
+    FROM message
+    WHERE content_type = ?
+    GROUP BY task_id
+)
+SELECT m.*
+FROM message AS m
+JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND datetime(m.create_time) = lm.latest_time
+ORDER BY datetime(m.create_time) DESC;
+
 
 selectTaskMessage:
 SELECT message.id, url_metadata.json_data
