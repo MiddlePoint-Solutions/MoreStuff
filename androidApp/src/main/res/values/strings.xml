@@ -94,6 +94,7 @@
     <string name="cd_scheduled_task_icon">Scheduled task icon</string>
     <string name="cd_task_reminder_icon">Task reminder icon</string>
     <string name="cd_task_done_icon">Task done icon</string>
+    <string name="cd_task_message_icon">Task message icon</string>
     <string name="create_new_chat">Create New Chat</string>
     <string name="main_input_hint">Add something…</string>
     <string name="cd_complete_task">Complete task</string>

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
@@ -39,6 +40,13 @@ import co.softov.morestuff.android.domain.model.TaskDomain
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.spacedBy(5.dp),
             ) {
+                if (task.extraDetails) {
+                    Icon(
+                        imageVector = Icons.Default.Notes,
+                        contentDescription = stringResource(R.string.cd_task_message_icon),
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
                 task.schedule.forEach { schedule ->
                     when (schedule.scheduleType) {
                         ScheduleType.OneTime -> {
