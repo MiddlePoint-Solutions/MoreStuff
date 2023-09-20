@@ -18,6 +18,7 @@ import co.softov.morestuff.db.StuffDb
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import co.softov.morestuff.android.domain.enums.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -33,6 +34,7 @@ class TaskRepositoryImpl(
 
     private val taskQueries = database.taskQueries
     private val scheduleQueries = database.scheduleQueries
+    private val messageQueries = database.messageQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(
@@ -60,9 +62,10 @@ class TaskRepositoryImpl(
             .asFlow()
             .mapToOne(Dispatchers.IO)
 
-        val schedulesFlow = scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
+        val schedulesFlow =
+            scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
 
         return taskFlow.combine(schedulesFlow) { task, schedules ->
             task.copy(schedule = schedules)
@@ -74,14 +77,26 @@ class TaskRepositoryImpl(
             .asFlow()
             .mapToList(Dispatchers.IO)
         val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(allScheduleTypes,mapper.scheduleDbMapper)
+        val schedulesFlow =
+            scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { it.groupBy { schedule -> schedule.taskId } }
+
+        val messagesFlow = messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
             .asFlow()
             .mapToList(Dispatchers.IO)
-            .map { it.groupBy { schedule -> schedule.taskId } }
+            .map { messages ->
+                messages.groupBy { message -> message.task_id }
+                    .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
+            }
 
-        return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
+        return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
             tasks.map { task ->
-                task.copy(schedule = schedules[task.id] ?: listOf())
+                task.copy(
+                    schedule = schedules[task.id] ?: listOf(),
+                    extraDetails = messageTaskIds.contains(task.id)
+                )
             }
         }
     }
@@ -98,20 +113,23 @@ class TaskRepositoryImpl(
             .executeAsOneOrNull()
 
         task?.let {
-            val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
-                .executeAsList()
+            val schedules =
+                scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
+                    .executeAsList()
             task.copy(schedule = schedules).right()
         } ?: TaskDoesNotExist.left()
     }
 
     override suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain> =
         taskQueries.transactionWithResult {
-            val task = taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDbMapper)
-                .executeAsOneOrNull()
+            val task =
+                taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDbMapper)
+                    .executeAsOneOrNull()
 
             task?.let {
-                val schedules = scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
-                    .executeAsList()
+                val schedules =
+                    scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
+                        .executeAsList()
                 task.copy(schedule = schedules).right()
             } ?: TaskDoesNotExist.left()
         }
@@ -154,9 +172,10 @@ class TaskRepositoryImpl(
             .asFlow()
             .mapToList(Dispatchers.IO)
 
-        val schedulesFlow = scheduleQueries.selectActiveSchedules(scheduleTypes,mapper.scheduleDbMapper)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
+        val schedulesFlow =
+            scheduleQueries.selectActiveSchedules(scheduleTypes, mapper.scheduleDbMapper)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
 
         return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
             schedules
