@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,7 +46,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
@@ -77,6 +75,89 @@ fun ImageImportScreen(
                 )
             )
         },
+        containerColor = Color.Transparent
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+                .navigationBarsPadding()
+                .imePadding(),
+        ) {
+
+            Image(
+                painter = rememberAsyncImagePainter(model = imageUri),
+                contentDescription = "Selected Image",
+                modifier = Modifier
+                    .weight(1f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = messageText,
+                    onValueChange = { text -> messageText = text },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = 8.dp)
+                        .defaultMinSize(minHeight = 46.dp),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Sentences,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if (messageText.isNotBlank()) {
+                            onImport(messageText.trim())
+                        }
+                    }),
+                    maxLines = Int.MAX_VALUE,
+                    textStyle = LocalTextStyle.current.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 18.sp
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (messageText.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.import_image_title_hint),
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        lineHeight = 20.sp,
+                                        fontWeight = FontWeight(400),
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        letterSpacing = 0.16.sp,
+                                    )
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+                ImportConfirmButton(onClick = { onImport(messageText.trim()) })
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ShareIntoImageImportPreviewScreen(
+    imageUri: Uri,
+    onImport: (String) -> Unit,
+    onBack: () -> Unit,
+) {
+    var messageText by remember { mutableStateOf("") }
+
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize(),
         containerColor = Color.Transparent
     ) {
         Column(

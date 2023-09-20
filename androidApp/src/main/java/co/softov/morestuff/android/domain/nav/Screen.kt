@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.nav
 
+import android.net.Uri
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
@@ -26,5 +27,8 @@ sealed class Screen : Parcelable {
 
     @Parcelize
     object AboutLibraries : Screen()
+
+    @Parcelize
+    data class ImagePreview(val imageUri: Uri, val taskId: Long) : Screen()
 
 }
