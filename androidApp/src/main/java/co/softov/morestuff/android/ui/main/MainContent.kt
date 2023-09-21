@@ -27,6 +27,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import org.koin.androidx.compose.koinViewModel
 
@@ -75,7 +76,7 @@ fun MainContent(
                     onImport = { message ->
                         val shareableImage = Shareable.Image(screen.imageUri.toString(), message)
                         shareContent(screen.taskId, shareableImage)
-                        navigation.push(TaskChat(screen.taskId))
+                        navigation.replaceAll(Home, TaskChat(screen.taskId))
                     },
                     onBack = navigation::pop
 
@@ -94,7 +95,9 @@ fun MainContent(
                     } else {
                         navigation.replaceCurrent(
                             TaskChat(taskId),
-                            onComplete = { shareContent(taskId, shareable) }
+                            onComplete = {
+                                shareContent(taskId, shareable)
+                            }
                         )
                     }
                 }
