@@ -121,23 +121,20 @@ class TimeManagerImplTest {
                 expectedHour = now.hour
                 15
             }
-            now.minute < 25 -> {
+            now.minute < 20 -> {
                 expectedHour = now.hour
                 30
             }
-            now.minute < 40 -> {
+            now.minute < 35 -> {
                 expectedHour = now.hour
                 45
             }
-            now.minute < 55 -> {
-                expectedHour = now.hour + 1
+            else -> {
+                expectedHour = if(now.hour < 23) now.hour + 1 else 0
                 0
             }
-            else -> {
-                expectedHour = now.hour + 1
-                15
-            }
         }
+
         val expectedDefaultPlanTime = kotlinx.datetime.LocalDateTime(
             now.year,
             now.month,
