@@ -4,6 +4,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
@@ -36,6 +37,8 @@ class MainViewModel(
             theme = store.settings.appTheme
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Idle)
+
+    val creatingNewTask = MutableLiveData(false)
 
     init {
         loadData()
