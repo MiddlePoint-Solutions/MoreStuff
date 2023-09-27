@@ -14,6 +14,9 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,48 +28,53 @@ import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 
 @Composable
- fun TaskItemBadges(
+fun TaskItemBadges(
     task: TaskDomain,
     modifier: Modifier = Modifier
 ) {
-    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurface) {
-        Box(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.align(Alignment.TopEnd),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.spacedBy(5.dp),
-            ) {
-                if (task.extraDetails) {
-                    Icon(
-                        imageVector = Icons.Default.Notes,
-                        contentDescription = stringResource(R.string.cd_task_message_icon),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-                task.schedule.forEach { schedule ->
-                    when (schedule.scheduleType) {
-                        ScheduleType.OneTime -> {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                                contentDescription = stringResource(R.string.cd_scheduled_task_icon),
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
 
-                        ScheduleType.Reminder -> {
-                            Icon(
-                                imageVector = Icons.Default.NotificationsActive,
-                                contentDescription = stringResource(R.string.cd_task_reminder_icon),
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
-                    }
-                }
-            }
+    val extraDetails by remember(task.extraDetails) {
+        derivedStateOf { task.extraDetails }
+    }
+
+    val hasSchedule by remember(task.schedule) {
+        derivedStateOf { task.hasSchedule }
+    }
+
+    val hasReminder by remember(task.schedule) {
+        derivedStateOf { task.hasReminder }
+    }
+
+    Row(
+        modifier = modifier.padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (extraDetails) {
+            Icon(
+                imageVector = Icons.Default.Notes,
+                contentDescription = stringResource(R.string.cd_task_message_icon),
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        if (hasSchedule) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                contentDescription = stringResource(R.string.cd_scheduled_task_icon),
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        if (hasReminder) {
+            Icon(
+                imageVector = Icons.Default.NotificationsActive,
+                contentDescription = stringResource(R.string.cd_task_reminder_icon),
+                modifier = Modifier.size(16.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
     }
 }

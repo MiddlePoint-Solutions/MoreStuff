@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -62,80 +64,75 @@ fun UserTextInput(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 15.dp, end = 15.dp, bottom = 13.dp)
+            .padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
             .animateContentSize(),
-        shape = RoundedCornerShape(
-            topStart = 47.dp,
-            topEnd = 47.dp,
-            bottomEnd = 47.dp,
-            bottomStart = 47.dp
-        ),
+        shape = RoundedCornerShape(42),
         color = backgroundColor
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .defaultMinSize(minHeight = 42.dp)
                 .semantics {
                     contentDescription = a11ylabel
                 },
             horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
                 modifier = Modifier
-                    .defaultMinSize(minHeight = 46.dp)
+                    .clearFocusOnKeyboardDismiss()
+                    .focusRequester(focusRequester)
+                    .weight(0.88f)
                     .align(Alignment.CenterVertically)
-            ) {
-                BasicTextField(
-                    value = value,
-                    onValueChange = onValueChange,
-                    enabled = true,
-                    modifier = Modifier
-                        .clearFocusOnKeyboardDismiss()
-                        .focusRequester(focusRequester)
-                        .weight(0.88f)
-                        .align(Alignment.CenterVertically)
-                        .padding(start = 20.dp, top = 13.dp, bottom = 13.dp, end = 4.dp),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences,
-                        keyboardType = KeyboardType.Text
-                    ),
-                    keyboardActions = KeyboardActions { sendAction(value.text) },
-                    maxLines = 4,
-                    cursorBrush = SolidColor(LocalContentColor.current),
-                    textStyle = LocalTextStyle.current.copy(
-                        color = LocalContentColor.current, fontSize = 18.sp
-                    ),
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (value.text.isEmpty()) {
-                                Text(
-                                    text = stringResource(R.string.main_input_hint),
+                    .padding(start = 28.dp, end = 4.dp),
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    keyboardType = KeyboardType.Text
+                ),
+                keyboardActions = KeyboardActions { sendAction(value.text) },
+                maxLines = 4,
+                cursorBrush = SolidColor(LocalContentColor.current),
+                textStyle = LocalTextStyle.current.copy(
+                    color = LocalContentColor.current, fontSize = 18.sp
+                ),
+                decorationBox = { innerTextField ->
+                    Box(
+                        contentAlignment = Alignment.CenterStart,
+                        modifier = Modifier.padding(bottom = 6.dp, top = 6.dp)
+                    ) {
+                        if (value.text.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.main_input_hint),
+                                modifier = Modifier.align(Alignment.CenterStart),
+                                style = LocalTextStyle.current.copy(
+                                    color = LocalContentColor.current.copy(alpha = 0.6f),
                                     fontSize = 18.sp
                                 )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(boxWeight)
-                        .height(IntrinsicSize.Min)
-                        .align(Alignment.Bottom)
-                        .padding(4.dp).padding(end = 7.dp)
-                ) {
-                    when {
-                        value.text.isBlank() -> {
-                            actionsContent()
-                        }
-
-                        else -> {
-                            SendIcon(
-                                onClick = { sendAction(value.text) }
                             )
                         }
+                        innerTextField()
+                    }
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(boxWeight)
+                    .align(Alignment.Bottom)
+                    .padding(end = 8.dp)
+            ) {
+                when {
+                    value.text.isBlank() -> {
+                        actionsContent()
+                    }
+
+                    else -> {
+                        SendIcon(
+                            onClick = { sendAction(value.text) }
+                        )
                     }
                 }
             }
