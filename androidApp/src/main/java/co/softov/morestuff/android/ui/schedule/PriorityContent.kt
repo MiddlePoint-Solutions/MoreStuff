@@ -142,6 +142,18 @@ fun PriorityContent(
         )
     }
 
+    val haptic = LocalHapticFeedback.current
+
+    var willDismissDirection: DismissDirection? by remember {
+        mutableStateOf(null)
+    }
+
+    LaunchedEffect(willDismissDirection) {
+        if (willDismissDirection != null) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+
     Box(
         modifier = modifier.fillMaxSize()
     ) {
@@ -149,7 +161,7 @@ fun PriorityContent(
             state = state.listState,
             modifier = Modifier
                 .fillMaxSize()
-                .reorderable(state),
+//                .reorderable(state),
         ) {
             items(
                 items = viewModel.tasks,
@@ -176,22 +188,11 @@ fun PriorityContent(
                     }
                 )
 
-                var willDismissDirection: DismissDirection? by remember {
-                    mutableStateOf(null)
-                }
-
                 LaunchedEffect(Unit) {
                     snapshotFlow { dismissState.dismissDirection }
                         .collect { dismissDirection ->
                             willDismissDirection = dismissDirection
                         }
-                }
-
-                val haptic = LocalHapticFeedback.current
-                LaunchedEffect(willDismissDirection) {
-                    if (willDismissDirection != null) {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
                 }
 
                 ReorderableItem(state, key = task.id) { isDragging ->

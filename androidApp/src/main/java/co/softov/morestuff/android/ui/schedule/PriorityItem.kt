@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -48,14 +51,20 @@ fun PriorityItem(
             .clickable { onClick(task.id) }
     ) {
         Row(
-            modifier = modifier.fillMaxSize().padding(start = 14.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(start = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
             TaskProfile(task.title)
 
+            val title by remember {
+                derivedStateOf { task.title }
+            }
+
             Text(
-                text = task.title,
+                text = title,
                 modifier = Modifier
                     .fillMaxWidth(0.90f)
                     .padding(12.dp),
