@@ -96,7 +96,7 @@
     <string name="cd_task_done_icon">Task done icon</string>
     <string name="cd_task_message_icon">Task message icon</string>
     <string name="create_new_chat">Create New Chat</string>
-    <string name="main_input_hint">Add something…</string>
+    <string name="main_input_hint">Create new task</string>
     <string name="cd_complete_task">Complete task</string>
     <string name="complete">Complete</string>
     <string name="completed">Completed</string>
@@ -112,7 +112,7 @@
     <string name="enable_confetti">Enable Confetti</string>
     <string name="delete">Delete</string>
     <string name="copy_message">Copy</string>
-    <string name="search">Search...</string>
+    <string name="search">Search…</string>
     <string name="share">Share</string>
     <string name="filter_scheduled">Scheduled</string>
     <string name="filter_reminder">Reminder</string>

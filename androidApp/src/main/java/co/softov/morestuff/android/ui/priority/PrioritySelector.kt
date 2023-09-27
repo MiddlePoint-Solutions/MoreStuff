@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -33,15 +36,19 @@ fun PrioritySelector(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 14.dp),
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
+
+        val nowSelected by remember(priority)  {
+            derivedStateOf { priority is PriorityModel.Now }
+        }
 
         PriorityButton(
             modifier = Modifier
                 .width(110.dp)
                 .height(47.dp),
-            selected = priority is PriorityModel.Now,
+            selected = nowSelected,
             onClick = onNowSelected,
         ) {
             Text(
@@ -55,11 +62,15 @@ fun PrioritySelector(
             )
         }
 
+        val laterSelected by remember(priority) {
+            derivedStateOf { priority is PriorityModel.Later }
+        }
+
         PriorityButton(
             modifier = Modifier
                 .width(110.dp)
                 .height(47.dp),
-            selected = priority is PriorityModel.Later,
+            selected = laterSelected,
             onClick = onLaterSelected,
         ) {
             Text(
@@ -73,11 +84,15 @@ fun PrioritySelector(
             )
         }
 
+        val planSelected by remember(priority) {
+            derivedStateOf { priority is PriorityModel.Plan }
+        }
+
         PriorityButton(
             modifier = Modifier
                 .width(110.dp)
                 .height(47.dp),
-            selected = priority is PriorityModel.Plan,
+            selected = planSelected,
             onClick = onPlanSelected,
         ) {
             Text(

@@ -75,7 +75,7 @@ fun PlanPrioritySelector(
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             SetSchedulePriorityButton(
