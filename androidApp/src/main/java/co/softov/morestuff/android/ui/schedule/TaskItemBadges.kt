@@ -33,21 +33,22 @@ fun TaskItemBadges(
     modifier: Modifier = Modifier
 ) {
 
-    val extraDetails by remember {
+    val extraDetails by remember(task.extraDetails) {
         derivedStateOf { task.extraDetails }
     }
 
-    val hasSchedule by remember {
-        derivedStateOf { task.schedule.any { it.scheduleType == ScheduleType.OneTime } }
+    val hasSchedule by remember(task.schedule) {
+        derivedStateOf { task.hasSchedule }
     }
 
-    val hasReminder by remember {
-        derivedStateOf { task.schedule.any { it.scheduleType == ScheduleType.Reminder } }
+    val hasReminder by remember(task.schedule) {
+        derivedStateOf { task.hasReminder }
     }
 
     Row(
-        modifier = modifier,
+        modifier = modifier.padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         if (extraDetails) {
             Icon(

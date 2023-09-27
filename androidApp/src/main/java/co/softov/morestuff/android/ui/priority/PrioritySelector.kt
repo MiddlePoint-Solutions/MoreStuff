@@ -36,11 +36,11 @@ fun PrioritySelector(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 14.dp),
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
 
-        val nowSelected by remember {
+        val nowSelected by remember(priority)  {
             derivedStateOf { priority is PriorityModel.Now }
         }
 
@@ -62,7 +62,7 @@ fun PrioritySelector(
             )
         }
 
-        val laterSelected by remember {
+        val laterSelected by remember(priority) {
             derivedStateOf { priority is PriorityModel.Later }
         }
 
@@ -84,7 +84,7 @@ fun PrioritySelector(
             )
         }
 
-        val planSelected by remember {
+        val planSelected by remember(priority) {
             derivedStateOf { priority is PriorityModel.Plan }
         }
 

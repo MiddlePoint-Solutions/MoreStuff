@@ -161,7 +161,7 @@ fun PriorityContent(
             state = state.listState,
             modifier = Modifier
                 .fillMaxSize()
-//                .reorderable(state),
+                .reorderable(state),
         ) {
             items(
                 items = viewModel.tasks,
