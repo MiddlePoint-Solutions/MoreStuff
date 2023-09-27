@@ -13,7 +13,7 @@ import co.softov.morestuff.android.domain.nav.Screen.TaskChat
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
-import co.softov.morestuff.android.ui.image.ShareIntoImageImportPreviewScreen
+import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
@@ -71,7 +71,7 @@ fun MainContent(
             )
 
             is Screen.ImagePreview -> {
-                ShareIntoImageImportPreviewScreen(
+                ImageImportScreen(
                     imageUri = screen.imageUri,
                     onImport = { message ->
                         val shareableImage = Shareable.Image(screen.imageUri.toString(), message)
@@ -89,7 +89,7 @@ fun MainContent(
                     onBack = navigation::pop,
                     shareable = screen.shareable,
                 ) { taskId, shareable ->
-                    if (shareable is Shareable.Image) {
+                    if (shareable is Shareable.Image && !viewModel.creatingNewTask.value!!) {
                         navigation.push(Screen.ImagePreview(Uri.parse(shareable.uris), taskId))
 
                     } else {

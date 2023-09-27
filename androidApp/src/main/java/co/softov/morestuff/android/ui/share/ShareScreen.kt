@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,10 +49,12 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,6 +78,9 @@ fun ShareScreen(
                             )
                         }
                     },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
                     actions = {
                         // TODO: Uncomment below code when implementing search for share.
                         /* IconButton(onClick = { *//* TODO: search *//* }) {
@@ -107,7 +113,8 @@ private fun ShareContent(
     shareToTask: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     shareViewModel: ShareViewModel = koinViewModel(),
-    userInputViewModel: UserInputViewModel = koinViewModel()
+    userInputViewModel: UserInputViewModel = koinViewModel(),
+    mainViewModel: MainViewModel = koinViewModel(),
 ) {
 
     val state = rememberLazyListState()
@@ -130,6 +137,7 @@ private fun ShareContent(
 
             item {
                 CreateNewTaskItem {
+                    mainViewModel.creatingNewTask.value = true
                     showUserInput = true
                 }
 
