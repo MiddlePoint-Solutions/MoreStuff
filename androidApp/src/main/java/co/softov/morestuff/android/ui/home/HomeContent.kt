@@ -1,28 +1,28 @@
 package co.softov.morestuff.android.ui.home
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,18 +31,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
-import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -83,6 +83,7 @@ fun HomeScreen() {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
@@ -91,84 +92,130 @@ fun HomeContent(
     userInputViewModel: UserInputViewModel = koinViewModel(),
     priorityViewModel: PriorityViewModel = koinViewModel(),
 ) {
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(skipHiddenState = false)
+    )
     val priorityScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    val visibleState = remember {
-        MutableTransitionState(true)
+    LaunchedEffect(scaffoldState.bottomSheetState) {
+        snapshotFlow { scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded }
+            .collect { isExpanded ->
+                isBottomSheetVisible = isExpanded
+                if (!isExpanded) {
+                    keyboardController?.hide()
+                }
+            }
     }
 
-    val focusRequester = remember { FocusRequester() }
 
-    Column(
-        modifier = modifier.fillMaxSize()
-    ) {
-
-        PriorityContent(
-            snackBarHostState = snackbarHostState,
-            showTaskChat = showTaskChat,
-            onCallToAction = { focusRequester.requestFocus() },
-            listState = priorityScrollState,
-            modifier = Modifier.weight(0.8f),
-        )
-
-        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
-
-        Column {
-            PriorityInput(
-                model = priorityModel,
-                onNowSelected = userInputViewModel::setNowPriority,
-                onLaterSelected = userInputViewModel::setLaterPriority,
-                onPlanSelected = userInputViewModel::setPlanPriority,
-                onTimeChange = userInputViewModel::updatePlanTime,
-                onDateChange = userInputViewModel::updatePlanDate,
-            )
-
-            Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer
-            ) {
-
-                var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                    mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
-                }
-
-                LaunchedEffect(userInputViewModel.userInput) {
-                    userInputValue =
-                        userInputValue.copy(text = userInputViewModel.userInput)
-                }
-
-                UserInput(
-                    textContent = {
-                        UserTextInput(
-                            value = userInputValue,
-                            onValueChange = { userInputValue = it },
-                            focusRequester = focusRequester,
-                            sendAction = { title ->
-                                scope.launch {
-                                    userInputViewModel.createNewTask(title)
-                                    userInputValue = userInputValue.copy("")
-                                    delay(100)
-                                    when (priorityModel.priority) {
-                                        PriorityModel.Later -> priorityScrollState.scrollToItem(
-                                            index = priorityViewModel.tasks.size - 1
-                                        )
-
-                                        PriorityModel.Now -> priorityScrollState.animateScrollToItem(
-                                            index = 0
-                                        )
-
-                                        is PriorityModel.Plan -> {}
-                                    }
-                                }
-                            },
-                            actionsContent = {
-                                VoiceToTextInput(
-                                    onUpdateValue = userInputViewModel::updateUserInput
-                                )
-                            }
-                        )
-                    },
+    BottomSheetScaffold(
+        sheetContent = {
+            Column {
+                PriorityInput(
+                    model = priorityModel,
+                    onNowSelected = userInputViewModel::setNowPriority,
+                    onLaterSelected = userInputViewModel::setLaterPriority,
+                    onPlanSelected = userInputViewModel::setPlanPriority,
+                    onTimeChange = userInputViewModel::updatePlanTime,
+                    onDateChange = userInputViewModel::updatePlanDate,
                 )
+
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+
+                    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                        mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+                    }
+
+                    LaunchedEffect(userInputViewModel.userInput) {
+                        userInputValue =
+                            userInputValue.copy(text = userInputViewModel.userInput)
+                    }
+
+                    UserInput(
+                        textContent = {
+                            UserTextInput(
+                                value = userInputValue,
+                                onValueChange = { userInputValue = it },
+                                focusRequester = focusRequester,
+                                sendAction = { title ->
+                                    scope.launch {
+                                        userInputViewModel.createNewTask(title)
+                                        userInputValue = userInputValue.copy("")
+                                        delay(100)
+                                        when (priorityModel.priority) {
+                                            PriorityModel.Later -> priorityScrollState.scrollToItem(
+                                                index = priorityViewModel.tasks.size - 1
+                                            )
+
+                                            PriorityModel.Now -> priorityScrollState.animateScrollToItem(
+                                                index = 0
+                                            )
+
+                                            is PriorityModel.Plan -> {}
+                                        }
+
+                                        scaffoldState.bottomSheetState.hide()
+                                        keyboardController?.hide()
+
+                                    }
+
+                                },
+                                actionsContent = {
+                                    VoiceToTextInput(
+                                        onUpdateValue = userInputViewModel::updateUserInput
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
+            }
+        },
+        scaffoldState = scaffoldState,
+        snackbarHost = { SnackbarHost(it) },
+        modifier = modifier,
+        sheetPeekHeight = 0.dp
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column {
+                PriorityContent(
+                    snackBarHostState = snackbarHostState,
+                    showTaskChat = showTaskChat,
+                    onCallToAction = { focusRequester.requestFocus() },
+                    listState = priorityScrollState,
+                    modifier = Modifier.weight(0.8f),
+                )
+
+            }
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        isBottomSheetVisible = true
+                        scaffoldState.bottomSheetState.expand()
+                        priorityViewModel.showContent()
+                    }
+
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp, bottom = 40.dp, end = 30.dp)
+                    .size(72.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = CircleShape
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null)
             }
         }
     }
