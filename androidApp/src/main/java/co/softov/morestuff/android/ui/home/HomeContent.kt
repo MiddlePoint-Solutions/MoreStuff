@@ -33,10 +33,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,7 +82,7 @@ fun HomeScreen() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
@@ -100,14 +99,14 @@ fun HomeContent(
     val focusRequester = remember { FocusRequester() }
     val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
     var isBottomSheetVisible by remember { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(scaffoldState.bottomSheetState) {
         snapshotFlow { scaffoldState.bottomSheetState.currentValue == SheetValue.Expanded }
             .collect { isExpanded ->
                 isBottomSheetVisible = isExpanded
                 if (!isExpanded) {
-                    keyboardController?.hide()
+                    focusManager.clearFocus()
                 }
             }
     }
@@ -162,7 +161,6 @@ fun HomeContent(
                                         }
 
                                         scaffoldState.bottomSheetState.hide()
-                                        keyboardController?.hide()
 
                                     }
 
