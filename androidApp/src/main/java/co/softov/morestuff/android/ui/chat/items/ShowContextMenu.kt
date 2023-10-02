@@ -17,12 +17,12 @@ import co.softov.morestuff.android.domain.model.Message
 @Composable
 fun ShowContextMenu(
     message: Message,
+    showMenu: Boolean,
+    modifier: Modifier = Modifier,
     onCopyMessage: (Message) -> Unit,
     onDeleteMessage: (Message) -> Unit,
     onShareImage: (String) -> Unit,
-    showMenu: Boolean,
     onClose: () -> Unit,
-    modifier: Modifier,
 ) {
     val contextMenuItems =
         if (message.messageData?.filePath != null) {

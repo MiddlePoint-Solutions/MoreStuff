@@ -110,17 +110,10 @@ fun Messages(
                         }
                     }
                     when (item.message.contentType) {
-                        ContentType.USER_NEW_TASK -> UserChatItem(messageUiModel = item, actions)
-                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(messageUiModel = item, actions)
-                        ContentType.TASK_REMINDER -> TaskReminderItem(
-                            messageUiModel = item,
-                            actions = actions
-                        )
-
-                        ContentType.TASK_MESSAGE -> UserChatItem(
-                            messageUiModel = item,
-                            actions = actions
-                        )
+                        ContentType.USER_NEW_TASK -> UserChatItem(item, actions)
+                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(item, actions)
+                        ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
+                        ContentType.TASK_MESSAGE -> UserChatItem(item, actions)
                     }
                 }
             }
