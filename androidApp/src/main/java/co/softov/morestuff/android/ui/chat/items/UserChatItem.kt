@@ -83,13 +83,6 @@ fun UserChatItem(
         }
     }
 
-    val haptic = LocalHapticFeedback.current
-    LaunchedEffect(showMenu) {
-        if (showMenu) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
-    }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -226,12 +219,10 @@ fun UserChatItem(
 
             ShowContextMenu(
                 message,
+                showMenu = showMenu,
                 onCopyMessage = actions.copyMessage,
                 onDeleteMessage = actions.deleteMessage,
-                showMenu = showMenu,
-                onClose = {
-                    showMenu = false
-                },
+                onClose = { showMenu = false },
                 modifier = Modifier.padding(top = 20.dp),
                 onShareImage = actions.shareImage
             )
