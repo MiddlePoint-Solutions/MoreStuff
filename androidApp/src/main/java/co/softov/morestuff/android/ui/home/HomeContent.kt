@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,11 +17,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.TextFieldValue
@@ -36,6 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
@@ -94,42 +97,39 @@ fun HomeContent(
     val messages by homeViewModel.messages.collectAsStateWithLifecycle()
     val scrollState = rememberLazyListState()
     val priorityScrollState = rememberLazyListState()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    isBottomSheetVisible = true
-                    priorityViewModel.showContent()
-                },
-                modifier = Modifier
-                    .padding(16.dp, bottom = 30.dp, end = 20.dp)
-                    .size(50.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                shape = CircleShape
-            ) {
-                Icon(Icons.Default.Add, contentDescription = null)
-            }
+
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Column {
+            PriorityContent(
+                snackBarHostState = snackbarHostState,
+                showTaskChat = showTaskChat,
+                onCallToAction = { focusRequester.requestFocus() },
+                listState = priorityScrollState,
+                modifier = Modifier.weight(0.8f),
+            )
         }
-    ) { paddingValues ->
-        Box(
+
+        FloatingActionButton(
+            onClick = {
+                isBottomSheetVisible = true
+                priorityViewModel.showContent()
+            },
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
+                .padding(16.dp, bottom = 40.dp, end = 20.dp)
+                .size(50.dp)
+                .align(Alignment.BottomEnd),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
         ) {
-            Column {
-                PriorityContent(
-                    snackBarHostState = snackbarHostState,
-                    showTaskChat = showTaskChat,
-                    onCallToAction = { focusRequester.requestFocus() },
-                    listState = priorityScrollState,
-                    modifier = Modifier.weight(0.8f),
-                )
-            }
+            Icon(Icons.Default.Add, contentDescription = null)
         }
     }
 
@@ -138,15 +138,16 @@ fun HomeContent(
             onDismissRequest = {
                 isBottomSheetVisible = false
             },
+            sheetState = bottomSheetState,
             content = {
                 Column {
-                    /* Messages(
-                         messages = messages,
-                         actions = chatActions,
-                         modifier = modifier.weight(0.5f)
-                             .fillMaxWidth(),
-                         scrollState = scrollState,
-                     )*/
+                    Messages(
+                        messages = messages,
+                        actions = chatActions,
+                        modifier = modifier.weight(0.5f)
+                            .fillMaxWidth(),
+                        scrollState = scrollState,
+                    )
 
                     PriorityInput(
                         model = priorityModel,
