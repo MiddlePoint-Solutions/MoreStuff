@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -140,71 +141,77 @@ fun HomeContent(
             },
             sheetState = bottomSheetState,
             content = {
-                Column {
-                    Messages(
-                        messages = messages,
-                        actions = chatActions,
-                        modifier = modifier.weight(0.5f)
-                            .fillMaxWidth(),
-                        scrollState = scrollState,
-                    )
+                BoxWithConstraints {
 
-                    PriorityInput(
-                        model = priorityModel,
-                        onNowSelected = userInputViewModel::setNowPriority,
-                        onLaterSelected = userInputViewModel::setLaterPriority,
-                        onPlanSelected = userInputViewModel::setPlanPriority,
-                        onTimeChange = userInputViewModel::updatePlanTime,
-                        onDateChange = userInputViewModel::updatePlanDate,
-                    )
-
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        modifier = Modifier.padding(bottom = 6.dp)
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
                     ) {
-                        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                            mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
-                        }
-
-                        LaunchedEffect(userInputViewModel.userInput) {
-                            userInputValue =
-                                userInputValue.copy(text = userInputViewModel.userInput)
-                        }
-
-                        UserInput(
-                            textContent = {
-                                UserTextInput(
-                                    value = userInputValue,
-                                    onValueChange = { userInputValue = it },
-                                    focusRequester = focusRequester,
-                                    sendAction = { title ->
-                                        scope.launch {
-                                            userInputViewModel.createNewTask(title)
-                                            userInputValue = userInputValue.copy("")
-                                            delay(100)
-                                            when (priorityModel.priority) {
-                                                PriorityModel.Later -> priorityScrollState.scrollToItem(
-                                                    index = priorityViewModel.tasks.size - 1
-                                                )
-
-                                                PriorityModel.Now -> priorityScrollState.animateScrollToItem(
-                                                    index = 0
-                                                )
-
-                                                is PriorityModel.Plan -> {}
-                                            }
-
-                                        }
-
-                                    },
-                                    actionsContent = {
-                                        VoiceToTextInput(
-                                            onUpdateValue = userInputViewModel::updateUserInput
-                                        )
-                                    }
-                                )
-                            }
+                        Messages(
+                            messages = messages,
+                            actions = chatActions,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(4f),
+                            scrollState = scrollState,
                         )
+
+                        PriorityInput(
+                            model = priorityModel,
+                            onNowSelected = userInputViewModel::setNowPriority,
+                            onLaterSelected = userInputViewModel::setLaterPriority,
+                            onPlanSelected = userInputViewModel::setPlanPriority,
+                            onTimeChange = userInputViewModel::updatePlanTime,
+                            onDateChange = userInputViewModel::updatePlanDate,
+
+                            )
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier
+                                .padding(bottom = 6.dp)
+                        ) {
+                            var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                                mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+                            }
+
+                            LaunchedEffect(userInputViewModel.userInput) {
+                                userInputValue =
+                                    userInputValue.copy(text = userInputViewModel.userInput)
+                            }
+
+                            UserInput(
+                                textContent = {
+                                    UserTextInput(
+                                        value = userInputValue,
+                                        onValueChange = { userInputValue = it },
+                                        focusRequester = focusRequester,
+                                        sendAction = { title ->
+                                            scope.launch {
+                                                userInputViewModel.createNewTask(title)
+                                                userInputValue = userInputValue.copy("")
+                                                delay(100)
+                                                when (priorityModel.priority) {
+                                                    PriorityModel.Later -> priorityScrollState.scrollToItem(
+                                                        index = priorityViewModel.tasks.size - 1
+                                                    )
+
+                                                    PriorityModel.Now -> priorityScrollState.animateScrollToItem(
+                                                        index = 0
+                                                    )
+
+                                                    is PriorityModel.Plan -> {}
+                                                }
+                                            }
+                                        },
+                                        actionsContent = {
+                                            VoiceToTextInput(
+                                                onUpdateValue = userInputViewModel::updateUserInput
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
