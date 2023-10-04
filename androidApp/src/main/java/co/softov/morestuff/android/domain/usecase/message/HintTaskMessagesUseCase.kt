@@ -11,7 +11,7 @@ interface HintTaskMessagesUseCase {
 }
 
 class HintTaskMessagesUseCaseImpl(
-    private val createMessageUseCase: CreateMessageUseCase
+    private val createMessageUseCase: CreateMessageUseCase,
 ) : HintTaskMessagesUseCase {
 
     private data class MessageHint(val content: String, val delay: Long)
@@ -36,7 +36,7 @@ class HintTaskMessagesUseCaseImpl(
         createMessageUseCase(
             taskId = taskId,
             title = content,
-            contentType = ContentType.TASK_MESSAGE,
+            contentType = ContentType.HINT_MESSAGE,
             messageData = null
         )
     }

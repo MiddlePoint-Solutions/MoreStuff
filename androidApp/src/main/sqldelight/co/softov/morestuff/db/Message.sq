@@ -54,7 +54,7 @@ SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.fil
 FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 LEFT JOIN message_data ON message.id = message_data.message_id
-WHERE message.task_id = ? AND message.content_type = ?
+WHERE message.task_id = ? AND message.content_type IN ?
 ORDER BY datetime(message.create_time) DESC;
 
 selectFirstTaskMessageWithType:
