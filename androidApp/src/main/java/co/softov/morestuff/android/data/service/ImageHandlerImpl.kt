@@ -22,7 +22,7 @@ class ImageHandlerImpl(
     private val timeManager: TimeManager
 ) : ImageHandler {
     override suspend fun saveImages(uris: String): String? = withContext(Dispatchers.IO) {
-        var outputStream: FileOutputStream?
+        val outputStream: FileOutputStream?
 
         val savedImagePath = try {
             val contentResolver = context.contentResolver

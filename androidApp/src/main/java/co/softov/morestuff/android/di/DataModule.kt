@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.work.WorkManager
 import co.softov.morestuff.android.data.service.DevToolsImpl
 import co.softov.morestuff.android.app.service.SchedulerImpl
@@ -38,6 +39,8 @@ import com.russhwolf.settings.SharedPreferencesSettings
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
+import co.softov.morestuff.android.data.service.DataMigrationHelperImpl
+import co.softov.morestuff.android.domain.service.DataMigrationHelper
 import co.softov.morestuff.db.Message
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -103,6 +106,7 @@ val dataModule = module {
     // Services
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
+    singleOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
 
     // Platform specific use-cases
     factoryOf(::GetPagedMessagesUseCaseImpl) bind GetPagedMessagesUseCase::class

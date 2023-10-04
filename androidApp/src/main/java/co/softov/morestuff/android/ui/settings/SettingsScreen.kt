@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.settings
 
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -14,8 +15,12 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,6 +53,8 @@ import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -63,6 +70,7 @@ fun SettingsScreen(
             selectAppTheme = viewModel::selectAppTheme,
             setSnoozeLimit = viewModel::onSnoozeLimitChanged,
             enableConfetti = viewModel::enableConfetti,
+            enableDevSettings = viewModel::enableDevSettings
         )
     )
 
@@ -71,14 +79,6 @@ fun SettingsScreen(
         model = model,
         actions = actions,
         showLibraries = { navigation.push(Screen.AboutLibraries) },
-        devTools = {
-            if (BuildConfig.DEBUG) {
-                DevSettings(
-                    devTools = viewModel.devTools,
-                    modifier = Modifier.padding(vertical = 20.dp)
-                )
-            }
-        }
     )
 }
 
@@ -88,7 +88,6 @@ private fun SettingsContent(
     showLibraries: () -> Unit,
     model: SettingsModel,
     actions: SettingsActions,
-    devTools: @Composable () -> Unit = {},
 ) {
 
     val scrollState = rememberScrollState()
@@ -126,9 +125,13 @@ private fun SettingsContent(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 ) {
 
-                    devTools()
+                    if (model.devSettings) {
+                        DevSettings()
+                    }
 
                     About(
+                        devSettingsEnabled = model.devSettings,
+                        enableDevSettings = actions.enableDevSettings,
                         showLibraries = showLibraries
                     )
                 }
@@ -246,10 +249,15 @@ fun EnableConfetti(
 @Composable
 fun About(
     modifier: Modifier = Modifier,
+    devSettingsEnabled: Boolean,
+    enableDevSettings: () -> Unit,
     showLibraries: () -> Unit,
 ) {
 
     val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var devSettingsCounter by remember { mutableIntStateOf(7) }
 
     Surface {
         Column(
@@ -271,13 +279,47 @@ fun About(
                     .padding(top = 16.dp)
             ) {
                 Text(
-                    text = "Version",
+                    text = stringResource(R.string.version),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    modifier = Modifier.clickable {
+                        val toast: Toast
+                        if (!devSettingsEnabled) {
+                            if (devSettingsCounter > 1) {
+                                devSettingsCounter -= 1
+                                toast = Toast.makeText(
+                                    context,
+                                    context.resources.getString(
+                                        R.string.click_s_to_enable_developer_settings,
+                                        devSettingsCounter.toString()
+                                    ),
+                                    Toast.LENGTH_SHORT
+                                )
+                            } else {
+                                enableDevSettings()
+                                toast = Toast.makeText(
+                                    context,
+                                    context.resources.getText(R.string.developer_settings_enabled),
+                                    Toast.LENGTH_SHORT
+                                )
+                            }
+                        } else {
+                            toast = Toast.makeText(
+                                context,
+                                context.resources.getText(R.string.dev_settings_already_enabled),
+                                Toast.LENGTH_SHORT
+                            )
+                        }
+                        scope.launch {
+                            toast.show()
+                            delay(1000)
+                            toast.cancel()
+                        }
+                    },
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -311,7 +353,9 @@ fun About(
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Button(

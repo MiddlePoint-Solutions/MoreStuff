@@ -1,9 +1,6 @@
 package co.softov.morestuff.android.domain.redux.state
 
-import co.softov.morestuff.android.domain.enums.AppSetting.Confetti
-import co.softov.morestuff.android.domain.enums.AppSetting.FirstTime
-import co.softov.morestuff.android.domain.enums.AppSetting.SnoozeLimit
-import co.softov.morestuff.android.domain.enums.AppSetting.Theme
+import co.softov.morestuff.android.domain.enums.AppSetting.*
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
@@ -14,6 +11,7 @@ import co.softov.morestuff.android.domain.redux.state.SettingAction.SetSnoozeLim
 import co.softov.morestuff.android.domain.redux.store.Action
 
 data class AppSettings(
+    val devSettings: Boolean = DevSettings.defaultValue,
     val isFirstTime: Boolean = FirstTime.defaultValue,
     val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
@@ -22,6 +20,7 @@ data class AppSettings(
 
 sealed class SettingAction : Action.FeatureAction() {
     data class InitSettings(val settings: AppSettings) : SettingAction()
+    data class EnableDevSettings(val enable: Boolean) : SettingAction()
     data class SetSnoozeLimit(val amount: Int) : SettingAction()
     data class SetAppTheme(val theme: AppTheme) : SettingAction()
     data class EnableConfetti(val enable: Boolean) : SettingAction()
@@ -43,5 +42,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SetAppTheme -> copy(appTheme = action.theme)
         is EnableConfetti -> copy(enableConfetti = action.enable)
         OnBoardingComplete -> copy(isFirstTime = false)
+        is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
     }
 }
