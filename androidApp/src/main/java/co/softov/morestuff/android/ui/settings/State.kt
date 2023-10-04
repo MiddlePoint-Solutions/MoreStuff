@@ -11,6 +11,7 @@ data class SettingsModel(
     val appTheme: AppTheme = AppTheme.System,
     val snoozeLimit: Int = 0,
     val confettiEnabled: Boolean = true,
+    val devSettings: Boolean = false,
 ) : BaseViewState
 
 @Immutable
@@ -18,4 +19,5 @@ data class SettingsActions(
     val selectAppTheme: (Int) -> Unit = {},
     val setSnoozeLimit: (Int) -> Unit = {},
     val enableConfetti: (Boolean) -> Unit = {},
+    val enableDevSettings: () -> Unit = {},
 )

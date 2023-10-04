@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.settings
 
+import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
@@ -18,6 +19,7 @@ class SettingsViewModel(
             SettingsModel(
                 appTheme = appTheme,
                 snoozeLimit = snoozeLimit,
+                devSettings = devSettings
             )
         }
     )
@@ -32,7 +34,8 @@ class SettingsViewModel(
                 it.copy(
                     appTheme = appTheme,
                     snoozeLimit = snoozeLimit,
-                    confettiEnabled = enableConfetti
+                    confettiEnabled = enableConfetti,
+                    devSettings = BuildConfig.DEBUG || devSettings
                 )
             }
         }
@@ -42,15 +45,15 @@ class SettingsViewModel(
         dispatchAppStoreAction(SettingAction.SetSnoozeLimit(limit))
     }
 
-    fun testReviewNotification() {
-        devTools.testReviewNotification()
-    }
-
     fun selectAppTheme(index: Int) {
         dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
     }
 
     fun enableConfetti(enable: Boolean) {
         dispatchAppStoreAction(SettingAction.EnableConfetti(enable))
+    }
+
+    fun enableDevSettings() {
+        dispatchAppStoreAction(SettingAction.EnableDevSettings(true))
     }
 }

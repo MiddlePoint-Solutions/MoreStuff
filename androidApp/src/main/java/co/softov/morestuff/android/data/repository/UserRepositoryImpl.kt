@@ -15,10 +15,11 @@ class UserRepositoryImpl(
 
     override suspend fun getAppSettings(default: AppSettings) = with(default) {
         AppSettings(
+            devSettings = getSetting(DevSettings, devSettings),
             isFirstTime = getSetting(FirstTime, isFirstTime),
             appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
-            enableConfetti = getSetting(Confetti, enableConfetti)
+            enableConfetti = getSetting(Confetti, enableConfetti),
         )
     }
 
@@ -29,6 +30,7 @@ class UserRepositoryImpl(
             Theme -> settings.putString(setting.key, settingValue as String)
             SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
             Confetti -> settings.putBoolean(setting.key, settingValue as Boolean)
+            DevSettings -> settings.putBoolean(setting.key, settingValue as Boolean)
         }
     }
 
@@ -39,6 +41,7 @@ class UserRepositoryImpl(
             Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
             SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
             Confetti -> getSetting(setting, setting.defaultValue as Boolean)
+            DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -50,6 +53,7 @@ class UserRepositoryImpl(
             Theme -> settings.getString(setting.key, defaultValue as String)
             SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
             Confetti -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            DevSettings -> settings.getBoolean(setting.key, defaultValue as Boolean)
         } as T
 
 }

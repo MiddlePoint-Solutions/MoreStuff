@@ -148,6 +148,10 @@
     <string name="voice_to_text_listening">Listening</string>
     <string name="empty_priority_list_cta">Let\'s Go! :)</string>
     <string name="cd_share_to_new_task">Share to new task</string>
+    <string name="dev_settings_already_enabled">You have already enabled developer settings!</string>
+    <string name="developer_settings_enabled">Developer settings enabled!</string>
+    <string name="click_s_to_enable_developer_settings">Click %1$s more times to enable developer settings</string>
+    <string name="version">Version</string>
 
 
 </resources>
