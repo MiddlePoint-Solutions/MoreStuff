@@ -5,6 +5,7 @@ object Constants {
     const val DATABASE_NAME = "morestuff.db"
 
     // User keys
+    const val KEY_DEV_SETTINGS = "key_enable_dev_settings"
     const val KEY_FIRST_TIME = "key_first_time_user"
     const val KEY_APP_THEME = "key_app_theme"
     const val KEY_USER_SNOOZE_LIMIT = "key_snooze_limit"

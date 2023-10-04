@@ -31,6 +31,10 @@ class SettingsMiddleware(
                 dispatch(InitSettings(getAppSettingsUseCase()))
             }
 
+            is EnableDevSettings -> scope.launch {
+                saveUserSettingUseCase(AppSetting.DevSettings, action.enable)
+            }
+
             is SetSnoozeLimit -> scope.launch {
                 saveUserSettingUseCase(AppSetting.SnoozeLimit, action.amount)
             }

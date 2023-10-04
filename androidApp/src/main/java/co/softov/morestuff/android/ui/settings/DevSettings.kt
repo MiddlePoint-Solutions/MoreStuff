@@ -1,5 +1,10 @@
 package co.softov.morestuff.android.ui.settings
 
+import android.app.Activity
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -17,6 +22,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,18 +39,70 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
-import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
 fun DevSettings(
-    devTools: DevTools,
-    modifier: Modifier = Modifier,
+    devTools: DevTools = koinInject(),
 ) {
+
+    val scope = rememberCoroutineScope()
+
+    var exportData by remember { mutableStateOf(false) }
+    if (exportData) {
+        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/octet-stream"
+            putExtra(Intent.EXTRA_TITLE, "morestuff.db")
+        }
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.also { uri ->
+                    scope.launch {
+                        devTools.exportData(uri)
+                    }
+                }
+            }
+            exportData = false
+        }
+
+        LaunchedEffect(Unit) {
+            launcher.launch(intent)
+        }
+    }
+
+    var importData by remember { mutableStateOf(false) }
+    if (importData) {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "application/octet-stream"
+        }
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult()
+        ) { result: ActivityResult ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.also { uri ->
+                    scope.launch {
+                        devTools.importData(uri)
+                    }
+                }
+            }
+            importData = false
+        }
+
+        LaunchedEffect(Unit) {
+            launcher.launch(intent)
+        }
+    }
+
 
     val navigation = LocalAppNavigation.current
     SettingsGroup(
@@ -73,6 +136,16 @@ fun DevSettings(
             onClick = devTools::testReviewNotification,
         )
 
+        SettingsMenuLink(
+            title = { Text(text = "Export Database") },
+            onClick = { exportData = true },
+        )
+
+        SettingsMenuLink(
+            title = { Text(text = "Import Database") },
+            onClick = { importData = true },
+        )
+
         DebugMessageSwitch(
             state = rememberAppSettingState(
                 defaultValue = { devTools.showDebugMessages },
@@ -80,6 +153,7 @@ fun DevSettings(
             )
         )
     }
+
 }
 
 @Composable

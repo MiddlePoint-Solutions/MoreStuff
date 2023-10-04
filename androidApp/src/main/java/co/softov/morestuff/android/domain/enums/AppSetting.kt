@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.domain.enums
 
 sealed class AppSetting<T>(val defaultValue: T) {
+    data object DevSettings : AppSetting<Boolean>(false)
     data object FirstTime : AppSetting<Boolean>(true)
     data object Theme : AppSetting<String>(AppTheme.System.name)
     data object SnoozeLimit : AppSetting<Int>(3)
