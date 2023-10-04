@@ -50,6 +50,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.HintTaskMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.HintTaskMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
@@ -100,6 +102,8 @@ import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCas
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
@@ -219,6 +223,8 @@ val taskUseCases = module {
     factoryOf(::GetTasksWithoutScheduleUseCaseImpl) bind GetTasksWithoutScheduleUseCase::class
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
     factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
+    factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
+    factoryOf(::HintTaskMessagesUseCaseImpl) bind HintTaskMessagesUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class

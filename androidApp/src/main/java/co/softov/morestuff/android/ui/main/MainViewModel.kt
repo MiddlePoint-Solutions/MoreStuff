@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
@@ -81,6 +83,10 @@ class MainViewModel(
 
     fun onBoardingCompleted() {
         dispatchAppStoreAction(SettingAction.OnBoardingComplete)
+    }
+
+    fun sendHintTask() {
+        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Now(), title = "Hint Task <---Click me!"))
     }
 
 }

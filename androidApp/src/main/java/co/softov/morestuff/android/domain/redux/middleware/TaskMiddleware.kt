@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
@@ -20,16 +21,21 @@ sealed class TaskAction : Action.FeatureAction() {
 
     data class CreateUserTaskAction(
         val title: String,
-        val priority: Priority
+        val priority: Priority,
     ) : TaskAction()
 
     data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
 
     data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
+    data class CreateHintTask(
+        val title: String,
+        val priority: Priority,
+    ) : TaskAction()
+
     internal data class TaskCreatedAction(
         val task: TaskDomain,
-        val priority: Priority
+        val priority: Priority,
     ) : TaskAction()
 
 }
@@ -38,7 +44,8 @@ sealed class TaskAction : Action.FeatureAction() {
 class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
-    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase
+    private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
+    private val createHintTaskUseCase: CreateHintTaskUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -46,7 +53,7 @@ class TaskMiddleware(
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
             is CreateUserTaskAction -> scope.launch {
@@ -65,6 +72,10 @@ class TaskMiddleware(
 
             is UpdateTaskTitleAction -> scope.launch {
                 updateTaskTitleUseCase(action.taskId, action.title)
+            }
+
+            is CreateHintTask -> scope.launch {
+                createHintTaskUseCase(params = TaskParams("Hint Task <---Click me!", Priority.Now(),TaskType.User))
             }
 
             else -> NoOp

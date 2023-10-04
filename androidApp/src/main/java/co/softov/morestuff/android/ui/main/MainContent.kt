@@ -58,6 +58,7 @@ fun MainContent(
                 onBoardingComplete = {
                     navigation.replaceCurrent(Home)
                     viewModel.onBoardingCompleted()
+                    viewModel.sendHintTask()
                 }
             )
 

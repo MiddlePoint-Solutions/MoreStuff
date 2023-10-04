@@ -22,6 +22,7 @@ import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.message.HintTaskMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
@@ -43,6 +44,7 @@ class TaskChatViewModel(
     private val imageHandler: ImageHandler,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
+    private val hintTaskMessagesUseCase: HintTaskMessagesUseCase,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
@@ -52,6 +54,11 @@ class TaskChatViewModel(
 
     init {
         Timber.d("TaskChatViewModel: $taskId")
+        if (taskId == 1L) {
+            viewModelScope.launch {
+                hintTaskMessagesUseCase.invoke(taskId)
+            }
+        }
     }
 
 
