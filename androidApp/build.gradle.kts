@@ -19,6 +19,7 @@ version = "1.0"
 
 object Env {
     const val Dev = "debug"
+    const val Staging = "staging"
     const val Release = "release"
 }
 
@@ -44,6 +45,15 @@ android {
         }
     }
 
+    signingConfigs {
+        create(Env.Staging) {
+            storeFile = file("./stage_key")
+            storePassword = "StageKey"
+            keyAlias = "staging"
+            keyPassword = "StageKey"
+        }
+    }
+
     buildTypes {
 
         getByName(Env.Release) {
@@ -58,13 +68,19 @@ android {
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
 
+        create(Env.Staging) {
+            initWith(getByName(Env.Release))
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+            signingConfig = signingConfigs.getByName(Env.Staging)
+            matchingFallbacks += listOf(Env.Release, Env.Dev)
+        }
     }
 
     compileOptions {
