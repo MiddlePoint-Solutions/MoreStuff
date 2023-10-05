@@ -9,15 +9,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,12 +35,17 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.OnBoarding
 import co.softov.morestuff.android.ui.navigation.ChildPages
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.PagesNavigation
 import com.arkivanov.decompose.router.pages.selectNext
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -52,6 +58,7 @@ fun OnBoardingScreen(
             add(OnBoarding.Welcome)
             if (requiresNotificationsPermission()) {
                 add(OnBoarding.NotificationPermission)
+                add(OnBoarding.ChatWithYourTask)
                 add(OnBoarding.WorkSpaceReady)
             }
         }
@@ -94,7 +101,13 @@ fun OnBoardingScreen(
             }
 
             OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
+            OnBoarding.ChatWithYourTask -> ChatWithYourTaskScreen(
+                modifier = Modifier,
+                onNext = navigation::selectNext
+            )
+
             OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
+
         }
     }
 }
@@ -102,7 +115,7 @@ fun OnBoardingScreen(
 
 @Composable
 private fun WelcomeScreen(
-    nextButton: @Composable () -> Unit
+    nextButton: @Composable () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -292,6 +305,71 @@ private fun ReadyScreen(onFinish: () -> Unit) {
                     content = {
                         Text(
                             text = stringResource(R.string.button_start),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 28.sp,
+                                fontWeight = FontWeight(700),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        )
+                    }
+                )
+
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChatWithYourTaskScreen(modifier: Modifier, onNext: () -> Unit) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lncy8nut))
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = stringResource(R.string.chat_task),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(R.string.save_details_chat),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+
+            Spacer(modifier = Modifier.padding(20.dp))
+            LottieAnimation(
+                modifier = modifier.size(380.dp),
+                composition = composition,
+                iterations = LottieConstants.IterateForever,
+            )
+        }
+
+        Row(
+            Modifier
+                .padding(bottom = 56.dp)
+                .align(Alignment.CenterHorizontally)
+
+        ) {
+            Column {
+                Button(
+                    onClick = { onNext() },
+                    modifier = Modifier
+                        .width(187.dp)
+                        .height(43.dp),
+                    content = {
+                        Text(
+                            text = stringResource(R.string.button_next),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 28.sp,
