@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.ui.home
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -101,19 +101,19 @@ fun HomeContent(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
     ) {
-        Column {
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
             PriorityContent(
                 snackBarHostState = snackbarHostState,
                 showTaskChat = showTaskChat,
                 onCallToAction = { focusRequester.requestFocus() },
                 listState = priorityScrollState,
-                modifier = Modifier.weight(0.8f),
+                modifier = Modifier.weight(0.8f).padding(bottom = 30.dp),
             )
         }
 
@@ -123,7 +123,7 @@ fun HomeContent(
                 priorityViewModel.showContent()
             },
             modifier = Modifier
-                .padding(16.dp, bottom = 40.dp, end = 20.dp)
+                .padding(16.dp, bottom = 48.dp, end = 20.dp)
                 .size(50.dp)
                 .align(Alignment.BottomEnd),
             containerColor = MaterialTheme.colorScheme.primary,
@@ -135,6 +135,11 @@ fun HomeContent(
     }
 
     if (isBottomSheetVisible) {
+        BackHandler(onBack = {
+            scope.launch {
+                bottomSheetState.hide()
+            }
+        })
         ModalBottomSheet(
             onDismissRequest = {
                 isBottomSheetVisible = false
@@ -142,7 +147,10 @@ fun HomeContent(
             sheetState = bottomSheetState,
             content = {
                 BoxWithConstraints {
-
+                    LaunchedEffect(isBottomSheetVisible) {
+                        delay(200)
+                        focusRequester.requestFocus()
+                    }
                     Column(
                         modifier = Modifier.fillMaxSize(),
                     ) {
