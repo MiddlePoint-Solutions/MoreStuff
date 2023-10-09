@@ -1,9 +1,7 @@
 package co.softov.morestuff.android.ui.settings
 
 import androidx.compose.runtime.Immutable
-import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
 
 @Immutable
@@ -12,6 +10,8 @@ data class SettingsModel(
     val snoozeLimit: Int = 0,
     val confettiEnabled: Boolean = true,
     val devSettings: Boolean = false,
+    val reviewTime: Pair<Int, Int> = Pair(0,0)
+
 ) : BaseViewState
 
 @Immutable
@@ -20,4 +20,5 @@ data class SettingsActions(
     val setSnoozeLimit: (Int) -> Unit = {},
     val enableConfetti: (Boolean) -> Unit = {},
     val enableDevSettings: () -> Unit = {},
+    val onTimeSelected: (hour: Int, minute: Int) -> Unit = { _, _ -> }
 )

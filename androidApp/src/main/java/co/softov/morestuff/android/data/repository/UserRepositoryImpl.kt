@@ -10,7 +10,7 @@ import com.russhwolf.settings.Settings
 
 
 class UserRepositoryImpl(
-    private val settings: Settings
+    private val settings: Settings,
 ) : UserRepository {
 
     override suspend fun getAppSettings(default: AppSettings) = with(default) {
@@ -20,6 +20,7 @@ class UserRepositoryImpl(
             appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             enableConfetti = getSetting(Confetti, enableConfetti),
+            reviewTime = getSetting(ReviewTime, reviewTime)
         )
     }
 
@@ -31,6 +32,10 @@ class UserRepositoryImpl(
             SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
             Confetti -> settings.putBoolean(setting.key, settingValue as Boolean)
             DevSettings -> settings.putBoolean(setting.key, settingValue as Boolean)
+            ReviewTime -> settings.putString(
+                setting.key,
+                (settingValue as Pair<Int, Int>).let { "${it.first};${it.second}" }
+            )
         }
     }
 
@@ -42,6 +47,7 @@ class UserRepositoryImpl(
             SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
             Confetti -> getSetting(setting, setting.defaultValue as Boolean)
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
+            ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -54,8 +60,18 @@ class UserRepositoryImpl(
             SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
             Confetti -> settings.getBoolean(setting.key, defaultValue as Boolean)
             DevSettings -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            is ReviewTime -> {
+                val timeStr = settings.getString(setting.key, setting.defaultValue.toString())
+                timeStr.toPairInt() ?: setting.defaultValue
+            }
         } as T
 
+}
+
+fun String.toPairInt(): Pair<Int, Int>? {
+    return this.split(";").let {
+        if (it.size == 2) Pair(it[0].toInt(), it[1].toInt()) else null
+    }
 }
 
 

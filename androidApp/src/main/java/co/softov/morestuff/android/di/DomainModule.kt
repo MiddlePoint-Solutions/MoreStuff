@@ -86,6 +86,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleReviewNotificationUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleReviewNotificationUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
@@ -253,6 +255,7 @@ val scheduleUseCases = module {
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleNotificationsAndWorkUseCaseImpl) bind ScheduleNotificationsAndWorkUseCase::class
     factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
+    factoryOf(::ScheduleReviewNotificationUseCaseImpl) bind ScheduleReviewNotificationUseCase::class
 }
 
 val messageUseCases = module {

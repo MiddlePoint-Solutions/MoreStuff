@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.redux.state.SettingAction.*
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.InitStoreAction
 import co.softov.morestuff.android.domain.redux.store.NoOp
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleReviewNotificationUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -15,16 +16,17 @@ import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
-    private val saveUserSettingUseCase: SaveUserSettingUseCase
+    private val saveUserSettingUseCase: SaveUserSettingUseCase,
+    private val scheduleReviewNotificationUseCase: ScheduleReviewNotificationUseCase,
 
-) : Middleware<AppState> {
+    ) : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
             is InitStoreAction -> scope.launch {
@@ -49,6 +51,12 @@ class SettingsMiddleware(
 
             is OnBoardingComplete -> scope.launch {
                 saveUserSettingUseCase(AppSetting.FirstTime, false)
+            }
+
+            is SetReviewTimeAction -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
+                scheduleReviewNotificationUseCase(action.hour, action.minute)
+
             }
 
             else -> NoOp

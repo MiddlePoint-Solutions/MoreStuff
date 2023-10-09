@@ -13,7 +13,7 @@ class ScheduleNotificationsAndWorkUseCaseImpl(
 ) : ScheduleNotificationsAndWorkUseCase {
 
     override fun invoke(): Either<Failure, Boolean> {
-        scheduler.scheduleNextReview()
+        //scheduler.scheduleNextReview()
         scheduler.schedulePlannedPriorityUpdate()
         return Either.Right(true)
     }
