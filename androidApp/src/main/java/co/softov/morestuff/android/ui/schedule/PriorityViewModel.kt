@@ -46,6 +46,11 @@ class PriorityViewModel(
     private var lastChange = 0 to 0
     private var lastCompleted: TaskDomain? = null
 
+    private val showContent = mutableStateOf(false)
+    fun showContent() {
+        showContent.value = true
+    }
+
     override fun onLoadData() {
         getActiveTasksFlowUseCase()
             .onEach { tasks = it }
