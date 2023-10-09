@@ -1,17 +1,14 @@
 package co.softov.morestuff.android.ui.home
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -20,9 +17,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,12 +36,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
-import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -77,12 +75,13 @@ fun HomeScreen() {
                     }
                 },
                 snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(top = it.calculateTopPadding())
+                modifier = Modifier.padding(top = it.calculateTopPadding()),
             )
         }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
@@ -90,89 +89,144 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     userInputViewModel: UserInputViewModel = koinViewModel(),
     priorityViewModel: PriorityViewModel = koinViewModel(),
+    homeViewModel: HomeViewModel = koinViewModel(),
 ) {
-    val priorityScrollState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-
-    val visibleState = remember {
-        MutableTransitionState(true)
-    }
-
     val focusRequester = remember { FocusRequester() }
+    val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    val messages by homeViewModel.messages.collectAsStateWithLifecycle()
+    val scrollState = rememberLazyListState()
+    val priorityScrollState = rememberLazyListState()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Column(
-        modifier = modifier.fillMaxSize()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-
-        PriorityContent(
-            snackBarHostState = snackbarHostState,
-            showTaskChat = showTaskChat,
-            onCallToAction = { focusRequester.requestFocus() },
-            listState = priorityScrollState,
-            modifier = Modifier.weight(0.8f),
-        )
-
-        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
-
-        Column {
-            PriorityInput(
-                model = priorityModel,
-                onNowSelected = userInputViewModel::setNowPriority,
-                onLaterSelected = userInputViewModel::setLaterPriority,
-                onPlanSelected = userInputViewModel::setPlanPriority,
-                onTimeChange = userInputViewModel::updatePlanTime,
-                onDateChange = userInputViewModel::updatePlanDate,
+        Column(
+            modifier = modifier.fillMaxSize()
+        ) {
+            PriorityContent(
+                snackBarHostState = snackbarHostState,
+                showTaskChat = showTaskChat,
+                onCallToAction = { focusRequester.requestFocus() },
+                listState = priorityScrollState,
+                modifier = Modifier.weight(0.8f).padding(bottom = 30.dp),
             )
+        }
 
-            Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer
-            ) {
-
-                var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                    mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
-                }
-
-                LaunchedEffect(userInputViewModel.userInput) {
-                    userInputValue =
-                        userInputValue.copy(text = userInputViewModel.userInput)
-                }
-
-                UserInput(
-                    textContent = {
-                        UserTextInput(
-                            value = userInputValue,
-                            onValueChange = { userInputValue = it },
-                            focusRequester = focusRequester,
-                            sendAction = { title ->
-                                scope.launch {
-                                    userInputViewModel.createNewTask(title)
-                                    userInputValue = userInputValue.copy("")
-                                    delay(100)
-                                    when (priorityModel.priority) {
-                                        PriorityModel.Later -> priorityScrollState.scrollToItem(
-                                            index = priorityViewModel.tasks.size - 1
-                                        )
-
-                                        PriorityModel.Now -> priorityScrollState.animateScrollToItem(
-                                            index = 0
-                                        )
-
-                                        is PriorityModel.Plan -> {}
-                                    }
-                                }
-                            },
-                            actionsContent = {
-                                VoiceToTextInput(
-                                    onUpdateValue = userInputViewModel::updateUserInput
-                                )
-                            }
-                        )
-                    },
-                )
-            }
+        FloatingActionButton(
+            onClick = {
+                isBottomSheetVisible = true
+                priorityViewModel.showContent()
+            },
+            modifier = Modifier
+                .padding(16.dp, bottom = 48.dp, end = 20.dp)
+                .size(50.dp)
+                .align(Alignment.BottomEnd),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            shape = CircleShape
+        ) {
+            Icon(Icons.Default.Add, contentDescription = null)
         }
     }
+
+    if (isBottomSheetVisible) {
+        BackHandler(onBack = {
+            scope.launch {
+                bottomSheetState.hide()
+            }
+        })
+        ModalBottomSheet(
+            onDismissRequest = {
+                isBottomSheetVisible = false
+            },
+            sheetState = bottomSheetState,
+            content = {
+                BoxWithConstraints {
+                    LaunchedEffect(isBottomSheetVisible) {
+                        delay(200)
+                        focusRequester.requestFocus()
+                    }
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        Messages(
+                            messages = messages,
+                            actions = chatActions,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(4f),
+                            scrollState = scrollState,
+                        )
+
+                        PriorityInput(
+                            model = priorityModel,
+                            onNowSelected = userInputViewModel::setNowPriority,
+                            onLaterSelected = userInputViewModel::setLaterPriority,
+                            onPlanSelected = userInputViewModel::setPlanPriority,
+                            onTimeChange = userInputViewModel::updatePlanTime,
+                            onDateChange = userInputViewModel::updatePlanDate,
+
+                            )
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier
+                                .padding(bottom = 6.dp)
+                        ) {
+                            var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                                mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
+                            }
+
+                            LaunchedEffect(userInputViewModel.userInput) {
+                                userInputValue =
+                                    userInputValue.copy(text = userInputViewModel.userInput)
+                            }
+
+                            UserInput(
+                                textContent = {
+                                    UserTextInput(
+                                        value = userInputValue,
+                                        onValueChange = { userInputValue = it },
+                                        focusRequester = focusRequester,
+                                        sendAction = { title ->
+                                            scope.launch {
+                                                userInputViewModel.createNewTask(title)
+                                                userInputValue = userInputValue.copy("")
+                                                delay(100)
+                                                when (priorityModel.priority) {
+                                                    PriorityModel.Later -> priorityScrollState.scrollToItem(
+                                                        index = priorityViewModel.tasks.size - 1
+                                                    )
+
+                                                    PriorityModel.Now -> priorityScrollState.animateScrollToItem(
+                                                        index = 0
+                                                    )
+
+                                                    is PriorityModel.Plan -> {}
+                                                }
+                                            }
+                                        },
+                                        actionsContent = {
+                                            VoiceToTextInput(
+                                                onUpdateValue = userInputViewModel::updateUserInput
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
 }
+
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
