@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.domain.usecase.settings
 
+import arrow.core.Either
 import co.softov.morestuff.android.domain.redux.state.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
+import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -13,14 +15,16 @@ import org.junit.jupiter.api.Test
 class GetUserSettingsUseCaseImplTest {
 
     private val userRepository = mockk<UserRepository>()
-    private val getUserSettingsUseCase = GetAppSettingsUseCaseImpl(userRepository)
+    private val updateReviewNotificationScheduleUseCase = mockk<UpdateReviewNotificationScheduleUseCase>()
+    private val getAppSettingsUseCase = GetAppSettingsUseCaseImpl(userRepository, updateReviewNotificationScheduleUseCase)
 
     @Test
-    fun `should call getUserSettings with correct params`(): Unit = runBlocking {
+    fun `should call getAppSettings with correct params`(): Unit = runBlocking {
         val expectedSettings = AppSettings()
         coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
+        coEvery { updateReviewNotificationScheduleUseCase.invoke(any(), any(), any()) } returns Either.Right(true)
 
-        getUserSettingsUseCase.invoke()
+        getAppSettingsUseCase.invoke()
 
         coVerify { userRepository.getAppSettings(expectedSettings) }
     }
@@ -29,10 +33,12 @@ class GetUserSettingsUseCaseImplTest {
     fun `should return AppSettings `() = runBlocking {
         val expectedSettings = AppSettings()
         coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
+        coEvery { updateReviewNotificationScheduleUseCase.invoke(any(), any(), any()) } returns Either.Right(true)
 
-        val result = getUserSettingsUseCase.invoke()
+        val result = getAppSettingsUseCase.invoke()
 
         assertEquals(expectedSettings, result)
     }
 }
+
 
