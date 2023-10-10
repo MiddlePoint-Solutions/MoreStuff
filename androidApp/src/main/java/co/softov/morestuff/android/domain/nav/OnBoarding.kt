@@ -14,5 +14,8 @@ sealed class OnBoarding : Parcelable {
 
     @Parcelize
     data object WorkSpaceReady : OnBoarding()
+
+    @Parcelize
+    data object ChatWithYourTask : OnBoarding()
 }
 
