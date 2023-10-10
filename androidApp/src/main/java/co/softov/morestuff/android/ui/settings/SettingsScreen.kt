@@ -116,8 +116,8 @@ private fun SettingsContent(
                 )
 
                 ReviewTimeSelector(
-                    onTimeSelected = actions.onTimeSelected,
-                    defaultReviewTime = model.reviewTime,
+                    valueChanged = actions.onTimeSelected,
+                    defaultValue = model.reviewTime,
                 )
 
                 if (model.devSettings) {
@@ -407,8 +407,8 @@ fun About(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ReviewTimeSelector(
-    onTimeSelected: (hour: Int, minute: Int) -> Unit,
-    defaultReviewTime: Pair<Int, Int>?,
+    valueChanged: (hour: Int, minute: Int) -> Unit,
+    defaultValue: Pair<Int, Int>?,
     modifier: Modifier = Modifier,
 ) {
 
@@ -416,10 +416,10 @@ fun ReviewTimeSelector(
     val timePickerState = rememberTimePickerState()
 
     val selectedTimeState = rememberAppSettingState(
-        defaultValue = { defaultReviewTime },
+        defaultValue = { defaultValue },
         valueChanged = { newTime ->
             if (newTime != null) {
-                onTimeSelected(newTime.first, newTime.second)
+                valueChanged(newTime.first, newTime.second)
             }
         }
     )
@@ -427,7 +427,7 @@ fun ReviewTimeSelector(
         PriorityTimePicker(
             dismissTimePicker = { showTimePickerDialog = false },
             onTimeChange = {
-                onTimeSelected(timePickerState.hour, timePickerState.minute)
+                valueChanged(timePickerState.hour, timePickerState.minute)
                 selectedTimeState.value = Pair(timePickerState.hour, timePickerState.minute)
             },
             state = timePickerState

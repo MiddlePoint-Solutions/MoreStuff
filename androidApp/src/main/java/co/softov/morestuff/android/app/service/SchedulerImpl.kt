@@ -60,31 +60,34 @@ class SchedulerImpl(
         }
     }
 
-    override fun scheduleNextReview(hour: Int, minute: Int) {
+    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val reviewIntent = NotificationReceiver.createReviewIntent(context)
         val pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
             context,
             reviewIntent
         )
-
-        if (pendingIntent == null) {
-            Timber.d("Review notification does not exist - creating...")
-            Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, hour)
-                set(Calendar.MINUTE, minute)
-            }.also {
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    it.timeInMillis,
-                    NotificationReceiver.createReviewPendingIntent(
-                        context,
-                        reviewIntent,
+        when {
+            pendingIntent == null -> {
+                Timber.d("Review notification does not exist - creating...")
+                Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                }.also {
+                    alarmManager.setExact(
+                        AlarmManager.RTC_WAKEUP,
+                        it.timeInMillis,
+                        NotificationReceiver.createReviewPendingIntent(
+                            context,
+                            reviewIntent,
+                        )
                     )
-                )
+                }
             }
-        } else {
-            Timber.d("Review exists")
+
+            replaceExisting -> {
+                alarmManager.cancel(pendingIntent)
+            }
         }
     }
 

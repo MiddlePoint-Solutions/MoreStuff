@@ -59,6 +59,6 @@ class SettingsViewModel(
     }
 
     fun setReviewTime(hour: Int, minute: Int) {
-        dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute))
+        dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute, true))
     }
 }

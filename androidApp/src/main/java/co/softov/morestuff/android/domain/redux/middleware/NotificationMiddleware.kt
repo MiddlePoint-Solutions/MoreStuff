@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux.middleware
 
+import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.AppState
@@ -8,25 +9,30 @@ import co.softov.morestuff.android.domain.service.Notifier
 import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.*
+import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class NotificationAction : Action.FeatureAction() {
     internal data class ShowReminderNotificationAction(
-        val message: Message
+        val message: Message,
     ) : NotificationAction()
 
     internal data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
-        val scheduleId: Long
+        val scheduleId: Long,
     ) : NotificationAction()
 }
 
 class NotificationMiddleware(
     private val notifier: Notifier,
     private val clearTaskNotificationsUseCase: ClearTaskNotificationsUseCase,
+    private val saveUserSettingUseCase: SaveUserSettingUseCase,
+    private val updateReviewNotificationScheduleUseCase: UpdateReviewNotificationScheduleUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -34,7 +40,7 @@ class NotificationMiddleware(
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
 
@@ -58,6 +64,11 @@ class NotificationMiddleware(
                 if (action.complete) scope.launch {
                     clearTaskNotificationsUseCase(action.taskId)
                 }
+            }
+
+            is SettingAction.SetReviewTimeAction -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
+                updateReviewNotificationScheduleUseCase(action.hour, action.minute, action.replaceExisting)
             }
 
             else -> NoOp
