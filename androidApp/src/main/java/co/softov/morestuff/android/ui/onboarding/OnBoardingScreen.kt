@@ -58,9 +58,9 @@ fun OnBoardingScreen(
             add(OnBoarding.Welcome)
             if (requiresNotificationsPermission()) {
                 add(OnBoarding.NotificationPermission)
-                add(OnBoarding.ChatWithYourTask)
-                add(OnBoarding.WorkSpaceReady)
             }
+            add(OnBoarding.ChatWithYourTask)
+            add(OnBoarding.WorkSpaceReady)
         }
     }
 
