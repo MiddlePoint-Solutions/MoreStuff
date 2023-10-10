@@ -101,11 +101,7 @@ fun OnBoardingScreen(
             }
 
             OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
-            OnBoarding.ChatWithYourTask -> ChatWithYourTaskScreen(
-                modifier = Modifier,
-                onNext = navigation::selectNext
-            )
-
+            OnBoarding.ChatWithYourTask -> ChatWithYourTaskScreen(onNext = navigation::selectNext)
             OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
 
         }
@@ -321,7 +317,7 @@ private fun ReadyScreen(onFinish: () -> Unit) {
 }
 
 @Composable
-private fun ChatWithYourTaskScreen(modifier: Modifier, onNext: () -> Unit) {
+private fun ChatWithYourTaskScreen(onNext: () -> Unit) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lncy8nut))
     Column(
         modifier = Modifier
@@ -349,7 +345,7 @@ private fun ChatWithYourTaskScreen(modifier: Modifier, onNext: () -> Unit) {
 
             Spacer(modifier = Modifier.padding(20.dp))
             LottieAnimation(
-                modifier = modifier.size(380.dp),
+                modifier = Modifier.size(380.dp),
                 composition = composition,
                 iterations = LottieConstants.IterateForever,
             )
