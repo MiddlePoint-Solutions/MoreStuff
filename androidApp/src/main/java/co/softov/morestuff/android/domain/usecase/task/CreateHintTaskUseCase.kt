@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.usecase.message.CreateHintTaskMessagesUseCase
 
 interface CreateHintTaskUseCase {
     suspend operator fun invoke(params: TaskParams): TaskDomain
@@ -9,12 +9,15 @@ interface CreateHintTaskUseCase {
 
 
 class CreateHintTaskUseCaseImpl(
-    private val taskRepository: TaskRepository,
-    private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase,
+    private val createTaskUseCase: CreateTaskUseCase,
+    private val createHintTaskMessagesUseCase: CreateHintTaskMessagesUseCase
 ) : CreateHintTaskUseCase {
 
-    override suspend fun invoke(params: TaskParams): TaskDomain = with(params) {
-        val priorityScore = getDefaultPriorityScoreUseCase(priority)
-        taskRepository.createTask(title, priorityScore, taskType)
+    override suspend fun invoke(params: TaskParams): TaskDomain {
+        val createdTask = createTaskUseCase(params)
+
+        createHintTaskMessagesUseCase(createdTask.id, params.priority )
+
+        return createdTask
     }
 }

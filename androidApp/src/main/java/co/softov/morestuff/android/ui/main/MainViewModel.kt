@@ -16,17 +16,20 @@ import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
+import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
 import co.softov.morestuff.android.ui.main.MainStates.Idle
 import co.softov.morestuff.android.ui.main.MainStates.Ready
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 
 class MainViewModel(
     getAppThemeUseCase: GetAppThemeUseCase,
-    checkFirstTimeUseCase: CheckFirstTimeUseCase
+    checkFirstTimeUseCase: CheckFirstTimeUseCase,
+    private val timeManager: TimeManager
 ) : NoStateViewModel() {
 
     var appTheme by mutableStateOf(getAppThemeUseCase())
@@ -85,8 +88,13 @@ class MainViewModel(
         dispatchAppStoreAction(SettingAction.OnBoardingComplete)
     }
 
-    fun sendHintTask() {
-        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Now(), title = "Hint Task <---Click me!"))
+
+    suspend fun sendHintTask() {
+        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Plan(timeManager.tomorrowLocalDateTime(9,30)), title = "Hint Task with Plan priority <---Click me!"))
+        delay(2000)
+        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Later(), title = "Hint with Later priority <---Click me!"))
+        delay(1000)
+        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Now(), title = "Hint Task with Now priority <---Click me!"))
     }
 
 }

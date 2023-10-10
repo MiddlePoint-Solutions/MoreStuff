@@ -75,7 +75,7 @@ class TaskMiddleware(
             }
 
             is CreateHintTask -> scope.launch {
-                createHintTaskUseCase(params = TaskParams("Hint Task <---Click me!", Priority.Now(),TaskType.User))
+                createHintTaskUseCase(params = TaskParams(action.title, action.priority,TaskType.User))
             }
 
             else -> NoOp

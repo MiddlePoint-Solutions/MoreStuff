@@ -50,8 +50,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.message.HintTaskMessagesUseCase
-import co.softov.morestuff.android.domain.usecase.message.HintTaskMessagesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.CreateHintTaskMessagesUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreateHintTaskMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
@@ -224,7 +224,7 @@ val taskUseCases = module {
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
     factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
-    factoryOf(::HintTaskMessagesUseCaseImpl) bind HintTaskMessagesUseCase::class
+    factoryOf(::CreateHintTaskMessagesUseCaseImpl) bind CreateHintTaskMessagesUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
