@@ -2,11 +2,17 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.store.Dispatch
-import co.softov.morestuff.android.domain.redux.store.Next
-import co.softov.morestuff.android.domain.redux.state.SettingAction.*
+import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
+import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableDevSettings
+import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
+import co.softov.morestuff.android.domain.redux.state.SettingAction.OnBoardingComplete
+import co.softov.morestuff.android.domain.redux.state.SettingAction.SetAppTheme
+import co.softov.morestuff.android.domain.redux.state.SettingAction.SetSnoozeLimit
 import co.softov.morestuff.android.domain.redux.store.Action
+import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.store.InitStoreAction
+import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
@@ -15,16 +21,16 @@ import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
-    private val saveUserSettingUseCase: SaveUserSettingUseCase
+    private val saveUserSettingUseCase: SaveUserSettingUseCase,
 
-) : Middleware<AppState> {
+    ) : Middleware<AppState> {
 
     override fun invoke(
         state: AppState,
         action: Action,
         dispatch: Dispatch,
         next: Next<AppState>,
-        scope: CoroutineScope
+        scope: CoroutineScope,
     ): Action {
         when (action) {
             is InitStoreAction -> scope.launch {
@@ -51,6 +57,9 @@ class SettingsMiddleware(
                 saveUserSettingUseCase(AppSetting.FirstTime, false)
             }
 
+            is SettingAction.SetReviewTimeAction -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
+            }
             else -> NoOp
         }
 

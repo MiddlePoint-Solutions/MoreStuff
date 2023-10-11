@@ -2,6 +2,7 @@ package co.softov.morestuff.android.app.service
 
 import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import androidx.work.*
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createCancelReviewPendingIntent
@@ -60,38 +61,44 @@ class SchedulerImpl(
         }
     }
 
-    override fun scheduleNextReview() {
+    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val reviewIntent = NotificationReceiver.createReviewIntent(context)
         val pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
             context,
             reviewIntent
         )
-
-        if (pendingIntent == null) {
-            Timber.d("Review notification does not exist - creating...")
-            Calendar.getInstance().apply {
-                val hourOfDay = get(Calendar.HOUR_OF_DAY)
-                if (hourOfDay in 10..19) {
-                    set(Calendar.HOUR_OF_DAY, 20)
-                    set(Calendar.MINUTE, 0)
-                } else {
-                    add(Calendar.DAY_OF_YEAR, 1)
-                    set(Calendar.HOUR_OF_DAY, 9)
-                    set(Calendar.MINUTE, 0)
-                }
-            }.also {
-                alarmManager.setExact(
-                    AlarmManager.RTC_WAKEUP,
-                    it.timeInMillis,
-                    NotificationReceiver.createReviewPendingIntent(
-                        context,
-                        reviewIntent,
-                    )
-                )
+        when {
+            pendingIntent == null -> {
+                Timber.d("Review notification does not exist - creating...")
+                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
             }
-        } else {
-            Timber.d("Review exists")
+
+            replaceExisting -> {
+                alarmManager.cancel(pendingIntent)
+                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
+            }
+        }
+    }
+
+    private fun setReviewAlarm(
+        alarmManager: AlarmManager,
+        hour: Int,
+        minute: Int,
+        reviewIntent: Intent,
+    ) {
+        Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+        }.also {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                it.timeInMillis,
+                NotificationReceiver.createReviewPendingIntent(
+                    context,
+                    reviewIntent,
+                )
+            )
         }
     }
 

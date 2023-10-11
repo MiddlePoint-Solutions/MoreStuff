@@ -45,11 +45,12 @@ import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.alorma.compose.settings.ui.SettingsList
-import com.alorma.compose.settings.ui.SettingsSlider
+import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
@@ -70,7 +71,8 @@ fun SettingsScreen(
             selectAppTheme = viewModel::selectAppTheme,
             setSnoozeLimit = viewModel::onSnoozeLimitChanged,
             enableConfetti = viewModel::enableConfetti,
-            enableDevSettings = viewModel::enableDevSettings
+            enableDevSettings = viewModel::enableDevSettings,
+            onTimeSelected = viewModel::setReviewTime
         )
     )
 
@@ -97,45 +99,38 @@ private fun SettingsContent(
             topBar = { SettingsTopBar(onBack = onBack) },
             containerColor = Color.Transparent
         ) {
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
                     .verticalScroll(scrollState)
-
             ) {
+                SelectTheme(
+                    themeSelected = actions.selectAppTheme,
+                    defaultValue = { model.appTheme.ordinal }
+                )
 
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                ) {
-                    SelectTheme(
-                        themeSelected = actions.selectAppTheme,
-                        defaultValue = { model.appTheme.ordinal }
-                    )
+                EnableConfetti(
+                    defaultValue = { model.confettiEnabled },
+                    valueChanged = actions.enableConfetti,
+                )
 
-                    EnableConfetti(
-                        defaultValue = { model.confettiEnabled },
-                        valueChanged = actions.enableConfetti,
-                    )
+                ReviewTimeSelector(
+                    valueChanged = actions.onTimeSelected,
+                    defaultValue = model.reviewTime,
+                )
 
+                if (model.devSettings) {
+                    DevSettings()
                 }
 
-                Column(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-
-                    if (model.devSettings) {
-                        DevSettings()
-                    }
-
-                    About(
-                        devSettingsEnabled = model.devSettings,
-                        enableDevSettings = actions.enableDevSettings,
-                        showLibraries = showLibraries
-                    )
-                }
+                About(
+                    devSettingsEnabled = model.devSettings,
+                    enableDevSettings = actions.enableDevSettings,
+                    showLibraries = showLibraries
+                )
             }
+
         }
 
     }
@@ -407,6 +402,54 @@ fun About(
             }
         }
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun ReviewTimeSelector(
+    valueChanged: (hour: Int, minute: Int) -> Unit,
+    defaultValue: Pair<Int, Int>?,
+    modifier: Modifier = Modifier,
+) {
+
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+    val timePickerState = rememberTimePickerState()
+
+    val selectedTimeState = rememberAppSettingState(
+        defaultValue = { defaultValue },
+        valueChanged = { newTime ->
+            if (newTime != null) {
+                valueChanged(newTime.first, newTime.second)
+            }
+        }
+    )
+    if (showTimePickerDialog) {
+        PriorityTimePicker(
+            dismissTimePicker = { showTimePickerDialog = false },
+            onTimeChange = {
+                valueChanged(timePickerState.hour, timePickerState.minute)
+                selectedTimeState.value = Pair(timePickerState.hour, timePickerState.minute)
+            },
+            state = timePickerState
+        )
+    }
+    SettingsMenuLink(
+        title = {
+            Column {
+                Text(text = "Set Review Time")
+                selectedTimeState.value?.let {
+                    Text(text = "${it.first}:${String.format("%02d", it.second)}")
+                }
+            }
+        },
+        onClick = { showTimePickerDialog = true },
+        icon = {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                contentDescription = stringResource(R.string.cd_schedule_icon),
+            )
+        },
+    )
 }
 
 

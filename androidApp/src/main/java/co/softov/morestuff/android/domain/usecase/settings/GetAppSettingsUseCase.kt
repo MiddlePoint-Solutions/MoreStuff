@@ -8,7 +8,7 @@ interface GetAppSettingsUseCase {
 }
 
 class GetAppSettingsUseCaseImpl(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
 ) : GetAppSettingsUseCase {
     override suspend fun invoke(): AppSettings {
         return userRepository.getAppSettings(AppSettings())
