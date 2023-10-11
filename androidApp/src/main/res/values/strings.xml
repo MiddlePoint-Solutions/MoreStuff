@@ -150,4 +150,22 @@
     <string name="cd_share_to_new_task">Share to new task</string>
 
 
+    <!-- Hint task and messages  -->
+    <string name="hint_task_now">Hint Task with Now priority.\nClick me!</string>
+    <string name="hint_task_later">Hint with Later priority.\nClick me!</string>
+    <string name="hint_task_plan">Hint Task with Plan priority.\nClick me!</string>
+
+    <string name="message_1_now_task">Here you can write stuff about the task</string>
+    <string name="message_2_now_task">You can also add pictures</string>
+    <string name="message_3_now_task">And you can set schedule</string>
+    <string name="message_4_now_task">You are ready to start!</string>
+
+    <string name="message_1_later_task">This can wait a bit, but don\'t forget about it</string>
+    <string name="message_2_later_task">It\'s not urgent, but it\'s important.</string>
+
+    <string name="message_1_plan_task">You\'ve planned this for later. Set a schedule!</string>
+
+
+
+
 </resources>

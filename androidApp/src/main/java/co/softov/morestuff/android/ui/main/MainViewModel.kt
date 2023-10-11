@@ -9,19 +9,16 @@ import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode
 import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.nav.Shareable
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.OnResumeAction
-import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
 import co.softov.morestuff.android.ui.main.MainStates.Idle
 import co.softov.morestuff.android.ui.main.MainStates.Ready
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -29,7 +26,6 @@ import kotlinx.coroutines.flow.stateIn
 class MainViewModel(
     getAppThemeUseCase: GetAppThemeUseCase,
     checkFirstTimeUseCase: CheckFirstTimeUseCase,
-    private val timeManager: TimeManager
 ) : NoStateViewModel() {
 
     var appTheme by mutableStateOf(getAppThemeUseCase())
@@ -89,12 +85,8 @@ class MainViewModel(
     }
 
 
-    suspend fun sendHintTask() {
-        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Plan(timeManager.tomorrowLocalDateTime(9,30)), title = "Hint Task with Plan priority <---Click me!"))
-        delay(2000)
-        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Later(), title = "Hint with Later priority <---Click me!"))
-        delay(1000)
-        store.dispatch(TaskAction.CreateHintTask(priority = Priority.Now(), title = "Hint Task with Now priority <---Click me!"))
+    fun sendHintTask() {
+        store.dispatch(TaskAction.CreateHintTask)
     }
 
 }

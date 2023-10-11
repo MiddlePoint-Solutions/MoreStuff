@@ -28,10 +28,7 @@ sealed class TaskAction : Action.FeatureAction() {
 
     data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
-    data class CreateHintTask(
-        val title: String,
-        val priority: Priority,
-    ) : TaskAction()
+    data object CreateHintTask : TaskAction()
 
     internal data class TaskCreatedAction(
         val task: TaskDomain,
@@ -75,7 +72,7 @@ class TaskMiddleware(
             }
 
             is CreateHintTask -> scope.launch {
-                createHintTaskUseCase(params = TaskParams(action.title, action.priority,TaskType.User))
+                createHintTaskUseCase()
             }
 
             else -> NoOp

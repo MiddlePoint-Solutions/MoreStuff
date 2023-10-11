@@ -41,7 +41,7 @@ class MessageRepositoryImpl(
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> =
         messageQueries.selectTaskMessagesByContentType(
             taskId,
-            listOf(ContentType.TASK_MESSAGE.value, ContentType.HINT_MESSAGE.value),
+            listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
             mapper = mapper.messageDataMapper
         ).asFlow().mapToList(Dispatchers.IO)
 

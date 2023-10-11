@@ -2,6 +2,7 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParserImpl
 import co.softov.morestuff.android.data.service.ClipboardHelperImpl
+import co.softov.morestuff.android.data.service.HintTaskProviderImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraphFetcherImpl
 import co.softov.morestuff.android.data.service.TimeManagerImpl
@@ -18,6 +19,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHelper
+import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.OpenGraphFetcher
 import co.softov.morestuff.android.domain.service.TimeManager
@@ -50,8 +52,6 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.message.CreateHintTaskMessagesUseCase
-import co.softov.morestuff.android.domain.usecase.message.CreateHintTaskMessagesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
@@ -224,7 +224,7 @@ val taskUseCases = module {
     factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
     factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
-    factoryOf(::CreateHintTaskMessagesUseCaseImpl) bind CreateHintTaskMessagesUseCase::class
+    factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class

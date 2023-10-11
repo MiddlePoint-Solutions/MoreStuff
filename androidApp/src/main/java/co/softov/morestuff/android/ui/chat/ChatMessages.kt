@@ -114,7 +114,7 @@ fun Messages(
                         ContentType.CONFIRM_NEW_TASK -> AppChatItem(item, actions)
                         ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
                         ContentType.TASK_MESSAGE -> UserChatItem(item, actions)
-                        ContentType.HINT_MESSAGE -> AppChatItem(item, actions)
+                        ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
                     }
                 }
             }
