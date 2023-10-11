@@ -15,14 +15,14 @@ class UpdateReviewNotificationScheduleUseCaseImplTest {
     private val updateReviewNotificationScheduleUseCase = UpdateReviewNotificationScheduleUseCaseImpl(scheduler)
 
     @Test
-    fun `should schedule next review and return Either Right on success`() = runBlocking {
-        // Arrange
+    fun `update Review Notification Schedule`() = runBlocking {
+
         val hour = 10
         val minute = 30
         val replaceExisting = true
         coEvery { scheduler.scheduleNextReview(hour, minute, replaceExisting) } returns Unit
 
-        val result = updateReviewNotificationScheduleUseCase.invoke(hour, minute, replaceExisting)
+        val result = updateReviewNotificationScheduleUseCase(hour, minute, replaceExisting)
 
         assertEquals(Either.Right(true), result)
         coVerify { scheduler.scheduleNextReview(hour, minute, replaceExisting) }

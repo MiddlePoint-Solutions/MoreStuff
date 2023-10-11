@@ -24,25 +24,21 @@ class ScheduleNotificationsAndWorkUseCaseImplTest {
 
     @Test
     fun `should schedule notifications and work and return Either Right on success`() = runBlocking {
-        // Arrange
         val appSettings = AppSettings(reviewTime = Pair(10, 30))
         coEvery { getAppSettingsUseCase.invoke() } returns appSettings
-        coEvery { updateReviewNotificationScheduleUseCase.invoke(10, 30, false) } returns Either.Right(true)
+        coEvery { updateReviewNotificationScheduleUseCase(10, 30, false) } returns Either.Right(true)
         coEvery { scheduler.schedulePlannedPriorityUpdate() } returns Unit
 
-        // Act
-        val result = scheduleNotificationsAndWorkUseCase.invoke()
+        val result = scheduleNotificationsAndWorkUseCase()
 
-        // Assert
         assertEquals(Either.Right(true), result)
         coVerify {
             getAppSettingsUseCase.invoke()
-            updateReviewNotificationScheduleUseCase.invoke(10, 30, false)
+            updateReviewNotificationScheduleUseCase(10, 30, false)
             scheduler.schedulePlannedPriorityUpdate()
         }
     }
 
-    // Optional: you can add more tests to handle different cases, for example, when scheduling fails.
 }
 
 

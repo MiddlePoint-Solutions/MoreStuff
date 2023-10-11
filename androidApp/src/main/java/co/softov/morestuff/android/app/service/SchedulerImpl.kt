@@ -2,6 +2,7 @@ package co.softov.morestuff.android.app.service
 
 import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import androidx.work.*
 import co.softov.morestuff.android.app.receiver.NotificationReceiver
 import co.softov.morestuff.android.app.receiver.createCancelReviewPendingIntent
@@ -70,24 +71,34 @@ class SchedulerImpl(
         when {
             pendingIntent == null -> {
                 Timber.d("Review notification does not exist - creating...")
-                Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, hour)
-                    set(Calendar.MINUTE, minute)
-                }.also {
-                    alarmManager.setExact(
-                        AlarmManager.RTC_WAKEUP,
-                        it.timeInMillis,
-                        NotificationReceiver.createReviewPendingIntent(
-                            context,
-                            reviewIntent,
-                        )
-                    )
-                }
+                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
             }
 
             replaceExisting -> {
                 alarmManager.cancel(pendingIntent)
+                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
             }
+        }
+    }
+
+    private fun setReviewAlarm(
+        alarmManager: AlarmManager,
+        hour: Int,
+        minute: Int,
+        reviewIntent: Intent,
+    ) {
+        Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+        }.also {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                it.timeInMillis,
+                NotificationReceiver.createReviewPendingIntent(
+                    context,
+                    reviewIntent,
+                )
+            )
         }
     }
 

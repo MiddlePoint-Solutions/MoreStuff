@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.redux.middleware
 
 import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
 import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableDevSettings
 import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
@@ -54,6 +55,10 @@ class SettingsMiddleware(
 
             is OnBoardingComplete -> scope.launch {
                 saveUserSettingUseCase(AppSetting.FirstTime, false)
+            }
+
+            is SettingAction.SetReviewTimeAction -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
             }
             else -> NoOp
         }
