@@ -78,7 +78,7 @@ class ScheduleMiddleware(
 
             is OnResumeAction,
             is NotificationAction.ShowReviewNotification,
-            is SettingAction.InitSettings -> {
+            is SettingAction.InitSettings -> scope.launch {
                 scheduleNotificationsAndWorkUseCase()
             }
 

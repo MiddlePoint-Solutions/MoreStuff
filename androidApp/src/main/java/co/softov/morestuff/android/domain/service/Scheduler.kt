@@ -6,6 +6,6 @@ interface Scheduler {
     fun schedulePlannedPriorityUpdate()
     fun cancelSchedule(scheduleId: Long)
     fun cancelPlannedPriorityUpdate()
-    fun scheduleNextReview()
+    fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean)
 
 }

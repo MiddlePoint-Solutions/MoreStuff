@@ -5,7 +5,6 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.middleware.DevAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,7 +18,8 @@ class SettingsViewModel(
             SettingsModel(
                 appTheme = appTheme,
                 snoozeLimit = snoozeLimit,
-                devSettings = devSettings
+                devSettings = devSettings,
+                reviewTime = reviewTime
             )
         }
     )
@@ -35,7 +35,8 @@ class SettingsViewModel(
                     appTheme = appTheme,
                     snoozeLimit = snoozeLimit,
                     confettiEnabled = enableConfetti,
-                    devSettings = BuildConfig.DEBUG || devSettings
+                    devSettings = BuildConfig.DEBUG || devSettings,
+                    reviewTime = reviewTime
                 )
             }
         }
@@ -55,5 +56,9 @@ class SettingsViewModel(
 
     fun enableDevSettings() {
         dispatchAppStoreAction(SettingAction.EnableDevSettings(true))
+    }
+
+    fun setReviewTime(hour: Int, minute: Int) {
+        dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute, true))
     }
 }

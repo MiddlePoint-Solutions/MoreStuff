@@ -20,7 +20,7 @@ class GetUserSettingsUseCaseImplTest {
         val expectedSettings = AppSettings()
         coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
-        getUserSettingsUseCase.invoke()
+        getUserSettingsUseCase()
 
         coVerify { userRepository.getAppSettings(expectedSettings) }
     }
@@ -30,9 +30,11 @@ class GetUserSettingsUseCaseImplTest {
         val expectedSettings = AppSettings()
         coEvery { userRepository.getAppSettings(expectedSettings) } returns expectedSettings
 
-        val result = getUserSettingsUseCase.invoke()
+        val result = getUserSettingsUseCase()
 
         assertEquals(expectedSettings, result)
+        coVerify { userRepository.getAppSettings(expectedSettings) }
     }
 }
+
 
