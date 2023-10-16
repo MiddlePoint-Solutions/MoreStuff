@@ -46,8 +46,8 @@ fun TaskProfile(title: String) {
             style = TextStyle(
                 fontSize = 24.sp,
                 lineHeight = 23.8.sp,
-                fontWeight = FontWeight(900),
-                color = Color(0xFFFFFFFF),
+                fontWeight = FontWeight(400),
+                color = Color.White,
             )
         )
     }
