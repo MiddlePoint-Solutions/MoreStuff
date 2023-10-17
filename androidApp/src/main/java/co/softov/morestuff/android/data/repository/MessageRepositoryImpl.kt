@@ -1,6 +1,8 @@
 package co.softov.morestuff.android.data.repository
 
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -14,8 +16,6 @@ import co.softov.morestuff.android.domain.repository.MessageDoesNotExist
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
@@ -41,7 +41,7 @@ class MessageRepositoryImpl(
     override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> =
         messageQueries.selectTaskMessagesByContentType(
             taskId,
-            ContentType.TASK_MESSAGE.value,
+            listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
             mapper = mapper.messageDataMapper
         ).asFlow().mapToList(Dispatchers.IO)
 
