@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +47,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -163,12 +166,17 @@ fun PriorityContent(
                 .fillMaxSize()
                 .reorderable(state),
         ) {
-            items(
+
+            itemsIndexed(
                 items = viewModel.tasks,
-                key = { task -> task.id }
-            ) {
-                val task by rememberUpdatedState(it)
+                key = { _, task  -> task.id }
+            ) { index, item ->
+                val task by rememberUpdatedState(item)
                 val itemClick by rememberUpdatedState(showTaskChat)
+
+                val isLast by remember(index) {
+                    derivedStateOf { index == viewModel.tasks.lastIndex }
+                }
 
                 val dismissState = rememberNoFlingDismissState(
                     positionalThreshold = { 130.dp.toPx() },
@@ -208,7 +216,16 @@ fun PriorityContent(
                             )
                         }
                     )
+
+                    if(!isLast) {
+                        Divider(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            thickness = Dp.Hairline
+                        )
+                    }
+
                 }
+
             }
         }
 
