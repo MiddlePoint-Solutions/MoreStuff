@@ -18,7 +18,7 @@ class PlannedPriorityUpdateWorker(
 
     override suspend fun doWork(): Result {
         Timber.d("Work: Dispatching UpdatePlannedTasksPriorityScore")
-        store.dispatchSuspend(PriorityAction.UpdatePlannedTasksPriorityScore)
+        store.dispatchSuspend(PriorityAction.UpdatePlannedPriorityAction)
         Timber.d("Work: Done")
         return Result.success()
     }

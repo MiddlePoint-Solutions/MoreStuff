@@ -10,6 +10,7 @@ import co.softov.morestuff.android.app.receiver.createReviewIntent
 import co.softov.morestuff.android.app.receiver.createReviewPendingIntent
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.PlannedPriorityUpdateWorker
+import co.softov.morestuff.android.app.work.ScheduleReviewNotificationWorker
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -46,7 +47,7 @@ class SchedulerImpl(
         workManager.enqueue(work)
     }
 
-    override fun schedulePlannedPriorityUpdate() {
+    override fun schedulePlannedPriorityWorker() {
         PeriodicWorkRequestBuilder<PlannedPriorityUpdateWorker>(
             repeatInterval = 20,
             repeatIntervalTimeUnit = TimeUnit.MINUTES,
@@ -55,6 +56,21 @@ class SchedulerImpl(
         ).build().also { request ->
             workManager.enqueueUniquePeriodicWork(
                 PLANNED_PRIORITY_WORK,
+                ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
+        }
+    }
+
+    override fun scheduleReviewWorker() {
+        PeriodicWorkRequestBuilder<ScheduleReviewNotificationWorker>(
+            repeatInterval = 30,
+            repeatIntervalTimeUnit = TimeUnit.MINUTES,
+            flexTimeInterval = 5,
+            flexTimeIntervalUnit = TimeUnit.MINUTES
+        ).build().also { request ->
+            workManager.enqueueUniquePeriodicWork(
+                PRIORITY_REVIEW_WORK,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
             )
@@ -88,6 +104,10 @@ class SchedulerImpl(
         reviewIntent: Intent,
     ) {
         Calendar.getInstance().apply {
+            val hourOfDay = get(Calendar.HOUR_OF_DAY)
+            if (hourOfDay > hour) {
+                add(Calendar.DAY_OF_YEAR, 1)
+            }
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
         }.also {

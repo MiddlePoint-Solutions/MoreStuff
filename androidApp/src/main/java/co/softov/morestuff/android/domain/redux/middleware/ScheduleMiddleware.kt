@@ -26,7 +26,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleWorkUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -56,7 +56,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
-    private val scheduleNotificationsAndWorkUseCase: ScheduleNotificationsAndWorkUseCase,
+    private val scheduleWorkUseCase: ScheduleWorkUseCase,
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
@@ -76,10 +76,8 @@ class ScheduleMiddleware(
     ): Action {
         when (action) {
 
-            is OnResumeAction,
-            is NotificationAction.ShowReviewNotification,
             is SettingAction.InitSettings -> scope.launch {
-                scheduleNotificationsAndWorkUseCase()
+                scheduleWorkUseCase()
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {

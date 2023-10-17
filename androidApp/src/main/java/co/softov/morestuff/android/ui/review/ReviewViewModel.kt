@@ -20,7 +20,6 @@ import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class ReviewViewModel(
     private val getTasksWithoutScheduleUseCase: GetTasksWithoutScheduleUseCase,
@@ -108,7 +107,7 @@ class ReviewViewModel(
 
         if (state.items.first() == item) {
             roundEndDelayJob = viewModelScope.launch {
-                dispatchAppStoreAction(PriorityAction.UpdatePlannedTasksPriorityScore)
+                dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction)
                 delay(500)
                 sendEvent(SetupRound(Final))
             }
