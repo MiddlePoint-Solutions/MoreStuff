@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
-import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.enums.ScheduleType
+import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.isOneTime
 import co.softov.morestuff.android.domain.model.isReminder
