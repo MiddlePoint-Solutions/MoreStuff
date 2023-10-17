@@ -2,7 +2,7 @@ package co.softov.morestuff.android.ui.main
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewModelScope
+import androidx.compose.runtime.rememberCoroutineScope
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
 import co.softov.morestuff.android.domain.nav.Screen.Home
@@ -30,7 +30,6 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -38,7 +37,6 @@ fun MainContent(
     initialScreen: Screen?,
     shareContent: (taskId: Long, content: Shareable) -> Unit,
 ) {
-
     val viewModel: MainViewModel = koinViewModel()
     val navigation = LocalAppNavigation.current
 
@@ -60,9 +58,8 @@ fun MainContent(
                 onBoardingComplete = {
                     navigation.replaceCurrent(Home)
                     viewModel.onBoardingCompleted()
-                    viewModel.viewModelScope.launch {
-                        viewModel.sendHintTask()
-                    }
+                    viewModel.sendHintTask()
+
                 }
             )
 

@@ -86,7 +86,7 @@ class MainViewModel(
 
 
     fun sendHintTask() {
-        store.dispatch(TaskAction.CreateHintTask)
+        dispatchAppStoreAction(TaskAction.CreateHintTask)
     }
 
 }
