@@ -36,17 +36,9 @@ object TaskColors {
             Color(0xFF448526),
         ),
         listOf(
-            Color(0xFFFCFF68),
-            Color(0xFF797B00),
-        ),
-        listOf(
             Color(0xFFD2D2D2),
             Color(0xFF6C6C6C),
         ),
-        listOf(
-            Color(0xFFDA496C),
-            Color(0xFF7D293D),
-        )
     )
 
     private fun taskTitleToNumber(str: String): Int {
@@ -54,7 +46,7 @@ object TaskColors {
         for (char in str) {
             sum += char.code
         }
-        return sum % 10
+        return sum % profileColors.size
     }
 
 }
