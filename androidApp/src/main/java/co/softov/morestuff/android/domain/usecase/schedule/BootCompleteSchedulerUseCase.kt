@@ -13,14 +13,14 @@ interface BootCompleteSchedulerUseCase {
 }
 
 class BootCompleteSchedulerUseCaseImpl(
-    private val scheduleNotificationsAndWorkUseCase: ScheduleNotificationsAndWorkUseCase,
+    private val scheduleWorkUseCase: ScheduleWorkUseCase,
     private val getActiveSchedulesUseCase: GetActiveSchedulesUseCase,
     private val scheduler: Scheduler,
     private val timeManager: TimeManager,
 ) : BootCompleteSchedulerUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
-        scheduleNotificationsAndWorkUseCase()
+        scheduleWorkUseCase()
         return when (val result = getActiveSchedulesUseCase()) {
             is Either.Left -> result
             is Either.Right -> {

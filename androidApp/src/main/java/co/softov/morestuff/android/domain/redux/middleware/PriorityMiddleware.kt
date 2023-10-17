@@ -25,7 +25,7 @@ sealed class PriorityAction : Action.FeatureAction() {
         val actionType: PriorityActionType
     ) : PriorityAction()
 
-    object UpdatePlannedTasksPriorityScore : PriorityAction()
+    data object UpdatePlannedPriorityAction : PriorityAction()
 
 }
 
@@ -52,7 +52,7 @@ class PriorityMiddleware(
                 updateTaskPriorityScoreUseCase(action.taskId, action.score)
             }
 
-            is UpdatePlannedTasksPriorityScore -> scope.launch {
+            is UpdatePlannedPriorityAction -> scope.launch {
                 updatePlannedTasksPriorityUseCase()
             }
 

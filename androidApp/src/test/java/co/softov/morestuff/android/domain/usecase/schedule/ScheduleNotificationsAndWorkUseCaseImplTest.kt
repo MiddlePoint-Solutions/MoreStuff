@@ -16,7 +16,7 @@ class ScheduleNotificationsAndWorkUseCaseImplTest {
     private val scheduler = mockk<Scheduler>()
     private val getAppSettingsUseCase = mockk<GetAppSettingsUseCase>()
     private val updateReviewNotificationScheduleUseCase = mockk<UpdateReviewNotificationScheduleUseCase>()
-    private val scheduleNotificationsAndWorkUseCase = ScheduleNotificationsAndWorkUseCaseImpl(
+    private val scheduleNotificationsAndWorkUseCase = ScheduleWorkUseCaseImpl(
         scheduler,
         getAppSettingsUseCase,
         updateReviewNotificationScheduleUseCase
@@ -27,7 +27,7 @@ class ScheduleNotificationsAndWorkUseCaseImplTest {
         val appSettings = AppSettings(reviewTime = Pair(10, 30))
         coEvery { getAppSettingsUseCase.invoke() } returns appSettings
         coEvery { updateReviewNotificationScheduleUseCase(10, 30, false) } returns Either.Right(true)
-        coEvery { scheduler.schedulePlannedPriorityUpdate() } returns Unit
+        coEvery { scheduler.schedulePlannedPriorityWorker() } returns Unit
 
         val result = scheduleNotificationsAndWorkUseCase()
 
@@ -35,7 +35,7 @@ class ScheduleNotificationsAndWorkUseCaseImplTest {
         coVerify {
             getAppSettingsUseCase.invoke()
             updateReviewNotificationScheduleUseCase(10, 30, false)
-            scheduler.schedulePlannedPriorityUpdate()
+            scheduler.schedulePlannedPriorityWorker()
         }
     }
 

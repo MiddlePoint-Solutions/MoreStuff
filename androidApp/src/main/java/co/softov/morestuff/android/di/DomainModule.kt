@@ -84,8 +84,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountU
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.ScheduleNotificationsAndWorkUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleWorkUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ScheduleWorkUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
@@ -253,7 +253,7 @@ val scheduleUseCases = module {
     factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
-    factoryOf(::ScheduleNotificationsAndWorkUseCaseImpl) bind ScheduleNotificationsAndWorkUseCase::class
+    factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
     factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
 }
