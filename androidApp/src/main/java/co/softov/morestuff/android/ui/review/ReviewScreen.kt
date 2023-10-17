@@ -147,10 +147,10 @@ private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.lastSwipedItem() =
 private fun firstVisibleItem(it: Pair<ReviewItemUiModel, SwipeableCardState>) =
     it.second.offset.value == Offset(0f, 0f) && !it.second.isSwiped
 
-private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull() =
+ fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull() =
     reversed().firstOrNull { firstVisibleItem(it) }
 
-private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
+ fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
     firstVisibleOrNull()?.second
 
 @Composable
