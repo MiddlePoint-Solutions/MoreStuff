@@ -412,9 +412,6 @@ fun ReviewTimeSelector(
     modifier: Modifier = Modifier,
 ) {
 
-    var showTimePickerDialog by remember { mutableStateOf(false) }
-    val timePickerState = rememberTimePickerState()
-
     val selectedTimeState = rememberAppSettingState(
         defaultValue = { defaultValue },
         valueChanged = { newTime ->
@@ -423,6 +420,12 @@ fun ReviewTimeSelector(
             }
         }
     )
+    val defaultHour = selectedTimeState.value?.first ?: defaultValue?.first ?: 9
+    val defaultMinute = selectedTimeState.value?.second ?: defaultValue?.second ?: 30
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+    val timePickerState = rememberTimePickerState(initialHour = defaultHour,
+        initialMinute = defaultMinute)
+
     if (showTimePickerDialog) {
         PriorityTimePicker(
             dismissTimePicker = { showTimePickerDialog = false },
