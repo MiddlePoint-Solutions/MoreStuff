@@ -10,7 +10,7 @@ data class SettingsModel(
     val snoozeLimit: Int = 0,
     val confettiEnabled: Boolean = true,
     val devSettings: Boolean = false,
-    val reviewTime: Pair<Int, Int> = Pair(0,0)
+    val reviewTime: Pair<Int, Int> = Pair(9,0)
 
 ) : BaseViewState
 

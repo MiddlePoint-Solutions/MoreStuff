@@ -408,21 +408,25 @@ fun About(
 @OptIn(ExperimentalMaterial3Api::class)
 fun ReviewTimeSelector(
     valueChanged: (hour: Int, minute: Int) -> Unit,
-    defaultValue: Pair<Int, Int>?,
+    defaultValue: Pair<Int, Int>,
     modifier: Modifier = Modifier,
 ) {
-
-    var showTimePickerDialog by remember { mutableStateOf(false) }
-    val timePickerState = rememberTimePickerState()
 
     val selectedTimeState = rememberAppSettingState(
         defaultValue = { defaultValue },
         valueChanged = { newTime ->
-            if (newTime != null) {
-                valueChanged(newTime.first, newTime.second)
-            }
+            valueChanged(newTime.first, newTime.second)
+
         }
     )
+    val defaultHour = selectedTimeState.value.first
+    val defaultMinute = selectedTimeState.value.second
+    var showTimePickerDialog by remember { mutableStateOf(false) }
+    val timePickerState = rememberTimePickerState(
+        initialHour = defaultHour,
+        initialMinute = defaultMinute
+    )
+
     if (showTimePickerDialog) {
         PriorityTimePicker(
             dismissTimePicker = { showTimePickerDialog = false },
@@ -437,7 +441,7 @@ fun ReviewTimeSelector(
         title = {
             Column {
                 Text(text = "Set Review Time")
-                selectedTimeState.value?.let {
+                selectedTimeState.value.let {
                     Text(text = "${it.first}:${String.format("%02d", it.second)}")
                 }
             }
