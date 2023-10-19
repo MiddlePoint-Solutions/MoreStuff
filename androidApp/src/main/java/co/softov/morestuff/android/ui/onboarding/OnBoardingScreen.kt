@@ -109,7 +109,7 @@ fun OnBoardingScreen(
 
             OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
             OnBoarding.ChatWithYourTask -> ChatWithYourTaskScreen(onNext = navigation::selectNext)
-            OnBoarding.TaskReview -> TaskPriorityOnBoardingScreen(onNext = navigation::selectNext)
+            OnBoarding.TaskReview -> TaskPriorityReviewOnBoardingScreen(onNext = navigation::selectNext)
             OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
 
         }
@@ -391,7 +391,7 @@ private fun ChatWithYourTaskScreen(onNext: () -> Unit) {
 
 
 @Composable
-private fun TaskPriorityOnBoardingScreen(
+private fun TaskPriorityReviewOnBoardingScreen(
     onNext: () -> Unit,
 ) {
     val tasks = listOf(
