@@ -14,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
@@ -139,19 +138,6 @@ fun ReviewContent(
     }
 }
 
-private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.lastSwipedItem() =
-    reversed().firstOrNull { firstVisibleItem(it) }?.run {
-        getOrNull(indexOf(this) + 1)
-    } ?: firstOrNull()
-
-private fun firstVisibleItem(it: Pair<ReviewItemUiModel, SwipeableCardState>) =
-    it.second.offset.value == Offset(0f, 0f) && !it.second.isSwiped
-
-private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleOrNull() =
-    reversed().firstOrNull { firstVisibleItem(it) }
-
-private fun List<Pair<ReviewItemUiModel, SwipeableCardState>>.firstVisibleStateOrNull() =
-    firstVisibleOrNull()?.second
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

@@ -156,6 +156,15 @@
     <string name="click_s_to_enable_developer_settings">Click %1$s more times to enable developer settings</string>
     <string name="version">Version</string>
 
+    <string name="review_your_tasks">Review your \ntasks</string>
+    <string name="up_priority">slide the card up to give it top priority</string>
+    <string name="down_priority">slide the card down to give it lowest priority</string>
+    <string name="left_priority">slide the card to the left to decrease  priority</string>
+    <string name="right_priority">slide the card to the right to increase  priority</string>
+    <string name="reload">Reload</string>
+
+
+
 
     <!-- Hint task and messages  -->
     <string name="hint_task_now">Hint Task with Now priority.\nClick me!</string>
