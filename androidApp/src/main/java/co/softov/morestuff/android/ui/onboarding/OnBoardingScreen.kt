@@ -42,6 +42,7 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.OnBoarding
 import co.softov.morestuff.android.ui.navigation.ChildPages
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
+import co.softov.morestuff.android.ui.settings.SettingsModel
 import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import co.softov.morestuff.android.ui.settings.rememberAppSettingState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -70,7 +71,7 @@ fun OnBoardingScreen(
             if (requiresNotificationsPermission()) {
                 add(OnBoarding.NotificationPermission)
             }
-            add(OnBoarding.DailyCheckins)
+            add(OnBoarding.DailyTaskReview)
             add(OnBoarding.ChatWithYourTask)
             add(OnBoarding.WorkSpaceReady)
         }
@@ -113,7 +114,7 @@ fun OnBoardingScreen(
             }
 
             OnBoarding.NotificationPermission -> NotificationPermissionScreen(onNext = navigation::selectNext)
-            OnBoarding.DailyCheckins -> { DailyReminders(onNext = navigation::selectNext)}
+            OnBoarding.DailyTaskReview -> { DailyTaskPriorityReminders(onNext = navigation::selectNext)}
             OnBoarding.ChatWithYourTask -> ChatWithYourTaskScreen(onNext = navigation::selectNext)
             OnBoarding.WorkSpaceReady -> ReadyScreen(onFinish = onBoardingComplete)
 
@@ -397,12 +398,13 @@ private fun ChatWithYourTaskScreen(onNext: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DailyReminders(
+private fun DailyTaskPriorityReminders(
     onNext: () -> Unit,
 ) {
     val viewModel: SettingsViewModel = koinViewModel()
+    val defaultReviewTime = SettingsModel().reviewTime
     val selectedTimeState = rememberAppSettingState(
-        defaultValue = { Pair(9,0) },
+        defaultValue = { defaultReviewTime },
         valueChanged = { newTime ->
             viewModel.setReviewTime(newTime.first, newTime.second)
         }
@@ -450,7 +452,7 @@ private fun DailyReminders(
                             modifier = Modifier.size(30.dp)
                         )
                         Text(
-                            text = "${selectedTime!!.first}:${String.format("%02d", selectedTime!!.second)}",
+                            text = "${selectedTime.first}:${String.format("%02d", selectedTime.second)}",
                             style = MaterialTheme.typography.bodyMedium.copy(fontSize = 30.sp),
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -479,7 +481,7 @@ private fun DailyReminders(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
-            if (selectedTime == Pair(9, 0)) {
+            if (selectedTime == defaultReviewTime) {
                 Button(
                     onClick ={ showTimePicker = true },
                     modifier = Modifier

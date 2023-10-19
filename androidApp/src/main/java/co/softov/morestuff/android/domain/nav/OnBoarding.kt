@@ -19,6 +19,6 @@ sealed class OnBoarding : Parcelable {
     data object ChatWithYourTask : OnBoarding()
 
     @Parcelize
-    data object DailyCheckins : OnBoarding()
+    data object DailyTaskReview : OnBoarding()
 }
 
