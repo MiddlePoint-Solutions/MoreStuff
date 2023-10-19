@@ -55,6 +55,7 @@ fun TaskCard(
     task: ReviewItemUiModel,
     onComplete: (ReviewItemUiModel) -> Unit,
     isVisible: Boolean = false,
+    isClickable: Boolean = true,
 ) {
     var visibleState by remember { mutableStateOf(true) }
     val selectedState = remember { MutableTransitionState(false) }
