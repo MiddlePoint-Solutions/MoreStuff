@@ -313,11 +313,15 @@ private fun TaskPrioritySwipe(
         modifier = modifier.padding(20.dp)
     ) {
         states.forEach { (task, state) ->
+            val isMoving = state.offset.value.x != 0f || state.offset.value.y != 0f
             if (state.swipedDirection == null) {
 
                 val isVisible = state == states.firstVisibleOrNull()?.second
-                val isMoving = state.offset.value.x != 0f || state.offset.value.y != 0f
-
+                if (isMoving) {
+                    onCardMoveStateChange(true)
+                } else {
+                    onCardMoveStateChange(false)
+                }
                 TaskCard(
                     modifier = Modifier
                         .layoutId(task.id)
@@ -333,19 +337,10 @@ private fun TaskPrioritySwipe(
                 ) {
                     HintArrowPriority()
                 }
-
-                if (isMoving) {
-                    onCardMoveStateChange(true)
-                } else {
-                    onCardMoveStateChange(false)
-                }
-
-                LaunchedEffect(task, state.swipedDirection, isMoving) {
-                    state.swipedDirection?.let { direction ->
-                        onSwiped(task, direction)
-                        onCardMoveStateChange(isMoving)
-                        onCardMoveStateChange(false)
-                    }
+            }
+            LaunchedEffect(task, state.swipedDirection) {
+                state.swipedDirection?.let { direction ->
+                    onSwiped(task, direction)
                 }
             }
         }
