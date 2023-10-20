@@ -74,7 +74,7 @@
     <string name="cd_task_complete">Task Complete</string>
     <string name="task_chat_schedule_action">Set Schedule</string>
     <string name="settings">Settings</string>
-    <string name="priority_review">Priority Review</string>
+    <string name="priority_review">Review</string>
     <string name="finish">Finish</string>
     <string name="cd_priority_review">Open Priority Review</string>
     <string name="cd_settings">Show Settings</string>

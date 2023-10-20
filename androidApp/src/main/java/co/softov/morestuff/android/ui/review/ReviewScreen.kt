@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,14 +33,16 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
-import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
+import co.softov.morestuff.android.ui.onboarding.DefaultHintTask
+import co.softov.morestuff.android.ui.onboarding.ReviewCardsOnBoarding
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -65,6 +69,8 @@ fun ReviewContent(
 ) {
 
     val scope = rememberCoroutineScope()
+    var isCardMoving by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
@@ -89,15 +95,17 @@ fun ReviewContent(
 
                     PriorityReviewTopBar(navigateUp = onBack)
 
-                    val states =
-                        model.items.map { it to rememberSwipeableCardState(model.round) }
+                    val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
-                    val visibleState = remember(model.round) {
-                        MutableTransitionState(false)
+                    val visibleState = remember(model.round) { MutableTransitionState(false) }
+
+                    LaunchedEffect(isCardMoving) {
+                        visibleState.targetState = !isCardMoving
                     }
-
-                    SlideAnimation(
+                    AnimatedVisibility(
                         visibleState = visibleState,
+                        enter = fadeIn(initialAlpha = 0.2f),
+                        exit = fadeOut(targetAlpha = 0.2f),
                         modifier = modifier
                             .fillMaxHeight(0.30f)
                             .align(Alignment.BottomCenter),
@@ -120,7 +128,8 @@ fun ReviewContent(
                                 states.firstVisibleStateOrNull()?.onComplete()
                                 viewModel.completeTask(it)
                             }
-                        }
+                        },
+                        onCardMoveStateChange = { moving -> isCardMoving = moving }
                     )
 
                     LaunchedEffect(key1 = model.round) {
@@ -145,6 +154,11 @@ private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
 ) {
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val tasks = DefaultHintTask.tasks.map { task ->
+        task.copy(title = stringResource(task.title.toInt()))
+    }
     TopAppBar(
         title = {
             Text(
@@ -159,16 +173,51 @@ private fun PriorityReviewTopBar(
                 )
             }
         },
+        actions = {
+            IconButton(onClick = { isBottomSheetVisible = true }) {
+                Icon(
+                    imageVector = Icons.Default.Help,
+                    contentDescription = ""
+                )
+            }
+        },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
+
+
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { isBottomSheetVisible = false },
+            sheetState = bottomSheetState,
+            content = {
+                var reloadCards by remember { mutableStateOf(0) }
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        delay(9000)
+                        reloadCards++
+                    }
+                }
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    key(reloadCards) {
+                        ReviewCardsOnBoarding(tasks)
+                    }
+                }
+            }
+        )
+    }
 }
+
 
 @Composable
 private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -258,6 +307,7 @@ private fun TaskPrioritySwipe(
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
+    onCardMoveStateChange: (Boolean) -> Unit,
 ) {
     Box(
         modifier = modifier.padding(20.dp)
@@ -266,6 +316,7 @@ private fun TaskPrioritySwipe(
             if (state.swipedDirection == null) {
 
                 val isVisible = state == states.firstVisibleOrNull()?.second
+                val isMoving = state.offset.value.x != 0f || state.offset.value.y != 0f
 
                 TaskCard(
                     modifier = Modifier
@@ -275,11 +326,131 @@ private fun TaskPrioritySwipe(
                     onComplete = onComplete,
                     isVisible = isVisible
                 )
-            }
-            LaunchedEffect(task, state.swipedDirection) {
-                state.swipedDirection?.let { direction ->
-                    onSwiped(task, direction)
+                AnimatedVisibility(
+                    visible = isMoving,
+                    enter = fadeIn(initialAlpha = 0.2f),
+                    exit = fadeOut(targetAlpha = 0.2f)
+                ) {
+                    HintArrowPriority()
                 }
+
+                if (isMoving) {
+                    onCardMoveStateChange(true)
+                } else {
+                    onCardMoveStateChange(false)
+                }
+
+                LaunchedEffect(task, state.swipedDirection, isMoving) {
+                    state.swipedDirection?.let { direction ->
+                        onSwiped(task, direction)
+                        onCardMoveStateChange(isMoving)
+                        onCardMoveStateChange(false)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun HintArrowPriority() {
+    Box(Modifier.fillMaxSize()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.TopCenter).padding(top = 30.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_up),
+                    contentDescription = "Highest",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Highest",
+                    style = TextStyle(
+                        fontSize = 18.67.sp,
+                        lineHeight = 23.76.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0x8CFFFFFF),
+                        textAlign = TextAlign.Center,
+                    )
+                )
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 30.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Lowest",
+                    style = TextStyle(
+                        fontSize = 18.67.sp,
+                        lineHeight = 23.76.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0x8CFFFFFF),
+                        textAlign = TextAlign.Center,
+                    )
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
+                    contentDescription = "Lowest",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 30.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
+                    contentDescription = "High",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "High",
+                    style = TextStyle(
+                        fontSize = 18.67.sp,
+                        lineHeight = 23.76.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0x8CFFFFFF),
+                        textAlign = TextAlign.Center,
+                    )
+                )
+            }
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.align(Alignment.CenterStart).padding(start = 30.dp)
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
+                    contentDescription = "Low",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "Low",
+                    style = TextStyle(
+                        fontSize = 18.67.sp,
+                        lineHeight = 23.76.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0x8CFFFFFF),
+                        textAlign = TextAlign.Center,
+                    )
+                )
             }
         }
     }

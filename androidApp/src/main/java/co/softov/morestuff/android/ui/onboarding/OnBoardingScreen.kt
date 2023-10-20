@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.OnBoarding
-import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.navigation.ChildPages
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.airbnb.lottie.compose.LottieAnimation
@@ -391,39 +390,12 @@ private fun ChatWithYourTaskScreen(onNext: () -> Unit) {
 
 
 @Composable
-private fun TaskPriorityReviewOnBoardingScreen(
+ fun TaskPriorityReviewOnBoardingScreen(
     onNext: () -> Unit,
 ) {
-    val tasks = listOf(
-        ReviewItemUiModel(
-            id = 1,
-            createTime = "10:30 AM",
-            title = stringResource(R.string.right_priority),
-            priorityScore = 5,
-            isCompleted = false,
-        ),
-        ReviewItemUiModel(
-            id = 2,
-            createTime = "11:00 AM",
-            title = stringResource(R.string.left_priority),
-            priorityScore = 3,
-            isCompleted = false
-        ),
-        ReviewItemUiModel(
-            id = 3,
-            createTime = "11:30 AM",
-            title = stringResource(R.string.up_priority),
-            priorityScore = 7,
-            isCompleted = false
-        ),
-        ReviewItemUiModel(
-            id = 4,
-            createTime = "12:30 AM",
-            title = stringResource(R.string.down_priority),
-            priorityScore = -1,
-            isCompleted = false
-        )
-    )
+    val tasks = DefaultHintTask.tasks.map { task ->
+        task.copy(title = stringResource(task.title.toInt()))
+    }
     var reloadCards by remember { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
