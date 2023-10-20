@@ -104,8 +104,8 @@ fun ReviewContent(
                     }
                     AnimatedVisibility(
                         visibleState = visibleState,
-                        enter = fadeIn(initialAlpha = 0.2f),
-                        exit = fadeOut(targetAlpha = 0.2f),
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                         modifier = modifier
                             .fillMaxHeight(0.30f)
                             .align(Alignment.BottomCenter),
@@ -122,7 +122,10 @@ fun ReviewContent(
                             .offset(y = 64.dp)
                             .fillMaxHeight(0.7f),
                         states = states,
-                        onSwiped = viewModel::onTaskSwiped,
+                        onSwiped = { schedule, direction ->
+                            viewModel.onTaskSwiped(schedule, direction)
+                            isCardMoving = false
+                        },
                         onComplete = {
                             scope.launch {
                                 states.firstVisibleStateOrNull()?.onComplete()
@@ -131,6 +134,14 @@ fun ReviewContent(
                         },
                         onCardMoveStateChange = { moving -> isCardMoving = moving }
                     )
+
+                    AnimatedVisibility(
+                        visible = isCardMoving,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        HintArrowPriority()
+                    }
 
                     LaunchedEffect(key1 = model.round) {
                         visibleState.targetState = true
@@ -198,7 +209,9 @@ private fun PriorityReviewTopBar(
                     }
                 }
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(bottom = 70.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -313,15 +326,18 @@ private fun TaskPrioritySwipe(
         modifier = modifier.padding(20.dp)
     ) {
         states.forEach { (task, state) ->
-            val isMoving = state.offset.value.x != 0f || state.offset.value.y != 0f
-            if (state.swipedDirection == null) {
 
+            val isMoving by remember(state.offset) {
+                derivedStateOf { state.offset.value.x != 0f || state.offset.value.y != 0f }
+            }
+
+            LaunchedEffect(isMoving) {
+                onCardMoveStateChange(isMoving)
+            }
+
+            if (state.swipedDirection == null) {
                 val isVisible = state == states.firstVisibleOrNull()?.second
-                if (isMoving) {
-                    onCardMoveStateChange(true)
-                } else {
-                    onCardMoveStateChange(false)
-                }
+
                 TaskCard(
                     modifier = Modifier
                         .layoutId(task.id)
@@ -330,13 +346,6 @@ private fun TaskPrioritySwipe(
                     onComplete = onComplete,
                     isVisible = isVisible
                 )
-                AnimatedVisibility(
-                    visible = isMoving,
-                    enter = fadeIn(initialAlpha = 0.2f),
-                    exit = fadeOut(targetAlpha = 0.2f)
-                ) {
-                    HintArrowPriority()
-                }
             }
             LaunchedEffect(task, state.swipedDirection) {
                 state.swipedDirection?.let { direction ->
@@ -353,7 +362,9 @@ private fun HintArrowPriority() {
     Box(Modifier.fillMaxSize()) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.TopCenter).padding(top = 30.dp)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 30.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
@@ -377,7 +388,9 @@ private fun HintArrowPriority() {
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 30.dp)
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 30.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
@@ -401,7 +414,9 @@ private fun HintArrowPriority() {
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 30.dp)
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(end = 30.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
@@ -425,7 +440,9 @@ private fun HintArrowPriority() {
         }
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.CenterStart).padding(start = 30.dp)
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 30.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
