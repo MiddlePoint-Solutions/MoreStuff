@@ -71,7 +71,6 @@ fun TaskCard(
     }
 
     LaunchedEffect(isVisible) {
-        Timber.d("task: ${task.title} isVisible: $isVisible")
         if (isVisible) {
             delay(1000)
             elevationState.targetState = !elevationState.currentState
