@@ -47,7 +47,6 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
 
     fun loadData() {
         onLoadData()
-
         store.state
             .onEach { onAppStateChange(it) }
             .launchIn(viewModelScope)

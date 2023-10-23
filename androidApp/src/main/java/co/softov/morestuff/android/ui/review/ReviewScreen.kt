@@ -6,6 +6,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Help
@@ -16,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
@@ -143,7 +145,7 @@ fun ReviewContent(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        HintArrowPriority()
+                        ReviewDragHint()
                     }
 
                     LaunchedEffect(key1 = model.round) {
@@ -380,116 +382,113 @@ private fun TaskPrioritySwipe(
     }
 }
 
-
 @Composable
-private fun HintArrowPriority() {
+private fun ReviewDragHint() {
     Box(Modifier.fillMaxSize()) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .padding(top = 30.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_up),
-                    contentDescription = "Highest",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Highest",
-                    style = TextStyle(
-                        fontSize = 18.67.sp,
-                        lineHeight = 23.76.sp,
-                        fontWeight = FontWeight(700),
-                        color = Color(0x8CFFFFFF),
-                        textAlign = TextAlign.Center,
-                    )
-                )
-            }
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_up),
+                contentDescription = stringResource(R.string.cd_highest_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            ReviewHintTitle(text = stringResource(R.string.review_hint_highest_priority))
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 30.dp)
+                .padding(bottom = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "Lowest",
-                    style = TextStyle(
-                        fontSize = 18.67.sp,
-                        lineHeight = 23.76.sp,
-                        fontWeight = FontWeight(700),
-                        color = Color(0x8CFFFFFF),
-                        textAlign = TextAlign.Center,
-                    )
+            Text(
+                text = stringResource(R.string.review_hint_lowest_priority),
+                style = TextStyle(
+                    fontSize = 18.67.sp,
+                    lineHeight = 23.76.sp,
+                    fontWeight = FontWeight(700),
+                    color = Color(0x8CFFFFFF),
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
-                    contentDescription = "Lowest",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
-                )
-            }
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
+                contentDescription = "Lowest",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 30.dp)
+                .padding(end = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
-                    contentDescription = "High",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
+                contentDescription = "High",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = stringResource(R.string.review_hint_high_priority),
+                style = TextStyle(
+                    fontSize = 18.67.sp,
+                    lineHeight = 23.76.sp,
+                    fontWeight = FontWeight(700),
+                    color = Color(0x8CFFFFFF),
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "High",
-                    style = TextStyle(
-                        fontSize = 18.67.sp,
-                        lineHeight = 23.76.sp,
-                        fontWeight = FontWeight(700),
-                        color = Color(0x8CFFFFFF),
-                        textAlign = TextAlign.Center,
-                    )
-                )
-            }
+            )
         }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 30.dp)
+                .padding(start = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
-                    contentDescription = "Low",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
+                contentDescription = "Low",
+                modifier = Modifier.size(30.dp),
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(8.dp))
 
-                Text(
-                    text = "Low",
-                    style = TextStyle(
-                        fontSize = 18.67.sp,
-                        lineHeight = 23.76.sp,
-                        fontWeight = FontWeight(700),
-                        color = Color(0x8CFFFFFF),
-                        textAlign = TextAlign.Center,
-                    )
+            Text(
+                text = stringResource(R.string.review_hint_low_priority),
+                style = TextStyle(
+                    fontSize = 18.67.sp,
+                    lineHeight = 23.76.sp,
+                    fontWeight = FontWeight(700),
+                    color = Color(0x8CFFFFFF),
+                    textAlign = TextAlign.Center,
                 )
-            }
+            )
         }
     }
+}
+
+@Composable
+private fun ReviewHintTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineSmall.copy(
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
+    )
 }
 
 @Composable
@@ -497,7 +496,6 @@ private fun MainReviewButton(
     onClick: () -> Unit,
     icon: ImageVector,
 ) {
-
     Button(
         modifier = Modifier
             .size(width = 140.dp, height = 56.dp)
@@ -537,77 +535,6 @@ private fun SecondaryReviewButton(
             modifier = Modifier.size(24.dp),
             tint = reviewIconTint
         )
-    }
-}
-
-@Composable
-private fun RoundInfo(
-    model: ReviewModel,
-    modifier: Modifier = Modifier,
-) {
-
-    val info by remember(model.round) {
-        mutableStateOf("Round ${model.round}")
-    }
-    val instructions by remember(model.round) {
-        when (model.round) {
-            ReviewRound.Review -> "<-- Low    High -->"
-            ReviewRound.Final -> ""
-        }.let {
-            mutableStateOf(it)
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .padding(vertical = 16.dp)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = info,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = instructions,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center
-        )
-
-        if (BuildConfig.DEBUG) {
-
-            val total by remember {
-                mutableStateOf("Total: ${model.items.size}")
-            }
-
-            Text(
-                text = total,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center
-            )
-
-            val debug = with(model) {
-                "RoundItems: ${items.size}"
-            }
-
-            Text(
-                text = debug,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }
 
