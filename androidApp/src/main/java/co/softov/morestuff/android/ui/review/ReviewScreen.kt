@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -70,7 +71,7 @@ fun ReviewContent(
 
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }
-
+    var showHintArrowPriority by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
@@ -93,7 +94,9 @@ fun ReviewContent(
             when (model.round) {
                 ReviewRound.Review -> {
 
-                    PriorityReviewTopBar(navigateUp = onBack)
+                    PriorityReviewTopBar(navigateUp = onBack, disableHintArrow = {
+                        showHintArrowPriority = !showHintArrowPriority
+                    })
 
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
@@ -136,7 +139,7 @@ fun ReviewContent(
                     )
 
                     AnimatedVisibility(
-                        visible = isCardMoving,
+                        visible = isCardMoving && showHintArrowPriority,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -164,12 +167,14 @@ fun ReviewContent(
 private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
+    disableHintArrow: () -> Unit,
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val tasks = DefaultHintTask.tasks.map { task ->
         task.copy(title = stringResource(task.title.toInt()))
     }
+    var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
             Text(
@@ -188,9 +193,28 @@ private fun PriorityReviewTopBar(
             IconButton(onClick = { isBottomSheetVisible = true }) {
                 Icon(
                     imageVector = Icons.Default.Help,
-                    contentDescription = ""
+                    contentDescription = stringResource(R.string.help)
                 )
             }
+            IconButton(onClick = { showMenu = true }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = stringResource(R.string.show_hint_arrow_priority)
+                )
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(onClick = {
+                    disableHintArrow()
+                    showMenu = false
+                },
+                    text = { Text(text = stringResource(R.string.disable_hint_arrow)) })
+
+            }
+
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
