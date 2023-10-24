@@ -21,7 +21,7 @@ class UserRepositoryImpl(
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             enableConfetti = getSetting(Confetti, enableConfetti),
             reviewTime = getSetting(ReviewTime, reviewTime),
-            showHintArrowPriority = getSetting(ShowHintArrowPriority, showHintArrowPriority)
+            enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint)
         )
     }
 

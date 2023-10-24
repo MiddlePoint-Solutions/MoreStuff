@@ -67,7 +67,6 @@ fun ReviewContent(
 
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }
-    val showHintArrowPriority by viewModel.showHintArrowPriorityFlow.collectAsState(initial = true)
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
@@ -90,14 +89,21 @@ fun ReviewContent(
             when (model.round) {
                 ReviewRound.Review -> {
 
-                    PriorityReviewTopBar(
-                        navigateUp = onBack, disableHintArrow = {
-                            scope.launch {
-                                viewModel.toggleHintArrowPriority()
-                            }
-                        },
-                        isHintArrowActive = showHintArrowPriority
-                    )
+                    AnimatedVisibility(
+                        visible = !isCardMoving,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        PriorityReviewTopBar(
+                            navigateUp = onBack,
+                            disableHintArrow = {
+                                scope.launch {
+                                    viewModel.toggleHintArrowPriority()
+                                }
+                            },
+                            isHintArrowActive = viewModel.reviewHintEnabled
+                        )
+                    }
 
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
@@ -140,7 +146,7 @@ fun ReviewContent(
                     )
 
                     AnimatedVisibility(
-                        visible = isCardMoving && showHintArrowPriority,
+                        visible = isCardMoving && viewModel.reviewHintEnabled,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -233,7 +239,7 @@ private fun PriorityReviewTopBar(
             onDismissRequest = { isBottomSheetVisible = false },
             sheetState = bottomSheetState,
             content = {
-                var reloadCards by remember { mutableStateOf(0) }
+                var reloadCards by remember { mutableIntStateOf(0) }
                 LaunchedEffect(Unit) {
                     while (true) {
                         delay(9000)
@@ -424,9 +430,9 @@ private fun ReviewDragHint() {
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
-                contentDescription = "Lowest",
-                modifier = Modifier.size(30.dp),
-                tint = Color.White
+                contentDescription = stringResource(R.string.cd_lowest_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
             )
         }
         Column(
@@ -441,9 +447,9 @@ private fun ReviewDragHint() {
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
-                contentDescription = "High",
-                modifier = Modifier.size(30.dp),
-                tint = Color.White
+                contentDescription = stringResource(R.string.cd_high_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.width(8.dp))
             ReviewHintTitle(text = stringResource(R.string.review_hint_high_priority))
@@ -461,9 +467,9 @@ private fun ReviewDragHint() {
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
-                contentDescription = "Low",
-                modifier = Modifier.size(30.dp),
-                tint = Color.White
+                contentDescription = stringResource(R.string.cd_low_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.width(8.dp))
             ReviewHintTitle(text = stringResource(R.string.review_hint_low_priority))
