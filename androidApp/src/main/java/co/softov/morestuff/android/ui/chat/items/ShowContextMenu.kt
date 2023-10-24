@@ -19,39 +19,17 @@ fun ShowContextMenu(
     message: Message,
     showMenu: Boolean,
     modifier: Modifier = Modifier,
-    onCopyMessage: (Message) -> Unit,
-    onDeleteMessage: (Message) -> Unit,
-    onShareImage: (String) -> Unit,
-    onClose: () -> Unit,
+    copyMessage: (Message) -> Unit,
+    deleteMessage: (Message) -> Unit,
+    shareImage: (String) -> Unit,
+    close: () -> Unit,
 ) {
-    val contextMenuItems =
-        if (message.messageData?.filePath != null) {
-            listOf(
-                ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete) {
-                    onDeleteMessage(message)
-                    onClose()
-                },
-                ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
-                    onShareImage(message.messageData.filePath)
-                    onClose()
-                },
-            )
-        } else {
-            listOf(
-                ContextMenuItem(stringResource(R.string.copy_message), Icons.Default.ContentCopy) {
-                    onCopyMessage(message)
-                    onClose()
-                },
-                ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete) {
-                    onDeleteMessage(message)
-                    onClose()
-                }
-            )
-        }
+    val contextMenuItems = getContextMenuItems(message, copyMessage, deleteMessage, shareImage, close)
 
     DropdownMenu(
         expanded = showMenu,
-        onDismissRequest = onClose,
+        onDismissRequest = close,
+        modifier = modifier
     ) {
         contextMenuItems.forEach { item ->
             DropdownMenuItem(
@@ -60,6 +38,38 @@ fun ShowContextMenu(
                 leadingIcon = { Icon(item.icon, contentDescription = null) }
             )
         }
+    }
+}
+
+@Composable
+private fun getContextMenuItems(
+    message: Message,
+    copyMessage: (Message) -> Unit,
+    deleteMessage: (Message) -> Unit,
+    shareImage: (String) -> Unit,
+    close: () -> Unit
+): List<ContextMenuItem> {
+    val deleteAction = {
+        deleteMessage(message)
+        close()
+    }
+
+    return if (message.messageData?.filePath != null) {
+        listOf(
+            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction),
+            ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
+                shareImage(message.messageData.filePath)
+                close()
+            },
+        )
+    } else {
+        listOf(
+            ContextMenuItem(stringResource(R.string.copy_message), Icons.Default.ContentCopy) {
+                copyMessage(message)
+                close()
+            },
+            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction)
+        )
     }
 }
 
