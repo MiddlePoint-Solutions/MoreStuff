@@ -182,6 +182,7 @@ private fun PriorityReviewTopBar(
     val tasks = DefaultHintTask.tasks.map { task ->
         task.copy(title = stringResource(task.title.toInt()))
     }
+    val scope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
@@ -216,8 +217,10 @@ private fun PriorityReviewTopBar(
                 onDismissRequest = { showMenu = false }
             ) {
                 DropdownMenuItem(onClick = {
-                    disableHintArrow()
-                    showMenu = false
+                    scope.launch {
+                        disableHintArrow()
+                        showMenu = false
+                    }
                 },
                     text = {
                         Text(
