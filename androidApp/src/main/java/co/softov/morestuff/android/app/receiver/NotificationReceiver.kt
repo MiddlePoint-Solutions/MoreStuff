@@ -3,21 +3,15 @@ package co.softov.morestuff.android.app.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkManager
-import co.softov.morestuff.android.app.work.NotificationResponseWorker
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction
+import co.softov.morestuff.android.domain.redux.middleware.ReminderAction
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-import org.koin.core.component.inject
 import timber.log.Timber
 
 class NotificationReceiver : BroadcastReceiver(), KoinComponent {
-
-    private val workManager: WorkManager by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
@@ -35,12 +29,10 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
 
     private fun onNotificationReply(intent: Intent) {
         intent.getReplyIntentExtras()?.let {
-            val work = OneTimeWorkRequestBuilder<NotificationResponseWorker>().apply {
-                setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(NotificationResponseWorker.createWorkerData(it.scheduleId, it.type))
-                addTag(NotificationResponseWorker.createWorkerTag(it.scheduleId))
-            }.build()
-            workManager.enqueue(work)
+            goAsync(Dispatchers.Default) {
+                val store: AppStore = get()
+                store.dispatchSuspend(ReminderAction.UserResponseAction(it.scheduleId, it.type))
+            }
         } ?: Timber.w("!!! Notification Reply missing extras !!!")
     }
 
