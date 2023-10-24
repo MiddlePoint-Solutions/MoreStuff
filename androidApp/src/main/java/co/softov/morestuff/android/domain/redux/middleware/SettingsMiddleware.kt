@@ -60,6 +60,9 @@ class SettingsMiddleware(
             is SettingAction.SetReviewTimeAction -> scope.launch {
                 saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
             }
+            is SettingAction.SetShowHintArrowPriority -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ShowHintArrowPriority, action.enable)
+            }
             else -> NoOp
         }
 

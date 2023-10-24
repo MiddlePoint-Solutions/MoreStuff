@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.domain.redux.state
 
+import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppSetting.Confetti
 import co.softov.morestuff.android.domain.enums.AppSetting.DevSettings
 import co.softov.morestuff.android.domain.enums.AppSetting.FirstTime
@@ -21,7 +22,8 @@ data class AppSettings(
     val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
     val enableConfetti: Boolean = Confetti.defaultValue,
-    val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue
+    val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
+    val showHintArrowPriority: Boolean = AppSetting.ShowHintArrowPriority.defaultValue
 )
 
 sealed class SettingAction : Action.FeatureAction() {
@@ -32,6 +34,7 @@ sealed class SettingAction : Action.FeatureAction() {
     data class EnableConfetti(val enable: Boolean) : SettingAction()
     data object OnBoardingComplete : SettingAction()
     data class SetReviewTimeAction(val hour: Int, val minute: Int, val replaceExisting: Boolean) : SettingAction()
+    data class SetShowHintArrowPriority(val enable: Boolean) : SettingAction()
 
 }
 
@@ -51,5 +54,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         OnBoardingComplete -> copy(isFirstTime = false)
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
         is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
+        is SettingAction.SetShowHintArrowPriority -> copy(showHintArrowPriority = action.enable)
     }
 }

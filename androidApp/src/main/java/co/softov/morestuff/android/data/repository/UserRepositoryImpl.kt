@@ -20,7 +20,8 @@ class UserRepositoryImpl(
             appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             enableConfetti = getSetting(Confetti, enableConfetti),
-            reviewTime = getSetting(ReviewTime, reviewTime)
+            reviewTime = getSetting(ReviewTime, reviewTime),
+            showHintArrowPriority = getSetting(ShowHintArrowPriority, showHintArrowPriority)
         )
     }
 
@@ -36,6 +37,7 @@ class UserRepositoryImpl(
                 setting.key,
                 (settingValue as Pair<Int, Int>).let { "${it.first};${it.second}" }
             )
+            ShowHintArrowPriority -> settings.putBoolean(setting.key, settingValue as Boolean)
         }
     }
 
@@ -48,6 +50,7 @@ class UserRepositoryImpl(
             Confetti -> getSetting(setting, setting.defaultValue as Boolean)
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
+            ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -64,6 +67,7 @@ class UserRepositoryImpl(
                 val timeStr = settings.getString(setting.key, setting.defaultValue.toString())
                 timeStr.toPairInt() ?: setting.defaultValue
             }
+            ShowHintArrowPriority -> settings.getBoolean(setting.key, defaultValue as Boolean)
         } as T
 
 }

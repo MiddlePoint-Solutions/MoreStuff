@@ -17,23 +17,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
@@ -73,7 +67,7 @@ fun ReviewContent(
 
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }
-    var showHintArrowPriority by remember { mutableStateOf(true) }
+    val showHintArrowPriority by viewModel.showHintArrowPriorityFlow.collectAsState(initial = true)
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
@@ -96,9 +90,14 @@ fun ReviewContent(
             when (model.round) {
                 ReviewRound.Review -> {
 
-                    PriorityReviewTopBar(navigateUp = onBack, disableHintArrow = {
-                        showHintArrowPriority = !showHintArrowPriority
-                    })
+                    PriorityReviewTopBar(
+                        navigateUp = onBack, disableHintArrow = {
+                            scope.launch {
+                                viewModel.toggleHintArrowPriority()
+                            }
+                        },
+                        isHintArrowActive = showHintArrowPriority
+                    )
 
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
@@ -170,6 +169,7 @@ private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
     disableHintArrow: () -> Unit,
+    isHintArrowActive: Boolean,
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -213,7 +213,13 @@ private fun PriorityReviewTopBar(
                     disableHintArrow()
                     showMenu = false
                 },
-                    text = { Text(text = stringResource(R.string.disable_hint_arrow)) })
+                    text = {
+                        Text(
+                            text = if (isHintArrowActive)
+                                stringResource(R.string.disable_hint_arrow)
+                            else stringResource(R.string.enable_hint_arrow)
+                        )
+                    })
 
             }
 
@@ -407,19 +413,14 @@ private fun ReviewDragHint() {
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = stringResource(R.string.review_hint_lowest_priority),
-                style = TextStyle(
-                    fontSize = 18.67.sp,
-                    lineHeight = 23.76.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0x8CFFFFFF),
-                    textAlign = TextAlign.Center,
-                )
-            )
+            ReviewHintTitle(text = stringResource(R.string.review_hint_lowest_priority))
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
@@ -431,8 +432,12 @@ private fun ReviewDragHint() {
         Column(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
@@ -441,22 +446,18 @@ private fun ReviewDragHint() {
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.review_hint_high_priority),
-                style = TextStyle(
-                    fontSize = 18.67.sp,
-                    lineHeight = 23.76.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0x8CFFFFFF),
-                    textAlign = TextAlign.Center,
-                )
-            )
+            ReviewHintTitle(text = stringResource(R.string.review_hint_high_priority))
         }
+
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 30.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
@@ -465,17 +466,7 @@ private fun ReviewDragHint() {
                 tint = Color.White
             )
             Spacer(modifier = Modifier.width(8.dp))
-
-            Text(
-                text = stringResource(R.string.review_hint_low_priority),
-                style = TextStyle(
-                    fontSize = 18.67.sp,
-                    lineHeight = 23.76.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0x8CFFFFFF),
-                    textAlign = TextAlign.Center,
-                )
-            )
+            ReviewHintTitle(text = stringResource(R.string.review_hint_low_priority))
         }
     }
 }

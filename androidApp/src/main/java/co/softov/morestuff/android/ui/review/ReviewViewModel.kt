@@ -4,10 +4,10 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
-
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-
+import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
@@ -19,11 +19,16 @@ import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
     private val getTasksWithoutScheduleUseCase: GetTasksWithoutScheduleUseCase,
     private val reviewItemMapper: ReviewItemMapper,
+    appStore: AppStore,
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
@@ -117,6 +122,15 @@ class ReviewViewModel(
     fun completeTask(item: ReviewItemUiModel) {
         sendEvent(ItemReview(item, PriorityActionType.Done))
         dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+    }
+
+    val showHintArrowPriorityFlow: Flow<Boolean> = appStore.state
+        .map { it.settings.showHintArrowPriority }
+        .distinctUntilChanged()
+
+    suspend fun toggleHintArrowPriority() {
+        val currentState = showHintArrowPriorityFlow.first()
+        dispatchAppStoreAction(SettingAction.SetShowHintArrowPriority(enable = !currentState))
     }
 
 }
