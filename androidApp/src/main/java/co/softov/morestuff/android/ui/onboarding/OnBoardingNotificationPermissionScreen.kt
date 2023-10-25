@@ -4,42 +4,57 @@ import android.Manifest
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
+import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.requiresNotificationsPermission
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
 
+    var rationaleDisplayed by remember { mutableStateOf(false) }
+    var showRationaleDialog by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
     val permissionState = if (requiresNotificationsPermission()) {
-        rememberPermissionState(
-            Manifest.permission.POST_NOTIFICATIONS
-        ) { granted ->
+        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) { granted ->
             if (granted) {
                 onNext()
             }
@@ -48,83 +63,115 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
         error("VERSION.SDK_INT < TIRAMISU")
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    if (permissionState.status.shouldShowRationale && !rationaleDisplayed) {
+        showRationaleDialog = true
+        rationaleDisplayed = true
+    }
+
+    if (showRationaleDialog) {
+        AlertDialog(
+            onDismissRequest = { showRationaleDialog = false },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            Card {
+                Text(
+                    text = stringResource(R.string.notification_permission_rationale),
+                    modifier = Modifier.padding(10.dp)
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = {
+                        scope.launch { permissionState.launchPermissionRequest() }
+                        showRationaleDialog = false
+                    }) {
+                        Text(text = stringResource(id = R.string.button_enable))
+                    }
+                    TextButton(onClick = {
+                        scope.launch { onNext() }
+                        showRationaleDialog = false
+                    }) {
+                        Text(text = stringResource(id = R.string.button_skip))
+                    }
+                }
+            }
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize(),
         ) {
 
+            val (image, title, subtitle) = createRefs()
+
             Text(
-                text = stringResource(R.string.notification),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.onboarding_notification_permission_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(title) { bottom.linkTo(subtitle.top, margin = 30.dp) },
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 40.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center
+                ),
                 color = MaterialTheme.colorScheme.primary,
             )
-            Spacer(modifier = Modifier.padding(15.dp))
             Text(
-                text = stringResource(R.string.more_stuff_requires_notification),
-                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(R.string.onboarding_notification_permission_subtitle),
+                modifier = Modifier
+                    .constrainAs(subtitle) { bottom.linkTo(image.top, margin = 30.dp) },
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.secondary,
             )
 
-            Spacer(modifier = Modifier.padding(20.dp))
             Image(
+                modifier = Modifier.constrainAs(image) { centerTo(parent) },
                 painter = painterResource(id = R.drawable.notification_permission),
-                contentDescription = "Notifications permission image",
+                contentDescription = stringResource(R.string.cd_notifications_permission_image),
             )
         }
 
-        Row(
-            Modifier
-                .padding(bottom = 56.dp)
-                .align(Alignment.CenterHorizontally)
-
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column {
-                Button(
-                    onClick = {
-                        permissionState.launchPermissionRequest()
-                    },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.button_enable),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
+            OnboardingButton(
+                onClick = {
+                    permissionState.launchPermissionRequest()
+                },
+                title = stringResource(id = R.string.button_enable)
+            )
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            TextButton(
+                onClick = { onNext() },
+                modifier = Modifier
+                    .width(187.dp)
+                    .height(43.dp),
+                content = {
+                    Text(
+                        text = stringResource(R.string.button_skip),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 28.sp,
+                            fontWeight = FontWeight(700),
+                            color = MaterialTheme.colorScheme.secondary,
                         )
-                    }
-                )
-                Spacer(modifier = Modifier.padding(5.dp))
-                Button(
-                    onClick = { onNext() },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.button_skip),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.secondary,
-                            )
-                        )
-                    }
-                )
-            }
+                    )
+                }
+            )
         }
     }
 }

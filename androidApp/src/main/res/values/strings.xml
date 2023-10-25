@@ -141,8 +141,8 @@
     <string name="onboarding_welcome_subtitle2">organize &amp; prioritize</string>
     <string name="onboarding_welcome_subtitle3">your stuff.</string>
     <string name="button_start">Start</string>
-    <string name="notification">Notification\npermission </string>
-    <string name="more_stuff_requires_notification">MoreStuff requires Notification\npermission to send you Task &amp;\nReminder notifications  </string>
+    <string name="onboarding_notification_permission_title">Allow Notifications</string>
+    <string name="onboarding_notification_permission_subtitle">MoreStuff requires a notification\npermission so you can schedule important stuff!</string>
     <string name="button_enable">Enable</string>
     <string name="button_skip">Skip</string>
     <string name="button_next">Next</string>
@@ -200,6 +200,8 @@
     <string name="review_hint_highest_priority">Highest Priority</string>
     <string name="review_hint_lowest_priority">Lowest Priority</string>
     <string name="cd_app_logo">app logo</string>
+    <string name="cd_notifications_permission_image">Notifications permission image</string>
+    <string name="notification_permission_rationale">MoreStuff needs the notification permission to enable setting schedules and reminders for the stuff that you don\'t want to forget…\nYou can also enable the permission while using the app.</string>
 
 
 </resources>

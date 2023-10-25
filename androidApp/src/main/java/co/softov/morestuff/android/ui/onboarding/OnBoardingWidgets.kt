@@ -7,23 +7,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.R
 
 @Composable
 fun OnboardingButton(
-    onNext: () -> Unit,
+    onClick: () -> Unit,
+    title: String,
     modifier: Modifier = Modifier,
 ) {
     Button(
-        onClick = onNext,
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(0.7f),
         content = {
             Text(
-                text = stringResource(R.string.button_next),
+                text = title,
                 modifier = Modifier.padding(vertical = 4.dp),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontSize = 16.sp,

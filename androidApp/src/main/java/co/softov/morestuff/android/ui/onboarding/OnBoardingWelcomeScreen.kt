@@ -66,10 +66,11 @@ fun OnBoardingWelcomeScreen(
         }
 
         OnboardingButton(
-            onNext = onNext,
+            onClick = onNext,
+            title = stringResource(id = R.string.button_next),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 45.dp)
+                .padding(bottom = 100.dp)
         )
     }
 }
