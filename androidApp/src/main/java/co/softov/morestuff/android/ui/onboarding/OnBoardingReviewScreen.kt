@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.onboarding
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
@@ -40,6 +42,7 @@ import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import co.softov.morestuff.android.ui.review.swipeable.SwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.swipableCard
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import kotlinx.coroutines.delay
 
@@ -238,5 +241,20 @@ private fun createSwipeOffset(direction: SwipeDirection, state: SwipeableCardSta
         SwipeDirection.Up -> Offset(0f, -state.maxHeight * fraction)
         SwipeDirection.Down -> Offset(0f, state.maxHeight * fraction)
         SwipeDirection.None -> Offset(0f, 0f)
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "Light"
+)
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        OnBoardingReviewScreen {}
     }
 }

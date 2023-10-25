@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import android.Manifest
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,16 +23,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.requiresNotificationsPermission
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun NotificationPermissionScreen(onNext: () -> Unit) {
+fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
 
     val permissionState = if (requiresNotificationsPermission()) {
         rememberPermissionState(
@@ -123,5 +126,20 @@ fun NotificationPermissionScreen(onNext: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "Light"
+)
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        OnBoardingNotificationPermissionScreen {}
     }
 }

@@ -1,67 +1,91 @@
 package co.softov.morestuff.android.ui.onboarding
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun OnBoardingWelcomeScreen(
-    nextButton: @Composable () -> Unit,
+    onNext: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Column(
+    Box {
+
+        Image(
+            painter = painterResource(id = R.drawable.logo),
             modifier = Modifier
-                .weight(1f),
+                .align(Alignment.TopCenter)
+                .padding(top = 100.dp),
+            contentDescription = stringResource(R.string.cd_app_logo),
+        )
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "app welcome image",
-                contentScale = ContentScale.None
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
 
             Text(
-                text = stringResource(R.string.our_goal),
+                text = stringResource(R.string.onboarding_welcome_title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
 
             Text(
-                text = stringResource(R.string.is_to_help_you_plan_and),
-                style = MaterialTheme.typography.bodyMedium,
+                text = buildAnnotatedString {
+                    append(stringResource(R.string.onboarding_welcome_subtitle1))
+                    append("\n")
+                    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                    append(stringResource(R.string.onboarding_welcome_subtitle2))
+                    pop()
+                    append("\n")
+                    append(stringResource(R.string.onboarding_welcome_subtitle3))
+                },
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.secondary,
             )
         }
 
-        Box(
-            Modifier
-                .padding(bottom = 56.dp)
-                .align(Alignment.CenterHorizontally)
-        ) {
-            nextButton()
-        }
+        OnboardingButton(
+            onNext = onNext,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 45.dp)
+        )
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "Light",
+    backgroundColor = 0xFFFFFFFF
+)
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        OnBoardingWelcomeScreen {}
     }
 }

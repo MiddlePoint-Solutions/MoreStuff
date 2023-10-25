@@ -136,8 +136,10 @@
     <string name="cd_show_task_chat">Show task chat</string>
 
     <!--  onBoarding  -->
-    <string name="our_goal">"Our goal"</string>
-    <string name="is_to_help_you_plan_and">is to help you prioritize and\nfulfill your tasks.</string>
+    <string name="onboarding_welcome_title">"Our goal"</string>
+    <string name="onboarding_welcome_subtitle1">is to help you intuitively</string>
+    <string name="onboarding_welcome_subtitle2">organize &amp; prioritize</string>
+    <string name="onboarding_welcome_subtitle3">your stuff.</string>
     <string name="button_start">Start</string>
     <string name="notification">Notification\npermission </string>
     <string name="more_stuff_requires_notification">MoreStuff requires Notification\npermission to send you Task &amp;\nReminder notifications  </string>
@@ -197,6 +199,7 @@
     <string name="review_hint_low_priority">Low Priority</string>
     <string name="review_hint_highest_priority">Highest Priority</string>
     <string name="review_hint_lowest_priority">Lowest Priority</string>
+    <string name="cd_app_logo">app logo</string>
 
 
 </resources>
