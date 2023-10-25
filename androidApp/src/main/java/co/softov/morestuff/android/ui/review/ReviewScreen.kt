@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
@@ -39,6 +40,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -49,10 +51,16 @@ fun ReviewScreen(
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
+    val scope = rememberCoroutineScope()
     ProvideLocalViewModelStoreOwner(lifecycleOwner) {
         ReviewContent(
             onBack = navigation::pop,
-            modifier = modifier
+            modifier = modifier,
+            showTaskChat = { taskId ->
+                scope.launch {
+                    navigation.push(Screen.TaskChat(taskId))
+                }
+            }
         )
     }
 }
@@ -62,8 +70,8 @@ fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewViewModel = koinViewModel(),
+    showTaskChat: (taskId: Long) -> Unit,
 ) {
-
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
@@ -120,7 +128,8 @@ fun ReviewContent(
                                 states.firstVisibleStateOrNull()?.onComplete()
                                 viewModel.completeTask(it)
                             }
-                        }
+                        },
+                        showTaskChat = showTaskChat
                     )
 
                     LaunchedEffect(key1 = model.round) {
@@ -258,7 +267,9 @@ private fun TaskPrioritySwipe(
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
+    showTaskChat: (taskId: Long) -> Unit,
 ) {
+    val itemClick by rememberUpdatedState(showTaskChat)
     Box(
         modifier = modifier.padding(20.dp)
     ) {
@@ -273,7 +284,8 @@ private fun TaskPrioritySwipe(
                         .swipableCard(state = state),
                     task = task,
                     onComplete = onComplete,
-                    isVisible = isVisible
+                    isVisible = isVisible,
+                    showTaskChat = itemClick
                 )
             }
             LaunchedEffect(task, state.swipedDirection) {

@@ -83,13 +83,14 @@ class TaskRepositoryImpl(
                 .mapToList(Dispatchers.IO)
                 .map { it.groupBy { schedule -> schedule.taskId } }
 
-        val messagesFlow = messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-            .map { messages ->
-                messages.groupBy { message -> message.task_id }
-                    .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
-            }
+        val messagesFlow =
+            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { messages ->
+                    messages.groupBy { message -> message.task_id }
+                        .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
+                }
 
         return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
             tasks.map { task ->
@@ -157,12 +158,26 @@ class TaskRepositoryImpl(
         return Right(true)
     }
 
-    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> =
-        taskQueries.getActiveTaskWithoutSchedule(
+    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> {
+        val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutSchedule(
             listOf(ScheduleType.OneTime),
             mapper = mapper.taskDbMapper
         ).executeAsList()
-            .right()
+
+        val firstTaskMessagesWithType =
+            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
+                .executeAsList()
+                .map { it.task_id }
+                .toSet()
+
+        val tasksWithExtraDetails = tasksWithoutSchedule.map { task ->
+            task.copy(
+                extraDetails = firstTaskMessagesWithType.contains(task.id)
+            )
+        }
+        return tasksWithExtraDetails.right()
+    }
+
 
     override suspend fun getTasksWithSchedule(
         scheduleTypes: List<ScheduleType>,
