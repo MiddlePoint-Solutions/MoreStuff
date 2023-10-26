@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,12 +24,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,34 +69,81 @@ fun ShareScreen(
     shareable: Shareable,
     shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
-            Surface(shadowElevation = 5.dp) {
-                TopAppBar(
-                    title = { Text(text = stringResource(R.string.select_chat)) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.cd_navigate_back)
-                            )
+            if (isSearchActive) {
+                ShareSearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it },
+                    onBack = { isSearchActive = false },
+                    shareable = shareable,
+                    shareToExistingTask = shareToExistingTask
+                )
+            } else {
+                Surface(shadowElevation = 5.dp) {
+                    TopAppBar(
+                        title = { Text(text = stringResource(R.string.select_chat)) },
+                        navigationIcon = {
+                            IconButton(onClick = onBack) {
+                                Icon(
+                                    imageVector = Icons.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.cd_navigate_back)
+                                )
+                            }
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        ),
+                        actions = {
+                            IconButton(onClick = { isSearchActive = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.cd_search_chats),
+                                    modifier = Modifier.size(32.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-                    actions = {
-                        // TODO: Uncomment below code when implementing search for share.
-                        /* IconButton(onClick = { *//* TODO: search *//* }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(R.string.cd_search_chats),
-                                modifier = Modifier.size(32.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
-                            )
-                        }*/
-                    }
+                    )
+                }
+            }
+        },
+        content = {
+            ShareContent(
+                shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
+                shareable = shareable,
+                modifier = Modifier.padding(it),
+                searchQuery = searchQuery,
+            )
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShareSearchBar(
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onBack: () -> Unit,
+    shareable: Shareable,
+    shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
+) {
+    SearchBar(
+        query = searchQuery,
+        onQueryChange = onSearchQueryChange,
+        onSearch = { },
+        active = true,
+        onActiveChange = { },
+        placeholder = { Text(text = stringResource(R.string.search)) },
+        leadingIcon = {
+            IconButton(onClick = onBack) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.cd_navigate_back)
                 )
             }
         },
@@ -99,9 +151,14 @@ fun ShareScreen(
             ShareContent(
                 shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
                 shareable = shareable,
-                modifier = Modifier.padding(it)
+                modifier = Modifier.padding(),
+                searchQuery = searchQuery,
+                searchBarActive = true
             )
         },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        )
     )
 }
 
@@ -115,7 +172,10 @@ private fun ShareContent(
     shareViewModel: ShareViewModel = koinViewModel(),
     userInputViewModel: UserInputViewModel = koinViewModel(),
     mainViewModel: MainViewModel = koinViewModel(),
+    searchQuery: String,
+    searchBarActive: Boolean = false,
 ) {
+    val filteredTasks = shareViewModel.filteredTasks.collectAsState().value
 
     val state = rememberLazyListState()
     var showUserInput by remember { mutableStateOf(false) }
@@ -127,6 +187,9 @@ private fun ShareContent(
             shareToTask(taskId)
         }
     }
+    LaunchedEffect(searchQuery) {
+        shareViewModel.updateQuery(searchQuery)
+    }
 
     Box(modifier) {
         LazyColumn(
@@ -134,21 +197,22 @@ private fun ShareContent(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End
         ) {
+            if (!searchBarActive) {
+                item {
+                    CreateNewTaskItem {
+                        mainViewModel.creatingNewTask.value = true
+                        showUserInput = true
+                    }
 
-            item {
-                CreateNewTaskItem {
-                    mainViewModel.creatingNewTask.value = true
-                    showUserInput = true
+                    Divider(
+                        thickness = 0.8.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-
-                Divider(
-                    thickness = 0.8.dp,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
 
             items(
-                shareViewModel.tasks,
+                filteredTasks,
                 key = { it.id }
             ) { task ->
                 PriorityItem(
@@ -244,6 +308,7 @@ fun ShareContentPreview() {
         ShareContent(
             shareable = Shareable.Text(""),
             shareToTask = {},
+            searchQuery = ""
         )
     }
 }
