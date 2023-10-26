@@ -79,7 +79,10 @@ fun ShareScreen(
                 ShareSearchBar(
                     searchQuery = searchQuery,
                     onSearchQueryChange = { searchQuery = it },
-                    onBack = { isSearchActive = false },
+                    onBack = {
+                        isSearchActive = false
+                        searchQuery = ""
+                    },
                     shareable = shareable,
                     shareToExistingTask = shareToExistingTask
                 )
