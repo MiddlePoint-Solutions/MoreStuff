@@ -1,15 +1,14 @@
 package co.softov.morestuff.android.ui.schedule
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -37,7 +36,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -60,11 +58,11 @@ import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
@@ -75,7 +73,6 @@ fun PriorityContent(
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
-
     val scope = rememberCoroutineScope()
     val model by viewModel.model.collectAsState()
 
@@ -108,7 +105,6 @@ fun PriorityContent(
                     }
                 }
             }
-
             else -> {}
         }
     }
@@ -157,23 +153,21 @@ fun PriorityContent(
         }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+
+    var selectedTasks by remember { mutableStateOf(setOf<Long>()) }
+    val isBulkMode by derivedStateOf { selectedTasks.isNotEmpty() }
+
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = state.listState,
             modifier = Modifier
                 .fillMaxSize()
                 .reorderable(state),
         ) {
-
             itemsIndexed(
                 items = viewModel.tasks,
-                key = { _, task  -> task.id }
+                key = { _, task -> task.id }
             ) { index, item ->
-                val task by rememberUpdatedState(item)
-                val itemClick by rememberUpdatedState(showTaskChat)
-
                 val isLast by remember(index) {
                     derivedStateOf { index == viewModel.tasks.lastIndex }
                 }
@@ -184,12 +178,11 @@ fun PriorityContent(
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                taskOptions = task
+                                taskOptions = item
                                 false
                             }
-
                             DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(task)
+                                viewModel.toggleReminder(item)
                                 false
                             }
                         }
@@ -203,29 +196,40 @@ fun PriorityContent(
                         }
                 }
 
-                ReorderableItem(state, key = task.id) { isDragging ->
+                ReorderableItem(state, key = item.id) { isDragging ->
                     NoFlingSwipeToDismiss(
                         state = dismissState,
-                        background = { SwipeBackground(dismissState, task.hasReminder) },
+                        background = { SwipeBackground(dismissState, item.hasReminder) },
                         dismissContent = {
                             PriorityItem(
-                                task = task,
-                                onClick = itemClick,
-                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
+                                task = item,
+                                onClick = {
+                                    if (isBulkMode) {
+                                        selectedTasks = if (item.id in selectedTasks) {
+                                            selectedTasks - item.id
+                                        } else {
+                                            selectedTasks + item.id
+                                        }
+                                    } else {
+                                        showTaskChat(item.id)
+                                    }
+                                },
+                                onLongClick = {
+                                    selectedTasks = setOf(item.id)
+                                },
+                                isSelected = item.id in selectedTasks,
                                 isDragging = isDragging
                             )
                         }
                     )
 
-                    if(!isLast) {
+                    if (!isLast) {
                         Divider(
                             modifier = Modifier.align(Alignment.BottomCenter),
                             thickness = Dp.Hairline
                         )
                     }
-
                 }
-
             }
         }
 
@@ -248,9 +252,7 @@ fun PriorityContent(
                     .padding(bottom = 180.dp),
                 contentAlignment = Alignment.Center
             ) {
-                TextButton(
-                    onClick = onCallToAction,
-                ) {
+                TextButton(onClick = onCallToAction) {
                     Text(
                         stringResource(R.string.empty_priority_list_cta),
                         style = MaterialTheme.typography.titleLarge.copy(
@@ -262,6 +264,7 @@ fun PriorityContent(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
