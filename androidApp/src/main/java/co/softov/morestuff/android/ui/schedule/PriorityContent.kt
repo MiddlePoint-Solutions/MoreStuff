@@ -4,12 +4,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -59,10 +57,6 @@ import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,16 +76,6 @@ fun PriorityContent(
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
     val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
-
-    val state = rememberReorderableLazyListState(
-        listState = listState,
-        onMove = { from, to ->
-            viewModel.updateTaskOrder(from.index, to.index)
-        },
-        onDragEnd = { start, end ->
-            viewModel.reorderTaskItem(start, end)
-        }
-    )
 
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
@@ -161,15 +145,12 @@ fun PriorityContent(
         modifier = modifier.fillMaxSize()
     ) {
         LazyColumn(
-            state = state.listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .reorderable(state),
+            modifier = Modifier.fillMaxSize(),
         ) {
 
             itemsIndexed(
                 items = viewModel.tasks,
-                key = { _, task  -> task.id }
+                key = { _, task -> task.id }
             ) { index, item ->
                 val task by rememberUpdatedState(item)
                 val itemClick by rememberUpdatedState(showTaskChat)
@@ -203,29 +184,23 @@ fun PriorityContent(
                         }
                 }
 
-                ReorderableItem(state, key = task.id) { isDragging ->
-                    NoFlingSwipeToDismiss(
-                        state = dismissState,
-                        background = { SwipeBackground(dismissState, task.hasReminder) },
-                        dismissContent = {
-                            PriorityItem(
-                                task = task,
-                                onClick = itemClick,
-                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
-                                isDragging = isDragging
-                            )
-                        }
-                    )
-
-                    if(!isLast) {
-                        Divider(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            thickness = Dp.Hairline
+                NoFlingSwipeToDismiss(
+                    state = dismissState,
+                    background = { SwipeBackground(dismissState, task.hasReminder) },
+                    dismissContent = {
+                        PriorityItem(
+                            task = task,
+                            onClick = itemClick,
                         )
                     }
+                )
 
+                if (!isLast) {
+                    Divider(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        thickness = Dp.Hairline
+                    )
                 }
-
             }
         }
 
@@ -262,6 +237,7 @@ fun PriorityContent(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
