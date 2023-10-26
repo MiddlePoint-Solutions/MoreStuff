@@ -57,9 +57,6 @@ import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnrememberedMutableState")
@@ -80,16 +77,6 @@ fun PriorityContent(
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
     val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
 
-    val state = rememberReorderableLazyListState(
-        listState = listState,
-        onMove = { from, to ->
-            viewModel.updateTaskOrder(from.index, to.index)
-        },
-        onDragEnd = { start, end ->
-            viewModel.reorderTaskItem(start, end)
-        }
-    )
-
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
         when (viewModel.notification) {
@@ -105,6 +92,7 @@ fun PriorityContent(
                     }
                 }
             }
+
             else -> {}
         }
     }
@@ -159,10 +147,7 @@ fun PriorityContent(
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
-            state = state.listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .reorderable(state),
+            modifier = Modifier.fillMaxSize(),
         ) {
             itemsIndexed(
                 items = viewModel.tasks,
@@ -181,6 +166,7 @@ fun PriorityContent(
                                 taskOptions = item
                                 false
                             }
+
                             DismissValue.DismissedToStart -> {
                                 viewModel.toggleReminder(item)
                                 false
@@ -196,70 +182,68 @@ fun PriorityContent(
                         }
                 }
 
-                ReorderableItem(state, key = item.id) { isDragging ->
-                    NoFlingSwipeToDismiss(
-                        state = dismissState,
-                        background = { SwipeBackground(dismissState, item.hasReminder) },
-                        dismissContent = {
-                            PriorityItem(
-                                task = item,
-                                onClick = {
-                                    if (isBulkMode) {
-                                        selectedTasks = if (item.id in selectedTasks) {
-                                            selectedTasks - item.id
-                                        } else {
-                                            selectedTasks + item.id
-                                        }
-                                    } else {
-                                        showTaskChat(item.id)
-                                    }
-                                },
-                                onLongClick = {
-                                    selectedTasks = setOf(item.id)
-                                },
-                                isSelected = item.id in selectedTasks,
-                                isDragging = isDragging
-                            )
-                        }
-                    )
 
-                    if (!isLast) {
-                        Divider(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            thickness = Dp.Hairline
+                NoFlingSwipeToDismiss(
+                    state = dismissState,
+                    background = { SwipeBackground(dismissState, item.hasReminder) },
+                    dismissContent = {
+                        PriorityItem(
+                            task = item,
+                            onClick = {
+                                if (isBulkMode) {
+                                    selectedTasks = if (item.id in selectedTasks) {
+                                        selectedTasks - item.id
+                                    } else {
+                                        selectedTasks + item.id
+                                    }
+                                } else {
+                                    showTaskChat(item.id)
+                                }
+                            },
+                            onLongClick = {
+                                selectedTasks = setOf(item.id)
+                            },
+                            isSelected = item.id in selectedTasks,
                         )
                     }
+                )
+
+                if (!isLast) {
+                    Divider(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        thickness = Dp.Hairline
+                    )
                 }
             }
         }
+    }
 
-        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = explode(),
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                        if (activeSystems == 0) showTaskCompleteAnimation = 0
-                    }
+    if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+        KonfettiView(
+            modifier = Modifier.fillMaxSize(),
+            parties = explode(),
+            updateListener = object : OnParticleSystemUpdateListener {
+                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                    if (activeSystems == 0) showTaskCompleteAnimation = 0
                 }
-            )
-        }
+            }
+        )
+    }
 
-        if (showEmptyState) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 180.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(onClick = onCallToAction) {
-                    Text(
-                        stringResource(R.string.empty_priority_list_cta),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+    if (showEmptyState) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(onClick = onCallToAction) {
+                Text(
+                    stringResource(R.string.empty_priority_list_cta),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                }
+                )
             }
         }
     }
