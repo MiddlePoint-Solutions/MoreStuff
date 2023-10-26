@@ -11,6 +11,7 @@ object Constants {
     const val KEY_USER_SNOOZE_LIMIT = "key_snooze_limit"
     const val KEY_ENABLE_CONFETTI = "key_enable_confetti"
     const val KEY_REVIEW_TIME = "key_review_time"
+    const val KEY_REVIEW_HINT = "key_review_hint"
 
     // Developer keys
     const val KEY_DEBUG_MESSAGES = "key_show_debug_message"

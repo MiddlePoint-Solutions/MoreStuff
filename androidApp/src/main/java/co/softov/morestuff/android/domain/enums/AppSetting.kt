@@ -7,5 +7,6 @@ sealed class AppSetting<T>(val defaultValue: T) {
     data object SnoozeLimit : AppSetting<Int>(3)
     data object Confetti : AppSetting<Boolean>(true)
     data object ReviewTime : AppSetting<Pair<Int, Int>>(9 to 0)
+    data object ShowHintArrowPriority : AppSetting<Boolean>(true)
 
 }
