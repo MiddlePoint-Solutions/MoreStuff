@@ -70,11 +70,15 @@
     <string name="done">Done</string>
     <string name="new_messages">Scroll Down</string>
     <string name="cd_navigate_back">Navigate Back</string>
+    <string name="help">Help</string>
+    <string name="show_hint_arrow_priority">Show hint arrow priority</string>
+    <string name="disable_hint_arrow">Disable hints</string>
+    <string name="enable_hint_arrow">Enable hints</string>
     <string name="cd_schedule_icon">Schedule Icon</string>
     <string name="cd_task_complete">Task Complete</string>
     <string name="task_chat_schedule_action">Set Schedule</string>
     <string name="settings">Settings</string>
-    <string name="priority_review">Priority Review</string>
+    <string name="priority_review">Review</string>
     <string name="finish">Finish</string>
     <string name="cd_priority_review">Open Priority Review</string>
     <string name="cd_settings">Show Settings</string>
@@ -184,8 +188,14 @@
     <string name="message_2_later_task">It\'s not urgent, but it\'s important.</string>
 
     <string name="message_1_plan_task">You\'ve planned this for later. Set a schedule!</string>
-
-
+    <string name="cd_highest_priority_hint_icon">Highest Priority hint icon</string>
+    <string name="cd_lowest_priority_hint_icon">Lowest Priority hint icon</string>
+    <string name="cd_low_priority_hint_icon">Low Priority hint icon</string>
+    <string name="cd_high_priority_hint_icon">High Priority hint icon</string>
+    <string name="review_hint_high_priority">High Priority</string>
+    <string name="review_hint_low_priority">Low Priority</string>
+    <string name="review_hint_highest_priority">Highest Priority</string>
+    <string name="review_hint_lowest_priority">Lowest Priority</string>
 
 
 </resources>

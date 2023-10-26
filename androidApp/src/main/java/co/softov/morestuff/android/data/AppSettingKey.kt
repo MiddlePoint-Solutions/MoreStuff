@@ -16,4 +16,5 @@ val AppSetting<*>.key: String
         Confetti -> Constants.KEY_ENABLE_CONFETTI
         DevSettings -> Constants.KEY_DEV_SETTINGS
         ReviewTime -> Constants.KEY_REVIEW_TIME
+        AppSetting.ShowHintArrowPriority -> Constants.KEY_REVIEW_HINT
     }
