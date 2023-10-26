@@ -1,14 +1,20 @@
 package co.softov.morestuff.android.ui.schedule
 
 import android.content.res.Configuration
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,18 +37,22 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PriorityItem(
     task: TaskDomain,
     onClick: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
+    isDragging: Boolean = false,
+    isSelected: Boolean = false,
+    onLongClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .clickable { onClick(task.id) }
+            .combinedClickable(onClick = { onClick(task.id) }, onLongClick = onLongClick)
     ) {
         Row(
             modifier = modifier
@@ -50,6 +60,15 @@ fun PriorityItem(
                 .padding(start = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+
+            if (isSelected) {
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
 
             TaskProfile(task.title)
 
@@ -82,6 +101,7 @@ fun PriorityItem(
     }
 }
 
+
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "DefaultPreviewDark"
@@ -101,7 +121,8 @@ fun PriorityItemPreview() {
                     add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
                 }
             ),
-            onClick = {}
+            onClick = {},
+            onLongClick = {}
         )
     }
 }
