@@ -36,7 +36,7 @@ import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.DefaultHintTask
-import co.softov.morestuff.android.ui.onboarding.ReviewCardsOnBoarding
+import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewCards
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
@@ -288,7 +288,7 @@ private fun PriorityReviewTopBar(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     key(reloadCards) {
-                        ReviewCardsOnBoarding(tasks)
+                        OnBoardingReviewCards(tasks)
                     }
                 }
             }

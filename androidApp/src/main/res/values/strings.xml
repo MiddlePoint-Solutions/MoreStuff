@@ -147,8 +147,8 @@
     <string name="button_skip">Skip</string>
     <string name="button_next">Next</string>
     <string name="your_workspace">Your workspace\nis ready </string>
-    <string name="chat_task">Chat with your tasks</string>
-    <string name="save_details_chat"> and save important details:\n  notes, images, links etc.</string>
+    <string name="onboarding_chat_task_title">Chat with your tasks</string>
+    <string name="onboarding_chat_task_subtitle">Just as you would with your favorite messaging app.</string>
     <string name="import_image_title">Import image</string>
     <string name="import_image_title_hint">Add a caption…</string>
     <string name="cd_share">Share</string>

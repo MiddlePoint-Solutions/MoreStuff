@@ -1,96 +1,121 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlinx.coroutines.delay
 
 @Composable
 fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.animation_lncy8nut))
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+
+    val composition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(R.raw.animation_lncy8nut)
+    )
+
+    var showComposition by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(300)
+        showComposition = true
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
+        ConstraintLayout(
             modifier = Modifier
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeContent),
         ) {
 
+            val (image, title, subtitle) = createRefs()
+
             Text(
-                text = stringResource(R.string.chat_task),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.onboarding_chat_task_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(title) { bottom.linkTo(subtitle.top, margin = 30.dp) },
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 40.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center
+                ),
                 color = MaterialTheme.colorScheme.primary,
             )
+
             Text(
-                text = stringResource(R.string.save_details_chat),
-                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(R.string.onboarding_chat_task_subtitle),
+                modifier = Modifier
+                    .constrainAs(subtitle) { bottom.linkTo(image.top, margin = 0.dp) }
+                    .padding(horizontal = 20.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
 
-            Spacer(modifier = Modifier.padding(20.dp))
-            LottieAnimation(
-                modifier = Modifier.size(380.dp),
-                composition = composition,
-                iterations = LottieConstants.IterateForever,
-            )
-        }
-
-        Row(
-            Modifier
-                .padding(bottom = 56.dp)
-                .align(Alignment.CenterHorizontally)
-
-        ) {
-            Column {
-                Button(
-                    onClick = { onNext() },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.button_next),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        )
-                    }
-                )
+            Box(modifier = Modifier
+                .constrainAs(image) { centerTo(parent) }
+                .size(380.dp)
+            ) {
+                AnimatedVisibility(
+                    modifier = Modifier.fillMaxSize(),
+                    visible = showComposition,
+                    enter = fadeIn()
+                ) {
+                    LottieAnimation(
+                        composition = composition,
+                        iterations = LottieConstants.IterateForever,
+                    )
+                }
             }
         }
+
+        OnboardingButton(
+            onClick = onNext,
+            title = stringResource(id = R.string.button_next),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp)
+        )
     }
 }
 
