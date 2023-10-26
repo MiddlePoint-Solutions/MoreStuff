@@ -140,7 +140,7 @@
     <string name="onboarding_welcome_subtitle1">is to help you intuitively</string>
     <string name="onboarding_welcome_subtitle2">organize &amp; prioritize</string>
     <string name="onboarding_welcome_subtitle3">your stuff.</string>
-    <string name="button_start">Start</string>
+    <string name="button_ready">Ready</string>
     <string name="onboarding_notification_permission_title">Allow Notifications</string>
     <string name="onboarding_notification_permission_subtitle">MoreStuff requires a notification\npermission so you can schedule important stuff!</string>
     <string name="button_enable">Enable</string>
