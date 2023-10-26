@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.schedule
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -35,7 +36,6 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -59,6 +59,7 @@ import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
@@ -69,7 +70,6 @@ fun PriorityContent(
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
-
     val scope = rememberCoroutineScope()
     val model by viewModel.model.collectAsState()
 
@@ -141,20 +141,18 @@ fun PriorityContent(
         }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+
+    var selectedTasks by remember { mutableStateOf(setOf<Long>()) }
+    val isBulkMode by derivedStateOf { selectedTasks.isNotEmpty() }
+
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
-
             itemsIndexed(
                 items = viewModel.tasks,
                 key = { _, task -> task.id }
             ) { index, item ->
-                val task by rememberUpdatedState(item)
-                val itemClick by rememberUpdatedState(showTaskChat)
-
                 val isLast by remember(index) {
                     derivedStateOf { index == viewModel.tasks.lastIndex }
                 }
@@ -165,12 +163,12 @@ fun PriorityContent(
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                taskOptions = task
+                                taskOptions = item
                                 false
                             }
 
                             DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(task)
+                                viewModel.toggleReminder(item)
                                 false
                             }
                         }
@@ -184,13 +182,28 @@ fun PriorityContent(
                         }
                 }
 
+
                 NoFlingSwipeToDismiss(
                     state = dismissState,
-                    background = { SwipeBackground(dismissState, task.hasReminder) },
+                    background = { SwipeBackground(dismissState, item.hasReminder) },
                     dismissContent = {
                         PriorityItem(
-                            task = task,
-                            onClick = itemClick,
+                            task = item,
+                            onClick = {
+                                if (isBulkMode) {
+                                    selectedTasks = if (item.id in selectedTasks) {
+                                        selectedTasks - item.id
+                                    } else {
+                                        selectedTasks + item.id
+                                    }
+                                } else {
+                                    showTaskChat(item.id)
+                                }
+                            },
+                            onLongClick = {
+                                selectedTasks = setOf(item.id)
+                            },
+                            isSelected = item.id in selectedTasks,
                         )
                     }
                 )
@@ -203,36 +216,34 @@ fun PriorityContent(
                 }
             }
         }
+    }
 
-        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = explode(),
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                        if (activeSystems == 0) showTaskCompleteAnimation = 0
-                    }
+    if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+        KonfettiView(
+            modifier = Modifier.fillMaxSize(),
+            parties = explode(),
+            updateListener = object : OnParticleSystemUpdateListener {
+                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                    if (activeSystems == 0) showTaskCompleteAnimation = 0
                 }
-            )
-        }
+            }
+        )
+    }
 
-        if (showEmptyState) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 180.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(
-                    onClick = onCallToAction,
-                ) {
-                    Text(
-                        stringResource(R.string.empty_priority_list_cta),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+    if (showEmptyState) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(onClick = onCallToAction) {
+                Text(
+                    stringResource(R.string.empty_priority_list_cta),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                }
+                )
             }
         }
     }
