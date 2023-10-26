@@ -13,15 +13,15 @@ sealed class OnBoarding : Parcelable {
     data object NotificationPermission : OnBoarding()
 
     @Parcelize
-    data object WorkSpaceReady : OnBoarding()
+    data object Ready : OnBoarding()
 
     @Parcelize
-    data object ChatWithYourTask : OnBoarding()
+    data object ChatWithYourTasks : OnBoarding()
 
     @Parcelize
-    data object DailyTaskReview : OnBoarding()
+    data object ReviewReminder : OnBoarding()
 
     @Parcelize
-    data object TaskReview : OnBoarding()
+    data object Review : OnBoarding()
 }
 
