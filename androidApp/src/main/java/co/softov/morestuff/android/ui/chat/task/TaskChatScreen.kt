@@ -84,6 +84,7 @@ fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    shouldShowAppBar: () -> Boolean = { true }
 ) {
 
     val navigation = remember { StackNavigation<ChatScreen>() }
@@ -96,11 +97,12 @@ fun TaskChatScreen(
         val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
             viewModel.shareImage(imagePath)
         }
+        val uniqueKey = remember { "TaskChatStack${taskId}_${System.currentTimeMillis()}" }
 
         ChildStack(
             source = navigation,
             initialStack = { listOf(ChatScreen.TaskChat) },
-            key = remember { "TaskChatStack$taskId" },
+            key = uniqueKey,
             handleBackButton = true,
             animation = stackAnimation(scale() + fade()),
         ) { screen ->
@@ -144,7 +146,8 @@ fun TaskChatScreen(
                         cancelActiveSchedule = viewModel::cancelActiveSchedule,
                         imagePicked = {
                             navigation.push(ChatScreen.ImageImport(it.toString()))
-                        }
+                        },
+                        shouldShowAppBar = shouldShowAppBar,
                     )
                 }
 
@@ -190,6 +193,7 @@ private fun TaskChatContent(
     createPlanSchedule: () -> Unit = {},
     cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
+    shouldShowAppBar: () -> Boolean,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -205,9 +209,11 @@ private fun TaskChatContent(
 
     Scaffold(
         topBar = {
-            TaskTopAppBar(
-                onBackPressed = onBack,
-            )
+            if (shouldShowAppBar.invoke()) {
+                TaskTopAppBar(
+                    onBackPressed = onBack,
+                )
+            }
         },
         modifier = modifier.navigationBarsPadding(),
         containerColor = Color.Transparent,
@@ -402,6 +408,7 @@ fun TaskChatPreview() {
                 )
             },
             chatActions = ChatActions(),
+            shouldShowAppBar = { true }
         )
     }
 }

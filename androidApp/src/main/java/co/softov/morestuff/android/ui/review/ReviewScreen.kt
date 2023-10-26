@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.review
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +30,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
+import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
@@ -40,7 +42,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -51,33 +52,29 @@ fun ReviewScreen(
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    val scope = rememberCoroutineScope()
     ProvideLocalViewModelStoreOwner(lifecycleOwner) {
         ReviewContent(
             onBack = navigation::pop,
             modifier = modifier,
-            showTaskChat = { taskId ->
-                scope.launch {
-                    navigation.push(Screen.TaskChat(taskId))
-                }
-            }
-        )
+            )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ReviewViewModel = koinViewModel(),
-    showTaskChat: (taskId: Long) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -129,14 +126,34 @@ fun ReviewContent(
                                 viewModel.completeTask(it)
                             }
                         },
-                        showTaskChat = showTaskChat
+                        showTaskChat = { taskId ->
+                            currentTaskId = taskId
+                            scope.launch {
+                                isBottomSheetVisible = true
+                            }
+                        }
                     )
-
+                    if (isBottomSheetVisible) {
+                        BackHandler(onBack = {
+                            scope.launch {
+                                bottomSheetState.hide()
+                            }
+                        })
+                        ModalBottomSheet(
+                            sheetState = bottomSheetState,
+                            onDismissRequest = {
+                                isBottomSheetVisible = false
+                            }
+                        ) {
+                            currentTaskId?.let { taskId ->
+                                TaskChatScreen(taskId = taskId, onBack, shouldShowAppBar = { false })
+                            }
+                        }
+                    }
                     LaunchedEffect(key1 = model.round) {
                         visibleState.targetState = true
                     }
                 }
-
                 ReviewRound.Final -> {
                     LaunchedEffect(Unit) {
                         onBack()
@@ -177,7 +194,7 @@ private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val scope = rememberCoroutineScope()
