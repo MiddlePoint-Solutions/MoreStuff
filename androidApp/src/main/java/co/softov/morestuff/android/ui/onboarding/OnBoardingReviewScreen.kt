@@ -1,159 +1,92 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.constraintlayout.compose.ConstraintLayout
+import arrow.core.const
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.model.ReviewItemUiModel
-import co.softov.morestuff.android.ui.review.TaskCard
-import co.softov.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
-import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
-import co.softov.morestuff.android.ui.review.swipeable.SwipeableCardState
-import co.softov.morestuff.android.ui.review.swipeable.swipableCard
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieConstants
 import kotlinx.coroutines.delay
 
 @Composable
 fun OnBoardingReviewScreen(
     onNext: () -> Unit,
 ) {
-    val tasks = listOf(
-        ReviewItemUiModel(
-            id = 1,
-            createTime = "10:30 AM",
-            title = stringResource(R.string.right_priority),
-            priorityScore = 5,
-            isCompleted = false,
-        ),
-        ReviewItemUiModel(
-            id = 2,
-            createTime = "11:00 AM",
-            title = stringResource(R.string.left_priority),
-            priorityScore = 3,
-            isCompleted = false
-        ),
-        ReviewItemUiModel(
-            id = 3,
-            createTime = "11:30 AM",
-            title = stringResource(R.string.up_priority),
-            priorityScore = 7,
-            isCompleted = false
-        ),
-        ReviewItemUiModel(
-            id = 4,
-            createTime = "12:30 AM",
-            title = stringResource(R.string.down_priority),
-            priorityScore = -1,
-            isCompleted = false
-        )
-    )
+
+    val context = LocalContext.current
+    val tasks = remember { buildReviewHintTasks(context) }
     var reloadCards by remember { mutableIntStateOf(0) }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(9000)
-            reloadCards++
-        }
-
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize(),
     ) {
+
         Column(
             modifier = Modifier
-                .weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .windowInsetsPadding(WindowInsets.safeContent)
+                .align(Alignment.TopCenter)
         ) {
-
             Text(
-                text = stringResource(R.string.review_your_tasks),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.onboarding_review_title),
+                modifier = Modifier.padding(top = 40.dp),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 40.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center
+                ),
                 color = MaterialTheme.colorScheme.primary,
             )
-
-            key(reloadCards) {
-                OnBoardingReviewCards(tasks)
-            }
         }
 
-        Row(
-            Modifier
-                .padding(bottom = 56.dp)
-                .align(Alignment.CenterHorizontally)
+        OnBoardingReviewCards(
+            tasks = tasks,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .zIndex(1f)
+        )
 
-        ) {
-            Column {
-                Button(
-                    onClick = { reloadCards++ },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp)
-                        .padding(bottom = 6.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.reload),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        )
-                    }
-                )
-                Button(
-                    onClick = { onNext() },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.button_next),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        )
-                    }
-                )
+        OnboardingButton(
+            onClick = onNext,
+            title = stringResource(id = R.string.button_next),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp)
+        )
 
-            }
-        }
     }
 }
+
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,

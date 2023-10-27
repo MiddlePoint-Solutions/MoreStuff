@@ -75,20 +75,8 @@ fun TaskCard(
         derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
     }
 
-    val elevationState = remember { MutableTransitionState(false) }
-    val elevationTransition = updateTransition(selectedState, "Selected Transition")
-    val elevation by elevationTransition.animateDp(label = "AnimateElevation") {
-        if (it) 12.dp else 0.dp
-    }
     val extraDetails by remember(task.extraDetails) {
         derivedStateOf { task.extraDetails }
-    }
-
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
-            delay(1000)
-            elevationState.targetState = !elevationState.currentState
-        }
     }
 
     AnimatedVisibility(
@@ -102,7 +90,7 @@ fun TaskCard(
                     selectedState.targetState = !selectedState.currentState
                 },
             elevation = CardDefaults.cardElevation(
-                defaultElevation = elevation
+                defaultElevation = 4.dp
             )
         ) {
             Box(

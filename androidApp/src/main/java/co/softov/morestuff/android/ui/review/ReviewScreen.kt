@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -35,8 +36,8 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
-import co.softov.morestuff.android.ui.onboarding.DefaultHintTask
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewCards
+import co.softov.morestuff.android.ui.onboarding.buildReviewHintTasks
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
@@ -210,11 +211,10 @@ private fun PriorityReviewTopBar(
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val tasks = DefaultHintTask.tasks.map { task ->
-        task.copy(title = stringResource(task.title.toInt()))
-    }
+    val tasks = buildReviewHintTasks(LocalContext.current)
     val scope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = {
             Text(
