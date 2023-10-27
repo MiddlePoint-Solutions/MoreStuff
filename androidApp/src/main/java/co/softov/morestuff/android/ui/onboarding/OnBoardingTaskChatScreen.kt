@@ -41,6 +41,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import kotlinx.coroutines.delay
 
@@ -50,12 +51,6 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.animation_lncy8nut)
     )
-
-    var showComposition by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(300)
-        showComposition = true
-    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -92,21 +87,14 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
                 color = MaterialTheme.colorScheme.secondary,
             )
 
-            Box(modifier = Modifier
-                .constrainAs(image) { centerTo(parent) }
-                .size(380.dp)
-            ) {
-                AnimatedVisibility(
-                    modifier = Modifier.fillMaxSize(),
-                    visible = showComposition,
-                    enter = fadeIn()
-                ) {
-                    LottieAnimation(
-                        composition = composition,
-                        iterations = LottieConstants.IterateForever,
-                    )
-                }
-            }
+            LottieAnimation(
+                composition = composition,
+                modifier = Modifier
+                    .constrainAs(image) { centerTo(parent) }
+                    .size(380.dp),
+                iterations = LottieConstants.IterateForever,
+            )
+
         }
 
         OnboardingButton(
