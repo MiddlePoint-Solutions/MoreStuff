@@ -1,16 +1,20 @@
 package co.softov.morestuff.android.ui.components
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Done
-import androidx.compose.material.icons.rounded.Numbers
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
 import co.softov.morestuff.android.ui.theme.surfaceContainer
@@ -31,14 +35,17 @@ fun MoreStuffTopBar(
         title = { Text(text = stringResource(id = R.string.app_name)) },
         actions = {
             if (itemSelectedState.value) {
-                IconButton(onClick = {}) {
+                IconButton(onClick = {
+                    viewModel.deleteSelectedTasks()
+                    itemSelectedState.value = false
+                }) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = stringResource(R.string.cd_priority_review),
                     )
                 }
                 IconButton(onClick = {
-                    viewModel.completeSelectedTask()
+                    viewModel.completeSelectedTasks()
                     itemSelectedState.value = false
                 }) {
                     Icon(
@@ -46,10 +53,13 @@ fun MoreStuffTopBar(
                         contentDescription = stringResource(R.string.cd_priority_review),
                     )
                 }
-                IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Rounded.Numbers,
-                        contentDescription = stringResource(R.string.cd_priority_review),
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(48.dp)
+                ) {
+                    Text(
+                        text = viewModel.selectedTaskIds.value.size.toString(),
                     )
                 }
             } else {

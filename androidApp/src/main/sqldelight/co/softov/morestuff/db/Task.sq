@@ -104,3 +104,7 @@ SELECT * FROM task
 WHERE title LIKE '%' || :searchText || '%'
 ORDER BY create_time DESC;
 
+deleteTask:
+DELETE FROM task
+WHERE id = ?;
+

@@ -110,6 +110,8 @@ import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
@@ -227,6 +229,7 @@ val taskUseCases = module {
     factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
     factoryOf(::HintTaskImpl) bind HintTask::class
+    factoryOf(::DeleteTaskUseCaseImpl) bind DeleteTaskUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class

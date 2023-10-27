@@ -81,6 +81,13 @@ fun PriorityContent(
     var selectedTasks by remember { mutableStateOf(setOf<Long>()) }
     val isBulkMode by derivedStateOf { selectedTasks.isNotEmpty() }
 
+    LaunchedEffect(viewModel.undoBulkMode.collectAsState().value) {
+        if (viewModel.undoBulkMode.value) {
+            selectedTasks = setOf()
+            itemSelectedState.value = false
+            viewModel.undoBulkMode.value = false
+        }
+    }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
@@ -197,19 +204,19 @@ fun PriorityContent(
                                 if (isBulkMode) {
                                     if (item.id in selectedTasks) {
                                         selectedTasks = selectedTasks - item.id
-                                        if (selectedTasks.isEmpty()) {
-                                            itemSelectedState.value = false
-                                        }
+                                        viewModel.selectedTaskIds.value = viewModel.selectedTaskIds.value - item.id
                                     } else {
                                         selectedTasks = selectedTasks + item.id
+                                        viewModel.selectedTaskIds.value = viewModel.selectedTaskIds.value + item.id
                                     }
+                                    itemSelectedState.value = viewModel.selectedTaskIds.value.isNotEmpty()
                                 } else {
                                     showTaskChat(item.id)
                                 }
                             },
                             onLongClick = {
-                                viewModel.selectedTaskId = item.id
-                                selectedTasks = setOf(item.id)
+                                selectedTasks = setOf(item.id) + selectedTasks
+                                viewModel.selectedTaskIds.value = listOf(item.id) + viewModel.selectedTaskIds.value
                                 itemSelectedState.value = true
                             },
                             isSelected = item.id in selectedTasks,

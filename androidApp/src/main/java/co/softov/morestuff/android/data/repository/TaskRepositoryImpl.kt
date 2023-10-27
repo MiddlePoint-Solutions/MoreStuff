@@ -211,4 +211,11 @@ class TaskRepositoryImpl(
         task_type = taskType
     )
 
+    override suspend fun deleteTask(taskId: Long): Either<Failure, Boolean> {
+        taskQueries.transaction {
+            taskQueries.deleteTask(taskId)
+        }
+        return Right(true)
+    }
+
 }
