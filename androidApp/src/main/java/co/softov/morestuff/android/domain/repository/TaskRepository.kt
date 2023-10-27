@@ -34,6 +34,7 @@ interface TaskRepository {
     suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
     suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>>
     fun searchTasks(searchText: String): Flow<List<TaskDomain>>
+    suspend fun deleteTask(taskId: Long): Either<Failure, Boolean>
     suspend fun countActiveTasks(): Either<Failure, Int>
 }
 

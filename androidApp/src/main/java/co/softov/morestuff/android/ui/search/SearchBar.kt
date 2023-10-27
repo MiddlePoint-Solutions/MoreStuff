@@ -184,7 +184,8 @@ fun SearchBar(
                                             onClick = { taskId ->
                                                 showTaskChat(taskId)
                                             },
-                                            onLongClick = {}
+                                            onLongClick = {},
+                                            isSelected = false
                                         )
                                     }
                                 }

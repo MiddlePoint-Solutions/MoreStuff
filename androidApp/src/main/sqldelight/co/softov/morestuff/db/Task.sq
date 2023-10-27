@@ -108,3 +108,7 @@ countActiveTasks:
 SELECT COUNT(*) FROM task
 WHERE task.complete_time IS NULL;
 
+deleteTask:
+DELETE FROM task
+WHERE id = ?;
+

@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.schedule
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -38,6 +39,11 @@ class PriorityViewModel(
         private set
 
     val model = MutableStateFlow(PriorityViewState())
+    var selectedTaskIds: MutableState<List<Long>> = mutableStateOf(listOf())
+        private set
+
+    private var recentlyCompletedTasks: MutableList<TaskDomain> = mutableListOf()
+    val undoBulkMode = MutableStateFlow(false)
 
     init {
         loadData()
@@ -85,7 +91,7 @@ class PriorityViewModel(
     fun completeTask(item: TaskDomain) {
         viewModelScope.launch {
             delay(120)
-            lastCompleted = item
+            recentlyCompletedTasks.add(item)
             tasks = tasks.toMutableList().apply {
                 remove(item)
             }
@@ -103,10 +109,11 @@ class PriorityViewModel(
 
     fun undoLastCompleted() {
         resetNotification()
-        lastCompleted?.let { task ->
+        for (task in recentlyCompletedTasks) {
             dispatchAppStoreAction(TaskAction.CompleteTaskAction(task.id, false))
-            lastCompleted = null
         }
+        recentlyCompletedTasks.clear()
+        undoBulkMode.value = true
     }
 
     fun moveToTop(task: TaskDomain) {
@@ -124,4 +131,28 @@ class PriorityViewModel(
     fun resetNotification() {
         notification = None
     }
+
+    fun completeSelectedTasks() {
+        val taskIdsToComplete = mutableListOf<Long>()
+
+        for (taskId in selectedTaskIds.value) {
+            val taskToComplete = tasks.find { it.id == taskId }
+            if (taskToComplete != null) {
+                recentlyCompletedTasks.add(taskToComplete)
+                completeTask(taskToComplete)
+                taskIdsToComplete.add(taskId)
+            }
+        }
+        selectedTaskIds.value = selectedTaskIds.value.filterNot { it in taskIdsToComplete }
+    }
+    fun deleteSelectedTasks() {
+        viewModelScope.launch {
+            for (taskId in selectedTaskIds.value) {
+                dispatchAppStoreAction(TaskAction.DeleteTaskAction(taskId))
+            }
+            tasks = tasks.filterNot { it.id in selectedTaskIds.value }
+            selectedTaskIds.value = emptyList()
+        }
+    }
+
 }

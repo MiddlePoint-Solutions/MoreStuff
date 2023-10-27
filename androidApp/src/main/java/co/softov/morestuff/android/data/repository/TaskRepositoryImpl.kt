@@ -228,4 +228,12 @@ class TaskRepositoryImpl(
 
     override suspend fun countActiveTasks(): Either<Failure, Int> =
         taskQueries.countActiveTasks().executeAsOne().toInt().right()
+
+    override suspend fun deleteTask(taskId: Long): Either<Failure, Boolean> {
+        taskQueries.transaction {
+            taskQueries.deleteTask(taskId)
+        }
+        return Right(true)
+    }
+
 }
