@@ -154,7 +154,8 @@ private fun ShareContent(
                 PriorityItem(
                     task = task,
                     onClick = shareToTask,
-                    onLongClick = {}
+                    onLongClick = {},
+                    isSelected = false
                 )
 
                 Divider(

@@ -124,4 +124,15 @@ class PriorityViewModel(
     fun resetNotification() {
         notification = None
     }
+    var selectedTaskId: Long? = null
+
+    fun completeSelectedTask() {
+        val taskId = selectedTaskId ?: return
+        val taskToComplete = tasks.find { it.id == taskId }
+        if (taskToComplete != null) {
+            completeTask(taskToComplete)
+            selectedTaskId = null
+        }
+    }
+
 }

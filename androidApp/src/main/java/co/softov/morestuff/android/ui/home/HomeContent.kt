@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,6 +64,7 @@ fun HomeScreen() {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val itemSelected = remember { mutableStateOf(false) }
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
@@ -76,8 +78,10 @@ fun HomeScreen() {
                 },
                 snackbarHostState = snackbarHostState,
                 modifier = Modifier.padding(top = it.calculateTopPadding()),
+                itemSelectedState = itemSelected,
             )
-        }
+        },
+        itemSelectedState = itemSelected,
     )
 }
 
@@ -90,6 +94,7 @@ fun HomeContent(
     userInputViewModel: UserInputViewModel = koinViewModel(),
     priorityViewModel: PriorityViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
+    itemSelectedState: MutableState<Boolean>,
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -114,6 +119,7 @@ fun HomeContent(
                 onCallToAction = { focusRequester.requestFocus() },
                 listState = priorityScrollState,
                 modifier = Modifier.weight(0.8f).padding(bottom = 30.dp),
+                itemSelectedState = itemSelectedState,
             )
         }
 
