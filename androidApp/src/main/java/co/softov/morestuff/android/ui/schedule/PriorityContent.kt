@@ -78,12 +78,11 @@ fun PriorityContent(
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
     val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
-    var selectedTasks by remember { mutableStateOf(setOf<Long>()) }
-    val isBulkMode by derivedStateOf { selectedTasks.isNotEmpty() }
+    val isBulkMode by derivedStateOf { viewModel.selectedTaskIds.value.isNotEmpty() }
 
     LaunchedEffect(viewModel.undoBulkMode.collectAsState().value) {
         if (viewModel.undoBulkMode.value) {
-            selectedTasks = setOf()
+            viewModel.selectedTaskIds.value = listOf()
             itemSelectedState.value = false
             viewModel.undoBulkMode.value = false
         }
@@ -202,11 +201,9 @@ fun PriorityContent(
                             task = item,
                             onClick = {
                                 if (isBulkMode) {
-                                    if (item.id in selectedTasks) {
-                                        selectedTasks = selectedTasks - item.id
+                                    if (item.id in viewModel.selectedTaskIds.value) {
                                         viewModel.selectedTaskIds.value = viewModel.selectedTaskIds.value - item.id
                                     } else {
-                                        selectedTasks = selectedTasks + item.id
                                         viewModel.selectedTaskIds.value = viewModel.selectedTaskIds.value + item.id
                                     }
                                     itemSelectedState.value = viewModel.selectedTaskIds.value.isNotEmpty()
@@ -215,11 +212,10 @@ fun PriorityContent(
                                 }
                             },
                             onLongClick = {
-                                selectedTasks = setOf(item.id) + selectedTasks
                                 viewModel.selectedTaskIds.value = listOf(item.id) + viewModel.selectedTaskIds.value
                                 itemSelectedState.value = true
                             },
-                            isSelected = item.id in selectedTasks,
+                            isSelected = item.id in viewModel.selectedTaskIds.value
                         )
                     }
                 )
