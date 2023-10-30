@@ -1,18 +1,21 @@
 package co.softov.morestuff.android.ui.schedule
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
@@ -20,6 +23,7 @@ import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -45,12 +49,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.ui.chat.Visibility
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
@@ -64,6 +70,8 @@ import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
+
+private val jumpToTopThreshold = 56.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +100,7 @@ fun PriorityContent(
             viewModel.reorderTaskItem(start, end)
         }
     )
+    val scrollState = rememberLazyListState()
 
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
@@ -161,7 +170,7 @@ fun PriorityContent(
         modifier = modifier.fillMaxSize()
     ) {
         LazyColumn(
-            state = state.listState,
+            state = scrollState,
             modifier = Modifier
                 .fillMaxSize()
                 .reorderable(state),
@@ -169,7 +178,7 @@ fun PriorityContent(
 
             itemsIndexed(
                 items = viewModel.tasks,
-                key = { _, task  -> task.id }
+                key = { _, task -> task.id }
             ) { index, item ->
                 val task by rememberUpdatedState(item)
                 val itemClick by rememberUpdatedState(showTaskChat)
@@ -217,7 +226,7 @@ fun PriorityContent(
                         }
                     )
 
-                    if(!isLast) {
+                    if (!isLast) {
                         Divider(
                             modifier = Modifier.align(Alignment.BottomCenter),
                             thickness = Dp.Hairline
@@ -226,8 +235,29 @@ fun PriorityContent(
 
                 }
 
+
             }
         }
+        val jumpThreshold = with(LocalDensity.current) {
+            jumpToTopThreshold.toPx()
+        }
+        val jumpToTopButtonEnabled by remember {
+            derivedStateOf {
+                (scrollState.firstVisibleItemIndex != 0 ||
+                        scrollState.firstVisibleItemScrollOffset > jumpThreshold)
+            }
+        }
+        JumpToTop(
+            enabled = jumpToTopButtonEnabled,
+            onClicked = {
+                scope.launch {
+
+                    scrollState.scrollToItem(0)
+                }
+            },
+            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
+        )
+
 
         if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
             KonfettiView(
@@ -305,6 +335,45 @@ private fun SwipeBackground(
             icon,
             contentDescription = "Localized description",
             modifier = Modifier.scale(scale)
+        )
+    }
+}
+
+@Composable
+fun JumpToTop(
+    enabled: Boolean,
+    onClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val transition = updateTransition(
+        if (enabled) Visibility.VISIBLE else Visibility.GONE,
+        label = "JumpToTopTransition"
+    )
+    val topOffset by transition.animateDp(label = "JumpToTopTransition") {
+        if (it == Visibility.GONE) {
+            (-32).dp
+        } else {
+            32.dp
+        }
+    }
+    if (topOffset > 0.dp) {
+        ExtendedFloatingActionButton(
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.ArrowUpward,
+                    modifier = Modifier.height(18.dp),
+                    contentDescription = null
+                )
+            },
+            text = {
+                Text(text = stringResource(id = R.string.jump_to_top))
+            },
+            onClick = onClicked,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.primary,
+            modifier = modifier
+                .offset(x = 0.dp, y = topOffset)
+                .height(36.dp)
         )
     }
 }

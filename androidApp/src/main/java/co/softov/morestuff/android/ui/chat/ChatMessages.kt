@@ -156,7 +156,7 @@ fun Messages(
 }
 
 
-private enum class Visibility {
+ enum class Visibility {
     VISIBLE,
     GONE
 }
