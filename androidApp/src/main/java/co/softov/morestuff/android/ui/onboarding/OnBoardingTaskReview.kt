@@ -41,7 +41,7 @@ fun ReviewCardsOnBoarding(tasks: List<ReviewItemUiModel>) {
 
         Box(
             modifier = Modifier
-                .size(400.dp),
+                .size(width = 450.dp, height = 470.dp),
             contentAlignment = Alignment.Center
         ) {
             OnBoardingTaskPrioritySwipe(
@@ -60,7 +60,7 @@ private fun OnBoardingTaskPrioritySwipe(
     modifier: Modifier = Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
 ) {
-    Box(modifier = modifier.padding(20.dp)) {
+    Box(modifier = modifier.padding(5.dp),contentAlignment = Alignment.Center) {
         var cardAnimated by remember { mutableStateOf(states.size - 1) }
 
         for ((index, pair) in states.reversed().withIndex()) {
@@ -73,7 +73,8 @@ private fun OnBoardingTaskPrioritySwipe(
                 task = task,
                 onComplete = {},
                 isVisible = true,
-                isClickable = false
+                isClickable = false,
+                showTaskChat = {}
             )
 
             if (index == cardAnimated && state.swipedDirection == null) {
