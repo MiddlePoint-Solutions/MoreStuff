@@ -8,3 +8,4 @@
 -dontwarn kotlinx.serialization.Serializable
 
 -dontwarn java.sql.JDBCType
+-dontwarn com.alorma.compose.settings.storage.base.ValueProviderKt

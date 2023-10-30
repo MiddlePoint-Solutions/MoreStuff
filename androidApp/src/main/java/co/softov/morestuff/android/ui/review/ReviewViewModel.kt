@@ -1,19 +1,25 @@
 package co.softov.morestuff.android.ui.review
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
-
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-
+import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Review
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent
-import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.*
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.ItemReview
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupInitialRound
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupRound
+import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.Undo
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
@@ -27,6 +33,9 @@ class ReviewViewModel(
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
+
+    var reviewHintEnabled by mutableStateOf(false)
+        private set
 
     override val enableDebug: Boolean
         get() = false
@@ -60,7 +69,10 @@ class ReviewViewModel(
                 filter { it.first.id != event.item.id }
             }
         )
+    }
 
+    override fun onAppStateChange(state: AppState) {
+        reviewHintEnabled = state.settings.enableReviewHint
     }
 
     private fun setInitialState(round: ReviewRound = Review) {
@@ -117,6 +129,10 @@ class ReviewViewModel(
     fun completeTask(item: ReviewItemUiModel) {
         sendEvent(ItemReview(item, PriorityActionType.Done))
         dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+    }
+
+     fun toggleHintArrowPriority() {
+        dispatchAppStoreAction(SettingAction.EnableReviewHint(enable = !reviewHintEnabled))
     }
 
 }

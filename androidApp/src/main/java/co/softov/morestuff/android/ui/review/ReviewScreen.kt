@@ -7,8 +7,11 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,26 +25,24 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
-import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
+import co.softov.morestuff.android.ui.onboarding.DefaultHintTask
+import co.softov.morestuff.android.ui.onboarding.ReviewCardsOnBoarding
 import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -56,7 +57,7 @@ fun ReviewScreen(
         ReviewContent(
             onBack = navigation::pop,
             modifier = modifier,
-            )
+        )
     }
 }
 
@@ -68,6 +69,7 @@ fun ReviewContent(
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
+    var isCardMoving by remember { mutableStateOf(false) }
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -92,17 +94,33 @@ fun ReviewContent(
             when (model.round) {
                 ReviewRound.Review -> {
 
-                    PriorityReviewTopBar(navigateUp = onBack)
-
-                    val states =
-                        model.items.map { it to rememberSwipeableCardState(model.round) }
-
-                    val visibleState = remember(model.round) {
-                        MutableTransitionState(false)
+                    AnimatedVisibility(
+                        visible = !isCardMoving,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        PriorityReviewTopBar(
+                            navigateUp = onBack,
+                            disableHintArrow = {
+                                scope.launch {
+                                    viewModel.toggleHintArrowPriority()
+                                }
+                            },
+                            isHintArrowActive = viewModel.reviewHintEnabled
+                        )
                     }
 
-                    SlideAnimation(
+                    val states = model.items.map { it to rememberSwipeableCardState(model.round) }
+
+                    val visibleState = remember(model.round) { MutableTransitionState(false) }
+
+                    LaunchedEffect(isCardMoving) {
+                        visibleState.targetState = !isCardMoving
+                    }
+                    AnimatedVisibility(
                         visibleState = visibleState,
+                        enter = fadeIn(),
+                        exit = fadeOut(),
                         modifier = modifier
                             .fillMaxHeight(0.30f)
                             .align(Alignment.BottomCenter),
@@ -119,13 +137,17 @@ fun ReviewContent(
                             .offset(y = 64.dp)
                             .fillMaxHeight(0.7f),
                         states = states,
-                        onSwiped = viewModel::onTaskSwiped,
+                        onSwiped = { schedule, direction ->
+                            viewModel.onTaskSwiped(schedule, direction)
+                            isCardMoving = false
+                        },
                         onComplete = {
                             scope.launch {
                                 states.firstVisibleStateOrNull()?.onComplete()
                                 viewModel.completeTask(it)
                             }
                         },
+                        onCardMoveStateChange = { moving -> isCardMoving = moving },
                         showTaskChat = { taskId ->
                             currentTaskId = taskId
                             scope.launch {
@@ -133,6 +155,15 @@ fun ReviewContent(
                             }
                         }
                     )
+
+                    AnimatedVisibility(
+                        visible = isCardMoving && viewModel.reviewHintEnabled,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        ReviewDragHint()
+                    }
+
                     if (isBottomSheetVisible) {
                         BackHandler(onBack = {
                             scope.launch {
@@ -146,7 +177,10 @@ fun ReviewContent(
                             }
                         ) {
                             currentTaskId?.let { taskId ->
-                                TaskChatScreen(taskId = taskId, onBack, shouldShowAppBar = { false })
+                                TaskChatScreen(
+                                    taskId = taskId,
+                                    onBack,
+                                    shouldShowAppBar = { false })
                             }
                         }
                     }
@@ -154,6 +188,7 @@ fun ReviewContent(
                         visibleState.targetState = true
                     }
                 }
+
                 ReviewRound.Final -> {
                     LaunchedEffect(Unit) {
                         onBack()
@@ -170,7 +205,16 @@ fun ReviewContent(
 private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
+    disableHintArrow: () -> Unit,
+    isHintArrowActive: Boolean,
 ) {
+    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val tasks = DefaultHintTask.tasks.map { task ->
+        task.copy(title = stringResource(task.title.toInt()))
+    }
+    val scope = rememberCoroutineScope()
+    var showMenu by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
             Text(
@@ -185,9 +229,73 @@ private fun PriorityReviewTopBar(
                 )
             }
         },
+        actions = {
+            IconButton(onClick = { isBottomSheetVisible = true }) {
+                Icon(
+                    imageVector = Icons.Default.Help,
+                    contentDescription = stringResource(R.string.help)
+                )
+            }
+            IconButton(onClick = { showMenu = true }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = stringResource(R.string.show_hint_arrow_priority)
+                )
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(onClick = {
+                    scope.launch {
+                        disableHintArrow()
+                        showMenu = false
+                    }
+                },
+                    text = {
+                        Text(
+                            text = if (isHintArrowActive)
+                                stringResource(R.string.disable_hint_arrow)
+                            else stringResource(R.string.enable_hint_arrow)
+                        )
+                    })
+
+            }
+
+        },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
+
+
+    if (isBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = { isBottomSheetVisible = false },
+            sheetState = bottomSheetState,
+            content = {
+                var reloadCards by remember { mutableIntStateOf(0) }
+                LaunchedEffect(Unit) {
+                    while (true) {
+                        delay(9000)
+                        reloadCards++
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 70.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    key(reloadCards) {
+                        ReviewCardsOnBoarding(tasks)
+                    }
+                }
+            }
+        )
+    }
 }
+
 
 @Composable
 private fun ReviewSwipeControls(
@@ -284,6 +392,7 @@ private fun TaskPrioritySwipe(
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
+    onCardMoveStateChange: (Boolean) -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
     val itemClick by rememberUpdatedState(showTaskChat)
@@ -291,8 +400,16 @@ private fun TaskPrioritySwipe(
         modifier = modifier.padding(20.dp)
     ) {
         states.forEach { (task, state) ->
-            if (state.swipedDirection == null) {
 
+            val isMoving by remember(state.offset) {
+                derivedStateOf { state.offset.value.x != 0f || state.offset.value.y != 0f }
+            }
+
+            LaunchedEffect(isMoving) {
+                onCardMoveStateChange(isMoving)
+            }
+
+            if (state.swipedDirection == null) {
                 val isVisible = state == states.firstVisibleOrNull()?.second
 
                 TaskCard(
@@ -315,11 +432,104 @@ private fun TaskPrioritySwipe(
 }
 
 @Composable
+private fun ReviewDragHint() {
+    Box(Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_up),
+                contentDescription = stringResource(R.string.cd_highest_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            ReviewHintTitle(text = stringResource(R.string.review_hint_highest_priority))
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            ReviewHintTitle(text = stringResource(R.string.review_hint_lowest_priority))
+            Spacer(modifier = Modifier.width(8.dp))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
+                contentDescription = stringResource(R.string.cd_lowest_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
+        }
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
+                contentDescription = stringResource(R.string.cd_high_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            ReviewHintTitle(text = stringResource(R.string.review_hint_high_priority))
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .background(
+                    color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+                    shape = RoundedCornerShape(15)
+                ).padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
+                contentDescription = stringResource(R.string.cd_low_priority_hint_icon),
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            ReviewHintTitle(text = stringResource(R.string.review_hint_low_priority))
+        }
+    }
+}
+
+@Composable
+private fun ReviewHintTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineSmall.copy(
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+        )
+    )
+}
+
+@Composable
 private fun MainReviewButton(
     onClick: () -> Unit,
     icon: ImageVector,
 ) {
-
     Button(
         modifier = Modifier
             .size(width = 140.dp, height = 56.dp)
@@ -359,77 +569,6 @@ private fun SecondaryReviewButton(
             modifier = Modifier.size(24.dp),
             tint = reviewIconTint
         )
-    }
-}
-
-@Composable
-private fun RoundInfo(
-    model: ReviewModel,
-    modifier: Modifier = Modifier,
-) {
-
-    val info by remember(model.round) {
-        mutableStateOf("Round ${model.round}")
-    }
-    val instructions by remember(model.round) {
-        when (model.round) {
-            ReviewRound.Review -> "<-- Low    High -->"
-            ReviewRound.Final -> ""
-        }.let {
-            mutableStateOf(it)
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .padding(vertical = 16.dp)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = info,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = instructions,
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp,
-            textAlign = TextAlign.Center
-        )
-
-        if (BuildConfig.DEBUG) {
-
-            val total by remember {
-                mutableStateOf("Total: ${model.items.size}")
-            }
-
-            Text(
-                text = total,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center
-            )
-
-            val debug = with(model) {
-                "RoundItems: ${items.size}"
-            }
-
-            Text(
-                text = debug,
-                color = MaterialTheme.colorScheme.onPrimary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }
 
