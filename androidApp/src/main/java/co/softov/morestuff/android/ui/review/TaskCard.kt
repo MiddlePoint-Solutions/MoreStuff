@@ -12,18 +12,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Notes
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,18 +39,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.TaskColors
+import co.softov.morestuff.android.ui.theme.surfaceContainer
 import kotlinx.coroutines.delay
-import timber.log.Timber
 
 @Composable
 fun TaskCard(
@@ -56,6 +66,7 @@ fun TaskCard(
     onComplete: (ReviewItemUiModel) -> Unit,
     isVisible: Boolean = false,
     isClickable: Boolean = true,
+    showTaskChat: (taskId: Long) -> Unit,
 ) {
     var visibleState by remember { mutableStateOf(true) }
     val selectedState = remember { MutableTransitionState(false) }
@@ -68,6 +79,9 @@ fun TaskCard(
     val elevationTransition = updateTransition(selectedState, "Selected Transition")
     val elevation by elevationTransition.animateDp(label = "AnimateElevation") {
         if (it) 12.dp else 0.dp
+    }
+    val extraDetails by remember(task.extraDetails) {
+        derivedStateOf { task.extraDetails }
     }
 
     LaunchedEffect(isVisible) {
@@ -94,69 +108,131 @@ fun TaskCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(backgroundColors)
-                    )
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
             ) {
+
+                Text(
+                    text = task.title,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.displaySmall.copy(
+                        fontWeight = FontWeight(400),
+                        fontSize = 25.sp,
+                        lineHeight = 28.sp
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                // Color area
                 Box(
                     modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .fillMaxWidth()
-                        .heightIn(min = 140.dp)
-//                        .background(brush = topScrimBrush())
-                    ,
-                    contentAlignment = Alignment.TopStart
-                ) {
-                    Text(
-                        text = task.title,
-                        color = Color(0xFF1B1B1F),
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight(400)),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 26.dp)
-                    )
+                        .padding(start = 20.dp, top = 105.dp, end =  20.dp)
+                        .size(width = 305.dp, height = 320.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            brush = Brush.verticalGradient(backgroundColors)
+                        ),
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                }
-
-                SlideAnimation(
-                    visibleState = selectedState,
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(min = 140.dp)
-//                            .background(brush = bottomScrimBrush())
-                        ,
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center,
                     ) {
-                        Button(
-                            onClick = {
-                                onComplete(task)
-//                                visibleState = false
-                            },
+                }
+                // Icons
+                if (extraDetails) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 277.dp, top = 93.dp)
+                    ) {
+                        FilledIconButton(
+                            onClick = {},
                             modifier = Modifier
-                                .widthIn(min = 140.dp)
-                                .padding(16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(39, 40, 53, 125)
-                            )
-                        ) {
-                            Text(
-                                text = "Done",
-                                color = Color.White
+                                .size(width = 30.dp, height = 25.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+
+                            ) {
+                            Icon(
+                                imageVector = Icons.Default.Notes,
+                                contentDescription = "Notes",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .padding(4.dp)
+
                             )
                         }
                     }
                 }
+                // Buttons
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 5.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    SlideAnimation(
+                        visibleState = selectedState,
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            Row {
+                                FilledIconButton(
+                                    onClick = { showTaskChat(task.id) },
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .padding(end = 20.dp, top = 15.dp, bottom = 5.dp),
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = Color(0xFFC4C5DD),
+
+                                        ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
+                                        contentDescription = stringResource(R.string.cd_show_task_chat),
+                                        tint = MaterialTheme.colorScheme.surfaceContainer
+                                    )
+                                }
+                                FilledIconButton(
+                                    onClick = {
+                                        onComplete(task)
+                                        // visibleState = false
+                                    },
+                                    modifier = Modifier
+                                        .size(70.dp)
+                                        .padding(end = 20.dp, top = 15.dp, bottom = 5.dp),
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = stringResource(R.string.cd_task_complete),
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
+
         }
     }
 }
+
 
 @NonRestartableComposable
 @Composable
@@ -198,7 +274,8 @@ fun TaskCardPreview() {
                 priorityScore = 0,
                 isCompleted = false
             ),
-            onComplete = {}
+            onComplete = {},
+            showTaskChat = {}
         )
     }
 }

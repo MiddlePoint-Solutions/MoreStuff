@@ -133,6 +133,7 @@
     <string name="cd_clear_search_query">Clear Search Query</string>
     <string name="cd_reminder_icon">Reminder Icon</string>
     <string name="task_chat_reminder_action">Reminder</string>
+    <string name="cd_show_task_chat">Show task chat</string>
 
     <!--  onBoarding  -->
     <string name="our_goal">"Our goal"</string>
