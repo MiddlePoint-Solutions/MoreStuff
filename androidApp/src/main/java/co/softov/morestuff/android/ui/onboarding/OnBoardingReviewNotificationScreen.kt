@@ -1,19 +1,23 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import android.content.res.Configuration
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -29,31 +33,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
-import co.softov.morestuff.android.ui.settings.SettingsModel
-import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import co.softov.morestuff.android.ui.settings.rememberAppSettingState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnBoardingReviewNotificationScreen(
     onNext: () -> Unit,
+    currentReviewTime: () -> Pair<Int, Int>,
+    onReviewTimeChange: (time: Pair<Int, Int>) -> Unit,
 ) {
-    val viewModel: SettingsViewModel = koinViewModel()
-    val defaultReviewTime = SettingsModel().reviewTime
+
     val selectedTimeState = rememberAppSettingState(
-        defaultValue = { defaultReviewTime },
-        valueChanged = { newTime ->
-            viewModel.setReviewTime(newTime.first, newTime.second)
-        }
+        defaultValue = currentReviewTime,
+        valueChanged = onReviewTimeChange
     )
     val defaultHour = selectedTimeState.value.first
     val defaultMinute = selectedTimeState.value.second
@@ -65,132 +66,91 @@ fun OnBoardingReviewNotificationScreen(
         initialMinute = defaultMinute
     )
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.safeContent)
+            .fillMaxSize(),
     ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize(),
         ) {
+
+            val (image, title, subtitle) = createRefs()
+
             Text(
-                text = stringResource(R.string.daily_check_ins),
-                style = MaterialTheme.typography.titleMedium,
+                text = stringResource(R.string.onboarding_schedule_review_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 40.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center
+                ),
                 color = MaterialTheme.colorScheme.primary,
             )
-            Spacer(modifier = Modifier.padding(15.dp))
+
             Text(
-                text = stringResource(R.string.daily_check_ins_description),
-                style = MaterialTheme.typography.bodyMedium,
+                text = stringResource(R.string.onboarding_schedule_review_subtitle),
+                modifier = Modifier
+                    .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) }
+                    .padding(horizontal = 20.dp),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
-            Spacer(modifier = Modifier.padding(20.dp))
-
-            Box(modifier = Modifier.size(250.dp), contentAlignment = (Alignment.Center)) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Alarm,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(30.dp)
-                    )
-                    Text(
-                        text = "${selectedTime.first}:${
-                            String.format(
-                                "%02d",
-                                selectedTime.second
-                            )
-                        }",
-                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 30.sp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-
-                if (showTimePicker) {
-                    PriorityTimePicker(
-                        dismissTimePicker = { showTimePicker = false },
-                        onTimeChange = {
-                            selectedTime = Pair(timePickerState.hour, timePickerState.minute)
-                            selectedTimeState.value = selectedTime
-                            viewModel.setReviewTime(timePickerState.hour, timePickerState.minute)
-                            showTimePicker = false
-                        },
-                        state = timePickerState
-                    )
-                }
-            }
-
-        }
-
-        Column(
-            Modifier
-                .padding(bottom = 56.dp)
-                .align(Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-
-            if (selectedTime == defaultReviewTime) {
-                Button(
-                    onClick = { showTimePicker = true },
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.add_reminder),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        )
-                    }
-                )
-            } else {
-                Button(
-                    onClick = onNext,
-                    modifier = Modifier
-                        .width(187.dp)
-                        .height(43.dp),
-                    content = {
-                        Text(
-                            text = stringResource(R.string.button_next),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 28.sp,
-                                fontWeight = FontWeight(700),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        )
-                    }
-                )
-            }
 
             Button(
-                onClick = onNext,
+                onClick = { showTimePicker = true },
                 modifier = Modifier
-                    .width(187.dp)
-                    .height(43.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                content = {
-                    Text(
-                        text = stringResource(R.string.button_skip),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(700),
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                    )
-                }
+                    .constrainAs(image) { centerTo(parent) },
+                shape = RoundedCornerShape(15),
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Transparent
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Alarm,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(30.dp)
+                )
+
+                Text(
+                    text = "${selectedTime.first}:${String.format("%02d", selectedTime.second)}",
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 30.sp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+        }
+
+        if (showTimePicker) {
+            PriorityTimePicker(
+                dismissTimePicker = { showTimePicker = false },
+                onTimeChange = {
+                    selectedTime = timePickerState.hour to timePickerState.minute
+                    selectedTimeState.value = selectedTime
+                    onReviewTimeChange(selectedTime)
+                    showTimePicker = false
+                },
+                state = timePickerState
             )
         }
+
+        OnboardingButton(
+            onClick = onNext,
+            title = stringResource(id = R.string.button_next),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp)
+        )
     }
 }
 
@@ -205,6 +165,10 @@ fun OnBoardingReviewNotificationScreen(
 @Composable
 private fun Preview() {
     MoreStuffTheme {
-        OnBoardingReviewNotificationScreen {}
+        OnBoardingReviewNotificationScreen(
+            onNext = {},
+            currentReviewTime = { 9 to 0 },
+            onReviewTimeChange = {}
+        )
     }
 }

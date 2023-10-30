@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -103,7 +106,9 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.safeContent)
+            .fillMaxSize()
     ) {
         ConstraintLayout(
             modifier = Modifier.fillMaxSize(),
@@ -115,7 +120,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
                 text = stringResource(R.string.onboarding_notification_permission_title),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .constrainAs(title) { bottom.linkTo(subtitle.top, margin = 30.dp) },
+                    .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 40.sp,
                     lineHeight = 44.sp,
@@ -127,7 +132,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
             Text(
                 text = stringResource(R.string.onboarding_notification_permission_subtitle),
                 modifier = Modifier
-                    .constrainAs(subtitle) { bottom.linkTo(image.top, margin = 30.dp) },
+                    .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.secondary,

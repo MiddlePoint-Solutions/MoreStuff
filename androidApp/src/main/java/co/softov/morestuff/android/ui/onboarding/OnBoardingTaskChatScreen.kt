@@ -53,12 +53,13 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
     )
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.safeContent)
+            .fillMaxSize()
     ) {
         ConstraintLayout(
             modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeContent),
+                .fillMaxSize(),
         ) {
 
             val (image, title, subtitle) = createRefs()
@@ -91,7 +92,7 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
                 composition = composition,
                 modifier = Modifier
                     .constrainAs(image) { centerTo(parent) }
-                    .size(380.dp),
+                    .size(300.dp),
                 iterations = LottieConstants.IterateForever,
             )
 

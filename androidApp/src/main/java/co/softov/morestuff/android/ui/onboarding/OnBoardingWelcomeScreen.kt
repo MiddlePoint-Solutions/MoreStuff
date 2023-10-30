@@ -5,8 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +30,9 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 fun OnBoardingWelcomeScreen(
     onNext: () -> Unit,
 ) {
-    Box {
+    Box(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.safeContent)
+    ) {
 
         Image(
             painter = painterResource(id = R.drawable.logo),
