@@ -121,11 +121,11 @@ fun SetSchedulePriorityButton(
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "DefaultPreviewDark"
+    name = "Dark"
 )
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
+    name = "Light"
 )
 @Composable
 private fun PriorityButtonPreview() {

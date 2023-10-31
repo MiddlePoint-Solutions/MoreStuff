@@ -4,30 +4,30 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.service.HintTask
+import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 
 interface CreateHintTaskUseCase {
-    suspend operator fun invoke(): List<TaskDomain>
+    suspend operator fun invoke()
 }
 
 class CreateHintTaskUseCaseImpl(
     private val createTaskUseCase: CreateTaskUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
-    private val hintTask: HintTask
+    private val hintTaskProvider: HintTaskProvider
 ) : CreateHintTaskUseCase {
 
-    override suspend fun invoke(): List<TaskDomain> {
-        val hintTasks = hintTask.getHintTasks()
+    override suspend fun invoke() {
+        val hintTasks = hintTaskProvider.getHintTasks()
         val createdTasks = mutableListOf<TaskDomain>()
 
-        for (hintTask in hintTasks) {
+        hintTasks.forEach { hintTask ->
             val priorityParams = Priority.Now()
             val taskParams = TaskParams(hintTask.taskTitle, priorityParams, TaskType.User)
             val createdTask = createTaskUseCase(taskParams)
             createdTasks.add(createdTask)
 
-            for (messageHint in hintTask.taskMessages) {
+            hintTask.taskMessages.forEach { messageHint ->
                 createMessageUseCase(
                     taskId = createdTask.id,
                     title = messageHint.content,
@@ -36,7 +36,5 @@ class CreateHintTaskUseCaseImpl(
                 )
             }
         }
-
-        return createdTasks
     }
 }

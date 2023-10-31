@@ -136,17 +136,20 @@
     <string name="cd_show_task_chat">Show task chat</string>
 
     <!--  onBoarding  -->
-    <string name="our_goal">"Our goal"</string>
-    <string name="is_to_help_you_plan_and">is to help you prioritize and\nfulfill your tasks.</string>
-    <string name="button_start">Start</string>
-    <string name="notification">Notification\npermission </string>
-    <string name="more_stuff_requires_notification">MoreStuff requires Notification\npermission to send you Task &amp;\nReminder notifications  </string>
+    <string name="onboarding_welcome_title">"Our goal"</string>
+    <string name="onboarding_welcome_subtitle1">to help you</string>
+    <string name="onboarding_welcome_subtitle2">organize &amp; prioritize</string>
+    <string name="onboarding_welcome_subtitle3">your stuff</string>
+    <string name="onboarding_notification_permission_title">Allow Notifications</string>
+    <string name="onboarding_notification_permission_subtitle">To schedule important stuff\nMoreStuff requires your permission</string>
     <string name="button_enable">Enable</string>
     <string name="button_skip">Skip</string>
     <string name="button_next">Next</string>
-    <string name="your_workspace">Your workspace\nis ready </string>
-    <string name="chat_task">Chat with your tasks</string>
-    <string name="save_details_chat"> and save important details:\n  notes, images, links etc.</string>
+    <string name="button_ready">Ready</string>
+    <string name="button_close">Close</string>
+    <string name="onboarding_complete_title">Your workspace\nis ready </string>
+    <string name="onboarding_chat_task_title">Chat with tasks</string>
+    <string name="onboarding_chat_task_subtitle">Just as you would with your contacts in a messaging app.</string>
     <string name="import_image_title">Import image</string>
     <string name="import_image_title_hint">Add a caption…</string>
     <string name="cd_share">Share</string>
@@ -161,34 +164,29 @@
     <string name="click_s_to_enable_developer_settings">Click %1$s more times to enable developer settings</string>
     <string name="version">Version</string>
 
-    <string name="daily_check_ins">Daily checks-ins</string>
-    <string name="daily_check_ins_description">A daily check-in will help you stay\n on schedule. Get a daily reminder at your desired time.\n
-        You can change this later via \nSettings page</string>
+    <string name="onboarding_schedule_review_title">Schedule Review</string>
+    <string name="onboarding_schedule_review_subtitle">Get into the habit of daily reviews by setting your preferred time</string>
     <string name="add_reminder">Add reminder</string>
-    <string name="review_your_tasks">Review your \ntasks</string>
-    <string name="up_priority">slide the card up to give it top priority</string>
-    <string name="down_priority">slide the card down to give it lowest priority</string>
-    <string name="left_priority">slide the card to the left to decrease  priority</string>
-    <string name="right_priority">slide the card to the right to increase  priority</string>
-    <string name="reload">Reload</string>
+    <string name="onboarding_review_title">Prioritize &amp; Review</string>
 
+    <!--  OnBoarding review tasks  -->
+    <string name="onboarding_review_task1">Plan Venice trip</string>
+    <string name="onboarding_review_task2">Call parents</string>
+    <string name="onboarding_review_task3">Logo ideas</string>
+    <string name="onboarding_review_task4">Website content research</string>
+    <string name="onboarding_review_task5">Print important documents</string>
+    <string name="onboarding_review_task6">Schedule meeting with designer</string>
+    <string name="onboarding_review_task7">Create business plan for client</string>
+    <string name="onboarding_review_task8">Writing ideas</string>
+    <string name="onboarding_review_task9">Pay parking ticket</string>
+    <string name="onboarding_review_task10">Listen to latest podcast</string>
 
+    <!-- Hint tasks and messages  -->
+    <string name="hint_task_1">Click me :)</string>
+    <string name="hint_task_1_message_1">Here you can add notes and links about the task</string>
+    <string name="hint_task_1_message_2">You can also add pictures!</string>
+    <string name="hint_task_1_message_3">And you can schedule to get reminded</string>
 
-
-    <!-- Hint task and messages  -->
-    <string name="hint_task_now">Hint Task with Now priority.\nClick me!</string>
-    <string name="hint_task_later">Hint with Later priority.\nClick me!</string>
-    <string name="hint_task_plan">Hint Task with Plan priority.\nClick me!</string>
-
-    <string name="message_1_now_task">Here you can write stuff about the task</string>
-    <string name="message_2_now_task">You can also add pictures</string>
-    <string name="message_3_now_task">And you can set schedule</string>
-    <string name="message_4_now_task">You are ready to start!</string>
-
-    <string name="message_1_later_task">This can wait a bit, but don\'t forget about it</string>
-    <string name="message_2_later_task">It\'s not urgent, but it\'s important.</string>
-
-    <string name="message_1_plan_task">You\'ve planned this for later. Set a schedule!</string>
     <string name="cd_highest_priority_hint_icon">Highest Priority hint icon</string>
     <string name="cd_lowest_priority_hint_icon">Lowest Priority hint icon</string>
     <string name="cd_low_priority_hint_icon">Low Priority hint icon</string>
@@ -197,6 +195,11 @@
     <string name="review_hint_low_priority">Low Priority</string>
     <string name="review_hint_highest_priority">Highest Priority</string>
     <string name="review_hint_lowest_priority">Lowest Priority</string>
+    <string name="cd_app_logo">app logo</string>
+    <string name="cd_notifications_permission_image">Notifications permission image</string>
+    <string name="notification_permission_rationale">MoreStuff needs the notification permission to enable setting schedules and reminders for the stuff that you don\'t want to forget…\nYou can also enable the permission while using the app.</string>
+    <string name="onboarding_review_all_done">All Done</string>
+    <string name="cd_extra_details">Notes</string>
 
 
 </resources>

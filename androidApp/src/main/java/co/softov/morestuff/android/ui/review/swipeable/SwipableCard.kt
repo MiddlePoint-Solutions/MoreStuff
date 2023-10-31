@@ -25,6 +25,7 @@ import kotlin.math.abs
 @ExperimentalSwipeableCardApi
 fun Modifier.swipableCard(
     state: SwipeableCardState,
+    enabled: Boolean = true,
     onSwiped: (SwipeDirection) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
     blockedDirections: List<SwipeDirection> = listOf(),
@@ -43,7 +44,7 @@ fun Modifier.swipableCard(
                 }
             },
             onDrag = { change, dragAmount ->
-                if (state.isSwiped) {
+                if (state.isSwiped || !enabled) {
                     change.consume()
                 } else {
                     velocityTracker.addPointerInputChange(change)
