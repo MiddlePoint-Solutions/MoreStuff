@@ -146,6 +146,7 @@
     <string name="button_skip">Skip</string>
     <string name="button_next">Next</string>
     <string name="button_ready">Ready</string>
+    <string name="button_close">Close</string>
     <string name="onboarding_complete_title">Your workspace\nis ready </string>
     <string name="onboarding_chat_task_title">Chat with tasks</string>
     <string name="onboarding_chat_task_subtitle">Just as you would with your contacts in a messaging app.</string>

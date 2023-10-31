@@ -33,6 +33,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun OnBoardingReviewScreen(
+    nextButtonText: String = stringResource(id = R.string.button_next),
     onNext: () -> Unit,
 ) {
 
@@ -79,7 +80,7 @@ fun OnBoardingReviewScreen(
 
         OnboardingButton(
             onClick = onNext,
-            title = stringResource(id = R.string.button_next),
+            title = nextButtonText,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 100.dp)
@@ -99,6 +100,6 @@ fun OnBoardingReviewScreen(
 @Composable
 private fun Preview() {
     MoreStuffTheme {
-        OnBoardingReviewScreen {}
+        OnBoardingReviewScreen("Next") {}
     }
 }

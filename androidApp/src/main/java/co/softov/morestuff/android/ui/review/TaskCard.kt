@@ -66,11 +66,9 @@ fun TaskCard(
     modifier: Modifier = Modifier,
     task: ReviewItemUiModel,
     onComplete: (ReviewItemUiModel) -> Unit,
-    isVisible: Boolean = false,
     isClickable: Boolean = true,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
-    var visibleState by remember { mutableStateOf(true) }
     val selectedState = remember { MutableTransitionState(false) }
 
     val backgroundColors by remember {
@@ -81,126 +79,121 @@ fun TaskCard(
         derivedStateOf { task.extraDetails }
     }
 
-    AnimatedVisibility(
-        visible = visibleState,
-        exit = scaleOut(targetScale = 1.5f) + fadeOut()
+    Card(
+        modifier = modifier
+            .clickable(isClickable) {
+                selectedState.targetState = !selectedState.currentState
+            }
+            .aspectRatio(0.7f),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     ) {
-        Card(
-            modifier = modifier
-                .aspectRatio(0.7f)
-                .clickable {
-                    selectedState.targetState = !selectedState.currentState
-                },
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp
+        Text(
+            text = task.title,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            textAlign = TextAlign.Start,
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight(400),
+                fontSize = 25.sp,
+                lineHeight = 28.sp
             ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            )
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+            maxLines = 2,
+            minLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Box(
+            modifier = Modifier
+                .aspectRatio(1f)
+                .padding(start = 20.dp, end = 20.dp, top = 5.dp),
         ) {
-            Text(
-                text = task.title,
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                textAlign = TextAlign.Start,
-                style = MaterialTheme.typography.displaySmall.copy(
-                    fontWeight = FontWeight(400),
-                    fontSize = 25.sp,
-                    lineHeight = 28.sp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-                maxLines = 2,
-                minLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
 
             Box(
                 modifier = Modifier
-                    .aspectRatio(1f)
-                    .padding(start = 20.dp, end = 20.dp, top = 5.dp),
-            ) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 12.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(brush = Brush.verticalGradient(backgroundColors))
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 10.dp),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    if (extraDetails) {
-                        Surface(
-                            modifier = Modifier.size(width = 30.dp, height = 25.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Notes,
-                                contentDescription = stringResource(R.string.cd_extra_details),
-                                tint = Color.White,
-                                modifier = Modifier.padding(4.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            AnimatedVisibility(
-                visibleState = selectedState,
-                modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 20.dp, end = 20.dp),
-                enter = fadeIn(),
-                exit = fadeOut()
+                    .padding(top = 12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush = Brush.verticalGradient(backgroundColors))
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.End
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Row(
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                if (extraDetails) {
+                    Surface(
+                        modifier = Modifier.size(width = 30.dp, height = 25.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = RoundedCornerShape(12.dp),
                     ) {
-                        FilledIconButton(
-                            onClick = { showTaskChat(task.id) },
-                            modifier = Modifier.size(55.dp),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = Color(0xFFC4C5DD),
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
-                                contentDescription = stringResource(R.string.cd_show_task_chat),
-                                tint = MaterialTheme.colorScheme.surfaceContainer
-                            )
-                        }
-                        FilledIconButton(
-                            onClick = { onComplete(task) },
-                            modifier = Modifier.size(55.dp),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            ),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = stringResource(R.string.cd_task_complete),
-                            )
-                        }
+                        Icon(
+                            imageVector = Icons.Default.Notes,
+                            contentDescription = stringResource(R.string.cd_extra_details),
+                            tint = Color.White,
+                            modifier = Modifier.padding(4.dp)
+                        )
                     }
                 }
             }
-
         }
+
+        AnimatedVisibility(
+            visibleState = selectedState,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 20.dp, end = 20.dp),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Row(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FilledIconButton(
+                        onClick = { showTaskChat(task.id) },
+                        modifier = Modifier.size(55.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
+                            contentDescription = stringResource(R.string.cd_show_task_chat),
+                            tint = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    }
+                    FilledIconButton(
+                        onClick = { onComplete(task) },
+                        modifier = Modifier.size(55.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(R.string.cd_task_complete),
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }
 

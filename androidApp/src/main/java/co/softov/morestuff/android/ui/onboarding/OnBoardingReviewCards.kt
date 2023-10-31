@@ -109,7 +109,6 @@ private fun OnBoardingTaskPrioritySwipe(
                     ),
                 task = task,
                 onComplete = {},
-                isVisible = true,
                 isClickable = false,
                 showTaskChat = {}
             )
