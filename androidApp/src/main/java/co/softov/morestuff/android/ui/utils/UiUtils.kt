@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.utils
 
+import android.os.Build
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -10,10 +11,13 @@ import java.util.regex.Pattern
 
 const val URL_PATTERN_REGEX =
     "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[a-zA-Z0-9_-]+(\\.[a-zA-Z]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
+
 val urlPattern: Pattern = Pattern.compile(
-    URL_PATTERN_REGEX,
-    Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
+    URL_PATTERN_REGEX, Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
 )
+
+fun requiresNotificationsPermission() =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
 
 fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern, urlColor: Color) {
