@@ -25,7 +25,7 @@ fun buildReviewHintTasks(context: Context): List<ReviewItemUiModel> =
         repeat(ids.size) {
             add(
                 ReviewItemUiModel(
-                    id = 1,
+                    id = it.toLong(),
                     createTime = "",
                     title = res.getString(ids[it]),
                     priorityScore = 5,
