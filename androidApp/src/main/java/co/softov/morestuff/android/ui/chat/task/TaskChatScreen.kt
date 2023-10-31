@@ -84,7 +84,6 @@ fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    shouldShowAppBar: () -> Boolean = { true }
 ) {
 
     val navigation = remember { StackNavigation<ChatScreen>() }
@@ -147,7 +146,6 @@ fun TaskChatScreen(
                         imagePicked = {
                             navigation.push(ChatScreen.ImageImport(it.toString()))
                         },
-                        shouldShowAppBar = shouldShowAppBar,
                     )
                 }
 
@@ -193,7 +191,6 @@ private fun TaskChatContent(
     createPlanSchedule: () -> Unit = {},
     cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
-    shouldShowAppBar: () -> Boolean,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -209,11 +206,9 @@ private fun TaskChatContent(
 
     Scaffold(
         topBar = {
-            if (shouldShowAppBar.invoke()) {
-                TaskTopAppBar(
-                    onBackPressed = onBack,
-                )
-            }
+            TaskTopAppBar(
+                onBackPressed = onBack,
+            )
         },
         modifier = modifier.navigationBarsPadding(),
         containerColor = Color.Transparent,
@@ -408,7 +403,6 @@ fun TaskChatPreview() {
                 )
             },
             chatActions = ChatActions(),
-            shouldShowAppBar = { true }
         )
     }
 }

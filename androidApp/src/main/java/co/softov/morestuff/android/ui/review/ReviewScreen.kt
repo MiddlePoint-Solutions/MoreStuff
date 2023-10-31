@@ -32,9 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
+import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewScreen
@@ -43,6 +45,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -71,7 +74,7 @@ fun ReviewContent(
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }
     var showReviewHelpScreen by remember { mutableStateOf(false) }
-    var showTaskChat by remember { mutableStateOf(false) }
+    var showTaskChat = remember { MutableTransitionState(false) }
     var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -143,7 +146,7 @@ fun ReviewContent(
                         showTaskChat = { taskId ->
                             currentTaskId = taskId
                             scope.launch {
-                                showTaskChat = true
+                                showTaskChat.targetState = true
                             }
                         }
                     )
@@ -169,23 +172,21 @@ fun ReviewContent(
             }
         }
 
-        if (showTaskChat) {
+
+        SlideAnimation(visibleState = showTaskChat) {
             BackHandler(onBack = {
                 scope.launch {
-                    bottomSheetState.hide()
+                    showTaskChat.targetState = false
                 }
             })
-            ModalBottomSheet(
-                sheetState = bottomSheetState,
-                onDismissRequest = {
-                    showTaskChat = false
-                }
-            ) {
-                currentTaskId?.let { taskId ->
+            currentTaskId?.let { taskId ->
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceContainer
+                ) {
                     TaskChatScreen(
                         taskId = taskId,
-                        onBack,
-                        shouldShowAppBar = { false })
+                        onBack = { showTaskChat.targetState = false },
+                    )
                 }
             }
         }
