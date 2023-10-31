@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
@@ -28,6 +29,7 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -90,128 +92,109 @@ fun TaskCard(
                     selectedState.targetState = !selectedState.currentState
                 },
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
+                defaultElevation = 2.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
             )
         ) {
+            Text(
+                text = task.title,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.displaySmall.copy(
+                    fontWeight = FontWeight(400),
+                    fontSize = 25.sp,
+                    lineHeight = 28.sp
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, start = 20.dp, end = 20.dp),
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                    .aspectRatio(1f)
+                    .padding(start = 20.dp, end = 20.dp, top = 5.dp),
             ) {
 
-                Text(
-                    text = task.title,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.displaySmall.copy(
-                        fontWeight = FontWeight(400),
-                        fontSize = 25.sp,
-                        lineHeight = 28.sp
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                // Color area
                 Box(
                     modifier = Modifier
-                        .padding(start = 20.dp, top = 105.dp, end =  20.dp)
-                        .size(width = 305.dp, height = 320.dp)
+                        .fillMaxSize()
+                        .padding(top = 12.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(
-                            brush = Brush.verticalGradient(backgroundColors)
-                        ),
+                        .background(brush = Brush.verticalGradient(backgroundColors))
+                )
 
-                    ) {
-                }
-                // Icons
-                if (extraDetails) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 277.dp, top = 93.dp)
-                    ) {
-                        FilledIconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .size(width = 30.dp, height = 25.dp),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            ),
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (extraDetails) {
+                        Surface(
+                            modifier = Modifier.size(width = 30.dp, height = 25.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             shape = RoundedCornerShape(12.dp),
-
-                            ) {
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.Notes,
-                                contentDescription = "Notes",
+                                contentDescription = stringResource(R.string.cd_extra_details),
                                 tint = Color.White,
-                                modifier = Modifier
-                                    .padding(4.dp)
-
+                                modifier = Modifier.padding(4.dp)
                             )
                         }
                     }
                 }
-                // Buttons
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomEnd)
-                        .padding(bottom = 5.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    SlideAnimation(
-                        visibleState = selectedState,
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.End,
-                            verticalArrangement = Arrangement.Center,
-                        ) {
-                            Row {
-                                FilledIconButton(
-                                    onClick = { showTaskChat(task.id) },
-                                    modifier = Modifier
-                                        .size(70.dp)
-                                        .padding(end = 20.dp, top = 15.dp, bottom = 5.dp),
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = Color(0xFFC4C5DD),
+            }
 
-                                        ),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
-                                        contentDescription = stringResource(R.string.cd_show_task_chat),
-                                        tint = MaterialTheme.colorScheme.surfaceContainer
-                                    )
-                                }
-                                FilledIconButton(
-                                    onClick = {
-                                        onComplete(task)
-                                        // visibleState = false
-                                    },
-                                    modifier = Modifier
-                                        .size(70.dp)
-                                        .padding(end = 20.dp, top = 15.dp, bottom = 5.dp),
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary,
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
-                                    ),
-                                    shape = RoundedCornerShape(12.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = stringResource(R.string.cd_task_complete),
-                                        tint = MaterialTheme.colorScheme.onPrimary
-                                    )
-                                }
-                            }
+            AnimatedVisibility(
+                visibleState = selectedState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 20.dp, end = 20.dp),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterEnd),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        FilledIconButton(
+                            onClick = { showTaskChat(task.id) },
+                            modifier = Modifier.size(55.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = Color(0xFFC4C5DD),
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
+                                contentDescription = stringResource(R.string.cd_show_task_chat),
+                                tint = MaterialTheme.colorScheme.surfaceContainer
+                            )
+                        }
+                        FilledIconButton(
+                            onClick = { onComplete(task) },
+                            modifier = Modifier.size(55.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = stringResource(R.string.cd_task_complete),
+                            )
                         }
                     }
                 }
@@ -260,7 +243,8 @@ fun TaskCardPreview() {
                 createTime = "",
                 id = 0,
                 priorityScore = 0,
-                isCompleted = false
+                isCompleted = false,
+                extraDetails = true
             ),
             onComplete = {},
             showTaskChat = {}

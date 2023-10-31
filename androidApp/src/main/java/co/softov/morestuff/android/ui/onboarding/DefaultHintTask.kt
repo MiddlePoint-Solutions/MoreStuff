@@ -30,6 +30,7 @@ fun buildReviewHintTasks(context: Context): List<ReviewItemUiModel> =
                     title = res.getString(ids[it]),
                     priorityScore = 5,
                     isCompleted = false,
+                    extraDetails = false
                 )
             )
         }

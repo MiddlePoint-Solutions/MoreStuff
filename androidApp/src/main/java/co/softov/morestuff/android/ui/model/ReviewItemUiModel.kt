@@ -6,5 +6,5 @@ data class ReviewItemUiModel(
     val title: String,
     val priorityScore: Long,
     var isCompleted: Boolean,
-    val extraDetails: Boolean = false,
+    val extraDetails: Boolean,
 )
