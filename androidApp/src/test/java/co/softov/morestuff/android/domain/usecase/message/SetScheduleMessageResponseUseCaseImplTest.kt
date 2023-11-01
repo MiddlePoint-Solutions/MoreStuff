@@ -15,12 +15,12 @@ class SetScheduleMessageResponseUseCaseImplTest {
     @Test
     fun `returns success when message repository addUserReplyMessage is successful`() = runBlocking {
         coEvery { messageRepository.addUserReplyMessage(any(), any(), any()) } returns Unit
-        val taskId = 1L
+        val taskId = listOf(1L)
         val title = "title"
         val replyType = ReplyType.DONE
         val result = setScheduleMessageResponse.invoke(taskId, title, replyType)
 
-        coVerify { messageRepository.addUserReplyMessage(taskId, replyType.value, title) }
+        coVerify { messageRepository.addUserReplyMessage(any(), replyType.value, title) }
         assertTrue(result.isRight())
         assertEquals(result, Either.Right(true))
     }

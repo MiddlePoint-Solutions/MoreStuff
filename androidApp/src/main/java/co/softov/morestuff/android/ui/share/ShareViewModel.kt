@@ -77,7 +77,7 @@ class ShareViewModel(
     suspend fun createNewShareableTask(title: String, priority: Priority): Long {
         val params = TaskParams(title, priority, TaskType.User)
         val task = createTaskUseCase(params)
-        store.dispatchSuspend(TaskAction.TaskCreatedAction(task, priority))
+        dispatchSuspend(TaskAction.TaskCreatedAction(task, priority))
         return task.id
     }
 

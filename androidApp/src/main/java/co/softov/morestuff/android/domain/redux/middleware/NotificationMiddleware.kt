@@ -59,9 +59,9 @@ class NotificationMiddleware(
                 notifier.clearScheduleNotification(action.scheduleId)
             }
 
-            is TaskAction.CompleteTaskAction -> {
+            is TaskAction.CompleteTasksAction -> {
                 if (action.complete) scope.launch {
-                    clearTaskNotificationsUseCase(action.taskId)
+                    clearTaskNotificationsUseCase(action.taskIds)
                 }
             }
 

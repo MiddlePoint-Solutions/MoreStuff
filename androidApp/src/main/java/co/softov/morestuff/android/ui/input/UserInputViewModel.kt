@@ -67,7 +67,7 @@ class UserInputViewModel(
     }
 
     suspend fun createNewTask(title: String) {
-        store.dispatchSuspend(
+        dispatchSuspend(
             TaskAction.CreateUserTaskAction(
                 title.trim(),
                 priorityModel.value.mapToDomain()

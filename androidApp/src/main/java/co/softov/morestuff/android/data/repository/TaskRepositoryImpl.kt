@@ -135,7 +135,7 @@ class TaskRepositoryImpl(
         }
 
     override suspend fun updateTasksComplete(
-        taskId: Long,
+        taskIds: List<Long>,
         complete: Boolean,
     ): Either<Failure, Boolean> {
         val time = when (complete) {
@@ -144,7 +144,7 @@ class TaskRepositoryImpl(
         }
 
         return taskQueries.transactionWithResult {
-            taskQueries.updateTaskComplete(time, taskId)
+            taskQueries.updateTaskComplete(time, taskIds)
             Right(true)
         }
     }

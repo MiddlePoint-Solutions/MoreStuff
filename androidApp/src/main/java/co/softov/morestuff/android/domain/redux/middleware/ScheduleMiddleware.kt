@@ -18,7 +18,6 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.Schedu
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
@@ -88,9 +87,9 @@ class ScheduleMiddleware(
                 }
             }
 
-            is TaskAction.CompleteTaskAction -> scope.launch {
+            is TaskAction.CompleteTasksAction -> scope.launch {
                 if (action.complete) {
-                    cancelActiveScheduleUseCase(action.taskId)
+                    cancelActiveScheduleUseCase(action.taskIds)
                 }
             }
 
@@ -103,9 +102,10 @@ class ScheduleMiddleware(
             }
 
             is CancelActiveScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.OneTime))
+                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.OneTime))
             }
 
+            // TODO: create use-case for this action
             is ScheduleReplyAction -> with(action) {
                 when (replyType) {
                     LATER -> {}
@@ -132,7 +132,11 @@ class ScheduleMiddleware(
                         )
                     }
 
-                    DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
+                    DONE -> {
+                        dispatch(
+                            TaskAction.CompleteTasksAction(listOf(schedule.taskId), true)
+                        )
+                    }
                 }
             }
 
@@ -160,7 +164,7 @@ class ScheduleMiddleware(
             }
 
             is CancelReminderScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.Reminder))
+                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.Reminder))
             }
 
             else -> NoOp

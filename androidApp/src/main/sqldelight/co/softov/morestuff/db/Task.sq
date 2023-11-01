@@ -53,8 +53,8 @@ VALUES ?;
 
 updateTaskComplete:
 UPDATE task
-SET complete_time = ?
-WHERE id = ?;
+SET complete_time = :completed_time
+WHERE id IN :task_ids;
 
 updateTaskTitle:
 UPDATE task

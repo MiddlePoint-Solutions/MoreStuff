@@ -95,7 +95,7 @@ class PriorityViewModel(
             tasks = tasks.toMutableList().apply {
                 remove(item)
             }
-            dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+            dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(item.id), true))
             notification = Complete
         }
     }
@@ -110,7 +110,7 @@ class PriorityViewModel(
     fun undoLastCompleted() {
         resetNotification()
         for (task in recentlyCompletedTasks) {
-            dispatchAppStoreAction(TaskAction.CompleteTaskAction(task.id, false))
+            dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(task.id), false))
         }
         recentlyCompletedTasks.clear()
         undoBulkMode.value = true

@@ -72,10 +72,8 @@ import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
@@ -252,7 +250,7 @@ val taskUseCases = module {
 
 
 val scheduleUseCases = module {
-    factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
+    factoryOf(::GetTaskActiveSchedulesUseCaseImpl) bind GetTaskActiveSchedulesUseCase::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
     factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
@@ -266,7 +264,6 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
-    factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
 }
 

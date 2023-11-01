@@ -25,7 +25,7 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority,
     ) : TaskAction()
 
-    data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
+    data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
     data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
@@ -65,9 +65,9 @@ class TaskMiddleware(
                 }
             }
 
-            is CompleteTaskAction -> scope.launch {
-                with(action) {
-                    setTaskCompleteUseCase(taskId, complete)
+            is CompleteTasksAction -> with(action) {
+                scope.launch {
+                    setTaskCompleteUseCase(taskIds, complete)
                 }
             }
 
@@ -78,6 +78,7 @@ class TaskMiddleware(
             is CreateHintTask -> scope.launch {
                 createHintTaskUseCase()
             }
+
             is DeleteTasksAction -> scope.launch {
                 deleteTasksUseCase(action.taskIds)
             }
