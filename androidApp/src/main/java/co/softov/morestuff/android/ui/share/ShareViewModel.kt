@@ -14,19 +14,46 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.ui.schedule.NotificationState
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class ShareViewModel(
     private val getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val createTaskUseCase: CreateTaskUseCase,
 ) : NoStateViewModel() {
+    var query by mutableStateOf("")
+        internal set
 
+    val filteredTasks = MutableStateFlow<List<TaskDomain>>(listOf())
+
+    private var filterJob: Job? = null
     override val enableDebug: Boolean
         get() = false
 
     init {
         loadData()
+        filterTasks()
+    }
+
+    fun updateQuery(searchQuery: String) {
+        this.query = searchQuery
+        filterTasks()
+    }
+
+    private fun filterTasks() {
+        filterJob?.cancel()
+        filterJob = viewModelScope.launch {
+            getActiveTasksFlowUseCase()
+                .onEach { results ->
+                    val filteredResults = results.filter { task ->
+                        task.title.contains(query, ignoreCase = true)
+                    }
+                    filteredTasks.value = filteredResults
+                }.launchIn(this)
+        }
     }
 
     var tasks: List<TaskDomain> by mutableStateOf(listOf())
