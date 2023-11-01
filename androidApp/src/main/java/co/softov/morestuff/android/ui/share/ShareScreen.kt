@@ -1,5 +1,9 @@
 package co.softov.morestuff.android.ui.share
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +20,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +45,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -72,47 +79,32 @@ fun ShareScreen(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
 
-
     Scaffold(
         topBar = {
-            if (isSearchActive) {
-                ShareSearchBar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { searchQuery = it },
-                    onBack = {
-                        isSearchActive = false
-                        searchQuery = ""
-                    },
-                    shareable = shareable,
-                    shareToExistingTask = shareToExistingTask
-                )
-            } else {
-                Surface(shadowElevation = 5.dp) {
-                    TopAppBar(
-                        title = { Text(text = stringResource(R.string.select_chat)) },
-                        navigationIcon = {
-                            IconButton(onClick = onBack) {
-                                Icon(
-                                    imageVector = Icons.Filled.ArrowBack,
-                                    contentDescription = stringResource(R.string.cd_navigate_back)
-                                )
-                            }
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                        ),
-                        actions = {
-                            IconButton(onClick = { isSearchActive = true }) {
-                                Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = stringResource(R.string.cd_search_chats),
-                                    modifier = Modifier.size(32.dp),
-                                    tint = MaterialTheme.colorScheme.onSurface
-                                )
-                            }
+            Surface(shadowElevation = 5.dp) {
+                TopAppBar(
+                    title = { Text(text = stringResource(R.string.select_chat)) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.cd_navigate_back)
+                            )
                         }
-                    )
-                }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
+                    actions = {
+                        IconButton(onClick = { isSearchActive = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(R.string.cd_search_chats),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                )
             }
         },
         content = {
@@ -124,6 +116,23 @@ fun ShareScreen(
             )
         },
     )
+
+    AnimatedVisibility(
+        visible = isSearchActive,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        ShareSearchBar(
+            searchQuery = searchQuery,
+            onSearchQueryChange = { searchQuery = it },
+            onBack = {
+                isSearchActive = false
+                searchQuery = ""
+            },
+            shareable = shareable,
+            shareToExistingTask = shareToExistingTask
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,18 +144,28 @@ fun ShareSearchBar(
     shareable: Shareable,
     shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
+
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     SearchBar(
         query = searchQuery,
         onQueryChange = onSearchQueryChange,
-        onSearch = { },
+        onSearch = onSearchQueryChange,
+        onActiveChange = { active -> if (!active) onBack() },
+        modifier = Modifier.focusRequester(focusRequester),
         active = true,
-        onActiveChange = { },
-        placeholder = { Text(text = stringResource(R.string.search)) },
+        placeholder = {
+            Text(text = stringResource(R.string.search))
+        },
         leadingIcon = {
             IconButton(onClick = onBack) {
                 Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_navigate_back)
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.cd_close_search)
                 )
             }
         },
@@ -154,7 +173,6 @@ fun ShareSearchBar(
             ShareContent(
                 shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
                 shareable = shareable,
-                modifier = Modifier.padding(),
                 searchQuery = searchQuery,
                 searchBarActive = true
             )

@@ -76,9 +76,7 @@ fun SearchBar(
     )
 
     SearchBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester),
+        modifier = Modifier.focusRequester(focusRequester),
         query = viewModel.query,
         onQueryChange = viewModel::setSearchQuery,
         onSearch = { },
