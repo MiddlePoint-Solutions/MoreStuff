@@ -200,6 +200,7 @@
     <string name="notification_permission_rationale">MoreStuff needs the notification permission to enable setting schedules and reminders for the stuff that you don\'t want to forget…\nYou can also enable the permission while using the app.</string>
     <string name="onboarding_review_all_done">All Done</string>
     <string name="cd_extra_details">Notes</string>
+    <string name="cd_close_search">Close search</string>
 
 
 </resources>
