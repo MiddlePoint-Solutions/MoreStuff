@@ -148,9 +148,7 @@ class PriorityViewModel(
 
     fun deleteSelectedTasks() {
         viewModelScope.launch {
-            for (taskId in selectedTaskIds.value) {
-                dispatchAppStoreAction(TaskAction.DeleteTaskAction(taskId))
-            }
+            dispatchAppStoreAction(TaskAction.DeleteTasksAction(selectedTaskIds.value))
             tasks = tasks.filterNot { it.id in selectedTaskIds.value }
             selectedTaskIds.value = emptyList()
         }
@@ -165,9 +163,8 @@ class PriorityViewModel(
     }
 
     fun handleLongPressOnTask(task: TaskDomain) {
-        val currentSelectedIds = selectedTaskIds.value
-        if (task.id !in currentSelectedIds) {
-            selectedTaskIds.value = currentSelectedIds + task.id
+        if (task.id !in selectedTaskIds.value) {
+            selectedTaskIds.value = selectedTaskIds.value + task.id
         }
     }
 

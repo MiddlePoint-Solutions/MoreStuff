@@ -110,5 +110,5 @@ WHERE task.complete_time IS NULL;
 
 deleteTask:
 DELETE FROM task
-WHERE id = ?;
+WHERE id IN :task_ids;
 

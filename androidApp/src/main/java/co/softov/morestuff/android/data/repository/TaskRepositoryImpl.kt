@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
-import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.data.mapper.TaskDb
 import co.softov.morestuff.android.domain.enums.TaskType
@@ -55,7 +54,7 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> =
-        getTaskFlow(taskId).firstOrNull().rightIfNotNull { TaskDoesNotExist }
+        getTaskFlow(taskId).firstOrNull()?.right() ?: TaskDoesNotExist.left()
 
     override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
         val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)
@@ -204,7 +203,7 @@ class TaskRepositoryImpl(
                             )
                         }
                 }
-        }.firstOrNull().rightIfNotNull { TaskDoesNotExist }
+        }.firstOrNull()?.right() ?: TaskDoesNotExist.left()
     }
 
     override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
@@ -226,14 +225,12 @@ class TaskRepositoryImpl(
         task_type = taskType
     )
 
-    override suspend fun countActiveTasks(): Either<Failure, Int> =
-        taskQueries.countActiveTasks().executeAsOne().toInt().right()
-
-    override suspend fun deleteTask(taskId: Long): Either<Failure, Boolean> {
-        taskQueries.transaction {
-            taskQueries.deleteTask(taskId)
-        }
+    override suspend fun deleteTasks(taskIds: List<Long>): Either<Failure, Boolean> {
+        taskQueries.deleteTask(taskIds)
         return Right(true)
     }
+
+    override suspend fun countActiveTasks(): Either<Failure, Int> =
+        taskQueries.countActiveTasks().executeAsOne().toInt().right()
 
 }

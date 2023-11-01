@@ -11,7 +11,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.DeleteTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -31,7 +31,7 @@ sealed class TaskAction : Action.FeatureAction() {
 
     data object CreateHintTask : TaskAction()
 
-    data class DeleteTaskAction(val taskId: Long) : TaskAction()
+    data class DeleteTasksAction(val taskIds: List<Long>) : TaskAction()
 
     internal data class TaskCreatedAction(
         val task: TaskDomain,
@@ -46,7 +46,7 @@ class TaskMiddleware(
     private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val createHintTaskUseCase: CreateHintTaskUseCase,
-    private val deleteTaskUseCase: DeleteTaskUseCase
+    private val deleteTasksUseCase: DeleteTasksUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -78,8 +78,8 @@ class TaskMiddleware(
             is CreateHintTask -> scope.launch {
                 createHintTaskUseCase()
             }
-            is DeleteTaskAction -> scope.launch {
-                deleteTaskUseCase(action.taskId)
+            is DeleteTasksAction -> scope.launch {
+                deleteTasksUseCase(action.taskIds)
             }
 
             else -> NoOp
