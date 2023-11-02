@@ -226,4 +226,6 @@ class TaskRepositoryImpl(
         task_type = taskType
     )
 
+    override suspend fun countActiveTasks(): Either<Failure, Int> =
+        taskQueries.countActiveTasks().executeAsOne().toInt().right()
 }

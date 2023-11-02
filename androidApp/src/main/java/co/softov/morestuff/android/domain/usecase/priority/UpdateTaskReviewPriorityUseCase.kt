@@ -5,11 +5,8 @@ import arrow.core.flatMap
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskUseCase
-import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCase
-import timber.log.Timber
 
 interface UpdateTaskReviewPriorityUseCase {
     suspend operator fun invoke(taskId: Long, actionType: PriorityActionType): Either<Failure, Long>

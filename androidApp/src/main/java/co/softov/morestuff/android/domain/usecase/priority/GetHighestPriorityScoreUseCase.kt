@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.domain.usecase.priority
 
 import co.softov.morestuff.android.domain.repository.PriorityRepository
-import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetHighestPriorityScoreUseCase {
     suspend operator fun invoke(): Long

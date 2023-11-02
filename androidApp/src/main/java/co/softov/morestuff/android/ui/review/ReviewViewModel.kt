@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.presentation.presenter.ReviewModel
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.presentation.presenter.ReviewRound.Final
@@ -21,15 +21,15 @@ import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupI
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.SetupRound
 import co.softov.morestuff.android.presentation.presenter.ReviewViewEvent.Undo
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
-import co.softov.morestuff.android.ui.model.map.ReviewItemMapper
+import co.softov.morestuff.android.ui.model.map.ReviewTasksMapper
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
-    private val getTasksWithoutScheduleUseCase: GetTasksWithoutScheduleUseCase,
-    private val reviewItemMapper: ReviewItemMapper,
+    private val getReviewTasksUseCase: GetReviewTasksUseCase,
+    private val reviewTasksMapper: ReviewTasksMapper,
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
@@ -77,8 +77,8 @@ class ReviewViewModel(
 
     private fun setInitialState(round: ReviewRound = Review) {
         viewModelScope.launch {
-            getTasksWithoutScheduleUseCase().map {
-                val tasks = it.shuffled().map(reviewItemMapper::map)
+            getReviewTasksUseCase().map {
+                val tasks = reviewTasksMapper.map(it).shuffled()
                 sendEvent(SetupInitialRound(round, tasks))
             }
         }

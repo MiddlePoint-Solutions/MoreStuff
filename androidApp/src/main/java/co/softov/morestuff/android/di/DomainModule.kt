@@ -124,6 +124,8 @@ import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScor
 import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskForScheduleUseCase
@@ -242,6 +244,7 @@ val taskUseCases = module {
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
     factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
+    factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
 }
 
 

@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,7 +57,7 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 @Composable
 fun TaskCard(
     modifier: Modifier = Modifier,
-    task: ReviewItemUiModel,
+    item: ReviewItemUiModel,
     onComplete: (ReviewItemUiModel) -> Unit,
     isClickable: Boolean = true,
     showTaskChat: (taskId: Long) -> Unit,
@@ -64,11 +65,11 @@ fun TaskCard(
     val selectedState = remember { MutableTransitionState(false) }
 
     val backgroundColors by remember {
-        derivedStateOf { TaskColors.getProfileColorsForTask(task.title) }
+        derivedStateOf { TaskColors.getProfileColorsForTask(item.title) }
     }
 
-    val extraDetails by remember(task.extraDetails) {
-        derivedStateOf { task.extraDetails }
+    val extraDetails by remember(item.extraDetails) {
+        derivedStateOf { item.extraDetails }
     }
 
     Card(
@@ -85,7 +86,7 @@ fun TaskCard(
         )
     ) {
         Text(
-            text = task.title,
+            text = item.title,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             textAlign = TextAlign.Start,
             style = MaterialTheme.typography.displaySmall.copy(
@@ -110,7 +111,7 @@ fun TaskCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 12.dp)
+                    .padding(top = 15.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush = Brush.verticalGradient(backgroundColors))
             )
@@ -119,22 +120,42 @@ fun TaskCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.spacedBy(
+                    space = 10.dp,
+                    alignment = Alignment.End
+                )
             ) {
+
                 if (extraDetails) {
                     Surface(
                         modifier = Modifier.size(width = 42.dp, height = 30.dp),
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = RoundedCornerShape(33.dp),
-                        border = BorderStroke(
-                            width = 0.5.dp,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                        shadowElevation = 2.dp
                     ) {
                         Icon(
                             imageVector = Icons.Default.Notes,
                             contentDescription = stringResource(R.string.cd_extra_details),
                             modifier = Modifier.padding(4.dp)
+                        )
+                    }
+                }
+
+                Surface(
+                    modifier = Modifier.size(width = 50.dp, height = 30.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(33.dp),
+                    shadowElevation = 2.dp
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = item.position,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                textAlign = TextAlign.Center
+                            ),
                         )
                     }
                 }
@@ -158,7 +179,7 @@ fun TaskCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     FilledIconButton(
-                        onClick = { showTaskChat(task.id) },
+                        onClick = { showTaskChat(item.id) },
                         modifier = Modifier.size(55.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.secondary,
@@ -172,7 +193,7 @@ fun TaskCard(
                         )
                     }
                     FilledIconButton(
-                        onClick = { onComplete(task) },
+                        onClick = { onComplete(item) },
                         modifier = Modifier.size(55.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -226,9 +247,10 @@ fun TaskCardPreview() {
             modifier = Modifier
                 .fillMaxSize()
                 .aspectRatio(1f),
-            task = ReviewItemUiModel(
+            item = ReviewItemUiModel(
                 title = "Hellooooo there",
                 createTime = "",
+                position = "1/10",
                 id = 0,
                 priorityScore = 0,
                 isCompleted = false,

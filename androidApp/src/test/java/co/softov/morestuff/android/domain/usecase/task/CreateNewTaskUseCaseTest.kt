@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.TaskType
@@ -12,7 +11,6 @@ import kotlinx.coroutines.runBlocking
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 
 
 class CreateNewTaskUseCaseTest {

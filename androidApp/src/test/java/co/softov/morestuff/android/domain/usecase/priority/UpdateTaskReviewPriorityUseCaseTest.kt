@@ -4,14 +4,12 @@ import arrow.core.right
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class UpdateTaskReviewPriorityUseCaseTest {
