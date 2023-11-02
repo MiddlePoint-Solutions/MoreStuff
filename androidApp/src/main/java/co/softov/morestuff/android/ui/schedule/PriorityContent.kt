@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.schedule
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -142,6 +143,12 @@ fun PriorityContent(
     LaunchedEffect(willDismissDirection) {
         if (willDismissDirection != null) {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+    if (isBulkMode) {
+        BackHandler {
+            viewModel.deselectAllTasks()
+            itemSelectedState(false)
         }
     }
 
