@@ -330,7 +330,7 @@ private fun TaskChatInput(
                             sendTaskMessage(it)
                             userInputValue = userInputValue.copy(text = "")
                         },
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                         actionsContent = {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -376,7 +376,7 @@ private fun TaskTopAppBar(
                     )
                 }
             },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         )
     }
 }
