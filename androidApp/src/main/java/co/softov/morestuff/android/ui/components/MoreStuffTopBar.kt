@@ -98,7 +98,7 @@ fun MoreStuffTopBar(
         actions = {
             if (itemSelectedState) {
                 IconButton(onClick = {
-                    viewModel.deleteSelectedTasks()
+                    viewModel.showDeleteDialog()
                     deselectAllTasks()
                 }) {
                     Icon(

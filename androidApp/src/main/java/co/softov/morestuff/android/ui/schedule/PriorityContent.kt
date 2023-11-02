@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
@@ -45,6 +46,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
@@ -144,12 +146,21 @@ fun PriorityContent(
     }
 
 
-
+    if (viewModel.showDeleteConfirmDialog) {
+        ConfirmDeleteDialog(
+            onConfirm = { viewModel.deleteSelectedTasks() },
+            onDismiss = {
+                viewModel.dismissDeleteDialog()
+                itemSelectedState(false)
+            }
+        )
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
+
             itemsIndexed(
                 items = viewModel.tasks,
                 key = { _, task -> task.id }
@@ -246,6 +257,34 @@ fun PriorityContent(
             }
         }
     }
+}
+
+@Composable
+fun ConfirmDeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Confirm Delete") },
+        text = {
+            Text(
+                text = "Are you sure you want to delete the following tasks?",
+                textAlign = TextAlign.Start
+
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 

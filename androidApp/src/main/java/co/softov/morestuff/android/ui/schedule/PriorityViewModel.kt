@@ -43,7 +43,11 @@ class PriorityViewModel(
         private set
 
     private var recentlyCompletedTasks: MutableList<TaskDomain> = mutableListOf()
-    val undoBulkMode = MutableStateFlow(false)
+
+    private val undoBulkMode = MutableStateFlow(false)
+    var showDeleteConfirmDialog: Boolean by mutableStateOf(false)
+        private set
+
 
     init {
         loadData()
@@ -152,6 +156,17 @@ class PriorityViewModel(
             tasks = tasks.filterNot { it.id in selectedTaskIds.value }
             selectedTaskIds.value = emptyList()
         }
+        showDeleteConfirmDialog = false
+        selectedTaskIds.value = emptyList()
+    }
+
+    fun showDeleteDialog() {
+        showDeleteConfirmDialog = true
+    }
+
+    fun dismissDeleteDialog() {
+        showDeleteConfirmDialog = false
+        deselectAllTasks()
     }
 
     fun handleTaskSelection(task: TaskDomain) {
@@ -160,6 +175,7 @@ class PriorityViewModel(
         } else {
             selectedTaskIds.value = selectedTaskIds.value + task.id
         }
+
     }
 
     fun handleLongPressOnTask(task: TaskDomain) {
@@ -172,4 +188,7 @@ class PriorityViewModel(
         selectedTaskIds.value = emptyList()
     }
 
+
+
 }
+
