@@ -58,8 +58,7 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
             .fillMaxSize()
     ) {
         ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
         ) {
 
             val (image, title, subtitle) = createRefs()
@@ -68,7 +67,7 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
                 text = stringResource(R.string.onboarding_chat_task_title),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .constrainAs(title) { bottom.linkTo(subtitle.top, margin = 30.dp) },
+                    .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 40.sp,
                     lineHeight = 44.sp,
@@ -81,7 +80,7 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
             Text(
                 text = stringResource(R.string.onboarding_chat_task_subtitle),
                 modifier = Modifier
-                    .constrainAs(subtitle) { bottom.linkTo(image.top, margin = 0.dp) }
+                    .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) }
                     .padding(horizontal = 20.dp),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall,
@@ -95,7 +94,6 @@ fun OnBoardingTaskChatScreen(onNext: () -> Unit) {
                     .size(300.dp),
                 iterations = LottieConstants.IterateForever,
             )
-
         }
 
         OnboardingButton(

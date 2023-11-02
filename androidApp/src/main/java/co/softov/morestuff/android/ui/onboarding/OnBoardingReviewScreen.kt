@@ -5,7 +5,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -27,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.constraintlayout.compose.ConstraintLayout
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.delay
@@ -52,30 +55,47 @@ fun OnBoardingReviewScreen(
             .fillMaxSize(),
     ) {
 
-        Text(
-            text = stringResource(R.string.onboarding_review_title),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 40.dp),
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 40.sp,
-                lineHeight = 44.sp,
-                fontWeight = FontWeight.Black,
-                textAlign = TextAlign.Center
-            ),
-            color = MaterialTheme.colorScheme.primary,
-        )
-
-        AnimatedVisibility(
-            visible = showExample,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .zIndex(1f),
-            enter = fadeIn()
+        ConstraintLayout(
+            modifier = Modifier.fillMaxSize(),
         ) {
-            OnBoardingReviewCards(
-                tasks = tasks,
+
+            val (image, title, subtitle) = createRefs()
+
+            Text(
+                text = stringResource(R.string.onboarding_review_title),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 40.sp,
+                    lineHeight = 44.sp,
+                    fontWeight = FontWeight.Black,
+                    textAlign = TextAlign.Center
+                ),
+                color = MaterialTheme.colorScheme.primary,
             )
+
+            Text(
+                text = stringResource(R.string.onboarding_review_subtitle),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.secondary,
+            )
+
+            AnimatedVisibility(
+                visible = showExample,
+                modifier = Modifier
+                    .constrainAs(image) { centerTo(parent) }
+                    .zIndex(1f),
+                enter = fadeIn()
+            ) {
+                OnBoardingReviewCards(
+                    tasks = tasks,
+                )
+            }
         }
 
         OnboardingButton(
@@ -85,7 +105,6 @@ fun OnBoardingReviewScreen(
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 100.dp)
         )
-
     }
 }
 
