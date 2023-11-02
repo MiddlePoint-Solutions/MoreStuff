@@ -169,26 +169,19 @@ class PriorityViewModel(
         deselectAllTasks()
     }
 
+
     fun handleTaskSelection(task: TaskDomain) {
-        if (task.id in selectedTaskIds.value) {
-            selectedTaskIds.value = selectedTaskIds.value - task.id
+        selectedTaskIds.value = if (task.id in selectedTaskIds.value) {
+            selectedTaskIds.value - task.id
         } else {
-            selectedTaskIds.value = selectedTaskIds.value + task.id
-        }
-
-    }
-
-    fun handleLongPressOnTask(task: TaskDomain) {
-        if (task.id !in selectedTaskIds.value) {
-            selectedTaskIds.value = selectedTaskIds.value + task.id
+            selectedTaskIds.value + task.id
         }
     }
+
 
     fun deselectAllTasks() {
         selectedTaskIds.value = emptyList()
     }
-
-
 
 }
 

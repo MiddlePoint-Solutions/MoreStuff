@@ -209,16 +209,13 @@ fun PriorityContent(
                         PriorityItem(
                             task = item,
                             onClick = {
-                                if (isBulkMode) {
-                                    viewModel.handleTaskSelection(item)
-                                    itemSelectedState(viewModel.selectedTaskIds.value.isNotEmpty())
-                                } else {
+                                if (!isBulkMode) {
                                     showTaskChat(item.id)
                                 }
                             },
                             onLongClick = {
-                                viewModel.handleLongPressOnTask(item)
-                                itemSelectedState(true)
+                                viewModel.handleTaskSelection(item)
+                                itemSelectedState(viewModel.selectedTaskIds.value.isNotEmpty())
                             },
                             isSelected = item.id in viewModel.selectedTaskIds.value
                         )
