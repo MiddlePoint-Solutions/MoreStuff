@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.chat.items
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,19 +35,18 @@ fun AppChatItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 15.dp, end = 45.dp, bottom = 7.dp)
-            .clickable { chatActions.taskChatAction(message.taskId) },
+            .padding(start = 15.dp, end = 45.dp, bottom = 7.dp),
         horizontalArrangement = Arrangement.Start
     ) {
         Surface(
+            onClick = { chatActions.taskChatAction(message.taskId) },
             shape = RoundedCornerShape(
                 topStart = 14.dp,
                 topEnd = 14.dp,
                 bottomEnd = 14.dp,
                 bottomStart = 5.dp
             ),
-            tonalElevation = 10.dp,
-            contentColor = contentColorFor(MaterialTheme.colorScheme.onSecondaryContainer),
+            color = MaterialTheme.colorScheme.secondaryContainer,
         ) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Text(

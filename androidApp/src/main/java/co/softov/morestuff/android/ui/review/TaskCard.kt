@@ -3,16 +3,13 @@ package co.softov.morestuff.android.ui.review
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateDp
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,13 +29,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,12 +48,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.TaskColors
 import co.softov.morestuff.android.ui.theme.surfaceContainer
-import kotlinx.coroutines.delay
 
 @Composable
 fun TaskCard(
@@ -89,7 +81,7 @@ fun TaskCard(
             defaultElevation = 2.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
         Text(
@@ -112,7 +104,7 @@ fun TaskCard(
         Box(
             modifier = Modifier
                 .aspectRatio(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 5.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 6.dp),
         ) {
 
             Box(
@@ -131,14 +123,17 @@ fun TaskCard(
             ) {
                 if (extraDetails) {
                     Surface(
-                        modifier = Modifier.size(width = 30.dp, height = 25.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(width = 42.dp, height = 30.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(33.dp),
+                        border = BorderStroke(
+                            width = 0.5.dp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Notes,
                             contentDescription = stringResource(R.string.cd_extra_details),
-                            tint = Color.White,
                             modifier = Modifier.padding(4.dp)
                         )
                     }
