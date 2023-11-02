@@ -14,6 +14,7 @@ fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
     topAppBarScrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
     content: @Composable (PaddingValues) -> Unit,
+    topBar: @Composable () -> Unit = {},
 ) {
     val dismissSnackbarState = rememberDismissState(
         confirmValueChange = { _ ->
@@ -34,7 +35,8 @@ fun MoreStuffHomeScaffold(
                 )
             }
         },
-        content = content
+        content = content,
+        topBar = topBar
     )
 }
 

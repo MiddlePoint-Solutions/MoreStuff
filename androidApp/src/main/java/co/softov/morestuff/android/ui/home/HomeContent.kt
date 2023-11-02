@@ -70,34 +70,35 @@ fun HomeScreen() {
     var itemSelected by remember { mutableStateOf(false) }
     var isSearching by rememberSaveable { mutableStateOf(false) }
 
-    Column {
-        MoreStuffTopBar(
-            reviewSelected = { navigation.push(Screen.Review) },
-            settingsSelected = { navigation.push(Screen.Settings) },
-            searchSelected = { isSearching = true },
-            scrollBehavior = scrollBehavior,
-            itemSelectedState = itemSelected,
-            deselectAllTasks = { itemSelected = false }
-        )
-
-        MoreStuffHomeScaffold(
-            snackbarHostState = snackbarHostState,
-            topAppBarScrollBehavior = scrollBehavior,
-            content = {
-                HomeContent(
-                    showTaskChat = { taskId ->
-                        scope.launch {
-                            navigation.push(Screen.TaskChat(taskId))
-                        }
-                    },
-                    snackbarHostState = snackbarHostState,
-                    itemSelectedState = { isSelected ->
-                        itemSelected = isSelected
+    MoreStuffHomeScaffold(
+        snackbarHostState = snackbarHostState,
+        topAppBarScrollBehavior = scrollBehavior,
+        topBar = {
+            MoreStuffTopBar(
+                reviewSelected = { navigation.push(Screen.Review) },
+                settingsSelected = { navigation.push(Screen.Settings) },
+                searchSelected = { isSearching = true },
+                scrollBehavior = scrollBehavior,
+                itemSelectedState = itemSelected,
+                deselectAllTasks = { itemSelected = false }
+            )
+        },
+        content = {
+            HomeContent(
+                showTaskChat = { taskId ->
+                    scope.launch {
+                        navigation.push(Screen.TaskChat(taskId))
                     }
-                )
-            },
-        )
-    }
+                },
+                snackbarHostState = snackbarHostState,
+                itemSelectedState = { isSelected ->
+                    itemSelected = isSelected
+                },
+                modifier = Modifier.padding(top = it.calculateTopPadding()),
+            )
+        },
+    )
+
     AnimatedVisibility(
         visible = isSearching,
         enter = fadeIn(),
@@ -121,7 +122,7 @@ fun HomeContent(
     userInputViewModel: UserInputViewModel = koinViewModel(),
     priorityViewModel: PriorityViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
-    itemSelectedState: (Boolean) -> Unit
+    itemSelectedState: (Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
