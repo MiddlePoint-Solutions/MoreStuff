@@ -168,6 +168,7 @@
     <string name="onboarding_schedule_review_subtitle">Get into the habit of daily reviews by setting your preferred time</string>
     <string name="add_reminder">Add reminder</string>
     <string name="onboarding_review_title">Prioritize &amp; Review</string>
+    <string name="onboarding_review_subtitle">Swipe to set priority</string>
 
     <!--  OnBoarding review tasks  -->
     <string name="onboarding_review_task1">Plan Venice trip</string>
@@ -182,10 +183,11 @@
     <string name="onboarding_review_task10">Listen to latest podcast</string>
 
     <!-- Hint tasks and messages  -->
-    <string name="hint_task_1">Click me :)</string>
-    <string name="hint_task_1_message_1">Here you can add notes and links about the task</string>
-    <string name="hint_task_1_message_2">You can also add pictures!</string>
-    <string name="hint_task_1_message_3">And you can schedule to get reminded</string>
+    <string name="hint_task_1">Welcome to MoreStuff 🤗</string>
+    <string name="hint_task_1_message_1">Here you can chat with your tasks</string>
+    <string name="hint_task_1_message_2">Add notes, links and pictures 🖼️</string>
+    <string name="hint_task_1_message_3">Also you set a schedule to get reminded</string>
+    <string name="hint_task_1_message_4">More to come so stay tuned 🥳</string>
 
     <string name="cd_highest_priority_hint_icon">Highest Priority hint icon</string>
     <string name="cd_lowest_priority_hint_icon">Lowest Priority hint icon</string>

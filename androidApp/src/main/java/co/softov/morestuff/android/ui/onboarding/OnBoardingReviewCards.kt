@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -53,38 +54,33 @@ fun OnBoardingReviewCards(
 
         val states = tasks.map { it to rememberSwipeableCardState() }
 
-        Box(
-            modifier = Modifier.fillMaxHeight(0.55f),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = Icons.Default.DoneAll,
+                contentDescription = "",
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colorScheme.secondary
+            )
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DoneAll,
-                    contentDescription = "",
-                    modifier = Modifier.size(40.dp),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+            Spacer(modifier = Modifier.height(10.dp))
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = stringResource(R.string.onboarding_review_all_done),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontSize = 38.sp
-                    ),
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-
-            OnBoardingTaskPrioritySwipe(
-                modifier = Modifier.fillMaxHeight(1f),
-                states = states,
+            Text(
+                text = stringResource(R.string.onboarding_review_all_done),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontSize = 38.sp
+                ),
+                color = MaterialTheme.colorScheme.secondary
             )
         }
+
+        OnBoardingTaskPrioritySwipe(
+            modifier = Modifier.align(Alignment.Center),
+            states = states,
+        )
     }
 }
 

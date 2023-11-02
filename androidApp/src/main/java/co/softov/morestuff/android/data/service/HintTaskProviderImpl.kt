@@ -16,9 +16,10 @@ class HintTaskProviderImpl(context: Context) : HintTaskProvider {
             HintTask(
                 taskTitle = resources.getString(R.string.hint_task_1),
                 taskMessages = listOf(
+                    HintMessage(resources.getString(R.string.hint_task_1_message_4)),
                     HintMessage(resources.getString(R.string.hint_task_1_message_3)),
                     HintMessage(resources.getString(R.string.hint_task_1_message_2)),
-                    HintMessage(resources.getString(R.string.hint_task_1_message_1))
+                    HintMessage(resources.getString(R.string.hint_task_1_message_1)),
                 )
             )
         )
