@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -103,7 +104,7 @@ fun TaskCard(
         Box(
             modifier = Modifier
                 .aspectRatio(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 5.dp),
+                .padding(start = 20.dp, end = 20.dp, top = 6.dp),
         ) {
 
             Box(
@@ -122,14 +123,17 @@ fun TaskCard(
             ) {
                 if (extraDetails) {
                     Surface(
-                        modifier = Modifier.size(width = 30.dp, height = 25.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(width = 42.dp, height = 30.dp),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(33.dp),
+                        border = BorderStroke(
+                            width = 0.5.dp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Notes,
                             contentDescription = stringResource(R.string.cd_extra_details),
-                            tint = Color.White,
                             modifier = Modifier.padding(4.dp)
                         )
                     }
