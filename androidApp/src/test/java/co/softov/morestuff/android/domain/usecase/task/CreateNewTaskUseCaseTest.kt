@@ -5,6 +5,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking

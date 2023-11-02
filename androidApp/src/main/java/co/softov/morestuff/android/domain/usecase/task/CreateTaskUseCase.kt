@@ -4,6 +4,7 @@ import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 
 interface CreateTaskUseCase {
     suspend operator fun invoke(params: TaskParams): TaskDomain
