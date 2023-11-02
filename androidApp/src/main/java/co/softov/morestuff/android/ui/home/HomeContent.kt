@@ -2,6 +2,9 @@ package co.softov.morestuff.android.ui.home
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -24,7 +27,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,7 @@ import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
+import co.softov.morestuff.android.ui.components.MoreStuffTopBar
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -50,6 +53,7 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
+import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
@@ -59,31 +63,54 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
-
     val navigation = LocalAppNavigation.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val itemSelected = remember { mutableStateOf(false) }
+    var itemSelected by remember { mutableStateOf(false) }
+    var isSearching by rememberSaveable { mutableStateOf(false) }
 
-    MoreStuffHomeScaffold(
-        snackbarHostState = snackbarHostState,
-        topAppBarScrollBehavior = scrollBehavior,
-        content = {
-            HomeContent(
-                showTaskChat = { taskId ->
-                    scope.launch {
-                        navigation.push(Screen.TaskChat(taskId))
+    Column {
+        MoreStuffTopBar(
+            reviewSelected = { navigation.push(Screen.Review) },
+            settingsSelected = { navigation.push(Screen.Settings) },
+            searchSelected = { isSearching = true },
+            scrollBehavior = scrollBehavior,
+            itemSelectedState = itemSelected,
+            deselectAllTasks = { itemSelected = false }
+        )
+
+        MoreStuffHomeScaffold(
+            snackbarHostState = snackbarHostState,
+            topAppBarScrollBehavior = scrollBehavior,
+            content = {
+                HomeContent(
+                    showTaskChat = { taskId ->
+                        scope.launch {
+                            navigation.push(Screen.TaskChat(taskId))
+                        }
+                    },
+                    snackbarHostState = snackbarHostState,
+                    itemSelectedState = { isSelected ->
+                        itemSelected = isSelected
                     }
-                },
-                snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(top = it.calculateTopPadding()),
-                itemSelectedState = itemSelected,
-            )
-        },
-        itemSelectedState = itemSelected,
-    )
+                )
+            },
+        )
+    }
+    AnimatedVisibility(
+        visible = isSearching,
+        enter = fadeIn(),
+        exit = fadeOut(),
+    ) {
+        SearchBar(
+            onSearchClose = { isSearching = false },
+            showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,7 +121,7 @@ fun HomeContent(
     userInputViewModel: UserInputViewModel = koinViewModel(),
     priorityViewModel: PriorityViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
-    itemSelectedState: MutableState<Boolean>,
+    itemSelectedState: (Boolean) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -119,7 +146,7 @@ fun HomeContent(
                 onCallToAction = { focusRequester.requestFocus() },
                 listState = priorityScrollState,
                 modifier = Modifier.weight(0.8f).padding(bottom = 30.dp),
-                itemSelectedState = itemSelectedState,
+                itemSelectedState = itemSelectedState
             )
         }
 

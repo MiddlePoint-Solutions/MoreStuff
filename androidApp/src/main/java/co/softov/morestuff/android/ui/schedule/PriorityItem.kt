@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -74,7 +73,7 @@ fun PriorityItem(
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .offset(x = 8.dp)
+                            .padding(start = 30.dp)
                             .background(
                                 color = MaterialTheme.colorScheme.surface,
                                 shape = CircleShape

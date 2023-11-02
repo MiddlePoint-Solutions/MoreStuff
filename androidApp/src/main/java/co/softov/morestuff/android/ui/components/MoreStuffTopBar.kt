@@ -27,7 +27,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -46,14 +45,15 @@ fun MoreStuffTopBar(
     settingsSelected: () -> Unit,
     searchSelected: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    itemSelectedState: MutableState<Boolean>,
+    itemSelectedState: Boolean,
+    deselectAllTasks: () -> Unit,
 ) {
     val viewModel: PriorityViewModel = koinViewModel()
 
     TopAppBar(
         title = {
             AnimatedVisibility(
-                visible = itemSelectedState.value,
+                visible = itemSelectedState,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically()
             ) {
@@ -63,7 +63,7 @@ fun MoreStuffTopBar(
                 ) {
                     IconButton(onClick = {
                         viewModel.deselectAllTasks()
-                        itemSelectedState.value = false
+                        deselectAllTasks()
                     }) {
                         Icon(
                             imageVector = Icons.Rounded.Close,
@@ -88,7 +88,7 @@ fun MoreStuffTopBar(
             }
 
             AnimatedVisibility(
-                visible = !itemSelectedState.value,
+                visible = !itemSelectedState,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically()
             ) {
@@ -96,10 +96,10 @@ fun MoreStuffTopBar(
             }
         },
         actions = {
-            if (itemSelectedState.value) {
+            if (itemSelectedState) {
                 IconButton(onClick = {
                     viewModel.deleteSelectedTasks()
-                    itemSelectedState.value = false
+                    deselectAllTasks()
                 }) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
@@ -108,7 +108,7 @@ fun MoreStuffTopBar(
                 }
                 IconButton(onClick = {
                     viewModel.completeSelectedTasks()
-                    itemSelectedState.value = false
+                    deselectAllTasks()
                 }) {
                     Icon(
                         imageVector = Icons.Rounded.Done,

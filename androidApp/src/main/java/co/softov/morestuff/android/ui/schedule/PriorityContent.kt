@@ -29,7 +29,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -70,7 +69,7 @@ fun PriorityContent(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
-    itemSelectedState: MutableState<Boolean>,
+    itemSelectedState: (Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val model by viewModel.model.collectAsState()
@@ -78,15 +77,7 @@ fun PriorityContent(
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
     val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
-    val isBulkMode by derivedStateOf { viewModel.selectedTaskIds.value.isNotEmpty() }
-
-    LaunchedEffect(viewModel.undoBulkMode.collectAsState().value) {
-        if (viewModel.undoBulkMode.value) {
-            viewModel.selectedTaskIds.value = listOf()
-            itemSelectedState.value = false
-            viewModel.undoBulkMode.value = false
-        }
-    }
+    val isBulkMode by remember { derivedStateOf { viewModel.selectedTaskIds.value.isNotEmpty() } }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
@@ -202,15 +193,14 @@ fun PriorityContent(
                             onClick = {
                                 if (isBulkMode) {
                                     viewModel.handleTaskSelection(item)
-                                    itemSelectedState.value =
-                                        viewModel.selectedTaskIds.value.isNotEmpty()
+                                    itemSelectedState(viewModel.selectedTaskIds.value.isNotEmpty())
                                 } else {
                                     showTaskChat(item.id)
                                 }
                             },
                             onLongClick = {
                                 viewModel.handleLongPressOnTask(item)
-                                itemSelectedState.value = true
+                                itemSelectedState(true)
                             },
                             isSelected = item.id in viewModel.selectedTaskIds.value
                         )
