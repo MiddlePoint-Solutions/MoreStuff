@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.review
 
-import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -27,7 +26,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -40,7 +38,6 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewScreen
 import co.softov.morestuff.android.ui.review.swipeable.*
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
@@ -72,13 +69,16 @@ fun ReviewContent(
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }
     var showReviewHelpScreen by remember { mutableStateOf(false) }
-    var showTaskChat = remember { MutableTransitionState(false) }
+    val showTaskChat = remember { MutableTransitionState(false) }
     var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var showReviewDragHints by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -107,9 +107,10 @@ fun ReviewContent(
 
                     val visibleState = remember(model.round) { MutableTransitionState(false) }
 
-                    LaunchedEffect(isCardMoving) {
-                        visibleState.targetState = !isCardMoving
+                    LaunchedEffect(showReviewDragHints) {
+                        visibleState.targetState = !showReviewDragHints
                     }
+
                     AnimatedVisibility(
                         visibleState = visibleState,
                         enter = fadeIn(),
@@ -132,7 +133,9 @@ fun ReviewContent(
                         states = states,
                         onSwiped = { schedule, direction ->
                             viewModel.onTaskSwiped(schedule, direction)
-                            isCardMoving = false
+                        },
+                        onDrag = { isDragging ->
+                            showReviewDragHints = isDragging
                         },
                         onComplete = {
                             scope.launch {
@@ -140,7 +143,6 @@ fun ReviewContent(
                                 viewModel.completeTask(it)
                             }
                         },
-                        onCardMoveStateChange = { moving -> isCardMoving = moving },
                         showTaskChat = { taskId ->
                             currentTaskId = taskId
                             scope.launch {
@@ -150,7 +152,7 @@ fun ReviewContent(
                     )
 
                     AnimatedVisibility(
-                        visible = isCardMoving && viewModel.reviewHintEnabled,
+                        visible = showReviewDragHints && viewModel.reviewHintEnabled,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -285,7 +287,7 @@ private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
 
     val scope = rememberCoroutineScope()
@@ -299,30 +301,16 @@ private fun ReviewSwipeControls(
             }
         }
     }
-
-    val lowAction: () -> Unit = {
+    val buttonAction: (SwipeDirection) -> Unit = { direction ->
         scope.launch {
-            firstVisibleState()?.swipe(SwipeDirection.Left)
+            firstVisibleState()?.swipe(direction)
         }
     }
 
-    val highAction: () -> Unit = {
-        scope.launch {
-            firstVisibleState()?.swipe(SwipeDirection.Right)
-        }
-    }
-
-    val doneAction: () -> Unit = {
-        scope.launch {
-            firstVisibleState()?.swipe(SwipeDirection.Up)
-        }
-    }
-
-    val laterAction: () -> Unit = {
-        scope.launch {
-            firstVisibleState()?.swipe(SwipeDirection.Down)
-        }
-    }
+    val lowAction: () -> Unit = { buttonAction(SwipeDirection.Left) }
+    val highAction: () -> Unit = { buttonAction(SwipeDirection.Right) }
+    val doneAction: () -> Unit = { buttonAction(SwipeDirection.Up) }
+    val laterAction: () -> Unit = { buttonAction(SwipeDirection.Down) }
 
     Column(
         modifier = modifier,
@@ -374,8 +362,8 @@ private fun TaskPrioritySwipe(
     modifier: Modifier = Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
+    onDrag: (Boolean) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
-    onCardMoveStateChange: (Boolean) -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
     val itemClick by rememberUpdatedState(showTaskChat)
@@ -407,20 +395,14 @@ private fun TaskPrioritySwipe(
         }
 
         states.forEach { (task, state) ->
-
-            val isMoving by remember(state.offset) {
-                derivedStateOf { state.offset.value.x != 0f || state.offset.value.y != 0f }
-            }
-
-            LaunchedEffect(isMoving) {
-                onCardMoveStateChange(isMoving)
-            }
-
             if (state.swipedDirection == null) {
                 TaskCard(
                     modifier = Modifier
                         .layoutId(task.id)
-                        .swipableCard(state = state),
+                        .swipableCard(
+                            state = state,
+                            onDrag = onDrag,
+                        ),
                     item = task,
                     onComplete = onComplete,
                     showTaskChat = itemClick
@@ -580,7 +562,7 @@ private fun SecondaryReviewButton(
     }
 }
 
-@Preview(
+/*@Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
 )
@@ -593,4 +575,4 @@ fun ReviewSwipeControlsPreview() {
     MoreStuffTheme {
         ReviewSwipeControls({ null }, { null }, {})
     }
-}
+}*/
