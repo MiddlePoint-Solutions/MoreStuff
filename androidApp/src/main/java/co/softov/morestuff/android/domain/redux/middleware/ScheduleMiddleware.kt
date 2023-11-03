@@ -40,7 +40,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
     ) : ScheduleAction()
 
     data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
-
+    data class ToggleReminderScheduleAction(val taskId: Long) : ScheduleAction()
     data class CreateReminderScheduleAction(val taskId: Long) : ScheduleAction()
     data class CancelReminderScheduleAction(val taskId: Long) : ScheduleAction()
 

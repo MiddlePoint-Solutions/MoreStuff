@@ -29,8 +29,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,14 +56,20 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.schedule.ConfirmDeleteDialog
 import co.softov.morestuff.android.ui.schedule.NotificationState
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
+import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
+import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -134,11 +140,14 @@ fun HomeContent(
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
-    var isBottomSheetVisible by remember { mutableStateOf(false) }
+    var showTaskInput by remember { mutableStateOf(false) }
     val messages by homeViewModel.messages.collectAsStateWithLifecycle()
     val scrollState = rememberLazyListState()
     val priorityScrollState = rememberLazyListState()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var taskOptions by remember { mutableLongStateOf(0) }
+    var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
 
     val tasks by priorityViewModel.tasks.collectAsStateWithLifecycle()
     val model by priorityViewModel.model.collectAsStateWithLifecycle()
@@ -148,7 +157,7 @@ fun HomeContent(
     }
 
     BackHandler(model.taskSelectionEnabled) {
-        priorityViewModel.deselectAllTasks()
+        priorityViewModel.clearSelectedTasks()
     }
 
     val resources = LocalContext.current.resources
@@ -171,27 +180,81 @@ fun HomeContent(
         }
     }
 
+    if (taskOptions > 0) {
+        val sheetState = rememberModalBottomSheetState()
+        val dismissDialog = { taskOptions = 0 }
+        TaskOptionsDialog(
+            sheetState = sheetState,
+            dismissDialog = dismissDialog,
+            completeTask = {
+                showTaskCompleteAnimation = taskOptions
+                scope.launch {
+                    priorityViewModel.completeTask(taskOptions)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToTop = {
+                scope.launch {
+                    priorityViewModel.moveToTop(taskOptions)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            },
+            moveToBottom = {
+                scope.launch {
+                    priorityViewModel.moveToBottom(taskOptions)
+                    sheetState.hide()
+                    dismissDialog()
+                }
+            }
+        )
+    }
+
+    if (priorityViewModel.showDeleteConfirmDialog) {
+        ConfirmDeleteDialog(
+            onConfirm = { priorityViewModel.deleteSelectedTasks() },
+            onDismiss = {
+                priorityViewModel.dismissDeleteDialog()
+            }
+        )
+    }
+
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = modifier.fillMaxSize()
-        ) {
-            PriorityContent(
-                tasks = tasks,
-                showTaskChat = showTaskChat,
-                onCallToAction = { focusRequester.requestFocus() },
-                listState = priorityScrollState,
-                modifier = Modifier
-                    .weight(0.8f)
-                    .padding(bottom = 30.dp),
+
+        PriorityContent(
+            tasks = tasks,
+            onItemClick = { taskId ->
+                if(model.taskSelectionEnabled) {
+                    priorityViewModel.toggleTaskSelection(taskId)
+                } else {
+                    showTaskChat(taskId)
+                }
+            },
+            onItemLongClick = priorityViewModel::toggleTaskSelection,
+            showTaskOptions = { taskOptions = it },
+            onCallToAction = { focusRequester.requestFocus() },
+            listState = priorityScrollState,
+            modifier = Modifier.padding(bottom = 30.dp),
+        )
+
+        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+            KonfettiView(
+                modifier = Modifier.fillMaxSize(),
+                parties = explode(),
+                updateListener = object : OnParticleSystemUpdateListener {
+                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
+                        if (activeSystems == 0) showTaskCompleteAnimation = 0
+                    }
+                }
             )
         }
 
         FloatingActionButton(
             onClick = {
-                isBottomSheetVisible = true
+                showTaskInput = true
                 priorityViewModel.showContent()
             },
             modifier = Modifier
@@ -206,7 +269,7 @@ fun HomeContent(
         }
     }
 
-    if (isBottomSheetVisible) {
+    if (showTaskInput) {
         BackHandler(onBack = {
             scope.launch {
                 bottomSheetState.hide()
@@ -214,12 +277,12 @@ fun HomeContent(
         })
         ModalBottomSheet(
             onDismissRequest = {
-                isBottomSheetVisible = false
+                showTaskInput = false
             },
             sheetState = bottomSheetState,
             content = {
                 BoxWithConstraints {
-                    LaunchedEffect(isBottomSheetVisible) {
+                    LaunchedEffect(showTaskInput) {
                         delay(200)
                         focusRequester.requestFocus()
                     }

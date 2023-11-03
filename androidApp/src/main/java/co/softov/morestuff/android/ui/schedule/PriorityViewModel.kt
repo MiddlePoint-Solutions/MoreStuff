@@ -12,7 +12,6 @@ import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
-import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
@@ -75,7 +74,7 @@ class PriorityViewModel(
     }
 
     fun toggleReminder(task: TaskDomain) {
-        when (task.hasReminder) {
+        when (task.hasReminder) { // TODO: continue with ToggleReminderScheduleAction
             false -> dispatchAppStoreAction(ScheduleAction.CreateReminderScheduleAction(task.id))
             true -> dispatchAppStoreAction(ScheduleAction.CancelReminderScheduleAction(task.id))
         }
@@ -88,15 +87,15 @@ class PriorityViewModel(
         )
     }
 
-    fun moveToTop(task: TaskDomain) {
+    fun moveToTop(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(task.id, PriorityActionType.Now)
+            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Now)
         )
     }
 
-    fun moveToBottom(task: TaskDomain) {
+    fun moveToBottom(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(task.id, PriorityActionType.Later)
+            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Later)
         )
     }
 
@@ -123,7 +122,7 @@ class PriorityViewModel(
 
     fun dismissDeleteDialog() {
         showDeleteConfirmDialog = false
-        deselectAllTasks()
+        clearSelectedTasks()
     }
 
     fun toggleTaskSelection(taskId: Long) {
@@ -137,8 +136,9 @@ class PriorityViewModel(
         }
     }
 
-    fun deselectAllTasks() {
+    fun clearSelectedTasks() {
         selectedTaskIds.value = emptyList()
+        model.update { it.copy(taskSelectionEnabled = false) }
     }
 
 }

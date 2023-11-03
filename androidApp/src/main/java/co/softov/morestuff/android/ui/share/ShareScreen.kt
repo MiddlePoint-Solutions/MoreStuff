@@ -238,7 +238,7 @@ private fun ShareContent(
             ) { task ->
                 PriorityItem(
                     task = task,
-                    onClick = shareToTask,
+                    onClick = { shareToTask(task.id) },
                     onLongClick = {},
                     isSelected = false
                 )

@@ -43,18 +43,17 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 @Composable
 fun PriorityItem(
     task: TaskDomain,
-    onClick: (taskId: Long) -> Unit,
-    modifier: Modifier = Modifier,
-    isDragging: Boolean = false,
-    isSelected: Boolean = false,
+    onClick: () -> Unit,
     onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(80.dp)
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .combinedClickable(onClick = { onClick(task.id) }, onLongClick = onLongClick)
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     ) {
         Row(
             modifier = modifier

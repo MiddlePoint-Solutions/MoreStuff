@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.schedule
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -24,16 +23,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -45,76 +41,31 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
-import co.softov.morestuff.android.ui.utils.explode
-import kotlinx.coroutines.launch
-import nl.dionsegijn.konfetti.compose.KonfettiView
-import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
-import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
     tasks: List<TaskDomain>,
-    showTaskChat: (taskId: Long) -> Unit,
+    onItemClick: (taskId: Long) -> Unit,
+    onItemLongClick: (taskId: Long) -> Unit,
+    showTaskOptions: (taskId: Long) -> Unit,
     onCallToAction: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
 ) {
-    val scope = rememberCoroutineScope()
 
-    val model by viewModel.model.collectAsState()
-
-    var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
-    var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-    val showEmptyState by remember { derivedStateOf { tasks.isEmpty() } }
+    val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
 
     val selectedTaskIds by viewModel.selectedTaskIds.collectAsState()
-    val taskSelectionActive by remember(selectedTaskIds) {
-        derivedStateOf { selectedTaskIds.isNotEmpty() }
-    }
-
-    taskOptions?.let { task ->
-        val sheetState = rememberModalBottomSheetState()
-        val dismissDialog = { taskOptions = null }
-        TaskOptionsDialog(
-            sheetState = sheetState,
-            task = task,
-            dismissDialog = dismissDialog,
-            completeTask = {
-                showTaskCompleteAnimation = task.id
-                scope.launch {
-                    viewModel.completeTask(task.id)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToTop = {
-                scope.launch {
-                    viewModel.moveToTop(task)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToBottom = {
-                scope.launch {
-                    viewModel.moveToBottom(task)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            }
-        )
-    }
 
     val haptic = LocalHapticFeedback.current
-
     var willDismissDirection: DismissDirection? by remember {
         mutableStateOf(null)
     }
@@ -125,19 +76,10 @@ fun PriorityContent(
         }
     }
 
-
-    if (viewModel.showDeleteConfirmDialog) {
-        ConfirmDeleteDialog(
-            onConfirm = { viewModel.deleteSelectedTasks() },
-            onDismiss = {
-                viewModel.dismissDeleteDialog()
-            }
-        )
-    }
-
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
+            state = listState,
         ) {
             itemsIndexed(
                 items = tasks,
@@ -153,7 +95,7 @@ fun PriorityContent(
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                taskOptions = item
+                                showTaskOptions(item.id)
                                 false
                             }
 
@@ -179,12 +121,8 @@ fun PriorityContent(
                     dismissContent = {
                         PriorityItem(
                             task = item,
-                            onClick = {
-                                if (!taskSelectionActive) {
-                                    showTaskChat(item.id)
-                                }
-                            },
-                            onLongClick = { viewModel.toggleTaskSelection(item.id) },
+                            onClick = { onItemClick(item.id) },
+                            onLongClick = { onItemLongClick(item.id) },
                             isSelected = item.id in selectedTaskIds
                         )
                     }
@@ -198,18 +136,6 @@ fun PriorityContent(
                 }
             }
         }
-    }
-
-    if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-        KonfettiView(
-            modifier = Modifier.fillMaxSize(),
-            parties = explode(),
-            updateListener = object : OnParticleSystemUpdateListener {
-                override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                    if (activeSystems == 0) showTaskCompleteAnimation = 0
-                }
-            }
-        )
     }
 
     if (showEmptyState) {

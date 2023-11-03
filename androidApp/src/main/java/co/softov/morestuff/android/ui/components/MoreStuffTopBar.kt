@@ -62,7 +62,7 @@ fun MoreStuffTopBar(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IconButton(onClick = {
-                        viewModel.deselectAllTasks()
+                        viewModel.clearSelectedTasks()
                         closeBulkMode()
                     }) {
                         Icon(

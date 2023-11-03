@@ -75,9 +75,8 @@ class TaskRepositoryImpl(
         val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
             .mapToList(Dispatchers.IO)
-        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
         val schedulesFlow =
-            scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
+            scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
                 .asFlow()
                 .mapToList(Dispatchers.IO)
                 .map { it.groupBy { schedule -> schedule.taskId } }

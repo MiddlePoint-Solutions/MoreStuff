@@ -34,7 +34,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 @OptIn(ExperimentalMaterial3Api::class)
 fun TaskOptionsDialog(
     sheetState: SheetState,
-    task: TaskDomain,
     dismissDialog: () -> Unit,
     completeTask: () -> Unit,
     moveToTop: () -> Unit,
