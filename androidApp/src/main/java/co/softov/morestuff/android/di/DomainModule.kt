@@ -116,14 +116,16 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithSchedul
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetDefaultPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetHighestPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetHighestPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetLowestPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetLowestPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.GetPlanPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskForScheduleUseCase
@@ -242,6 +244,7 @@ val taskUseCases = module {
     factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
     factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
+    factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
 }
 
 

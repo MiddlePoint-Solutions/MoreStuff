@@ -1,16 +1,18 @@
 package co.softov.morestuff.android.domain.usecase.task
 
 import co.softov.morestuff.android.data.service.TimeManagerImpl
-import co.softov.morestuff.android.domain.DomainKoinTest
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.koin.test.inject
 
 class GetDefaultPriorityScoreUseCaseTest {
 

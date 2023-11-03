@@ -1,17 +1,16 @@
 package co.softov.morestuff.android.domain.usecase.task
 
-import arrow.core.Either
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 
 
 class CreateNewTaskUseCaseTest {

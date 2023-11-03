@@ -4,6 +4,7 @@ data class ReviewItemUiModel(
     val id: Long,
     val createTime: String,
     val title: String,
+    val position: String,
     val priorityScore: Long,
     var isCompleted: Boolean,
     val extraDetails: Boolean,

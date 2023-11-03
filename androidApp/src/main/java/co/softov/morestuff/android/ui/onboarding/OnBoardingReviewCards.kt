@@ -1,20 +1,15 @@
 package co.softov.morestuff.android.ui.onboarding
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.DoneOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,7 +34,6 @@ import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import co.softov.morestuff.android.ui.review.swipeable.SwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.swipableCard
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import kotlinx.coroutines.delay
 
 @Composable
@@ -103,7 +96,7 @@ private fun OnBoardingTaskPrioritySwipe(
                         state = state,
                         enabled = false
                     ),
-                task = task,
+                item = task,
                 onComplete = {},
                 isClickable = false,
                 showTaskChat = {}

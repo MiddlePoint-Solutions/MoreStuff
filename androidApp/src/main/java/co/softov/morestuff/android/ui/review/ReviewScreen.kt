@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.presentation.presenter.ReviewRound
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
@@ -45,7 +44,6 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -423,7 +421,7 @@ private fun TaskPrioritySwipe(
                     modifier = Modifier
                         .layoutId(task.id)
                         .swipableCard(state = state),
-                    task = task,
+                    item = task,
                     onComplete = onComplete,
                     showTaskChat = itemClick
                 )

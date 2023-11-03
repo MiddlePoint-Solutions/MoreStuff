@@ -185,9 +185,9 @@
     <!-- Hint tasks and messages  -->
     <string name="hint_task_1">Welcome to MoreStuff 🤗</string>
     <string name="hint_task_1_message_1">Here you can chat with your tasks</string>
-    <string name="hint_task_1_message_2">Add notes, links and pictures 🖼️</string>
-    <string name="hint_task_1_message_3">Also you set a schedule to get reminded</string>
-    <string name="hint_task_1_message_4">More to come so stay tuned 🥳</string>
+    <string name="hint_task_1_message_2">Add notes, links and photos 🖼️</string>
+    <string name="hint_task_1_message_3">Create a reminder so you don\'t forget</string>
+    <string name="hint_task_1_message_4">Stay tuned! More features coming 🥳</string>
 
     <string name="cd_highest_priority_hint_icon">Highest Priority hint icon</string>
     <string name="cd_lowest_priority_hint_icon">Lowest Priority hint icon</string>
