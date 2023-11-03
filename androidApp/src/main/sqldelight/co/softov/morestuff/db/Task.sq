@@ -104,3 +104,7 @@ SELECT * FROM task
 WHERE title LIKE '%' || :searchText || '%'
 ORDER BY create_time DESC;
 
+countActiveTasks:
+SELECT COUNT(*) FROM task
+WHERE task.complete_time IS NULL;
+

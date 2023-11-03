@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.usecase.task
+package co.softov.morestuff.android.domain.usecase.priority
 
 import co.softov.morestuff.android.domain.model.Priority
 
