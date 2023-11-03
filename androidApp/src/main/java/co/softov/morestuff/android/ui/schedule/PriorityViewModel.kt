@@ -17,51 +17,41 @@ import co.softov.morestuff.android.ui.schedule.NotificationState.Complete
 import co.softov.morestuff.android.ui.schedule.NotificationState.None
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class PriorityViewModel(
-    private val getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
-    private val reorderTaskUseCase: ReorderTaskUseCase,
+    getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
 ) : NoStateViewModel() {
 
     override val enableDebug: Boolean
         get() = false
 
-    var tasks: List<TaskDomain> by mutableStateOf(listOf())
-        private set
+    val tasks = getActiveTasksFlowUseCase().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = listOf()
+    )
 
     var notification: NotificationState by mutableStateOf(None)
         private set
 
     val model = MutableStateFlow(PriorityViewState())
     val selectedTaskIds = MutableStateFlow(listOf<Long>())
-
-    private var recentlyCompletedTasks: MutableList<TaskDomain> = mutableListOf()
+    private val recentlyCompletedTasks = mutableListOf<Long>()
 
     var showDeleteConfirmDialog: Boolean by mutableStateOf(false)
         private set
-
 
     init {
         loadData()
     }
 
-    private var lastChange = 0 to 0
-    private var lastCompleted: TaskDomain? = null
-
     private val showContent = mutableStateOf(false)
     fun showContent() {
         showContent.value = true
-    }
-
-    override fun onLoadData() {
-        getActiveTasksFlowUseCase()
-            .onEach { tasks = it }
-            .launchIn(viewModelScope)
     }
 
     override fun onAppStateChange(state: AppState) {
@@ -70,35 +60,18 @@ class PriorityViewModel(
         }
     }
 
-    fun updateTaskOrder(fromPosition: Int, toPosition: Int) {
-        tasks = tasks.toMutableList().apply {
-            add(toPosition, removeAt(fromPosition))
-        }
-        lastChange = toPosition to fromPosition
-    }
-
-    fun reorderTaskItem(fromPosition: Int, toPosition: Int) {
-        if (fromPosition != toPosition) {
-            Timber.d("lastChange $toPosition: ${tasks[toPosition].title}")
-            val task = tasks[toPosition]
-            val scoreAbove = tasks.getOrNull(toPosition - 1)?.priorityScore
-            val scoreBelow = tasks.getOrNull(toPosition + 1)?.priorityScore
-            viewModelScope.launch {
-                reorderTaskUseCase(task.id, scoreAbove, scoreBelow)
-            }
-        }
-    }
-
-    fun completeTask(item: TaskDomain) {
+    fun completeTask(taskId: Long) {
         viewModelScope.launch {
             delay(120)
-            recentlyCompletedTasks.add(item)
-            tasks = tasks.toMutableList().apply {
-                remove(item)
-            }
-            dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(item.id), true))
+            saveToUndoList(listOf(taskId))
+            dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(taskId), true))
             notification = Complete
         }
+    }
+
+    private fun saveToUndoList(taskIds: List<Long>) {
+        recentlyCompletedTasks.clear()
+        recentlyCompletedTasks.addAll(taskIds.toList())
     }
 
     fun toggleReminder(task: TaskDomain) {
@@ -111,9 +84,8 @@ class PriorityViewModel(
     fun undoLastCompleted() {
         resetNotification()
         dispatchAppStoreAction(
-            TaskAction.CompleteTasksAction(recentlyCompletedTasks.map { it.id }, false)
+            TaskAction.CompleteTasksAction(recentlyCompletedTasks, false)
         )
-        recentlyCompletedTasks.clear()
     }
 
     fun moveToTop(task: TaskDomain) {
@@ -133,27 +105,16 @@ class PriorityViewModel(
     }
 
     fun completeSelectedTasks() {
-        val taskIdsToComplete = mutableListOf<Long>()
-
-        for (taskId in selectedTaskIds.value) {
-            val taskToComplete = tasks.find { it.id == taskId }
-            if (taskToComplete != null) {
-                recentlyCompletedTasks.add(taskToComplete)
-                completeTask(taskToComplete)
-                taskIdsToComplete.add(taskId)
-            }
-        }
-        selectedTaskIds.value = selectedTaskIds.value.filterNot { it in taskIdsToComplete }
+        saveToUndoList(selectedTaskIds.value)
+        selectedTaskIds.update { listOf() }
+        dispatchAppStoreAction(TaskAction.CompleteTasksAction(recentlyCompletedTasks, true))
+        notification = Complete
     }
 
     fun deleteSelectedTasks() {
-        viewModelScope.launch {
-            dispatchAppStoreAction(TaskAction.DeleteTasksAction(selectedTaskIds.value))
-            tasks = tasks.filterNot { it.id in selectedTaskIds.value }
-            selectedTaskIds.value = emptyList()
-        }
+        dispatchAppStoreAction(TaskAction.DeleteTasksAction(selectedTaskIds.value))
         showDeleteConfirmDialog = false
-        selectedTaskIds.value = emptyList()
+        selectedTaskIds.update { listOf() }
     }
 
     fun showDeleteDialog() {
@@ -170,6 +131,9 @@ class PriorityViewModel(
             selectedTaskIds.value - taskId
         } else {
             selectedTaskIds.value + taskId
+        }
+        model.update {
+            it.copy(taskSelectionEnabled = selectedTaskIds.value.isNotEmpty())
         }
     }
 

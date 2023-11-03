@@ -29,6 +29,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -139,6 +140,17 @@ fun HomeContent(
     val priorityScrollState = rememberLazyListState()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val tasks by priorityViewModel.tasks.collectAsStateWithLifecycle()
+    val model by priorityViewModel.model.collectAsStateWithLifecycle()
+
+    LaunchedEffect(model.taskSelectionEnabled) {
+        itemSelectedState(model.taskSelectionEnabled)
+    }
+
+    BackHandler(model.taskSelectionEnabled) {
+        priorityViewModel.deselectAllTasks()
+    }
+
     val resources = LocalContext.current.resources
     LaunchedEffect(priorityViewModel.notification) {
         when (priorityViewModel.notification) {
@@ -154,6 +166,7 @@ fun HomeContent(
                     }
                 }
             }
+
             else -> {}
         }
     }
@@ -166,13 +179,13 @@ fun HomeContent(
             modifier = modifier.fillMaxSize()
         ) {
             PriorityContent(
+                tasks = tasks,
                 showTaskChat = showTaskChat,
                 onCallToAction = { focusRequester.requestFocus() },
                 listState = priorityScrollState,
                 modifier = Modifier
                     .weight(0.8f)
                     .padding(bottom = 30.dp),
-                itemSelectedState = itemSelectedState
             )
         }
 
@@ -258,7 +271,7 @@ fun HomeContent(
                                                 delay(100)
                                                 when (priorityModel.priority) {
                                                     PriorityModel.Later -> priorityScrollState.scrollToItem(
-                                                        index = priorityViewModel.tasks.size - 1
+                                                        index = tasks.size - 1
                                                     )
 
                                                     PriorityModel.Now -> priorityScrollState.animateScrollToItem(

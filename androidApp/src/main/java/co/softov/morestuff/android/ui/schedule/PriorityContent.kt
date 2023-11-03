@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.schedule
 
-import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -23,9 +22,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -44,12 +40,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
@@ -62,31 +58,27 @@ import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 
-@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
+    tasks: List<TaskDomain>,
     showTaskChat: (taskId: Long) -> Unit,
     onCallToAction: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     viewModel: PriorityViewModel = koinViewModel(),
-    itemSelectedState: (Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+
     val model by viewModel.model.collectAsState()
 
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-    val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
+    val showEmptyState by remember { derivedStateOf { tasks.isEmpty() } }
 
     val selectedTaskIds by viewModel.selectedTaskIds.collectAsState()
     val taskSelectionActive by remember(selectedTaskIds) {
         derivedStateOf { selectedTaskIds.isNotEmpty() }
-    }
-
-    LaunchedEffect(taskSelectionActive) {
-        itemSelectedState(taskSelectionActive)
     }
 
     taskOptions?.let { task ->
@@ -99,7 +91,7 @@ fun PriorityContent(
             completeTask = {
                 showTaskCompleteAnimation = task.id
                 scope.launch {
-                    viewModel.completeTask(task)
+                    viewModel.completeTask(task.id)
                     sheetState.hide()
                     dismissDialog()
                 }
@@ -132,12 +124,6 @@ fun PriorityContent(
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
-    if (taskSelectionActive) {
-        BackHandler {
-            viewModel.deselectAllTasks()
-            itemSelectedState(false)
-        }
-    }
 
 
     if (viewModel.showDeleteConfirmDialog) {
@@ -145,7 +131,6 @@ fun PriorityContent(
             onConfirm = { viewModel.deleteSelectedTasks() },
             onDismiss = {
                 viewModel.dismissDeleteDialog()
-                itemSelectedState(false)
             }
         )
     }
@@ -154,13 +139,12 @@ fun PriorityContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
-
             itemsIndexed(
-                items = viewModel.tasks,
+                items = tasks,
                 key = { _, task -> task.id }
             ) { index, item ->
                 val isLast by remember(index) {
-                    derivedStateOf { index == viewModel.tasks.lastIndex }
+                    derivedStateOf { index == tasks.lastIndex }
                 }
 
                 val dismissState = rememberNoFlingDismissState(
@@ -200,10 +184,7 @@ fun PriorityContent(
                                     showTaskChat(item.id)
                                 }
                             },
-                            onLongClick = {
-                                viewModel.toggleTaskSelection(item.id)
-                                itemSelectedState(viewModel.selectedTaskIds.value.isNotEmpty())
-                            },
+                            onLongClick = { viewModel.toggleTaskSelection(item.id) },
                             isSelected = item.id in selectedTaskIds
                         )
                     }
