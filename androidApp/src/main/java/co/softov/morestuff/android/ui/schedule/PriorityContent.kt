@@ -80,7 +80,15 @@ fun PriorityContent(
     var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
     val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
-    val isBulkMode by remember { derivedStateOf { viewModel.selectedTaskIds.value.isNotEmpty() } }
+
+    val selectedTaskIds by viewModel.selectedTaskIds.collectAsState()
+    val taskSelectionActive by remember(selectedTaskIds) {
+        derivedStateOf { selectedTaskIds.isNotEmpty() }
+    }
+
+    LaunchedEffect(taskSelectionActive) {
+        itemSelectedState(taskSelectionActive)
+    }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(viewModel.notification) {
@@ -145,7 +153,7 @@ fun PriorityContent(
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
-    if (isBulkMode) {
+    if (taskSelectionActive) {
         BackHandler {
             viewModel.deselectAllTasks()
             itemSelectedState(false)
@@ -209,15 +217,15 @@ fun PriorityContent(
                         PriorityItem(
                             task = item,
                             onClick = {
-                                if (!isBulkMode) {
+                                if (!taskSelectionActive) {
                                     showTaskChat(item.id)
                                 }
                             },
                             onLongClick = {
-                                viewModel.handleTaskSelection(item)
+                                viewModel.toggleTaskSelection(item.id)
                                 itemSelectedState(viewModel.selectedTaskIds.value.isNotEmpty())
                             },
-                            isSelected = item.id in viewModel.selectedTaskIds.value
+                            isSelected = item.id in selectedTaskIds
                         )
                     }
                 )

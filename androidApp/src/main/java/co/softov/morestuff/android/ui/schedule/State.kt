@@ -10,4 +10,5 @@ sealed class NotificationState {
 @Immutable
 data class PriorityViewState(
     val enableConfetti: Boolean = true,
+    val taskSelectionEnabled: Boolean = false
 )

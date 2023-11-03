@@ -44,9 +44,9 @@ fun MoreStuffTopBar(
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
     searchSelected: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    itemSelectedState: Boolean,
     closeBulkMode: () -> Unit,
+    itemSelectedState: Boolean,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val viewModel: PriorityViewModel = koinViewModel()
 
@@ -99,7 +99,7 @@ fun MoreStuffTopBar(
             if (itemSelectedState) {
                 IconButton(onClick = {
                     viewModel.showDeleteDialog()
-                    closeBulkMode()
+                    //closeBulkMode()
                 }) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,

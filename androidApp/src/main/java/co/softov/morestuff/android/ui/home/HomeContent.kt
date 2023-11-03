@@ -133,7 +133,6 @@ fun HomeContent(
     val priorityScrollState = rememberLazyListState()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-
     Box(
         modifier = Modifier
             .fillMaxSize()

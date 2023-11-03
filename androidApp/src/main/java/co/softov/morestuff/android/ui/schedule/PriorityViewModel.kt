@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.schedule
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,12 +38,10 @@ class PriorityViewModel(
         private set
 
     val model = MutableStateFlow(PriorityViewState())
-    var selectedTaskIds: MutableState<List<Long>> = mutableStateOf(listOf())
-        private set
+    val selectedTaskIds = MutableStateFlow(listOf<Long>())
 
     private var recentlyCompletedTasks: MutableList<TaskDomain> = mutableListOf()
 
-    private val undoBulkMode = MutableStateFlow(false)
     var showDeleteConfirmDialog: Boolean by mutableStateOf(false)
         private set
 
@@ -113,11 +110,10 @@ class PriorityViewModel(
 
     fun undoLastCompleted() {
         resetNotification()
-        for (task in recentlyCompletedTasks) {
-            dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(task.id), false))
-        }
+        dispatchAppStoreAction(
+            TaskAction.CompleteTasksAction(recentlyCompletedTasks.map { it.id }, false)
+        )
         recentlyCompletedTasks.clear()
-        undoBulkMode.value = true
     }
 
     fun moveToTop(task: TaskDomain) {
@@ -169,15 +165,13 @@ class PriorityViewModel(
         deselectAllTasks()
     }
 
-
-    fun handleTaskSelection(task: TaskDomain) {
-        selectedTaskIds.value = if (task.id in selectedTaskIds.value) {
-            selectedTaskIds.value - task.id
+    fun toggleTaskSelection(taskId: Long) {
+        selectedTaskIds.value = if (taskId in selectedTaskIds.value) {
+            selectedTaskIds.value - taskId
         } else {
-            selectedTaskIds.value + task.id
+            selectedTaskIds.value + taskId
         }
     }
-
 
     fun deselectAllTasks() {
         selectedTaskIds.value = emptyList()
