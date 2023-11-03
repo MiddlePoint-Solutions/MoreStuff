@@ -21,7 +21,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -36,10 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
@@ -51,6 +55,7 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.schedule.NotificationState
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
 import co.softov.morestuff.android.ui.search.SearchBar
@@ -63,6 +68,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
+
     val navigation = LocalAppNavigation.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -133,6 +139,25 @@ fun HomeContent(
     val priorityScrollState = rememberLazyListState()
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    val resources = LocalContext.current.resources
+    LaunchedEffect(priorityViewModel.notification) {
+        when (priorityViewModel.notification) {
+            NotificationState.Complete -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(R.string.snack_task_completed),
+                    actionLabel = resources.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
+                ).also {
+                    when (it) {
+                        SnackbarResult.Dismissed -> priorityViewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> priorityViewModel.undoLastCompleted()
+                    }
+                }
+            }
+            else -> {}
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -141,11 +166,12 @@ fun HomeContent(
             modifier = modifier.fillMaxSize()
         ) {
             PriorityContent(
-                snackBarHostState = snackbarHostState,
                 showTaskChat = showTaskChat,
                 onCallToAction = { focusRequester.requestFocus() },
                 listState = priorityScrollState,
-                modifier = Modifier.weight(0.8f).padding(bottom = 30.dp),
+                modifier = Modifier
+                    .weight(0.8f)
+                    .padding(bottom = 30.dp),
                 itemSelectedState = itemSelectedState
             )
         }
@@ -203,8 +229,7 @@ fun HomeContent(
                             onPlanSelected = userInputViewModel::setPlanPriority,
                             onTimeChange = userInputViewModel::updatePlanTime,
                             onDateChange = userInputViewModel::updatePlanDate,
-
-                            )
+                        )
 
                         Surface(
                             color = MaterialTheme.colorScheme.secondaryContainer,

@@ -66,7 +66,6 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
-    snackBarHostState: SnackbarHostState,
     showTaskChat: (taskId: Long) -> Unit,
     onCallToAction: () -> Unit,
     modifier: Modifier = Modifier,
@@ -88,26 +87,6 @@ fun PriorityContent(
 
     LaunchedEffect(taskSelectionActive) {
         itemSelectedState(taskSelectionActive)
-    }
-
-    val resources = LocalContext.current.resources
-    LaunchedEffect(viewModel.notification) {
-        when (viewModel.notification) {
-            NotificationState.Complete -> {
-                snackBarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_completed),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
-                    }
-                }
-            }
-
-            else -> {}
-        }
     }
 
     taskOptions?.let { task ->
