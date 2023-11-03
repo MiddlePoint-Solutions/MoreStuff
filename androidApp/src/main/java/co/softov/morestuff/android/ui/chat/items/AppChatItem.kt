@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.chat.items
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -17,8 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
@@ -35,34 +35,45 @@ fun AppChatItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 15.dp, end = 45.dp, bottom = 7.dp),
+            .padding(end = 45.dp),
         horizontalArrangement = Arrangement.Start
     ) {
-        Surface(
-            onClick = { chatActions.taskChatAction(message.taskId) },
-            shape = RoundedCornerShape(
-                topStart = 14.dp,
-                topEnd = 14.dp,
-                bottomEnd = 14.dp,
-                bottomStart = 5.dp
-            ),
-            color = MaterialTheme.colorScheme.secondaryContainer,
+        Box(
+            modifier = Modifier
+                .padding(start = 5.dp, bottom = 4.dp)
         ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Text(
-                    text = message.content, style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
+            Surface(
+                onClick = { chatActions.taskChatAction(message.taskId) },
+                shape = RoundedCornerShape(
+                    topStart = 14.dp,
+                    topEnd = 14.dp,
+                    bottomEnd = 14.dp,
+                    bottomStart = 5.dp
+                ),
+                color = MaterialTheme.colorScheme.secondaryContainer,
+            ) {
+                Column {
+                    Text(
+                        modifier = Modifier
+                            .padding(
+                                start = 14.dp,
+                                end = 15.dp,
+                                top = 8.dp,
+                                bottom = 3.dp
+                            ),
+                        text = message.content,
+                        style = LocalTextStyle.current.copy(
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontSize = 16.sp
+                        )
                     )
-                )
-                Row(Modifier.align(Alignment.End).padding(top = 3.dp)) {
-                    MessageTime(
-                        formattedTimeOnly = messageUiModel.formattedTimeOnly,
-                        modifier = Modifier,
-                        textColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    Row(Modifier.align(Alignment.End)) {
+                        MessageTime(
+                            formattedTimeOnly = messageUiModel.formattedTimeOnly,
+                            modifier = Modifier,
+                            textColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
                 }
             }
         }
