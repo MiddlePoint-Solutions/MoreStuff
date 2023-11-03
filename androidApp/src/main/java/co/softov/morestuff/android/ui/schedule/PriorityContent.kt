@@ -270,22 +270,22 @@ fun ConfirmDeleteDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Confirm Delete") },
+        title = { Text(stringResource(R.string.confirm_delete)) },
         text = {
             Text(
-                text = "Are you sure you want to delete the following tasks?",
+                text = stringResource(R.string.sure_delete_task),
                 textAlign = TextAlign.Start
 
             )
         },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("Delete")
+                Text(stringResource(R.string.delete))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

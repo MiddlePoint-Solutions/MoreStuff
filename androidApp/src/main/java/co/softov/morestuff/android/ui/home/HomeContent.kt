@@ -80,7 +80,7 @@ fun HomeScreen() {
                 searchSelected = { isSearching = true },
                 scrollBehavior = scrollBehavior,
                 itemSelectedState = itemSelected,
-                deselectAllTasks = { itemSelected = false }
+                closeBulkMode = { itemSelected = false }
             )
         },
         content = {
