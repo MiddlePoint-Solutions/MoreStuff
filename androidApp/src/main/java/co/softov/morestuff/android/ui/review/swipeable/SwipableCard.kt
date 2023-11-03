@@ -27,6 +27,7 @@ fun Modifier.swipableCard(
     state: SwipeableCardState,
     enabled: Boolean = true,
     onSwiped: (SwipeDirection) -> Unit = {},
+    onDrag: (Boolean) -> Unit = {},
     onSwipeCancel: () -> Unit = {},
     blockedDirections: List<SwipeDirection> = listOf(),
 ) = pointerInput(state) {
@@ -34,6 +35,7 @@ fun Modifier.swipableCard(
         val velocityTracker = VelocityTracker()
         detectDragGestures(
             onDragStart = {
+                onDrag(true)
                 Timber.d("DRAG: START(${it.x}, ${it.y})")
             },
             onDragCancel = {
@@ -61,6 +63,7 @@ fun Modifier.swipableCard(
                 }
             },
             onDragEnd = {
+                onDrag(false)
                 launch {
                     val coercedOffset = state.offset.targetValue
                         .coerceIn(

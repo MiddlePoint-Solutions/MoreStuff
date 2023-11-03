@@ -72,11 +72,13 @@ fun ReviewContent(
     val showTaskChat = remember { MutableTransitionState(false) }
     var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var isButtonInitiatedMovement by remember { mutableStateOf(false) }
+
+    var showReviewDragHints by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -105,9 +107,10 @@ fun ReviewContent(
 
                     val visibleState = remember(model.round) { MutableTransitionState(false) }
 
-                    LaunchedEffect(isCardMoving, isButtonInitiatedMovement) {
-                        visibleState.targetState = !isCardMoving || isButtonInitiatedMovement
+                    LaunchedEffect(showReviewDragHints) {
+                        visibleState.targetState = !showReviewDragHints
                     }
+
                     AnimatedVisibility(
                         visibleState = visibleState,
                         enter = fadeIn(),
@@ -120,9 +123,6 @@ fun ReviewContent(
                             lastItemSwiped = { states.lastSwipedItem() },
                             firstVisibleState = { states.firstVisibleStateOrNull() },
                             undoAction = viewModel::undo,
-                            onButtonInitiatedMovement = { started ->
-                                isButtonInitiatedMovement = started
-                            },
                         )
                     }
 
@@ -133,7 +133,9 @@ fun ReviewContent(
                         states = states,
                         onSwiped = { schedule, direction ->
                             viewModel.onTaskSwiped(schedule, direction)
-                            isCardMoving = false
+                        },
+                        onDrag = { isDragging ->
+                            showReviewDragHints = isDragging
                         },
                         onComplete = {
                             scope.launch {
@@ -141,7 +143,6 @@ fun ReviewContent(
                                 viewModel.completeTask(it)
                             }
                         },
-                        onCardMoveStateChange = { moving -> isCardMoving = moving },
                         showTaskChat = { taskId ->
                             currentTaskId = taskId
                             scope.launch {
@@ -151,7 +152,7 @@ fun ReviewContent(
                     )
 
                     AnimatedVisibility(
-                        visible = isCardMoving && viewModel.reviewHintEnabled && !isButtonInitiatedMovement,
+                        visible = showReviewDragHints && viewModel.reviewHintEnabled,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -286,8 +287,7 @@ private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier,
-    onButtonInitiatedMovement: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     val scope = rememberCoroutineScope()
@@ -303,10 +303,7 @@ private fun ReviewSwipeControls(
     }
     val buttonAction: (SwipeDirection) -> Unit = { direction ->
         scope.launch {
-            onButtonInitiatedMovement(true)
-            firstVisibleState()?.swipe(direction)?.also {
-                onButtonInitiatedMovement(false)
-            }
+            firstVisibleState()?.swipe(direction)
         }
     }
 
@@ -365,8 +362,8 @@ private fun TaskPrioritySwipe(
     modifier: Modifier = Modifier,
     states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
     onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
+    onDrag: (Boolean) -> Unit,
     onComplete: (ReviewItemUiModel) -> Unit,
-    onCardMoveStateChange: (Boolean) -> Unit,
     showTaskChat: (taskId: Long) -> Unit,
 ) {
     val itemClick by rememberUpdatedState(showTaskChat)
@@ -398,20 +395,14 @@ private fun TaskPrioritySwipe(
         }
 
         states.forEach { (task, state) ->
-
-            val isMoving by remember(state.offset) {
-                derivedStateOf { state.offset.value.x != 0f || state.offset.value.y != 0f }
-            }
-
-            LaunchedEffect(isMoving) {
-                onCardMoveStateChange(isMoving)
-            }
-
             if (state.swipedDirection == null) {
                 TaskCard(
                     modifier = Modifier
                         .layoutId(task.id)
-                        .swipableCard(state = state),
+                        .swipableCard(
+                            state = state,
+                            onDrag = onDrag,
+                        ),
                     item = task,
                     onComplete = onComplete,
                     showTaskChat = itemClick
