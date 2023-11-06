@@ -1,10 +1,9 @@
 package co.softov.morestuff.android.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -27,89 +26,79 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.schedule.PriorityViewModel
+import co.softov.morestuff.android.ui.home.HomeUiModel
+import co.softov.morestuff.android.ui.model.Digit
+import co.softov.morestuff.android.ui.model.compareTo
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MoreStuffTopBar(
+fun HomeTopBar(
+    model: HomeUiModel,
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
     searchSelected: () -> Unit,
-    closeBulkMode: () -> Unit,
-    itemSelectedState: Boolean,
+    clearTaskSelection: () -> Unit,
+    completeSelectedTasks: () -> Unit,
+    deleteSelectedTasks: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    val viewModel: PriorityViewModel = koinViewModel()
+
+    val taskSelectionActive = remember(model) { model.taskSelectionActive }
+    val transition = updateTransition(taskSelectionActive, label = "Selection state")
 
     TopAppBar(
         title = {
-            AnimatedVisibility(
-                visible = itemSelectedState,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    IconButton(onClick = {
-                        viewModel.clearSelectedTasks()
-                        closeBulkMode()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Rounded.Close,
-                            contentDescription = "",
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(48.dp)
+            transition.AnimatedContent { targetState ->
+                if (targetState) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.animateContentSize(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
+                        IconButton(onClick = clearTaskSelection) {
+                            Icon(
+                                imageVector = Icons.Rounded.Close,
+                                contentDescription = "",
+                                modifier = Modifier.size(30.dp)
+                            )
+                        }
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.size(48.dp)
                         ) {
-                            val count = viewModel.selectedTaskIds.value.size
-                            AnimatedCounter(count = count)
+                            Row(
+                                modifier = Modifier.animateContentSize(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                AnimatedCounter(count = model.selectedTaskIds.size)
+                            }
                         }
                     }
+                } else {
+                    Text(text = stringResource(id = R.string.app_name))
                 }
-            }
-
-            AnimatedVisibility(
-                visible = !itemSelectedState,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
-            ) {
-                Text(text = stringResource(id = R.string.app_name))
             }
         },
         actions = {
-            if (itemSelectedState) {
-                IconButton(onClick = {
-                    viewModel.showDeleteDialog()
-                    //closeBulkMode()
-                }) {
+            if (taskSelectionActive) {
+                IconButton(onClick = deleteSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = stringResource(R.string.cd_priority_review)
                     )
                 }
-                IconButton(onClick = {
-                    viewModel.completeSelectedTasks()
-                    closeBulkMode()
-                }) {
+                IconButton(onClick = completeSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Done,
                         contentDescription = stringResource(R.string.cd_priority_review)
@@ -162,9 +151,9 @@ private fun AnimatedCounter(count: Int) {
                             slideInVertically { it } togetherWith slideOutVertically { -it }
                         }
                     }, label = ""
-                ) { digit ->
+                ) {
                     Text(
-                        text = "${digit.digitChar}",
+                        text = "${it.digitChar}",
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -172,21 +161,6 @@ private fun AnimatedCounter(count: Int) {
     }
 }
 
-data class Digit(val digitChar: Char, val fullNumber: Int, val place: Int) {
-    override fun equals(other: Any?): Boolean {
-        return when (other) {
-            is Digit -> digitChar == other.digitChar
-            else -> super.equals(other)
-        }
-    }
-}
-
-operator fun Digit.compareTo(other: Digit): Int {
-    return fullNumber.compareTo(other.fullNumber)
-}
-
-
-/*
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -197,13 +171,16 @@ operator fun Digit.compareTo(other: Digit): Int {
     name = "Light"
 )
 @Composable
-fun MoreStuffTopBarPreview() {
-    MoreStuffTheme() {
-        MoreStuffTopBar(
+private fun Preview() {
+    MoreStuffTheme {
+        HomeTopBar(
+            model = HomeUiModel(),
             reviewSelected = {},
             settingsSelected = {},
             searchSelected = { },
-            itemSelectedState =
+            clearTaskSelection = {},
+            completeSelectedTasks = {},
+            deleteSelectedTasks = {}
         )
     }
-}*/
+}

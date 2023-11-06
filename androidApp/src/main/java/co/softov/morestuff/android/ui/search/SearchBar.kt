@@ -185,7 +185,6 @@ fun SearchBar(
                                                 showTaskChat(task.id)
                                             },
                                             onLongClick = {},
-                                            isSelected = false
                                         )
                                     }
                                 }

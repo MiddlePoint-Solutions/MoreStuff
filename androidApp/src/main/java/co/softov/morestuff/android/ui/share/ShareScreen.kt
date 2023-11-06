@@ -56,12 +56,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.nav.Shareable
-import co.softov.morestuff.android.ui.home.mapToDomain
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.main.MainViewModel
+import co.softov.morestuff.android.ui.model.mapToDomain
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskProfile
@@ -196,7 +196,7 @@ private fun ShareContent(
     searchQuery: String,
     searchBarActive: Boolean = false,
 ) {
-    val filteredTasks = shareViewModel.filteredTasks.collectAsState().value
+    val filteredTasks by shareViewModel.filteredTasks.collectAsState()
 
     val state = rememberLazyListState()
     var showUserInput by remember { mutableStateOf(false) }
@@ -240,7 +240,6 @@ private fun ShareContent(
                     task = task,
                     onClick = { shareToTask(task.id) },
                     onLongClick = {},
-                    isSelected = false
                 )
 
                 Divider(

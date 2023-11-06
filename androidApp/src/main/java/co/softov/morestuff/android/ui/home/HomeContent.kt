@@ -5,11 +5,13 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,6 +24,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -56,16 +59,16 @@ import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
-import co.softov.morestuff.android.ui.components.MoreStuffTopBar
+import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
-import co.softov.morestuff.android.ui.schedule.NotificationState
+import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.schedule.PriorityContent
-import co.softov.morestuff.android.ui.schedule.PriorityViewModel
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -80,51 +83,65 @@ import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    viewModel: HomeViewModel = koinViewModel()
+) {
 
     val navigation = LocalAppNavigation.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    var itemSelected by remember { mutableStateOf(false) }
-    var isSearching by rememberSaveable { mutableStateOf(false) }
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+
+    val model by viewModel.uiModel.collectAsStateWithLifecycle()
+
+    BackHandler(model.taskSelectionActive) {
+        viewModel.clearSelectedTasks()
+    }
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         topAppBarScrollBehavior = scrollBehavior,
         topBar = {
-            MoreStuffTopBar(
+            HomeTopBar(
+                model = model,
                 reviewSelected = { navigation.push(Screen.Review) },
                 settingsSelected = { navigation.push(Screen.Settings) },
-                searchSelected = { isSearching = true },
+                searchSelected = { isSearchActive = true },
                 scrollBehavior = scrollBehavior,
-                itemSelectedState = itemSelected,
-                closeBulkMode = { itemSelected = false }
+                clearTaskSelection = viewModel::clearSelectedTasks,
+                completeSelectedTasks = viewModel::completeSelectedTasks,
+                deleteSelectedTasks = { showDeleteConfirmationDialog = true }
+
             )
         },
         content = {
             HomeContent(
-                showTaskChat = { taskId ->
-                    scope.launch {
-                        navigation.push(Screen.TaskChat(taskId))
-                    }
-                },
+                showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
                 snackbarHostState = snackbarHostState,
-                itemSelectedState = { isSelected ->
-                    itemSelected = isSelected
-                },
                 modifier = Modifier.padding(top = it.calculateTopPadding()),
             )
         },
     )
 
+    if (showDeleteConfirmationDialog) {
+        ConfirmDeleteDialog(
+            onDismiss = { showDeleteConfirmationDialog = false },
+            onConfirm = {
+                viewModel.deleteSelectedTasks()
+                showDeleteConfirmationDialog = false
+            }
+        )
+    }
+
     AnimatedVisibility(
-        visible = isSearching,
+        visible = isSearchActive,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
         SearchBar(
-            onSearchClose = { isSearching = false },
+            onSearchClose = { isSearchActive = false },
             showTaskChat = { navigation.push(Screen.TaskChat(it)) },
             modifier = Modifier.fillMaxWidth()
         )
@@ -138,40 +155,23 @@ fun HomeContent(
     showTaskChat: (taskId: Long) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    userInputViewModel: UserInputViewModel = koinViewModel(),
-    priorityViewModel: PriorityViewModel = koinViewModel(),
     homeViewModel: HomeViewModel = koinViewModel(),
-    itemSelectedState: (Boolean) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val focusRequester = remember { FocusRequester() }
-    val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
     var showTaskInput by remember { mutableStateOf(false) }
-    val messages by homeViewModel.messages.collectAsStateWithLifecycle()
-    val scrollState = rememberLazyListState()
     val priorityScrollState = rememberLazyListState()
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
 
-    val tasks by priorityViewModel.tasks.collectAsStateWithLifecycle()
-    val model by priorityViewModel.model.collectAsStateWithLifecycle()
-    val selectedTaskIds by priorityViewModel.selectedTaskIds.collectAsState()
+    val tasks by homeViewModel.tasks.collectAsState()
+    val model by homeViewModel.uiModel.collectAsState()
 
     val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
 
-    LaunchedEffect(model.taskSelectionEnabled) {
-        itemSelectedState(model.taskSelectionEnabled)
-    }
-
-    BackHandler(model.taskSelectionEnabled) {
-        priorityViewModel.clearSelectedTasks()
-    }
-
     val resources = LocalContext.current.resources
-    LaunchedEffect(priorityViewModel.notification) {
-        when (priorityViewModel.notification) {
+    LaunchedEffect(model.notification) {
+        when (model.notification) {
             NotificationState.Complete -> {
                 snackbarHostState.showSnackbar(
                     message = resources.getString(R.string.snack_task_completed),
@@ -179,8 +179,8 @@ fun HomeContent(
                     duration = SnackbarDuration.Long
                 ).also {
                     when (it) {
-                        SnackbarResult.Dismissed -> priorityViewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> priorityViewModel.undoLastCompleted()
+                        SnackbarResult.Dismissed -> homeViewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> homeViewModel.undoLastCompleted()
                     }
                 }
             }
@@ -198,33 +198,24 @@ fun HomeContent(
             completeTask = {
                 showTaskCompleteAnimation = taskOptions
                 scope.launch {
-                    priorityViewModel.completeTask(taskOptions)
+                    homeViewModel.completeTask(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
             },
             moveToTop = {
                 scope.launch {
-                    priorityViewModel.moveToTop(taskOptions)
+                    homeViewModel.moveToTop(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
             },
             moveToBottom = {
                 scope.launch {
-                    priorityViewModel.moveToBottom(taskOptions)
+                    homeViewModel.moveToBottom(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
-            }
-        )
-    }
-
-    if (priorityViewModel.showDeleteConfirmDialog) {
-        ConfirmDeleteDialog(
-            onConfirm = { priorityViewModel.deleteSelectedTasks() },
-            onDismiss = {
-                priorityViewModel.dismissDeleteDialog()
             }
         )
     }
@@ -232,25 +223,23 @@ fun HomeContent(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-
         PriorityContent(
             tasks = tasks,
-            selectedTaskIds = selectedTaskIds,
             onItemClick = { taskId ->
-                if (model.taskSelectionEnabled) {
-                    priorityViewModel.toggleTaskSelection(taskId)
+                if (model.taskSelectionActive) {
+                    homeViewModel.toggleTaskSelection(taskId)
                 } else {
                     showTaskChat(taskId)
                 }
             },
-            onItemLongClick = priorityViewModel::toggleTaskSelection,
+            onItemLongClick = homeViewModel::toggleTaskSelection,
             showTaskOptions = { taskOptions = it },
-            toggleQuickReminder = priorityViewModel::toggleQuickReminder,
+            toggleQuickReminder = homeViewModel::toggleQuickReminder,
             listState = priorityScrollState,
             modifier = Modifier.padding(bottom = 30.dp),
         )
 
-        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
+        if (showTaskCompleteAnimation > 0 && model.confettiEnabled) {
             KonfettiView(
                 modifier = Modifier.fillMaxSize(),
                 parties = explode(),
@@ -265,7 +254,6 @@ fun HomeContent(
         FloatingActionButton(
             onClick = {
                 showTaskInput = true
-                priorityViewModel.showContent()
             },
             modifier = Modifier
                 .padding(16.dp, bottom = 48.dp, end = 20.dp)
@@ -298,90 +286,25 @@ fun HomeContent(
     }
 
     if (showTaskInput) {
+        val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
         BackHandler(onBack = {
             scope.launch {
-                bottomSheetState.hide()
+                taskInputBottomSheetState.hide()
             }
         })
-        ModalBottomSheet(
-            onDismissRequest = {
-                showTaskInput = false
+
+        TaskInputBottomSheet(
+            onDismissRequest = { showTaskInput = false },
+            sheetState = taskInputBottomSheetState,
+            scrollNowPriority = {
+                scope.launch {
+                    priorityScrollState.animateScrollToItem(index = 0)
+                }
             },
-            sheetState = bottomSheetState,
-            content = {
-                BoxWithConstraints {
-                    LaunchedEffect(showTaskInput) {
-                        focusRequester.requestFocus()
-                    }
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        Messages(
-                            messages = messages,
-                            actions = chatActions,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(4f),
-                            scrollState = scrollState,
-                        )
-
-                        PriorityInput(
-                            model = priorityModel,
-                            onNowSelected = userInputViewModel::setNowPriority,
-                            onLaterSelected = userInputViewModel::setLaterPriority,
-                            onPlanSelected = userInputViewModel::setPlanPriority,
-                            onTimeChange = userInputViewModel::updatePlanTime,
-                            onDateChange = userInputViewModel::updatePlanDate,
-                        )
-
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier
-                                .padding(bottom = 6.dp)
-                        ) {
-                            var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                                mutableStateOf(TextFieldValue(text = userInputViewModel.userInput))
-                            }
-
-                            LaunchedEffect(userInputViewModel.userInput) {
-                                userInputValue =
-                                    userInputValue.copy(text = userInputViewModel.userInput)
-                            }
-
-                            UserInput(
-                                textContent = {
-                                    UserTextInput(
-                                        value = userInputValue,
-                                        onValueChange = { userInputValue = it },
-                                        focusRequester = focusRequester,
-                                        sendAction = { title ->
-                                            scope.launch {
-                                                userInputViewModel.createNewTask(title)
-                                                userInputValue = userInputValue.copy("")
-                                                delay(100)
-                                                when (priorityModel.priority) {
-                                                    PriorityModel.Later -> priorityScrollState.scrollToItem(
-                                                        index = tasks.size - 1
-                                                    )
-
-                                                    PriorityModel.Now -> priorityScrollState.animateScrollToItem(
-                                                        index = 0
-                                                    )
-
-                                                    is PriorityModel.Plan -> {}
-                                                }
-                                            }
-                                        },
-                                        actionsContent = {
-                                            VoiceToTextInput(
-                                                onUpdateValue = userInputViewModel::updateUserInput
-                                            )
-                                        }
-                                    )
-                                }
-                            )
-                        }
-                    }
+            scrollLaterPriority = {
+                scope.launch {
+                    priorityScrollState.scrollToItem(index = tasks.size - 1)
                 }
             }
         )
@@ -389,9 +312,102 @@ fun HomeContent(
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun TaskInputBottomSheet(
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState,
+    scrollNowPriority: () -> Unit,
+    scrollLaterPriority: () -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
+    val scrollState = rememberLazyListState()
+
+    val viewModel = koinViewModel<UserInputViewModel>()
+    val messages by viewModel.messages.collectAsStateWithLifecycle()
+    val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        content = {
+
+            BoxWithConstraints {
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+                Column(
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    Messages(
+                        messages = messages,
+                        actions = chatActions,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp),
+                        scrollState = scrollState,
+                    )
+
+                    PriorityInput(
+                        model = priorityModel,
+                        onNowSelected = viewModel::setNowPriority,
+                        onLaterSelected = viewModel::setLaterPriority,
+                        onPlanSelected = viewModel::setPlanPriority,
+                        onTimeChange = viewModel::updatePlanTime,
+                        onDateChange = viewModel::updatePlanDate,
+                    )
+
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier
+                            .padding(bottom = 6.dp)
+                    ) {
+                        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                            mutableStateOf(TextFieldValue(text = viewModel.userInput))
+                        }
+
+                        LaunchedEffect(viewModel.userInput) {
+                            userInputValue =
+                                userInputValue.copy(text = viewModel.userInput)
+                        }
+
+                        UserInput(
+                            textContent = {
+                                UserTextInput(
+                                    value = userInputValue,
+                                    onValueChange = { userInputValue = it },
+                                    focusRequester = focusRequester,
+                                    sendAction = { title ->
+                                        scope.launch {
+                                            viewModel.createNewTask(title)
+                                            userInputValue = userInputValue.copy("")
+                                            delay(100)
+                                            when (priorityModel.priority) {
+                                                PriorityUiModel.Later -> scrollLaterPriority()
+                                                PriorityUiModel.Now -> scrollNowPriority()
+                                                is PriorityUiModel.Plan -> {}
+                                            }
+                                        }
+                                    },
+                                    actionsContent = {
+                                        VoiceToTextInput(
+                                            onUpdateValue = viewModel::updateUserInput
+                                        )
+                                    }
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
 private fun ConfirmDeleteDialog(
-    onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -400,7 +416,6 @@ private fun ConfirmDeleteDialog(
             Text(
                 text = stringResource(R.string.sure_delete_task),
                 textAlign = TextAlign.Start
-
             )
         },
         confirmButton = {
@@ -431,4 +446,3 @@ fun MainContentPreview() {
         HomeScreen()
     }
 }
-

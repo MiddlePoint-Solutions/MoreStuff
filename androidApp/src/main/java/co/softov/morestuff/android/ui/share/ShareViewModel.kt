@@ -12,22 +12,26 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
-import co.softov.morestuff.android.ui.schedule.NotificationState
-import co.softov.morestuff.android.ui.schedule.NotificationState.None
+import co.softov.morestuff.android.ui.model.NotificationState
+import co.softov.morestuff.android.ui.model.NotificationState.None
+import co.softov.morestuff.android.ui.model.TaskUiModel
+import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ShareViewModel(
     private val getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val createTaskUseCase: CreateTaskUseCase,
+    private val taskUiMapper: TaskUiMapper,
 ) : NoStateViewModel() {
     var query by mutableStateOf("")
         internal set
 
-    val filteredTasks = MutableStateFlow<List<TaskDomain>>(listOf())
+    val filteredTasks = MutableStateFlow<List<TaskUiModel>>(listOf())
 
     private var filterJob: Job? = null
     override val enableDebug: Boolean
@@ -48,10 +52,12 @@ class ShareViewModel(
         filterJob = viewModelScope.launch {
             getActiveTasksFlowUseCase()
                 .onEach { results ->
-                    val filteredResults = results.filter { task ->
-                        task.title.contains(query, ignoreCase = true)
+                    filteredTasks.update {
+                        val filteredResults = results.filter { task ->
+                            task.title.contains(query, ignoreCase = true)
+                        }
+                        taskUiMapper.map(filteredResults)
                     }
-                    filteredTasks.value = filteredResults
                 }.launchIn(this)
         }
     }

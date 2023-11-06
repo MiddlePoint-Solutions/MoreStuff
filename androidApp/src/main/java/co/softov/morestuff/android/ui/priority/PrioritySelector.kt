@@ -22,12 +22,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun PrioritySelector(
-    priority: PriorityModel,
+    priority: PriorityUiModel,
     onNowSelected: () -> Unit = {},
     onLaterSelected: () -> Unit = {},
     onPlanSelected: () -> Unit = {},
@@ -41,7 +41,7 @@ fun PrioritySelector(
     ) {
 
         val nowSelected by remember(priority)  {
-            derivedStateOf { priority is PriorityModel.Now }
+            derivedStateOf { priority is PriorityUiModel.Now }
         }
 
         PriorityButton(
@@ -63,7 +63,7 @@ fun PrioritySelector(
         }
 
         val laterSelected by remember(priority) {
-            derivedStateOf { priority is PriorityModel.Later }
+            derivedStateOf { priority is PriorityUiModel.Later }
         }
 
         PriorityButton(
@@ -85,7 +85,7 @@ fun PrioritySelector(
         }
 
         val planSelected by remember(priority) {
-            derivedStateOf { priority is PriorityModel.Plan }
+            derivedStateOf { priority is PriorityUiModel.Plan }
         }
 
         PriorityButton(
@@ -121,7 +121,7 @@ fun PrioritySelector(
 fun UserPriorityInputPreviewDark() {
     MoreStuffTheme {
         PrioritySelector(
-            priority = PriorityModel.Now,
+            priority = PriorityUiModel.Now,
         )
     }
 }

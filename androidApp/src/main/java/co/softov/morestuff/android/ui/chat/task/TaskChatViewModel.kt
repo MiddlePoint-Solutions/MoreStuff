@@ -22,10 +22,9 @@ import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.home.ScheduleUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first

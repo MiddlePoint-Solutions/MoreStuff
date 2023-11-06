@@ -39,12 +39,12 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
+import co.softov.morestuff.android.ui.model.TaskUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
-    tasks: List<TaskDomain>,
-    selectedTaskIds: List<Long>,
+    tasks: List<TaskUiModel>,
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
     showTaskOptions: (taskId: Long) -> Unit,
@@ -109,8 +109,7 @@ fun PriorityContent(
                         PriorityItem(
                             task = item,
                             onClick = { onItemClick(item.id) },
-                            onLongClick = { onItemLongClick(item.id) },
-                            isSelected = item.id in selectedTaskIds
+                            onLongClick = { onItemLongClick(item.id) }
                         )
                     }
                 )

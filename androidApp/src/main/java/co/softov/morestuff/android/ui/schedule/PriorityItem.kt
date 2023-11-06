@@ -36,17 +36,18 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.ui.model.TaskUiModel
+import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PriorityItem(
-    task: TaskDomain,
+    task: TaskUiModel,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isSelected: Boolean = false,
 ) {
     Box(
         modifier = Modifier
@@ -65,7 +66,7 @@ fun PriorityItem(
             Box(modifier = Modifier) {
                 TaskProfile(task.title)
 
-                if (isSelected) {
+                if (task.isSelected) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
@@ -130,12 +131,18 @@ fun PriorityItem(
 fun PriorityItemPreview() {
     MoreStuffTheme {
         PriorityItem(
-            task = TaskDomain(
+            task = TaskUiModel(
+                id = 0,
                 title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                schedule = buildList {
-                    add(ScheduleDomain(scheduleType = ScheduleType.OneTime))
-                    add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
-                }
+                createTime = "",
+                completeTime = "",
+                isComplete = false,
+                priorityScore = 100,
+                position = 1,
+                extraDetails = true,
+                hasSchedule = true,
+                hasReminder = true,
+                isSelected = true
             ),
             onClick = {},
             onLongClick = {}
