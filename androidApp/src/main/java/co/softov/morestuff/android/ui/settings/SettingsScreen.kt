@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import co.softov.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import co.softov.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
@@ -72,7 +74,8 @@ fun SettingsScreen(
             setSnoozeLimit = viewModel::onSnoozeLimitChanged,
             enableConfetti = viewModel::enableConfetti,
             enableDevSettings = viewModel::enableDevSettings,
-            onTimeSelected = viewModel::setReviewTime
+            onTimeSelected = viewModel::setReviewTime,
+            inputVoiceLanguage = viewModel::selectLanguage
         )
     )
 
@@ -118,6 +121,10 @@ private fun SettingsContent(
                 ReviewTimeSelector(
                     valueChanged = actions.onTimeSelected,
                     defaultValue = model.reviewTime,
+                )
+                SelectLanguage(
+                    languageSelected =actions.inputVoiceLanguage,
+                    defaultValue = {model.inputVoiceLanguage.ordinal}
                 )
 
                 if (model.devSettings) {
@@ -455,6 +462,51 @@ fun ReviewTimeSelector(
         },
     )
 }
+
+@Composable
+fun SelectLanguage(
+    languageSelected: (Int) -> Unit,
+    defaultValue: () -> Int,
+) {
+    val resources = LocalContext.current.resources
+    val languageOptions = remember {
+        Language.values().map { it.displayTitle(resources) }
+    }
+
+
+
+    val state = rememberAppSettingState(
+        defaultValue = defaultValue,
+        valueChanged = languageSelected,
+    )
+
+    SettingsList(
+        state = state,
+        title = {
+            Text(
+                text = stringResource(R.string.select_language),
+            )
+        },
+        items = languageOptions,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Translate,
+                contentDescription = stringResource(R.string.select_language)
+            )
+        },
+        closeDialogDelay = 0,
+        useSelectedValueAsSubtitle = false,
+    )
+}
+
+private fun Language.displayTitle(res: Resources): String = when (this) {
+    Language.DEVICE -> res.getString(R.string.language_device_default)
+    Language.ENGLISH -> res.getString(R.string.language_english)
+    Language.SPANISH -> res.getString(R.string.language_spanish)
+    Language.HEBREW -> res.getString(R.string.language_hebrew)
+    Language.RUSSIAN -> res.getString(R.string.language_russian)
+}
+
 
 
 @Preview(

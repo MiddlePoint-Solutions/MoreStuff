@@ -4,6 +4,7 @@ import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,5 +61,9 @@ class SettingsViewModel(
 
     fun setReviewTime(hour: Int, minute: Int) {
         dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute, true))
+    }
+
+    fun selectLanguage(index: Int) {
+        dispatchAppStoreAction(SettingAction.SetLanguage(Language[index]))
     }
 }

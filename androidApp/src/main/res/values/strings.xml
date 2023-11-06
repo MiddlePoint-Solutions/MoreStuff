@@ -135,6 +135,13 @@
     <string name="task_chat_reminder_action">Reminder</string>
     <string name="cd_show_task_chat">Show task chat</string>
 
+    <string name="select_language">Select Language</string>
+    <string name="language_english">English</string>
+    <string name="language_device_default">Device</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_hebrew">HEBREW</string>
+    <string name="language_russian">RUSSIAN</string>
+
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>
     <string name="onboarding_welcome_subtitle1">to help you</string>

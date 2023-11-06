@@ -20,6 +20,11 @@ class VoiceToTextParserImpl(
     override val state = _state.asStateFlow()
     private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
 
+    private val _additionalLanguage = MutableStateFlow<String?>(null)
+
+    override fun selectLanguage(language: String) {
+        _additionalLanguage.value = language
+    }
     override fun startListening(languageCode: String) {
         _state.update { VoiceToTextParserState() }
 
@@ -30,14 +35,18 @@ class VoiceToTextParserImpl(
                 )
             }
         }
-        val deviceLanguage = if (languageCode == "device language") Locale.getDefault().language else languageCode
+        val chosenLanguage = languageCode.takeIf { it != "device language" } ?: Locale.getDefault().language
+        val chosenAdditionalLanguage = _additionalLanguage.value
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, deviceLanguage)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosenLanguage)
+            chosenAdditionalLanguage?.let {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, it)
+            }
         }
 
         recognizer.setRecognitionListener(this)

@@ -63,6 +63,9 @@ class SettingsMiddleware(
             is SettingAction.EnableReviewHint -> scope.launch {
                 saveUserSettingUseCase(AppSetting.ShowHintArrowPriority, action.enable)
             }
+            is SettingAction.SetLanguage -> scope.launch {
+                saveUserSettingUseCase(AppSetting.VoiceInputLanguage, action.language.name)
+            }
             else -> NoOp
         }
 

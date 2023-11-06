@@ -10,6 +10,7 @@ import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.DevMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ErrorMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.InputVoiceLanguageMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.LoggerMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.MessageMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.NotificationMiddleware
@@ -124,6 +125,8 @@ import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScor
 import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.settings.SelectLanguageUseCase
+import co.softov.morestuff.android.domain.usecase.settings.SelectLanguageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -196,7 +199,9 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            priorityMiddleware = get()
+            priorityMiddleware = get(),
+            inputVoiceLanguageMiddleware = get()
+
         )
     }
 
@@ -211,7 +216,7 @@ val storeModule = module {
     factoryOf(::ErrorMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::DevMiddleware)
-
+    factoryOf(::InputVoiceLanguageMiddleware)
 }
 
 val taskUseCases = module {
@@ -291,6 +296,7 @@ val settingsUseCases = module {
     factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
     factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
     factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
+    factoryOf(::SelectLanguageUseCaseImpl) bind SelectLanguageUseCase::class
 }
 
 val timeManagerModule = module {

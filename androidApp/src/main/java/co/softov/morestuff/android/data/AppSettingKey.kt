@@ -17,4 +17,5 @@ val AppSetting<*>.key: String
         DevSettings -> Constants.KEY_DEV_SETTINGS
         ReviewTime -> Constants.KEY_REVIEW_TIME
         AppSetting.ShowHintArrowPriority -> Constants.KEY_REVIEW_HINT
+        AppSetting.VoiceInputLanguage -> Constants.KEY_LANGUAGE_INPUT
     }
