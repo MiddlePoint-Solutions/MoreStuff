@@ -11,6 +11,7 @@ import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Locale
 
 class VoiceToTextParserImpl(
     private val context: Application,
@@ -29,13 +30,14 @@ class VoiceToTextParserImpl(
                 )
             }
         }
+        val deviceLanguage = Locale.getDefault().language
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, deviceLanguage)
         }
 
         recognizer.setRecognitionListener(this)
