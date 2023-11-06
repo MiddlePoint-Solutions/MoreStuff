@@ -30,7 +30,7 @@ class VoiceToTextParserImpl(
                 )
             }
         }
-        val deviceLanguage = Locale.getDefault().language
+        val deviceLanguage = if (languageCode == "device language") Locale.getDefault().language else languageCode
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
