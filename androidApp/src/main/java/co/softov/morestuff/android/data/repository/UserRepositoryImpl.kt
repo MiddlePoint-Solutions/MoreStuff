@@ -21,7 +21,8 @@ class UserRepositoryImpl(
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             enableConfetti = getSetting(Confetti, enableConfetti),
             reviewTime = getSetting(ReviewTime, reviewTime),
-            enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint)
+            enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
+            language = getSetting(VoiceInputLanguage, language)
         )
     }
 
@@ -38,6 +39,7 @@ class UserRepositoryImpl(
                 (settingValue as Pair<Int, Int>).let { "${it.first};${it.second}" }
             )
             ShowHintArrowPriority -> settings.putBoolean(setting.key, settingValue as Boolean)
+            is VoiceInputLanguage -> settings.putString(setting.key, settingValue as String)
         }
     }
 
@@ -51,6 +53,7 @@ class UserRepositoryImpl(
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
             ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
+            VoiceInputLanguage -> getSetting(setting, setting.defaultValue as String)
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -68,6 +71,7 @@ class UserRepositoryImpl(
                 timeStr.toPairInt() ?: setting.defaultValue
             }
             ShowHintArrowPriority -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            VoiceInputLanguage -> settings.getString(setting.key, defaultValue as String)
         } as T
 
 }

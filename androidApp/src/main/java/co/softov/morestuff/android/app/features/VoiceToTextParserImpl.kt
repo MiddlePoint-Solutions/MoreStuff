@@ -11,6 +11,7 @@ import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Locale
 
 class VoiceToTextParserImpl(
     private val context: Application,
@@ -19,6 +20,11 @@ class VoiceToTextParserImpl(
     override val state = _state.asStateFlow()
     private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
 
+    private val _additionalLanguage = MutableStateFlow<String?>(null)
+
+    override fun selectLanguage(language: String) {
+        _additionalLanguage.value = language
+    }
     override fun startListening(languageCode: String) {
         _state.update { VoiceToTextParserState() }
 
@@ -29,12 +35,18 @@ class VoiceToTextParserImpl(
                 )
             }
         }
+        val chosenLanguage = languageCode.takeIf { it != "device language" } ?: Locale.getDefault().language
+        val chosenAdditionalLanguage = _additionalLanguage.value
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosenLanguage)
+            chosenAdditionalLanguage?.let {
+                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, it)
+            }
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
@@ -121,4 +133,3 @@ data class VoiceToTextParserState(
     val isSpeaking: Boolean = false,
     val error: String? = null,
 )
-

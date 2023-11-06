@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.enums.AppSetting.ReviewTime
 import co.softov.morestuff.android.domain.enums.AppSetting.SnoozeLimit
 import co.softov.morestuff.android.domain.enums.AppSetting.Theme
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
 import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
@@ -23,7 +24,8 @@ data class AppSettings(
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
     val enableConfetti: Boolean = Confetti.defaultValue,
     val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
-    val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue
+    val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
+    val language: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
 )
 
 sealed class SettingAction : Action.FeatureAction() {
@@ -35,6 +37,7 @@ sealed class SettingAction : Action.FeatureAction() {
     data object OnBoardingComplete : SettingAction()
     data class SetReviewTimeAction(val hour: Int, val minute: Int, val replaceExisting: Boolean) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
+    data class SetLanguage(val language: Language) : SettingAction()
 
 }
 
@@ -55,5 +58,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
         is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
+        is SettingAction.SetLanguage -> copy(language = action.language)
     }
 }
