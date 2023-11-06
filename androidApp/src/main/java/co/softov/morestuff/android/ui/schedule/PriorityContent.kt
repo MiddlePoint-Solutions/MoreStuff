@@ -14,18 +14,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,33 +33,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
     tasks: List<TaskDomain>,
+    selectedTaskIds: List<Long>,
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
     showTaskOptions: (taskId: Long) -> Unit,
-    onCallToAction: () -> Unit,
+    toggleQuickReminder: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    viewModel: PriorityViewModel = koinViewModel(),
 ) {
-
-    val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
-
-    val selectedTaskIds by viewModel.selectedTaskIds.collectAsState()
 
     val haptic = LocalHapticFeedback.current
     var willDismissDirection: DismissDirection? by remember {
@@ -100,7 +88,7 @@ fun PriorityContent(
                             }
 
                             DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(item)
+                                toggleQuickReminder(item.id)
                                 false
                             }
                         }
@@ -113,7 +101,6 @@ fun PriorityContent(
                             willDismissDirection = dismissDirection
                         }
                 }
-
 
                 NoFlingSwipeToDismiss(
                     state = dismissState,
@@ -137,54 +124,7 @@ fun PriorityContent(
             }
         }
     }
-
-    if (showEmptyState) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 180.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            TextButton(onClick = onCallToAction) {
-                Text(
-                    stringResource(R.string.empty_priority_list_cta),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        }
-    }
 }
-
-@Composable
-fun ConfirmDeleteDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.confirm_delete)) },
-        text = {
-            Text(
-                text = stringResource(R.string.sure_delete_task),
-                textAlign = TextAlign.Start
-
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.delete))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-}
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

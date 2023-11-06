@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
@@ -73,11 +72,8 @@ class PriorityViewModel(
         recentlyCompletedTasks.addAll(taskIds.toList())
     }
 
-    fun toggleReminder(task: TaskDomain) {
-        when (task.hasReminder) { // TODO: continue with ToggleReminderScheduleAction
-            false -> dispatchAppStoreAction(ScheduleAction.CreateReminderScheduleAction(task.id))
-            true -> dispatchAppStoreAction(ScheduleAction.CancelReminderScheduleAction(task.id))
-        }
+    fun toggleQuickReminder(taskId: Long) {
+        dispatchAppStoreAction(ScheduleAction.ToggleReminderScheduleAction(taskId))
     }
 
     fun undoLastCompleted() {

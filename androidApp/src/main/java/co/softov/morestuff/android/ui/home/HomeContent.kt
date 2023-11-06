@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -25,10 +26,14 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -40,7 +45,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,7 +63,6 @@ import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityInput
-import co.softov.morestuff.android.ui.schedule.ConfirmDeleteDialog
 import co.softov.morestuff.android.ui.schedule.NotificationState
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.PriorityViewModel
@@ -151,6 +157,9 @@ fun HomeContent(
 
     val tasks by priorityViewModel.tasks.collectAsStateWithLifecycle()
     val model by priorityViewModel.model.collectAsStateWithLifecycle()
+    val selectedTaskIds by priorityViewModel.selectedTaskIds.collectAsState()
+
+    val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
 
     LaunchedEffect(model.taskSelectionEnabled) {
         itemSelectedState(model.taskSelectionEnabled)
@@ -226,8 +235,9 @@ fun HomeContent(
 
         PriorityContent(
             tasks = tasks,
+            selectedTaskIds = selectedTaskIds,
             onItemClick = { taskId ->
-                if(model.taskSelectionEnabled) {
+                if (model.taskSelectionEnabled) {
                     priorityViewModel.toggleTaskSelection(taskId)
                 } else {
                     showTaskChat(taskId)
@@ -235,7 +245,7 @@ fun HomeContent(
             },
             onItemLongClick = priorityViewModel::toggleTaskSelection,
             showTaskOptions = { taskOptions = it },
-            onCallToAction = { focusRequester.requestFocus() },
+            toggleQuickReminder = priorityViewModel::toggleQuickReminder,
             listState = priorityScrollState,
             modifier = Modifier.padding(bottom = 30.dp),
         )
@@ -269,6 +279,24 @@ fun HomeContent(
         }
     }
 
+    if (showEmptyState) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 180.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            TextButton(onClick = { showTaskInput = true }) {
+                Text(
+                    stringResource(R.string.empty_priority_list_cta),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                )
+            }
+        }
+    }
+
     if (showTaskInput) {
         BackHandler(onBack = {
             scope.launch {
@@ -283,7 +311,6 @@ fun HomeContent(
             content = {
                 BoxWithConstraints {
                     LaunchedEffect(showTaskInput) {
-                        delay(200)
                         focusRequester.requestFocus()
                     }
                     Column(
@@ -359,6 +386,34 @@ fun HomeContent(
             }
         )
     }
+}
+
+@Composable
+private fun ConfirmDeleteDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.confirm_delete)) },
+        text = {
+            Text(
+                text = stringResource(R.string.sure_delete_task),
+                textAlign = TextAlign.Start
+
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
 }
 
 

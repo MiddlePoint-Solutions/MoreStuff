@@ -66,7 +66,7 @@ import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleU
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCaseImpl
@@ -124,6 +124,8 @@ import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScor
 import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -254,6 +256,7 @@ val scheduleUseCases = module {
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
     factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
+    factoryOf(::ToggleQuickReminderUseCaseImpl) bind ToggleQuickReminderUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class

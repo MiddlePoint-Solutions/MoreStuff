@@ -22,6 +22,7 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
@@ -60,6 +61,7 @@ class ScheduleMiddleware(
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
     private val createReminderUseCase: CreateReminderUseCase,
+    private val toggleQuickReminderUseCase: ToggleQuickReminderUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
 ) : Middleware<AppState> {
@@ -154,6 +156,12 @@ class ScheduleMiddleware(
                         setScheduleFulfilledUseCase(schedule.id)
                         dispatch(CreateScheduleMessageAction(schedule.id))
                     }
+                }
+            }
+
+            is ToggleReminderScheduleAction -> scope.launch {
+                toggleQuickReminderUseCase(action.taskId).map {
+                    dispatch(ScheduleCreatedAction(it))
                 }
             }
 
