@@ -120,7 +120,7 @@ fun HomeScreen(
             HomeContent(
                 showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
                 snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(top = it.calculateTopPadding()),
+                modifier = Modifier.padding(it),
             )
         },
     )
@@ -256,12 +256,10 @@ fun HomeContent(
                 showTaskInput = true
             },
             modifier = Modifier
-                .padding(16.dp, bottom = 48.dp, end = 20.dp)
-                .size(50.dp)
+                .padding(20.dp)
                 .align(Alignment.BottomEnd),
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            shape = CircleShape
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
         }
@@ -333,9 +331,6 @@ private fun TaskInputBottomSheet(
         content = {
 
             BoxWithConstraints {
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
                 Column(
                     verticalArrangement = Arrangement.Bottom
                 ) {
