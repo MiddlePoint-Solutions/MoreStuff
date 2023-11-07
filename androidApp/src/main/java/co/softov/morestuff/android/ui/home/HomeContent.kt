@@ -321,15 +321,18 @@ private fun TaskInputBottomSheet(
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
 
-    val viewModel = koinViewModel<UserInputViewModel>()
+    val viewModel: UserInputViewModel = koinViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         content = {
-
             BoxWithConstraints {
                 Column(
                     verticalArrangement = Arrangement.Bottom

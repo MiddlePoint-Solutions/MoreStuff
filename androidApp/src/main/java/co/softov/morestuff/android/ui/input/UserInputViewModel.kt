@@ -3,47 +3,51 @@ package co.softov.morestuff.android.ui.input
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.mapToDomain
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalDateTime
 
 class UserInputViewModel(
-    getMessagesUseCase: GetMessagesUseCase,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
 ) : NoStateViewModel() {
 
-    val messages: StateFlow<List<MessageUiModel>> = getMessagesUseCase()
-        .map { messages ->
-            messages.map { message ->
-                val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
-                val formattedTime =
-                    timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?: ""
-                val formattedTimeOnly =
-                    timeFormatter.formatTimeOnly(messageDateTime.toString()) ?: ""
-                MessageUiModel(message, formattedTime, formattedTimeOnly)
-            }
+    val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
+
+    override fun onLoadData() {
+        messages.update {
+            listOf(
+                createMessage("What can I do for you today?", false)
+            )
         }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = listOf()
+    }
+
+    private fun createMessage(content: String, isUserMessage: Boolean): MessageUiModel {
+        val message = Message(
+            id = timeManager.nowUtcMillis,
+            contentType = if (isUserMessage) ContentType.USER_NEW_TASK else ContentType.APP_TASK_MESSAGE,
+            createTime = timeManager.getCreateTime(),
+            content = content,
         )
+        val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime).toString()
+        return MessageUiModel(
+            message = message,
+            formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime) ?: "",
+            formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime) ?: ""
+        )
+    }
 
     val priorityModel = MutableStateFlow(
         PriorityInputUiModel(
@@ -91,13 +95,18 @@ class UserInputViewModel(
     }
 
     suspend fun createNewTask(title: String) {
+        messages.update {
+            it.toMutableList().apply { add(0, createMessage(title, true)) }
+        }
         dispatchSuspend(
-            TaskAction.CreateUserTaskAction(
-                title.trim(),
-                priorityModel.value.mapToDomain()
-            )
+            TaskAction.CreateUserTaskAction(title.trim(), priorityModel.value.mapToDomain())
         )
         userInput = ""
+
+        delay(1000)
+        messages.update {
+            it.toMutableList().apply { add(0, createMessage("Added new task!", false)) }
+        }
     }
 
     fun setNowPriority() {
@@ -126,5 +135,4 @@ class UserInputViewModel(
             )
         }
     }
-
 }
