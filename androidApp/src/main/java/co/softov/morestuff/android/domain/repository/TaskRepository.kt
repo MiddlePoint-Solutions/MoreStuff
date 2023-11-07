@@ -19,7 +19,7 @@ interface TaskRepository {
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
     suspend fun updateTasksComplete(
-        taskId: Long,
+        taskIds: List<Long>,
         complete: Boolean,
     ): Either<Failure, Boolean>
 
@@ -35,6 +35,7 @@ interface TaskRepository {
     suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>>
     fun searchTasks(searchText: String): Flow<List<TaskDomain>>
     suspend fun countActiveTasks(): Either<Failure, Int>
+    suspend fun deleteTasks(taskIds: List<Long>): Either<Failure, Boolean>
 }
 
 object TaskDoesNotExist : FeatureFailure

@@ -13,15 +13,15 @@ import org.junit.jupiter.api.Test
 
 class GetActiveScheduleImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getActiveScheduleImpl = GetActiveScheduleUseCaseImpl(scheduleRepository)
+    private val getActiveScheduleImpl = GetTaskActiveSchedulesUseCaseImpl(scheduleRepository)
 
     @Test
     fun `returns active schedule for a task`() = runBlocking {
-        val taskId = 1L
+        val taskId = listOf(1L)
         val schedule = listOf(createScheduleForTest(scheduleType = ScheduleType.OneTime))
 
         coEvery {
-            scheduleRepository.getActiveSchedulesForTask(
+            scheduleRepository.getActiveSchedulesForTasks(
                 taskId,
                 listOf(ScheduleType.OneTime)
             )
@@ -30,6 +30,6 @@ class GetActiveScheduleImplTest {
         val result = getActiveScheduleImpl(taskId, listOf(ScheduleType.OneTime))
 
         assertEquals(schedule.right(), result)
-        coVerify { scheduleRepository.getActiveSchedulesForTask(taskId, any()) }
+        coVerify { scheduleRepository.getActiveSchedulesForTasks(taskId, any()) }
     }
 }

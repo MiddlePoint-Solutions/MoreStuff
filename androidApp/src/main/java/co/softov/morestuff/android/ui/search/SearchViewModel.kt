@@ -12,6 +12,8 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithSchedul
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.model.TaskUiModel
+import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -22,7 +24,7 @@ class SearchViewModel(
     private val searchTasksUseCase: SearchTasksUseCase,
     private val getCompletedTasksUseCase: GetCompletedTasksUseCase,
     private val getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase,
-    private val timeFormatter: TimeFormatter,
+    private val taskUiMapper: TaskUiMapper,
 ) : NoStateViewModel() {
 
     var query by mutableStateOf("")
@@ -30,7 +32,7 @@ class SearchViewModel(
     var filter by mutableStateOf(FilterType.None)
         private set
 
-    val searchResults = MutableStateFlow<List<TaskDomain>>(listOf())
+    val searchResults = MutableStateFlow<List<TaskUiModel>>(listOf())
 
     private var searchJob: Job? = null
 
@@ -72,14 +74,7 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             searchTasksUseCase(searchText)
                 .onEach { results ->
-                    val formattedTasks = results.map { task ->
-                        if (task.isComplete) {
-                            task.copy(completeTime = timeFormatter.formatTimeDayMonthHour(task.completeTime))
-                        } else {
-                            task
-                        }
-                    }
-                    searchResults.value = formattedTasks
+                    searchResults.value = taskUiMapper.map(filterByQuery(results, searchText))
                 }.launchIn(this)
         }
     }
@@ -89,12 +84,7 @@ class SearchViewModel(
         searchJob = viewModelScope.launch {
             getCompletedTasksUseCase()
                 .collect { results ->
-                    val formattedTasks = results.map { task ->
-                        task.copy(completeTime = timeFormatter.formatTimeDayMonthHour(task.completeTime))
-                    }.filter { task ->
-                        task.title.contains(searchText, ignoreCase = true)
-                    }
-                    searchResults.value = formattedTasks
+                    searchResults.value = taskUiMapper.map(filterByQuery(results, searchText))
                 }
         }
     }
@@ -102,9 +92,7 @@ class SearchViewModel(
     private fun loadActiveTasksWithOneTimeSchedule(searchText: String) {
         searchJob = viewModelScope.launch {
             getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map {
-                searchResults.value = it.filter { task ->
-                    task.title.contains(searchText, ignoreCase = true)
-                }
+                searchResults.value = taskUiMapper.map(filterByQuery(it, searchText))
             }
         }
     }
@@ -112,11 +100,16 @@ class SearchViewModel(
     private fun loadTasksWithReminderSchedule(searchText: String) {
         searchJob = viewModelScope.launch {
             getActiveTasksWithScheduleUseCase(listOf(ScheduleType.Reminder)).map {
-                searchResults.value = it.filter { task ->
-                    task.title.contains(searchText, ignoreCase = true)
-                }
+                searchResults.value = taskUiMapper.map(filterByQuery(it, searchText))
             }
         }
+    }
+
+    private fun filterByQuery(
+        it: List<TaskDomain>,
+        searchText: String
+    ) = it.filter { task ->
+        task.title.contains(searchText, ignoreCase = true)
     }
 
 }

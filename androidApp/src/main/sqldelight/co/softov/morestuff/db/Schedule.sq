@@ -36,7 +36,7 @@ WHERE task_id = ?;
 selectActiveScheduleByTaskId:
 SELECT *
 FROM schedule
-WHERE task_id = :task_id
+WHERE task_id IN :task_ids
 AND active = 1
 AND schedule_type IN :schedule_types
 ORDER BY id DESC;

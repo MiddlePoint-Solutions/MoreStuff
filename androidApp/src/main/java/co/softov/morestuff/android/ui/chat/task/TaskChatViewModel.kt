@@ -22,10 +22,9 @@ import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.home.ScheduleUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -44,7 +43,6 @@ class TaskChatViewModel(
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
-    getActiveScheduleFlow: GetActiveScheduleFlowUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     getTaskFlow: GetTaskFlowUseCase,
     devTools: DevTools,
@@ -76,8 +74,10 @@ class TaskChatViewModel(
 
             val formattedMessages = messages.map { message ->
                 val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
-                val formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?:""
-                val formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime.toString()) ?:""
+                val formattedTime =
+                    timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?: ""
+                val formattedTimeOnly =
+                    timeFormatter.formatTimeOnly(messageDateTime.toString()) ?: ""
                 MessageUiModel(message, formattedTime, formattedTimeOnly)
             }
 
@@ -105,7 +105,7 @@ class TaskChatViewModel(
     }
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
-        store.dispatch(UserResponseAction(scheduleId, replyType))
+        dispatchAppStoreAction(UserResponseAction(scheduleId, replyType))
     }
 
     fun updateTaskTitle(title: String) {
@@ -116,15 +116,20 @@ class TaskChatViewModel(
     }
 
     fun toggleTaskComplete() {
-        store.dispatch(TaskAction.CompleteTaskAction(taskId = taskId, !task.value.isComplete))
+        dispatchAppStoreAction(
+            TaskAction.CompleteTasksAction(
+                taskIds = listOf(taskId),
+                !task.value.isComplete
+            )
+        )
     }
 
     fun sendTaskChatMessage(content: String) {
-        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
+        dispatchAppStoreAction(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
     fun sendImageMessageForTask(uris: String, message: String) {
-        store.dispatch(MessageAction.CreateImageMessageAction(taskId, uris, message))
+        dispatchAppStoreAction(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 
     fun createOneTimeSchedule() {
@@ -155,7 +160,7 @@ class TaskChatViewModel(
     }
 
     fun cancelActiveSchedule() {
-        store.dispatch(ScheduleAction.CancelActiveScheduleAction(taskId))
+        dispatchAppStoreAction(ScheduleAction.CancelActiveScheduleAction(taskId))
     }
 
     fun copyToClipboard(text: String) {

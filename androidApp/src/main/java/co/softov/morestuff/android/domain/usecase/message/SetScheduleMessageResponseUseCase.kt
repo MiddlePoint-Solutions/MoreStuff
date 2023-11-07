@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 
 interface SetScheduleMessageResponseUseCase {
     suspend operator fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         title: String,
         replyType: ReplyType
     ): Either<Failure, Boolean>
@@ -18,11 +18,13 @@ class SetScheduleMessageResponseUseCaseImpl(
 ) : SetScheduleMessageResponseUseCase {
 
     override suspend fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         title: String,
         replyType: ReplyType
     ): Either<Failure, Boolean> {
-        messageRepository.addUserReplyMessage(taskId, replyType.value, title)
+        taskIds.forEach {
+            messageRepository.addUserReplyMessage(it, replyType.value, title)
+        }
         return Either.Right(true)
     }
 }

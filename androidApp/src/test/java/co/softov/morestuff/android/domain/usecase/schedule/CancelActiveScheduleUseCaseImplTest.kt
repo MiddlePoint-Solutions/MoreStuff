@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class CancelActiveScheduleUseCaseImplTest {
     private val scheduler = mockk<Scheduler>()
-    private val getActiveSchedule = mockk<GetActiveScheduleUseCase>(relaxed = true)
+    private val getActiveSchedule = mockk<GetTaskActiveSchedulesUseCase>(relaxed = true)
     private val setScheduleFulfilled = mockk<SetScheduleFulfilledUseCase>(relaxed = true)
     private val cancelActiveScheduleUseCaseImpl = CancelActiveScheduleUseCaseImpl(
         scheduler,
@@ -21,7 +21,7 @@ class CancelActiveScheduleUseCaseImplTest {
 
     @Test
     fun `cancels schedule`() = runBlocking {
-        val taskId = 1L
+        val taskId = listOf(1L)
         val scheduleId = 2L
         val schedules = listOf(createScheduleForTest(scheduleId, scheduleType = ScheduleType.OneTime))
 

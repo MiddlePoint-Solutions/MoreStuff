@@ -66,16 +66,14 @@ import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleU
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleForTaskUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
@@ -110,6 +108,8 @@ import co.softov.morestuff.android.domain.usecase.task.CreateNewTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.DecrementTaskPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
@@ -124,6 +124,8 @@ import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScor
 import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -229,6 +231,7 @@ val taskUseCases = module {
     factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
     factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
+    factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
@@ -249,10 +252,11 @@ val taskUseCases = module {
 
 
 val scheduleUseCases = module {
-    factoryOf(::GetActiveScheduleUseCaseImpl) bind GetActiveScheduleUseCase::class
+    factoryOf(::GetTaskActiveSchedulesUseCaseImpl) bind GetTaskActiveSchedulesUseCase::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
     factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
+    factoryOf(::ToggleQuickReminderUseCaseImpl) bind ToggleQuickReminderUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
@@ -263,7 +267,6 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
-    factoryOf(::GetActiveScheduleForTaskUseCaseImpl) bind GetActiveScheduleForTaskUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
 }
 

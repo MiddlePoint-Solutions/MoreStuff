@@ -15,6 +15,7 @@ import co.softov.morestuff.android.domain.repository.ScheduleRepository
 import co.softov.morestuff.db.StuffDb
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import arrow.core.left
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -75,19 +76,21 @@ class ScheduleRepositoryImpl(
         .asFlow()
         .mapToList(Dispatchers.IO)
 
-    override suspend fun getActiveSchedulesForTask(
-        taskId: Long,
+    override suspend fun getActiveSchedulesForTasks(
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
-    ): Either<Failure, List<ScheduleDomain>> = getActiveSchedulesForTaskFlow(taskId, scheduleType)
-        .firstOrNull()
-        .rightIfNotNull { ScheduleDoesNotExist }
+    ): Either<Failure, List<ScheduleDomain>> = scheduleQueries.selectActiveScheduleByTaskId(
+        taskIds,
+        scheduleType,
+        mapper = mapper.scheduleDbMapper
+    ).executeAsList().right()
 
     override fun getActiveSchedulesForTaskFlow(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>> =
         scheduleQueries.selectActiveScheduleByTaskId(
-            taskId,
+            taskIds,
             scheduleType,
             mapper = mapper.scheduleDbMapper
         )
