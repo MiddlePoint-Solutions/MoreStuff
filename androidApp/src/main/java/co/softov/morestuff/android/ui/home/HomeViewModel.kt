@@ -28,19 +28,19 @@ class HomeViewModel(
     taskMapper: TaskUiMapper
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
-    private val _tasks = getActiveTasksFlowUseCase()
-        .mapLatest { taskMapper.map(it, state.selectedTaskIds) }
-        .onEach { tasks.value = it }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = listOf()
-        )
-
     val tasks = MutableStateFlow<List<TaskUiModel>>(listOf())
 
     init {
         loadData()
+
+        getActiveTasksFlowUseCase()
+            .mapLatest { taskMapper.map(it, state.selectedTaskIds) }
+            .onEach { tasks.value = it }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = listOf()
+            )
     }
 
     override fun onAppStateChange(state: AppState) {
@@ -49,10 +49,13 @@ class HomeViewModel(
 
     override fun onReduceState(event: HomeUiEvent): HomeUiModel {
         return when (event) {
-            ClearTaskSelection -> state.copy(
-                taskSelectionActive = false,
-                selectedTaskIds = listOf()
-            )
+            ClearTaskSelection -> {
+                tasks.update { it.map { task -> task.copy(isSelected = false) } }
+                state.copy(
+                    taskSelectionActive = false,
+                    selectedTaskIds = listOf()
+                )
+            }
 
             UndoComplete -> with(state) {
                 dispatchAppStoreAction(
