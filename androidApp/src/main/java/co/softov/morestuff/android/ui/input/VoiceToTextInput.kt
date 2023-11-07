@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.features.VoiceToTextParserState
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
@@ -64,6 +65,7 @@ fun VoiceToTextInput(
 
     val recordingState by voiceToText.state.collectAsState()
     val selectedLanguageCode = viewModel.model.collectAsState().value.inputVoiceLanguage.code
+    val selectedLanguageTitle =viewModel.model.collectAsState().value.inputVoiceLanguage.name //settingsModel.inputVoiceLanguage.name
 
     LaunchedEffect(recordingState.spokenText) {
         onUpdateValue(recordingState.spokenText)
@@ -75,6 +77,7 @@ fun VoiceToTextInput(
         recordingState = recordingState,
         startListening = { voiceToText.startListening(selectedLanguageCode) },
         stopListening = voiceToText::stopListening,
+        selectedLanguage = selectedLanguageTitle
     )
 }
 
@@ -84,6 +87,7 @@ private fun VoiceToTextInputContent(
     recordingState: VoiceToTextParserState,
     startListening: () -> Unit,
     stopListening: () -> Unit,
+    selectedLanguage: String
 ) {
 
     var canRecord by remember { mutableStateOf(false) }
@@ -176,6 +180,11 @@ private fun VoiceToTextInputContent(
                         text = stringResource(R.string.voice_to_text_listening),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
+                    )
+                    Text(
+                        text = selectedLanguage,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }

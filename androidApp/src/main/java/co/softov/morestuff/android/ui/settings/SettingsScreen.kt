@@ -123,8 +123,8 @@ private fun SettingsContent(
                     defaultValue = model.reviewTime,
                 )
                 SelectLanguage(
-                    languageSelected =actions.inputVoiceLanguage,
-                    defaultValue = {model.inputVoiceLanguage.ordinal}
+                    languageSelected = actions.inputVoiceLanguage,
+                    defaultValue = { model.inputVoiceLanguage.ordinal }
                 )
 
                 if (model.devSettings) {
@@ -449,7 +449,11 @@ fun ReviewTimeSelector(
             Column {
                 Text(text = "Set Review Time")
                 selectedTimeState.value.let {
-                    Text(text = "${it.first}:${String.format("%02d", it.second)}")
+                    Text(
+                        text = "${it.first}:${String.format("%02d", it.second)}",
+                        fontSize = 12.sp
+
+                    )
                 }
             }
         },
@@ -474,18 +478,22 @@ fun SelectLanguage(
     }
 
 
-
     val state = rememberAppSettingState(
         defaultValue = defaultValue,
         valueChanged = languageSelected,
     )
+    val selectedLanguage = languageOptions[state.value]
 
     SettingsList(
         state = state,
         title = {
-            Text(
-                text = stringResource(R.string.select_language),
-            )
+            Column {
+                Text(text = "Select Language")
+                Text(
+                    text = selectedLanguage,
+                    fontSize = 12.sp
+                )
+            }
         },
         items = languageOptions,
         icon = {
@@ -506,7 +514,6 @@ private fun Language.displayTitle(res: Resources): String = when (this) {
     Language.RUSSIAN -> res.getString(R.string.language_russian)
     Language.CATALAN -> res.getString(R.string.language_catalan)
 }
-
 
 
 @Preview(
