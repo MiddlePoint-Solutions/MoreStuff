@@ -18,11 +18,11 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction.Schedu
 import co.softov.morestuff.android.domain.redux.state.SettingAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
-import co.softov.morestuff.android.domain.redux.store.OnResumeAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
@@ -41,7 +41,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
     ) : ScheduleAction()
 
     data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
-
+    data class ToggleReminderScheduleAction(val taskId: Long) : ScheduleAction()
     data class CreateReminderScheduleAction(val taskId: Long) : ScheduleAction()
     data class CancelReminderScheduleAction(val taskId: Long) : ScheduleAction()
 
@@ -61,6 +61,7 @@ class ScheduleMiddleware(
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
     private val createReminderUseCase: CreateReminderUseCase,
+    private val toggleQuickReminderUseCase: ToggleQuickReminderUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
 ) : Middleware<AppState> {
@@ -88,9 +89,9 @@ class ScheduleMiddleware(
                 }
             }
 
-            is TaskAction.CompleteTaskAction -> scope.launch {
+            is TaskAction.CompleteTasksAction -> scope.launch {
                 if (action.complete) {
-                    cancelActiveScheduleUseCase(action.taskId)
+                    cancelActiveScheduleUseCase(action.taskIds)
                 }
             }
 
@@ -103,9 +104,10 @@ class ScheduleMiddleware(
             }
 
             is CancelActiveScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.OneTime))
+                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.OneTime))
             }
 
+            // TODO: create use-case for this action
             is ScheduleReplyAction -> with(action) {
                 when (replyType) {
                     LATER -> {}
@@ -132,7 +134,11 @@ class ScheduleMiddleware(
                         )
                     }
 
-                    DONE -> dispatch(TaskAction.CompleteTaskAction(schedule.taskId, true))
+                    DONE -> {
+                        dispatch(
+                            TaskAction.CompleteTasksAction(listOf(schedule.taskId), true)
+                        )
+                    }
                 }
             }
 
@@ -153,6 +159,12 @@ class ScheduleMiddleware(
                 }
             }
 
+            is ToggleReminderScheduleAction -> scope.launch {
+                toggleQuickReminderUseCase(action.taskId).map {
+                    dispatch(ScheduleCreatedAction(it))
+                }
+            }
+
             is CreateReminderScheduleAction -> scope.launch {
                 createReminderUseCase(action.taskId).map {
                     dispatch(ScheduleCreatedAction(it))
@@ -160,7 +172,7 @@ class ScheduleMiddleware(
             }
 
             is CancelReminderScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskId, listOf(ScheduleType.Reminder))
+                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.Reminder))
             }
 
             else -> NoOp

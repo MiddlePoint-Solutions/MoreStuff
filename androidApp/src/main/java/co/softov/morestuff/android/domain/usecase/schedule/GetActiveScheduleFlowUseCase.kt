@@ -19,6 +19,6 @@ class GetActiveScheduleFlowUseCaseImpl(
         taskId: Long,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>> {
-        return scheduleRepository.getActiveSchedulesForTaskFlow(taskId, scheduleType)
+        return scheduleRepository.getActiveSchedulesForTaskFlow(listOf(taskId), scheduleType)
     }
 }

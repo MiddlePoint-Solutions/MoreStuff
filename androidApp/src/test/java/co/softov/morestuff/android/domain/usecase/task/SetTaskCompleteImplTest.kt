@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 class SetTaskCompleteImplTest {
     @Test
     fun `invoke should return true when task is set as completed`() {
-        val taskId = 1L
+        val taskId = listOf(1L)
         val taskRepository: TaskRepository = mockk()
         val setTaskCompleteUseCase = SetTaskCompleteImpl(taskRepository)
 

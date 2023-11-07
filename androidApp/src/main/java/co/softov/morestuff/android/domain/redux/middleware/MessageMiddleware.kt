@@ -97,12 +97,12 @@ class MessageMiddleware(
             is ScheduleAction.ScheduleReplyAction -> scope.launch {
                 with(action) {
                     val title = replyType.displayTitle
-                    setScheduleResponseMessage(schedule.taskId, title, replyType)
+                    setScheduleResponseMessage(listOf(schedule.taskId), title, replyType)
                 }
             }
 
-            is TaskAction.CompleteTaskAction -> scope.launch {
-                setScheduleResponseMessage(action.taskId, "Done", ReplyType.DONE)
+            is TaskAction.CompleteTasksAction -> scope.launch {
+                setScheduleResponseMessage(action.taskIds, "Done", ReplyType.DONE)
             }
 
 

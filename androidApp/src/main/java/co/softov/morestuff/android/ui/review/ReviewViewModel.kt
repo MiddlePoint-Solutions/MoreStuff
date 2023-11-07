@@ -91,7 +91,7 @@ class ReviewViewModel(
         }?.let {
             when (it.second) {
                 PriorityActionType.Done -> dispatchAppStoreAction(
-                    TaskAction.CompleteTaskAction(item.id, false)
+                    TaskAction.CompleteTasksAction(listOf(item.id), false)
                 )
 
                 else -> dispatchAppStoreAction(
@@ -128,10 +128,10 @@ class ReviewViewModel(
 
     fun completeTask(item: ReviewItemUiModel) {
         sendEvent(ItemReview(item, PriorityActionType.Done))
-        dispatchAppStoreAction(TaskAction.CompleteTaskAction(item.id, true))
+        dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(item.id), true))
     }
 
-     fun toggleHintArrowPriority() {
+    fun toggleHintArrowPriority() {
         dispatchAppStoreAction(SettingAction.EnableReviewHint(enable = !reviewHintEnabled))
     }
 

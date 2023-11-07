@@ -8,22 +8,22 @@ import co.softov.morestuff.android.domain.service.Scheduler
 
 interface CancelActiveScheduleUseCase {
     suspend operator fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType> = listOf()
     ): Either<Failure, List<ScheduleDomain>>
 }
 
 class CancelActiveScheduleUseCaseImpl(
     private val scheduler: Scheduler,
-    private val getActiveSchedule: GetActiveScheduleUseCase,
+    private val getActiveSchedule: GetTaskActiveSchedulesUseCase,
     private val setScheduleFulfilled: SetScheduleFulfilledUseCase
 ) : CancelActiveScheduleUseCase {
 
     override suspend fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
     ): Either<Failure, List<ScheduleDomain>> {
-        return getActiveSchedule(taskId, scheduleType).tap { schedules ->
+        return getActiveSchedule(taskIds, scheduleType).onRight { schedules ->
             schedules.forEach {
                 setScheduleFulfilled(it.id)
                 scheduler.cancelSchedule(it.id)

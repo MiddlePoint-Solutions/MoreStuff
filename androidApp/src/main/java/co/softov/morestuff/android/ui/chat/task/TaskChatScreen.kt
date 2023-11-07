@@ -54,7 +54,7 @@ import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
-import co.softov.morestuff.android.ui.home.ScheduleUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.LocalBoxWeight

@@ -11,6 +11,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -24,11 +25,13 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority,
     ) : TaskAction()
 
-    data class CompleteTaskAction(val taskId: Long, val complete: Boolean) : TaskAction()
+    data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
 
     data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
 
     data object CreateHintTask : TaskAction()
+
+    data class DeleteTasksAction(val taskIds: List<Long>) : TaskAction()
 
     internal data class TaskCreatedAction(
         val task: TaskDomain,
@@ -42,7 +45,8 @@ class TaskMiddleware(
     private val createTaskUseCase: CreateTaskUseCase,
     private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
-    private val createHintTaskUseCase: CreateHintTaskUseCase
+    private val createHintTaskUseCase: CreateHintTaskUseCase,
+    private val deleteTasksUseCase: DeleteTasksUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -61,9 +65,9 @@ class TaskMiddleware(
                 }
             }
 
-            is CompleteTaskAction -> scope.launch {
-                with(action) {
-                    setTaskCompleteUseCase(taskId, complete)
+            is CompleteTasksAction -> with(action) {
+                scope.launch {
+                    setTaskCompleteUseCase(taskIds, complete)
                 }
             }
 
@@ -73,6 +77,10 @@ class TaskMiddleware(
 
             is CreateHintTask -> scope.launch {
                 createHintTaskUseCase()
+            }
+
+            is DeleteTasksAction -> scope.launch {
+                deleteTasksUseCase(action.taskIds)
             }
 
             else -> NoOp

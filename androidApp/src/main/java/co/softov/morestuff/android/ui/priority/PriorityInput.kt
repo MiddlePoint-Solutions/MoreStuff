@@ -17,12 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import co.softov.morestuff.android.ui.home.PriorityInputModel
-import co.softov.morestuff.android.ui.home.PriorityModel
+import co.softov.morestuff.android.ui.model.PriorityInputUiModel
+import co.softov.morestuff.android.ui.model.PriorityUiModel
 
 @Composable
 fun PriorityInput(
-    model: PriorityInputModel,
+    model: PriorityInputUiModel,
     onNowSelected: () -> Unit,
     onLaterSelected: () -> Unit,
     onPlanSelected: () -> Unit,
@@ -43,7 +43,7 @@ fun PriorityInput(
 
 @Composable
 private fun PriorityInputContent(
-    model: PriorityInputModel,
+    model: PriorityInputUiModel,
     modifier: Modifier = Modifier,
     onNowSelected: () -> Unit = {},
     onLaterSelected: () -> Unit = {},
@@ -54,7 +54,7 @@ private fun PriorityInputContent(
     Column {
 
         val showPlanInput by remember(model.priority) {
-            derivedStateOf { model.priority is PriorityModel.Plan }
+            derivedStateOf { model.priority is PriorityUiModel.Plan }
         }
 
         AnimatedVisibility(

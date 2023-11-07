@@ -134,6 +134,10 @@
     <string name="cd_reminder_icon">Reminder Icon</string>
     <string name="task_chat_reminder_action">Reminder</string>
     <string name="cd_show_task_chat">Show task chat</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
+
+
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>

@@ -46,7 +46,7 @@ open class SimpleStore<State>(
     private val actions = Channel<Action>()
 
     override val coroutineContext: CoroutineContext
-        get() = SupervisorJob() + Dispatchers.IO
+        get() = SupervisorJob() + Dispatchers.Default
 
     init {
         launch {
@@ -60,12 +60,12 @@ open class SimpleStore<State>(
     }
 
     final override fun dispatch(action: Action) {
-        launch(Dispatchers.Main) {
+        launch(Dispatchers.Main.immediate) {
             actions.send(action)
         }
     }
 
-    override suspend fun dispatchSuspend(action: Action) = withContext(Dispatchers.Main) {
+    override suspend fun dispatchSuspend(action: Action) = withContext(Dispatchers.Main.immediate) {
         actions.send(action)
     }
 

@@ -30,10 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.enums.ScheduleType
-import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.ui.schedule.PriorityItem
+import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.schedule.TaskItemBadges
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -41,7 +38,7 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 
 @Composable
 fun CompletePriorityItem(
-    task: TaskDomain,
+    task: TaskUiModel,
     onClick: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     isDragging: Boolean = false,
@@ -81,18 +78,16 @@ fun CompletePriorityItem(
                         color = Color(0xFFFFFFFF),
                     )
                 )
-                task.completeTime?.let { completeTime ->
-                    if (task.isComplete) {
-                        Text(
-                            text = stringResource(R.string.completed) + " $completeTime",
-                            textAlign = TextAlign.Start,
-                            modifier = Modifier.align(Alignment.Start),
-                            style = TextStyle(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 12.sp,
-                            )
+                if (task.isComplete) {
+                    Text(
+                        text = stringResource(R.string.completed) + " ${task.completeTime}",
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.align(Alignment.Start),
+                        style = TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.sp,
                         )
-                    }
+                    )
                 }
             }
             Icon(
@@ -124,13 +119,18 @@ fun CompletePriorityItem(
 fun CompletePriorityItem() {
     MoreStuffTheme {
         CompletePriorityItem(
-            task = TaskDomain(
+            task = TaskUiModel(
+                id = 0,
                 title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                schedule = buildList {
-                    add(ScheduleDomain(scheduleType = ScheduleType.OneTime))
-                    add(ScheduleDomain(scheduleType = ScheduleType.Reminder))
-                },
-                completeTime = ""
+                createTime = "",
+                completeTime = "",
+                isComplete = true,
+                priorityScore = 100,
+                position = 1,
+                extraDetails = true,
+                hasSchedule = true,
+                hasReminder = true,
+                isSelected = true
             ),
             onClick = {}
         )

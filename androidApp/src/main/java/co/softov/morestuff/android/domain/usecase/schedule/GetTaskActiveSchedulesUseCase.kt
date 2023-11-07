@@ -7,21 +7,21 @@ import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
 
-interface GetActiveScheduleUseCase {
+interface GetTaskActiveSchedulesUseCase {
     suspend operator fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType> = ScheduleType.entries
     ): Either<Failure, List<ScheduleDomain>>
 }
 
-class GetActiveScheduleUseCaseImpl(
+class GetTaskActiveSchedulesUseCaseImpl(
     private val scheduleRepository: ScheduleRepository
-) : GetActiveScheduleUseCase {
+) : GetTaskActiveSchedulesUseCase {
     override suspend fun invoke(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
     ): Either<Failure, List<ScheduleDomain>> {
-        return scheduleRepository.getActiveSchedulesForTask(taskId, scheduleType)
+        return scheduleRepository.getActiveSchedulesForTasks(taskIds, scheduleType)
     }
 } 
 

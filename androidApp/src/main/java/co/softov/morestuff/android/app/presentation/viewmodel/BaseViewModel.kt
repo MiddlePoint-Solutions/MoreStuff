@@ -61,6 +61,10 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
         store.dispatch(action)
     }
 
+    protected suspend fun dispatchSuspend(action: Action) {
+        store.dispatchSuspend(action)
+    }
+
     protected open fun onLoadData() {}
 
     protected open fun onLoadData(appState: AppState) {}

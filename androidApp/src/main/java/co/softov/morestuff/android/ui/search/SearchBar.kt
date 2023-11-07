@@ -181,9 +181,10 @@ fun SearchBar(
 
                                         else -> PriorityItem(
                                             task = task,
-                                            onClick = { taskId ->
-                                                showTaskChat(taskId)
-                                            }
+                                            onClick = {
+                                                showTaskChat(task.id)
+                                            },
+                                            onLongClick = {},
                                         )
                                     }
                                 }

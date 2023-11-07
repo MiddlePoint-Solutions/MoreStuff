@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.home.ScheduleUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker

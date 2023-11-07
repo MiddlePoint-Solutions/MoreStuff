@@ -31,13 +31,13 @@ interface ScheduleRepository {
 
     suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long>
 
-    suspend fun getActiveSchedulesForTask(
-        taskId: Long,
+    suspend fun getActiveSchedulesForTasks(
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
     ): Either<Failure, List<ScheduleDomain>>
 
     fun getActiveSchedulesForTaskFlow(
-        taskId: Long,
+        taskIds: List<Long>,
         scheduleType: List<ScheduleType>
     ): Flow<List<ScheduleDomain>>
 

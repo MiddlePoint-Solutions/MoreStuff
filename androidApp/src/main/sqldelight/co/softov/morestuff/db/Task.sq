@@ -53,8 +53,8 @@ VALUES ?;
 
 updateTaskComplete:
 UPDATE task
-SET complete_time = ?
-WHERE id = ?;
+SET complete_time = :completed_time
+WHERE id IN :task_ids;
 
 updateTaskTitle:
 UPDATE task
@@ -107,4 +107,8 @@ ORDER BY create_time DESC;
 countActiveTasks:
 SELECT COUNT(*) FROM task
 WHERE task.complete_time IS NULL;
+
+deleteTask:
+DELETE FROM task
+WHERE id IN :task_ids;
 

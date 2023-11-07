@@ -4,12 +4,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -22,131 +20,40 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
-import co.softov.morestuff.android.ui.utils.explode
-import kotlinx.coroutines.launch
-import nl.dionsegijn.konfetti.compose.KonfettiView
-import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
-import nl.dionsegijn.konfetti.core.PartySystem
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
-import org.koin.androidx.compose.koinViewModel
+import co.softov.morestuff.android.ui.model.TaskUiModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PriorityContent(
-    snackBarHostState: SnackbarHostState,
-    showTaskChat: (taskId: Long) -> Unit,
-    onCallToAction: () -> Unit,
+    tasks: List<TaskUiModel>,
+    onItemClick: (taskId: Long) -> Unit,
+    onItemLongClick: (taskId: Long) -> Unit,
+    showTaskOptions: (taskId: Long) -> Unit,
+    toggleQuickReminder: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    viewModel: PriorityViewModel = koinViewModel(),
 ) {
 
-    val scope = rememberCoroutineScope()
-    val model by viewModel.model.collectAsState()
-
-    var taskOptions by remember { mutableStateOf<TaskDomain?>(null) }
-    var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-    val showEmptyState by remember { derivedStateOf { viewModel.tasks.isEmpty() } }
-
-    val state = rememberReorderableLazyListState(
-        listState = listState,
-        onMove = { from, to ->
-            viewModel.updateTaskOrder(from.index, to.index)
-        },
-        onDragEnd = { start, end ->
-            viewModel.reorderTaskItem(start, end)
-        }
-    )
-
-    val resources = LocalContext.current.resources
-    LaunchedEffect(viewModel.notification) {
-        when (viewModel.notification) {
-            NotificationState.Complete -> {
-                snackBarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_completed),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
-                    }
-                }
-            }
-
-            else -> {}
-        }
-    }
-
-    taskOptions?.let { task ->
-        val sheetState = rememberModalBottomSheetState()
-        val dismissDialog = { taskOptions = null }
-        TaskOptionsDialog(
-            sheetState = sheetState,
-            task = task,
-            dismissDialog = dismissDialog,
-            completeTask = {
-                showTaskCompleteAnimation = task.id
-                scope.launch {
-                    viewModel.completeTask(task)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToTop = {
-                scope.launch {
-                    viewModel.moveToTop(task)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToBottom = {
-                scope.launch {
-                    viewModel.moveToBottom(task)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            }
-        )
-    }
-
     val haptic = LocalHapticFeedback.current
-
     var willDismissDirection: DismissDirection? by remember {
         mutableStateOf(null)
     }
@@ -157,25 +64,17 @@ fun PriorityContent(
         }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
-            state = state.listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .reorderable(state),
+            modifier = Modifier.fillMaxSize(),
+            state = listState,
         ) {
-
             itemsIndexed(
-                items = viewModel.tasks,
-                key = { _, task  -> task.id }
+                items = tasks,
+                key = { _, task -> task.id }
             ) { index, item ->
-                val task by rememberUpdatedState(item)
-                val itemClick by rememberUpdatedState(showTaskChat)
-
                 val isLast by remember(index) {
-                    derivedStateOf { index == viewModel.tasks.lastIndex }
+                    derivedStateOf { index == tasks.lastIndex }
                 }
 
                 val dismissState = rememberNoFlingDismissState(
@@ -184,12 +83,12 @@ fun PriorityContent(
                         when (dismissValue) {
                             DismissValue.Default -> false
                             DismissValue.DismissedToEnd -> {
-                                taskOptions = task
+                                showTaskOptions(item.id)
                                 false
                             }
 
                             DismissValue.DismissedToStart -> {
-                                viewModel.toggleReminder(task)
+                                toggleQuickReminder(item.id)
                                 false
                             }
                         }
@@ -203,59 +102,22 @@ fun PriorityContent(
                         }
                 }
 
-                ReorderableItem(state, key = task.id) { isDragging ->
-                    NoFlingSwipeToDismiss(
-                        state = dismissState,
-                        background = { SwipeBackground(dismissState, task.hasReminder) },
-                        dismissContent = {
-                            PriorityItem(
-                                task = task,
-                                onClick = itemClick,
-                                if (!task.hasSchedule) Modifier.detectReorderAfterLongPress(state) else Modifier,
-                                isDragging = isDragging
-                            )
-                        }
-                    )
-
-                    if(!isLast) {
-                        Divider(
-                            modifier = Modifier.align(Alignment.BottomCenter),
-                            thickness = Dp.Hairline
+                NoFlingSwipeToDismiss(
+                    state = dismissState,
+                    background = { SwipeBackground(dismissState, item.hasReminder) },
+                    dismissContent = {
+                        PriorityItem(
+                            task = item,
+                            onClick = { onItemClick(item.id) },
+                            onLongClick = { onItemLongClick(item.id) }
                         )
                     }
+                )
 
-                }
-
-            }
-        }
-
-        if (showTaskCompleteAnimation > 0 && model.enableConfetti) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = explode(),
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                        if (activeSystems == 0) showTaskCompleteAnimation = 0
-                    }
-                }
-            )
-        }
-
-        if (showEmptyState) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 180.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                TextButton(
-                    onClick = onCallToAction,
-                ) {
-                    Text(
-                        stringResource(R.string.empty_priority_list_cta),
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                if (!isLast) {
+                    Divider(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        thickness = Dp.Hairline
                     )
                 }
             }

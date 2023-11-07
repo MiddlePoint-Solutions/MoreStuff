@@ -26,31 +26,19 @@ import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.ui.model.TaskUiModel
 
 @Composable
 fun TaskItemBadges(
-    task: TaskDomain,
+    task: TaskUiModel,
     modifier: Modifier = Modifier
 ) {
-
-    val extraDetails by remember(task.extraDetails) {
-        derivedStateOf { task.extraDetails }
-    }
-
-    val hasSchedule by remember(task.schedule) {
-        derivedStateOf { task.hasSchedule }
-    }
-
-    val hasReminder by remember(task.schedule) {
-        derivedStateOf { task.hasReminder }
-    }
-
     Row(
         modifier = modifier.padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (extraDetails) {
+        if (task.extraDetails) {
             Icon(
                 imageVector = Icons.Default.Notes,
                 contentDescription = stringResource(R.string.cd_task_message_icon),
@@ -59,7 +47,7 @@ fun TaskItemBadges(
             )
         }
 
-        if (hasSchedule) {
+        if (task.hasSchedule) {
             Icon(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
                 contentDescription = stringResource(R.string.cd_scheduled_task_icon),
@@ -68,7 +56,7 @@ fun TaskItemBadges(
             )
         }
 
-        if (hasReminder) {
+        if (task.hasReminder) {
             Icon(
                 imageVector = Icons.Default.NotificationsActive,
                 contentDescription = stringResource(R.string.cd_task_reminder_icon),
