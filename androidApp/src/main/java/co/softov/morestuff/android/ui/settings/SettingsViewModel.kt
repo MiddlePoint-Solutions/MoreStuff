@@ -20,7 +20,8 @@ class SettingsViewModel(
                 appTheme = appTheme,
                 snoozeLimit = snoozeLimit,
                 devSettings = devSettings,
-                reviewTime = reviewTime
+                reviewTime = reviewTime,
+                inputVoiceLanguage = language
             )
         }
     )
@@ -37,7 +38,8 @@ class SettingsViewModel(
                     snoozeLimit = snoozeLimit,
                     confettiEnabled = enableConfetti,
                     devSettings = BuildConfig.DEBUG || devSettings,
-                    reviewTime = reviewTime
+                    reviewTime = reviewTime,
+                    inputVoiceLanguage = language
                 )
             }
         }

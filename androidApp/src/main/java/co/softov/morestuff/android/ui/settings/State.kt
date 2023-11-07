@@ -12,7 +12,7 @@ data class SettingsModel(
     val confettiEnabled: Boolean = true,
     val devSettings: Boolean = false,
     val reviewTime: Pair<Int, Int> = Pair(9,0),
-    val inputVoiceLanguage: Language = Language.DEVICE
+    val inputVoiceLanguage: Language = Language.ENGLISH
 
 ) : BaseViewState
 

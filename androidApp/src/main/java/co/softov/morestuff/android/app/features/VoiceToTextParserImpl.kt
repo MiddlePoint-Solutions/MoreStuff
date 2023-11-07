@@ -35,8 +35,7 @@ class VoiceToTextParserImpl(
                 )
             }
         }
-        val chosenLanguage = languageCode.takeIf { it != "device language" } ?: Locale.getDefault().language
-        val chosenAdditionalLanguage = _additionalLanguage.value
+        val chosenLanguage = languageCode.ifBlank { _additionalLanguage.value ?: Locale.getDefault().language }
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
@@ -44,10 +43,6 @@ class VoiceToTextParserImpl(
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosenLanguage)
-            chosenAdditionalLanguage?.let {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, it)
-            }
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
             putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
         }
