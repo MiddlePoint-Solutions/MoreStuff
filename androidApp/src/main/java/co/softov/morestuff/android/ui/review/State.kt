@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.presentation.presenter
+package co.softov.morestuff.android.ui.review
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
