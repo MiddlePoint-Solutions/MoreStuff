@@ -221,7 +221,8 @@ fun UserChatItem(
                 deleteMessage = actions.deleteMessage,
                 close = { showMenu = false },
                 modifier = Modifier.padding(top = 20.dp),
-                shareImage = actions.shareImage
+                shareImage = actions.shareImage,
+                shareMessage = actions.shareMessage
             )
         }
     }
@@ -231,7 +232,7 @@ fun UserChatItem(
 fun MessageTime(
     formattedTimeOnly: String?,
     modifier: Modifier = Modifier,
-    textColor: Color = MaterialTheme.colorScheme.onPrimary
+    textColor: Color = MaterialTheme.colorScheme.onPrimary,
 ) {
     formattedTimeOnly?.let {
         Text(

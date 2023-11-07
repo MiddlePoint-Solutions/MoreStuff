@@ -5,6 +5,7 @@ import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.HintTaskProviderImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraphFetcherImpl
+import co.softov.morestuff.android.data.service.ShareTaskMessageImpl
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.redux.AppStore
@@ -22,6 +23,7 @@ import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.OpenGraphFetcher
+import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import co.softov.morestuff.android.domain.usecase.message.CheckForUrlMetadataUseCase
@@ -179,6 +181,7 @@ val featuresModule = module {
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     factoryOf(::ImageHandlerImpl) bind ImageHandler::class
     factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
+    factoryOf(::ShareTaskMessageImpl) bind ShareTaskMessage::class
 }
 
 

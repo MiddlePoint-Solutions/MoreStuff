@@ -22,9 +22,11 @@ fun ShowContextMenu(
     copyMessage: (Message) -> Unit,
     deleteMessage: (Message) -> Unit,
     shareImage: (String) -> Unit,
+    shareMessage: (Message) -> Unit,
     close: () -> Unit,
 ) {
-    val contextMenuItems = getContextMenuItems(message, copyMessage, deleteMessage, shareImage, close)
+    val contextMenuItems =
+        getContextMenuItems(message, copyMessage, deleteMessage, shareImage, shareMessage, close)
 
     DropdownMenu(
         expanded = showMenu,
@@ -47,7 +49,8 @@ private fun getContextMenuItems(
     copyMessage: (Message) -> Unit,
     deleteMessage: (Message) -> Unit,
     shareImage: (String) -> Unit,
-    close: () -> Unit
+    shareMessage: (Message) -> Unit,
+    close: () -> Unit,
 ): List<ContextMenuItem> {
     val deleteAction = {
         deleteMessage(message)
@@ -68,7 +71,11 @@ private fun getContextMenuItems(
                 copyMessage(message)
                 close()
             },
-            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction)
+            ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction),
+            ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
+                shareMessage(message)
+                close()
+            }
         )
     }
 }

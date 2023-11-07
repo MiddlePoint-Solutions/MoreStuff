@@ -124,7 +124,8 @@ fun TaskChatScreen(
                             val title = it.content
                             navigation.push(ChatScreen.ImagePreview(path, title))
                         },
-                        shareImage = { imagePath -> shareImage(imagePath) }
+                        shareImage = { imagePath -> shareImage(imagePath) },
+                        shareMessage = viewModel::shareMessage
                     )
 
                     TaskChatContent(
