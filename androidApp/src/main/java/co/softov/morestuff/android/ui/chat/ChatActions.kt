@@ -11,4 +11,5 @@ data class ChatActions(
     val deleteMessage: (Message) -> Unit = {},
     val onImageSelected: (Message) -> Unit = {},
     val shareImage: (imagePath: String) -> Unit = {},
+    val shareMessage: (Message) -> Unit = {},
 )

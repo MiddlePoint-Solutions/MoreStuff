@@ -9,6 +9,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ScheduleType
+import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.isOneTime
@@ -19,6 +20,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
+import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
@@ -42,6 +44,7 @@ class TaskChatViewModel(
     private val imageHandler: ImageHandler,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
+    private val shareTaskMessage: ShareTaskMessage,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     getTaskFlow: GetTaskFlowUseCase,
@@ -183,10 +186,15 @@ class TaskChatViewModel(
 
 
     private fun createScheduleModel(
-        time: LocalDateTime = timeManager.getDefaultPlanTime()
+        time: LocalDateTime = timeManager.getDefaultPlanTime(),
     ) = ScheduleUiModel(
         localDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
     )
+
+    fun shareMessage(message: Message) {
+        shareTaskMessage.shareMessage(message)
+    }
+
 }
