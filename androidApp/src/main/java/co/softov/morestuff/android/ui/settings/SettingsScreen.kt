@@ -508,6 +508,7 @@ fun SelectLanguage(
 }
 
 private fun Language.displayTitle(res: Resources): String = when (this) {
+    Language.DEVICE -> res.getString(R.string.language_device_default)
     Language.ENGLISH -> res.getString(R.string.language_english)
     Language.SPANISH -> res.getString(R.string.language_spanish)
     Language.HEBREW -> res.getString(R.string.language_hebrew)

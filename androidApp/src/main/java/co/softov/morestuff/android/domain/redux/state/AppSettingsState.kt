@@ -25,7 +25,7 @@ data class AppSettings(
     val enableConfetti: Boolean = Confetti.defaultValue,
     val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
     val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
-    val language: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
+    val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
 )
 
 sealed class SettingAction : Action.FeatureAction() {
@@ -58,6 +58,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
         is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
-        is SettingAction.SetLanguage -> copy(language = action.language)
+        is SettingAction.SetLanguage -> copy(voiceInputLanguage = action.language)
     }
 }

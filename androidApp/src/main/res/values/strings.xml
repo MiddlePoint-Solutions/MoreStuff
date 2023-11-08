@@ -140,6 +140,7 @@
     <string name="language_hebrew">Hebrew</string>
     <string name="language_russian">Russian</string>
     <string name="language_catalan">Catalan</string>
+    <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
 

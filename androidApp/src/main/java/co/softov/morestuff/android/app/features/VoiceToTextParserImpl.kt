@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Locale
 
+
 class VoiceToTextParserImpl(
     private val context: Application,
 ) : RecognitionListener, VoiceToTextParser {
@@ -35,6 +36,7 @@ class VoiceToTextParserImpl(
                 )
             }
         }
+
         val chosenLanguage = languageCode.ifBlank { _additionalLanguage.value ?: Locale.getDefault().language }
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {

@@ -1,6 +1,9 @@
 package co.softov.morestuff.android.domain.enums
 
+import java.util.Locale
+
 enum class Language(val code: String) {
+    DEVICE(Locale.getDefault().language),
     ENGLISH("en"),
     SPANISH("es"),
     HEBREW("he"),
@@ -10,4 +13,7 @@ enum class Language(val code: String) {
     companion object {
         operator fun get(index: Int): Language = values()[index]
     }
+
 }
+
+

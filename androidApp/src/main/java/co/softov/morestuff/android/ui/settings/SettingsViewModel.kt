@@ -21,7 +21,7 @@ class SettingsViewModel(
                 snoozeLimit = snoozeLimit,
                 devSettings = devSettings,
                 reviewTime = reviewTime,
-                inputVoiceLanguage = language
+                inputVoiceLanguage = voiceInputLanguage
             )
         }
     )
@@ -39,7 +39,7 @@ class SettingsViewModel(
                     confettiEnabled = enableConfetti,
                     devSettings = BuildConfig.DEBUG || devSettings,
                     reviewTime = reviewTime,
-                    inputVoiceLanguage = language
+                    inputVoiceLanguage = voiceInputLanguage
                 )
             }
         }

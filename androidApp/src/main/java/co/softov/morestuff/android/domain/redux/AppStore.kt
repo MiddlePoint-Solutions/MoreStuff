@@ -16,7 +16,6 @@ class AppStore(
     notificationMiddleware: NotificationMiddleware,
     settingsMiddleware: SettingsMiddleware,
     priorityMiddleware: PriorityMiddleware,
-    inputVoiceLanguageMiddleware: InputVoiceLanguageMiddleware
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
@@ -33,6 +32,5 @@ class AppStore(
         responseMiddleware,
         notificationMiddleware,
         priorityMiddleware,
-        inputVoiceLanguageMiddleware
     )
 )

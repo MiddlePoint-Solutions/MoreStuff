@@ -64,14 +64,13 @@ fun VoiceToTextInput(
 ) {
 
     val recordingState by voiceToText.state.collectAsState()
-    val selectedLanguageCode = viewModel.model.collectAsState().value.inputVoiceLanguage.code
-    val selectedLanguageTitle =viewModel.model.collectAsState().value.inputVoiceLanguage.name //settingsModel.inputVoiceLanguage.name
+    val inputVoiceLanguage = viewModel.model.collectAsState().value.inputVoiceLanguage
+    val selectedLanguageCode = inputVoiceLanguage.code
+    val selectedLanguageTitle = inputVoiceLanguage.name
 
     LaunchedEffect(recordingState.spokenText) {
         onUpdateValue(recordingState.spokenText)
     }
-
-
 
     VoiceToTextInputContent(
         recordingState = recordingState,

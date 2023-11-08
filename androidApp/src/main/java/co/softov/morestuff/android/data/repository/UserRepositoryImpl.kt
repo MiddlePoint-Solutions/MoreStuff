@@ -23,7 +23,7 @@ class UserRepositoryImpl(
             enableConfetti = getSetting(Confetti, enableConfetti),
             reviewTime = getSetting(ReviewTime, reviewTime),
             enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
-            language = getSetting(VoiceInputLanguage, language)
+            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
         )
     }
 
