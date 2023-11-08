@@ -76,7 +76,7 @@ fun Messages(
             itemsIndexed(
                 items = messages,
                 key = { _, item -> item.message.id },
-                contentType = { _, item -> /* TODO: after date item is created in ViewModel (with MessageUiModel) */ }
+                contentType = { _, item -> item.message.contentType }
             ) { index, item ->
 
                 val nextMessage = messages.getOrNull(index + 1)
@@ -110,11 +110,12 @@ fun Messages(
                         }
                     }
                     when (item.message.contentType) {
+                        ContentType.TASK_MESSAGE,
                         ContentType.USER_NEW_TASK -> UserChatItem(item, actions)
-                        ContentType.CONFIRM_NEW_TASK -> AppChatItem(item, actions)
-                        ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
-                        ContentType.TASK_MESSAGE -> UserChatItem(item, actions)
+                        ContentType.CONFIRM_NEW_TASK,
                         ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
+                        ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
+
                     }
                 }
             }

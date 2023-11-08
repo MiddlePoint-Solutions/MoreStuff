@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.PopupProperties
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Message
 
@@ -31,13 +32,14 @@ fun ShowContextMenu(
     DropdownMenu(
         expanded = showMenu,
         onDismissRequest = close,
-        modifier = modifier
+        modifier = modifier,
+        properties = PopupProperties(focusable = false)
     ) {
         contextMenuItems.forEach { item ->
             DropdownMenuItem(
                 text = { Text(text = item.label) },
                 onClick = item.onClick,
-                leadingIcon = { Icon(item.icon, contentDescription = null) }
+                leadingIcon = { Icon(item.icon, contentDescription = null) },
             )
         }
     }

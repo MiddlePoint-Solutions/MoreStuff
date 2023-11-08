@@ -56,8 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.chat.items.MockData.chatActions
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.input.UserInput
@@ -120,7 +120,7 @@ fun HomeScreen(
             HomeContent(
                 showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
                 snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(top = it.calculateTopPadding()),
+                modifier = Modifier.padding(it),
             )
         },
     )
@@ -256,12 +256,10 @@ fun HomeContent(
                 showTaskInput = true
             },
             modifier = Modifier
-                .padding(16.dp, bottom = 48.dp, end = 20.dp)
-                .size(50.dp)
+                .padding(20.dp)
                 .align(Alignment.BottomEnd),
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
-            shape = CircleShape
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
         }
@@ -323,19 +321,32 @@ private fun TaskInputBottomSheet(
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
 
-    val viewModel = koinViewModel<UserInputViewModel>()
+    val viewModel: UserInputViewModel = koinViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadData()
+    }
+
+    val navigation = LocalAppNavigation.current
+
+    val chatActions = remember {
+        ChatActions(
+            taskChatAction = {
+                navigation.push(Screen.TaskChat(it))
+                scope.launch {
+                    sheetState.hide()
+                }
+            }
+        )
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         content = {
-
             BoxWithConstraints {
-                LaunchedEffect(Unit) {
-                    focusRequester.requestFocus()
-                }
                 Column(
                     verticalArrangement = Arrangement.Bottom
                 ) {
