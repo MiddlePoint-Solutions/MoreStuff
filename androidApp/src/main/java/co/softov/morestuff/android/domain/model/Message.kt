@@ -17,20 +17,8 @@ data class Message(
     val replyTime: String? = null,
     val openGraphResult: OpenGraphResult? = null,
     val messageData: MessageData? = null
-)
+) {
 
-
-sealed class MessageData2 {
-
-    object Empty : MessageData2()
-
-    data class Image(
-        val id: Long,
-        val filePath: String,
-        val creationTime: String,
-        val messageType: MessageDataType
-    ) : MessageData2()
+    val isDataMessage: Boolean get() = messageData != null
 
 }
-
-

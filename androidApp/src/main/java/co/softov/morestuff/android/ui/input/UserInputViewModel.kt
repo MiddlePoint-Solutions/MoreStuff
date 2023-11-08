@@ -38,7 +38,8 @@ class UserInputViewModel(
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
-    val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
+
+    private val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
         .distinctUntilChanged { old, new -> old.id == new.id }
         .map {
