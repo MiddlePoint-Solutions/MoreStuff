@@ -3,41 +3,73 @@ package co.softov.morestuff.android.ui.input
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.mapToDomain
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.LocalDateTime
+import timber.log.Timber
 
 class UserInputViewModel(
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
+    private val getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
+    val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
+        .drop(1)
+        .distinctUntilChanged { old, new -> old.id == new.id }
+        .map {
+            val messageDateTime = timeManager.utcStringToLocalDateTime(it.createTime).toString()
+            MessageUiModel(
+                message = it,
+                formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime) ?: "",
+                formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime) ?: ""
+            )
+        }.onEach { uiMessage ->
+            Timber.d("Adding message: ${uiMessage.message.id} ")
+            messages.update {
+                it.toMutableList().apply { add(0, uiMessage) }
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = null
+        )
+
 
     override fun onLoadData() {
         messages.update {
-            listOf(
-                createMessage("What can I do for you today?", false)
-            )
+            listOf(createAppMessage("What can I do for you today?"))
         }
     }
 
-    private fun createMessage(content: String, isUserMessage: Boolean): MessageUiModel {
+    private fun createAppMessage(content: String): MessageUiModel {
         val message = Message(
             id = timeManager.nowUtcMillis,
-            contentType = if (isUserMessage) ContentType.USER_NEW_TASK else ContentType.APP_TASK_MESSAGE,
+            contentType = ContentType.APP_TASK_MESSAGE,
             createTime = timeManager.getCreateTime(),
             content = content,
         )
@@ -95,9 +127,6 @@ class UserInputViewModel(
     }
 
     suspend fun createNewTask(title: String) {
-        messages.update {
-            it.toMutableList().apply { add(0, createMessage(title, true)) }
-        }
         dispatchSuspend(
             TaskAction.CreateUserTaskAction(title.trim(), priorityModel.value.mapToDomain())
         )
@@ -105,7 +134,7 @@ class UserInputViewModel(
 
         delay(1000)
         messages.update {
-            it.toMutableList().apply { add(0, createMessage("Added new task!", false)) }
+            it.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
         }
     }
 

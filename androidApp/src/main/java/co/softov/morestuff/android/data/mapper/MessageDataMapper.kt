@@ -13,7 +13,18 @@ import co.softov.morestuff.android.domain.util.TimeFormatter
 import kotlinx.serialization.json.Json
 
 typealias MessageDb = co.softov.morestuff.db.Message
-typealias MessageDbMapper = (MessageDb) -> Message
+typealias MessageDbMapper = (
+    id: Long,
+    task_id: Long,
+    schedule_id: Long,
+    create_time: String,
+    seen_time: String?,
+    content_type: Int,
+    content: String,
+    reply_type: Int?,
+    reply_content: String?,
+    reply_time: String?,
+) -> Message
 
 typealias MessageDataMapper = (
     id: Long,
@@ -80,28 +91,33 @@ fun mapMessageData(
 }
 
 
-fun makeMessageDbMapper(timeFormatter: TimeFormatter): MessageDbMapper = { message ->
-    mapMessageDb(message, timeFormatter)
-}
+fun makeMessageDbMapper(): MessageDbMapper = ::mapMessageDb
 
-fun mapMessageDb(input: MessageDb, timeFormatter: TimeFormatter): Message {
-    val createTime = timeFormatter.formatTimeOnly(input.create_time)
-    val seenTime = timeFormatter.formatTimeOnly(input.seen_time)
-    val replyTime = timeFormatter.formatTimeOnly(input.reply_time)
+fun mapMessageDb(
+    id: Long,
+    task_id: Long,
+    schedule_id: Long,
+    create_time: String,
+    seen_time: String?,
+    content_type: Int,
+    content: String,
+    reply_type: Int?,
+    reply_content: String?,
+    reply_time: String?,
+): Message {
     return Message(
-        id = input.id,
-        taskId = input.task_id,
-        scheduleId = input.schedule_id,
-        contentType = ContentType.withValue(input.content_type),
-        createTime = createTime ?: "",
-        seenTime = seenTime,
-        content = input.content,
-        replyType = input.reply_type?.let { ReplyType.withValue(it) },
-        replyContent = input.reply_content,
-        replyTime = replyTime,
+        id = id,
+        taskId = task_id,
+        scheduleId = schedule_id,
+        contentType = ContentType.withValue(content_type),
+        createTime = create_time,
+        seenTime = seen_time,
+        content = content,
+        replyType = reply_type?.let { ReplyType.withValue(it) },
+        replyContent = reply_content,
+        replyTime = reply_time,
         openGraphResult = null,
         messageData = null
-
     )
 }
 
