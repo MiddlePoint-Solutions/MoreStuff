@@ -55,8 +55,8 @@ val dataModule = module {
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
-    single<DataMappers> { DataMappersImpl(timeFormatter = get()) }
     singleOf(::DevToolsImpl) bind DevTools::class
+    singleOf(::DataMappersImpl) bind DataMappers::class
 
     // Database
     single { createDatabase(androidApplication()) }

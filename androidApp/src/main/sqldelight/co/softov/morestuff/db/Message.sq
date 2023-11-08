@@ -69,12 +69,16 @@ FROM message AS m
 JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND datetime(m.create_time) = lm.latest_time
 ORDER BY datetime(m.create_time) DESC;
 
-
 selectTaskMessage:
 SELECT message.id, url_metadata.json_data
 FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ? AND content_type = ?
+ORDER BY id DESC LIMIT 1;
+
+selectLastTaskMessageByContentType:
+SELECT * FROM message
+WHERE content_type = ?
 ORDER BY id DESC LIMIT 1;
 
 insertMessage:

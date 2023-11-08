@@ -44,6 +44,8 @@ import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import co.softov.morestuff.android.domain.usecase.message.FetchOpenGraphMetadataUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
+import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.GetMessageImpl
 import co.softov.morestuff.android.domain.usecase.message.GetMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetMessagesUseCase
@@ -288,6 +290,7 @@ val messageUseCases = module {
     factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
     factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
+    factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
 }
 
 

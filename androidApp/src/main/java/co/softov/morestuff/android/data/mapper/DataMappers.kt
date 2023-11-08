@@ -13,13 +13,13 @@ interface DataMappers {
 
 
 
-class DataMappersImpl(private val timeFormatter: TimeFormatter) : DataMappers {
+class DataMappersImpl() : DataMappers {
 
     override val messageDataMapper: MessageDataMapper
         get() = makeMessageWithDataMapper()
 
     override val messageDbMapper: MessageDbMapper
-        get() = makeMessageDbMapper(timeFormatter)
+        get() = makeMessageDbMapper()
 
     override val scheduleDbMapper: ScheduleDbMapper
         get() = makeScheduleDbMapper()

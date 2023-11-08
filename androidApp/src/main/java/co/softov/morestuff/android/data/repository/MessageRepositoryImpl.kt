@@ -3,6 +3,7 @@ package co.softov.morestuff.android.data.repository
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOne
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
@@ -60,6 +61,14 @@ class MessageRepositoryImpl(
             else -> message.right()
         }
     }
+
+    override fun getLastMessageFlow(contentType: ContentType): Flow<Message> =
+        messageQueries.selectLastTaskMessageByContentType(
+            contentType.value,
+            mapper = mapper.messageDbMapper
+        ).asFlow()
+            .mapToOne(Dispatchers.IO)
+
 
     override suspend fun createMessage(
         taskId: Long,

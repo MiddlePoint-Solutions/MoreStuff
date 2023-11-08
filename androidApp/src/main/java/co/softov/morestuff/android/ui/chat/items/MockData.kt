@@ -4,14 +4,21 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.ui.chat.ChatActions
+import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 
 object MockData {
 
     val chatActions = ChatActions(scheduleAction = { _, _ -> })
 
-    object Message {
+    val messageUiModel: MessageUiModel
+        get() = MessageUiModel(
+            message = userNewTask,
+            formattedTime = "",
+            formattedTimeOnly = "10:00"
+        )
 
-        val userNewTask =
+    val userNewTask: Message
+        get() =
             Message(
                 0,
                 0,
@@ -26,7 +33,5 @@ object MockData {
                 null,
                 null
             )
-
-    }
 
 }

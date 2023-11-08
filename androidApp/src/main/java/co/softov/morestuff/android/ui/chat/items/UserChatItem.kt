@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.items
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -13,6 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowRightAlt
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Start
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -38,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.task.MessageUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -72,86 +80,136 @@ fun UserChatItem(
 
     val urls by remember {
         derivedStateOf {
-            try {
-                content.getStringAnnotations("URL", start = 0, end = content.length).first().item
-            } catch (e: Exception) {
-                null
-            }
+            content.getStringAnnotations("URL", start = 0, end = content.length).firstOrNull()?.item
         }
     }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 45.dp),
-        horizontalArrangement = Arrangement.End
+    val isNewUserTask by remember {
+        derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
     ) {
-        Box(
-            modifier = Modifier
-                .padding(end = 5.dp, bottom = 4.dp)
-                .clickable {
-                    showMenu = true
-                }
+        Row(
+            modifier = Modifier.padding(start = 45.dp),
+            horizontalArrangement = Arrangement.End
         ) {
-            if (message.messageData?.filePath != null) {
-                Surface(
-                    shape = RoundedCornerShape(
-                        topStart = 10.dp,
-                        topEnd = 10.dp,
-                        bottomEnd = 7.dp,
-                        bottomStart = 10.dp
-                    ),
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.align(Alignment.CenterEnd),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.End
+            Box(
+                modifier = Modifier
+                    .padding(end = 5.dp, bottom = 4.dp)
+                    .clickable { showMenu = true }
+            ) {
+                if (message.isDataMessage) {
+                    Surface(
+                        shape = RoundedCornerShape(
+                            topStart = 10.dp,
+                            topEnd = 10.dp,
+                            bottomEnd = 7.dp,
+                            bottomStart = 10.dp
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(2.dp)
                     ) {
+                        Column(
+                            modifier = Modifier.align(Alignment.CenterEnd),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.End
+                        ) {
 
-                        val uri by remember {
-                            derivedStateOf { Uri.parse(message.messageData.filePath) }
-                        }
+                            val uri by remember {
+                                derivedStateOf { Uri.parse(message.messageData?.filePath) }
+                            }
 
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = ImageRequest.Builder(LocalContext.current)
-                                    .data(data = uri)
-                                    .crossfade(true)
-                                    .scale(Scale.FIT)
-                                    .memoryCacheKey(message.messageData.filePath)
-                                    .build(),
-                                imageLoader = LocalContext.current.imageLoader
-                            ),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
-                                .combinedClickable(
-                                    onClick = { actions.onImageSelected(message) },
-                                    onLongClick = { showMenu = true }
-                                )
-                                .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
-                                .clip(RoundedCornerShape(8.dp)),
-                            contentScale = ContentScale.Inside
-                        )
-
-                        Column {
-                            if (message.content.isNotEmpty()) {
-                                Text(
-                                    text = message.content,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(
-                                            start = 14.dp,
-                                            end = 15.dp,
-                                            bottom = 3.dp
-                                        ),
-                                    style = LocalTextStyle.current.copy(
-                                        color = MaterialTheme.colorScheme.onPrimary,
-                                        fontSize = 16.sp
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(data = uri)
+                                        .crossfade(true)
+                                        .scale(Scale.FIT)
+                                        .memoryCacheKey(message.messageData?.filePath)
+                                        .build(),
+                                    imageLoader = LocalContext.current.imageLoader
+                                ),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
+                                    .combinedClickable(
+                                        onClick = { actions.onImageSelected(message) },
+                                        onLongClick = { showMenu = true }
                                     )
+                                    .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
+                                    .clip(RoundedCornerShape(8.dp)),
+                                contentScale = ContentScale.Inside
+                            )
+
+                            Column {
+                                if (message.content.isNotEmpty()) {
+                                    Text(
+                                        text = message.content,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                start = 14.dp,
+                                                end = 15.dp,
+                                                bottom = 3.dp
+                                            ),
+                                        style = LocalTextStyle.current.copy(
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            fontSize = 16.sp
+                                        )
+                                    )
+                                }
+                                Row(Modifier.align(Alignment.End)) {
+                                    MessageTime(
+                                        formattedTimeOnly = messageUiModel.formattedTimeOnly,
+                                        modifier = Modifier
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                } else {
+                    Surface(
+                        shape = RoundedCornerShape(
+                            topStart = 14.dp,
+                            topEnd = 14.dp,
+                            bottomEnd = 5.dp,
+                            bottomStart = 14.dp
+                        ),
+                        color = MaterialTheme.colorScheme.primary,
+                    ) {
+                        Column {
+                            Text(
+                                modifier = Modifier
+                                    .padding(
+                                        start = 14.dp,
+                                        end = 15.dp,
+                                        top = 8.dp,
+                                        bottom = 3.dp
+                                    )
+                                    .run {
+                                        urls?.let {
+                                            combinedClickable(
+                                                onClick = {
+                                                    coroutineScope.launch {
+                                                        uriHandler.openUri(it)
+                                                    }
+                                                },
+                                                onLongClick = { showMenu = true }
+                                            )
+                                        } ?: this
+                                    },
+                                text = content,
+                                style = LocalTextStyle.current.copy(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontSize = 16.sp
                                 )
+                            )
+                            if (openGraphResult?.title != null && openGraphResult.description != null) {
+                                OpenGraphView(openGraphResult)
                             }
                             Row(Modifier.align(Alignment.End)) {
                                 MessageTime(
@@ -163,68 +221,27 @@ fun UserChatItem(
                     }
                 }
 
-            } else {
-                Surface(
-                    shape = RoundedCornerShape(
-                        topStart = 14.dp,
-                        topEnd = 14.dp,
-                        bottomEnd = 5.dp,
-                        bottomStart = 14.dp
-                    ),
-                    color = MaterialTheme.colorScheme.primary,
-                ) {
-                    Column {
-                        Text(
-                            modifier = Modifier
-                                .padding(
-                                    start = 14.dp,
-                                    end = 15.dp,
-                                    top = 8.dp,
-                                    bottom = 3.dp
-                                )
-                                .run {
-                                    urls?.let {
-                                        combinedClickable(
-                                            onClick = {
-                                                coroutineScope.launch {
-                                                    uriHandler.openUri(it)
-                                                }
-                                            },
-                                            onLongClick = { showMenu = true }
-                                        )
-                                    } ?: this
-                                },
-                            text = content,
-                            style = LocalTextStyle.current.copy(
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 16.sp
-                            )
-                        )
-                        if (openGraphResult?.title != null && openGraphResult.description != null) {
-                            OpenGraphView(openGraphResult)
-                        }
-                        Row(Modifier.align(Alignment.End)) {
-                            MessageTime(
-                                formattedTimeOnly = messageUiModel.formattedTimeOnly,
-                                modifier = Modifier
-                            )
-                        }
-
-                    }
-                }
+                ShowContextMenu(
+                    message,
+                    showMenu = showMenu,
+                    copyMessage = actions.copyMessage,
+                    deleteMessage = actions.deleteMessage,
+                    close = { showMenu = false },
+                    shareImage = actions.shareImage,
+                    shareMessage = actions.shareMessage
+                )
             }
-
-            ShowContextMenu(
-                message,
-                showMenu = showMenu,
-                copyMessage = actions.copyMessage,
-                deleteMessage = actions.deleteMessage,
-                close = { showMenu = false },
-                modifier = Modifier.padding(top = 20.dp),
-                shareImage = actions.shareImage,
-                shareMessage = actions.shareMessage
-            )
         }
+
+        if (isNewUserTask) {
+            FilledIconButton(onClick = { actions.taskChatAction(message.taskId) }) {
+                Icon(
+                    imageVector = Icons.Default.Start,
+                    contentDescription = ""
+                )
+            }
+        }
+
     }
 }
 
@@ -249,10 +266,17 @@ fun MessageTime(
 }
 
 
-@Preview
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "Dark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "Light"
+)
 @Composable
 fun UserChatItemPreview() {
     MoreStuffTheme {
-        // UserChatItem(message = MockData.Message.userNewTask, ChatActions())
+        UserChatItem(MockData.messageUiModel, ChatActions())
     }
 }
