@@ -8,4 +8,5 @@ interface VoiceToTextParser {
     val state: StateFlow<VoiceToTextParserState>
     fun startListening(languageCode: Language)
     fun stopListening()
+    fun clearSpokenText()
 }

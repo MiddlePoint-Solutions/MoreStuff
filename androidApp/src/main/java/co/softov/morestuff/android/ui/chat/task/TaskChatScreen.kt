@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.chat.task
 
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -30,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,23 +44,24 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.model.ScheduleUiModel
+import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.LocalBoxWeight
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.input.VoiceToTextViewModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -70,9 +71,6 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -89,10 +87,11 @@ fun TaskChatScreen(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
-
+    val voiceToTextViewModel: VoiceToTextViewModel = koinViewModel()
     val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
+    val inputVoiceLanguage = voiceToTextViewModel.model.collectAsState().value.inputVoiceLanguage
 
     ChildStack(
         source = navigation,
@@ -144,6 +143,8 @@ fun TaskChatScreen(
                     imagePicked = {
                         navigation.push(ChatScreen.ImageImport(it.toString()))
                     },
+                    inputVoiceLanguage = { inputVoiceLanguage }
+
                 )
             }
 
@@ -188,6 +189,7 @@ private fun TaskChatContent(
     createPlanSchedule: () -> Unit = {},
     cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
+    inputVoiceLanguage: () -> Language
 ) {
 
     val scope = rememberCoroutineScope()
@@ -288,7 +290,8 @@ private fun TaskChatContent(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.Transparent)
+                            .background(Color.Transparent),
+                        inputVoiceLanguage = inputVoiceLanguage
                     )
                 }
             }
@@ -301,6 +304,7 @@ private fun TaskChatInput(
     sendTaskMessage: (String) -> Unit,
     pickImage: () -> Unit,
     modifier: Modifier = Modifier,
+    inputVoiceLanguage: () -> Language
 ) {
     val isTextEmpty = remember { mutableStateOf(true) }
 
@@ -346,7 +350,8 @@ private fun TaskChatInput(
                                 VoiceToTextInput(
                                     onUpdateValue = {
                                         userInputValue = userInputValue.copy(text = it)
-                                    }
+                                    },
+                                    inputVoiceLanguage = inputVoiceLanguage()
                                 )
                             }
                         },
@@ -378,7 +383,7 @@ private fun TaskTopAppBar(
     }
 }
 
-@Preview(
+/*@Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
 )
@@ -402,4 +407,4 @@ fun TaskChatPreview() {
             chatActions = ChatActions(),
         )
     }
-}
+}*/

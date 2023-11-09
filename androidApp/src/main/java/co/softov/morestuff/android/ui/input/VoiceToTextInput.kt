@@ -48,23 +48,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.features.VoiceToTextParserState
-import co.softov.morestuff.android.domain.service.VoiceToTextParser
-import co.softov.morestuff.android.ui.settings.SettingsViewModel
+import co.softov.morestuff.android.domain.enums.Language
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.rememberKoinInject
 
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
-    voiceToText: VoiceToTextParser = rememberKoinInject(),
-    viewModel: SettingsViewModel = koinViewModel(),
+    viewModel: VoiceToTextViewModel = rememberKoinInject(),
+    inputVoiceLanguage: Language,
 ) {
 
-    val recordingState by voiceToText.state.collectAsState()
-    val inputVoiceLanguage = viewModel.model.collectAsState().value.inputVoiceLanguage
+    val recordingState by viewModel.voiceToTextParser.state.collectAsState()
 
     LaunchedEffect(recordingState.spokenText) {
         onUpdateValue(recordingState.spokenText)
@@ -72,11 +69,12 @@ fun VoiceToTextInput(
 
     VoiceToTextInputContent(
         recordingState = recordingState,
-        startListening = { voiceToText.startListening(inputVoiceLanguage) },
-        stopListening = voiceToText::stopListening,
+        startListening = { viewModel.startListening(inputVoiceLanguage) },
+        stopListening = viewModel::stopListening,
         selectedLanguage = inputVoiceLanguage.name
     )
 }
+
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +82,7 @@ private fun VoiceToTextInputContent(
     recordingState: VoiceToTextParserState,
     startListening: () -> Unit,
     stopListening: () -> Unit,
-    selectedLanguage: String
+    selectedLanguage: String,
 ) {
 
     var canRecord by remember { mutableStateOf(false) }

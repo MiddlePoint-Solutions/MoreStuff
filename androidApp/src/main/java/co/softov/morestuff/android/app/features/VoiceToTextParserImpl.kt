@@ -125,6 +125,10 @@ class VoiceToTextParserImpl(
         TODO("Not yet implemented")
     }
 
+    override fun clearSpokenText() {
+        _state.update { it.copy(spokenText = "") }
+    }
+
 }
 
 @Immutable
