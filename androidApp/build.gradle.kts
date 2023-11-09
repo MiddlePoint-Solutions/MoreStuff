@@ -93,7 +93,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.4"
     }
 
     testOptions {
@@ -146,6 +146,7 @@ dependencies {
     // AndroidX and Compose
     implementation(libs.bundles.android)
     implementation(platform(libs.androidxComposeBom))
+    implementation(platform(libs.arrowBom))
     implementation(libs.bundles.compose)
 
     // Testing
