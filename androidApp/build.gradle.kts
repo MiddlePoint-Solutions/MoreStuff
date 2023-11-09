@@ -143,31 +143,19 @@ sqldelight {
 dependencies {
     implementation(project(":shared"))
 
-    // AndroidX and Compose
-    implementation(libs.bundles.android)
     implementation(platform(libs.androidxComposeBom))
     implementation(platform(libs.arrowBom))
-    implementation(libs.bundles.compose)
-
-    // Testing
-    testImplementation(libs.bundles.testing)
-
-    // Networking
-    implementation(libs.bundles.networking)
-
-    // SQL Delight
-    implementation(libs.bundles.sqldelight)
-
-    // Firebase
+    implementation(platform(libs.koinBom))
     implementation(platform(libs.firebaseBom))
+
+    implementation(libs.bundles.android)
+    implementation(libs.bundles.compose)
+    testImplementation(libs.bundles.testing)
+    implementation(libs.bundles.networking)
+    implementation(libs.bundles.sqldelight)
     implementation(libs.bundles.firebase)
-
-    // Utilities
     implementation(libs.bundles.utils)
-
-    // About Libraries
     implementation(libs.bundles.aboutLibraries)
-
 
     debugImplementation(libs.uiTestManifest)
 }
