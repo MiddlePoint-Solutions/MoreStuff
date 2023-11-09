@@ -29,9 +29,8 @@ okhttp = "4.11.0"
 sqldelight = "2.0.0"
 firebaseBom = "32.5.0"
 googleServices = "4.4.0"
-koin = "3.4.2"
 koinGradle = "3.2.0"
-koinCompose = "3.4.5"
+koinBom = "3.5.1"
 koinTest = "3.5.0"
 junit = "4.13.2"
 timber = "5.0.1"
@@ -123,9 +122,9 @@ firebaseBom = { module = "com.google.firebase:firebase-bom", version.ref = "fire
 firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebaseAnalytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 googleServices = { module = "com.google.gms:google-services", version.ref = "googleServices" }
-koinAndroid = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koinAndroidCompat = { module = "io.insert-koin:koin-android-compat", version.ref = "koin" }
-koinAndroidxCompose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinCompose" }
+koinBom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
+koinAndroid = { module = "io.insert-koin:koin-android" }
+koinAndroidxCompose = { module = "io.insert-koin:koin-androidx-compose" }
 koinTest = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
 koinTestJunit = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinTest" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -260,7 +259,6 @@ utils = [
     "coroutinesAndroid",
     "multiplatformSettingsNoArg",
     "koinAndroid",
-    "koinAndroidCompat",
     "koinAndroidxCompose",
     "timber",
     "telephoto",
