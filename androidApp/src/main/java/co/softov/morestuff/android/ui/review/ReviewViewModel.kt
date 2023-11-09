@@ -126,6 +126,12 @@ class ReviewViewModel(
     fun completeTask(item: ReviewItemUiModel) {
         sendEvent(ItemReview(item, PriorityActionType.Done))
         dispatchAppStoreAction(TaskAction.CompleteTasksAction(listOf(item.id), true))
+        if (state.items.first() == item) {
+            roundEndDelayJob = viewModelScope.launch {
+                delay(500)
+                sendEvent(SetupRound(Final))
+            }
+        }
     }
 
     fun toggleHintArrowPriority() {
