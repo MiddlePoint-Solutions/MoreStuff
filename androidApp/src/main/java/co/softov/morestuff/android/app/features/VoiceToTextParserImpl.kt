@@ -7,6 +7,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.compose.runtime.Immutable
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,12 +22,7 @@ class VoiceToTextParserImpl(
     override val state = _state.asStateFlow()
     private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
 
-    private val _additionalLanguage = MutableStateFlow<String?>(null)
-
-    override fun selectLanguage(language: String) {
-        _additionalLanguage.value = language
-    }
-    override fun startListening(languageCode: String) {
+    override fun startListening(languageCode: Language) {
         _state.update { VoiceToTextParserState() }
 
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -37,7 +33,11 @@ class VoiceToTextParserImpl(
             }
         }
 
-        val chosenLanguage = languageCode.ifBlank { _additionalLanguage.value ?: Locale.getDefault().language }
+        val chosenLanguage = if (languageCode == Language.DEVICE) {
+            Locale.getDefault().language
+        } else {
+            languageCode.code
+        }
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
@@ -45,8 +45,11 @@ class VoiceToTextParserImpl(
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosenLanguage)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
+            putExtra(
+                RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,
+                3000
+            )
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000)
         }
 
         recognizer.setRecognitionListener(this)
