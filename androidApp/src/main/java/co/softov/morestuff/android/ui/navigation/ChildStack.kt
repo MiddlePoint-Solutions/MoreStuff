@@ -28,6 +28,7 @@ inline fun <reified C : Parcelable> ChildStack(
                 source = source,
                 initialStack = initialStack,
                 key = key,
+                persistent = false,
                 handleBackButton = handleBackButton,
                 childFactory = { _, childComponentContext -> childComponentContext },
             )

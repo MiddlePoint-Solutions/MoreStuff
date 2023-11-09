@@ -17,6 +17,7 @@ import co.softov.morestuff.db.StuffDb
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOne
+import app.cash.sqldelight.coroutines.mapToOneNotNull
 import co.softov.morestuff.android.domain.enums.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -59,7 +60,7 @@ class TaskRepositoryImpl(
     override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
         val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)
             .asFlow()
-            .mapToOne(Dispatchers.IO)
+            .mapToOneNotNull(Dispatchers.IO)
 
         val schedulesFlow =
             scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)

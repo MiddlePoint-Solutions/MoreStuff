@@ -27,6 +27,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -54,7 +55,6 @@ class TaskChatViewModel(
     init {
         Timber.d("TaskChatViewModel: $taskId")
     }
-
 
     val task: StateFlow<TaskDomain> = getTaskFlow(taskId)
         .onEach { task ->
@@ -195,6 +195,11 @@ class TaskChatViewModel(
 
     fun shareMessage(message: Message) {
         shareTaskMessage.shareMessage(message)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Timber.d("onCleared")
     }
 
 }
