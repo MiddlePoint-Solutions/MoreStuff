@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.di
 
+import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.input.UserInputViewModel

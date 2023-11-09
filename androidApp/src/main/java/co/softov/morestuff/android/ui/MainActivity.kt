@@ -22,6 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -51,11 +53,14 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import com.arkivanov.decompose.router.stack.push
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
 
+    @OptIn(KoinExperimentalAPI::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -80,7 +85,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         ProvideComponentContext(rootComponentContext) {
                             ProvideAppNavigation(navigation) {
-                                val stateModel by viewModel.states.collectAsStateWithLifecycle()
+                                val stateModel by viewModel.states.collectAsState()
 
                                 when (val model = stateModel) {
                                     MainStates.Idle -> {}
@@ -91,10 +96,13 @@ class MainActivity : ComponentActivity() {
                                             handleLaunchIntent(intent)
                                         }
 
-                                        MainContent(
-                                            initialScreen = initialScreen,
-                                            shareContent = viewModel::shareContentToTask
-                                        )
+                                        KoinAndroidContext {
+                                            MainContent(
+                                                initialScreen = initialScreen,
+                                                shareContent = viewModel::shareContentToTask
+                                            )
+                                        }
+
                                     }
                                 }
                             }

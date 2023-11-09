@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.chat.task
 
 import android.content.res.Configuration
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.*
@@ -76,6 +77,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.LocalKoinScope
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
@@ -87,88 +89,86 @@ fun TaskChatScreen(
 ) {
 
     val navigation = remember { StackNavigation<ChatScreen>() }
+    val viewModel: TaskChatViewModel = koinViewModel(
+        key = "TaskChat$taskId",
+        parameters = { parametersOf(taskId) }
+    )
 
-    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
+    val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
+        viewModel.shareImage(imagePath)
+    }
 
-        val viewModel: TaskChatViewModel = koinViewModel { parametersOf(taskId) }
+    ChildStack(
+        source = navigation,
+        initialStack = { listOf(ChatScreen.TaskChat) },
+        key = "TaskChatStack",
+        handleBackButton = true,
+        animation = stackAnimation(scale() + fade()),
+    ) { screen ->
 
-        val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
-            viewModel.shareImage(imagePath)
-        }
-        val uniqueKey = remember { "TaskChatStack${taskId}_${System.currentTimeMillis()}" }
+        when (screen) {
+            is ChatScreen.TaskChat -> {
 
-        ChildStack(
-            source = navigation,
-            initialStack = { listOf(ChatScreen.TaskChat) },
-            key = uniqueKey,
-            handleBackButton = true,
-            animation = stackAnimation(scale() + fade()),
-        ) { screen ->
-            when (screen) {
-                is ChatScreen.TaskChat -> {
+                val task by viewModel.task.collectAsStateWithLifecycle()
+                val messages by viewModel.messages.collectAsStateWithLifecycle()
 
-                    val task by viewModel.task.collectAsStateWithLifecycle()
-                    val messages by viewModel.messages.collectAsStateWithLifecycle()
+                val chatActions = ChatActions(
+                    scheduleAction = viewModel::scheduleResponse,
+                    copyMessage = { message ->
+                        viewModel.copyToClipboard(message.content)
+                    },
+                    deleteMessage = { message ->
+                        viewModel.deleteMessage(messageId = message.id)
+                    },
+                    onImageSelected = {
+                        val path = it.messageData?.filePath ?: ""
+                        val title = it.content
+                        navigation.push(ChatScreen.ImagePreview(path, title))
+                    },
+                    shareImage = { imagePath -> shareImage(imagePath) },
+                    shareMessage = viewModel::shareMessage
+                )
 
-                    val chatActions = ChatActions(
-                        scheduleAction = viewModel::scheduleResponse,
-                        copyMessage = { message ->
-                            viewModel.copyToClipboard(message.content)
-                        },
-                        deleteMessage = { message ->
-                            viewModel.deleteMessage(messageId = message.id)
-                        },
-                        onImageSelected = {
-                            val path = it.messageData?.filePath ?: ""
-                            val title = it.content
-                            navigation.push(ChatScreen.ImagePreview(path, title))
-                        },
-                        shareImage = { imagePath -> shareImage(imagePath) },
-                        shareMessage = viewModel::shareMessage
-                    )
+                TaskChatContent(
+                    task = task,
+                    taskTitle = { viewModel.taskTitle },
+                    schedule = { viewModel.scheduleModel },
+                    reminder = { viewModel.reminderModel },
+                    messages = messages,
+                    chatActions = chatActions,
+                    modifier = modifier,
+                    onBack = onBack,
+                    sendTaskMessage = viewModel::sendTaskChatMessage,
+                    updateTaskTitle = viewModel::updateTaskTitle,
+                    toggleTaskComplete = viewModel::toggleTaskComplete,
+                    updatePlanTime = viewModel::updatePlanTime,
+                    updatePlanDate = viewModel::updatePlanDate,
+                    createPlanSchedule = viewModel::createOneTimeSchedule,
+                    cancelActiveSchedule = viewModel::cancelActiveSchedule,
+                    imagePicked = {
+                        navigation.push(ChatScreen.ImageImport(it.toString()))
+                    },
+                )
+            }
 
-                    TaskChatContent(
-                        task = task,
-                        taskTitle = { viewModel.taskTitle },
-                        schedule = { viewModel.scheduleModel },
-                        reminder = { viewModel.reminderModel },
-                        messages = messages,
-                        chatActions = chatActions,
-                        modifier = modifier,
-                        onBack = onBack,
-                        sendTaskMessage = viewModel::sendTaskChatMessage,
-                        updateTaskTitle = viewModel::updateTaskTitle,
-                        toggleTaskComplete = viewModel::toggleTaskComplete,
-                        updatePlanTime = viewModel::updatePlanTime,
-                        updatePlanDate = viewModel::updatePlanDate,
-                        createPlanSchedule = viewModel::createOneTimeSchedule,
-                        cancelActiveSchedule = viewModel::cancelActiveSchedule,
-                        imagePicked = {
-                            navigation.push(ChatScreen.ImageImport(it.toString()))
-                        },
-                    )
-                }
+            is ChatScreen.ImageImport -> {
+                ImageImportScreen(
+                    imageUri = Uri.parse(screen.uri),
+                    onImport = { title ->
+                        viewModel.sendImageMessageForTask(screen.uri, title)
+                        navigation.pop()
+                    },
+                    onBack = navigation::pop
+                )
+            }
 
-                is ChatScreen.ImageImport -> {
-                    ImageImportScreen(
-                        imageUri = Uri.parse(screen.uri),
-                        onImport = { title ->
-                            viewModel.sendImageMessageForTask(screen.uri, title)
-                            navigation.pop()
-                        },
-                        onBack = navigation::pop
-                    )
-                }
-
-                is ChatScreen.ImagePreview -> {
-                    ImagePreviewScreen(
-                        imagePath = screen.imagePath,
-                        onBack = navigation::pop,
-                        onSendImage = shareImage,
-                        title = screen.title,
-                    )
-                }
+            is ChatScreen.ImagePreview -> {
+                ImagePreviewScreen(
+                    imagePath = screen.imagePath,
+                    onBack = navigation::pop,
+                    onSendImage = shareImage,
+                    title = screen.title,
+                )
             }
         }
     }
