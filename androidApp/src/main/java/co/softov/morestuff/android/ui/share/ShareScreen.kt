@@ -58,7 +58,6 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
-import co.softov.morestuff.android.ui.input.VoiceToTextViewModel
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.model.mapToDomain
 import co.softov.morestuff.android.ui.priority.PriorityInput
@@ -207,8 +206,6 @@ private fun ShareContent(
             shareToTask(taskId)
         }
     }
-    val voiceToTextViewModel: VoiceToTextViewModel = koinViewModel()
-    val inputVoiceLanguage = voiceToTextViewModel.model.collectAsState().value.inputVoiceLanguage
     LaunchedEffect(searchQuery) {
         shareViewModel.updateQuery(searchQuery)
     }
@@ -291,7 +288,6 @@ private fun ShareContent(
                             actionsContent = {
                                 VoiceToTextInput(
                                     onUpdateValue = userInputViewModel::updateUserInput,
-                                    inputVoiceLanguage = inputVoiceLanguage
                                 )
                             }
                         )

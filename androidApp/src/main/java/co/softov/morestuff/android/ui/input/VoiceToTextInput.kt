@@ -43,43 +43,47 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.features.VoiceToTextParserState
-import co.softov.morestuff.android.domain.enums.Language
+import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import org.koin.compose.rememberKoinInject
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
-    viewModel: VoiceToTextViewModel = rememberKoinInject(),
-    inputVoiceLanguage: Language,
 ) {
+    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
+    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
 
-    val recordingState by viewModel.voiceToTextParser.state.collectAsState()
+        val viewModel: VoiceToTextViewModel = koinViewModel()
+        val recordingState by viewModel.uiModel.collectAsState()
 
-    LaunchedEffect(recordingState.spokenText) {
-        onUpdateValue(recordingState.spokenText)
+        LaunchedEffect(recordingState.spokenText) {
+            onUpdateValue(recordingState.spokenText)
+        }
+
+        VoiceToTextInputContent(
+            recordingState = recordingState,
+            startListening = { viewModel.startListening() },
+            stopListening = viewModel::stopListening,
+            selectedLanguage = recordingState.detectedLanguage.name
+        )
     }
-
-    VoiceToTextInputContent(
-        recordingState = recordingState,
-        startListening = { viewModel.startListening(inputVoiceLanguage) },
-        stopListening = viewModel::stopListening,
-        selectedLanguage = inputVoiceLanguage.name
-    )
 }
 
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun VoiceToTextInputContent(
-    recordingState: VoiceToTextParserState,
+    recordingState: VoiceToTextUiModel,
     startListening: () -> Unit,
     stopListening: () -> Unit,
     selectedLanguage: String,
@@ -90,8 +94,24 @@ private fun VoiceToTextInputContent(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(recordAudioPermissionState.status) {
+        if (recordAudioPermissionState.status == PermissionStatus.Granted) {
+            canRecord = true
+            if (!recordingState.isListening) {
+                startListening()
+                showDialog = true
+            }
+        }
+    }
+    LaunchedEffect(recordingState.isListening) {
+        if (!recordingState.isListening) {
+            stopListening()
+            showDialog = false
+        }
+    }
+
     val onRecord = {
-        if (!recordingState.isSpeaking) {
+        if (!recordingState.isListening) {
             if (canRecord) {
                 startListening()
                 showDialog = true
@@ -111,6 +131,7 @@ private fun VoiceToTextInputContent(
             onConfirm = {
                 recordAudioPermissionState.launchPermissionRequest()
                 dismissDialog = true
+
             },
             onCancel = { dismissDialog = true }
         )
@@ -127,10 +148,10 @@ private fun VoiceToTextInputContent(
     ) {
         IconButton(onClick = onRecord) {
             AnimatedContent(
-                targetState = recordingState.isSpeaking,
+                targetState = recordingState.isListening,
                 label = "Voice recording animation"
-            ) { isSpeaking ->
-                if (isSpeaking) {
+            ) { isListening ->
+                if (isListening) {
                     Icon(
                         imageVector = Icons.Filled.Stop,
                         contentDescription = "",
@@ -144,8 +165,8 @@ private fun VoiceToTextInputContent(
             }
         }
     }
-    LaunchedEffect(recordingState.isSpeaking) {
-        if (!recordingState.isSpeaking) {
+    LaunchedEffect(recordingState.isListening) {
+        if (!recordingState.isListening) {
             showDialog = false
         }
     }

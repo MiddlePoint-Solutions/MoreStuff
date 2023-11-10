@@ -62,7 +62,6 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
-import co.softov.morestuff.android.ui.input.VoiceToTextViewModel
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
@@ -322,10 +321,8 @@ private fun TaskInputBottomSheet(
     val scrollState = rememberLazyListState()
 
     val viewModel: UserInputViewModel = koinViewModel()
-    val voiceToTextViewModel: VoiceToTextViewModel = koinViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
-    val inputVoiceLanguage = voiceToTextViewModel.model.collectAsState().value.inputVoiceLanguage
 
     LaunchedEffect(Unit) {
         viewModel.loadData()
@@ -405,7 +402,6 @@ private fun TaskInputBottomSheet(
                                     actionsContent = {
                                         VoiceToTextInput(
                                             onUpdateValue = viewModel::updateUserInput,
-                                            inputVoiceLanguage = inputVoiceLanguage
                                         )
                                     }
                                 )

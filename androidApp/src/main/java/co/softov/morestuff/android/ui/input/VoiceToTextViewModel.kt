@@ -1,43 +1,50 @@
 package co.softov.morestuff.android.ui.input
 
-import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.Language
-import co.softov.morestuff.android.domain.redux.AppState
+import androidx.lifecycle.viewModelScope
+import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
-import co.softov.morestuff.android.ui.settings.SettingsModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class VoiceToTextViewModel(
-    val voiceToTextParser: VoiceToTextParser
-) : NoStateViewModel() {
+    private val voiceToTextParser: VoiceToTextParser
+) : BaseViewModel<VoiceToTextUiModel, VoiceToTextUiEvent>(VoiceToTextUiModel()) {
 
-    val model = MutableStateFlow(
-        with(store.state.value.settings) {
-            SettingsModel(
-                inputVoiceLanguage = voiceInputLanguage
-            )
-        }
-    )
-    override fun onAppStateChange(state: AppState) {
-        model.update {
-            with(state.settings) {
-                it.copy(
-                    inputVoiceLanguage = voiceInputLanguage
-                )
-            }
-        }
-    }
     init {
-        loadData()
+        setupVoiceToTextParser()
+    }
+    private fun setupVoiceToTextParser() {
+        voiceToTextParser.state
+            .onEach { parserState ->
+                if (parserState.isSpeaking != state.isListening) {
+                    sendEvent(if (parserState.isSpeaking) VoiceToTextUiEvent.StartListening else VoiceToTextUiEvent.StopListening)
+                }
+                if (parserState.spokenText.isNotEmpty()) {
+                    sendEvent(VoiceToTextUiEvent.UpdateSpokenText(parserState.spokenText))
+                }
+                parserState.error?.let { sendEvent(VoiceToTextUiEvent.ReportError(it)) }
+            }
+            .launchIn(viewModelScope)
     }
 
-    fun startListening(languageCode: Language) {
-        voiceToTextParser.startListening(languageCode)
+    override fun onReduceState(event: VoiceToTextUiEvent): VoiceToTextUiModel {
+        return when (event) {
+            VoiceToTextUiEvent.StartListening -> state.copy(isListening = true)
+            VoiceToTextUiEvent.StopListening -> state.copy(isListening = false)
+            is VoiceToTextUiEvent.SetDetectedLanguage -> state.copy(detectedLanguage = event.language)
+            is VoiceToTextUiEvent.UpdateSpokenText -> state.copy(spokenText = event.text)
+            is VoiceToTextUiEvent.ReportError -> state.copy(error = event.errorMessage)
+        }
+    }
+
+    fun startListening() {
+        val language = state.detectedLanguage
+        sendEvent(VoiceToTextUiEvent.SetDetectedLanguage(language))
+        voiceToTextParser.startListening(language)
     }
 
     fun stopListening() {
+        sendEvent(VoiceToTextUiEvent.StopListening)
         voiceToTextParser.stopListening()
     }
-
 }
