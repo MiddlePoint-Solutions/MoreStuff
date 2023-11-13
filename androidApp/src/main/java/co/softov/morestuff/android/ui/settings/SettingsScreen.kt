@@ -474,7 +474,7 @@ fun SelectLanguage(
 ) {
     val resources = LocalContext.current.resources
     val languageOptions = remember {
-        Language.values().map { it.displayTitle(resources) }
+        Language.entries.map { it.displayTitle(resources) }
     }
 
 
@@ -508,12 +508,12 @@ fun SelectLanguage(
 }
 
 private fun Language.displayTitle(res: Resources): String = when (this) {
-    Language.DEVICE -> res.getString(R.string.language_device_default)
-    Language.ENGLISH -> res.getString(R.string.language_english)
-    Language.SPANISH -> res.getString(R.string.language_spanish)
-    Language.HEBREW -> res.getString(R.string.language_hebrew)
-    Language.RUSSIAN -> res.getString(R.string.language_russian)
-    Language.CATALAN -> res.getString(R.string.language_catalan)
+    Language.Device -> res.getString(R.string.language_device_default)
+    Language.English -> res.getString(R.string.language_english)
+    Language.Spanish -> res.getString(R.string.language_spanish)
+    Language.Hebrew -> res.getString(R.string.language_hebrew)
+    Language.Russian -> res.getString(R.string.language_russian)
+    Language.Catalan -> res.getString(R.string.language_catalan)
 }
 
 

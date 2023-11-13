@@ -8,7 +8,7 @@ import javax.annotation.concurrent.Immutable
 @Immutable
 data class VoiceToTextUiModel(
     val isListening: Boolean = false,
-    val detectedLanguage: Language = Language.DEVICE,
+    val detectedLanguage: Language = Language.Device,
     val spokenText: String = "",
     val error: String? = null
 ) : BaseViewState

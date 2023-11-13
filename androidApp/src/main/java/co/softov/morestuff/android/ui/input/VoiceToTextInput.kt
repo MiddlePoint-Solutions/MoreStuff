@@ -74,7 +74,7 @@ fun VoiceToTextInput(
             recordingState = recordingState,
             startListening = { viewModel.startListening() },
             stopListening = viewModel::stopListening,
-            selectedLanguage = recordingState.detectedLanguage.name
+            selectedLanguage = viewModel.displayLanguageName()
         )
     }
 }

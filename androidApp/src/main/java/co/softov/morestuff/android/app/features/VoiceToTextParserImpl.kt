@@ -33,7 +33,7 @@ class VoiceToTextParserImpl(
             }
         }
 
-        val chosenLanguage = if (languageCode == Language.DEVICE) {
+        val chosenLanguage = if (languageCode == Language.Device) {
             Locale.getDefault().language
         } else {
             languageCode.code
