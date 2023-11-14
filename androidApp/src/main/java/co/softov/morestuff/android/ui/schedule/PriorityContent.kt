@@ -35,7 +35,6 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.NoFlingDismissState
 import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
@@ -49,6 +48,7 @@ fun PriorityContent(
     onItemLongClick: (taskId: Long) -> Unit,
     showTaskOptions: (taskId: Long) -> Unit,
     toggleQuickReminder: (taskId: Long) -> Unit,
+    taskSelectionActive: () -> Boolean,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
@@ -77,42 +77,49 @@ fun PriorityContent(
                     derivedStateOf { index == tasks.lastIndex }
                 }
 
-                val dismissState = rememberNoFlingDismissState(
-                    positionalThreshold = { 130.dp.toPx() },
-                    confirmValueChange = { dismissValue ->
-                        when (dismissValue) {
-                            DismissValue.Default -> false
-                            DismissValue.DismissedToEnd -> {
-                                showTaskOptions(item.id)
-                                false
-                            }
-
-                            DismissValue.DismissedToStart -> {
-                                toggleQuickReminder(item.id)
-                                false
+                if (!taskSelectionActive()) {
+                    val dismissState = rememberNoFlingDismissState(
+                        positionalThreshold = { 130.dp.toPx() },
+                        confirmValueChange = { dismissValue ->
+                            when (dismissValue) {
+                                DismissValue.Default -> false
+                                DismissValue.DismissedToEnd -> {
+                                    showTaskOptions(item.id)
+                                    false
+                                }
+                                DismissValue.DismissedToStart -> {
+                                    toggleQuickReminder(item.id)
+                                    false
+                                }
                             }
                         }
+                    )
+
+                    LaunchedEffect(Unit) {
+                        snapshotFlow { dismissState.dismissDirection }
+                            .collect { dismissDirection ->
+                                willDismissDirection = dismissDirection
+                            }
                     }
-                )
 
-                LaunchedEffect(Unit) {
-                    snapshotFlow { dismissState.dismissDirection }
-                        .collect { dismissDirection ->
-                            willDismissDirection = dismissDirection
+                    NoFlingSwipeToDismiss(
+                        state = dismissState,
+                        background = { SwipeBackground(dismissState, item.hasReminder) },
+                        dismissContent = {
+                            PriorityItem(
+                                task = item,
+                                onClick = { onItemClick(item.id) },
+                                onLongClick = { onItemLongClick(item.id) }
+                            )
                         }
+                    )
+                } else {
+                    PriorityItem(
+                        task = item,
+                        onClick = { onItemClick(item.id) },
+                        onLongClick = { onItemLongClick(item.id) }
+                    )
                 }
-
-                NoFlingSwipeToDismiss(
-                    state = dismissState,
-                    background = { SwipeBackground(dismissState, item.hasReminder) },
-                    dismissContent = {
-                        PriorityItem(
-                            task = item,
-                            onClick = { onItemClick(item.id) },
-                            onLongClick = { onItemLongClick(item.id) }
-                        )
-                    }
-                )
 
                 if (!isLast) {
                     Divider(
@@ -124,6 +131,7 @@ fun PriorityContent(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
