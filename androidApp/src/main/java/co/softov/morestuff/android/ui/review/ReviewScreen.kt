@@ -286,7 +286,7 @@ private fun ReviewSwipeControls(
     lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
     firstVisibleState: () -> SwipeableCardState?,
     undoAction: (ReviewItemUiModel) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val scope = rememberCoroutineScope()
@@ -367,7 +367,9 @@ private fun TaskPrioritySwipe(
 ) {
     val itemClick by rememberUpdatedState(showTaskChat)
     Box(
-        modifier = modifier.padding(20.dp)
+        modifier = modifier
+            .padding(20.dp)
+            .clip(RoundedCornerShape(10.dp))
     ) {
 
         Column(
