@@ -235,11 +235,11 @@ fun MessageText(
     showMenu: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val urlColor = rememberUpdatedState(MaterialTheme.colorScheme.onPrimary)
+    val urlColor = MaterialTheme.colorScheme.onPrimary
     val content by remember {
         derivedStateOf {
             buildAnnotatedString {
-                appendUrlsWithStyle(message.content, urlPattern, urlColor.value)
+                appendUrlsWithStyle(message.content, urlPattern, urlColor)
             }
         }
     }
