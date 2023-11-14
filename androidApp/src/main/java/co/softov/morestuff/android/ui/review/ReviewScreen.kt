@@ -369,7 +369,6 @@ private fun TaskPrioritySwipe(
     Box(
         modifier = modifier
             .padding(20.dp)
-            .clip(RoundedCornerShape(10.dp))
     ) {
 
         Column(
