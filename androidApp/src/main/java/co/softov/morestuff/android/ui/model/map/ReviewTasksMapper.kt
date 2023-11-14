@@ -26,7 +26,7 @@ class ReviewTasksMapper(
             createTime = createTime,
             title = input.title,
             priorityScore = input.priorityScore,
-            position = "$position/$count",
+            position = "$position",
             isCompleted = input.isComplete,
             extraDetails = input.extraDetails
         )

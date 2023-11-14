@@ -28,7 +28,8 @@ WHERE complete_time IS NULL AND id NOT IN (
     SELECT task_id
     FROM schedule
     WHERE active = 1 AND schedule_type IN :schedule_types
-);
+)
+ORDER BY task.priority_score DESC;
 
 selectAllComplete:
 SELECT *
