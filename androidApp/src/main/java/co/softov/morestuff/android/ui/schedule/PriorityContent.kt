@@ -48,7 +48,7 @@ fun PriorityContent(
     onItemLongClick: (taskId: Long) -> Unit,
     showTaskOptions: (taskId: Long) -> Unit,
     toggleQuickReminder: (taskId: Long) -> Unit,
-    isAnyTaskSelected: () -> Boolean,
+    taskSelectionActive: () -> Boolean,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
@@ -77,7 +77,7 @@ fun PriorityContent(
                     derivedStateOf { index == tasks.lastIndex }
                 }
 
-                if (!isAnyTaskSelected()) {
+                if (!taskSelectionActive()) {
                     val dismissState = rememberNoFlingDismissState(
                         positionalThreshold = { 130.dp.toPx() },
                         confirmValueChange = { dismissValue ->

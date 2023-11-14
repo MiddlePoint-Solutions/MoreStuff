@@ -234,7 +234,7 @@ fun HomeContent(
             showTaskOptions = { taskOptions = it },
             toggleQuickReminder = homeViewModel::toggleQuickReminder,
             listState = priorityScrollState,
-            isAnyTaskSelected = { model.taskSelectionActive },
+            taskSelectionActive = { model.taskSelectionActive },
             modifier = Modifier.padding(bottom = 30.dp),
         )
 
