@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.items.MockData.messageUiModel
-import co.softov.morestuff.android.ui.chat.task.MessageUiModel
+import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
@@ -59,12 +59,12 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun UserChatItem(
-    messageUiModel: MessageUiModel,
+    message: MessageUiModel,
     actions: ChatActions,
 ) {
     val showMenu = remember { mutableStateOf(false) }
     val isNewUserTask by remember {
-        derivedStateOf { messageUiModel.message.contentType == ContentType.USER_NEW_TASK }
+        derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
     }
 
     Column(
@@ -81,13 +81,13 @@ fun UserChatItem(
                     .clickable { showMenu.value = true }
             ) {
                 MessageContent(
-                    messageUiModel = messageUiModel,
+                    message = message,
                     actions = actions,
                     showMenu = showMenu,
                 )
 
                 ShowContextMenu(
-                    messageUiModel.message,
+                    message,
                     showMenu = showMenu.value,
                     copyMessage = actions.copyMessage,
                     deleteMessage = actions.deleteMessage,
@@ -98,7 +98,7 @@ fun UserChatItem(
             }
         }
         if (isNewUserTask) {
-            FilledIconButton(onClick = { actions.taskChatAction(messageUiModel.message.taskId) }) {
+            FilledIconButton(onClick = { actions.taskChatAction(message.taskId) }) {
                 Icon(
                     imageVector = Icons.Default.Start,
                     contentDescription = ""
@@ -111,18 +111,18 @@ fun UserChatItem(
 
 @Composable
 fun MessageContent(
-    messageUiModel: MessageUiModel,
+    message: MessageUiModel,
     actions: ChatActions,
     showMenu: MutableState<Boolean>,
 ) {
-    if (messageUiModel.message.isDataMessage) {
+    if (message.isDataMessage) {
         MessageImage(
-            message = messageUiModel,
+            message = message,
             actions = actions,
             showMenu = showMenu,
         )
     } else {
-        val openGraphResult = messageUiModel.message.openGraphResult
+        val openGraphResult = message.openGraphResult
         Surface(
             shape = RoundedCornerShape(
                 topStart = 14.dp,
@@ -135,7 +135,7 @@ fun MessageContent(
             Column {
                 MessageText(
                     showMenu = showMenu,
-                    messageUiModel = messageUiModel,
+                    message = message,
                     modifier = Modifier
                         .padding(
                             start = 14.dp,
@@ -149,7 +149,7 @@ fun MessageContent(
                 }
                 Row(Modifier.align(Alignment.End)) {
                     MessageTime(
-                        formattedTimeOnly = messageUiModel.formattedTimeOnly,
+                        formattedTimeOnly = message.formattedTimeOnly,
                         modifier = Modifier
                     )
                 }
@@ -180,7 +180,7 @@ fun MessageImage(
             horizontalAlignment = Alignment.End
         ) {
             val uri by remember {
-                derivedStateOf { Uri.parse(message.message.messageData?.filePath) }
+                derivedStateOf { Uri.parse(message.messageData?.filePath) }
             }
 
             Image(
@@ -189,7 +189,7 @@ fun MessageImage(
                         .data(data = uri)
                         .crossfade(true)
                         .scale(Scale.FIT)
-                        .memoryCacheKey(message.message.messageData?.filePath)
+                        .memoryCacheKey(message.messageData?.filePath)
                         .build(),
                     imageLoader = LocalContext.current.imageLoader
                 ),
@@ -197,17 +197,17 @@ fun MessageImage(
                 modifier = Modifier
                     .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
                     .combinedClickable(
-                        onClick = { actions.onImageSelected(message.message) },
+                        onClick = { actions.onImageSelected(message) },
                         onLongClick = { showMenu.value = true }
                     )
                     .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Inside
             )
-            if (message.message.content.isNotEmpty()) {
+            if (message.content.isNotEmpty()) {
                 MessageText(
                     showMenu = showMenu,
-                    messageUiModel = message,
+                    message = message,
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.Start)
@@ -231,11 +231,10 @@ fun MessageImage(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageText(
-    messageUiModel: MessageUiModel,
+    message: MessageUiModel,
     showMenu: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val message = messageUiModel.message
     val urlColor = rememberUpdatedState(MaterialTheme.colorScheme.onPrimary)
     val content by remember {
         derivedStateOf {

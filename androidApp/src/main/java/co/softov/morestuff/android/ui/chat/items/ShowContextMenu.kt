@@ -13,17 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.PopupProperties
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.model.MessageUiModel
 
 @Composable
 fun ShowContextMenu(
-    message: Message,
+    message: MessageUiModel,
     showMenu: Boolean,
     modifier: Modifier = Modifier,
-    copyMessage: (Message) -> Unit,
-    deleteMessage: (Message) -> Unit,
+    copyMessage: (MessageUiModel) -> Unit,
+    deleteMessage: (MessageUiModel) -> Unit,
     shareImage: (String) -> Unit,
-    shareMessage: (Message) -> Unit,
+    shareMessage: (MessageUiModel) -> Unit,
     close: () -> Unit,
 ) {
     val contextMenuItems =
@@ -47,11 +47,11 @@ fun ShowContextMenu(
 
 @Composable
 private fun getContextMenuItems(
-    message: Message,
-    copyMessage: (Message) -> Unit,
-    deleteMessage: (Message) -> Unit,
+    message: MessageUiModel,
+    copyMessage: (MessageUiModel) -> Unit,
+    deleteMessage: (MessageUiModel) -> Unit,
     shareImage: (String) -> Unit,
-    shareMessage: (Message) -> Unit,
+    shareMessage: (MessageUiModel) -> Unit,
     close: () -> Unit,
 ): List<ContextMenuItem> {
     val deleteAction = {

@@ -43,7 +43,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
 import co.softov.morestuff.android.ui.chat.items.TaskReminderItem
 import co.softov.morestuff.android.ui.chat.items.UserChatItem
-import co.softov.morestuff.android.ui.chat.task.MessageUiModel
+import co.softov.morestuff.android.ui.model.MessageUiModel
 import kotlinx.coroutines.launch
 
 private val jumpToBottomThreshold = 56.dp
@@ -75,8 +75,8 @@ fun Messages(
         ) {
             itemsIndexed(
                 items = messages,
-                key = { _, item -> item.message.id },
-                contentType = { _, item -> item.message.contentType }
+                key = { _, item -> item.id },
+                contentType = { _, item -> item.contentType }
             ) { index, item ->
 
                 val nextMessage = messages.getOrNull(index + 1)
@@ -109,7 +109,7 @@ fun Messages(
                             )
                         }
                     }
-                    when (item.message.contentType) {
+                    when (item.contentType) {
                         ContentType.TASK_MESSAGE,
                         ContentType.USER_NEW_TASK -> UserChatItem(item, actions)
                         ContentType.CONFIRM_NEW_TASK,

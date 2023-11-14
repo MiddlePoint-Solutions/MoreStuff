@@ -9,7 +9,6 @@ import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ScheduleType
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.isOneTime
@@ -26,8 +25,9 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
-import kotlinx.coroutines.cancel
+import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -46,6 +46,7 @@ class TaskChatViewModel(
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     private val shareTaskMessage: ShareTaskMessage,
+    private val messageUiMapper: MessageUiMapper,
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     getTaskFlow: GetTaskFlowUseCase,
@@ -75,14 +76,7 @@ class TaskChatViewModel(
                 getTaskChatMessagesUseCase(taskId = taskId).first()
             }
 
-            val formattedMessages = messages.map { message ->
-                val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime)
-                val formattedTime =
-                    timeFormatter.formatTimeWithDayMonthYear(messageDateTime.toString()) ?: ""
-                val formattedTimeOnly =
-                    timeFormatter.formatTimeOnly(messageDateTime.toString()) ?: ""
-                MessageUiModel(message, formattedTime, formattedTimeOnly)
-            }
+            val formattedMessages = messageUiMapper.map(messages)
 
             emit(formattedMessages)
         }
@@ -193,7 +187,7 @@ class TaskChatViewModel(
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
     )
 
-    fun shareMessage(message: Message) {
+    fun shareMessage(message: MessageUiModel) {
         shareTaskMessage.shareMessage(message)
     }
 
