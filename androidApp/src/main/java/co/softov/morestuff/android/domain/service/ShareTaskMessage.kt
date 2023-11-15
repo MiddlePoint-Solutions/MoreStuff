@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.service
 
-import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.ui.model.MessageUiModel
 
 interface ShareTaskMessage {
-    fun shareMessage(message: Message)
+    fun shareMessage(message: MessageUiModel)
 }

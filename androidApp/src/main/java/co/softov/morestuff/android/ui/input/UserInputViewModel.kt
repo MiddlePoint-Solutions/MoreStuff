@@ -11,20 +11,18 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.chat.task.MessageUiModel
+import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
+import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import co.softov.morestuff.android.ui.model.mapToDomain
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -34,7 +32,8 @@ import timber.log.Timber
 class UserInputViewModel(
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
-    private val getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
+    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
+    private val messageUiMapper: MessageUiMapper,
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
@@ -42,15 +41,11 @@ class UserInputViewModel(
     private val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
         .distinctUntilChanged { old, new -> old.id == new.id }
-        .map {
-            val messageDateTime = timeManager.utcStringToLocalDateTime(it.createTime).toString()
-            MessageUiModel(
-                message = it,
-                formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime) ?: "",
-                formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime) ?: ""
-            )
+        .map { message ->
+            messageUiMapper.internalMap(message)
+
         }.onEach { uiMessage ->
-            Timber.d("Adding message: ${uiMessage.message.id} ")
+            Timber.d("Adding message: ${uiMessage.id} ")
             messages.update {
                 it.toMutableList().apply { add(0, uiMessage) }
             }
@@ -74,12 +69,7 @@ class UserInputViewModel(
             createTime = timeManager.getCreateTime(),
             content = content,
         )
-        val messageDateTime = timeManager.utcStringToLocalDateTime(message.createTime).toString()
-        return MessageUiModel(
-            message = message,
-            formattedTime = timeFormatter.formatTimeWithDayMonthYear(messageDateTime) ?: "",
-            formattedTimeOnly = timeFormatter.formatTimeOnly(messageDateTime) ?: ""
-        )
+        return messageUiMapper.internalMap(message)
     }
 
     val priorityModel = MutableStateFlow(
@@ -97,7 +87,7 @@ class UserInputViewModel(
     }
 
     private fun createPlanTime(
-        time: LocalDateTime = timeManager.getDefaultPlanTime()
+        time: LocalDateTime = timeManager.getDefaultPlanTime(),
     ) = ScheduleUiModel(
         localDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
