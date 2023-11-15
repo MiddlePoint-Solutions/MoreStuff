@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.chat.task
 
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -58,6 +60,7 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
+import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -67,6 +70,9 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -373,7 +379,7 @@ private fun TaskTopAppBar(
     }
 }
 
-/*@Preview(
+@Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
 )
@@ -397,4 +403,4 @@ fun TaskChatPreview() {
             chatActions = ChatActions(),
         )
     }
-}*/
+}

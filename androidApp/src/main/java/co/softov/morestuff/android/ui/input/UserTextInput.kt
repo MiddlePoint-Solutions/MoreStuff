@@ -1,7 +1,10 @@
 package co.softov.morestuff.android.ui.input
 
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -43,6 +46,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 val LocalBoxWeight = compositionLocalOf { 0.12f }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun UserTextInput(
     value: TextFieldValue,
@@ -58,31 +62,20 @@ fun UserTextInput(
     val boxWeight = LocalBoxWeight.current
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
-            .animateContentSize(),
-        shape = RoundedCornerShape(42),
-        color = backgroundColor
+        modifier = modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
+            .animateContentSize(), shape = RoundedCornerShape(42), color = backgroundColor
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 42.dp)
-                .semantics {
-                    contentDescription = a11ylabel
-                },
+            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 42.dp).semantics {
+                contentDescription = a11ylabel
+            },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BasicTextField(
-                value = value,
+            BasicTextField(value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier
-                    .clearFocusOnKeyboardDismiss()
-                    .focusRequester(focusRequester)
-                    .weight(0.88f)
-                    .align(Alignment.CenterVertically)
+                modifier = Modifier.clearFocusOnKeyboardDismiss().focusRequester(focusRequester)
+                    .weight(0.88f).align(Alignment.CenterVertically)
                     .padding(start = 28.dp, end = 4.dp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -111,24 +104,24 @@ fun UserTextInput(
                         }
                         innerTextField()
                     }
-                }
-            )
+                })
 
             Box(
-                modifier = Modifier
-                    .weight(if (value.text.isBlank()) boxWeight else 0.15f)
-                    .align(Alignment.Bottom)
-                    .padding(end = 8.dp)
+                modifier = Modifier.weight(if (value.text.isBlank()) boxWeight else 0.15f)
+                    .align(Alignment.Bottom).padding(end = 8.dp)
             ) {
-                when {
-                    value.text.isBlank() -> {
-                        actionsContent()
-                    }
+                Crossfade(
+                    targetState = value.text.isBlank(),
+                    animationSpec = tween(700), label = ""
+                ) { isBlank ->
+                    when {
+                        isBlank -> {
+                            actionsContent()
+                        }
 
-                    else -> {
-                        SendIcon(
-                            onClick = { sendAction(value.text) }
-                        )
+                        else -> {
+                            SendIcon(onClick = { sendAction(value.text) })
+                        }
                     }
                 }
             }
@@ -136,13 +129,12 @@ fun UserTextInput(
     }
 }
 
+
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
+    uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark"
 )
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
+    uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light"
 )
 @Composable
 private fun Preview() {

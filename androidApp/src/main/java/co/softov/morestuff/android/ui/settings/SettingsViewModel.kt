@@ -66,6 +66,6 @@ class SettingsViewModel(
     }
 
     fun selectLanguage(index: Int) {
-        dispatchAppStoreAction(SettingAction.SetLanguage(Language[index]))
+        dispatchAppStoreAction(SettingAction.SetVoiceLanguage(Language[index]))
     }
 }

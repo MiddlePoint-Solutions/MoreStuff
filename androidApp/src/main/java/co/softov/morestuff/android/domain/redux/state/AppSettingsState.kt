@@ -37,7 +37,7 @@ sealed class SettingAction : Action.FeatureAction() {
     data object OnBoardingComplete : SettingAction()
     data class SetReviewTimeAction(val hour: Int, val minute: Int, val replaceExisting: Boolean) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
-    data class SetLanguage(val language: Language) : SettingAction()
+    data class SetVoiceLanguage(val language: Language) : SettingAction()
 
 }
 
@@ -58,6 +58,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
         is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
-        is SettingAction.SetLanguage -> copy(voiceInputLanguage = action.language)
+        is SettingAction.SetVoiceLanguage -> copy(voiceInputLanguage = action.language)
     }
 }

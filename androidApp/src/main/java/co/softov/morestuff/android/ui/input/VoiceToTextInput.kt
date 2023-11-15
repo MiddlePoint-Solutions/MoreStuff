@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.input
 
 import android.Manifest
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -21,7 +20,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -147,24 +145,14 @@ private fun VoiceToTextInputContent(
         modifier = Modifier.height(IntrinsicSize.Min)
     ) {
         IconButton(onClick = onRecord) {
-            AnimatedContent(
-                targetState = recordingState.isListening,
-                label = "Voice recording animation"
-            ) { isListening ->
-                if (isListening) {
-                    Icon(
-                        imageVector = Icons.Filled.Stop,
-                        contentDescription = "",
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.Mic,
-                        contentDescription = "",
-                    )
-                }
-            }
+            Icon(
+                imageVector = Icons.Filled.Mic,
+                contentDescription = "",
+            )
+
         }
     }
+
     LaunchedEffect(recordingState.isListening) {
         if (!recordingState.isListening) {
             showDialog = false
