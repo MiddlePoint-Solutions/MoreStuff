@@ -20,15 +20,17 @@ import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +41,6 @@ import co.softov.morestuff.android.ui.home.HomeUiModel
 import co.softov.morestuff.android.ui.model.Digit
 import co.softov.morestuff.android.ui.model.compareTo
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +53,7 @@ fun HomeTopBar(
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
+    containerColor: State<Color>,
 ) {
 
     val taskSelectionActive = remember(model) { model.taskSelectionActive }
@@ -127,9 +129,9 @@ fun HomeTopBar(
                 }
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
-        scrollBehavior = scrollBehavior
-    )
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor.value),
+            scrollBehavior = scrollBehavior
+        )
 }
 
 @Composable
@@ -173,6 +175,7 @@ private fun AnimatedCounter(count: Int) {
 @Composable
 private fun Preview() {
     MoreStuffTheme {
+        val previewContainerColor = remember { mutableStateOf(Color.Blue) }
         HomeTopBar(
             model = HomeUiModel(),
             reviewSelected = {},
@@ -180,7 +183,8 @@ private fun Preview() {
             searchSelected = { },
             clearTaskSelection = {},
             completeSelectedTasks = {},
-            deleteSelectedTasks = {}
+            deleteSelectedTasks = {},
+            containerColor = previewContainerColor
         )
     }
 }
