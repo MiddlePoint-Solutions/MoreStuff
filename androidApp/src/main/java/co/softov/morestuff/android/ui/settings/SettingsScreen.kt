@@ -59,6 +59,7 @@ import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -482,7 +483,11 @@ fun SelectLanguage(
         defaultValue = defaultValue,
         valueChanged = languageSelected,
     )
-    val selectedLanguage = languageOptions[state.value]
+    val selectedLanguage = if (Language.entries[state.value] == Language.Device) {
+        Locale.getDefault().displayLanguage
+    } else {
+        languageOptions[state.value]
+    }
 
     SettingsList(
         state = state,
