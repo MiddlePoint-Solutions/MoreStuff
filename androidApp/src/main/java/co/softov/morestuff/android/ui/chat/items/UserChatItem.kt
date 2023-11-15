@@ -29,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -89,11 +89,8 @@ fun UserChatItem(
                 ShowContextMenu(
                     message,
                     showMenu = showMenu.value,
-                    copyMessage = actions.copyMessage,
-                    deleteMessage = actions.deleteMessage,
+                    actions = actions,
                     close = { showMenu.value = false },
-                    shareImage = actions.shareImage,
-                    shareMessage = actions.shareMessage
                 )
             }
         }
@@ -122,7 +119,6 @@ fun MessageContent(
             showMenu = showMenu,
         )
     } else {
-        val openGraphResult = message.openGraphResult
         Surface(
             shape = RoundedCornerShape(
                 topStart = 14.dp,
@@ -144,9 +140,7 @@ fun MessageContent(
                             bottom = 3.dp
                         )
                 )
-                if (openGraphResult?.title != null && openGraphResult.description != null) {
-                    OpenGraphView(openGraphResult)
-                }
+                OpenGraphContent(message)
                 Row(Modifier.align(Alignment.End)) {
                     MessageTime(
                         formattedTimeOnly = message.formattedTimeOnly,
@@ -154,6 +148,15 @@ fun MessageContent(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun OpenGraphContent(message: MessageUiModel) {
+    message.openGraphResult?.let { openGraphResult ->
+        if (openGraphResult.title != null && openGraphResult.description != null) {
+            OpenGraphView(openGraphResult)
         }
     }
 }
@@ -235,32 +238,17 @@ fun MessageText(
     showMenu: MutableState<Boolean>,
     modifier: Modifier = Modifier,
 ) {
-    val urlColor = MaterialTheme.colorScheme.onPrimary
-    val content by remember {
-        derivedStateOf {
-            buildAnnotatedString {
-                appendUrlsWithStyle(message.content, urlPattern, urlColor)
-            }
-        }
-    }
-
-    val urls by remember {
-        derivedStateOf {
-            content.getStringAnnotations("URL", start = 0, end = content.length)
-                .firstOrNull()?.item
-        }
-    }
+    val (content, url) = handleUrlText(message.content)
     val scope = rememberCoroutineScope()
     val uriHandler = LocalUriHandler.current
+
     Text(
         modifier = modifier
             .run {
-                urls?.let {
+                url?.let {
                     combinedClickable(
                         onClick = {
-                            scope.launch {
-                                uriHandler.openUri(it)
-                            }
+                            scope.launch { uriHandler.openUri(it) }
                         },
                         onLongClick = { showMenu.value = true }
                     )
@@ -273,6 +261,20 @@ fun MessageText(
         )
     )
 }
+@Composable
+private fun handleUrlText(text: String): Pair<AnnotatedString, String?> {
+    val content = buildAnnotatedString {
+        val urlColor = MaterialTheme.colorScheme.onPrimary
+        appendUrlsWithStyle(text, urlPattern, urlColor)
+    }
+
+    val url = content.getStringAnnotations("URL", start = 0, end = content.length)
+        .firstOrNull()?.item
+
+    return Pair(content, url)
+}
+
+
 
 
 @Composable

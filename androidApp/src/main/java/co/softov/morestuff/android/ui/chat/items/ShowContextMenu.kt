@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.PopupProperties
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.model.MessageUiModel
 
 @Composable
@@ -20,14 +21,11 @@ fun ShowContextMenu(
     message: MessageUiModel,
     showMenu: Boolean,
     modifier: Modifier = Modifier,
-    copyMessage: (MessageUiModel) -> Unit,
-    deleteMessage: (MessageUiModel) -> Unit,
-    shareImage: (String) -> Unit,
-    shareMessage: (MessageUiModel) -> Unit,
+    actions: ChatActions,
     close: () -> Unit,
 ) {
     val contextMenuItems =
-        getContextMenuItems(message, copyMessage, deleteMessage, shareImage, shareMessage, close)
+        getContextMenuItems(message, actions, close)
 
     DropdownMenu(
         expanded = showMenu,
@@ -48,14 +46,11 @@ fun ShowContextMenu(
 @Composable
 private fun getContextMenuItems(
     message: MessageUiModel,
-    copyMessage: (MessageUiModel) -> Unit,
-    deleteMessage: (MessageUiModel) -> Unit,
-    shareImage: (String) -> Unit,
-    shareMessage: (MessageUiModel) -> Unit,
+    actions: ChatActions,
     close: () -> Unit,
 ): List<ContextMenuItem> {
     val deleteAction = {
-        deleteMessage(message)
+        actions.deleteMessage(message)
         close()
     }
 
@@ -63,19 +58,19 @@ private fun getContextMenuItems(
         listOf(
             ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction),
             ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
-                shareImage(message.messageData.filePath)
+                actions.shareImage(message.messageData.filePath)
                 close()
             },
         )
     } else {
         listOf(
             ContextMenuItem(stringResource(R.string.copy_message), Icons.Default.ContentCopy) {
-                copyMessage(message)
+                actions.copyMessage(message)
                 close()
             },
             ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction),
             ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
-                shareMessage(message)
+                actions.shareMessage(message)
                 close()
             }
         )
