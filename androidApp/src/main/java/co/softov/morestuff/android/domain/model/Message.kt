@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.domain.model
 
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.ReplyType
 
 data class Message(
@@ -17,8 +16,4 @@ data class Message(
     val replyTime: String? = null,
     val openGraphResult: OpenGraphResult? = null,
     val messageData: MessageData? = null
-) {
-
-    val isDataMessage: Boolean get() = messageData != null
-
-}
+)

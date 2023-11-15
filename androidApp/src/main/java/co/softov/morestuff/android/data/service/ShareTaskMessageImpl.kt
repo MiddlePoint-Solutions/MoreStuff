@@ -2,14 +2,14 @@ package co.softov.morestuff.android.data.service
 
 import android.content.Context
 import android.content.Intent
-import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.service.ShareTaskMessage
+import co.softov.morestuff.android.ui.model.MessageUiModel
 
 class ShareTaskMessageImpl(
     private val context: Context,
 ) : ShareTaskMessage {
 
-        override fun shareMessage(message: Message) {
+        override fun shareMessage(message: MessageUiModel) {
             val intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, message.content)
