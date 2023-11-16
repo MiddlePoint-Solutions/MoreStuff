@@ -58,6 +58,7 @@ import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
+import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -380,6 +381,9 @@ private fun TaskInputBottomSheet(
                             userInputValue =
                                 userInputValue.copy(text = viewModel.userInput)
                         }
+                        val isTextEmpty = remember(userInputValue.text) {
+                            mutableStateOf(userInputValue.text.isBlank())
+                        }
 
                         UserInput(
                             textContent = {
@@ -400,9 +404,25 @@ private fun TaskInputBottomSheet(
                                         }
                                     },
                                     actionsContent = {
-                                        VoiceToTextInput(
-                                            onUpdateValue = viewModel::updateUserInput,
-                                        )
+                                        if (isTextEmpty.value) {
+                                            VoiceToTextInput(
+                                                onUpdateValue = viewModel::updateUserInput,
+                                            )
+                                        } else {
+                                            AnimatedVisibility(
+                                                visible = !isTextEmpty.value,
+                                                enter = fadeIn(),
+                                                exit = fadeOut()
+                                            ) {
+                                                SendIcon(onClick = {
+                                                    scope.launch {
+                                                        viewModel.createNewTask(userInputValue.text)
+                                                        userInputValue = TextFieldValue()
+                                                    }
+                                                })
+                                            }
+
+                                        }
                                     }
                                 )
                             }

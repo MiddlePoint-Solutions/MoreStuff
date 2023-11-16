@@ -41,13 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
@@ -58,14 +55,13 @@ import org.koin.androidx.compose.koinViewModel
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
 ) {
-    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
-
-        val viewModel: VoiceToTextViewModel = koinViewModel()
+    val viewModel: VoiceToTextViewModel = koinViewModel()
         val recordingState by viewModel.uiModel.collectAsState()
-
         LaunchedEffect(recordingState.spokenText) {
-            onUpdateValue(recordingState.spokenText)
+            if(recordingState.spokenText.isNotEmpty()) {
+                onUpdateValue(recordingState.spokenText)
+                viewModel.clearInput()
+            }
         }
 
         VoiceToTextInputContent(
@@ -74,7 +70,6 @@ fun VoiceToTextInput(
             stopListening = viewModel::stopListening,
             selectedLanguage = viewModel.displayLanguageName()
         )
-    }
 }
 
 

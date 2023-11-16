@@ -1,10 +1,7 @@
 package co.softov.morestuff.android.ui.input
 
 import android.content.res.Configuration
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,13 +37,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.extension.clearFocusOnKeyboardDismiss
-import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 
 val LocalBoxWeight = compositionLocalOf { 0.12f }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun UserTextInput(
     value: TextFieldValue,
@@ -110,20 +105,7 @@ fun UserTextInput(
                 modifier = Modifier.weight(if (value.text.isBlank()) boxWeight else 0.15f)
                     .align(Alignment.Bottom).padding(end = 8.dp)
             ) {
-                Crossfade(
-                    targetState = value.text.isBlank(),
-                    animationSpec = tween(700), label = ""
-                ) { isBlank ->
-                    when {
-                        isBlank -> {
-                            actionsContent()
-                        }
-
-                        else -> {
-                            SendIcon(onClick = { sendAction(value.text) })
-                        }
-                    }
-                }
+                actionsContent()
             }
         }
     }

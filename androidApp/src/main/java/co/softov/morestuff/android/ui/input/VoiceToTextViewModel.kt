@@ -52,7 +52,10 @@ class VoiceToTextViewModel(
                 state.copy(isListening = false)
             }
             is SetDetectedLanguage -> state.copy(detectedLanguage = event.language)
-            is UpdateSpokenText -> state.copy(spokenText = event.text)
+            is UpdateSpokenText -> {
+                voiceToTextParser.clearSpokenText()
+                state.copy(spokenText = event.text)
+            }
             is ReportError -> state.copy(error = event.errorMessage)
         }
     }
@@ -71,5 +74,9 @@ class VoiceToTextViewModel(
         } else {
             state.detectedLanguage.name
         }
+    }
+
+    fun clearInput() {
+        sendEvent(UpdateSpokenText(""))
     }
 }
