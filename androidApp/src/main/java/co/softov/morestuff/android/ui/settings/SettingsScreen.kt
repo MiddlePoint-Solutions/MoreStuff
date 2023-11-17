@@ -493,7 +493,7 @@ fun SelectLanguage(
         state = state,
         title = {
             Column {
-                Text(text = "Select Language")
+                Text(text = stringResource(R.string.select_language))
                 Text(
                     text = selectedLanguage,
                     fontSize = 12.sp
