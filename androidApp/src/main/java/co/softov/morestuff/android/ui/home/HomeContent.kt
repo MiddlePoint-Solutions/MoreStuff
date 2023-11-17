@@ -94,14 +94,20 @@ fun HomeScreen(
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
     val model by viewModel.uiModel.collectAsStateWithLifecycle()
+    val taskSelectionActive = model.taskSelectionActive
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
     val scrollContainerColor = surfaceContainerElevation
     val containerColor = remember { mutableStateOf(defaultContainerColor) }
-    LaunchedEffect(scrollBehavior) {
-        snapshotFlow { scrollBehavior.state.overlappedFraction }
-            .collect { fraction ->
-                containerColor.value = if (fraction > 0.5f) scrollContainerColor else defaultContainerColor
+
+    LaunchedEffect(scrollBehavior, taskSelectionActive) {
+        snapshotFlow { Pair(scrollBehavior.state.overlappedFraction, taskSelectionActive) }
+            .collect { (fraction, isActive) ->
+                when {
+                    isActive -> containerColor.value = scrollContainerColor
+                    fraction > 0.2f -> containerColor.value = scrollContainerColor
+                    else -> containerColor.value = defaultContainerColor
+                }
             }
     }
 
