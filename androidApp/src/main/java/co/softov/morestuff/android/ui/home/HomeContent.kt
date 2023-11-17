@@ -373,7 +373,7 @@ private fun TaskInputBottomSheet(
                         actions = chatActions,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(250.dp),
+                            .height(216.dp),
                         scrollState = scrollState,
                     )
 
