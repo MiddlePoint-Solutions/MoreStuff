@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import co.softov.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import co.softov.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
@@ -57,6 +59,7 @@ import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 @Composable
 fun SettingsScreen(
@@ -72,7 +75,8 @@ fun SettingsScreen(
             setSnoozeLimit = viewModel::onSnoozeLimitChanged,
             enableConfetti = viewModel::enableConfetti,
             enableDevSettings = viewModel::enableDevSettings,
-            onTimeSelected = viewModel::setReviewTime
+            onTimeSelected = viewModel::setReviewTime,
+            inputVoiceLanguage = viewModel::selectLanguage
         )
     )
 
@@ -118,6 +122,10 @@ private fun SettingsContent(
                 ReviewTimeSelector(
                     valueChanged = actions.onTimeSelected,
                     defaultValue = model.reviewTime,
+                )
+                SelectLanguage(
+                    languageSelected = actions.inputVoiceLanguage,
+                    defaultValue = { model.inputVoiceLanguage.ordinal }
                 )
 
                 if (model.devSettings) {
@@ -442,7 +450,11 @@ fun ReviewTimeSelector(
             Column {
                 Text(text = "Set Review Time")
                 selectedTimeState.value.let {
-                    Text(text = "${it.first}:${String.format("%02d", it.second)}")
+                    Text(
+                        text = "${it.first}:${String.format("%02d", it.second)}",
+                        fontSize = 12.sp
+
+                    )
                 }
             }
         },
@@ -454,6 +466,59 @@ fun ReviewTimeSelector(
             )
         },
     )
+}
+
+@Composable
+fun SelectLanguage(
+    languageSelected: (Int) -> Unit,
+    defaultValue: () -> Int,
+) {
+    val resources = LocalContext.current.resources
+    val languageOptions = remember {
+        Language.entries.map { it.displayTitle(resources) }
+    }
+
+
+    val state = rememberAppSettingState(
+        defaultValue = defaultValue,
+        valueChanged = languageSelected,
+    )
+    val selectedLanguage = if (Language.entries[state.value] == Language.Device) {
+        Locale.getDefault().displayLanguage
+    } else {
+        languageOptions[state.value]
+    }
+
+    SettingsList(
+        state = state,
+        title = {
+            Column {
+                Text(text = "Select Language")
+                Text(
+                    text = selectedLanguage,
+                    fontSize = 12.sp
+                )
+            }
+        },
+        items = languageOptions,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Translate,
+                contentDescription = stringResource(R.string.select_language)
+            )
+        },
+        closeDialogDelay = 0,
+        useSelectedValueAsSubtitle = false,
+    )
+}
+
+private fun Language.displayTitle(res: Resources): String = when (this) {
+    Language.Device -> res.getString(R.string.language_device_default)
+    Language.English -> res.getString(R.string.language_english)
+    Language.Spanish -> res.getString(R.string.language_spanish)
+    Language.Hebrew -> res.getString(R.string.language_hebrew)
+    Language.Russian -> res.getString(R.string.language_russian)
+    Language.Catalan -> res.getString(R.string.language_catalan)
 }
 
 

@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.ui.input
 
 import android.Manifest
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -14,19 +13,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,46 +39,47 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.app.features.VoiceToTextParserState
-import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import org.koin.compose.rememberKoinInject
-import timber.log.Timber
+import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
-    voiceToText: VoiceToTextParser = rememberKoinInject()
 ) {
+    val viewModel: VoiceToTextViewModel = koinViewModel()
+        val recordingState by viewModel.uiModel.collectAsState()
+        LaunchedEffect(recordingState.spokenText) {
+            if(recordingState.spokenText.isNotEmpty()) {
+                onUpdateValue(recordingState.spokenText)
+                viewModel.clearInput()
+            }
+        }
 
-    val recordingState by voiceToText.state.collectAsState()
-    LaunchedEffect(recordingState.spokenText) {
-        onUpdateValue(recordingState.spokenText)
-    }
-
-    VoiceToTextInputContent(
-        recordingState = recordingState,
-        startListening = { voiceToText.startListening("en") },
-        stopListening = voiceToText::stopListening,
-    )
+        VoiceToTextInputContent(
+            recordingState = recordingState,
+            startListening = { viewModel.startListening() },
+            stopListening = viewModel::stopListening,
+            selectedLanguage = viewModel.displayLanguageName()
+        )
 }
+
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun VoiceToTextInputContent(
-    recordingState: VoiceToTextParserState,
+    recordingState: VoiceToTextUiModel,
     startListening: () -> Unit,
     stopListening: () -> Unit,
+    selectedLanguage: String,
 ) {
 
     var canRecord by remember { mutableStateOf(false) }
@@ -91,8 +87,24 @@ private fun VoiceToTextInputContent(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(recordAudioPermissionState.status) {
+        if (recordAudioPermissionState.status == PermissionStatus.Granted) {
+            canRecord = true
+            if (!recordingState.isListening) {
+                startListening()
+                showDialog = true
+            }
+        }
+    }
+    LaunchedEffect(recordingState.isListening) {
+        if (!recordingState.isListening) {
+            stopListening()
+            showDialog = false
+        }
+    }
+
     val onRecord = {
-        if (!recordingState.isSpeaking) {
+        if (!recordingState.isListening) {
             if (canRecord) {
                 startListening()
                 showDialog = true
@@ -112,6 +124,7 @@ private fun VoiceToTextInputContent(
             onConfirm = {
                 recordAudioPermissionState.launchPermissionRequest()
                 dismissDialog = true
+
             },
             onCancel = { dismissDialog = true }
         )
@@ -127,26 +140,16 @@ private fun VoiceToTextInputContent(
         modifier = Modifier.height(IntrinsicSize.Min)
     ) {
         IconButton(onClick = onRecord) {
-            AnimatedContent(
-                targetState = recordingState.isSpeaking,
-                label = "Voice recording animation"
-            ) { isSpeaking ->
-                if (isSpeaking) {
-                    Icon(
-                        imageVector = Icons.Filled.Stop,
-                        contentDescription = "",
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Filled.Mic,
-                        contentDescription = "",
-                    )
-                }
-            }
+            Icon(
+                imageVector = Icons.Filled.Mic,
+                contentDescription = "",
+            )
+
         }
     }
-    LaunchedEffect(recordingState.isSpeaking) {
-        if (!recordingState.isSpeaking) {
+
+    LaunchedEffect(recordingState.isListening) {
+        if (!recordingState.isListening) {
             showDialog = false
         }
     }
@@ -176,6 +179,11 @@ private fun VoiceToTextInputContent(
                         text = stringResource(R.string.voice_to_text_listening),
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(top = 8.dp)
+                    )
+                    Text(
+                        text = selectedLanguage,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }

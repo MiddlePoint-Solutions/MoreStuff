@@ -7,10 +7,13 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import androidx.compose.runtime.Immutable
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Locale
+
 
 class VoiceToTextParserImpl(
     private val context: Application,
@@ -19,7 +22,7 @@ class VoiceToTextParserImpl(
     override val state = _state.asStateFlow()
     private val recognizer = SpeechRecognizer.createSpeechRecognizer(context)
 
-    override fun startListening(languageCode: String) {
+    override fun startListening(languageCode: Language) {
         _state.update { VoiceToTextParserState() }
 
         if (!SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -30,14 +33,23 @@ class VoiceToTextParserImpl(
             }
         }
 
+        val chosenLanguage = if (languageCode == Language.Device) {
+            Locale.getDefault().language
+        } else {
+            languageCode.code
+        }
+
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, languageCode)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
-            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS,3000)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosenLanguage)
+            putExtra(
+                RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS,
+                3000
+            )
+            putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000)
         }
 
         recognizer.setRecognitionListener(this)
@@ -113,6 +125,10 @@ class VoiceToTextParserImpl(
         TODO("Not yet implemented")
     }
 
+    override fun clearSpokenText() {
+        _state.update { it.copy(spokenText = "") }
+    }
+
 }
 
 @Immutable
@@ -121,4 +137,3 @@ data class VoiceToTextParserState(
     val isSpeaking: Boolean = false,
     val error: String? = null,
 )
-

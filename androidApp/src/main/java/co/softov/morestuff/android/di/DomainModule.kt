@@ -203,7 +203,8 @@ val storeModule = module {
             responseMiddleware = get(),
             notificationMiddleware = get(),
             settingsMiddleware = get(),
-            priorityMiddleware = get()
+            priorityMiddleware = get(),
+
         )
     }
 
@@ -218,7 +219,6 @@ val storeModule = module {
     factoryOf(::ErrorMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::DevMiddleware)
-
 }
 
 val taskUseCases = module {

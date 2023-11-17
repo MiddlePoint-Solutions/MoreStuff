@@ -4,6 +4,7 @@ import co.softov.morestuff.android.data.key
 import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.enums.AppSetting.*
 import co.softov.morestuff.android.domain.enums.AppTheme
+import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.redux.state.AppSettings
 import co.softov.morestuff.android.domain.repository.UserRepository
 import com.russhwolf.settings.Settings
@@ -21,7 +22,8 @@ class UserRepositoryImpl(
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             enableConfetti = getSetting(Confetti, enableConfetti),
             reviewTime = getSetting(ReviewTime, reviewTime),
-            enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint)
+            enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
+            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
         )
     }
 
@@ -38,6 +40,7 @@ class UserRepositoryImpl(
                 (settingValue as Pair<Int, Int>).let { "${it.first};${it.second}" }
             )
             ShowHintArrowPriority -> settings.putBoolean(setting.key, settingValue as Boolean)
+            is VoiceInputLanguage -> settings.putString(setting.key, settingValue as String)
         }
     }
 
@@ -51,6 +54,7 @@ class UserRepositoryImpl(
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
             ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
+            VoiceInputLanguage -> Language.valueOf(settings.getString(setting.key, (setting.defaultValue as Language).name))
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -68,6 +72,10 @@ class UserRepositoryImpl(
                 timeStr.toPairInt() ?: setting.defaultValue
             }
             ShowHintArrowPriority -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            VoiceInputLanguage -> {
+                val languageName = settings.getString(setting.key, (defaultValue as Language).name)
+                Language.valueOf(languageName)
+            }
         } as T
 
 }
