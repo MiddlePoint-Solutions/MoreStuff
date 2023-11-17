@@ -2,11 +2,14 @@ package co.softov.morestuff.android.data.utils
 
 import android.content.Context
 import android.text.format.DateFormat.is24HourFormat
+import androidx.compose.ui.res.stringResource
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import kotlinx.datetime.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class TimeFormatterImpl(
     private val context: Context,
@@ -21,9 +24,13 @@ class TimeFormatterImpl(
             val localDateTime = ZonedDateTime.parse(it, formatter)
                 .withZoneSameInstant(ZoneId.systemDefault())
                 .toLocalDateTime()
-            val timeFormatter = DateTimeFormatter.ofPattern(pattern)
+            val timeFormatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
             localDateTime.format(timeFormatter)
         }
+    }
+    override fun formatTimeDayMonthInDeviceLanguage(timeString: String?): String? {
+        val dateConnector = context.getString(R.string.date_connector)
+        return formatTime(timeString, "d '$dateConnector' MMMM")
     }
 
     override fun formatTimeOnly(timeString: String?): String? {

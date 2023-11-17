@@ -215,5 +215,9 @@
     <string name="cd_extra_details">Notes</string>
     <string name="cd_close_search">Close search</string>
 
+    <string name="date_connector">of</string>
+
+
+
 
 </resources>
