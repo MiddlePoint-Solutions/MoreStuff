@@ -4,13 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -32,7 +29,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.app.presentation.extension.clearFocusOnKeyboardDismiss
-import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 
@@ -55,38 +50,27 @@ fun UserTextInput(
     sendAction: (String) -> Unit = {},
     actionsContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
-    focusRequester: FocusRequester = remember { FocusRequester() }
+    focusRequester: FocusRequester = remember { FocusRequester() },
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
     val boxWeight = LocalBoxWeight.current
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
-            .animateContentSize(),
-        shape = RoundedCornerShape(42),
-        color = backgroundColor
+        modifier = modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
+            .animateContentSize(), shape = RoundedCornerShape(42), color = backgroundColor
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 42.dp)
-                .semantics {
-                    contentDescription = a11ylabel
-                },
+            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 42.dp).semantics {
+                contentDescription = a11ylabel
+            },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BasicTextField(
-                value = value,
+            BasicTextField(value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier
-                    .clearFocusOnKeyboardDismiss()
-                    .focusRequester(focusRequester)
-                    .weight(0.88f)
-                    .align(Alignment.CenterVertically)
+                modifier = Modifier.clearFocusOnKeyboardDismiss().focusRequester(focusRequester)
+                    .weight(0.88f).align(Alignment.CenterVertically)
                     .padding(start = 28.dp, end = 4.dp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
@@ -115,38 +99,24 @@ fun UserTextInput(
                         }
                         innerTextField()
                     }
-                }
-            )
+                })
 
             Box(
-                modifier = Modifier
-                    .weight(boxWeight)
-                    .align(Alignment.Bottom)
-                    .padding(end = 8.dp)
+                modifier = Modifier.weight(if (value.text.isBlank()) boxWeight else 0.15f)
+                    .align(Alignment.Bottom).padding(end = 8.dp)
             ) {
-                when {
-                    value.text.isBlank() -> {
-                        actionsContent()
-                    }
-
-                    else -> {
-                        SendIcon(
-                            onClick = { sendAction(value.text) }
-                        )
-                    }
-                }
+                actionsContent()
             }
         }
     }
 }
 
+
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
+    uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark"
 )
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
+    uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light"
 )
 @Composable
 private fun Preview() {

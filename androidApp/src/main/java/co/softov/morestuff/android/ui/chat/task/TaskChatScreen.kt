@@ -4,9 +4,11 @@ import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts.*
+import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +53,7 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
-import co.softov.morestuff.android.ui.model.ScheduleUiModel
+import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
 import co.softov.morestuff.android.ui.input.LocalBoxWeight
@@ -59,6 +61,7 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
@@ -89,10 +92,10 @@ fun TaskChatScreen(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
-
     val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
+
 
     ChildStack(
         source = navigation,
@@ -144,6 +147,7 @@ fun TaskChatScreen(
                     imagePicked = {
                         navigation.push(ChatScreen.ImageImport(it.toString()))
                     },
+
                 )
             }
 
@@ -288,7 +292,7 @@ private fun TaskChatContent(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.Transparent)
+                            .background(Color.Transparent),
                     )
                 }
             }
@@ -334,20 +338,35 @@ private fun TaskChatInput(
                                 horizontalArrangement = Arrangement.Start,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                IconButton(
-                                    onClick = pickImage,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(
-                                        Icons.Filled.PhotoLibrary,
-                                        contentDescription = stringResource(R.string.cd_select_images)
-                                    )
-                                }
-                                VoiceToTextInput(
-                                    onUpdateValue = {
-                                        userInputValue = userInputValue.copy(text = it)
+                                if (isTextEmpty.value) {
+                                    IconButton(
+                                        onClick = pickImage,
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Icon(
+                                            Icons.Filled.PhotoLibrary,
+                                            contentDescription = stringResource(R.string.cd_select_images)
+                                        )
                                     }
-                                )
+                                    VoiceToTextInput(
+                                        onUpdateValue = {
+                                            userInputValue = userInputValue.copy(text = it)
+                                            isTextEmpty.value = it.isBlank()
+                                        }
+                                    )
+                                } else {
+                                    AnimatedVisibility(
+                                        visible = !isTextEmpty.value,
+                                        enter = fadeIn(),
+                                        exit = fadeOut()
+                                    ) {
+                                        SendIcon(onClick = {
+                                            sendTaskMessage(userInputValue.text)
+                                            userInputValue = TextFieldValue()
+                                            isTextEmpty.value = true
+                                        })
+                                    }
+                                }
                             }
                         },
                     )
