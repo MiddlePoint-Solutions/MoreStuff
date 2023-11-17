@@ -42,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -71,6 +72,8 @@ import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
@@ -89,11 +92,25 @@ fun HomeScreen(
     val navigation = LocalAppNavigation.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
-
     val model by viewModel.uiModel.collectAsStateWithLifecycle()
+    val taskSelectionActive = model.taskSelectionActive
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
+    val scrollContainerColor = surfaceContainerElevation
+    val containerColor = remember { mutableStateOf(defaultContainerColor) }
+
+    LaunchedEffect(scrollBehavior, taskSelectionActive) {
+        snapshotFlow { Pair(scrollBehavior.state.overlappedFraction, taskSelectionActive) }
+            .collect { (fraction, isActive) ->
+                when {
+                    isActive -> containerColor.value = scrollContainerColor
+                    fraction > 0.2f -> containerColor.value = scrollContainerColor
+                    else -> containerColor.value = defaultContainerColor
+                }
+            }
+    }
 
     BackHandler(model.taskSelectionActive) {
         viewModel.clearSelectedTasks()
@@ -111,7 +128,8 @@ fun HomeScreen(
                 scrollBehavior = scrollBehavior,
                 clearTaskSelection = viewModel::clearSelectedTasks,
                 completeSelectedTasks = viewModel::completeSelectedTasks,
-                deleteSelectedTasks = { showDeleteConfirmationDialog = true }
+                deleteSelectedTasks = { showDeleteConfirmationDialog = true },
+                containerColor = containerColor
 
             )
         },
