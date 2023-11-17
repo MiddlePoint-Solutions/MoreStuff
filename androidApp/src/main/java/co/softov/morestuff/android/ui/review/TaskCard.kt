@@ -23,6 +23,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -177,28 +178,27 @@ fun TaskCard(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    FilledIconButton(
+
+                    // TODO: uncomment when ready to show task chat from review
+                    /*TaskCardIconButton(
                         onClick = { showTaskChat(item.id) },
-                        modifier = Modifier.size(55.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.secondary,
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        )
                     ) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
                             contentDescription = stringResource(R.string.cd_show_task_chat),
                             tint = MaterialTheme.colorScheme.surfaceContainer
                         )
-                    }
-                    FilledIconButton(
+                    }*/
+
+                    TaskCardIconButton(
                         onClick = { onComplete(item) },
-                        modifier = Modifier.size(55.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
@@ -210,6 +210,22 @@ fun TaskCard(
         }
 
     }
+}
+
+@Composable
+private fun TaskCardIconButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
+    content: @Composable () -> Unit
+) {
+    FilledIconButton(
+        onClick = onClick,
+        modifier = modifier.size(55.dp),
+        colors = colors,
+        shape = RoundedCornerShape(12.dp),
+        content = content
+    )
 }
 
 
