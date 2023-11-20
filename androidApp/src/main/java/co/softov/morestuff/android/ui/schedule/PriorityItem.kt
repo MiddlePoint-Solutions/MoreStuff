@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -33,11 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.domain.enums.ScheduleType
-import co.softov.morestuff.android.domain.model.ScheduleDomain
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.model.TaskUiModel
-import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 
@@ -80,9 +77,10 @@ fun PriorityItem(
                             )
                             .border(
                                 width = 2.dp,
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.surfaceContainer,
                                 shape = CircleShape
                             )
+                            .size(20.dp)
                     )
                 }
             }
