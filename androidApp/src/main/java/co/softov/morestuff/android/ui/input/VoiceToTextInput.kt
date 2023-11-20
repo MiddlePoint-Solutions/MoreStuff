@@ -56,20 +56,20 @@ fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
 ) {
     val viewModel: VoiceToTextViewModel = koinViewModel()
-        val recordingState by viewModel.uiModel.collectAsState()
-        LaunchedEffect(recordingState.spokenText) {
-            if(recordingState.spokenText.isNotEmpty()) {
-                onUpdateValue(recordingState.spokenText)
-                viewModel.clearInput()
-            }
+    val recordingState by viewModel.uiModel.collectAsState()
+    LaunchedEffect(recordingState.spokenText) {
+        if (recordingState.spokenText.isNotEmpty()) {
+            onUpdateValue(recordingState.spokenText)
+            viewModel.clearInput()
         }
+    }
 
-        VoiceToTextInputContent(
-            recordingState = recordingState,
-            startListening = { viewModel.startListening() },
-            stopListening = viewModel::stopListening,
-            selectedLanguage = viewModel.displayLanguageName()
-        )
+    VoiceToTextInputContent(
+        recordingState = recordingState,
+        startListening = { viewModel.startListening() },
+        stopListening = viewModel::stopListening,
+        selectedLanguage = viewModel.displayLanguageName()
+    )
 }
 
 
@@ -87,15 +87,8 @@ private fun VoiceToTextInputContent(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(recordAudioPermissionState.status) {
-        if (recordAudioPermissionState.status == PermissionStatus.Granted) {
-            canRecord = true
-            if (!recordingState.isListening) {
-                startListening()
-                showDialog = true
-            }
-        }
-    }
+
+
     LaunchedEffect(recordingState.isListening) {
         if (!recordingState.isListening) {
             stopListening()
@@ -144,7 +137,6 @@ private fun VoiceToTextInputContent(
                 imageVector = Icons.Filled.Mic,
                 contentDescription = "",
             )
-
         }
     }
 
