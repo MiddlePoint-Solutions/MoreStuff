@@ -16,6 +16,7 @@ class AppStore(
     notificationMiddleware: NotificationMiddleware,
     settingsMiddleware: SettingsMiddleware,
     priorityMiddleware: PriorityMiddleware,
+    scopeMiddleware: ScopeMiddleware
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
@@ -32,5 +33,6 @@ class AppStore(
         responseMiddleware,
         notificationMiddleware,
         priorityMiddleware,
+        scopeMiddleware
     )
 )

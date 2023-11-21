@@ -12,4 +12,5 @@ data class TaskUiModel(
     val hasSchedule: Boolean,
     val hasReminder: Boolean,
     val isSelected: Boolean,
+    val hasScope: Boolean
 )

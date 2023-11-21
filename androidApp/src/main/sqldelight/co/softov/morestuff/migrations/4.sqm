@@ -1,0 +1,18 @@
+CREATE TABLE scope (
+    scope_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    scope_uid TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+CREATE TABLE task_scope (
+    task_id INTEGER NOT NULL REFERENCES task(id),
+    scope_id INTEGER NOT NULL REFERENCES scope(scope_id),
+    PRIMARY KEY (task_id, scope_id)
+);
+
+CREATE TRIGGER AssignToAllScope AFTER INSERT ON task
+FOR EACH ROW
+BEGIN
+    INSERT INTO task_scope (task_id, scope_id)
+    VALUES (task_id, (SELECT scope_id FROM scope WHERE name = 'All'));
+END;

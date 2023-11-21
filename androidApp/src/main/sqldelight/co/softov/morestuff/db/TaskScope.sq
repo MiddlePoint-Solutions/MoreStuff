@@ -1,0 +1,13 @@
+CREATE TABLE task_scope (
+    task_id INTEGER NOT NULL REFERENCES task(id),
+    scope_id INTEGER NOT NULL REFERENCES scope(scope_id),
+    PRIMARY KEY (task_id, scope_id)
+);
+
+insertTask:
+INSERT INTO task_scope (task_id, scope_id)
+VALUES (:task_id, :scope_id);
+
+removeTask:
+DELETE FROM task_scope
+WHERE task_id = :task_id AND scope_id = :scope_id;

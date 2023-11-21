@@ -16,7 +16,6 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOne
 import app.cash.sqldelight.coroutines.mapToOneNotNull
 import co.softov.morestuff.android.domain.enums.ContentType
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +34,7 @@ class TaskRepositoryImpl(
     private val taskQueries = database.taskQueries
     private val scheduleQueries = database.scheduleQueries
     private val messageQueries = database.messageQueries
+    private val taskScopeQueries = database.taskScopeQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createTask(
@@ -233,4 +233,20 @@ class TaskRepositoryImpl(
     override suspend fun countActiveTasks(): Either<Failure, Int> =
         taskQueries.countActiveTasks().executeAsOne().toInt().right()
 
+    override suspend fun getTasksForGivenScope(scopeId: Long): List<TaskDomain> {
+        return taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper)
+            .executeAsList()
+    }
+
+    override suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long) {
+        taskScopeQueries.transaction {
+            taskScopeQueries.insertTask(taskId, scopeId)
+        }
+    }
+
+    override suspend fun removeTaskFromScope(taskId: Long, scopeId: Long) {
+        taskScopeQueries.transaction {
+            taskScopeQueries.removeTask(taskId, scopeId)
+        }
+    }
 }

@@ -1,0 +1,17 @@
+CREATE TABLE scope (
+    scope_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    scope_uid TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+createScope:
+INSERT INTO scope (scope_uid, name)
+VALUES (:scope_uid,:name);
+
+
+
+deleteScope:
+DELETE FROM scope
+WHERE scope_id IN :scope_ids;
+
+INSERT INTO scope (scope_uid, name) VALUES ('all-scope', 'All');

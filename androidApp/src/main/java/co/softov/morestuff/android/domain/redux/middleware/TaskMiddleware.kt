@@ -12,6 +12,9 @@ import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetTasksForGivenScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -38,6 +41,10 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority,
     ) : TaskAction()
 
+    data class GetTasksForGivenScopeAction(val scopeId: Long) : TaskAction()
+    data class InsertTaskIntoScopeAction(val taskId: Long, val scopeId: Long) : TaskAction()
+    data class RemoveTaskFromScopeAction(val taskId: Long, val scopeId: Long) : TaskAction()
+
 }
 
 
@@ -46,7 +53,10 @@ class TaskMiddleware(
     private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val createHintTaskUseCase: CreateHintTaskUseCase,
-    private val deleteTasksUseCase: DeleteTasksUseCase
+    private val deleteTasksUseCase: DeleteTasksUseCase,
+    private val getTasksForGivenScopeUseCase: GetTasksForGivenScopeUseCase,
+    private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
+    private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -81,6 +91,18 @@ class TaskMiddleware(
 
             is DeleteTasksAction -> scope.launch {
                 deleteTasksUseCase(action.taskIds)
+            }
+
+            is GetTasksForGivenScopeAction -> scope.launch {
+                getTasksForGivenScopeUseCase(action.scopeId)
+            }
+
+            is InsertTaskIntoScopeAction -> scope.launch {
+                insertTaskIntoScopeUseCase(action.taskId, action.scopeId)
+            }
+
+            is RemoveTaskFromScopeAction -> scope.launch {
+                removeTaskFromScopeUseCase(action.taskId, action.scopeId)
             }
 
             else -> NoOp
