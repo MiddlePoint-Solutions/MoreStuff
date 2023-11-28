@@ -8,32 +8,47 @@ import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
-import co.softov.morestuff.android.ui.home.HomeUiEvent.*
+import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
+import co.softov.morestuff.android.ui.home.HomeUiEvent.AddSelectedTasksToScope
+import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
+import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
+import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteTask
+import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasks
+import co.softov.morestuff.android.ui.home.HomeUiEvent.SetConfettiEnabled
+import co.softov.morestuff.android.ui.home.HomeUiEvent.SetNotification
+import co.softov.morestuff.android.ui.home.HomeUiEvent.ToggleTaskSelection
+import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoComplete
 import co.softov.morestuff.android.ui.model.NotificationState.Complete
 import co.softov.morestuff.android.ui.model.NotificationState.None
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.model.map.TaskUiMapper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
-    taskMapper: TaskUiMapper
+    private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
+    taskMapper: TaskUiMapper,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val tasks = MutableStateFlow<List<TaskUiModel>>(listOf())
+    private val _selectedScopeId = MutableStateFlow<Long>(1)
 
     init {
         loadData()
 
-        getActiveTasksFlowUseCase()
+        _selectedScopeId.flatMapLatest { scopeId ->
+            getActiveTasksFlowUseCase(scopeId)
+        }
             .mapLatest { taskMapper.map(it, state.selectedTaskIds) }
             .onEach { tasks.value = it }
             .stateIn(
@@ -42,6 +57,7 @@ class HomeViewModel(
                 initialValue = listOf()
             )
     }
+
 
     override fun onAppStateChange(state: AppState) {
         sendEvent(SetConfettiEnabled(state.settings.enableConfetti))
@@ -113,6 +129,16 @@ class HomeViewModel(
                 )
             }
 
+            is AddSelectedTasksToScope -> {
+                val selectedTaskIds = state.selectedTaskIds
+                viewModelScope.launch {
+                    selectedTaskIds.forEach { taskId ->
+                        insertTaskIntoScopeUseCase(taskId, event.scopeId)
+                    }
+                }
+                state
+            }
+
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
         }
     }
@@ -162,6 +188,14 @@ class HomeViewModel(
 
     fun clearSelectedTasks() {
         sendEvent(ClearTaskSelection)
+    }
+
+    fun addSelectedTasksToScope(scopeId: Long) {
+        sendEvent(AddSelectedTasksToScope(scopeId))
+    }
+
+    fun updateTasksForSelectedScope(scopeId: Long) {
+        _selectedScopeId.value = scopeId
     }
 
 }

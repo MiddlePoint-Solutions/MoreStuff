@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,14 +13,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -33,6 +38,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -70,18 +76,24 @@ import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
+import co.softov.morestuff.android.ui.scope.ScopeUiEvent
+import co.softov.morestuff.android.ui.scope.ScopeUiModel
+import co.softov.morestuff.android.ui.scope.ScopeViewModel
+import co.softov.morestuff.android.ui.scope.ScopesScreen
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,6 +127,14 @@ fun HomeScreen(
     BackHandler(model.taskSelectionActive) {
         viewModel.clearSelectedTasks()
     }
+    val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val showScopeSelection: () -> Unit = {
+        scope.launch {
+            if (!scopeSelectionSheetState.isVisible) {
+                scopeSelectionSheetState.show()
+            }
+        }
+    }
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
@@ -129,16 +149,21 @@ fun HomeScreen(
                 clearTaskSelection = viewModel::clearSelectedTasks,
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
+                selectScope = showScopeSelection,
                 containerColor = containerColor
 
             )
         },
         content = {
-            HomeContent(
-                showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
-                snackbarHostState = snackbarHostState,
-                modifier = Modifier.padding(it),
-            )
+            Column(modifier = Modifier.fillMaxSize()) {
+                ScopesScreen(modifier = Modifier.padding(it))
+                /*HomeContent(
+                    showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
+                    snackbarHostState = snackbarHostState,
+                    modifier = Modifier.padding(it),
+                )*/
+            }
+
         },
     )
 
@@ -163,6 +188,13 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         )
     }
+    if (scopeSelectionSheetState.isVisible) {
+        ScopeSelectionBottomSheet(
+            onDismissRequest = { scope.launch { scopeSelectionSheetState.hide() } },
+            sheetState = scopeSelectionSheetState,
+            coroutineScope = scope
+        )
+    }
 }
 
 
@@ -180,11 +212,18 @@ fun HomeContent(
 
     var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-
     val tasks by homeViewModel.tasks.collectAsState()
     val model by homeViewModel.uiModel.collectAsState()
 
     val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
+
+    val scopeViewModel: ScopeViewModel = koinViewModel()
+    val selectedScopeId = remember { scopeViewModel.uiState.value.selectedScopeId }
+    LaunchedEffect(selectedScopeId) {
+        selectedScopeId?.let {
+            homeViewModel.updateTasksForSelectedScope(it)
+        }
+    }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(model.notification) {
@@ -451,6 +490,146 @@ private fun TaskInputBottomSheet(
         }
     )
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScopeSelectionBottomSheet(
+    onDismissRequest: () -> Unit,
+    sheetState: SheetState,
+    coroutineScope: CoroutineScope,
+) {
+    val scopeViewModel: ScopeViewModel = koinViewModel()
+    val homeViewModel: HomeViewModel = koinViewModel()
+    val scopes = scopeViewModel.uiState.collectAsState()
+    var newScopeName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue())
+    }
+    val isTextEmpty = remember(newScopeName.text) {
+        mutableStateOf(newScopeName.text.isBlank())
+    }
+    var isUserInputActive by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    ModalBottomSheet(
+        content = {
+            BoxWithConstraints {
+                Column(
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    ScopeList(
+                        scopes = scopes,
+                        onScopeSelected = { scopeId ->
+                            scopeViewModel.handleEvent(ScopeUiEvent.SelectScope(scopeId))
+                            //scopeViewModel.insertTaskIntoScope(scopeId, homeViewModel.getSelectedTaskIds())
+                            homeViewModel.addSelectedTasksToScope(scopeId)
+                            homeViewModel.clearSelectedTasks()
+                        },
+                        coroutineScope = coroutineScope,
+                        sheetState = sheetState,
+                        modifier = Modifier.height(216.dp),
+                    )
+                    if (isUserInputActive) {
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.padding(bottom = 6.dp).navigationBarsPadding()
+                        ) {
+                            UserInput(
+                                textContent = {
+                                    UserTextInput(
+                                        value = newScopeName,
+                                        onValueChange = { newScopeName = it },
+                                        focusRequester = focusRequester,
+                                        sendAction = {
+                                            coroutineScope.launch {
+                                                scopeViewModel.handleEvent(
+                                                    ScopeUiEvent.CreateScope(
+                                                        UUID.randomUUID().toString(),
+                                                        newScopeName.text
+                                                    )
+                                                )
+                                                newScopeName = newScopeName.copy("")
+                                                sheetState.hide()
+                                            }
+                                        },
+                                        actionsContent = {
+                                            if (isTextEmpty.value) {
+                                                VoiceToTextInput(
+                                                    onUpdateValue = {
+                                                        newScopeName = newScopeName.copy("")
+                                                    }
+                                                )
+                                            } else {
+                                                AnimatedVisibility(
+                                                    visible = !isTextEmpty.value,
+                                                    enter = fadeIn(),
+                                                    exit = fadeOut()
+                                                ) {
+                                                    SendIcon(onClick = {
+                                                        coroutineScope.launch {
+                                                            scopeViewModel.handleEvent(
+                                                                ScopeUiEvent.CreateScope(
+                                                                    UUID.randomUUID().toString(),
+                                                                    newScopeName.text
+                                                                )
+                                                            )
+                                                            newScopeName = newScopeName.copy("")
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    )
+                                })
+                        }
+                    }
+                    Button(
+                        onClick = {
+                            isUserInputActive = true
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isUserInputActive
+                    ) {
+                        Text("Create new Scope")
+                    }
+                }
+            }
+
+        },
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScopeList(
+    scopes: State<ScopeUiModel>,
+    onScopeSelected: (Long) -> Unit,
+    coroutineScope: CoroutineScope,
+    sheetState: SheetState,
+    modifier: Modifier,
+) {
+    Text(
+        text = "Choose a Scope",
+        style = MaterialTheme.typography.titleMedium
+    )
+    LazyColumn {
+        items(scopes.value.scopes.size) { index ->
+            val scope = scopes.value.scopes[index]
+            ListItem(
+                modifier = Modifier.clickable {
+                    onScopeSelected(scope.scopeId)
+                    coroutineScope.launch { sheetState.hide() }
+                },
+                headlineContent = {
+                    Text(scope.name)
+                }
+            )
+        }
+    }
+}
+
 
 @Composable
 private fun ConfirmDeleteDialog(

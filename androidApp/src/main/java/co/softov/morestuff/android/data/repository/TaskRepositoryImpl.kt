@@ -1,27 +1,31 @@
 package co.softov.morestuff.android.data.repository
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import app.cash.sqldelight.coroutines.mapToOneNotNull
 import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.data.mapper.TaskDb
+import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
-import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
-import app.cash.sqldelight.coroutines.asFlow
-import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOneNotNull
-import co.softov.morestuff.android.domain.enums.ContentType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
@@ -36,6 +40,10 @@ class TaskRepositoryImpl(
     private val messageQueries = database.messageQueries
     private val taskScopeQueries = database.taskScopeQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
+    private val _currentScopeId = MutableStateFlow<Long>(1)
+    override fun updateCurrentScopeId(newScopeId: Long) {
+        _currentScopeId.value = newScopeId
+    }
 
     override suspend fun createTask(
         title: String,
@@ -50,6 +58,8 @@ class TaskRepositoryImpl(
             )
             taskQueries.insertTask(data)
             val taskId = lastInsertedRowId
+
+            taskScopeQueries.insertTask(taskId, 1)
             taskQueries.selectTaskById(taskId, mapper = mapper.taskDbMapper).executeAsOne()
         }
     }
@@ -72,7 +82,18 @@ class TaskRepositoryImpl(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
+        return _currentScopeId.flatMapLatest { scopeId ->
+            if (scopeId == 1L) {
+                combineActiveTasksFlows()
+            } else {
+                getTasksForGivenScopeFlow(scopeId)
+            }
+        }
+    }
+
+    private fun combineActiveTasksFlows(): Flow<List<TaskDomain>> {
         val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
             .asFlow()
             .mapToList(Dispatchers.IO)
@@ -81,7 +102,6 @@ class TaskRepositoryImpl(
                 .asFlow()
                 .mapToList(Dispatchers.IO)
                 .map { it.groupBy { schedule -> schedule.taskId } }
-
         val messagesFlow =
             messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
                 .asFlow()
@@ -98,6 +118,12 @@ class TaskRepositoryImpl(
                     extraDetails = messageTaskIds.contains(task.id)
                 )
             }
+        }
+    }
+
+    private fun getTasksForGivenScopeFlow(scopeId: Long): Flow<List<TaskDomain>> {
+        return flow {
+            emit(taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper).executeAsList())
         }
     }
 

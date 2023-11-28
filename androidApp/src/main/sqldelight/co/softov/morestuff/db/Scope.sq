@@ -14,4 +14,9 @@ deleteScope:
 DELETE FROM scope
 WHERE scope_id IN :scope_ids;
 
-INSERT INTO scope (scope_uid, name) VALUES ('all-scope', 'All');
+INSERT INTO scope (scope_id, scope_uid, name) VALUES (1, 'all-scope', 'All');
+
+
+getScope:
+SELECT scope_id, scope_uid, name
+FROM scope;

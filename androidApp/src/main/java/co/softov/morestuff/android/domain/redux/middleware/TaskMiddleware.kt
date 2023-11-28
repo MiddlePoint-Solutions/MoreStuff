@@ -20,6 +20,7 @@ import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 sealed class TaskAction : Action.FeatureAction() {
 
@@ -94,6 +95,7 @@ class TaskMiddleware(
             }
 
             is GetTasksForGivenScopeAction -> scope.launch {
+                Timber.d(" Scope Manejando acción GetTasksForGivenScopeAction para scopeId: ${action.scopeId}")
                 getTasksForGivenScopeUseCase(action.scopeId)
             }
 

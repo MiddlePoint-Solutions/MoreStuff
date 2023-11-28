@@ -104,6 +104,7 @@ val dataModule = module {
     single<ScopeRepository> {
         ScopeRepositoryImpl(
             database = get(),
+            dataMappers = get()
         )
     }
 

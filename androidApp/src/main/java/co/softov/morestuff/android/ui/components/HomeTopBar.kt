@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,6 +53,7 @@ fun HomeTopBar(
     clearTaskSelection: () -> Unit,
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
+    selectScope: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     containerColor: State<Color>,
 ) {
@@ -100,6 +102,13 @@ fun HomeTopBar(
                         contentDescription = stringResource(R.string.cd_priority_review)
                     )
                 }
+                IconButton(onClick = selectScope) {
+                    Icon(
+                        imageVector = Icons.Rounded.Layers,
+                        contentDescription = stringResource(R.string.cd_priority_review)
+                    )
+                }
+
                 IconButton(onClick = completeSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Done,
@@ -184,6 +193,7 @@ private fun Preview() {
             clearTaskSelection = {},
             completeSelectedTasks = {},
             deleteSelectedTasks = {},
+            selectScope = {},
             containerColor = previewContainerColor
         )
     }
