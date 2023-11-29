@@ -28,5 +28,15 @@ class ScopeRepositoryImpl(
             dataMappers.scopeDbMapper(scope.scope_id, scope.scope_uid, scope.name)
         }
     }
+    override suspend fun updateScopeName(scopeId: Long, newName: String) {
+        scopeQueries.transaction {
+            scopeQueries.updateScopeName(newName, scopeId)
+        }
+    }
+    override suspend fun updateScopeOrder(scopeId: Long, newOrderIndex: Long) {
+        scopeQueries.transaction {
+            scopeQueries.updateScopeOrder(scopeId, newOrderIndex)
+        }
+    }
 
 }

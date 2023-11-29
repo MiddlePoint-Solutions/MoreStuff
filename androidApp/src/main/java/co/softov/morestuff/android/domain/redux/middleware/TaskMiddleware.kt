@@ -4,15 +4,21 @@ import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CompleteTasksAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateHintTask
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateUserTaskAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.DeleteTasksAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.InsertTaskIntoScopeAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.RemoveTaskFromScopeAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.TaskCreatedAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.UpdateTaskTitleAction
+import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.store.Next
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.*
-import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetTasksForGivenScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
@@ -20,7 +26,6 @@ import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class TaskAction : Action.FeatureAction() {
 
@@ -42,7 +47,6 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority,
     ) : TaskAction()
 
-    data class GetTasksForGivenScopeAction(val scopeId: Long) : TaskAction()
     data class InsertTaskIntoScopeAction(val taskId: Long, val scopeId: Long) : TaskAction()
     data class RemoveTaskFromScopeAction(val taskId: Long, val scopeId: Long) : TaskAction()
 
@@ -55,7 +59,6 @@ class TaskMiddleware(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val createHintTaskUseCase: CreateHintTaskUseCase,
     private val deleteTasksUseCase: DeleteTasksUseCase,
-    private val getTasksForGivenScopeUseCase: GetTasksForGivenScopeUseCase,
     private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
     private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
 ) : Middleware<AppState> {
@@ -92,11 +95,6 @@ class TaskMiddleware(
 
             is DeleteTasksAction -> scope.launch {
                 deleteTasksUseCase(action.taskIds)
-            }
-
-            is GetTasksForGivenScopeAction -> scope.launch {
-                Timber.d(" Scope Manejando acción GetTasksForGivenScopeAction para scopeId: ${action.scopeId}")
-                getTasksForGivenScopeUseCase(action.scopeId)
             }
 
             is InsertTaskIntoScopeAction -> scope.launch {

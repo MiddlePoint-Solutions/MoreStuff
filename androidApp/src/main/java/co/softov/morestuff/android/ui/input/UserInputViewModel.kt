@@ -40,14 +40,15 @@ class UserInputViewModel(
 
     private val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
-        .distinctUntilChanged { old, new -> old.id == new.id }
+        .distinctUntilChanged { old, new -> old?.id == new?.id }
         .map { message ->
-            messageUiMapper.internalMap(message)
-
-        }.onEach { uiMessage ->
-            Timber.d("Adding message: ${uiMessage.id} ")
-            messages.update {
-                it.toMutableList().apply { add(0, uiMessage) }
+            message?.let(messageUiMapper::internalMap)
+        }.onEach { message ->
+            message?.let {
+                Timber.d("Adding message: ${it.id} ")
+                messages.update { messages ->
+                    messages.toMutableList().apply { add(0, it) }
+                }
             }
         }.stateIn(
             scope = viewModelScope,

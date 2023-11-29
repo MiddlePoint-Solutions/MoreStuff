@@ -5,52 +5,57 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.nav.Screen
-import co.softov.morestuff.android.ui.home.HomeContent
-import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.home.HomeViewModel
+import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.surfaceContainer
-import com.arkivanov.decompose.router.stack.push
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 
-
 @Composable
 fun ScopesScreen(
-    modifier: Modifier = Modifier
+    showTaskChat: (taskId: Long) -> Unit,
 ) {
     val viewModel: ScopeViewModel = koinViewModel()
-
+    val homeViewModel: HomeViewModel = koinViewModel()
     val uiState = viewModel.uiState.collectAsState()
-
-    val navigation = LocalAppNavigation.current
-    val snackbarHostState = remember { SnackbarHostState() }
+    val tasks by homeViewModel.tasks.collectAsState()
+    val model by homeViewModel.uiModel.collectAsState()
+    var taskOptions by remember { mutableLongStateOf(0) }
+    val priorityScrollState = rememberLazyListState()
 
     if (uiState.value.scopes.isNotEmpty()) {
-        Column(modifier) {
-            Spacer(Modifier.height(8.dp))
-
+        Column {
             uiState.value.selectedScopeId?.let { selectedScopeId ->
                 val selectedScope = uiState.value.scopes.find { it.scopeId == selectedScopeId }
                 selectedScope?.let {
                     ScopeTabs(
                         scopes = uiState.value.scopes,
                         selectedScope = it,
-                        onScopeSelected = { scope -> viewModel.handleEvent(ScopeUiEvent.SelectScope(scope.scopeId)) },
-                        modifier = Modifier.fillMaxWidth()
+                        onScopeSelected = { scope ->
+                            viewModel.handleEvent(
+                                ScopeUiEvent.SelectScope(
+                                    scope.scopeId
+                                )
+                            )
+                        },
                     )
                 }
             }
@@ -66,9 +71,21 @@ fun ScopesScreen(
                     .weight(1f), label = ""
             ) { scopeId ->
                 scopeId?.let {
-                    HomeContent(
-                        showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) },
-                        snackbarHostState = snackbarHostState
+                    PriorityContent(
+                        tasks = tasks,
+                        onItemClick = { taskId ->
+                            if (model.taskSelectionActive) {
+                                homeViewModel.toggleTaskSelection(taskId)
+                            } else {
+                                showTaskChat(taskId)
+                            }
+                        },
+                        onItemLongClick = homeViewModel::toggleTaskSelection,
+                        showTaskOptions = { taskOptions = it },
+                        toggleQuickReminder = homeViewModel::toggleQuickReminder,
+                        listState = priorityScrollState,
+                        taskSelectionActive = { model.taskSelectionActive },
+                        modifier = Modifier.padding(bottom = 20.dp),
                     )
                 }
             }
@@ -81,11 +98,8 @@ fun ScopeTabs(
     scopes: List<ScopeDomain>,
     selectedScope: ScopeDomain,
     onScopeSelected: (ScopeDomain) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     val selectedIndex = scopes.indexOfFirst { it == selectedScope }
-
-
     val selectedTabColor = MaterialTheme.colorScheme.primary
     val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
 

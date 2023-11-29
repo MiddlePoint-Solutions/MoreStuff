@@ -17,11 +17,12 @@ import timber.log.Timber
 class ScopeViewModel(
     private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
     private val getScopesUseCase: GetScopesUseCase,
-    private val taskRepository: TaskRepository
+    private val taskRepository: TaskRepository,
 ) : BaseViewModel<ScopeUiModel, ScopeUiEvent>(ScopeUiModel()) {
 
     private val _uiState = MutableStateFlow(ScopeUiModel())
     val uiState: StateFlow<ScopeUiModel> = _uiState.asStateFlow()
+
     init {
         handleEvent(ScopeUiEvent.LoadScopes)
     }
@@ -32,13 +33,29 @@ class ScopeViewModel(
                 loadDataAndPrepare()
                 state
             }
+
             is ScopeUiEvent.CreateScope -> {
                 createScope(event.uid, event.name)
                 state
             }
+
             is ScopeUiEvent.SelectScope -> {
                 selectScope(event.scopeId)
                 state.copy(selectedScopeId = event.scopeId)
+            }
+            is ScopeUiEvent.DeleteScopes -> {
+                deleteScopes(event.scopeIds)
+                state
+            }
+            is ScopeUiEvent.UpdateScopeName -> {
+                updateScopeName(event.scopeId, event.newName)
+                state
+            }
+            is ScopeUiEvent.ReorderScopes -> {
+                val reorderedScopes = state.scopes.sortedBy { scope ->
+                    event.newOrder.indexOf(scope.scopeId)
+                }
+                state.copy(scopes = reorderedScopes)
             }
         }
     }
@@ -48,13 +65,19 @@ class ScopeViewModel(
             is ScopeUiEvent.LoadScopes -> loadDataAndPrepare()
             is ScopeUiEvent.CreateScope -> createScope(event.uid, event.name)
             is ScopeUiEvent.SelectScope -> selectScope(event.scopeId)
+            is ScopeUiEvent.DeleteScopes -> deleteScopes(event.scopeIds)
+            is ScopeUiEvent.UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
+            is ScopeUiEvent.ReorderScopes -> reorderScopes(event.newOrder)
         }
     }
 
     private fun loadDataAndPrepare() {
         viewModelScope.launch {
             val loadedScopes = getScopesUseCase.invoke()
-            _uiState.value = _uiState.value.copy(scopes = loadedScopes, selectedScopeId = loadedScopes.firstOrNull()?.scopeId)
+            _uiState.value = _uiState.value.copy(
+                scopes = loadedScopes,
+                selectedScopeId = loadedScopes.firstOrNull()?.scopeId
+            )
         }
     }
 
@@ -75,16 +98,37 @@ class ScopeViewModel(
     }
 
 
-    fun deleteScopes(scopeId: List<Long>) {
-        dispatchAppStoreAction(ScopeAction.DeleteScopeAction(scopeId))
+    fun deleteScopes(scopeIds: List<Long>) {
+        viewModelScope.launch {
+            dispatchAppStoreAction(ScopeAction.DeleteScopeAction(scopeIds))
+            delay(500)
+            loadDataAndPrepare()
+        }
     }
+
 
     fun removeTaskFromScope(taskId: Long, scopeId: Long) {
         viewModelScope.launch {
             removeTaskFromScopeUseCase(taskId, scopeId)
         }
     }
+    private fun updateScopeName(scopeId: Long, newName: String) {
+        viewModelScope.launch {
+            dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))
+            delay(500)
+            loadDataAndPrepare()
+        }
+    }
+    private fun reorderScopes(newOrder: List<Long>) {
+        viewModelScope.launch {
+            newOrder.forEachIndexed { index, scopeId ->
+                dispatchAppStoreAction(ScopeAction.UpdateScopeOrderAction(scopeId, index.toLong()))
+            }
+            delay(500)
 
+            loadDataAndPrepare()
+        }
+    }
 
 
 }

@@ -143,8 +143,14 @@
     <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
-
-
+    <string name="sure_delete_scope">Are you sure you want to delete\nthe following scope?</string>
+    <string name="create_new_scope">Create new Scope</string>
+    <string name="confirm">Confirm</string>
+    <string name="edit_scope_name">Edit Scope Name</string>
+    <string name="task_scopes">Task Scopes</string>
+    <string name="create_scope">Create Scope</string>
+    <string name="choose_scope">Choose Scope</string>
+    <string name="manage_scopes">Manage Scopes</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>

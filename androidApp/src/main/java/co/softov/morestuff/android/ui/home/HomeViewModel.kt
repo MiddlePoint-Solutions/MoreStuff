@@ -41,12 +41,12 @@ class HomeViewModel(
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val tasks = MutableStateFlow<List<TaskUiModel>>(listOf())
-    private val _selectedScopeId = MutableStateFlow<Long>(1)
+    private val selectedScopeId = MutableStateFlow<Long>(1)
 
     init {
         loadData()
 
-        _selectedScopeId.flatMapLatest { scopeId ->
+        selectedScopeId.flatMapLatest { scopeId ->
             getActiveTasksFlowUseCase(scopeId)
         }
             .mapLatest { taskMapper.map(it, state.selectedTaskIds) }
@@ -195,7 +195,7 @@ class HomeViewModel(
     }
 
     fun updateTasksForSelectedScope(scopeId: Long) {
-        _selectedScopeId.value = scopeId
+        selectedScopeId.value = scopeId
     }
 
 }

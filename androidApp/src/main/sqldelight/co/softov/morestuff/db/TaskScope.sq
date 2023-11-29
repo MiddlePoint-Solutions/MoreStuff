@@ -5,7 +5,7 @@ CREATE TABLE task_scope (
 );
 
 insertTask:
-INSERT INTO task_scope (task_id, scope_id)
+INSERT OR IGNORE INTO task_scope (task_id, scope_id)
 VALUES (:task_id, :scope_id);
 
 removeTask:

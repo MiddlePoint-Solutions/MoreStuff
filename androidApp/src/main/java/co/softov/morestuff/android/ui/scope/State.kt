@@ -18,5 +18,8 @@ sealed class ScopeUiEvent : BaseViewEvent {
     data object LoadScopes : ScopeUiEvent()
     data class CreateScope(val uid: String, val name: String) : ScopeUiEvent()
     data class SelectScope(val scopeId: Long) : ScopeUiEvent()
+    data class DeleteScopes(val scopeIds: List<Long>) : ScopeUiEvent()
+    data class UpdateScopeName(val scopeId: Long, val newName: String) : ScopeUiEvent()
+    data class ReorderScopes(val newOrder: List<Long>) : ScopeUiEvent()
 }
 

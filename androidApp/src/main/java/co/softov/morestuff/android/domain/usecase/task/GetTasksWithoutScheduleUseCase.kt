@@ -2,7 +2,6 @@ package co.softov.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
-import co.softov.morestuff.android.domain.model.ReviewTasks
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
 

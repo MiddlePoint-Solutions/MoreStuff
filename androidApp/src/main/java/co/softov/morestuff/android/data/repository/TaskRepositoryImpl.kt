@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
@@ -40,9 +39,9 @@ class TaskRepositoryImpl(
     private val messageQueries = database.messageQueries
     private val taskScopeQueries = database.taskScopeQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
-    private val _currentScopeId = MutableStateFlow<Long>(1)
+    private val currentScopeId = MutableStateFlow<Long>(1)
     override fun updateCurrentScopeId(newScopeId: Long) {
-        _currentScopeId.value = newScopeId
+        currentScopeId.value = newScopeId
     }
 
     override suspend fun createTask(
@@ -84,7 +83,7 @@ class TaskRepositoryImpl(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        return _currentScopeId.flatMapLatest { scopeId ->
+        return currentScopeId.flatMapLatest { scopeId ->
             if (scopeId == 1L) {
                 combineActiveTasksFlows()
             } else {
@@ -122,10 +121,38 @@ class TaskRepositoryImpl(
     }
 
     private fun getTasksForGivenScopeFlow(scopeId: Long): Flow<List<TaskDomain>> {
-        return flow {
-            emit(taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper).executeAsList())
+        val tasksFlow = taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper)
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+        val schedulesFlow =
+            scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { it.groupBy { schedule -> schedule.taskId } }
+        val messagesFlow =
+            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { messages ->
+                    messages.groupBy { message -> message.task_id }
+                        .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
+                }
+
+        return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
+            tasks.map { task ->
+                task.copy(
+                    schedule = schedules[task.id] ?: listOf(),
+                    extraDetails = messageTaskIds.contains(task.id)
+                )
+            }
         }
     }
+
+    /* private fun getTasksForGivenScopeFlow(scopeId: Long): Flow<List<TaskDomain>> {
+         return flow {
+             emit(taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper).executeAsList())
+         }
+     }*/
 
     override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
         taskQueries.selectAllComplete(mapper = mapper.taskDbMapper)
@@ -259,10 +286,6 @@ class TaskRepositoryImpl(
     override suspend fun countActiveTasks(): Either<Failure, Int> =
         taskQueries.countActiveTasks().executeAsOne().toInt().right()
 
-    override suspend fun getTasksForGivenScope(scopeId: Long): List<TaskDomain> {
-        return taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper)
-            .executeAsList()
-    }
 
     override suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long) {
         taskScopeQueries.transaction {

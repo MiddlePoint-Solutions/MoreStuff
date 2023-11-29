@@ -15,6 +15,7 @@ SELECT *
 FROM task
 ORDER BY datetime(create_time);
 
+
 selectAllActive:
 SELECT *
 FROM task
@@ -118,6 +119,7 @@ SELECT task.*
 FROM task
 JOIN task_scope ON task.id = task_scope.task_id
 WHERE task_scope.scope_id = :scope_id
+  AND task.complete_time IS NULL
 ORDER BY task.priority_score;
 
 
