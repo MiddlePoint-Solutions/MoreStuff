@@ -39,7 +39,7 @@ class TaskRepositoryImpl(
     private val messageQueries = database.messageQueries
     private val taskScopeQueries = database.taskScopeQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
-    private val currentScopeId = MutableStateFlow<Long>(1)
+    override val currentScopeId = MutableStateFlow<Long>(1)
     override fun updateCurrentScopeId(newScopeId: Long) {
         currentScopeId.value = newScopeId
     }
@@ -210,9 +210,10 @@ class TaskRepositoryImpl(
         return Right(true)
     }
 
-    override suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>> {
+    override suspend fun getTasksWithoutSchedule(scopeId: Long): Either<Failure, List<TaskDomain>> {
         val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutSchedule(
             listOf(ScheduleType.OneTime),
+            scopeId,
             mapper = mapper.taskDbMapper
         ).executeAsList()
 

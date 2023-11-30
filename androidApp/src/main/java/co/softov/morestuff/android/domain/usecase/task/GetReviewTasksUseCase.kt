@@ -17,7 +17,8 @@ class GetReviewTasksUseCaseImpl(
 
     override suspend fun invoke(): Either<Failure, ReviewTasks> =
         taskRepository.countActiveTasks().flatMap { count ->
-            getTasksWithoutScheduleUseCase().map { tasks ->
+            val scopeId = taskRepository.currentScopeId.value
+            getTasksWithoutScheduleUseCase(scopeId).map { tasks ->
                 ReviewTasks(tasks, count)
             }
         }

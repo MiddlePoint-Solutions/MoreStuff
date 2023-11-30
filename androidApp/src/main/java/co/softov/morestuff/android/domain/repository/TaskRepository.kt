@@ -8,6 +8,7 @@ import co.softov.morestuff.android.domain.model.FeatureFailure
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface TaskRepository {
 
@@ -31,7 +32,7 @@ interface TaskRepository {
     suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
     suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
 
-    suspend fun getTasksWithoutSchedule(): Either<Failure, List<TaskDomain>>
+    suspend fun getTasksWithoutSchedule(scopeId: Long): Either<Failure, List<TaskDomain>>
     suspend fun getTasksWithSchedule(scheduleTypes: List<ScheduleType>): Either<Failure, List<TaskDomain>>
     fun searchTasks(searchText: String): Flow<List<TaskDomain>>
     suspend fun countActiveTasks(): Either<Failure, Int>
@@ -40,6 +41,8 @@ interface TaskRepository {
     suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long)
     suspend fun removeTaskFromScope(taskId: Long, scopeId: Long)
     fun updateCurrentScopeId(newScopeId: Long)
+    val currentScopeId: MutableStateFlow<Long>
+
 }
 
 object TaskDoesNotExist : FeatureFailure

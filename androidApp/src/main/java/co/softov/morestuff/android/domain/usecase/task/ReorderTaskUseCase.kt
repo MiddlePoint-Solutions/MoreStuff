@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 
 val NA: Nothing? = null
 
+
 interface ReorderTaskUseCase {
     suspend operator fun invoke(
         taskId: Long,
@@ -19,7 +20,9 @@ interface ReorderTaskUseCase {
 
 class ReorderTaskUseCaseImpl(
     private val priorityRepository: PriorityRepository,
-    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase
+    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
+    private val taskRepository: TaskRepository,
+    val scopeId: Long = taskRepository.currentScopeId.value
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
         taskId: Long,
@@ -41,9 +44,9 @@ class ReorderTaskUseCaseImpl(
         else -> {
             val average = (aboveScore + belowScore) / 2
             if (aboveScore == average) {
-                priorityRepository.updateTasksPriorityScoreByAdding(taskId, average)
+                priorityRepository.updateTasksPriorityScoreByAdding(taskId, average, scopeId)
             } else if (belowScore == average) {
-                priorityRepository.updateTasksPriorityScoreBySubtracting(taskId, average)
+                priorityRepository.updateTasksPriorityScoreBySubtracting(taskId, average, scopeId)
             } else {
                 updateTaskPriorityScoreUseCase(taskId, average)
             }

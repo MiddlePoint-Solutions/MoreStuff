@@ -6,14 +6,14 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetTasksWithoutScheduleUseCase {
-    suspend operator fun invoke(): Either<Failure, List<TaskDomain>>
+    suspend operator fun invoke(scopeId: Long): Either<Failure, List<TaskDomain>>
 }
 
 class GetTasksWithoutScheduleUseCaseImpl(
     private val taskRepository: TaskRepository,
 ) : GetTasksWithoutScheduleUseCase {
 
-    override suspend fun invoke(): Either<Failure, List<TaskDomain>> =
-        taskRepository.getTasksWithoutSchedule()
+    override suspend fun invoke(scopeId: Long): Either<Failure, List<TaskDomain>> =
+        taskRepository.getTasksWithoutSchedule(scopeId)
 }
 

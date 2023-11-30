@@ -11,8 +11,10 @@ interface DecrementTaskPriorityScoreUseCase {
 
 class DecreaseTaskPriorityScoreUseCaseImpl(
     private val priorityRepository: PriorityRepository,
+    private val taskRepository: TaskRepository
 ) : DecrementTaskPriorityScoreUseCase {
     override suspend operator fun invoke(taskId: Long): Either<Failure, Long> {
-        return priorityRepository.decreaseTaskPriorityScore(taskId)
+        val scopeId = taskRepository.currentScopeId.value
+        return priorityRepository.decreaseTaskPriorityScore(taskId, scopeId)
     }
 }
