@@ -9,6 +9,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.AddSelectedTasksToScope
 import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
 import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
+    private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
     taskMapper: TaskUiMapper,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
@@ -138,6 +140,15 @@ class HomeViewModel(
                 }
                 state
             }
+            is HomeUiEvent.DeleteSelectedTasksFromScope -> {
+                val selectedTaskIds = state.selectedTaskIds
+                viewModelScope.launch {
+                    selectedTaskIds.forEach { taskId ->
+                        removeTaskFromScopeUseCase(taskId)
+                    }
+                }
+                state
+            }
 
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
         }
@@ -196,6 +207,10 @@ class HomeViewModel(
 
     fun updateTasksForSelectedScope(scopeId: Long) {
         selectedScopeId.value = scopeId
+    }
+
+    fun removeTaskFromScope() {
+        sendEvent(HomeUiEvent.DeleteSelectedTasksFromScope)
     }
 
 }

@@ -25,4 +25,5 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class SetConfettiEnabled(val enabled: Boolean) : HomeUiEvent()
     data class SetNotification(val notification: NotificationState) : HomeUiEvent()
     data class AddSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
+    data object DeleteSelectedTasksFromScope : HomeUiEvent()
 }

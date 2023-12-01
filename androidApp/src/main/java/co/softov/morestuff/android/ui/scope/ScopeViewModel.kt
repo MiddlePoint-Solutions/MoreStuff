@@ -5,7 +5,6 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
-import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +14,6 @@ import timber.log.Timber
 
 
 class ScopeViewModel(
-    private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
     private val getScopesUseCase: GetScopesUseCase,
     private val taskRepository: TaskRepository,
 ) : BaseViewModel<ScopeUiModel, ScopeUiEvent>(ScopeUiModel()) {
@@ -106,12 +104,6 @@ class ScopeViewModel(
         }
     }
 
-
-    fun removeTaskFromScope(taskId: Long, scopeId: Long) {
-        viewModelScope.launch {
-            removeTaskFromScopeUseCase(taskId, scopeId)
-        }
-    }
     private fun updateScopeName(scopeId: Long, newName: String) {
         viewModelScope.launch {
             dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))

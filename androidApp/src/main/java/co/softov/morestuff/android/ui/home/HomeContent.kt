@@ -149,7 +149,8 @@ fun HomeScreen(
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
                 selectScope = showScopeSelection,
-                containerColor = containerColor
+                containerColor = containerColor,
+                deleteSelectedTasksFromScope = viewModel::removeTaskFromScope
 
             )
         },
@@ -504,7 +505,10 @@ fun ScopeSelectionBottomSheet(
                     )
                     CreateScopeButton(
                         isUserInputActive = false,
-                        onButtonClick = { navigation.push(Screen.CreateScope) }
+                        onButtonClick = {
+                            navigation.push(Screen.CreateScope)
+                            coroutineScope.launch { sheetState.hide() }
+                        }
                     )
 
 

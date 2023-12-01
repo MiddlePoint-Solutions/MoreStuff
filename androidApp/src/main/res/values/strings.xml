@@ -151,6 +151,7 @@
     <string name="create_scope">Create Scope</string>
     <string name="choose_scope">Choose Scope</string>
     <string name="manage_scopes">Manage Scopes</string>
+    <string name="delete_task_from_scope">Delete task from scope</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>
