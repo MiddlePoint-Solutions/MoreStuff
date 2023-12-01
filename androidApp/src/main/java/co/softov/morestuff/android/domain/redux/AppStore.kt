@@ -3,6 +3,7 @@ package co.softov.morestuff.android.domain.redux
 import co.softov.morestuff.android.domain.redux.middleware.*
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.state.reduceSettingState
+import co.softov.morestuff.android.domain.redux.state.reduceTaskState
 import co.softov.morestuff.android.domain.redux.store.SimpleStore
 
 class AppStore(
@@ -21,6 +22,7 @@ class AppStore(
     AppState(),
     listOf(
         AppState::reduceSettingState,
+        AppState::reduceTaskState,
     ),
     listOf(
         logger,

@@ -131,7 +131,7 @@ fun CompletePriorityItem() {
                 hasSchedule = true,
                 hasReminder = true,
                 isSelected = true,
-                hasScope = false
+                hasScope = false,
             ),
             onClick = {}
         )

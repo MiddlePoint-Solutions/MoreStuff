@@ -141,7 +141,7 @@ fun PriorityItemPreview() {
                 hasSchedule = true,
                 hasReminder = true,
                 isSelected = true,
-                hasScope = false
+                hasScope = false,
             ),
             onClick = {},
             onLongClick = {}

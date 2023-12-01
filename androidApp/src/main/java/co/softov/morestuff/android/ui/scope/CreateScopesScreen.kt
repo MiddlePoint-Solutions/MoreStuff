@@ -87,6 +87,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
     var isUserInputActive by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Top,

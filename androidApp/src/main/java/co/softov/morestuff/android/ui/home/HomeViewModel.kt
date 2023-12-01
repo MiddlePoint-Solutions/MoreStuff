@@ -7,20 +7,12 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.redux.state.TaskAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
-import co.softov.morestuff.android.ui.home.HomeUiEvent.AddSelectedTasksToScope
-import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
-import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
-import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteTask
-import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasks
-import co.softov.morestuff.android.ui.home.HomeUiEvent.SetConfettiEnabled
-import co.softov.morestuff.android.ui.home.HomeUiEvent.SetNotification
-import co.softov.morestuff.android.ui.home.HomeUiEvent.ToggleTaskSelection
-import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoComplete
+import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState.Complete
 import co.softov.morestuff.android.ui.model.NotificationState.None
 import co.softov.morestuff.android.ui.model.TaskUiModel
@@ -55,7 +47,12 @@ class HomeViewModel(
 
     init {
         loadData()
-        handleEvent(HomeUiEvent.LoadScopes)
+
+        viewModelScope.launch {
+            val loadedScopes = getScopesUseCase()
+            sendEvent(SetScopes(loadedScopes))
+        }
+
         selectedScopeId.flatMapLatest { scopeId ->
             getActiveTasksFlowUseCase(scopeId)
         }
@@ -150,7 +147,7 @@ class HomeViewModel(
                 state
             }
 
-            is HomeUiEvent.DeleteSelectedTasksFromScope -> {
+            is DeleteSelectedTasksFromScope -> {
                 val selectedTaskIds = state.selectedTaskIds
                 viewModelScope.launch {
                     selectedTaskIds.forEach { taskId ->
@@ -160,32 +157,29 @@ class HomeViewModel(
                 state
             }
 
-            is HomeUiEvent.LoadScopes -> {
-                loadDataAndPrepare()
-                state
-            }
+            is SetScopes -> state.copy(scopes = event.scopes)
 
-            is HomeUiEvent.CreateScope -> {
+            is CreateScope -> {
                 createScope(event.uid, event.name)
                 state
             }
 
-            is HomeUiEvent.SelectScope -> {
+            is SelectScope -> {
                 selectScope(event.scopeId)
                 state.copy(selectedScopeId = event.scopeId)
             }
 
-            is HomeUiEvent.DeleteScopes -> {
+            is DeleteScopes -> {
                 deleteScopes(event.scopeIds)
                 state
             }
 
-            is HomeUiEvent.UpdateScopeName -> {
+            is UpdateScopeName -> {
                 updateScopeName(event.scopeId, event.newName)
                 state
             }
 
-            is HomeUiEvent.ReorderScopes -> {
+            is ReorderScopes -> {
                 val reorderedScopes = state.scopes.sortedBy { scope ->
                     event.newOrder.indexOf(scope.scopeId)
                 }
@@ -198,12 +192,11 @@ class HomeViewModel(
 
     fun handleEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.LoadScopes -> loadDataAndPrepare()
-            is HomeUiEvent.CreateScope -> createScope(event.uid, event.name)
-            is HomeUiEvent.SelectScope -> selectScope(event.scopeId)
-            is HomeUiEvent.DeleteScopes -> deleteScopes(event.scopeIds)
-            is HomeUiEvent.UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
-            is HomeUiEvent.ReorderScopes -> reorderScopes(event.newOrder)
+            is CreateScope -> createScope(event.uid, event.name)
+            is SelectScope -> selectScope(event.scopeId)
+            is DeleteScopes -> deleteScopes(event.scopeIds)
+            is UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
+            is ReorderScopes -> reorderScopes(event.newOrder)
             else -> {}
         }
     }
@@ -225,13 +218,21 @@ class HomeViewModel(
 
     fun moveToTop(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Now, selectedScopeId.value)
+            PriorityAction.TaskPriorityUpdateAction(
+                taskId,
+                PriorityActionType.Now,
+                selectedScopeId.value
+            )
         )
     }
 
     fun moveToBottom(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Later, selectedScopeId.value)
+            PriorityAction.TaskPriorityUpdateAction(
+                taskId,
+                PriorityActionType.Later,
+                selectedScopeId.value
+            )
         )
     }
 
@@ -264,24 +265,13 @@ class HomeViewModel(
     }
 
     fun removeTaskFromScope() {
-        sendEvent(HomeUiEvent.DeleteSelectedTasksFromScope)
-    }
-
-    private fun loadDataAndPrepare() {
-        viewModelScope.launch {
-            val loadedScopes = getScopesUseCase.invoke()
-            _uiState.value = _uiState.value.copy(
-                scopes = loadedScopes,
-                selectedScopeId = loadedScopes.firstOrNull()?.scopeId
-            )
-        }
+        sendEvent(DeleteSelectedTasksFromScope)
     }
 
     private fun createScope(uid: String, name: String) {
         viewModelScope.launch {
             dispatchAppStoreAction(ScopeAction.CreateScopeAction(uid, name))
             delay(500)
-            loadDataAndPrepare()
         }
     }
 
@@ -298,7 +288,6 @@ class HomeViewModel(
         viewModelScope.launch {
             dispatchAppStoreAction(ScopeAction.DeleteScopeAction(scopeIds))
             delay(500)
-            loadDataAndPrepare()
         }
     }
 
@@ -306,7 +295,6 @@ class HomeViewModel(
         viewModelScope.launch {
             dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))
             delay(500)
-            loadDataAndPrepare()
         }
     }
 
@@ -316,8 +304,6 @@ class HomeViewModel(
                 dispatchAppStoreAction(ScopeAction.UpdateScopeOrderAction(scopeId, index.toLong()))
             }
             delay(500)
-
-            loadDataAndPrepare()
         }
     }
 

@@ -75,42 +75,6 @@ class TaskRepositoryImpl(
     }
 
     override fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
-        return if (scopeId == 1L) {
-            combineActiveTasksFlows()
-        } else {
-            getTasksForGivenScopeFlow(scopeId)
-        }
-    }
-
-    private fun combineActiveTasksFlows(): Flow<List<TaskDomain>> {
-        val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-        val schedulesFlow =
-            scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
-                .asFlow()
-                .mapToList(Dispatchers.IO)
-                .map { it.groupBy { schedule -> schedule.taskId } }
-        val messagesFlow =
-            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
-                .asFlow()
-                .mapToList(Dispatchers.IO)
-                .map { messages ->
-                    messages.groupBy { message -> message.task_id }
-                        .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
-                }
-
-        return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
-            tasks.map { task ->
-                task.copy(
-                    schedule = schedules[task.id] ?: listOf(),
-                    extraDetails = messageTaskIds.contains(task.id)
-                )
-            }
-        }
-    }
-
-    private fun getTasksForGivenScopeFlow(scopeId: Long): Flow<List<TaskDomain>> {
         val tasksFlow = taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper)
             .asFlow()
             .mapToList(Dispatchers.IO)
