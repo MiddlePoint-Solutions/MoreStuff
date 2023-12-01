@@ -42,11 +42,13 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
+    scopeId:Long
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
@@ -54,6 +56,7 @@ fun ReviewScreen(
         ReviewContent(
             onBack = navigation::pop,
             modifier = modifier,
+            scopeId = scopeId
         )
     }
 }
@@ -63,7 +66,8 @@ fun ReviewScreen(
 fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ReviewViewModel = koinViewModel(),
+    scopeId: Long,
+    viewModel: ReviewViewModel = koinViewModel(parameters = { parametersOf(scopeId) }),
 ) {
     val scope = rememberCoroutineScope()
     var isCardMoving by remember { mutableStateOf(false) }

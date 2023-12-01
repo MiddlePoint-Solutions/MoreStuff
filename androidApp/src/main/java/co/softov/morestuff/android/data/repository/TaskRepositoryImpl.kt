@@ -19,12 +19,9 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import java.util.UUID
 
@@ -39,10 +36,6 @@ class TaskRepositoryImpl(
     private val messageQueries = database.messageQueries
     private val taskScopeQueries = database.taskScopeQueries
     private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
-    override val currentScopeId = MutableStateFlow<Long>(1)
-    override fun updateCurrentScopeId(newScopeId: Long) {
-        currentScopeId.value = newScopeId
-    }
 
     override suspend fun createTask(
         title: String,
@@ -81,14 +74,11 @@ class TaskRepositoryImpl(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-        return currentScopeId.flatMapLatest { scopeId ->
-            if (scopeId == 1L) {
-                combineActiveTasksFlows()
-            } else {
-                getTasksForGivenScopeFlow(scopeId)
-            }
+    override fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
+        return if (scopeId == 1L) {
+            combineActiveTasksFlows()
+        } else {
+            getTasksForGivenScopeFlow(scopeId)
         }
     }
 
@@ -148,11 +138,6 @@ class TaskRepositoryImpl(
         }
     }
 
-    /* private fun getTasksForGivenScopeFlow(scopeId: Long): Flow<List<TaskDomain>> {
-         return flow {
-             emit(taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper).executeAsList())
-         }
-     }*/
 
     override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
         taskQueries.selectAllComplete(mapper = mapper.taskDbMapper)

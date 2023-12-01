@@ -102,7 +102,7 @@ class TaskMiddleware(
             }
 
             is RemoveTaskFromScopeAction -> scope.launch {
-                removeTaskFromScopeUseCase(action.taskId)
+                removeTaskFromScopeUseCase(action.taskId, action.scopeId)
             }
 
             else -> NoOp

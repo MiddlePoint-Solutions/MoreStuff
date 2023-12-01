@@ -1,27 +1,45 @@
 package co.softov.morestuff.android.ui.scope
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.TabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.ui.home.HomeUiEvent
 import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.schedule.PriorityContent
 import co.softov.morestuff.android.ui.theme.surfaceContainer
@@ -33,25 +51,29 @@ import timber.log.Timber
 fun ScopesScreen(
     showTaskChat: (taskId: Long) -> Unit,
 ) {
-    val viewModel: ScopeViewModel = koinViewModel()
+
     val homeViewModel: HomeViewModel = koinViewModel()
-    val uiState = viewModel.uiState.collectAsState()
+    val scopeState = homeViewModel.uiState.collectAsState()
     val tasks by homeViewModel.tasks.collectAsState()
     val model by homeViewModel.uiModel.collectAsState()
     var taskOptions by remember { mutableLongStateOf(0) }
     val priorityScrollState = rememberLazyListState()
 
-    if (uiState.value.scopes.isNotEmpty()) {
+    LaunchedEffect(tasks.size) {
+        priorityScrollState.scrollToItem(0)
+    }
+
+    if (scopeState.value.scopes.isNotEmpty()) {
         Column {
-            uiState.value.selectedScopeId?.let { selectedScopeId ->
-                val selectedScope = uiState.value.scopes.find { it.scopeId == selectedScopeId }
+            scopeState.value.selectedScopeId?.let { selectedScopeId ->
+                val selectedScope = scopeState.value.scopes.find { it.scopeId == selectedScopeId }
                 selectedScope?.let {
                     ScopeTabs(
-                        scopes = uiState.value.scopes,
+                        scopes = scopeState.value.scopes,
                         selectedScope = it,
                         onScopeSelected = { scope ->
-                            viewModel.handleEvent(
-                                ScopeUiEvent.SelectScope(
+                            homeViewModel.handleEvent(
+                                HomeUiEvent.SelectScope(
                                     scope.scopeId
                                 )
                             )
@@ -59,13 +81,13 @@ fun ScopesScreen(
                     )
                 }
             }
-            Timber.d("Selected Scope ID: ${uiState.value.selectedScopeId}")
-            Timber.d("Scopes: ${uiState.value.scopes}")
+            Timber.d("Selected Scope ID: ${scopeState.value.selectedScopeId}")
+            Timber.d("Scopes: ${scopeState.value.scopes}")
 
             Spacer(Modifier.height(8.dp))
 
             Crossfade(
-                targetState = uiState.value.selectedScopeId,
+                targetState = scopeState.value.selectedScopeId,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f), label = ""
@@ -108,9 +130,14 @@ fun ScopeTabs(
         edgePadding = 16.dp,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         indicator = { tabPositions ->
-            TabRowDefaults.Indicator(
-                Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                color = selectedTabColor
+            CustomIndicator(
+                Modifier.tabIndicatorOffset(
+                    currentTabPosition = tabPositions[selectedIndex],
+                    indicatorWidth = 20.dp
+                ),
+                color = selectedTabColor,
+                height = 3.dp,
+                cornerRadius = 8.dp
             )
         },
     ) {
@@ -122,7 +149,10 @@ fun ScopeTabs(
                 text = {
                     Text(
                         text = scope.name,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight(500),
+                        ),
                         color = if (index == selectedIndex) selectedTabColor else unselectedTabColor
                     )
                 }
@@ -130,3 +160,40 @@ fun ScopeTabs(
         }
     }
 }
+
+fun Modifier.tabIndicatorOffset(
+    currentTabPosition: TabPosition,
+    indicatorWidth: Dp = 17.dp
+): Modifier = composed {
+    val tabCenter = currentTabPosition.left + currentTabPosition.width / 2
+
+    val indicatorOffset = tabCenter - indicatorWidth / 2
+
+    val animatedOffset by animateDpAsState(
+        targetValue = indicatorOffset,
+        animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing), label = ""
+    )
+
+    fillMaxWidth()
+        .wrapContentSize(Alignment.BottomStart)
+        .offset(x = animatedOffset)
+        .width(indicatorWidth)
+}
+
+@Composable
+fun CustomIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary,
+    width: Dp = 17.dp,
+    height: Dp = 3.dp,
+    cornerRadius: Dp = 10.dp
+) {
+    Box(
+        modifier
+            .width(width)
+            .height(height)
+            .clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius))
+            .background(color = color)
+    )
+}
+

@@ -25,6 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
+    private val scopeId: Long,
     private val getReviewTasksUseCase: GetReviewTasksUseCase,
     private val reviewTasksMapper: ReviewTasksMapper,
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
@@ -74,7 +75,7 @@ class ReviewViewModel(
 
     private fun setInitialState(round: ReviewRound = Review) {
         viewModelScope.launch {
-            getReviewTasksUseCase().map {
+            getReviewTasksUseCase(scopeId).map {
                 val tasks = reviewTasksMapper.map(it).shuffled()
                 sendEvent(SetupInitialRound(round, tasks))
             }
@@ -92,7 +93,7 @@ class ReviewViewModel(
                 )
 
                 else -> dispatchAppStoreAction(
-                    PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore)
+                    PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore, scopeId)
                 )
             }
         }
@@ -111,12 +112,12 @@ class ReviewViewModel(
             SwipeDirection.None -> return
         }
 
-        dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction))
+        dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction, scopeId))
         sendEvent(ItemReview(item, reviewAction))
 
         if (state.items.first() == item) {
             roundEndDelayJob = viewModelScope.launch {
-                dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction)
+                dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction(scopeId))
                 delay(500)
                 sendEvent(SetupRound(Final))
             }

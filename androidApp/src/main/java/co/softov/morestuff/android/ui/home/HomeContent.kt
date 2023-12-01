@@ -78,8 +78,6 @@ import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.scope.CreateScopeButton
-import co.softov.morestuff.android.ui.scope.ScopeUiModel
-import co.softov.morestuff.android.ui.scope.ScopeViewModel
 import co.softov.morestuff.android.ui.scope.ScopesScreen
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -141,7 +139,7 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 model = model,
-                reviewSelected = { navigation.push(Screen.Review) },
+                reviewSelected = { navigation.push(Screen.Review(viewModel.selectedScopeId.value)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
                 searchSelected = { isSearchActive = true },
                 scrollBehavior = scrollBehavior,
@@ -214,11 +212,11 @@ fun HomeContent(
 
     val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
 
-    val scopeViewModel: ScopeViewModel = koinViewModel()
-    val selectedScopeId = remember { scopeViewModel.uiState.value.selectedScopeId }
+
+    val selectedScopeId = remember { homeViewModel.uiState.value.selectedScopeId }
     LaunchedEffect(selectedScopeId) {
         selectedScopeId?.let {
-            homeViewModel.updateTasksForSelectedScope(it)
+            homeViewModel.updateTasksForSelectedScope(selectedScopeId)
         }
     }
 
@@ -482,9 +480,8 @@ fun ScopeSelectionBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
 ) {
-    val scopeViewModel: ScopeViewModel = koinViewModel()
     val homeViewModel: HomeViewModel = koinViewModel()
-    val scopes = scopeViewModel.uiState.collectAsState()
+    val scopes = homeViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppNavigation.current
     ModalBottomSheet(
@@ -523,7 +520,7 @@ fun ScopeSelectionBottomSheet(
 
 @Composable
 fun ScopeList(
-    scopes: State<ScopeUiModel>,
+    scopes: State<HomeUiModel>,
     onScopeSelected: (Long) -> Unit,
     modifier: Modifier,
     hideSheet: () -> Unit,

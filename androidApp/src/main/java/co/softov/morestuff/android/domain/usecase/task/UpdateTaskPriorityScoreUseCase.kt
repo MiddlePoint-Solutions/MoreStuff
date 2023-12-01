@@ -8,19 +8,19 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 interface UpdateTaskPriorityScoreUseCase {
     suspend operator fun invoke(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
+        scopeId:Long
     ): Either<Failure, Long>
 }
 
 class UpdateTaskPriorityScoreUseCaseImpl(
     private val priorityRepository: PriorityRepository,
-    private val taskRepository: TaskRepository
 ) : UpdateTaskPriorityScoreUseCase {
     override suspend operator fun invoke(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
+        scopeId:Long
     ): Either<Failure, Long> {
-        val scopeId = taskRepository.currentScopeId.value
         return priorityRepository.updateTaskPriority(taskId, priorityScore, scopeId)
     }
 }

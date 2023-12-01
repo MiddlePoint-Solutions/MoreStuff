@@ -17,15 +17,17 @@ sealed class PriorityAction : Action.FeatureAction() {
 
     data class UndoTaskPriorityUpdateAction(
         val taskId: Long,
-        val score: Long
+        val score: Long,
+        val scopeId: Long
     ) : PriorityAction()
 
     data class TaskPriorityUpdateAction(
         val task: Long,
-        val actionType: PriorityActionType
+        val actionType: PriorityActionType,
+        val scopeId: Long
     ) : PriorityAction()
 
-    data object UpdatePlannedPriorityAction : PriorityAction()
+    data class UpdatePlannedPriorityAction(val scopeId: Long? = null) : PriorityAction()
 
 }
 
@@ -45,15 +47,15 @@ class PriorityMiddleware(
         when (action) {
 
             is TaskPriorityUpdateAction -> scope.launch {
-                updateTaskReviewPriorityUseCase(action.task, action.actionType)
+                updateTaskReviewPriorityUseCase(action.task, action.actionType, action.scopeId)
             }
 
             is UndoTaskPriorityUpdateAction -> scope.launch {
-                updateTaskPriorityScoreUseCase(action.taskId, action.score)
+                updateTaskPriorityScoreUseCase(action.taskId, action.score, action.scopeId)
             }
 
             is UpdatePlannedPriorityAction -> scope.launch {
-                updatePlannedTasksPriorityUseCase()
+                action.scopeId?.let { updatePlannedTasksPriorityUseCase(it) }
             }
 
             else -> NoOp

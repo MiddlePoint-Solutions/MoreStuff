@@ -62,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.components.SendIcon
+import co.softov.morestuff.android.ui.home.HomeUiEvent
+import co.softov.morestuff.android.ui.home.HomeUiModel
 import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -75,9 +77,8 @@ import java.util.UUID
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScopesScreen(onBack: () -> Unit) {
-    val scopeViewModel: ScopeViewModel = koinViewModel()
     val homeViewModel: HomeViewModel = koinViewModel()
-    val scopes = scopeViewModel.uiState.collectAsState()
+    val scopes = homeViewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val isEditDialogOpen = remember { mutableStateOf(false) }
     val isDeleteDialogOpen = remember { mutableStateOf(false) }
@@ -108,7 +109,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             ManageScopeList(
                 scopes = scopes,
                 onScopeSelected = { scopeId ->
-                    scopeViewModel.handleEvent(ScopeUiEvent.SelectScope(scopeId))
+                    homeViewModel.handleEvent(HomeUiEvent.SelectScope(scopeId))
                     homeViewModel.addSelectedTasksToScope(scopeId)
                     homeViewModel.clearSelectedTasks()
                 },
@@ -136,7 +137,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
                 }
                 UserInputComponent(
                     focusRequester = focusRequester,
-                    scopeViewModel = scopeViewModel,
+                    homeViewModel = homeViewModel,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -161,8 +162,8 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             scopeName = remember { mutableStateOf(updateScopeName) },
             onConfirm = { scopeId, newName ->
                 coroutineScope.launch {
-                    scopeViewModel.handleEvent(
-                        ScopeUiEvent.UpdateScopeName(scopeId, newName)
+                    homeViewModel.handleEvent(
+                        HomeUiEvent.UpdateScopeName(scopeId, newName)
                     )
                 }
                 isEditDialogOpen.value = false
@@ -175,7 +176,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             isDeleteDialogOpen = isDeleteDialogOpen,
             scopeId = selectScopeId,
             onConfirm = { scopeId ->
-                scopeViewModel.deleteScopes(listOf(scopeId))
+                homeViewModel.deleteScopes(listOf(scopeId))
                 isDeleteDialogOpen.value = false
             },
             onDismiss = {
@@ -188,7 +189,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
 
 @Composable
 fun ManageScopeList(
-    scopes: State<ScopeUiModel>,
+    scopes: State<HomeUiModel>,
     onScopeSelected: (Long) -> Unit,
     onEditScope: (Long, String) -> Unit,
     onDeleteScope: (Long) -> Unit,
@@ -307,7 +308,7 @@ fun EditScopeDialog(
 @Composable
 fun UserInputComponent(
     focusRequester: FocusRequester,
-    scopeViewModel: ScopeViewModel,
+    homeViewModel: HomeViewModel,
     modifier: Modifier,
 ) {
     var newScopeName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -327,8 +328,8 @@ fun UserInputComponent(
                     focusRequester = focusRequester,
                     sendAction = {
                         coroutineScope.launch {
-                            scopeViewModel.handleEvent(
-                                ScopeUiEvent.CreateScope(
+                            homeViewModel.handleEvent(
+                                HomeUiEvent.CreateScope(
                                     UUID.randomUUID().toString(),
                                     newScopeName.text
                                 )
@@ -352,8 +353,8 @@ fun UserInputComponent(
                             ) {
                                 SendIcon(onClick = {
                                     coroutineScope.launch {
-                                        scopeViewModel.handleEvent(
-                                            ScopeUiEvent.CreateScope(
+                                        homeViewModel.handleEvent(
+                                            HomeUiEvent.CreateScope(
                                                 UUID.randomUUID().toString(),
                                                 newScopeName.text
                                             )

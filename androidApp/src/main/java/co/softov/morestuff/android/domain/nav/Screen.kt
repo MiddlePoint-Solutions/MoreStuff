@@ -14,7 +14,7 @@ sealed class Screen : Parcelable {
     data object Home : Screen()
 
     @Parcelize
-    data object Review : Screen()
+    data class Review(val scopeId: Long) : Screen()
 
     @Parcelize
     data object Settings : Screen()

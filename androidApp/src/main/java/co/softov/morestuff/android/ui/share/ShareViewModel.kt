@@ -32,7 +32,7 @@ class ShareViewModel(
         internal set
 
     val filteredTasks = MutableStateFlow<List<TaskUiModel>>(listOf())
-
+    private val selectedScopeId = MutableStateFlow<Long>(1)
     private var filterJob: Job? = null
     override val enableDebug: Boolean
         get() = false
@@ -50,7 +50,7 @@ class ShareViewModel(
     private fun filterTasks() {
         filterJob?.cancel()
         filterJob = viewModelScope.launch {
-            getActiveTasksFlowUseCase()
+            getActiveTasksFlowUseCase(selectedScopeId.value)
                 .onEach { results ->
                     filteredTasks.update {
                         val filteredResults = results.filter { task ->
@@ -69,7 +69,7 @@ class ShareViewModel(
         private set
 
     override fun onLoadData() {
-        getActiveTasksFlowUseCase()
+        getActiveTasksFlowUseCase(selectedScopeId.value)
             .onEach { tasks = it }
             .launchIn(viewModelScope)
     }

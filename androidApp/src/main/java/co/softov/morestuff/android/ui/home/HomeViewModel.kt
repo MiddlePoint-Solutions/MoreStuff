@@ -6,7 +6,9 @@ import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
+import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
@@ -27,27 +29,33 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
     private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
+    private val getScopesUseCase: GetScopesUseCase,
     taskMapper: TaskUiMapper,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val tasks = MutableStateFlow<List<TaskUiModel>>(listOf())
-    private val selectedScopeId = MutableStateFlow<Long>(1)
+    val selectedScopeId = MutableStateFlow<Long>(1)
+    private val _uiState = MutableStateFlow(HomeUiModel())
+    val uiState: StateFlow<HomeUiModel> = _uiState.asStateFlow()
 
     init {
         loadData()
-
+        handleEvent(HomeUiEvent.LoadScopes)
         selectedScopeId.flatMapLatest { scopeId ->
             getActiveTasksFlowUseCase(scopeId)
         }
@@ -58,6 +66,7 @@ class HomeViewModel(
                 started = SharingStarted.Eagerly,
                 initialValue = listOf()
             )
+
     }
 
 
@@ -140,17 +149,62 @@ class HomeViewModel(
                 }
                 state
             }
+
             is HomeUiEvent.DeleteSelectedTasksFromScope -> {
                 val selectedTaskIds = state.selectedTaskIds
                 viewModelScope.launch {
                     selectedTaskIds.forEach { taskId ->
-                        removeTaskFromScopeUseCase(taskId)
+                        removeTaskFromScopeUseCase(taskId, selectedScopeId.value)
                     }
                 }
                 state
             }
 
+            is HomeUiEvent.LoadScopes -> {
+                loadDataAndPrepare()
+                state
+            }
+
+            is HomeUiEvent.CreateScope -> {
+                createScope(event.uid, event.name)
+                state
+            }
+
+            is HomeUiEvent.SelectScope -> {
+                selectScope(event.scopeId)
+                state.copy(selectedScopeId = event.scopeId)
+            }
+
+            is HomeUiEvent.DeleteScopes -> {
+                deleteScopes(event.scopeIds)
+                state
+            }
+
+            is HomeUiEvent.UpdateScopeName -> {
+                updateScopeName(event.scopeId, event.newName)
+                state
+            }
+
+            is HomeUiEvent.ReorderScopes -> {
+                val reorderedScopes = state.scopes.sortedBy { scope ->
+                    event.newOrder.indexOf(scope.scopeId)
+                }
+                state.copy(scopes = reorderedScopes)
+            }
+
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
+        }
+    }
+
+    fun handleEvent(event: HomeUiEvent) {
+        when (event) {
+            is HomeUiEvent.LoadScopes -> loadDataAndPrepare()
+            is HomeUiEvent.CreateScope -> createScope(event.uid, event.name)
+            is HomeUiEvent.SelectScope -> selectScope(event.scopeId)
+            is HomeUiEvent.DeleteScopes -> deleteScopes(event.scopeIds)
+            is HomeUiEvent.UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
+            is HomeUiEvent.ReorderScopes -> reorderScopes(event.newOrder)
+            else -> {}
         }
     }
 
@@ -171,13 +225,13 @@ class HomeViewModel(
 
     fun moveToTop(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Now)
+            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Now, selectedScopeId.value)
         )
     }
 
     fun moveToBottom(taskId: Long) {
         dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Later)
+            PriorityAction.TaskPriorityUpdateAction(taskId, PriorityActionType.Later, selectedScopeId.value)
         )
     }
 
@@ -211,6 +265,64 @@ class HomeViewModel(
 
     fun removeTaskFromScope() {
         sendEvent(HomeUiEvent.DeleteSelectedTasksFromScope)
+    }
+
+    private fun loadDataAndPrepare() {
+        viewModelScope.launch {
+            val loadedScopes = getScopesUseCase.invoke()
+            _uiState.value = _uiState.value.copy(
+                scopes = loadedScopes,
+                selectedScopeId = loadedScopes.firstOrNull()?.scopeId
+            )
+        }
+    }
+
+    private fun createScope(uid: String, name: String) {
+        viewModelScope.launch {
+            dispatchAppStoreAction(ScopeAction.CreateScopeAction(uid, name))
+            delay(500)
+            loadDataAndPrepare()
+        }
+    }
+
+    private fun selectScope(scopeId: Long) {
+        Timber.d("Scope seleccionado: $scopeId")
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(selectedScopeId = scopeId)
+            updateCurrentScopeId(scopeId)
+        }
+    }
+
+
+    fun deleteScopes(scopeIds: List<Long>) {
+        viewModelScope.launch {
+            dispatchAppStoreAction(ScopeAction.DeleteScopeAction(scopeIds))
+            delay(500)
+            loadDataAndPrepare()
+        }
+    }
+
+    private fun updateScopeName(scopeId: Long, newName: String) {
+        viewModelScope.launch {
+            dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))
+            delay(500)
+            loadDataAndPrepare()
+        }
+    }
+
+    private fun reorderScopes(newOrder: List<Long>) {
+        viewModelScope.launch {
+            newOrder.forEachIndexed { index, scopeId ->
+                dispatchAppStoreAction(ScopeAction.UpdateScopeOrderAction(scopeId, index.toLong()))
+            }
+            delay(500)
+
+            loadDataAndPrepare()
+        }
+    }
+
+    private fun updateCurrentScopeId(newScopeId: Long) {
+        selectedScopeId.value = newScopeId
     }
 
 }

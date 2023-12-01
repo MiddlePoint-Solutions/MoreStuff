@@ -2,13 +2,12 @@ package co.softov.morestuff.android.domain.repository
 
 
 import arrow.core.Either
+import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.FeatureFailure
-import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.TaskDomain
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 interface TaskRepository {
 
@@ -26,7 +25,7 @@ interface TaskRepository {
 
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
     fun getTaskFlow(taskId: Long): Flow<TaskDomain>
-    fun getActiveTasksFlow(): Flow<List<TaskDomain>>
+    fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>>
     fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
 
     suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
@@ -40,8 +39,6 @@ interface TaskRepository {
 
     suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long)
     suspend fun removeTaskFromScope(taskId: Long, scopeId: Long)
-    fun updateCurrentScopeId(newScopeId: Long)
-    val currentScopeId: MutableStateFlow<Long>
 
 }
 

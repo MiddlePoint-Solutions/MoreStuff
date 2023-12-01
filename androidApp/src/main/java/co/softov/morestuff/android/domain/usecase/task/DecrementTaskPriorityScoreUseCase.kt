@@ -3,18 +3,15 @@ package co.softov.morestuff.android.domain.usecase.task
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.PriorityRepository
-import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface DecrementTaskPriorityScoreUseCase {
-    suspend operator fun invoke(taskId: Long): Either<Failure, Long>
+    suspend operator fun invoke(taskId: Long, scopeId: Long): Either<Failure, Long>
 }
 
 class DecreaseTaskPriorityScoreUseCaseImpl(
     private val priorityRepository: PriorityRepository,
-    private val taskRepository: TaskRepository
 ) : DecrementTaskPriorityScoreUseCase {
-    override suspend operator fun invoke(taskId: Long): Either<Failure, Long> {
-        val scopeId = taskRepository.currentScopeId.value
+    override suspend operator fun invoke(taskId: Long, scopeId: Long): Either<Failure, Long> {
         return priorityRepository.decreaseTaskPriorityScore(taskId, scopeId)
     }
 }
