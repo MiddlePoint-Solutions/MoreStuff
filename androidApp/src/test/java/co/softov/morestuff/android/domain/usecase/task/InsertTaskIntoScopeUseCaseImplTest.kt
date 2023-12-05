@@ -11,11 +11,9 @@ class InsertTaskIntoScopeUseCaseTest {
 
     @Test
     fun `insert task into scope`() = runBlocking {
-        val taskId = 1L
+        val taskIds = listOf(1L)
         val scopeId = 2L
-
-        useCase(taskId, scopeId)
-
-        coVerify(exactly = 1) { taskRepository.insertTasksIntoScope(taskId, scopeId) }
+        useCase(taskIds, scopeId)
+        coVerify(exactly = 1) { taskRepository.insertTasksIntoScope(taskIds, scopeId) }
     }
 }

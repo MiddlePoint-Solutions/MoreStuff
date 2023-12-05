@@ -13,11 +13,9 @@ class RemoveTaskFromScopeUseCaseTest {
 
     @Test
     fun `remove task from scope`() = runBlocking {
-        val taskId = 1L
+        val taskIds = listOf(1L)
         val scopeId = 2L
-
-        useCase(taskId, scopeId)
-
-        coVerify(exactly = 1) { taskRepository.removeTasksFromScope(taskId, scopeId) }
+        useCase(taskIds, scopeId)
+        coVerify(exactly = 1) { taskRepository.removeTasksFromScope(taskIds, scopeId) }
     }
 }
