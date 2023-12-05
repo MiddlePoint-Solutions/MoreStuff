@@ -20,7 +20,6 @@ import kotlinx.coroutines.launch
 sealed class ScopeAction : Action.FeatureAction() {
     data class CreateScopeAction(val scopeUid: String, val name: String) : ScopeAction()
     data class DeleteScopeAction(val scopeId: Long) : ScopeAction()
-    data class UpdateScopesListAction(val scopes: List<ScopeDomain>) : ScopeAction()
     data class UpdateScopeNameAction(val scopeId: Long, val newName: String) : ScopeAction()
     data class UpdateScopeOrderAction(val scopeId: Long, val order: Int) : ScopeAction()
 }
@@ -28,7 +27,6 @@ sealed class ScopeAction : Action.FeatureAction() {
 class ScopeMiddleware(
     private val createScopeUseCase: CreateScopeUseCase,
     private val deleteScopeUseCase: DeleteScopeUseCase,
-    private val getScopesUseCase: GetScopesUseCase,
     private val updateScopeNameUseCase: UpdateScopeNameUseCase,
     private val updateScopeOrderUseCase: UpdateScopeOrderUseCase
 ) : Middleware<AppState> {

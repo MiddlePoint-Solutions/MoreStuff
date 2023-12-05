@@ -6,7 +6,6 @@ import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.Re
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import co.softov.morestuff.android.domain.redux.middleware.NotificationAction.ShowReviewNotification
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.redux.state.TaskAction
 import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.Dispatch
 import co.softov.morestuff.android.domain.redux.store.Next

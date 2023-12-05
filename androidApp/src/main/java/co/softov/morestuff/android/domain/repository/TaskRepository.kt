@@ -25,7 +25,7 @@ interface TaskRepository {
 
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
     fun getTaskFlow(taskId: Long): Flow<TaskDomain>
-    fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>>
+    fun getActiveTasksFlow(scoped: Boolean, scopeId: Long): Flow<List<TaskDomain>>
     fun getCompleteTasksFlow(): Flow<List<TaskDomain>>
 
     suspend fun getTaskAbovePriorityScore(priorityScore: Long): Either<Failure, TaskDomain>
@@ -37,8 +37,8 @@ interface TaskRepository {
     suspend fun countActiveTasks(): Either<Failure, Int>
     suspend fun deleteTasks(taskIds: List<Long>): Either<Failure, Boolean>
 
-    suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long)
-    suspend fun removeTaskFromScope(taskId: Long, scopeId: Long)
+    suspend fun insertTasksIntoScope(taskIds: List<Long>, scopeId: Long)
+    suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long)
 
 }
 

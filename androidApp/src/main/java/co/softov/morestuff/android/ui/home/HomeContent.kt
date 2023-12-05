@@ -86,8 +86,6 @@ import co.softov.morestuff.android.ui.scope.CreateScopeButton
 import co.softov.morestuff.android.ui.scope.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
@@ -108,33 +106,13 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
+    var showScopeSelection by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
-    val model by viewModel.uiModel.collectAsStateWithLifecycle()
-    val selectedTasks by viewModel.selectedTasksFlow.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
-    val scrollContainerColor = surfaceContainerElevation
-    val containerColor = remember { mutableStateOf(defaultContainerColor) }
 
-    LaunchedEffect(scrollBehavior, selectedTasks) {
-        snapshotFlow { Pair(scrollBehavior.state.overlappedFraction, selectedTasks.isNotEmpty()) }
-            .collect { (fraction, isActive) ->
-                when {
-                    isActive -> containerColor.value = scrollContainerColor
-                    fraction > 0.2f -> containerColor.value = scrollContainerColor
-                    else -> containerColor.value = defaultContainerColor
-                }
-            }
-    }
-
-    val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val showScopeSelection: () -> Unit = {
-        scope.launch {
-            if (!scopeSelectionSheetState.isVisible) {
-                scopeSelectionSheetState.show()
-            }
-        }
-    }
+    val selectedTasks by viewModel.selectedTasks.collectAsState()
+    val model by viewModel.uiModel.collectAsState()
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
@@ -142,16 +120,15 @@ fun HomeScreen(
         topBar = {
             HomeTopBar(
                 selectedTaskCount = selectedTasks.size,
-                reviewSelected = { navigation.push(Screen.Review(viewModel.selectedScopeId.value)) },
+                reviewSelected = { navigation.push(Screen.Review(model.selectedScopeId)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
-                searchSelected = { isSearchActive = true },
+                searchAction = { isSearchActive = true },
                 scrollBehavior = scrollBehavior,
                 clearTaskSelection = viewModel::clearSelectedTasks,
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
-                selectScope = showScopeSelection,
-                containerColor = containerColor,
-                deleteSelectedTasksFromScope = viewModel::removeTaskFromScope
+                selectScope = { showScopeSelection = true },
+                removeSelectedTasksFromScope = viewModel::removeSelectedTaskFromScope
             )
         },
         content = {
@@ -184,9 +161,14 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         )
     }
-    if (scopeSelectionSheetState.isVisible) {
+
+    if (showScopeSelection) {
+        val scopes by viewModel.scopes.collectAsState()
+        val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ScopeSelectionBottomSheet(
-            onDismissRequest = { scope.launch { scopeSelectionSheetState.hide() } },
+            onDismissRequest = { showScopeSelection = false },
+            addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
+            scopes = scopes,
             sheetState = scopeSelectionSheetState,
         )
     }
@@ -198,21 +180,32 @@ fun HomeScreen(
 fun HomeContent(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = koinViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
 ) {
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
     val priorityScrollState = rememberLazyListState()
     val navigation = LocalAppNavigation.current
     var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-    val model by homeViewModel.uiModel.collectAsState()
-    val scopes by homeViewModel.scopes.collectAsState()
-    val selectedTasks by homeViewModel.selectedTasksFlow.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+
+
+    val model by viewModel.uiModel.collectAsState()
+    val scopes by viewModel.scopes.collectAsState()
+    val selectedTasks by viewModel.selectedTasks.collectAsState()
 
     val pagerState = rememberPagerState(pageCount = { scopes.size })
 
+    LaunchedEffect(Unit) {
+        snapshotFlow { pagerState.currentPage }
+            .collect {
+                viewModel.selectScope(scopes[it].id)
+            }
+    }
+
+    BackHandler(selectedTasks.isNotEmpty()) {
+        viewModel.clearSelectedTasks()
+    }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(model.notification) {
@@ -224,8 +217,8 @@ fun HomeContent(
                     duration = SnackbarDuration.Long
                 ).also {
                     when (it) {
-                        SnackbarResult.Dismissed -> homeViewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> homeViewModel.undoLastCompleted()
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
                     }
                 }
             }
@@ -242,22 +235,22 @@ fun HomeContent(
             dismissDialog = dismissDialog,
             completeTask = {
                 showTaskCompleteAnimation = taskOptions
-                scope.launch {
-                    homeViewModel.completeTask(taskOptions)
+                coroutineScope.launch {
+                    viewModel.completeTask(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
             },
             moveToTop = {
-                scope.launch {
-                    homeViewModel.moveToTop(taskOptions)
+                coroutineScope.launch {
+                    viewModel.moveToTop(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
             },
             moveToBottom = {
-                scope.launch {
-                    homeViewModel.moveToBottom(taskOptions)
+                coroutineScope.launch {
+                    viewModel.moveToBottom(taskOptions)
                     sheetState.hide()
                     dismissDialog()
                 }
@@ -294,7 +287,7 @@ fun HomeContent(
                         parameters = {
                             parametersOf(
                                 scopes[it].id,
-                                homeViewModel.selectedTasksFlow
+                                viewModel.selectedTasks
                             )
                         }
                     )
@@ -326,14 +319,14 @@ fun HomeContent(
                             tasks = scopeTasks,
                             onItemClick = { taskId ->
                                 if (selectedTasks.isNotEmpty()) {
-                                    homeViewModel.toggleTaskSelection(taskId)
+                                    viewModel.toggleTaskSelection(taskId)
                                 } else {
                                     navigation.push(Screen.TaskChat(taskId))
                                 }
                             },
-                            onItemLongClick = homeViewModel::toggleTaskSelection,
+                            onItemLongClick = viewModel::toggleTaskSelection,
                             showTaskOptions = { taskId -> taskOptions = taskId },
-                            toggleQuickReminder = homeViewModel::toggleQuickReminder,
+                            toggleQuickReminder = viewModel::toggleQuickReminder,
                             listState = priorityScrollState,
                             taskSelectionActive = selectedTasks::isNotEmpty,
                             modifier = Modifier.padding(bottom = 20.dp),
@@ -373,7 +366,7 @@ fun HomeContent(
         val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
         BackHandler(onBack = {
-            scope.launch {
+            coroutineScope.launch {
                 taskInputBottomSheetState.hide()
             }
         })
@@ -382,12 +375,12 @@ fun HomeContent(
             onDismissRequest = { showTaskInput = false },
             sheetState = taskInputBottomSheetState,
             scrollNowPriority = {
-                scope.launch {
+                coroutineScope.launch {
                     priorityScrollState.animateScrollToItem(index = 0)
                 }
             },
             scrollLaterPriority = {
-                scope.launch {
+                coroutineScope.launch {
                     // TODO priorityScrollState.scrollToItem(index = tasks.size - 1)
                 }
             }
@@ -507,7 +500,6 @@ private fun TaskInputBottomSheet(
                                                     }
                                                 })
                                             }
-
                                         }
                                     }
                                 )
@@ -525,10 +517,10 @@ private fun TaskInputBottomSheet(
 @Composable
 fun ScopeSelectionBottomSheet(
     onDismissRequest: () -> Unit,
+    addSelectedTasksToScope: (Long) -> Unit,
+    scopes: List<ScopeDomain>,
     sheetState: SheetState,
 ) {
-    val homeViewModel: HomeViewModel = koinViewModel()
-    val scopes by homeViewModel.scopes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppNavigation.current
     ModalBottomSheet(
@@ -539,23 +531,25 @@ fun ScopeSelectionBottomSheet(
                 ) {
                     ScopeList(
                         scopes = scopes,
-                        onScopeSelected = { scopeId ->
-                            homeViewModel.addSelectedTasksToScope(scopeId)
-                            homeViewModel.clearSelectedTasks()
-
-                        },
+                        onScopeSelected = addSelectedTasksToScope,
                         modifier = Modifier.height(216.dp),
-                        hideSheet = { coroutineScope.launch { sheetState.hide() } }
+                        hideSheet = {
+                            coroutineScope.launch {
+                                sheetState.hide()
+                                onDismissRequest()
+                            }
+                        }
                     )
                     CreateScopeButton(
                         isUserInputActive = false,
                         onButtonClick = {
                             navigation.push(Screen.CreateScope)
-                            coroutineScope.launch { sheetState.hide() }
+                            coroutineScope.launch {
+                                sheetState.hide()
+                                onDismissRequest()
+                            }
                         }
                     )
-
-
                 }
             }
 
@@ -575,7 +569,7 @@ fun ScopeList(
     val scrollState = rememberLazyListState()
 
     Text(
-        text = (stringResource(R.string.choose_scope)),
+        text = (stringResource(R.string.add_to_scope)),
         color = MaterialTheme.colorScheme.primary,
         fontSize = 22.sp,
         fontWeight = FontWeight(400),

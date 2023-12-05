@@ -3,9 +3,7 @@ package co.softov.morestuff.android.ui.home
 import androidx.compose.runtime.Immutable
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
-import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.model.NotificationState
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @Immutable
 data class HomeUiModel(
@@ -28,7 +26,7 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class AddSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
     data object DeleteSelectedTasksFromScope : HomeUiEvent()
     data class CreateScope(val uid: String, val name: String) : HomeUiEvent()
-    data class SelectScope(val scopeId: Long) : HomeUiEvent()
+    data class ScopeSelected(val scopeId: Long) : HomeUiEvent()
     data class DeleteScope(val scopeId: Long) : HomeUiEvent()
     data class UpdateScopeName(val scopeId: Long, val newName: String) : HomeUiEvent()
 }

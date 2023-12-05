@@ -74,10 +74,11 @@ class TaskRepositoryImpl(
         }
     }
 
-    override fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
-        val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
+    override fun getActiveTasksFlow(scoped: Boolean, scopeId: Long): Flow<List<TaskDomain>> {
+        val tasksFlow = when (scoped) {
+            true -> taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
+            false -> taskQueries.selectAllActive(mapper.taskDbMapper)
+        }.asFlow().mapToList(Dispatchers.IO)
 
         val schedulesFlow =
             scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
@@ -238,15 +239,15 @@ class TaskRepositoryImpl(
         taskQueries.countActiveTasks().executeAsOne().toInt().right()
 
 
-    override suspend fun insertTaskIntoScope(taskId: Long, scopeId: Long) {
+    override suspend fun insertTasksIntoScope(taskIds: List<Long>, scopeId: Long) {
         taskScopeQueries.transaction {
-            taskScopeQueries.insertTask(taskId, scopeId)
+            taskIds.forEach { taskScopeQueries.insertTask(it, scopeId) }
         }
     }
 
-    override suspend fun removeTaskFromScope(taskId: Long, scopeId: Long) {
+    override suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long) {
         taskScopeQueries.transaction {
-            taskScopeQueries.removeTask(taskId, scopeId)
+            taskIds.forEach { taskScopeQueries.removeTask(it, scopeId) }
         }
     }
 }

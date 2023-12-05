@@ -149,9 +149,9 @@
     <string name="edit_scope_name">Edit Scope Name</string>
     <string name="task_scopes">Task Scopes</string>
     <string name="create_scope">Create Scope</string>
-    <string name="choose_scope">Choose Scope</string>
+    <string name="add_to_scope">Add to Scope</string>
     <string name="manage_scopes">Manage Scopes</string>
-    <string name="delete_task_from_scope">Delete task from scope</string>
+    <string name="remove_from_scope">Remove from current scope</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>
@@ -223,8 +223,11 @@
     <string name="cd_close_search">Close search</string>
 
     <string name="date_connector">of</string>
-
-
+    <string name="cd_delete_tasks">Delete tasks</string>
+    <string name="cd_complete_tasks">Complete tasks</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_open_settings">Open settings</string>
+    <string name="cd_search_tasks">Search tasks</string>
 
 
 </resources>

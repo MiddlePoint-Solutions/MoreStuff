@@ -39,7 +39,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -64,7 +63,6 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.home.HomeUiEvent
-import co.softov.morestuff.android.ui.home.HomeUiModel
 import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
@@ -111,7 +109,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             ManageScopeList(
                 scopes = scopes,
                 onScopeSelected = { scopeId ->
-                    homeViewModel.handleEvent(HomeUiEvent.SelectScope(scopeId))
+                    homeViewModel.handleEvent(HomeUiEvent.ScopeSelected(scopeId))
                     homeViewModel.addSelectedTasksToScope(scopeId)
                     homeViewModel.clearSelectedTasks()
                 },

@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 class InsertTaskIntoScopeUseCaseTest {
     private val taskRepository: TaskRepository = mockk(relaxed = true)
-    private val useCase: InsertTaskIntoScopeUseCase = InsertTaskIntoScopeUseCaseImpl(taskRepository)
+    private val useCase: AddTasksToScopeUseCase = AddTasksToScopeUseCaseImpl(taskRepository)
 
     @Test
     fun `insert task into scope`() = runBlocking {
@@ -16,6 +16,6 @@ class InsertTaskIntoScopeUseCaseTest {
 
         useCase(taskId, scopeId)
 
-        coVerify(exactly = 1) { taskRepository.insertTaskIntoScope(taskId, scopeId) }
+        coVerify(exactly = 1) { taskRepository.insertTasksIntoScope(taskId, scopeId) }
     }
 }

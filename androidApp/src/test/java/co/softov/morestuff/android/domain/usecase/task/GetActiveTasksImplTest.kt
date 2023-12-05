@@ -7,7 +7,6 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -25,11 +24,11 @@ class GetActiveTasksUseCaseTest {
         val exampleTasks: List<TaskDomain> = createListOfTasks(2)
         val scopeId = 1L
 
-        coEvery { mockTaskRepository.getActiveTasksFlow(scopeId) } returns flowOf(exampleTasks)
+        coEvery { mockTaskRepository.getActiveTasksFlow(, scopeId) } returns flowOf(exampleTasks)
 
         val activeTasksFlow = getActiveTasksImpl.invoke(scopeId)
 
-        coVerify { mockTaskRepository.getActiveTasksFlow(scopeId) }
+        coVerify { mockTaskRepository.getActiveTasksFlow(, scopeId) }
 
         assertEquals(exampleTasks, activeTasksFlow.first())
     }

@@ -8,14 +8,11 @@ import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
-import co.softov.morestuff.android.domain.redux.state.TaskAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
-import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState.Complete
 import co.softov.morestuff.android.ui.model.NotificationState.None
-import co.softov.morestuff.android.ui.model.TaskUiModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,19 +20,15 @@ import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class HomeViewModel(
     getScopesFlowUseCase: GetScopesFlowUseCase,
-    private val insertTaskIntoScopeUseCase: InsertTaskIntoScopeUseCase,
-    private val removeTaskFromScopeUseCase: RemoveTaskFromScopeUseCase,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
-    val selectedScopeId = MutableStateFlow<Long>(1)
-    val selectedTasksFlow = MutableStateFlow<List<Long>>(listOf())
+    override val enableDebug: Boolean
+        get() = true
 
-    private val _uiState = MutableStateFlow(HomeUiModel())
-
+    val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
     val scopes = getScopesFlowUseCase()
         .stateIn(
@@ -55,7 +48,7 @@ class HomeViewModel(
     override fun onReduceState(event: HomeUiEvent): HomeUiModel = state.run {
         return when (event) {
             ClearTaskSelection -> {
-                selectedTasksFlow.update { listOf() }
+                selectedTasks.update { listOf() }
                 this
             }
 
@@ -84,7 +77,7 @@ class HomeViewModel(
             }
 
             CompleteSelectedTasks -> {
-                val completedTasks = selectedTasksFlow.getAndUpdate { listOf() }
+                val completedTasks = selectedTasks.getAndUpdate { listOf() }
                 dispatchAppStoreAction(TaskAction.CompleteTasksAction(completedTasks, true))
                 copy(
                     recentlyCompletedTasks = completedTasks,
@@ -93,7 +86,7 @@ class HomeViewModel(
             }
 
             DeleteSelectedTasks -> {
-                val deletedTasks = selectedTasksFlow.getAndUpdate { listOf() }
+                val deletedTasks = selectedTasks.getAndUpdate { listOf() }
                 dispatchAppStoreAction(TaskAction.DeleteTasksAction(deletedTasks))
                 this
             }
@@ -101,50 +94,46 @@ class HomeViewModel(
             is SetNotification -> copy(notification = event.notification)
 
             is ToggleTaskSelection -> {
-                selectedTasksFlow.update {
+                selectedTasks.update {
                     if (event.taskId in it) it - event.taskId else it + event.taskId
                 }
                 this
             }
 
             is AddSelectedTasksToScope -> {
-//                val selectedTaskIds = state.selectedTaskIds
-//                viewModelScope.launch {
-//                    selectedTaskIds.forEach { taskId ->
-//                        insertTaskIntoScopeUseCase(taskId, event.scopeId)
-//                    }
-//                }
-                state
+                val selectedTasks = selectedTasks.getAndUpdate { listOf() }
+                dispatchAppStoreAction(
+                    TaskAction.AddTasksToScopeAction(
+                        selectedTasks,
+                        event.scopeId
+                    )
+                )
+                this
             }
 
             is DeleteSelectedTasksFromScope -> {
-//                val selectedTaskIds = state.selectedTaskIds
-//                viewModelScope.launch {
-//                    selectedTaskIds.forEach { taskId ->
-//                        removeTaskFromScopeUseCase(taskId, selectedScopeId.value)
-//                    }
-//                }
-                state
+                val selectedTasks = selectedTasks.getAndUpdate { listOf() }
+                dispatchAppStoreAction(
+                    TaskAction.RemoveTasksFromScopeAction(selectedTasks, selectedScopeId)
+                )
+                this
             }
 
             is CreateScope -> {
                 createScope(event.uid, event.name)
-                state
+                this
             }
 
-            is SelectScope -> {
-                selectScope(event.scopeId)
-                state.copy(selectedScopeId = event.scopeId)
-            }
+            is ScopeSelected -> copy(selectedScopeId = event.scopeId)
 
             is DeleteScope -> {
                 dispatchAppStoreAction(ScopeAction.DeleteScopeAction(event.scopeId))
-                state
+                this
             }
 
             is UpdateScopeName -> {
                 updateScopeName(event.scopeId, event.newName)
-                state
+                this
             }
 
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
@@ -154,7 +143,7 @@ class HomeViewModel(
     fun handleEvent(event: HomeUiEvent) {
         when (event) {
             is CreateScope -> createScope(event.uid, event.name)
-            is SelectScope -> selectScope(event.scopeId)
+            is ScopeSelected -> selectScope(event.scopeId)
             is UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
             else -> {}
         }
@@ -217,11 +206,7 @@ class HomeViewModel(
         sendEvent(AddSelectedTasksToScope(scopeId))
     }
 
-    fun updateTasksForSelectedScope(scopeId: Long) {
-        selectedScopeId.value = scopeId
-    }
-
-    fun removeTaskFromScope() {
+    fun removeSelectedTaskFromScope() {
         sendEvent(DeleteSelectedTasksFromScope)
     }
 
@@ -232,13 +217,9 @@ class HomeViewModel(
         }
     }
 
-    private fun selectScope(scopeId: Long) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(selectedScopeId = scopeId)
-            updateCurrentScopeId(scopeId)
-        }
+    fun selectScope(scopeId: Long) {
+        sendEvent(ScopeSelected(scopeId))
     }
-
 
     fun deleteScopes(scopeId: Long) {
         sendEvent(DeleteScope(scopeId))
@@ -249,10 +230,6 @@ class HomeViewModel(
             dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))
             delay(500)
         }
-    }
-
-    private fun updateCurrentScopeId(newScopeId: Long) {
-        selectedScopeId.value = newScopeId
     }
 
 }

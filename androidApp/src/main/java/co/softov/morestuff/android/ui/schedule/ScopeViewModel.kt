@@ -41,7 +41,3 @@ class ScopeViewModel(
     }
 
 }
-
-data class ScopeUiModel(
-    val tasks: List<ScopeDomain> = listOf()
-)

@@ -2,7 +2,7 @@ package co.softov.morestuff.android.domain.nav
 
 import android.net.Uri
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 
 sealed class Screen : Parcelable {

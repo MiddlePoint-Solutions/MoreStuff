@@ -155,10 +155,10 @@ import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUs
 import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCase
-import co.softov.morestuff.android.domain.usecase.task.InsertTaskIntoScopeUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCase
-import co.softov.morestuff.android.domain.usecase.task.RemoveTaskFromScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
@@ -258,8 +258,8 @@ val taskUseCases = module {
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
     factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
     factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
-    factoryOf(::InsertTaskIntoScopeUseCaseImpl) bind InsertTaskIntoScopeUseCase::class
-    factoryOf(::RemoveTaskFromScopeUseCaseImpl) bind RemoveTaskFromScopeUseCase::class
+    factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
+    factoryOf(::RemoveTasksFromScopeUseCaseImpl) bind RemoveTasksFromScopeUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
