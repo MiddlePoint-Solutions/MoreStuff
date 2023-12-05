@@ -184,11 +184,9 @@ fun HomeContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
-    val priorityScrollState = rememberLazyListState()
     val navigation = LocalAppNavigation.current
     var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-
 
     val model by viewModel.uiModel.collectAsState()
     val scopes by viewModel.scopes.collectAsState()
@@ -292,6 +290,7 @@ fun HomeContent(
                         }
                     )
 
+                    val priorityScrollState = rememberLazyListState()
                     val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
 
                     val showEmptyState by remember(scopeTasks.size) {
@@ -377,7 +376,7 @@ fun HomeContent(
             initialScopeId = model.selectedScopeId,
             scrollNowPriority = {
                 coroutineScope.launch {
-                    priorityScrollState.animateScrollToItem(index = 0)
+                // TODO priorityScrollState.animateScrollToItem(index = 0)
                 }
             },
             scrollLaterPriority = {

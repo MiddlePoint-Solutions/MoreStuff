@@ -23,7 +23,7 @@ class CreateNewTaskUseCaseTest {
     fun `create new task use case`() = runBlocking {
         val taskParams = TaskParams("title", Priority.Now(), TaskType.User)
         val task = createTaskForTest()
-        coEvery { taskRepository.createTask(any(), any(), any(),) } returns task
+        coEvery { taskRepository.createTask(any(), any(), any(), any()) } returns task
         coEvery { getDefaultPriorityScoreUseCase(taskParams.priority) } returns 0
         val result = useCase.invoke(taskParams)
         assertEquals(task, result)
