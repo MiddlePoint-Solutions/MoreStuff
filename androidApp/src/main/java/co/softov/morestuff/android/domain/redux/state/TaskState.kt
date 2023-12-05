@@ -1,7 +1,7 @@
 package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.ScopeAll
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 
 data class TaskState(
     val scopes: List<ScopeDomain> = listOf(),
-    val currentScope: ScopeDomain = ScopeAll,
+    val currentScope: ScopeDomain = scopeAll,
     val selected: List<Long> = listOf(),
 )
 

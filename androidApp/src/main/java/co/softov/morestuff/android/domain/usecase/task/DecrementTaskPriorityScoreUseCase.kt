@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.repository.PriorityRepository
 
 interface DecrementTaskPriorityScoreUseCase {
-    suspend operator fun invoke(taskId: Long, scopeId: Long): Either<Failure, Long>
+    suspend operator fun invoke(taskId: Long): Either<Failure, Long>
 }
 
 class DecreaseTaskPriorityScoreUseCaseImpl(
     private val priorityRepository: PriorityRepository,
 ) : DecrementTaskPriorityScoreUseCase {
-    override suspend operator fun invoke(taskId: Long, scopeId: Long): Either<Failure, Long> {
-        return priorityRepository.decreaseTaskPriorityScore(taskId, scopeId)
+    override suspend operator fun invoke(taskId: Long): Either<Failure, Long> {
+        return priorityRepository.decreaseTaskPriorityScore(taskId)
     }
 }

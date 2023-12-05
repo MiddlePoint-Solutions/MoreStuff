@@ -2,11 +2,11 @@ package co.softov.morestuff.android.data.mapper
 
 import co.softov.morestuff.android.domain.model.ScopeDomain
 
-typealias ScopeDb = co.softov.morestuff.db.Scope
 typealias ScopeDataMapper = (
     scope_id: Long,
     scope_uid: String,
-    name: String
+    scope_name: String,
+    scope_order: Int,
 ) -> ScopeDomain
 
 fun makeScopeDbMapper(): ScopeDataMapper = ::mapScopeDb
@@ -14,11 +14,13 @@ fun makeScopeDbMapper(): ScopeDataMapper = ::mapScopeDb
 fun mapScopeDb(
     scope_id: Long,
     scope_uid: String,
-    name: String
+    scope_name: String,
+    scope_order: Int,
 ): ScopeDomain {
     return ScopeDomain(
-        scopeId = scope_id,
+        id = scope_id,
         uid = scope_uid,
-        name = name
+        name = scope_name,
+        order = scope_order,
     )
 }

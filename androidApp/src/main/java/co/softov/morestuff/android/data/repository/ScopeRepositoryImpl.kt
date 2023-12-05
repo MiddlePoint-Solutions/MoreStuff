@@ -1,42 +1,102 @@
 package co.softov.morestuff.android.data.repository
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
+import arrow.core.Either
+import arrow.core.right
 import co.softov.morestuff.android.data.mapper.DataMappers
+import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.repository.ScopeRepository
 import co.softov.morestuff.db.StuffDb
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 
 class ScopeRepositoryImpl(
     database: StuffDb,
     private val dataMappers: DataMappers,
 ) : ScopeRepository {
+
     private val scopeQueries = database.scopeQueries
 
+    override suspend fun createScope(uid: String, name: String): Either<Failure, ScopeDomain?> {
+        return scopeQueries.transactionWithResult {
+            val count = scopeQueries.countScopes().executeAsOne().toInt()
+            scopeQueries.createScope(uid, name, count)
+            val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
+            scopeQueries
+                .selectScope(scopeId, dataMappers.scopeDbMapper)
+                .executeAsOneOrNull()
+                .right()
+        }
+    }
 
-    override suspend fun createScope(scopeUid: String, name: String) {
-        scopeQueries.transaction {
-            scopeQueries.createScope(scopeUid, name)
-        }
-    }
-    override suspend fun deleteScope(scopeIds: List<Long>) {
-        scopeQueries.transaction {
-            scopeQueries.deleteScope(scopeIds)
-        }
-    }
+    override suspend fun deleteScope(id: Long): Either<Failure, ScopeDomain> =
+        scopeQueries.transactionWithResult {
 
-    override suspend fun getScopes(): List<ScopeDomain> {
-        return scopeQueries.getScope().executeAsList().map { scope ->
-            dataMappers.scopeDbMapper(scope.scope_id, scope.scope_uid, scope.name)
+            val deleted = scopeQueries.selectScope(
+                id = id,
+                mapper = dataMappers.scopeDbMapper
+            ).executeAsOne()
+
+            scopeQueries.deleteScope(id)
+
+            scopeQueries
+                .selectAllScopes()
+                .executeAsList()
+                .forEachIndexed { index, scope ->
+                    scopeQueries.updateScopeOrder(
+                        scopeId = scope.scope_id,
+                        scopeOrder = index + 1
+                    )
+                }
+
+            deleted.right()
         }
-    }
-    override suspend fun updateScopeName(scopeId: Long, newName: String) {
-        scopeQueries.transaction {
-            scopeQueries.updateScopeName(newName, scopeId)
+
+    override suspend fun getScopes(): Either<Failure, List<ScopeDomain>> = scopeQueries
+        .selectAllScopes(mapper = dataMappers.scopeDbMapper)
+        .executeAsList()
+        .right()
+
+    override fun getScopesFlow(): Flow<List<ScopeDomain>> = scopeQueries
+        .selectAllScopes(mapper = dataMappers.scopeDbMapper)
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+
+    override suspend fun updateScopeName(id: Long, name: String): Either<Failure, ScopeDomain> =
+        scopeQueries.transactionWithResult {
+            scopeQueries.updateScopeName(name, id)
+            scopeQueries
+                .selectScope(id, dataMappers.scopeDbMapper)
+                .executeAsOne()
+                .right()
         }
-    }
-    override suspend fun updateScopeOrder(scopeId: Long, newOrderIndex: Long) {
-        scopeQueries.transaction {
-            scopeQueries.updateScopeOrder(scopeId, newOrderIndex)
+
+    override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, ScopeDomain> =
+        scopeQueries.transactionWithResult {
+            scopeQueries.updateScopeOrder(
+                scopeId = id,
+                scopeOrder = order
+            )
+
+            scopeQueries
+                .selectAllScopes()
+                .executeAsList()
+                .map { if (it.scope_id == id) it.copy(scope_order = order) else it }
+                .sortedBy { it.scope_order }
+                .onEachIndexed { index, scope ->
+                    scopeQueries.updateScopeOrder(
+                        scopeId = scope.scope_id,
+                        scopeOrder = index + 1
+                    )
+                }
+
+
+            scopeQueries.selectScope(id, dataMappers.scopeDbMapper)
+                .executeAsOne()
+                .right()
         }
-    }
 
 }

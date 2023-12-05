@@ -12,10 +12,10 @@ class DeleteScopeUseCaseTest {
 
     @Test
     fun `delete scope`() = runBlocking {
-        val scopeIds = listOf(1L, 2L, 3L)
+        val scopeId = 1L
 
-        useCase(scopeIds)
+        useCase(scopeId)
 
-        coVerify(exactly = 1) { scopeRepository.deleteScope(scopeIds) }
+        coVerify(exactly = 1) { scopeRepository.deleteScope(scopeId) }
     }
 }

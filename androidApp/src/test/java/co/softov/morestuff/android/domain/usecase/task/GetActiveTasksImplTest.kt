@@ -20,16 +20,16 @@ class GetActiveTasksUseCaseTest {
     private val mockTaskRepository: TaskRepository = mockk()
     private val getActiveTasksImpl = GetActiveTasksFlowUseCaseImpl(mockTaskRepository)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `Test getActiveTasksFlow is called`() = runTest {
         val exampleTasks: List<TaskDomain> = createListOfTasks(2)
+        val scopeId = 1L
 
-        coEvery { mockTaskRepository.getActiveTasksFlow() } returns flowOf(exampleTasks)
+        coEvery { mockTaskRepository.getActiveTasksFlow(scopeId) } returns flowOf(exampleTasks)
 
-        val activeTasksFlow = getActiveTasksImpl.invoke()
+        val activeTasksFlow = getActiveTasksImpl.invoke(scopeId)
 
-        coVerify { mockTaskRepository.getActiveTasksFlow() }
+        coVerify { mockTaskRepository.getActiveTasksFlow(scopeId) }
 
         assertEquals(exampleTasks, activeTasksFlow.first())
     }

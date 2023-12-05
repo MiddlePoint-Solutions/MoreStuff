@@ -9,7 +9,6 @@ interface UpdateTaskPriorityScoreUseCase {
     suspend operator fun invoke(
         taskId: Long,
         priorityScore: Long,
-        scopeId:Long
     ): Either<Failure, Long>
 }
 
@@ -19,8 +18,7 @@ class UpdateTaskPriorityScoreUseCaseImpl(
     override suspend operator fun invoke(
         taskId: Long,
         priorityScore: Long,
-        scopeId:Long
     ): Either<Failure, Long> {
-        return priorityRepository.updateTaskPriority(taskId, priorityScore, scopeId)
+        return priorityRepository.updateTaskPriority(taskId, priorityScore)
     }
 }

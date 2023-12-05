@@ -20,7 +20,6 @@ interface ReorderTaskUseCase {
 class ReorderTaskUseCaseImpl(
     private val priorityRepository: PriorityRepository,
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
-    val scopeId: Long,
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
         taskId: Long,
@@ -32,21 +31,21 @@ class ReorderTaskUseCaseImpl(
         }
 
         aboveScore == NA -> {
-            updateTaskPriorityScoreUseCase(taskId, (belowScore ?: 0) + 1, scopeId)
+            updateTaskPriorityScoreUseCase(taskId, (belowScore ?: 0) + 1)
         }
 
         belowScore == NA -> {
-            updateTaskPriorityScoreUseCase(taskId, aboveScore - 1, scopeId)
+            updateTaskPriorityScoreUseCase(taskId, aboveScore - 1)
         }
 
         else -> {
             val average = (aboveScore + belowScore) / 2
             if (aboveScore == average) {
-                priorityRepository.updateTasksPriorityScoreByAdding(taskId, average, scopeId)
+                priorityRepository.updateTasksPriorityScoreByAdding(taskId, average)
             } else if (belowScore == average) {
-                priorityRepository.updateTasksPriorityScoreBySubtracting(taskId, average, scopeId)
+                priorityRepository.updateTasksPriorityScoreBySubtracting(taskId, average)
             } else {
-                updateTaskPriorityScoreUseCase(taskId, average, scopeId)
+                updateTaskPriorityScoreUseCase(taskId, average)
             }
         }
     }

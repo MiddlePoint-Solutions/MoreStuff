@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
@@ -37,7 +40,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -62,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
@@ -76,9 +79,11 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.schedule.ScopeContent
+import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.scope.CreateScopeButton
-import co.softov.morestuff.android.ui.scope.ScopesScreen
+import co.softov.morestuff.android.ui.scope.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
@@ -91,6 +96,7 @@ import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,14 +110,14 @@ fun HomeScreen(
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
     val model by viewModel.uiModel.collectAsStateWithLifecycle()
-    val taskSelectionActive = model.taskSelectionActive
+    val selectedTasks by viewModel.selectedTasksFlow.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
     val scrollContainerColor = surfaceContainerElevation
     val containerColor = remember { mutableStateOf(defaultContainerColor) }
 
-    LaunchedEffect(scrollBehavior, taskSelectionActive) {
-        snapshotFlow { Pair(scrollBehavior.state.overlappedFraction, taskSelectionActive) }
+    LaunchedEffect(scrollBehavior, selectedTasks) {
+        snapshotFlow { Pair(scrollBehavior.state.overlappedFraction, selectedTasks.isNotEmpty()) }
             .collect { (fraction, isActive) ->
                 when {
                     isActive -> containerColor.value = scrollContainerColor
@@ -121,9 +127,6 @@ fun HomeScreen(
             }
     }
 
-    BackHandler(model.taskSelectionActive) {
-        viewModel.clearSelectedTasks()
-    }
     val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showScopeSelection: () -> Unit = {
         scope.launch {
@@ -138,7 +141,7 @@ fun HomeScreen(
         topAppBarScrollBehavior = scrollBehavior,
         topBar = {
             HomeTopBar(
-                model = model,
+                selectedTaskCount = selectedTasks.size,
                 reviewSelected = { navigation.push(Screen.Review(viewModel.selectedScopeId.value)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
                 searchSelected = { isSearchActive = true },
@@ -149,17 +152,13 @@ fun HomeScreen(
                 selectScope = showScopeSelection,
                 containerColor = containerColor,
                 deleteSelectedTasksFromScope = viewModel::removeTaskFromScope
-
             )
         },
         content = {
-            Column(modifier = Modifier.fillMaxSize()) {
-                HomeContent(
-                    snackbarHostState = snackbarHostState,
-                    modifier = Modifier.padding(it),
-                )
-            }
-
+            HomeContent(
+                snackbarHostState = snackbarHostState,
+                modifier = Modifier.padding(it),
+            )
         },
     )
 
@@ -194,7 +193,7 @@ fun HomeScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
     snackbarHostState: SnackbarHostState,
@@ -207,18 +206,13 @@ fun HomeContent(
     val navigation = LocalAppNavigation.current
     var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
-    val tasks by homeViewModel.tasks.collectAsState()
     val model by homeViewModel.uiModel.collectAsState()
+    val scopes by homeViewModel.scopes.collectAsState()
+    val selectedTasks by homeViewModel.selectedTasksFlow.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
 
-    val showEmptyState by remember(tasks) { derivedStateOf { tasks.isEmpty() } }
+    val pagerState = rememberPagerState(pageCount = { scopes.size })
 
-
-    val selectedScopeId = remember { homeViewModel.uiState.value.selectedScopeId }
-    LaunchedEffect(selectedScopeId) {
-        selectedScopeId?.let {
-            homeViewModel.updateTasksForSelectedScope(selectedScopeId)
-        }
-    }
 
     val resources = LocalContext.current.resources
     LaunchedEffect(model.notification) {
@@ -236,7 +230,7 @@ fun HomeContent(
                 }
             }
 
-            else -> {}
+            NotificationState.None -> {}
         }
     }
 
@@ -274,9 +268,80 @@ fun HomeContent(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        ScopesScreen(
-            showTaskChat = { taskId -> navigation.push(Screen.TaskChat(taskId)) }
-        )
+
+        Column {
+            ScopeTabs(
+                currentPage = pagerState.currentPage,
+                scopes = scopes,
+                onScopeSelected = { index, _ ->
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(index)
+                    }
+                }
+            )
+
+            Divider(
+                thickness = Dp.Hairline
+            )
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                pageContent = {
+
+                    val scopeViewModel = koinViewModel<ScopeViewModel>(
+                        key = "Scope$it",
+                        parameters = {
+                            parametersOf(
+                                scopes[it].id,
+                                homeViewModel.selectedTasksFlow
+                            )
+                        }
+                    )
+
+                    val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
+
+                    val showEmptyState by remember(scopeTasks.size) {
+                        derivedStateOf { scopeTasks.isEmpty() }
+                    }
+
+                    if (showEmptyState) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(bottom = 180.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            TextButton(onClick = { showTaskInput = true }) {
+                                Text(
+                                    stringResource(R.string.empty_priority_list_cta),
+                                    style = MaterialTheme.typography.titleLarge.copy(
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                            }
+                        }
+                    } else {
+                        ScopeContent(
+                            tasks = scopeTasks,
+                            onItemClick = { taskId ->
+                                if (selectedTasks.isNotEmpty()) {
+                                    homeViewModel.toggleTaskSelection(taskId)
+                                } else {
+                                    navigation.push(Screen.TaskChat(taskId))
+                                }
+                            },
+                            onItemLongClick = homeViewModel::toggleTaskSelection,
+                            showTaskOptions = { taskId -> taskOptions = taskId },
+                            toggleQuickReminder = homeViewModel::toggleQuickReminder,
+                            listState = priorityScrollState,
+                            taskSelectionActive = selectedTasks::isNotEmpty,
+                            modifier = Modifier.padding(bottom = 20.dp),
+                        )
+                    }
+                }
+            )
+        }
 
         if (showTaskCompleteAnimation > 0 && model.confettiEnabled) {
             KonfettiView(
@@ -304,24 +369,6 @@ fun HomeContent(
         }
     }
 
-    if (showEmptyState) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 180.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            TextButton(onClick = { showTaskInput = true }) {
-                Text(
-                    stringResource(R.string.empty_priority_list_cta),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                )
-            }
-        }
-    }
-
     if (showTaskInput) {
         val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -341,7 +388,7 @@ fun HomeContent(
             },
             scrollLaterPriority = {
                 scope.launch {
-                    priorityScrollState.scrollToItem(index = tasks.size - 1)
+                    // TODO priorityScrollState.scrollToItem(index = tasks.size - 1)
                 }
             }
         )
@@ -481,7 +528,7 @@ fun ScopeSelectionBottomSheet(
     sheetState: SheetState,
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val scopes = homeViewModel.uiState.collectAsState()
+    val scopes by homeViewModel.scopes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppNavigation.current
     ModalBottomSheet(
@@ -520,7 +567,7 @@ fun ScopeSelectionBottomSheet(
 
 @Composable
 fun ScopeList(
-    scopes: State<HomeUiModel>,
+    scopes: List<ScopeDomain>,
     onScopeSelected: (Long) -> Unit,
     modifier: Modifier,
     hideSheet: () -> Unit,
@@ -537,18 +584,21 @@ fun ScopeList(
     LazyColumn(
         state = scrollState
     ) {
-        items(scopes.value.scopes.size) { index ->
-            val scope = scopes.value.scopes[index]
+        items(
+            scopes.size,
+            key = { "Scope$it" }
+        ) {
+            val scope = scopes[it]
             ListItem(
                 modifier = Modifier.clickable {
-                    onScopeSelected(scope.scopeId)
+                    onScopeSelected(scope.id)
                     hideSheet()
                 },
                 headlineContent = {
                     Text(scope.name)
                 },
             )
-            if (index < scopes.value.scopes.size - 1) {
+            if (it < scopes.size - 1) {
                 Divider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     thickness = Dp.Hairline

@@ -75,14 +75,16 @@ class TaskRepositoryImpl(
     }
 
     override fun getActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
-        val tasksFlow = taskQueries.returnTaskByScopeId(scopeId, mapper.taskDbMapper)
+        val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
             .asFlow()
             .mapToList(Dispatchers.IO)
+
         val schedulesFlow =
             scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
                 .asFlow()
                 .mapToList(Dispatchers.IO)
                 .map { it.groupBy { schedule -> schedule.taskId } }
+
         val messagesFlow =
             messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
                 .asFlow()
@@ -162,7 +164,6 @@ class TaskRepositoryImpl(
     override suspend fun getTasksWithoutSchedule(scopeId: Long): Either<Failure, List<TaskDomain>> {
         val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutSchedule(
             listOf(ScheduleType.OneTime),
-            scopeId,
             mapper = mapper.taskDbMapper
         ).executeAsList()
 

@@ -3,34 +3,21 @@ package co.softov.morestuff.android.ui.scope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -42,84 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.ui.home.HomeViewModel
-import co.softov.morestuff.android.ui.schedule.PriorityContent
-import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.theme.surfaceContainer
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
-import timber.log.Timber
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ScopesScreen(
-    showTaskChat: (taskId: Long) -> Unit,
-) {
-    val homeViewModel: HomeViewModel = koinViewModel()
-    val model by homeViewModel.uiModel.collectAsState()
-    var taskOptions by remember { mutableLongStateOf(0L) }
-    val priorityScrollState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    val scopes = remember(model.scopes) { model.scopes }
-    val pagerState = rememberPagerState(pageCount = { scopes.size })
-
-    if (scopes.isNotEmpty()) {
-        Column {
-            ScopeTabs(
-                currentPage = pagerState.currentPage,
-                scopes = scopes,
-                onScopeSelected = { index, scope ->
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(index)
-                    }
-                },
-            )
-
-            Divider(
-                thickness = Dp.Hairline
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                pageContent = {
-
-                    val scopeViewModel = koinViewModel<ScopeViewModel>(
-                        key = "Scope$it",
-                        parameters = { parametersOf(scopes[it].scopeId) }
-                    )
-
-                    val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
-
-                    PriorityContent(
-                        tasks = scopeTasks,
-                        onItemClick = { taskId ->
-                            if (model.taskSelectionActive) {
-                                homeViewModel.toggleTaskSelection(taskId)
-                            } else {
-                                showTaskChat(taskId)
-                            }
-                        },
-                        onItemLongClick = homeViewModel::toggleTaskSelection,
-                        showTaskOptions = { taskOptions = it },
-                        toggleQuickReminder = homeViewModel::toggleQuickReminder,
-                        listState = priorityScrollState,
-                        taskSelectionActive = { model.taskSelectionActive },
-                        modifier = Modifier.padding(bottom = 20.dp),
-                    )
-                }
-            )
-        }
-    }
-}
-
 
 @Composable
 fun ScopeTabs(
@@ -147,7 +57,6 @@ fun ScopeTabs(
         divider = {}
     ) {
         scopes.forEachIndexed { index, scope ->
-            Timber.d("Creating tab for scope: ${scope.name}")
             Tab(
                 selected = index == currentPage,
                 onClick = { onScopeSelected(index, scope) },

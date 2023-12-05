@@ -1,33 +1,42 @@
+import kotlin.Int;
+
 CREATE TABLE scope (
     scope_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     scope_uid TEXT NOT NULL,
-    name TEXT NOT NULL,
-    order_index INTEGER NOT NULL DEFAULT 0
+    scope_name TEXT UNIQUE NOT NULL ,
+    scope_order INTEGER AS Int NOT NULL
 );
 
 createScope:
-INSERT INTO scope (scope_uid, name)
-VALUES (:scope_uid,:name);
-
-
+INSERT OR IGNORE INTO scope (scope_uid, scope_name, scope_order)
+VALUES (:uid, :name, :order);
 
 deleteScope:
 DELETE FROM scope
-WHERE scope_id IN :scope_ids;
+WHERE scope_id = :id;
 
-INSERT INTO scope (scope_id, scope_uid, name) VALUES (1, 'all-scope', 'All');
+selectScope:
+SELECT scope.*
+FROM scope
+WHERE scope_id = :id;
 
-
-getScope:
-SELECT scope_id, scope_uid, name
-FROM scope;
+selectAllScopes:
+SELECT scope.*
+FROM scope
+ORDER BY scope_order ASC;
 
 updateScopeName:
 UPDATE scope
-SET name = :newName
+SET scope_name = :scopeName
 WHERE scope_id = :scopeId;
 
 updateScopeOrder:
 UPDATE scope
-SET order_index = :newOrderIndex
+SET scope_order = :scopeOrder
 WHERE scope_id = :scopeId;
+
+countScopes:
+SELECT COUNT(*) FROM scope;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

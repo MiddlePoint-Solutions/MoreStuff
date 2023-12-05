@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,9 +41,8 @@ import co.softov.morestuff.android.ui.compose.NoFlingSwipeToDismiss
 import co.softov.morestuff.android.ui.compose.rememberNoFlingDismissState
 import co.softov.morestuff.android.ui.model.TaskUiModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriorityContent(
+fun ScopeContent(
     tasks: List<TaskUiModel>,
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
@@ -51,6 +51,57 @@ fun PriorityContent(
     taskSelectionActive: () -> Boolean,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+) {
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        state = listState,
+    ) {
+        itemsIndexed(
+            items = tasks,
+            key = { _, task -> task.id }
+        ) { index, item ->
+
+            val isLast by remember(index) {
+                derivedStateOf { index == tasks.lastIndex }
+            }
+
+            if (!taskSelectionActive()) {
+                SwipeablePriorityItem(
+                    showTaskOptions,
+                    item,
+                    toggleQuickReminder,
+                ) {
+                    PriorityItem(
+                        task = item,
+                        onClick = { onItemClick(item.id) },
+                        onLongClick = { onItemLongClick(item.id) }
+                    )
+                }
+            } else {
+                PriorityItem(
+                    task = item,
+                    onClick = { onItemClick(item.id) },
+                    onLongClick = { onItemLongClick(item.id) }
+                )
+            }
+
+            if (!isLast) {
+                Divider(
+                    thickness = Dp.Hairline
+                )
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SwipeablePriorityItem(
+    showTaskOptions: (taskId: Long) -> Unit,
+    item: TaskUiModel,
+    toggleQuickReminder: (taskId: Long) -> Unit,
+    content: @Composable RowScope.() -> Unit,
 ) {
 
     val haptic = LocalHapticFeedback.current
@@ -64,72 +115,36 @@ fun PriorityContent(
         }
     }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            state = listState,
-        ) {
-            itemsIndexed(
-                items = tasks,
-                key = { _, task -> task.id }
-            ) { index, item ->
-                val isLast by remember(index) {
-                    derivedStateOf { index == tasks.lastIndex }
+    val dismissState = rememberNoFlingDismissState(
+        positionalThreshold = { 130.dp.toPx() },
+        confirmValueChange = { dismissValue ->
+            when (dismissValue) {
+                DismissValue.Default -> false
+                DismissValue.DismissedToEnd -> {
+                    showTaskOptions(item.id)
+                    false
                 }
 
-                if (!taskSelectionActive()) {
-                    val dismissState = rememberNoFlingDismissState(
-                        positionalThreshold = { 130.dp.toPx() },
-                        confirmValueChange = { dismissValue ->
-                            when (dismissValue) {
-                                DismissValue.Default -> false
-                                DismissValue.DismissedToEnd -> {
-                                    showTaskOptions(item.id)
-                                    false
-                                }
-                                DismissValue.DismissedToStart -> {
-                                    toggleQuickReminder(item.id)
-                                    false
-                                }
-                            }
-                        }
-                    )
-
-                    LaunchedEffect(Unit) {
-                        snapshotFlow { dismissState.dismissDirection }
-                            .collect { dismissDirection ->
-                                willDismissDirection = dismissDirection
-                            }
-                    }
-
-                    NoFlingSwipeToDismiss(
-                        state = dismissState,
-                        background = { SwipeBackground(dismissState, item.hasReminder) },
-                        dismissContent = {
-                            PriorityItem(
-                                task = item,
-                                onClick = { onItemClick(item.id) },
-                                onLongClick = { onItemLongClick(item.id) }
-                            )
-                        }
-                    )
-                } else {
-                    PriorityItem(
-                        task = item,
-                        onClick = { onItemClick(item.id) },
-                        onLongClick = { onItemLongClick(item.id) }
-                    )
-                }
-
-                if (!isLast) {
-                    Divider(
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                        thickness = Dp.Hairline
-                    )
+                DismissValue.DismissedToStart -> {
+                    toggleQuickReminder(item.id)
+                    false
                 }
             }
         }
+    )
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { dismissState.dismissDirection }
+            .collect { dismissDirection ->
+                willDismissDirection = dismissDirection
+            }
     }
+
+    NoFlingSwipeToDismiss(
+        state = dismissState,
+        background = { SwipeBackground(dismissState, item.hasReminder) },
+        dismissContent = content
+    )
 }
 
 

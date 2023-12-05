@@ -31,11 +31,6 @@ WHERE complete_time IS NULL
       FROM schedule
       WHERE active = 1 AND schedule_type IN :schedule_types
   )
-  AND id IN (
-      SELECT task_id
-      FROM task_scope
-      WHERE scope_id = :scope_id
-  )
 ORDER BY task.priority_score DESC;
 
 
@@ -79,7 +74,7 @@ SET priority_score = :priority_score
 WHERE id = :task_id AND EXISTS (
     SELECT 1
     FROM task_scope
-    WHERE task_id = :task_id AND scope_id = :scope_id
+    WHERE task_id = :task_id
 );
 
 
@@ -126,7 +121,7 @@ deleteTask:
 DELETE FROM task
 WHERE id IN :task_ids;
 
-returnTaskByScopeId:
+selectTasksByScopeId:
 SELECT task.*
 FROM task
 JOIN task_scope ON task.id = task_scope.task_id

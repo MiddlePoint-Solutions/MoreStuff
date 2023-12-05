@@ -52,7 +52,7 @@ import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    model: HomeUiModel,
+    selectedTaskCount: Int,
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
     searchSelected: () -> Unit,
@@ -65,7 +65,7 @@ fun HomeTopBar(
     containerColor: State<Color>,
 ) {
 
-    val taskSelectionActive = remember(model) { model.taskSelectionActive }
+    val taskSelectionActive = remember(selectedTaskCount) { selectedTaskCount > 0 }
     val transition = updateTransition(taskSelectionActive, label = "Selection state")
     var showMenu by remember { mutableStateOf(false) }
 
@@ -93,7 +93,7 @@ fun HomeTopBar(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                AnimatedCounter(count = model.selectedTaskIds.size)
+                                AnimatedCounter(count = selectedTaskCount)
                             }
                         }
                     }
@@ -218,7 +218,7 @@ private fun Preview() {
     MoreStuffTheme {
         val previewContainerColor = remember { mutableStateOf(Color.Blue) }
         HomeTopBar(
-            model = HomeUiModel(),
+            selectedTaskCount = 0,
             reviewSelected = {},
             settingsSelected = {},
             searchSelected = { },

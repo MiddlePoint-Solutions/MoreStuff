@@ -39,6 +39,7 @@ import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCas
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.db.Message
 import co.softov.morestuff.db.Schedule
+import co.softov.morestuff.db.Scope
 import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
 import com.russhwolf.settings.Settings
@@ -144,6 +145,9 @@ internal fun createDatabase(context: Context): StuffDb {
         messageAdapter = Message.Adapter(
             content_typeAdapter = IntColumnAdapter,
             reply_typeAdapter = IntColumnAdapter
+        ),
+        scopeAdapter = Scope.Adapter(
+            scope_orderAdapter = IntColumnAdapter,
         )
     )
 }

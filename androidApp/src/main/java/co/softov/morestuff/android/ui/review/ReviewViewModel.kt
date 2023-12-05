@@ -93,7 +93,7 @@ class ReviewViewModel(
                 )
 
                 else -> dispatchAppStoreAction(
-                    PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore, scopeId)
+                    PriorityAction.UndoTaskPriorityUpdateAction(item.id, item.priorityScore)
                 )
             }
         }
@@ -112,12 +112,12 @@ class ReviewViewModel(
             SwipeDirection.None -> return
         }
 
-        dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction, scopeId))
+        dispatchAppStoreAction(PriorityAction.TaskPriorityUpdateAction(item.id, reviewAction))
         sendEvent(ItemReview(item, reviewAction))
 
         if (state.items.first() == item) {
             roundEndDelayJob = viewModelScope.launch {
-                dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction(scopeId))
+                dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction)
                 delay(500)
                 sendEvent(SetupRound(Final))
             }

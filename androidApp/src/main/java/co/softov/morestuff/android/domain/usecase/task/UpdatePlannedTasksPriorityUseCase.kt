@@ -7,7 +7,7 @@ import timber.log.Timber
 
 
 interface UpdatePlannedTasksPriorityUseCase {
-    suspend operator fun invoke(scopeId:Long)
+    suspend operator fun invoke()
 }
 
 class UpdatePlannedTasksPriorityUseCaseImpl(
@@ -16,7 +16,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
 ) : UpdatePlannedTasksPriorityUseCase {
 
-    override suspend fun invoke(scopeId:Long) {
+    override suspend fun invoke() {
         Timber.d("UpdatePlannedTasksPriorityUseCase")
         getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map { tasks ->
             Timber.d("UpdatePlannedTasksPriorityUseCase tasks: ${tasks.size}")
@@ -27,7 +27,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
                         scheduleTimeLocal = scheduleLocalTime.toLocalDateTime(),
                         taskCreateTimeUtc = task.createTime
                     )
-                    updateTaskPriorityScoreUseCase(task.id, newPriorityScore, scopeId)
+                    updateTaskPriorityScoreUseCase(task.id, newPriorityScore)
                 }
             }
         }

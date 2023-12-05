@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.home.HomeUiEvent
 import co.softov.morestuff.android.ui.home.HomeUiModel
@@ -78,7 +79,7 @@ import java.util.UUID
 @Composable
 fun CreateScopesScreen(onBack: () -> Unit) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val scopes = homeViewModel.uiState.collectAsState()
+    val scopes by homeViewModel.scopes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val isEditDialogOpen = remember { mutableStateOf(false) }
     val isDeleteDialogOpen = remember { mutableStateOf(false) }
@@ -177,7 +178,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             isDeleteDialogOpen = isDeleteDialogOpen,
             scopeId = selectScopeId,
             onConfirm = { scopeId ->
-                homeViewModel.deleteScopes(listOf(scopeId))
+                homeViewModel.deleteScopes(scopeId)
                 isDeleteDialogOpen.value = false
             },
             onDismiss = {
@@ -190,7 +191,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
 
 @Composable
 fun ManageScopeList(
-    scopes: State<HomeUiModel>,
+    scopes: List<ScopeDomain>,
     onScopeSelected: (Long) -> Unit,
     onEditScope: (Long, String) -> Unit,
     onDeleteScope: (Long) -> Unit,
@@ -208,11 +209,11 @@ fun ManageScopeList(
     LazyColumn(
         state = scrollState
     ) {
-        items(scopes.value.scopes.size) { index ->
-            val scope = scopes.value.scopes[index]
+        items(scopes.size) { index ->
+            val scope = scopes[index]
             ListItem(
                 modifier = Modifier.clickable {
-                    onScopeSelected(scope.scopeId)
+                    onScopeSelected(scope.id)
                     hideSheet()
                 },
                 headlineContent = {
@@ -223,8 +224,8 @@ fun ManageScopeList(
                         horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (scope.scopeId != 1L) {
-                            IconButton(onClick = { onEditScope(scope.scopeId, scope.name) }) {
+                        if (scope.id != 1L) {
+                            IconButton(onClick = { onEditScope(scope.id, scope.name) }) {
                                 Icon(
                                     imageVector = Icons.Filled.Edit,
                                     contentDescription = "Edit"
@@ -232,7 +233,7 @@ fun ManageScopeList(
                             }
                             Spacer(Modifier.width(10.dp))
 
-                            IconButton(onClick = { onDeleteScope(scope.scopeId) }) {
+                            IconButton(onClick = { onDeleteScope(scope.id) }) {
                                 Icon(
                                     imageVector = Icons.Filled.Delete,
                                     contentDescription = "Delete",
@@ -246,7 +247,7 @@ fun ManageScopeList(
                     containerColor = Color.Transparent
                 )
             )
-            if (index < scopes.value.scopes.size - 1) {
+            if (index < scopes.size - 1) {
                 Divider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     thickness = Dp.Hairline

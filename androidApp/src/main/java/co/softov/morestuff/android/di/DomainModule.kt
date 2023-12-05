@@ -135,6 +135,8 @@ import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
 import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCase
 import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
@@ -282,6 +284,7 @@ val scopeUseCases = module{
     factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
     factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
     factoryOf(::UpdateScopeOrderUseCaseImpl) bind UpdateScopeOrderUseCase::class
+    factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
 }
 
 val scheduleUseCases = module {

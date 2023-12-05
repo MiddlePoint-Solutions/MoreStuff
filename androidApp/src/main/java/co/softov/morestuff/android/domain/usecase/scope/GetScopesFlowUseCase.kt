@@ -4,13 +4,14 @@ import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.repository.ScopeRepository
+import kotlinx.coroutines.flow.Flow
 
-interface GetScopesUseCase {
-    suspend operator fun invoke(): Either<Failure, List<ScopeDomain>>
+interface GetScopesFlowUseCase {
+    operator fun invoke(): Flow<List<ScopeDomain>>
 }
 
-class GetScopesUseCaseImpl(
+class GetScopesFlowUseCaseImpl(
     private val scopeRepository: ScopeRepository
-) : GetScopesUseCase {
-    override suspend fun invoke(): Either<Failure, List<ScopeDomain>> = scopeRepository.getScopes()
+) : GetScopesFlowUseCase {
+    override fun invoke(): Flow<List<ScopeDomain>> = scopeRepository.getScopesFlow()
 }

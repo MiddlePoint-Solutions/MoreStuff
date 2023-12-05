@@ -5,16 +5,14 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.model.NotificationState
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Immutable
 data class HomeUiModel(
     val confettiEnabled: Boolean = true,
-    val taskSelectionActive: Boolean = false,
-    val selectedTaskIds: List<Long> = listOf(),
     val recentlyCompletedTasks: List<Long> = listOf(),
     val notification: NotificationState = NotificationState.None,
-    val selectedScopeId: Long? = null,
-    val scopes: List<ScopeDomain> = emptyList(),
+    val selectedScopeId: Long = 0,
 ) : BaseViewState
 
 @Immutable
@@ -29,10 +27,8 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class SetNotification(val notification: NotificationState) : HomeUiEvent()
     data class AddSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
     data object DeleteSelectedTasksFromScope : HomeUiEvent()
-    data class SetScopes(val scopes: List<ScopeDomain>) : HomeUiEvent()
     data class CreateScope(val uid: String, val name: String) : HomeUiEvent()
     data class SelectScope(val scopeId: Long) : HomeUiEvent()
-    data class DeleteScopes(val scopeIds: List<Long>) : HomeUiEvent()
+    data class DeleteScope(val scopeId: Long) : HomeUiEvent()
     data class UpdateScopeName(val scopeId: Long, val newName: String) : HomeUiEvent()
-    data class ReorderScopes(val newOrder: List<Long>) : HomeUiEvent()
 }

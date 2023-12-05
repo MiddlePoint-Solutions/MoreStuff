@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.usecase.task.GetTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 
 interface UpdateTaskReviewPriorityUseCase {
-    suspend operator fun invoke(taskId: Long, actionType: PriorityActionType, scopeId:Long): Either<Failure, Long>
+    suspend operator fun invoke(taskId: Long, actionType: PriorityActionType): Either<Failure, Long>
 }
 
 class UpdateTaskReviewPriorityUseCaseImpl(
@@ -23,27 +23,26 @@ class UpdateTaskReviewPriorityUseCaseImpl(
     override suspend fun invoke(
         taskId: Long,
         actionType: PriorityActionType,
-        scopeId:Long
     ): Either<Failure, Long> = when (actionType) {
         PriorityActionType.Now -> {
             val score = getDefaultPriorityScoreUseCase(Priority.Now())
-            updateTaskPriorityScoreUseCase(taskId, score, scopeId)
+            updateTaskPriorityScoreUseCase(taskId, score)
         }
 
         PriorityActionType.Later -> {
             val score = getDefaultPriorityScoreUseCase(Priority.Later())
-            updateTaskPriorityScoreUseCase(taskId, score, scopeId)
+            updateTaskPriorityScoreUseCase(taskId, score)
         }
 
         PriorityActionType.More -> getTaskUseCase(taskId).flatMap { task ->
             getTaskAbovePriorityScoreUseCase(task.priorityScore).flatMap { taskAbove ->
-                updateTaskPriorityScoreUseCase(taskId, taskAbove.priorityScore + 1, scopeId)
+                updateTaskPriorityScoreUseCase(taskId, taskAbove.priorityScore + 1)
             }
         }
 
         PriorityActionType.Less -> getTaskUseCase(taskId).flatMap { task ->
             getTaskBelowPriorityScoreUseCase(task.priorityScore).flatMap { taskBelow ->
-                updateTaskPriorityScoreUseCase(taskId, taskBelow.priorityScore - 1, scopeId)
+                updateTaskPriorityScoreUseCase(taskId, taskBelow.priorityScore - 1)
             }
         }
 
