@@ -6,8 +6,8 @@ import co.softov.morestuff.android.ui.model.MessageUiModel
 
 class MessageUiMapper(private val timeFormatter: TimeFormatter) {
 
-    fun internalMap(input: Message): MessageUiModel {
-        return MessageUiModel(
+    fun map(input: Message): MessageUiModel =
+        MessageUiModel(
             id = input.id,
             taskId = input.taskId,
             scheduleId = input.scheduleId,
@@ -17,15 +17,11 @@ class MessageUiMapper(private val timeFormatter: TimeFormatter) {
             messageData = input.messageData,
             replyType = input.replyType,
             replyContent = input.replyContent,
-            formattedTime = timeFormatter.formatTimeDayMonthInDeviceLanguage(input.createTime) ?: "",
+            formattedTime = timeFormatter.formatTimeDayMonthInDeviceLanguage(input.createTime)
+                ?: "",
             formattedTimeOnly = timeFormatter.formatTimeOnly(input.createTime) ?: "",
             openGraphResult = input.openGraphResult
         )
-    }
 
-    fun map(input: List<Message>): List<MessageUiModel> {
-        return input.map { message ->
-            internalMap(message)
-        }
-    }
+    fun map(input: List<Message>): List<MessageUiModel> = input.map(this::map)
 }

@@ -25,9 +25,6 @@ class HomeViewModel(
     getScopesFlowUseCase: GetScopesFlowUseCase,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
-    override val enableDebug: Boolean
-        get() = true
-
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
     val scopes = getScopesFlowUseCase()

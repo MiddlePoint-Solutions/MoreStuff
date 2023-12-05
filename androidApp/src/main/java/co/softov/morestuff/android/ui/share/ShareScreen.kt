@@ -282,9 +282,9 @@ private fun ShareContent(
                         UserTextInput(
                             value = userInputValue,
                             onValueChange = { userInputValue = it },
-                            sendAction = {
+                            /*sendAction = {
                                 newTaskContent = it to priorityModel.mapToDomain()
-                            },
+                            },*/
                             actionsContent = {
                                 VoiceToTextInput(
                                     onUpdateValue = userInputViewModel::updateUserInput,

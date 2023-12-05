@@ -326,17 +326,6 @@ fun UserInputComponent(
                     value = newScopeName,
                     onValueChange = { newScopeName = it },
                     focusRequester = focusRequester,
-                    sendAction = {
-                        coroutineScope.launch {
-                            homeViewModel.handleEvent(
-                                HomeUiEvent.CreateScope(
-                                    UUID.randomUUID().toString(),
-                                    newScopeName.text
-                                )
-                            )
-                            newScopeName = newScopeName.copy("")
-                        }
-                    },
                     backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                     actionsContent = {
                         if (isTextEmpty.value) {

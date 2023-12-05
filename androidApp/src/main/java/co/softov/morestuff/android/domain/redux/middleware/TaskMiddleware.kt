@@ -32,6 +32,7 @@ sealed class TaskAction : Action.FeatureAction() {
     data class CreateUserTaskAction(
         val title: String,
         val priority: Priority,
+        val scopeId: Long,
     ) : TaskAction()
 
     data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
@@ -72,7 +73,7 @@ class TaskMiddleware(
         when (action) {
             is CreateUserTaskAction -> scope.launch {
                 with(action) {
-                    val params = TaskParams(title, priority, TaskType.User)
+                    val params = TaskParams(title, priority, TaskType.User, scopeId)
                     val task = createTaskUseCase(params)
                     dispatch(TaskCreatedAction(task, priority))
                 }

@@ -374,6 +374,7 @@ fun HomeContent(
         TaskInputBottomSheet(
             onDismissRequest = { showTaskInput = false },
             sheetState = taskInputBottomSheetState,
+            initialScopeId = model.selectedScopeId,
             scrollNowPriority = {
                 coroutineScope.launch {
                     priorityScrollState.animateScrollToItem(index = 0)
@@ -393,6 +394,7 @@ fun HomeContent(
 private fun TaskInputBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
+    initialScopeId: Long,
     scrollNowPriority: () -> Unit,
     scrollLaterPriority: () -> Unit,
 ) {
@@ -470,18 +472,6 @@ private fun TaskInputBottomSheet(
                                     value = userInputValue,
                                     onValueChange = { userInputValue = it },
                                     focusRequester = focusRequester,
-                                    sendAction = { title ->
-                                        scope.launch {
-                                            viewModel.createNewTask(title)
-                                            userInputValue = userInputValue.copy("")
-                                            delay(100)
-                                            when (priorityModel.priority) {
-                                                PriorityUiModel.Later -> scrollLaterPriority()
-                                                PriorityUiModel.Now -> scrollNowPriority()
-                                                is PriorityUiModel.Plan -> {}
-                                            }
-                                        }
-                                    },
                                     actionsContent = {
                                         if (isTextEmpty.value) {
                                             VoiceToTextInput(
@@ -495,8 +485,14 @@ private fun TaskInputBottomSheet(
                                             ) {
                                                 SendIcon(onClick = {
                                                     scope.launch {
-                                                        viewModel.createNewTask(userInputValue.text)
-                                                        userInputValue = TextFieldValue()
+                                                        viewModel.createNewTask(userInputValue.text, initialScopeId)
+                                                        userInputValue = userInputValue.copy("")
+                                                        delay(100)
+                                                        when (priorityModel.priority) {
+                                                            PriorityUiModel.Later -> scrollLaterPriority()
+                                                            PriorityUiModel.Now -> scrollNowPriority()
+                                                            is PriorityUiModel.Plan -> {}
+                                                        }
                                                     }
                                                 })
                                             }

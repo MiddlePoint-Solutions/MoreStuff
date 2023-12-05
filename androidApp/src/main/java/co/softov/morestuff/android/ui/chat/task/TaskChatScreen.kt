@@ -327,10 +327,6 @@ private fun TaskChatInput(
                             userInputValue = it
                             isTextEmpty.value = it.text.isBlank()
                         },
-                        sendAction = {
-                            sendTaskMessage(it)
-                            userInputValue = userInputValue.copy(text = "")
-                        },
                         backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                         actionsContent = {
                             Row(
@@ -362,7 +358,7 @@ private fun TaskChatInput(
                                     ) {
                                         SendIcon(onClick = {
                                             sendTaskMessage(userInputValue.text)
-                                            userInputValue = TextFieldValue()
+                                            userInputValue = userInputValue.copy(text = "")
                                             isTextEmpty.value = true
                                         })
                                     }

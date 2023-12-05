@@ -41,6 +41,7 @@ class TaskRepositoryImpl(
         title: String,
         priorityScore: Long,
         taskType: TaskType,
+        scopeId: Long?,
     ): TaskDomain {
         return taskQueries.transactionWithResult {
             val data = createTaskData(
@@ -51,7 +52,10 @@ class TaskRepositoryImpl(
             taskQueries.insertTask(data)
             val taskId = lastInsertedRowId
 
-            taskScopeQueries.insertTask(taskId, 1)
+            scopeId?.let {
+                taskScopeQueries.insert(taskId, it)
+            }
+
             taskQueries.selectTaskById(taskId, mapper = mapper.taskDbMapper).executeAsOne()
         }
     }
@@ -241,13 +245,13 @@ class TaskRepositoryImpl(
 
     override suspend fun insertTasksIntoScope(taskIds: List<Long>, scopeId: Long) {
         taskScopeQueries.transaction {
-            taskIds.forEach { taskScopeQueries.insertTask(it, scopeId) }
+            taskIds.forEach { taskScopeQueries.insert(it, scopeId) }
         }
     }
 
     override suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long) {
         taskScopeQueries.transaction {
-            taskIds.forEach { taskScopeQueries.removeTask(it, scopeId) }
+            taskIds.forEach { taskScopeQueries.remove(it, scopeId) }
         }
     }
 }

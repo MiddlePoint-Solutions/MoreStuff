@@ -15,6 +15,7 @@ interface TaskRepository {
         title: String,
         priorityScore: Long,
         taskType: TaskType,
+        scopeId: Long?,
     ): TaskDomain
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>

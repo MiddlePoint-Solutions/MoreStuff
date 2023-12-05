@@ -20,6 +20,7 @@ import co.softov.morestuff.android.ui.model.mapToDomain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -30,19 +31,19 @@ import kotlinx.datetime.LocalDateTime
 import timber.log.Timber
 
 class UserInputViewModel(
+    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
-    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
     private val messageUiMapper: MessageUiMapper,
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
 
-    private val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
+    private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
         .distinctUntilChanged { old, new -> old?.id == new?.id }
         .map { message ->
-            message?.let(messageUiMapper::internalMap)
+            message?.let(messageUiMapper::map)
         }.onEach { message ->
             message?.let {
                 Timber.d("Adding message: ${it.id} ")
@@ -55,6 +56,16 @@ class UserInputViewModel(
             started = SharingStarted.Eagerly,
             initialValue = null
         )
+
+    val priorityModel = MutableStateFlow(
+        PriorityInputUiModel(
+            priority = PriorityUiModel.Now,
+            planTime = createPlanTime()
+        )
+    )
+
+    var userInput by mutableStateOf("")
+        private set
 
 
     override fun onLoadData() {
@@ -70,18 +81,8 @@ class UserInputViewModel(
             createTime = timeManager.getCreateTime(),
             content = content,
         )
-        return messageUiMapper.internalMap(message)
+        return messageUiMapper.map(message)
     }
-
-    val priorityModel = MutableStateFlow(
-        PriorityInputUiModel(
-            priority = PriorityUiModel.Now,
-            planTime = createPlanTime()
-        )
-    )
-
-    var userInput by mutableStateOf("")
-        private set
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PriorityUiModel.Plan(localDateTime = timeManager.getDefaultPlanTime())
@@ -118,9 +119,13 @@ class UserInputViewModel(
         }
     }
 
-    suspend fun createNewTask(title: String) {
+    suspend fun createNewTask(title: String, scopeId: Long) {
         dispatchSuspend(
-            TaskAction.CreateUserTaskAction(title.trim(), priorityModel.value.mapToDomain())
+            TaskAction.CreateUserTaskAction(
+                title = title.trim(),
+                priority = priorityModel.value.mapToDomain(),
+                scopeId = scopeId
+            )
         )
         userInput = ""
 

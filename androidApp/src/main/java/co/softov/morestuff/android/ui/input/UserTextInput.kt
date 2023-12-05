@@ -47,7 +47,6 @@ fun UserTextInput(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    sendAction: (String) -> Unit = {},
     actionsContent: @Composable () -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = remember { FocusRequester() },
@@ -76,7 +75,6 @@ fun UserTextInput(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text
                 ),
-                keyboardActions = KeyboardActions { sendAction(value.text) },
                 maxLines = 4,
                 cursorBrush = SolidColor(LocalContentColor.current),
                 textStyle = LocalTextStyle.current.copy(
