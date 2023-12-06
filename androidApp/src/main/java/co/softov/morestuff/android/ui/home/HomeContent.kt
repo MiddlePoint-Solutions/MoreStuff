@@ -427,6 +427,7 @@ private fun TaskInputBottomSheet(
         sheetState = sheetState,
         content = {
             BoxWithConstraints {
+                val height = remember { (this.maxHeight.value / 2.5).dp }
                 Column(
                     verticalArrangement = Arrangement.Bottom
                 ) {
@@ -435,7 +436,7 @@ private fun TaskInputBottomSheet(
                         actions = chatActions,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(216.dp),
+                            .height(height),
                         scrollState = scrollState,
                     )
 
