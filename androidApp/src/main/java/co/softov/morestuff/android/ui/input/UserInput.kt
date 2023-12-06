@@ -22,9 +22,10 @@ fun UserInput(
         modifier = modifier
             .imePadding()
             .navigationBarsPadding()
-            .background(color = backgroundColor)
+//            .background(color = backgroundColor)
     ) {
         priorityContent()
+
         textContent()
     }
 }

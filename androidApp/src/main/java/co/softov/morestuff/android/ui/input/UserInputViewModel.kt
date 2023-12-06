@@ -7,9 +7,13 @@ import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
@@ -23,21 +27,25 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import timber.log.Timber
 
 class UserInputViewModel(
     getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
+    private val getScopesUseCase: GetScopesUseCase,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     private val messageUiMapper: MessageUiMapper,
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
+    val scopes = MutableStateFlow<List<ScopeDomain>>(listOf())
 
     private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
@@ -64,13 +72,22 @@ class UserInputViewModel(
         )
     )
 
+    var currentScope by mutableStateOf(scopeAll)
+        private set
+
     var userInput by mutableStateOf("")
         private set
 
-
-    override fun onLoadData() {
+    fun load(initialScopeId: Long) {
         messages.update {
             listOf(createAppMessage("What can I do for you today?"))
+        }
+
+        viewModelScope.launch {
+            getScopesUseCase().onRight { scopeList ->
+                scopes.update { scopeList }
+                currentScope = scopeList.first { scope -> scope.id == initialScopeId }
+            }
         }
     }
 
@@ -119,12 +136,12 @@ class UserInputViewModel(
         }
     }
 
-    suspend fun createNewTask(title: String, scopeId: Long) {
+    suspend fun createNewTask(title: String) {
         dispatchSuspend(
             TaskAction.CreateUserTaskAction(
                 title = title.trim(),
                 priority = priorityModel.value.mapToDomain(),
-                scopeId = scopeId
+                scopeId = currentScope.id
             )
         )
         userInput = ""
@@ -151,6 +168,10 @@ class UserInputViewModel(
         userInput = input
     }
 
+    fun setCurrentScope(scopeId: Long) {
+        currentScope = scopes.value.first { it.id == scopeId }
+    }
+
     private fun priorityChanged(priority: PriorityUiModel) {
         priorityModel.update {
             PriorityInputUiModel(
@@ -161,4 +182,6 @@ class UserInputViewModel(
             )
         }
     }
+
+
 }

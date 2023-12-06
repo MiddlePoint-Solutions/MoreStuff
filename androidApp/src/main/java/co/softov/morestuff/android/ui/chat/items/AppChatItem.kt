@@ -42,7 +42,7 @@ fun AppChatItem(
                 .padding(start = 5.dp, bottom = 4.dp)
         ) {
             Surface(
-                onClick = { chatActions.taskChatAction(message.taskId) },
+                onClick = { },
                 shape = RoundedCornerShape(
                     topStart = 14.dp,
                     topEnd = 14.dp,

@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -11,19 +12,34 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -62,6 +78,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
@@ -376,7 +395,7 @@ fun HomeContent(
             initialScopeId = model.selectedScopeId,
             scrollNowPriority = {
                 coroutineScope.launch {
-                // TODO priorityScrollState.animateScrollToItem(index = 0)
+                    // TODO priorityScrollState.animateScrollToItem(index = 0)
                 }
             },
             scrollLaterPriority = {
@@ -404,9 +423,10 @@ private fun TaskInputBottomSheet(
     val viewModel: UserInputViewModel = koinViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
+    val scopes by viewModel.scopes.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadData()
+        viewModel.load(initialScopeId)
     }
 
     val navigation = LocalAppNavigation.current
@@ -424,68 +444,121 @@ private fun TaskInputBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
+        modifier = Modifier.fillMaxHeight(0.95f),
         sheetState = sheetState,
-        content = {
-            BoxWithConstraints {
-                val height = remember { (this.maxHeight.value / 2.5).dp }
-                Column(
-                    verticalArrangement = Arrangement.Bottom
+        dragHandle = {
+            var expanded by remember { mutableStateOf(false) }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                BottomSheetDefaults.DragHandle()
+
+                FilterChip(
+                    selected = true,
+                    onClick = { expanded = true },
+                    label = {
+                        Text(
+                            text = viewModel.currentScope.name,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.sizeIn(minWidth = 48.dp)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "Localized Description",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    properties = PopupProperties(focusable = false)
                 ) {
-                    Messages(
-                        messages = messages,
-                        actions = chatActions,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(height),
-                        scrollState = scrollState,
-                    )
+                    scopes.forEach { scope ->
+                        DropdownMenuItem(
+                            text = { Text(scope.name) },
+                            onClick = {
+                                viewModel.setCurrentScope(scope.id)
+                                expanded = false
+                            },
+                        )
+                    }
+                }
+            }
+        },
+        content = {
+            ConstraintLayout {
 
-                    PriorityInput(
-                        model = priorityModel,
-                        onNowSelected = viewModel::setNowPriority,
-                        onLaterSelected = viewModel::setLaterPriority,
-                        onPlanSelected = viewModel::setPlanPriority,
-                        onTimeChange = viewModel::updatePlanTime,
-                        onDateChange = viewModel::updatePlanDate,
-                    )
+                val (chat, input) = createRefs()
 
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        modifier = Modifier
-                            .padding(bottom = 6.dp)
-                    ) {
-                        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                            mutableStateOf(TextFieldValue(text = viewModel.userInput))
-                        }
+                Messages(
+                    messages = messages,
+                    actions = chatActions,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .constrainAs(chat) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(input.top)
+                            height = Dimension.preferredWrapContent
+                        },
+                    scrollState = scrollState,
+                )
 
-                        LaunchedEffect(viewModel.userInput) {
-                            userInputValue =
-                                userInputValue.copy(text = viewModel.userInput)
-                        }
-                        val isTextEmpty = remember(userInputValue.text) {
-                            mutableStateOf(userInputValue.text.isBlank())
-                        }
+                Surface(
+                    modifier = Modifier.constrainAs(input) {
+                        bottom.linkTo(parent.bottom, margin = 6.dp)
+                    }
+                ) {
+                    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                        mutableStateOf(TextFieldValue(text = viewModel.userInput))
+                    }
 
-                        UserInput(
-                            textContent = {
+                    LaunchedEffect(viewModel.userInput) {
+                        userInputValue =
+                            userInputValue.copy(text = viewModel.userInput)
+                    }
+                    val isTextEmpty = remember(userInputValue.text) {
+                        mutableStateOf(userInputValue.text.isBlank())
+                    }
+
+                    UserInput(
+                        priorityContent = {
+                            PriorityInput(
+                                model = priorityModel,
+                                onNowSelected = viewModel::setNowPriority,
+                                onLaterSelected = viewModel::setLaterPriority,
+                                onPlanSelected = viewModel::setPlanPriority,
+                                onTimeChange = viewModel::updatePlanTime,
+                                onDateChange = viewModel::updatePlanDate,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        textContent = {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            ) {
                                 UserTextInput(
                                     value = userInputValue,
                                     onValueChange = { userInputValue = it },
                                     focusRequester = focusRequester,
+                                    startWithFocus = true,
                                     actionsContent = {
                                         if (isTextEmpty.value) {
                                             VoiceToTextInput(
                                                 onUpdateValue = viewModel::updateUserInput,
                                             )
                                         } else {
-                                            AnimatedVisibility(
+                                            this@ModalBottomSheet.AnimatedVisibility(
                                                 visible = !isTextEmpty.value,
                                                 enter = fadeIn(),
                                                 exit = fadeOut()
                                             ) {
                                                 SendIcon(onClick = {
                                                     scope.launch {
-                                                        viewModel.createNewTask(userInputValue.text, initialScopeId)
+                                                        viewModel.createNewTask(userInputValue.text)
                                                         userInputValue = userInputValue.copy("")
                                                         delay(100)
                                                         when (priorityModel.priority) {
@@ -500,8 +573,8 @@ private fun TaskInputBottomSheet(
                                     }
                                 )
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
         }

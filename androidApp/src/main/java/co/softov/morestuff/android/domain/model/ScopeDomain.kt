@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.domain.model
 
+import javax.annotation.concurrent.Immutable
+
+@Immutable
 data class ScopeDomain(
     val id: Long,
     val uid: String,
