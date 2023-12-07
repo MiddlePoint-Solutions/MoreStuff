@@ -1,18 +1,25 @@
 package co.softov.morestuff.android.ui.share
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,18 +40,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -59,23 +71,31 @@ import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.main.MainViewModel
+import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.model.mapToDomain
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShareScreen(
     onBack: () -> Unit,
     shareable: Shareable,
+    shareViewModel: ShareViewModel = koinViewModel(),
     shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
-    var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
+
+    val tasks by shareViewModel.tasks.collectAsState()
 
     Scaffold(
         topBar = {
@@ -107,10 +127,9 @@ fun ShareScreen(
         },
         content = {
             ShareContent(
+                tasks = tasks,
                 shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
-                shareable = shareable,
                 modifier = Modifier.padding(it),
-                searchQuery = searchQuery,
             )
         },
     )
@@ -120,83 +139,80 @@ fun ShareScreen(
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
-        ShareSearchBar(
-            searchQuery = searchQuery,
-            onSearchQueryChange = { searchQuery = it },
-            onBack = {
-                isSearchActive = false
-                searchQuery = ""
+
+        var searchQuery by remember(isSearchActive) { mutableStateOf("") }
+        val searchTasks by shareViewModel.searchResults.collectAsState()
+
+        val focusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            snapshotFlow { searchQuery }
+                .onEach { shareViewModel.updateQuery(it) }
+                .launchIn(this)
+            // TODO: maybe use disposable effect and when disposed clear query
+        }
+
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { searchQuery = it },
+            onSearch = { searchQuery = it },
+            onActiveChange = { active ->
+                if (!active) {
+                    isSearchActive = false
+                    searchQuery = ""
+                }
             },
-            shareable = shareable,
-            shareToExistingTask = shareToExistingTask
-        )
-    }
-}
+            modifier = Modifier
+                .navigationBarsPadding()
+                .focusRequester(focusRequester),
+            active = true,
+            placeholder = { Text(text = stringResource(R.string.search)) },
+            leadingIcon = {
+                IconButton(
+                    onClick = {
+                        isSearchActive = false
+                        searchQuery = ""
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Close,
+                        contentDescription = stringResource(R.string.cd_close_search)
+                    )
+                }
+            },
+            content = {
+                Crossfade(
+                    targetState = searchTasks,
+                    animationSpec = tween(durationMillis = 150),
+                    label = "Search results crossfade"
+                ) {
+                    ShareTasksList(
+                        searchBarActive = true,
+                        tasks = it,
+                        shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
+                    )
+                }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShareSearchBar(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    onBack: () -> Unit,
-    shareable: Shareable,
-    shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
-) {
-
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
-    SearchBar(
-        query = searchQuery,
-        onQueryChange = onSearchQueryChange,
-        onSearch = onSearchQueryChange,
-        onActiveChange = { active -> if (!active) onBack() },
-        modifier = Modifier.focusRequester(focusRequester),
-        active = true,
-        placeholder = {
-            Text(text = stringResource(R.string.search))
-        },
-        leadingIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Filled.Close,
-                    contentDescription = stringResource(R.string.cd_close_search)
-                )
-            }
-        },
-        content = {
-            ShareContent(
-                shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
-                shareable = shareable,
-                searchQuery = searchQuery,
-                searchBarActive = true
+            },
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
             )
-        },
-        colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         )
-    )
+    }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareContent(
-    shareable: Shareable,
+    tasks: List<TaskUiModel>,
     shareToTask: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
     shareViewModel: ShareViewModel = koinViewModel(),
     userInputViewModel: UserInputViewModel = koinViewModel(),
-    mainViewModel: MainViewModel = koinViewModel(),
-    searchQuery: String,
     searchBarActive: Boolean = false,
 ) {
-    val filteredTasks by shareViewModel.filteredTasks.collectAsState()
 
-    val state = rememberLazyListState()
     var showUserInput by remember { mutableStateOf(false) }
 
     var newTaskContent by remember { mutableStateOf<Pair<String, Priority>?>(null) }
@@ -206,22 +222,102 @@ private fun ShareContent(
             shareToTask(taskId)
         }
     }
-    LaunchedEffect(searchQuery) {
-        shareViewModel.updateQuery(searchQuery)
-    }
 
+    ShareTasksList(
+        modifier = modifier,
+        searchBarActive = searchBarActive,
+        tasks = tasks,
+        shareToTask = shareToTask,
+        showUserInput = { showUserInput = true }
+    )
+
+    if (showUserInput) {
+
+        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+            mutableStateOf(TextFieldValue(text = ""))
+        }
+
+        val scope = rememberCoroutineScope()
+        val interactionSource = remember { MutableInteractionSource() }
+        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
+        val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        ModalBottomSheet(
+            onDismissRequest = { showUserInput = false },
+            modifier = Modifier.imePadding(),
+            sheetState = taskInputBottomSheetState,
+            dragHandle = null,
+            shape = RoundedCornerShape(0),
+            containerColor = Color.Transparent,
+            content = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null,
+                        ) {
+                            scope.launch {
+                                taskInputBottomSheetState.hide()
+                                showUserInput = false
+                            }
+                        }
+                ) {
+                    UserInput(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        priorityContent = {
+                            PriorityInput(
+                                model = priorityModel,
+                                onNowSelected = userInputViewModel::setNowPriority,
+                                onLaterSelected = userInputViewModel::setLaterPriority,
+                                onPlanSelected = userInputViewModel::setPlanPriority,
+                                onTimeChange = userInputViewModel::updatePlanTime,
+                                onDateChange = userInputViewModel::updatePlanDate,
+                            )
+                        },
+                        textContent = {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceVariant
+                            ) {
+                                UserTextInput(
+                                    value = userInputValue,
+                                    onValueChange = { userInputValue = it },
+                                    /* TODO: choose Scope
+                                    sendAction = {
+                                    newTaskContent = it to priorityModel.mapToDomain()
+                                },*/
+                                    actionsContent = {
+                                        VoiceToTextInput(
+                                            onUpdateValue = userInputViewModel::updateUserInput,
+                                        )
+                                    },
+                                    startWithFocus = true
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun ShareTasksList(
+    tasks: List<TaskUiModel>,
+    searchBarActive: Boolean,
+    shareToTask: (taskId: Long) -> Unit,
+    modifier: Modifier = Modifier,
+    showUserInput: () -> Unit = {}
+) {
     Box(modifier) {
         LazyColumn(
-            state = state,
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.End
         ) {
             if (!searchBarActive) {
                 item {
-                    CreateNewTaskItem {
-                        mainViewModel.creatingNewTask.value = true
-                        showUserInput = true
-                    }
+                    CreateNewTaskItem(showUserInput)
 
                     Divider(
                         thickness = 0.8.dp,
@@ -231,7 +327,7 @@ private fun ShareContent(
             }
 
             items(
-                filteredTasks,
+                tasks,
                 key = { it.id }
             ) { task ->
                 PriorityItem(
@@ -246,54 +342,6 @@ private fun ShareContent(
                 )
             }
         }
-    }
-
-    if (showUserInput) {
-
-        val contentTitle = when (shareable) {
-            is Shareable.Image -> ""
-            is Shareable.Text -> ""
-        }
-
-        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue(text = contentTitle))
-        }
-
-        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
-
-        ModalBottomSheet(
-            onDismissRequest = { showUserInput = false },
-            modifier = Modifier.imePadding(),
-            dragHandle = null,
-            shape = RoundedCornerShape(0),
-            content = {
-                UserInput(
-                    priorityContent = {
-                        PriorityInput(
-                            model = priorityModel,
-                            onNowSelected = userInputViewModel::setNowPriority,
-                            onLaterSelected = userInputViewModel::setLaterPriority,
-                            onPlanSelected = userInputViewModel::setPlanPriority,
-                            onTimeChange = userInputViewModel::updatePlanTime,
-                            onDateChange = userInputViewModel::updatePlanDate,
-                        )
-                    },
-                    textContent = {
-                        UserTextInput(
-                            value = userInputValue,
-                            onValueChange = { userInputValue = it },
-                            /*sendAction = {
-                                newTaskContent = it to priorityModel.mapToDomain()
-                            },*/
-                            actionsContent = {
-                                VoiceToTextInput(
-                                    onUpdateValue = userInputViewModel::updateUserInput,
-                                )
-                            }
-                        )
-                    },
-                )
-            })
     }
 }
 
@@ -326,9 +374,8 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
 fun ShareContentPreview() {
     MoreStuffTheme() {
         ShareContent(
-            shareable = Shareable.Text(""),
+            tasks = listOf(),
             shareToTask = {},
-            searchQuery = ""
         )
     }
 }

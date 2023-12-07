@@ -91,9 +91,8 @@ fun MainContent(
                     onBack = navigation::pop,
                     shareable = screen.shareable,
                 ) { taskId, shareable ->
-                    if (shareable is Shareable.Image && !viewModel.creatingNewTask.value!!) {
+                    if (shareable is Shareable.Image) {
                         navigation.push(Screen.ImagePreview(Uri.parse(shareable.uris), taskId))
-
                     } else {
                         navigation.replaceCurrent(
                             TaskChat(taskId),

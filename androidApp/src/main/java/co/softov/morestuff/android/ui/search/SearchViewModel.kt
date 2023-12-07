@@ -11,7 +11,6 @@ import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
-import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
@@ -72,7 +71,7 @@ class SearchViewModel(
 
     private fun searchTasksWithNoFilter(searchText: String) {
         searchJob = viewModelScope.launch {
-            searchTasksUseCase(searchText)
+            searchTasksUseCase(searchText, false)
                 .onEach { results ->
                     searchResults.value = taskUiMapper.map(filterByQuery(results, searchText))
                 }.launchIn(this)

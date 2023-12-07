@@ -84,31 +84,8 @@ class TaskRepositoryImpl(
             false -> taskQueries.selectAllActive(mapper.taskDbMapper)
         }.asFlow().mapToList(Dispatchers.IO)
 
-        val schedulesFlow =
-            scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
-                .asFlow()
-                .mapToList(Dispatchers.IO)
-                .map { it.groupBy { schedule -> schedule.taskId } }
-
-        val messagesFlow =
-            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
-                .asFlow()
-                .mapToList(Dispatchers.IO)
-                .map { messages ->
-                    messages.groupBy { message -> message.task_id }
-                        .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
-                }
-
-        return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
-            tasks.map { task ->
-                task.copy(
-                    schedule = schedules[task.id] ?: listOf(),
-                    extraDetails = messageTaskIds.contains(task.id)
-                )
-            }
-        }
+        return combinedTaskFlow(tasksFlow)
     }
-
 
     override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
         taskQueries.selectAllComplete(mapper = mapper.taskDbMapper)
@@ -215,10 +192,13 @@ class TaskRepositoryImpl(
         }.firstOrNull()?.right() ?: TaskDoesNotExist.left()
     }
 
-    override fun searchTasks(searchText: String): Flow<List<TaskDomain>> =
-        taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper)
-            .asFlow()
+    override fun searchTasks(searchText: String, activeOnly: Boolean): Flow<List<TaskDomain>> =
+        when (activeOnly) {
+            true -> taskQueries.searchActiveTasks(searchText, mapper = mapper.taskDbMapper)
+            false -> taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper)
+        }.asFlow()
             .mapToList(Dispatchers.IO)
+            .let { combinedTaskFlow(it) }
 
     private fun createTaskData(
         title: String,
@@ -252,6 +232,32 @@ class TaskRepositoryImpl(
     override suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long) {
         taskScopeQueries.transaction {
             taskIds.forEach { taskScopeQueries.remove(it, scopeId) }
+        }
+    }
+
+    private fun combinedTaskFlow(tasksFlow: Flow<List<TaskDomain>>): Flow<List<TaskDomain>> {
+        val schedulesFlow =
+            scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { it.groupBy { schedule -> schedule.taskId } }
+
+        val messagesFlow =
+            messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
+                .asFlow()
+                .mapToList(Dispatchers.IO)
+                .map { messages ->
+                    messages.groupBy { message -> message.task_id }
+                        .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
+                }
+
+        return combine(tasksFlow, schedulesFlow, messagesFlow) { tasks, schedules, messageTaskIds ->
+            tasks.map { task ->
+                task.copy(
+                    schedule = schedules[task.id] ?: listOf(),
+                    extraDetails = messageTaskIds.contains(task.id)
+                )
+            }
         }
     }
 }

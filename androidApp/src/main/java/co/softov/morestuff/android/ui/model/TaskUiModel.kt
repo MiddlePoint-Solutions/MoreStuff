@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.ui.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class TaskUiModel(
     val id: Long,
     val title: String,

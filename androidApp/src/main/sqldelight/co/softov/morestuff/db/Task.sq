@@ -15,7 +15,6 @@ SELECT *
 FROM task
 ORDER BY datetime(create_time);
 
-
 selectAllActive:
 SELECT *
 FROM task
@@ -111,6 +110,12 @@ LIMIT 1;
 searchTasks:
 SELECT * FROM task
 WHERE title LIKE '%' || :searchText || '%'
+ORDER BY create_time DESC;
+
+searchActiveTasks:
+SELECT * FROM task
+WHERE task.complete_time IS NULL
+AND (title LIKE '%' || :searchText || '%')
 ORDER BY create_time DESC;
 
 countActiveTasks:

@@ -54,7 +54,6 @@ class UserInputViewModel(
             message?.let(messageUiMapper::map)
         }.onEach { message ->
             message?.let {
-                Timber.d("Adding message: ${it.id} ")
                 messages.update { messages ->
                     messages.toMutableList().apply { add(0, it) }
                 }
