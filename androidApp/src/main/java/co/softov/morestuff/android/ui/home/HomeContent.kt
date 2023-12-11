@@ -60,12 +60,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
+import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
@@ -75,6 +77,7 @@ import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
@@ -317,6 +320,41 @@ fun HomeContent(
                             modifier = Modifier.padding(bottom = 20.dp),
                         )
                     }
+
+                    if (showTaskInput) {
+                        val taskInputBottomSheetState =
+                            rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+                        val chatContext = remember { ChatContext.Main(model.selectedScopeId) }
+
+                        BackHandler(onBack = {
+                            coroutineScope.launch {
+                                taskInputBottomSheetState.hide()
+                            }
+                        })
+
+                        TaskInputBottomSheet(
+                            onDismissRequest = { showTaskInput = false },
+                            sheetState = taskInputBottomSheetState,
+                            context = chatContext,
+                            onNewTaskCreated = { _, priority ->
+                                coroutineScope.launch {
+                                    delay(300)
+                                    when (priority) {
+                                        PriorityUiModel.Later -> {
+                                            priorityScrollState.scrollToItem(index = scopeTasks.size - 1)
+                                        }
+
+                                        PriorityUiModel.Now -> {
+                                            priorityScrollState.animateScrollToItem(index = 0)
+                                        }
+
+                                        is PriorityUiModel.Plan -> {}
+                                    }
+                                }
+                            },
+                        )
+                    }
                 }
             )
         }
@@ -345,33 +383,6 @@ fun HomeContent(
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
         }
-    }
-
-    if (showTaskInput) {
-        val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-        BackHandler(onBack = {
-            coroutineScope.launch {
-                taskInputBottomSheetState.hide()
-            }
-        })
-
-        TaskInputBottomSheet(
-            onDismissRequest = { showTaskInput = false },
-            sheetState = taskInputBottomSheetState,
-            initialScopeId = model.selectedScopeId,
-            onCreateNewTask = { title, priority ->  },
-            scrollNowPriority = {
-                coroutineScope.launch {
-                    // TODO priorityScrollState.animateScrollToItem(index = 0)
-                }
-            },
-            scrollLaterPriority = {
-                coroutineScope.launch {
-                    // TODO priorityScrollState.scrollToItem(index = tasks.size - 1)
-                }
-            }
-        )
     }
 }
 

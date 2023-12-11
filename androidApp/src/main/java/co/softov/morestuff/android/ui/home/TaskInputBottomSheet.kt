@@ -42,6 +42,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
@@ -63,10 +64,8 @@ import org.koin.androidx.compose.koinViewModel
 fun TaskInputBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
-    initialScopeId: Long,
-    onCreateNewTask: (title: String, priority: PriorityUiModel) -> Unit,
-    scrollNowPriority: () -> Unit,
-    scrollLaterPriority: () -> Unit,
+    context: ChatContext,
+    onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -78,7 +77,7 @@ fun TaskInputBottomSheet(
     val scopes by viewModel.scopes.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.load(initialScopeId)
+        viewModel.load(context)
     }
 
     val navigation = LocalAppNavigation.current
@@ -107,7 +106,7 @@ fun TaskInputBottomSheet(
 
                 FilterChip(
                     selected = true,
-                    onClick = { expanded = true },
+                    onClick = { expanded = !expanded },
                     label = {
                         Text(
                             text = viewModel.currentScope.name,
@@ -210,19 +209,11 @@ fun TaskInputBottomSheet(
                                                 exit = fadeOut()
                                             ) {
                                                 SendIcon(onClick = {
-                                                    onCreateNewTask(
-                                                        userInputValue.text,
-                                                        priorityModel.priority
-                                                    )
                                                     scope.launch {
-                                                        viewModel.createNewTask(userInputValue.text)
+                                                        val taskId =
+                                                            viewModel.createNewTask(userInputValue.text)
+                                                        onNewTaskCreated(taskId, priorityModel.priority)
                                                         userInputValue = userInputValue.copy("")
-                                                        delay(100)
-                                                        when (priorityModel.priority) {
-                                                            PriorityUiModel.Later -> scrollLaterPriority()
-                                                            PriorityUiModel.Now -> scrollNowPriority()
-                                                            is PriorityUiModel.Plan -> {}
-                                                        }
                                                     }
                                                 })
                                             }

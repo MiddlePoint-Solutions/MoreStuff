@@ -1,5 +1,6 @@
 package co.softov.morestuff.android.ui.share
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -70,12 +71,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.ui.home.TaskInputBottomSheet
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
@@ -211,24 +216,11 @@ private fun ShareContent(
     tasks: List<TaskUiModel>,
     shareToTask: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
-    shareViewModel: ShareViewModel = koinViewModel(),
-    userInputViewModel: UserInputViewModel = koinViewModel(),
     searchBarActive: Boolean = false,
 ) {
 
-    LaunchedEffect(Unit) {
-        userInputViewModel.load()
-    }
-
+    val scope = rememberCoroutineScope()
     var showUserInput by remember { mutableStateOf(false) }
-
-    var newTaskContent by remember { mutableStateOf<Pair<String, Priority>?>(null) }
-    LaunchedEffect(newTaskContent) {
-        newTaskContent?.let {
-            val taskId = shareViewModel.createNewShareableTask(it.first, it.second)
-            shareToTask(taskId)
-        }
-    }
 
     ShareTasksList(
         modifier = modifier,
@@ -239,112 +231,29 @@ private fun ShareContent(
     )
 
     if (showUserInput) {
+        val taskInputBottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
 
-        var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-            mutableStateOf(TextFieldValue(text = ""))
-        }
+        val chatContext = remember { ChatContext.Share(Shareable.Text("")) }
 
-        val scope = rememberCoroutineScope()
-        val interactionSource = remember { MutableInteractionSource() }
-        val priorityModel by userInputViewModel.priorityModel.collectAsState()
-        val scopes by userInputViewModel.scopes.collectAsState()
-        val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        BackHandler(onBack = {
+            scope.launch {
+                taskInputBottomSheetState.hide()
+            }
+        })
 
-        // TODO: we should use "TaskInputBottomSheet" here for a seamless UX
-        ModalBottomSheet(
+        TaskInputBottomSheet(
             onDismissRequest = { showUserInput = false },
-            modifier = Modifier.imePadding(),
             sheetState = taskInputBottomSheetState,
-            dragHandle = {
-                var expanded by remember { mutableStateOf(false) }
-
-                FilterChip(
-                    selected = true,
-                    onClick = { expanded = true },
-                    label = {
-                        Text(
-                            text = userInputViewModel.currentScope.name,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.sizeIn(minWidth = 48.dp)
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Localized Description",
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
-                    }
-                )
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    properties = PopupProperties(focusable = false)
-                ) {
-                    scopes.forEach { scope ->
-                        DropdownMenuItem(
-                            text = { Text(scope.name) },
-                            onClick = {
-                                userInputViewModel.setCurrentScope(scope.id)
-                                expanded = false
-                            },
-                        )
-                    }
+            context = chatContext,
+            onNewTaskCreated = { taskId, _ ->
+                scope.launch {
+                    delay(300)
+                    taskInputBottomSheetState.hide()
+                    shareToTask(taskId)
                 }
             },
-            shape = RoundedCornerShape(0),
-            containerColor = Color.Transparent,
-            content = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                        ) {
-                            scope.launch {
-                                taskInputBottomSheetState.hide()
-                                showUserInput = false
-                            }
-                        }
-                ) {
-
-                    UserInput(
-                        modifier = Modifier.align(Alignment.BottomCenter),
-                        priorityContent = {
-                            PriorityInput(
-                                model = priorityModel,
-                                onNowSelected = userInputViewModel::setNowPriority,
-                                onLaterSelected = userInputViewModel::setLaterPriority,
-                                onPlanSelected = userInputViewModel::setPlanPriority,
-                                onTimeChange = userInputViewModel::updatePlanTime,
-                                onDateChange = userInputViewModel::updatePlanDate,
-                            )
-                        },
-                        textContent = {
-                            Surface(
-                                color = MaterialTheme.colorScheme.surfaceVariant
-                            ) {
-                                UserTextInput(
-                                    value = userInputValue,
-                                    onValueChange = { userInputValue = it },
-                                    /* TODO: choose Scope
-                                    sendAction = {
-                                    newTaskContent = it to priorityModel.mapToDomain()
-                                },*/
-                                    actionsContent = {
-                                        VoiceToTextInput(
-                                            onUpdateValue = { userInputValue = userInputValue.copy(it) },
-                                        )
-                                    },
-                                    startWithFocus = true
-                                )
-                            }
-                        },
-                    )
-                }
-            }
         )
     }
 }
@@ -396,11 +305,11 @@ private fun ShareTasksList(
 private fun CreateNewTaskItem(showUserInput: () -> Unit) {
     Row(
         modifier = Modifier
+            .clickable(onClick = showUserInput)
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.background)
             .heightIn(80.dp)
-            .padding(start = 14.dp)
-            .clickable(onClick = showUserInput),
+            .padding(start = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
 

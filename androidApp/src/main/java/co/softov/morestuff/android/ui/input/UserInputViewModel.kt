@@ -6,14 +6,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
+import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
@@ -24,21 +27,19 @@ import co.softov.morestuff.android.ui.model.mapToDomain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.delayFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import timber.log.Timber
 
 class UserInputViewModel(
     getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
     private val getScopesUseCase: GetScopesUseCase,
+    private val createTaskUseCase: CreateTaskUseCase,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     private val messageUiMapper: MessageUiMapper,
@@ -50,9 +51,8 @@ class UserInputViewModel(
     private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
         .distinctUntilChanged { old, new -> old?.id == new?.id }
-        .map { message ->
-            message?.let(messageUiMapper::map)
-        }.onEach { message ->
+        .map { message -> message?.let(messageUiMapper::map) }
+        .onEach { message ->
             message?.let {
                 messages.update { messages ->
                     messages.toMutableList().apply { add(0, it) }
@@ -78,11 +78,8 @@ class UserInputViewModel(
     var currentScope by mutableStateOf(scopeAll)
         private set
 
-    fun load() {
-        load(initialScopeId = scopeAll.id)
-    }
-
-    fun load(initialScopeId: Long) {
+    fun load(context: ChatContext) {
+        // TODO: add messages according to chat context
         messages.update {
             listOf(createAppMessage("What can I do for you today?"))
         }
@@ -90,7 +87,7 @@ class UserInputViewModel(
         viewModelScope.launch {
             getScopesUseCase().onRight { scopeList ->
                 scopes.update { scopeList }
-                currentScope = scopeList.first { scope -> scope.id == initialScopeId }
+                currentScope = scopeList.first { scope -> scope.id == context.scopeId }
             }
         }
     }
@@ -140,14 +137,18 @@ class UserInputViewModel(
         }
     }
 
-    suspend fun createNewTask(title: String) {
-        dispatchSuspend(
-            TaskAction.CreateUserTaskAction(
-                title = title.trim(),
-                priority = priorityModel.value.mapToDomain(),
-                scopeId = currentScope.id
-            )
-        )
+    /**
+     * Creates a new task and returns its id.
+     * The taskId can then be used for navigation.
+     *
+     * @return TaskId of the newly created task
+     */
+    suspend fun createNewTask(title: String): Long {
+        val priority = priorityModel.value.mapToDomain()
+        val params = TaskParams(title, priority, TaskType.User, currentScope.id)
+        val task = createTaskUseCase(params)
+        dispatchAppStoreAction(TaskAction.TaskCreatedAction(task, priority))
+        return task.id
     }
 
     fun setNowPriority() {

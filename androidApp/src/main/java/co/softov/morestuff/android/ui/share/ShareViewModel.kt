@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 class ShareViewModel(
     getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
     private val searchTasksUseCase: SearchTasksUseCase,
-    private val createTaskUseCase: CreateTaskUseCase,
     private val taskUiMapper: TaskUiMapper,
 ) : NoStateViewModel() {
 
@@ -69,18 +68,4 @@ class ShareViewModel(
             searchQueryFlow.update { "" }
         }
     }
-
-    /**
-     * Creates a new task and returns its id.
-     * This is only used when we need the taskId for navigation.
-     *
-     * @return TaskId of the newly created task
-     */
-    suspend fun createNewShareableTask(title: String, priority: Priority): Long {
-        val params = TaskParams(title, priority, TaskType.User)
-        val task = createTaskUseCase(params)
-        dispatchSuspend(TaskAction.TaskCreatedAction(task, priority))
-        return task.id
-    }
-
 }
