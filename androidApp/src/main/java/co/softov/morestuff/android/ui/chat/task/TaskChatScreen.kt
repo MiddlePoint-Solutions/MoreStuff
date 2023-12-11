@@ -317,7 +317,6 @@ private fun TaskChatInput(
     ) {
         UserInput(
             modifier = Modifier.align(Alignment.BottomCenter),
-            backgroundColor = Color.Transparent,
             textContent = {
                 val weight = if (isTextEmpty.value) 0.30f else 0.12f
                 CompositionLocalProvider(LocalBoxWeight provides weight) {

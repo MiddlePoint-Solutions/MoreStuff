@@ -16,13 +16,11 @@ fun UserInput(
     modifier: Modifier = Modifier,
     priorityContent: @Composable () -> Unit = {},
     textContent: @Composable () -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
 ) {
     Column(
         modifier = modifier
             .imePadding()
             .navigationBarsPadding()
-//            .background(color = backgroundColor)
     ) {
         priorityContent()
 

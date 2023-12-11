@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.share
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -8,9 +7,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,17 +17,23 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -62,6 +67,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.Priority
@@ -70,20 +76,19 @@ import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
-import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.model.TaskUiModel
-import co.softov.morestuff.android.ui.model.mapToDomain
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskProfile
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -148,9 +153,9 @@ fun ShareScreen(
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
             snapshotFlow { searchQuery }
-                .onEach { shareViewModel.updateQuery(it) }
-                .launchIn(this)
-            // TODO: maybe use disposable effect and when disposed clear query
+                .onEach { shareViewModel.updateSearchQuery(it) }
+                .onCompletion { shareViewModel.resetSearchQuery() }
+                .collect()
         }
 
         SearchBar(
@@ -160,7 +165,6 @@ fun ShareScreen(
             onActiveChange = { active ->
                 if (!active) {
                     isSearchActive = false
-                    searchQuery = ""
                 }
             },
             modifier = Modifier
@@ -172,7 +176,6 @@ fun ShareScreen(
                 IconButton(
                     onClick = {
                         isSearchActive = false
-                        searchQuery = ""
                     }
                 ) {
                     Icon(
@@ -213,6 +216,10 @@ private fun ShareContent(
     searchBarActive: Boolean = false,
 ) {
 
+    LaunchedEffect(Unit) {
+        userInputViewModel.load()
+    }
+
     var showUserInput by remember { mutableStateOf(false) }
 
     var newTaskContent by remember { mutableStateOf<Pair<String, Priority>?>(null) }
@@ -239,14 +246,53 @@ private fun ShareContent(
 
         val scope = rememberCoroutineScope()
         val interactionSource = remember { MutableInteractionSource() }
-        val priorityModel by userInputViewModel.priorityModel.collectAsStateWithLifecycle()
+        val priorityModel by userInputViewModel.priorityModel.collectAsState()
+        val scopes by userInputViewModel.scopes.collectAsState()
         val taskInputBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+        // TODO: we should use "TaskInputBottomSheet" here for a seamless UX
         ModalBottomSheet(
             onDismissRequest = { showUserInput = false },
             modifier = Modifier.imePadding(),
             sheetState = taskInputBottomSheetState,
-            dragHandle = null,
+            dragHandle = {
+                var expanded by remember { mutableStateOf(false) }
+
+                FilterChip(
+                    selected = true,
+                    onClick = { expanded = true },
+                    label = {
+                        Text(
+                            text = userInputViewModel.currentScope.name,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.sizeIn(minWidth = 48.dp)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "Localized Description",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    }
+                )
+
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    properties = PopupProperties(focusable = false)
+                ) {
+                    scopes.forEach { scope ->
+                        DropdownMenuItem(
+                            text = { Text(scope.name) },
+                            onClick = {
+                                userInputViewModel.setCurrentScope(scope.id)
+                                expanded = false
+                            },
+                        )
+                    }
+                }
+            },
             shape = RoundedCornerShape(0),
             containerColor = Color.Transparent,
             content = {
@@ -263,6 +309,7 @@ private fun ShareContent(
                             }
                         }
                 ) {
+
                     UserInput(
                         modifier = Modifier.align(Alignment.BottomCenter),
                         priorityContent = {

@@ -77,6 +77,10 @@ class UserInputViewModel(
     var userInput by mutableStateOf("")
         private set
 
+    fun load() {
+        load(initialScopeId = scopeAll.id)
+    }
+
     fun load(initialScopeId: Long) {
         messages.update {
             listOf(createAppMessage("What can I do for you today?"))

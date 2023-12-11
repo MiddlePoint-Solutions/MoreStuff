@@ -320,7 +320,6 @@ fun UserInputComponent(
     val coroutineScope = rememberCoroutineScope()
     Box {
         UserInput(
-            backgroundColor = Color.Transparent,
             textContent = {
                 UserTextInput(
                     value = newScopeName,

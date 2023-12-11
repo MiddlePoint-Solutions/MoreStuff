@@ -16,6 +16,7 @@ import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ShareViewModel(
     getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase,
@@ -57,8 +59,15 @@ class ShareViewModel(
             initialValue = listOf()
         )
 
-    fun updateQuery(searchQuery: String) {
+    fun updateSearchQuery(searchQuery: String) {
         searchQueryFlow.update { searchQuery }
+    }
+
+    fun resetSearchQuery() {
+        viewModelScope.launch {
+            delay(300)
+            searchQueryFlow.update { "" }
+        }
     }
 
     /**
