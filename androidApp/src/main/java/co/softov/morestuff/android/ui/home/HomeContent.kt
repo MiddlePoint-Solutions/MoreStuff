@@ -360,6 +360,7 @@ fun HomeContent(
             onDismissRequest = { showTaskInput = false },
             sheetState = taskInputBottomSheetState,
             initialScopeId = model.selectedScopeId,
+            onCreateNewTask = { title, priority ->  },
             scrollNowPriority = {
                 coroutineScope.launch {
                     // TODO priorityScrollState.animateScrollToItem(index = 0)

@@ -57,6 +57,10 @@ class UserInputViewModel(
                 messages.update { messages ->
                     messages.toMutableList().apply { add(0, it) }
                 }
+                delay(1000)
+                messages.update { messages ->
+                    messages.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
+                }
             }
         }.stateIn(
             scope = viewModelScope,
@@ -72,9 +76,6 @@ class UserInputViewModel(
     )
 
     var currentScope by mutableStateOf(scopeAll)
-        private set
-
-    var userInput by mutableStateOf("")
         private set
 
     fun load() {
@@ -147,12 +148,6 @@ class UserInputViewModel(
                 scopeId = currentScope.id
             )
         )
-        userInput = ""
-
-        delay(1000)
-        messages.update {
-            it.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
-        }
     }
 
     fun setNowPriority() {
@@ -165,10 +160,6 @@ class UserInputViewModel(
 
     fun setPlanPriority() {
         priorityChanged(createPlanModel())
-    }
-
-    fun updateUserInput(input: String) {
-        userInput = input
     }
 
     fun setCurrentScope(scopeId: Long) {

@@ -64,6 +64,7 @@ fun TaskInputBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState,
     initialScopeId: Long,
+    onCreateNewTask: (title: String, priority: PriorityUiModel) -> Unit,
     scrollNowPriority: () -> Unit,
     scrollLaterPriority: () -> Unit,
 ) {
@@ -163,14 +164,13 @@ fun TaskInputBottomSheet(
                         bottom.linkTo(parent.bottom, margin = 6.dp)
                     }
                 ) {
-                    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-                        mutableStateOf(TextFieldValue(text = viewModel.userInput))
+                    var userInputValue by rememberSaveable(
+                        stateSaver = TextFieldValue.Saver,
+                        key = "UserInput1"
+                    ) {
+                        mutableStateOf(TextFieldValue(text = ""))
                     }
 
-                    LaunchedEffect(viewModel.userInput) {
-                        userInputValue =
-                            userInputValue.copy(text = viewModel.userInput)
-                    }
                     val isTextEmpty = remember(userInputValue.text) {
                         mutableStateOf(userInputValue.text.isBlank())
                     }
@@ -199,7 +199,9 @@ fun TaskInputBottomSheet(
                                     actionsContent = {
                                         if (isTextEmpty.value) {
                                             VoiceToTextInput(
-                                                onUpdateValue = viewModel::updateUserInput,
+                                                onUpdateValue = {
+                                                    userInputValue = userInputValue.copy(it)
+                                                },
                                             )
                                         } else {
                                             this@ModalBottomSheet.AnimatedVisibility(
@@ -208,6 +210,10 @@ fun TaskInputBottomSheet(
                                                 exit = fadeOut()
                                             ) {
                                                 SendIcon(onClick = {
+                                                    onCreateNewTask(
+                                                        userInputValue.text,
+                                                        priorityModel.priority
+                                                    )
                                                     scope.launch {
                                                         viewModel.createNewTask(userInputValue.text)
                                                         userInputValue = userInputValue.copy("")

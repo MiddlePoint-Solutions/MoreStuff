@@ -335,7 +335,7 @@ private fun ShareContent(
                                 },*/
                                     actionsContent = {
                                         VoiceToTextInput(
-                                            onUpdateValue = userInputViewModel::updateUserInput,
+                                            onUpdateValue = { userInputValue = userInputValue.copy(it) },
                                         )
                                     },
                                     startWithFocus = true
