@@ -475,7 +475,7 @@ private fun TaskChatInput(
                                         },
                                             text = {
                                                 Text(
-                                                    text = "Seleccionar Imagen"
+                                                    text = stringResource(R.string.select_image)
                                                 )
                                             })
                                         DropdownMenuItem(onClick = {
@@ -484,7 +484,7 @@ private fun TaskChatInput(
                                         },
                                             text = {
                                                 Text(
-                                                    text = "Seleccionar Pdf"
+                                                    text = stringResource(R.string.select_pdf)
                                                 )
                                             })
 
