@@ -110,6 +110,9 @@ fun TaskChatScreen(
     val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
+    val sharePdf by rememberUpdatedState<(String) -> Unit> { pdfPath ->
+        viewModel.sharePdf(pdfPath)
+    }
 
 
     ChildStack(
@@ -202,7 +205,7 @@ fun TaskChatScreen(
                 PdfPreviewScreen(
                     imagePath = screen.imagePath,
                     onBack = navigation::pop,
-                    onSendPdf = {},
+                    onSendPdf = sharePdf,
                 )
             }
         }

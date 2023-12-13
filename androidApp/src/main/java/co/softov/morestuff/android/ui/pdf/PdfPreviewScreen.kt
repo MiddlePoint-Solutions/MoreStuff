@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.pdf
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +26,7 @@ import co.softov.morestuff.android.ui.components.NavigateBackIconButton
 fun PdfPreviewScreen(
     imagePath: String,
     onBack: () -> Unit,
-    onSendPdf: (Uri) -> Unit,
+    onSendPdf: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -41,7 +40,7 @@ fun PdfPreviewScreen(
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             actions = {
-                IconButton(onClick = { onSendPdf(imagePath.toUri()) }) {
+                IconButton(onClick = { onSendPdf(imagePath) }) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = stringResource(R.string.cd_share),

@@ -71,6 +71,15 @@ class MainViewModel(
                     )
                 )
             }
+            is Shareable.Pdf -> {
+                dispatchAppStoreAction(
+                    MessageAction.CreatePdfMessageAction(
+                        taskId,
+                        content.uris,
+                        content.message
+                    )
+                )
+            }
         }
     }
 
