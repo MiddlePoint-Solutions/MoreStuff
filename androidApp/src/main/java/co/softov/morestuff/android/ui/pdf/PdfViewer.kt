@@ -91,9 +91,10 @@ fun PdfPageItem(
     height: Int,
     imageLoader: ImageLoader,
     scope: CoroutineScope,
-    mutex: Mutex
+    mutex: Mutex,
+
 ) {
-    val cacheKey = MemoryCache.Key("$uri-$index")
+    val cacheKey = MemoryCache.Key("$uri-$index-${width}x${height}")
     val cacheValue: Bitmap? = imageLoader.memoryCache?.get(cacheKey)?.bitmap
 
     var bitmap by remember { mutableStateOf(cacheValue) }
