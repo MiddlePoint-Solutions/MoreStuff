@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -24,6 +25,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -33,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -71,6 +76,7 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
+import co.softov.morestuff.android.ui.pdf.PdfPreviewScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
@@ -134,6 +140,11 @@ fun TaskChatScreen(
                         val title = it.content
                         navigation.push(ChatScreen.ImagePreview(path, title))
                     },
+                    onPdfSelected = {
+                        val path = it.messageData?.filePath ?: ""
+                        val title = it.content
+                        navigation.push(ChatScreen.PdfPreview(path, title))
+                    },
                     shareImage = { imagePath -> shareImage(imagePath) },
                     shareMessage = viewModel::shareMessage
                 )
@@ -157,8 +168,14 @@ fun TaskChatScreen(
                     imagePicked = {
                         navigation.push(ChatScreen.ImageImport(it.toString()))
                     },
+                    pdfPicked = { uri ->
+                        viewModel.sendPdfMessageForTask(uri.toString(), message = "")
+                    },
                     completeTaskMessage = stringResource(R.string.snack_task_completed) + " " + formattedCompleteTime
+
                 )
+
+
             }
 
             is ChatScreen.ImageImport -> {
@@ -178,6 +195,14 @@ fun TaskChatScreen(
                     onBack = navigation::pop,
                     onSendImage = shareImage,
                     title = screen.title,
+                )
+            }
+
+            is ChatScreen.PdfPreview -> {
+                PdfPreviewScreen(
+                    imagePath = screen.imagePath,
+                    onBack = navigation::pop,
+                    onSendPdf = {},
                 )
             }
         }
@@ -202,6 +227,7 @@ private fun TaskChatContent(
     createPlanSchedule: () -> Unit = {},
     cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
+    pdfPicked: (Uri) -> Unit = {},
     completeTaskMessage: String,
 ) {
     val scope = rememberCoroutineScope()
@@ -215,6 +241,15 @@ private fun TaskChatContent(
         }
     }
     val isEditing = remember { mutableStateOf(false) }
+
+
+    val pickPdf = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            pdfPicked(uri)
+        } else {
+            Timber.d("Pdf picker uri is NULL!")
+        }
+    }
 
 
     Scaffold(
@@ -325,6 +360,9 @@ private fun TaskChatContent(
                                 )
                             )
                         },
+                        pickPdf = {
+                            pickPdf.launch("application/pdf")
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color.Transparent),
@@ -383,6 +421,7 @@ private fun TaskChatContent(
 private fun TaskChatInput(
     sendTaskMessage: (String) -> Unit,
     pickImage: () -> Unit,
+    pickPdf: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val isTextEmpty = remember { mutableStateOf(true) }
@@ -390,6 +429,7 @@ private fun TaskChatInput(
     var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
+    var showMenu by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -414,13 +454,37 @@ private fun TaskChatInput(
                             ) {
                                 if (isTextEmpty.value) {
                                     IconButton(
-                                        onClick = pickImage,
+                                        onClick = { showMenu = true },
                                         modifier = Modifier.weight(1f)
                                     ) {
                                         Icon(
-                                            Icons.Filled.PhotoLibrary,
+                                            Icons.Filled.AttachFile,
                                             contentDescription = stringResource(R.string.cd_select_images)
                                         )
+                                    }
+                                    DropdownMenu(
+                                        expanded = showMenu,
+                                        onDismissRequest = { showMenu = false }
+                                    ) {
+                                        DropdownMenuItem(onClick = {
+                                            pickImage()
+                                            showMenu = false
+                                        },
+                                            text = {
+                                                Text(
+                                                    text = "Seleccionar Imagen"
+                                                )
+                                            })
+                                        DropdownMenuItem(onClick = {
+                                            pickPdf()
+                                            showMenu = false
+                                        },
+                                            text = {
+                                                Text(
+                                                    text = "Seleccionar Pdf"
+                                                )
+                                            })
+
                                     }
                                     VoiceToTextInput(
                                         onUpdateValue = {

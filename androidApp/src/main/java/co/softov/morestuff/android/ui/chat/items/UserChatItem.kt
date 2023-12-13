@@ -47,6 +47,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.items.MockData.messageUiModel
 import co.softov.morestuff.android.ui.model.MessageUiModel
+import co.softov.morestuff.android.ui.pdf.PdfPreview
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
@@ -112,40 +113,56 @@ fun MessageContent(
     actions: ChatActions,
     showMenu: MutableState<Boolean>,
 ) {
-    if (message.isDataMessage) {
-        MessageImage(
-            message = message,
-            actions = actions,
-            showMenu = showMenu,
-        )
-    } else {
-        Surface(
-            shape = RoundedCornerShape(
-                topStart = 14.dp,
-                topEnd = 14.dp,
-                bottomEnd = 5.dp,
-                bottomStart = 14.dp
-            ),
-            color = MaterialTheme.colorScheme.primary
-        ) {
-            Column {
-                MessageText(
+    when {
+        message.isPdfMessage -> {
+            message.messageData?.filePath?.let { filePath ->
+                PdfPreview(
+                    pdfUri = Uri.parse(filePath),
+                    actions = actions,
                     showMenu = showMenu,
-                    message = message,
-                    modifier = Modifier
-                        .padding(
-                            start = 14.dp,
-                            end = 15.dp,
-                            top = 8.dp,
-                            bottom = 3.dp
-                        )
+                    message = message
                 )
-                OpenGraphContent(message)
-                Row(Modifier.align(Alignment.End)) {
-                    MessageTime(
-                        formattedTimeOnly = message.formattedTimeOnly,
+            }
+        }
+
+        message.isDataMessage -> {
+            MessageImage(
+                message = message,
+                actions = actions,
+                showMenu = showMenu,
+            )
+        }
+
+
+        else -> {
+            Surface(
+                shape = RoundedCornerShape(
+                    topStart = 14.dp,
+                    topEnd = 14.dp,
+                    bottomEnd = 5.dp,
+                    bottomStart = 14.dp
+                ),
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                Column {
+                    MessageText(
+                        showMenu = showMenu,
+                        message = message,
                         modifier = Modifier
+                            .padding(
+                                start = 14.dp,
+                                end = 15.dp,
+                                top = 8.dp,
+                                bottom = 3.dp
+                            )
                     )
+                    OpenGraphContent(message)
+                    Row(Modifier.align(Alignment.End)) {
+                        MessageTime(
+                            formattedTimeOnly = message.formattedTimeOnly,
+                            modifier = Modifier
+                        )
+                    }
                 }
             }
         }
@@ -261,6 +278,7 @@ fun MessageText(
         )
     )
 }
+
 @Composable
 private fun handleUrlText(text: String): Pair<AnnotatedString, String?> {
     val content = buildAnnotatedString {
@@ -273,8 +291,6 @@ private fun handleUrlText(text: String): Pair<AnnotatedString, String?> {
 
     return Pair(content, url)
 }
-
-
 
 
 @Composable

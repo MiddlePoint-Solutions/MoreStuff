@@ -22,6 +22,7 @@ import co.softov.morestuff.android.data.repository.UserRepositoryImpl
 import co.softov.morestuff.android.data.service.DataMigrationHelperImpl
 import co.softov.morestuff.android.data.service.DevToolsImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
+import co.softov.morestuff.android.data.service.PdfHandlerImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.repository.MessageRepository
@@ -33,6 +34,7 @@ import co.softov.morestuff.android.domain.repository.UserRepository
 import co.softov.morestuff.android.domain.service.DataMigrationHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.Notifier
+import co.softov.morestuff.android.domain.service.PdfHandler
 import co.softov.morestuff.android.domain.service.Scheduler
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetPagedMessagesUseCaseImpl
@@ -54,6 +56,7 @@ import org.koin.dsl.module
 val dataModule = module {
 
     single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
+    single<PdfHandler> { PdfHandlerImpl(timeManager = get(), context = get()) }
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 

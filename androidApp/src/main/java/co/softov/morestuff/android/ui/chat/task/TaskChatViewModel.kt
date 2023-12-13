@@ -129,6 +129,10 @@ class TaskChatViewModel(
         dispatchAppStoreAction(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 
+    fun sendPdfMessageForTask(uris: String, message: String) {
+        dispatchAppStoreAction(MessageAction.CreatePdfMessageAction(taskId, uris, message))
+    }
+
     fun createOneTimeSchedule() {
         createScheduleModel().run {
             dispatchAppStoreAction(

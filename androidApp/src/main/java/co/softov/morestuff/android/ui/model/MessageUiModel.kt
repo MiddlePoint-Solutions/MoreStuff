@@ -2,6 +2,7 @@ package co.softov.morestuff.android.ui.model
 
 import androidx.compose.runtime.Immutable
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.OpenGraphResult
@@ -22,4 +23,5 @@ data class MessageUiModel(
     val formattedTimeOnly: String
 ){
     val isDataMessage: Boolean get() = messageData != null
+    val isPdfMessage: Boolean get() = messageData?.messageType == MessageDataType.Pdf
 }
