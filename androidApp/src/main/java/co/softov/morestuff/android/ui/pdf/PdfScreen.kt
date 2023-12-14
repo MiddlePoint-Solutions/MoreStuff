@@ -23,7 +23,7 @@ import co.softov.morestuff.android.ui.components.NavigateBackIconButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PdfPreviewScreen(
+fun PdfScreen(
     imagePath: String,
     onBack: () -> Unit,
     onSendPdf: (String) -> Unit,

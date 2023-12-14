@@ -76,7 +76,7 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
-import co.softov.morestuff.android.ui.pdf.PdfPreviewScreen
+import co.softov.morestuff.android.ui.pdf.PdfScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
@@ -149,6 +149,7 @@ fun TaskChatScreen(
                         navigation.push(ChatScreen.PdfPreview(path, title))
                     },
                     shareImage = { imagePath -> shareImage(imagePath) },
+                    sharePdf = { pdfPath -> sharePdf(pdfPath) },
                     shareMessage = viewModel::shareMessage
                 )
 
@@ -202,7 +203,7 @@ fun TaskChatScreen(
             }
 
             is ChatScreen.PdfPreview -> {
-                PdfPreviewScreen(
+                PdfScreen(
                     imagePath = screen.imagePath,
                     onBack = navigation::pop,
                     onSendPdf = sharePdf,

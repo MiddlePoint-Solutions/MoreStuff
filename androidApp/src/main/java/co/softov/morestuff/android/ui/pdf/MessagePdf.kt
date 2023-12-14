@@ -40,7 +40,7 @@ import kotlin.math.sqrt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PdfPreview(
+fun MessagePdf(
     pdfUri: Uri,
     actions: ChatActions,
     message: MessageUiModel,
@@ -57,7 +57,7 @@ fun PdfPreview(
             value = PdfRenderer(input)
         }
     }
-    val pdfFileName = getFileNameFromUri(fileUri) ?: "PDF Desconocido"
+    val pdfFileName = getFileNameFromUri(fileUri) ?: "PDF Unknown"
 
 
     Surface(
