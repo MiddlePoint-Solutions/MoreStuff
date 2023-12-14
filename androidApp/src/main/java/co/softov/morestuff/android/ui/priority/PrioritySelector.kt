@@ -14,7 +14,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,7 +45,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(110.dp)
+                .width(100.dp)
                 .height(47.dp),
             selected = nowSelected,
             onClick = onNowSelected,
@@ -68,7 +67,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(110.dp)
+                .width(130.dp)
                 .height(47.dp),
             selected = laterSelected,
             onClick = onLaterSelected,
@@ -90,7 +89,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(110.dp)
+                .width(100.dp)
                 .height(47.dp),
             selected = planSelected,
             onClick = onPlanSelected,

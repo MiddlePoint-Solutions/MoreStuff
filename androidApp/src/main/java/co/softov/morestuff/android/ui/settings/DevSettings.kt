@@ -31,11 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
@@ -114,7 +116,7 @@ fun DevSettings(
                 Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
                 Spacer(modifier = Modifier.width(20.dp))
                 Text(
-                    text = "Developer Settings",
+                    text = stringResource(id = R.string.developer_settings),
                     style = TextStyle(
                         fontSize = 22.sp,
                         lineHeight = 28.sp,
@@ -127,22 +129,22 @@ fun DevSettings(
     ) {
 
         SettingsMenuLink(
-            title = { Text(text = "Test OnBoarding") },
+            title = { Text(text = stringResource(id = R.string.test_onboarding)) },
             onClick = { navigation.replaceAll(Screen.OnBoarding) },
         )
 
         SettingsMenuLink(
-            title = { Text(text = "Test Review Notification") },
+            title = { Text(text = stringResource(id = R.string.test_review_notifications))},
             onClick = devTools::testReviewNotification,
         )
 
         SettingsMenuLink(
-            title = { Text(text = "Export Database") },
+            title = { Text(text = stringResource(id = R.string.export_database)) },
             onClick = { exportData = true },
         )
 
         SettingsMenuLink(
-            title = { Text(text = "Import Database") },
+            title = { Text(text = stringResource(id = R.string.import_database)) },
             onClick = { importData = true },
         )
 
@@ -177,7 +179,7 @@ private fun DebugMessageSwitch(
             },
             title = {
                 Text(
-                    text = "Debug Messages",
+                    text = stringResource(id = R.string.debug_messages),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )
