@@ -1,59 +1,70 @@
 package co.softov.morestuff.android.data.service
 
 import co.softov.morestuff.android.domain.model.OpenGraphResult
-import co.softov.morestuff.android.domain.service.OpenGraphFetcher
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
+import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
+import co.softov.morestuff.android.domain.service.OpenGraphFetcher
+import java.util.Locale
+
 
 class OpenGraphFetcherImpl : OpenGraphFetcher {
-
     override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
         withContext(Dispatchers.IO) {
+            val client = HttpClient(CIO) {
+                expectSuccess = true
+                followRedirects = true
+            }
             try {
-                val userAgent = "Mozilla"
-                val referrer = "http://www.google.com"
-                val timeout = 10000
-                val docSelectQuery = "meta[property^=og:]"
-                val openGraphKey = "content"
-                val property = "property"
-                val ogImage = "og:image"
-                val ogDescription = "og:description"
-                val ogUrl = "og:url"
-                val ogTitle = "og:title"
-                val ogSiteName = "og:site_name"
-                val ogType = "og:type"
                 var url = inputUrl
-
-                if (!url.contains("http")) {
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
                     url = "http://$url"
                 }
 
-                val response = Jsoup.connect(url).ignoreContentType(true).userAgent(userAgent)
-                    .referrer(referrer).timeout(timeout).followRedirects(true).execute()
-
-                val doc = response.parse()
-
-                val ogTags = doc.select(docSelectQuery)
-
-                var openGraphResult = OpenGraphResult()
-
-                ogTags.forEach { tag ->
-                    openGraphResult = when (tag.attr(property)) {
-                        ogImage -> openGraphResult.copy(image = tag.attr(openGraphKey))
-                        ogDescription -> openGraphResult.copy(description = tag.attr(openGraphKey))
-                        ogUrl -> openGraphResult.copy(url = tag.attr(openGraphKey))
-                        ogTitle -> openGraphResult.copy(title = tag.attr(openGraphKey))
-                        ogSiteName -> openGraphResult.copy(siteName = tag.attr(openGraphKey))
-                        ogType -> openGraphResult.copy(type = tag.attr(openGraphKey))
-                        else -> openGraphResult
+                val response: HttpResponse = client.get(url) {
+                    headers {
+                        append(HttpHeaders.UserAgent, "WhatsApp/2")
+                        append(HttpHeaders.Referrer, "http://www.google.com")
                     }
                 }
+
+                val html = response.bodyAsText()
+
+                var openGraphResult = OpenGraphResult()
+                val handler = KsoupHtmlHandler
+                    .Builder()
+                    .onOpenTag { name, attributes, _ ->
+                        if (name.lowercase(Locale.getDefault()) == "meta" && attributes["property"]?.lowercase(
+                                Locale.getDefault()
+                            )
+                                ?.startsWith("og:") == true) {
+                            when (attributes["property"]?.lowercase(Locale.getDefault())) {
+                                "og:image" -> openGraphResult = openGraphResult.copy(image = attributes["content"])
+                                "og:description" -> openGraphResult = openGraphResult.copy(description = attributes["content"])
+                                "og:url" -> openGraphResult = openGraphResult.copy(url = attributes["content"])
+                                "og:title" -> openGraphResult = openGraphResult.copy(title = attributes["content"])
+                                "og:site_name" -> openGraphResult = openGraphResult.copy(siteName = attributes["content"])
+                                "og:type" -> openGraphResult = openGraphResult.copy(type = attributes["content"])
+                            }
+                        }
+                    }
+                    .build()
+                val ksoupHtmlParser = KsoupHtmlParser(handler)
+                ksoupHtmlParser.write(html)
+                ksoupHtmlParser.end()
 
                 return@withContext openGraphResult
             } catch (e: Exception) {
                 e.printStackTrace()
                 return@withContext null
+            } finally {
+                client.close()
             }
         }
 }

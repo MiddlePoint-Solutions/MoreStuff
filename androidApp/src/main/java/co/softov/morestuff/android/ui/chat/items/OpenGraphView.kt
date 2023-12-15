@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.OpenGraphResult
 import co.softov.morestuff.android.ui.theme.isDarkTheme
 import coil.compose.rememberAsyncImagePainter
+import timber.log.Timber
 
 
 @Composable
@@ -51,6 +52,7 @@ fun OpenGraphView(openGraphResult: OpenGraphResult) {
             )
 
             if (openGraphResult.image != null) {
+                Timber.d("Loading image: ${openGraphResult.image}")
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
