@@ -42,9 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -148,7 +146,7 @@ fun TaskChatScreen(
                         navigation.push(ChatScreen.ImageImport(it.toString()))
                     },
 
-                )
+                    )
             }
 
             is ChatScreen.ImageImport -> {
@@ -196,7 +194,7 @@ private fun TaskChatContent(
 
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
-
+    var showSchedule by remember { mutableStateOf(false) }
     val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
             imagePicked(uri)
@@ -229,22 +227,21 @@ private fun TaskChatContent(
                     taskTitle = taskTitle,
                     onTitleChange = updateTaskTitle,
                     toggleTaskComplete = toggleTaskComplete,
+                    showSchedule = showSchedule,
+                    setShowSchedule = { showSchedule = it },
+                    task = task
                 ) {
+                    if (showSchedule) {
+                        TaskSchedule(
+                            model = schedule,
+                            actionText = stringResource(id = R.string.task_chat_schedule_action),
+                            onTimeChange = updatePlanTime,
+                            onDateChange = updatePlanDate,
+                            createSchedule = createPlanSchedule,
+                            cancelSchedule = cancelActiveSchedule,
+                        )
+                    }
 
-                    TaskSchedule(
-                        model = schedule,
-                        actionText = stringResource(id = R.string.task_chat_schedule_action),
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                                contentDescription = stringResource(R.string.cd_schedule_icon),
-                            )
-                        },
-                        onTimeChange = updatePlanTime,
-                        onDateChange = updatePlanDate,
-                        createSchedule = createPlanSchedule,
-                        cancelSchedule = cancelActiveSchedule,
-                    )
 
                     // TODO: uncomment this when we have proper support for reminders
                     /*TaskSchedule(
@@ -263,7 +260,6 @@ private fun TaskChatContent(
                     )*/
 
                 }
-
                 Messages(
                     messages = messages,
                     actions = chatActions,

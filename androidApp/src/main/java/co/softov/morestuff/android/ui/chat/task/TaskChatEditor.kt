@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.chat.task
 
-import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,9 +24,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -43,19 +44,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.ui.compose.keyboardAsState
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun TaskChatEditor(
     isComplete: Boolean,
+    showSchedule: Boolean,
+    setShowSchedule: (Boolean) -> Unit,
+    task: TaskDomain,
     taskTitle: () -> String,
     onTitleChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -85,7 +90,6 @@ fun TaskChatEditor(
         Box(
             modifier = Modifier
                 .animateContentSize(animationSpec = tween())
-                .padding(vertical = 7.dp)
                 .then(
                     if (isEditing) {
                         Modifier
@@ -166,7 +170,7 @@ fun TaskChatEditor(
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                         },
-                        minLines = 2,
+                        minLines = 1,
                         maxLines = 4,
                         textStyle = MaterialTheme.typography.headlineMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
@@ -174,9 +178,25 @@ fun TaskChatEditor(
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                     )
                 }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                AnimatedVisibility(visible = !isEditing) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(onClick = { setShowSchedule(!showSchedule) }) {
+                            Icon(
+                                imageVector = if (showSchedule) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                contentDescription = if (showSchedule) "Hide Schedule" else "Show Schedule"
+                            )
+                        }
+                        if (task.hasSchedule) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                                contentDescription = stringResource(R.string.cd_schedule_icon),
+                            )
+                        }
+                    }
+                }
                 AnimatedVisibility(
                     visible = !isComplete && !isEditing,
                     modifier = Modifier.padding(horizontal = 16.dp),
@@ -188,6 +208,7 @@ fun TaskChatEditor(
     }
 }
 
+/*
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
@@ -205,4 +226,4 @@ fun TaskChatTopBarPreview() {
             onTitleChange = {}
         )
     }
-}
+}*/
