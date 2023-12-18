@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class HomeViewModel(
     getScopesFlowUseCase: GetScopesFlowUseCase,
@@ -215,6 +216,7 @@ class HomeViewModel(
     }
 
     fun selectScope(scopeId: Long) {
+        Timber.d("Updating scopeId")
         sendEvent(ScopeSelected(scopeId))
     }
 

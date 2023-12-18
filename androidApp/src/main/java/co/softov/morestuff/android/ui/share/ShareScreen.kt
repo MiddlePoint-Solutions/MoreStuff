@@ -137,6 +137,7 @@ fun ShareScreen(
         },
         content = {
             ShareContent(
+                shareable = shareable,
                 tasks = tasks,
                 shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
                 modifier = Modifier.padding(it),
@@ -213,6 +214,7 @@ fun ShareScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareContent(
+    shareable: Shareable,
     tasks: List<TaskUiModel>,
     shareToTask: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -235,7 +237,7 @@ private fun ShareContent(
             skipPartiallyExpanded = true
         )
 
-        val chatContext = remember { ChatContext.Share(Shareable.Text("")) }
+        val chatContext = remember { ChatContext.Share(shareable) }
 
         BackHandler(onBack = {
             scope.launch {
@@ -330,6 +332,7 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
 fun ShareContentPreview() {
     MoreStuffTheme() {
         ShareContent(
+            shareable = Shareable.Text(""),
             tasks = listOf(),
             shareToTask = {},
         )

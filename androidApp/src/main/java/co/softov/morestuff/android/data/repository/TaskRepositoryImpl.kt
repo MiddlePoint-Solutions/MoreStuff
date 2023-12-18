@@ -145,7 +145,8 @@ class TaskRepositoryImpl(
 
     override suspend fun getTasksWithoutSchedule(scopeId: Long): Either<Failure, List<TaskDomain>> {
         val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutSchedule(
-            listOf(ScheduleType.OneTime),
+            scope_id = scopeId,
+            schedule_types = listOf(ScheduleType.OneTime),
             mapper = mapper.taskDbMapper
         ).executeAsList()
 

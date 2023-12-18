@@ -25,7 +25,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
-    private val scopeId: Long,
     private val getReviewTasksUseCase: GetReviewTasksUseCase,
     private val reviewTasksMapper: ReviewTasksMapper,
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
@@ -38,8 +37,14 @@ class ReviewViewModel(
     override val enableDebug: Boolean
         get() = false
 
-    override fun onLoadData() {
-        setInitialState()
+    fun load(scopeId: Long) {
+        loadData()
+        viewModelScope.launch {
+            getReviewTasksUseCase(scopeId).map {
+                val tasks = reviewTasksMapper.map(it).shuffled()
+                sendEvent(SetupInitialRound(Review, tasks))
+            }
+        }
     }
 
     override fun onReduceState(event: ReviewViewEvent) = when (event) {
@@ -71,15 +76,6 @@ class ReviewViewModel(
 
     override fun onAppStateChange(state: AppState) {
         reviewHintEnabled = state.settings.enableReviewHint
-    }
-
-    private fun setInitialState(round: ReviewRound = Review) {
-        viewModelScope.launch {
-            getReviewTasksUseCase(scopeId).map {
-                val tasks = reviewTasksMapper.map(it).shuffled()
-                sendEvent(SetupInitialRound(round, tasks))
-            }
-        }
     }
 
     fun undo(item: ReviewItemUiModel) {

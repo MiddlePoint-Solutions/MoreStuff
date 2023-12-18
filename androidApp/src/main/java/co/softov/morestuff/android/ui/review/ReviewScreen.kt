@@ -67,10 +67,9 @@ fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     scopeId: Long,
-    viewModel: ReviewViewModel = koinViewModel(parameters = { parametersOf(scopeId) }),
+    viewModel: ReviewViewModel = koinViewModel(),
 ) {
     val scope = rememberCoroutineScope()
-    var isCardMoving by remember { mutableStateOf(false) }
     var showReviewHelpScreen by remember { mutableStateOf(false) }
     val showTaskChat = remember { MutableTransitionState(false) }
     var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
@@ -79,7 +78,7 @@ fun ReviewContent(
     var showReviewDragHints by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadData()
+        viewModel.load(scopeId)
     }
 
     Box(
