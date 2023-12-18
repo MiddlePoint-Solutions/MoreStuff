@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.MoreVert
@@ -28,8 +29,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
@@ -40,6 +45,8 @@ import co.softov.morestuff.android.ui.review.swipeable.*
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -48,7 +55,7 @@ import timber.log.Timber
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
-    scopeId:Long
+    scopeId: Long
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
@@ -89,20 +96,28 @@ fun ReviewContent(
 
         val model by viewModel.uiModel.collectAsState()
 
-        BoxWithConstraints(
+        ConstraintLayout(
             modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
 
+            val (topBar, cards, controls) = createRefs()
+
             when (model.round) {
-                ReviewRound.Review -> {
+                is ReviewRound.Review -> {
 
                     PriorityReviewTopBar(
+                        currentScope = model.currentScope,
+                        scopes = viewModel.scopes,
+                        setCurrentScope = viewModel::setCurrentScope,
                         navigateUp = onBack,
                         toggleReviewHint = viewModel::toggleHintArrowPriority,
                         showReviewHelpScreen = { showReviewHelpScreen = true },
-                        isReviewHintActive = viewModel.reviewHintEnabled
+                        isReviewHintActive = viewModel.reviewHintEnabled,
+                        modifier = Modifier.constrainAs(topBar) {
+                            top.linkTo(parent.top)
+                        }
                     )
 
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
@@ -118,8 +133,12 @@ fun ReviewContent(
                         enter = fadeIn(),
                         exit = fadeOut(),
                         modifier = modifier
-                            .fillMaxHeight(0.30f)
-                            .align(Alignment.BottomCenter),
+                            .navigationBarsPadding()
+                            .fillMaxWidth()
+                            .constrainAs(controls) {
+                                top.linkTo(cards.bottom)
+                                height = Dimension.preferredWrapContent
+                            },
                     ) {
                         ReviewSwipeControls(
                             lastItemSwiped = { states.lastSwipedItem() },
@@ -130,8 +149,10 @@ fun ReviewContent(
 
                     TaskPrioritySwipe(
                         modifier = modifier
-                            .offset(y = 64.dp)
-                            .fillMaxHeight(0.7f),
+                            .fillMaxHeight(0.7f)
+                            .constrainAs(cards) {
+                                centerVerticallyTo(parent, bias = 0.4f)
+                            },
                         states = states,
                         onSwiped = { schedule, direction ->
                             viewModel.onTaskSwiped(schedule, direction)
@@ -217,69 +238,116 @@ fun ReviewContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-    modifier: Modifier = Modifier,
-    navigateUp: () -> Unit = {},
+    currentScope: ScopeDomain,
+    scopes: List<ScopeDomain>,
+    setCurrentScope: (Long) -> Unit,
     toggleReviewHint: () -> Unit,
     showReviewHelpScreen: () -> Unit,
     isReviewHintActive: Boolean,
+    modifier: Modifier = Modifier,
+    navigateUp: () -> Unit = {},
 ) {
 
     val scope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
 
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.priority_review),
+    Column(modifier = modifier) {
+        TopAppBar(
+            title = {
+                Text(
+                    text = stringResource(id = R.string.priority_review),
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = navigateUp) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_navigate_back)
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = showReviewHelpScreen) {
+                    Icon(
+                        imageVector = Icons.Default.Help,
+                        contentDescription = stringResource(R.string.help)
+                    )
+                }
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = stringResource(R.string.show_hint_arrow_priority)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(onClick = {
+                        scope.launch {
+                            toggleReviewHint()
+                            showMenu = false
+                        }
+                    },
+                        text = {
+                            Text(
+                                text = if (isReviewHintActive) {
+                                    stringResource(R.string.disable_hint_arrow)
+                                } else {
+                                    stringResource(R.string.enable_hint_arrow)
+                                }
+                            )
+                        })
+
+                }
+
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        )
+
+        var expanded by remember { mutableStateOf(false) }
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            FilterChip(
+                selected = expanded,
+                onClick = { expanded = !expanded },
+                label = {
+                    Text(
+                        text = currentScope.name,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.sizeIn(minWidth = 48.dp)
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowDropDown,
+                        contentDescription = "Localized Description",
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
+                }
             )
-        },
-        navigationIcon = {
-            IconButton(onClick = navigateUp) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.cd_navigate_back)
-                )
-            }
-        },
-        actions = {
-            IconButton(onClick = showReviewHelpScreen) {
-                Icon(
-                    imageVector = Icons.Default.Help,
-                    contentDescription = stringResource(R.string.help)
-                )
-            }
-            IconButton(onClick = { showMenu = true }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.show_hint_arrow_priority)
-                )
-            }
 
             DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                properties = PopupProperties(focusable = true)
             ) {
-                DropdownMenuItem(onClick = {
-                    scope.launch {
-                        toggleReviewHint()
-                        showMenu = false
-                    }
-                },
-                    text = {
-                        Text(
-                            text = if (isReviewHintActive) {
-                                stringResource(R.string.disable_hint_arrow)
-                            } else {
-                                stringResource(R.string.enable_hint_arrow)
-                            }
-                        )
-                    })
-
+                scopes.forEach { scope ->
+                    DropdownMenuItem(
+                        text = { Text(scope.name) },
+                        onClick = {
+                            setCurrentScope(scope.id)
+                            expanded = false
+                        },
+                    )
+                }
             }
-
-        },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
-    )
+        }
+    }
 
 }
 
@@ -296,7 +364,6 @@ private fun ReviewSwipeControls(
 
     val undoLastAction: () -> Unit = {
         scope.launch {
-            Timber.d("Undoing")
             lastItemSwiped()?.let { lastItem ->
                 lastItem.second.undo()
                 undoAction(lastItem.first)

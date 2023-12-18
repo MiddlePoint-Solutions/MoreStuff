@@ -143,12 +143,22 @@ class TaskRepositoryImpl(
         return Right(true)
     }
 
-    override suspend fun getTasksWithoutSchedule(scopeId: Long): Either<Failure, List<TaskDomain>> {
-        val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutSchedule(
-            scope_id = scopeId,
-            schedule_types = listOf(ScheduleType.OneTime),
-            mapper = mapper.taskDbMapper
-        ).executeAsList()
+    override suspend fun getTasksWithoutSchedule(
+        scoped: Boolean,
+        scopeId: Long
+    ): Either<Failure, List<TaskDomain>> {
+        val tasksWithoutSchedule = when (scoped) {
+            true -> taskQueries.getActiveTaskWithoutScheduleByScopeId(
+                scope_id = scopeId,
+                schedule_types = listOf(ScheduleType.OneTime),
+                mapper = mapper.taskDbMapper
+            )
+
+            false -> taskQueries.getActiveTaskWithoutSchedule(
+                schedule_types = listOf(ScheduleType.OneTime),
+                mapper = mapper.taskDbMapper
+            )
+        }.executeAsList()
 
         val firstTaskMessagesWithType =
             messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)

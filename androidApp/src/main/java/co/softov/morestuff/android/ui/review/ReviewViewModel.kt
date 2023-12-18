@@ -6,60 +6,77 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.redux.state.SettingAction
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.ui.review.ReviewRound.Final
 import co.softov.morestuff.android.ui.review.ReviewRound.Review
 import co.softov.morestuff.android.ui.review.ReviewViewEvent.ItemReview
-import co.softov.morestuff.android.ui.review.ReviewViewEvent.SetupInitialRound
-import co.softov.morestuff.android.ui.review.ReviewViewEvent.SetupRound
+import co.softov.morestuff.android.ui.review.ReviewViewEvent.FinalRound
 import co.softov.morestuff.android.ui.review.ReviewViewEvent.Undo
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.model.map.ReviewTasksMapper
+import co.softov.morestuff.android.ui.review.ReviewViewEvent.SetupReviewRound
 import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class ReviewViewModel(
     private val getReviewTasksUseCase: GetReviewTasksUseCase,
+    private val getScopesUseCase: GetScopesUseCase,
     private val reviewTasksMapper: ReviewTasksMapper,
 ) : BaseViewModel<ReviewModel, ReviewViewEvent>(ReviewModel()) {
 
     private var roundEndDelayJob: Job? = null
 
-    var reviewHintEnabled by mutableStateOf(false)
+    var scopes by mutableStateOf(listOf<ScopeDomain>())
         private set
 
-    override val enableDebug: Boolean
-        get() = false
+    var reviewHintEnabled by mutableStateOf(false)
+        private set
 
     fun load(scopeId: Long) {
         loadData()
         viewModelScope.launch {
+            getScopesUseCase().onRight {
+                scopes = it
+                setCurrentScope(scopeId)
+            }
+        }
+    }
+
+    fun setCurrentScope(scopeId: Long) {
+        if (state.currentScope.id == scopeId && state.items.isNotEmpty()) {
+            return
+        }
+
+        viewModelScope.launch {
             getReviewTasksUseCase(scopeId).map {
+                val scope = scopes.first { scope -> scope.id == scopeId }
                 val tasks = reviewTasksMapper.map(it).shuffled()
-                sendEvent(SetupInitialRound(Review, tasks))
+                sendEvent(SetupReviewRound(scope, tasks))
             }
         }
     }
 
     override fun onReduceState(event: ReviewViewEvent) = when (event) {
-        is SetupInitialRound -> {
-            ReviewModel(items = event.items)
-        }
 
-        is SetupRound -> when (event.round) {
-            Review -> ReviewModel(
-                round = Review,
-                items = state.items
-            )
+        is SetupReviewRound -> ReviewModel(
+            round = Review(event.currentScope.id),
+            currentScope = event.currentScope,
+            items = event.items
+        )
 
-            Final -> state.copy(round = Final)
-        }
+        is FinalRound -> state.copy(round = Final)
 
         is ItemReview -> state.copy(
             actions = state.actions.toMutableList().apply {
@@ -72,6 +89,8 @@ class ReviewViewModel(
                 filter { it.first.id != event.item.id }
             }
         )
+
+
     }
 
     override fun onAppStateChange(state: AppState) {
@@ -115,7 +134,7 @@ class ReviewViewModel(
             roundEndDelayJob = viewModelScope.launch {
                 dispatchAppStoreAction(PriorityAction.UpdatePlannedPriorityAction)
                 delay(500)
-                sendEvent(SetupRound(Final))
+                sendEvent(FinalRound)
             }
         }
     }
@@ -130,7 +149,7 @@ class ReviewViewModel(
         if (state.items.first() == item) {
             roundEndDelayJob = viewModelScope.launch {
                 delay(500)
-                sendEvent(SetupRound(Final))
+                sendEvent(FinalRound)
             }
         }
     }

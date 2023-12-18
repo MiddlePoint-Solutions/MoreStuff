@@ -57,7 +57,7 @@ class UserInputViewModel(
                 messages.update { messages ->
                     messages.toMutableList().apply { add(0, it) }
                 }
-                delay(1000)
+                delay(1500)
                 messages.update { messages ->
                     messages.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
                 }
