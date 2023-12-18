@@ -7,7 +7,7 @@ import co.softov.morestuff.android.domain.model.ReviewTasks
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetReviewTasksUseCase {
-    suspend operator fun invoke(): Either<Failure, ReviewTasks>
+    suspend operator fun invoke(scopeId:Long): Either<Failure, ReviewTasks>
 
 }
 class GetReviewTasksUseCaseImpl(
@@ -15,9 +15,9 @@ class GetReviewTasksUseCaseImpl(
     private val getTasksWithoutScheduleUseCase: GetTasksWithoutScheduleUseCase,
 ) : GetReviewTasksUseCase {
 
-    override suspend fun invoke(): Either<Failure, ReviewTasks> =
+    override suspend fun invoke(scopeId:Long): Either<Failure, ReviewTasks> =
         taskRepository.countActiveTasks().flatMap { count ->
-            getTasksWithoutScheduleUseCase().map { tasks ->
+            getTasksWithoutScheduleUseCase(scopeId).map { tasks ->
                 ReviewTasks(tasks, count)
             }
         }

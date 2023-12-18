@@ -317,7 +317,6 @@ private fun TaskChatInput(
     ) {
         UserInput(
             modifier = Modifier.align(Alignment.BottomCenter),
-            backgroundColor = Color.Transparent,
             textContent = {
                 val weight = if (isTextEmpty.value) 0.30f else 0.12f
                 CompositionLocalProvider(LocalBoxWeight provides weight) {
@@ -326,10 +325,6 @@ private fun TaskChatInput(
                         onValueChange = {
                             userInputValue = it
                             isTextEmpty.value = it.text.isBlank()
-                        },
-                        sendAction = {
-                            sendTaskMessage(it)
-                            userInputValue = userInputValue.copy(text = "")
                         },
                         backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                         actionsContent = {
@@ -362,7 +357,7 @@ private fun TaskChatInput(
                                     ) {
                                         SendIcon(onClick = {
                                             sendTaskMessage(userInputValue.text)
-                                            userInputValue = TextFieldValue()
+                                            userInputValue = userInputValue.copy(text = "")
                                             isTextEmpty.value = true
                                         })
                                     }

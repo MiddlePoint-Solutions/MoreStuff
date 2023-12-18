@@ -2,7 +2,6 @@ package co.softov.morestuff.android.domain.repository
 
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
-import co.softov.morestuff.android.domain.model.TaskDomain
 
 interface PriorityRepository {
 

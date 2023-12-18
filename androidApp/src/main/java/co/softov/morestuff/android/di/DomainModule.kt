@@ -17,6 +17,7 @@ import co.softov.morestuff.android.domain.redux.middleware.NotificationMiddlewar
 import co.softov.morestuff.android.domain.redux.middleware.PriorityMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ReminderMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
+import co.softov.morestuff.android.domain.redux.middleware.ScopeMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
 import co.softov.morestuff.android.domain.service.ClipboardHelper
@@ -130,6 +131,18 @@ import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreU
 import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
+import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCase
+import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -142,6 +155,10 @@ import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUs
 import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
@@ -175,6 +192,7 @@ val useCaseModules
         add(scheduleUseCases)
         add(messageUseCases)
         add(settingsUseCases)
+        add(scopeUseCases)
     }
 
 val serviceModule = module {
@@ -204,6 +222,7 @@ val storeModule = module {
             notificationMiddleware = get(),
             settingsMiddleware = get(),
             priorityMiddleware = get(),
+            scopeMiddleware = get()
 
         )
     }
@@ -219,6 +238,8 @@ val storeModule = module {
     factoryOf(::ErrorMiddleware)
     factoryOf(::PriorityMiddleware)
     factoryOf(::DevMiddleware)
+    factoryOf(::ScopeMiddleware)
+
 }
 
 val taskUseCases = module {
@@ -237,6 +258,8 @@ val taskUseCases = module {
     factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
     factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
     factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
+    factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
+    factoryOf(::RemoveTasksFromScopeUseCaseImpl) bind RemoveTasksFromScopeUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
@@ -255,6 +278,14 @@ val taskUseCases = module {
     factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
 }
 
+val scopeUseCases = module{
+    factoryOf(::CreateScopeUseCaseImpl) bind CreateScopeUseCase::class
+    factoryOf(::DeleteScopeUseCaseImpl) bind DeleteScopeUseCase::class
+    factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
+    factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
+    factoryOf(::UpdateScopeOrderUseCaseImpl) bind UpdateScopeOrderUseCase::class
+    factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
+}
 
 val scheduleUseCases = module {
     factoryOf(::GetTaskActiveSchedulesUseCaseImpl) bind GetTaskActiveSchedulesUseCase::class

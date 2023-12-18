@@ -16,7 +16,7 @@ interface MessageRepository {
     suspend fun getMessage(messageId: Long): Either<Failure, Message>
     fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>>
     fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>>
-    fun getLastMessageFlow(contentType: ContentType): Flow<Message>
+    fun getLastMessageFlow(contentType: ContentType): Flow<Message?>
     suspend fun createMessage(
         taskId: Long,
         scheduleId: Long,

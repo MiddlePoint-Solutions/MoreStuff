@@ -19,13 +19,11 @@ class CreateHintTaskUseCaseImpl(
 
     override suspend fun invoke() {
         val hintTasks = hintTaskProvider.getHintTasks()
-        val createdTasks = mutableListOf<TaskDomain>()
 
         hintTasks.forEach { hintTask ->
             val priorityParams = Priority.Now()
             val taskParams = TaskParams(hintTask.taskTitle, priorityParams, TaskType.User)
             val createdTask = createTaskUseCase(taskParams)
-            createdTasks.add(createdTask)
 
             hintTask.taskMessages.forEach { messageHint ->
                 createMessageUseCase(

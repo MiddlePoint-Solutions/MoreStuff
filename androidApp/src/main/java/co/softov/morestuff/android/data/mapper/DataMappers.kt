@@ -1,7 +1,5 @@
 package co.softov.morestuff.android.data.mapper
 
-import co.softov.morestuff.android.domain.util.TimeFormatter
-
 
 interface DataMappers {
     val messageDataMapper: MessageDataMapper
@@ -9,6 +7,7 @@ interface DataMappers {
     val scheduleDbMapper: ScheduleDbMapper
     val scheduleDomainMapper: ScheduleDomainMapper
     val taskDbMapper: TaskDataMapper
+    val scopeDbMapper: ScopeDataMapper
 }
 
 
@@ -29,6 +28,9 @@ class DataMappersImpl() : DataMappers {
 
     override val taskDbMapper: TaskDataMapper
         get() = makeTaskDbMapper()
+
+    override val scopeDbMapper: ScopeDataMapper
+        get() = makeScopeDbMapper()
 
 }
 

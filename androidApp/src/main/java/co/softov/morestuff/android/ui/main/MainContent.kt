@@ -2,7 +2,6 @@ package co.softov.morestuff.android.ui.main
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
 import co.softov.morestuff.android.domain.nav.Screen.Home
@@ -19,6 +18,7 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
 import co.softov.morestuff.android.ui.review.ReviewScreen
+import co.softov.morestuff.android.ui.scope.CreateScopesScreen
 import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
@@ -63,8 +63,9 @@ fun MainContent(
             )
 
             Home -> HomeScreen()
-            Review -> ReviewScreen()
+            is Review -> ReviewScreen(scopeId = screen.scopeId)
             Settings -> SettingsScreen()
+            Screen.CreateScope -> CreateScopesScreen(onBack = navigation::pop)
 
             is TaskChat -> TaskChatScreen(
                 taskId = screen.taskId,
@@ -90,9 +91,8 @@ fun MainContent(
                     onBack = navigation::pop,
                     shareable = screen.shareable,
                 ) { taskId, shareable ->
-                    if (shareable is Shareable.Image && !viewModel.creatingNewTask.value!!) {
+                    if (shareable is Shareable.Image) {
                         navigation.push(Screen.ImagePreview(Uri.parse(shareable.uris), taskId))
-
                     } else {
                         navigation.replaceCurrent(
                             TaskChat(taskId),

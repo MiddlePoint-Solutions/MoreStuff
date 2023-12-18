@@ -135,7 +135,7 @@ val ColorScheme.surfaceContainer: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
 
-val surfaceContainerElevation: Color
+val ColorScheme.surfaceContainerElevation: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
 @Composable

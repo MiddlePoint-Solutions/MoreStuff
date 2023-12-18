@@ -21,6 +21,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     private val getPlanPriorityScoreUseCase = mockk<GetPlanPriorityScoreUseCase>(relaxed = true)
     private val updateTaskPriorityScoreUseCase =
         mockk<UpdateTaskPriorityScoreUseCase>(relaxed = true)
+
     private val useCase = UpdatePlannedTasksPriorityUseCaseImpl(
         getActiveTasksWithScheduleUseCase,
         getPlanPriorityScoreUseCase,

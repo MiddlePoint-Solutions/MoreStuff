@@ -10,6 +10,7 @@ import co.softov.morestuff.android.ui.model.map.ReviewTasksMapper
 import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import co.softov.morestuff.android.ui.priority.PlanViewModel
 import co.softov.morestuff.android.ui.review.ReviewViewModel
+import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.search.SearchViewModel
 import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import co.softov.morestuff.android.ui.share.ShareViewModel
@@ -22,6 +23,7 @@ val presentationModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::ReviewViewModel)
+    viewModelOf(::ScopeViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::TaskChatViewModel)
     viewModelOf(::PlanViewModel)

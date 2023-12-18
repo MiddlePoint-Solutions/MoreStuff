@@ -4,7 +4,15 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -12,8 +20,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -127,6 +148,7 @@ private fun SettingsContent(
                     languageSelected = actions.inputVoiceLanguage,
                     defaultValue = { model.inputVoiceLanguage.ordinal }
                 )
+                ScopeSettingsScreen()
 
                 if (model.devSettings) {
                     DevSettings()
@@ -519,6 +541,21 @@ private fun Language.displayTitle(res: Resources): String = when (this) {
     Language.Hebrew -> res.getString(R.string.language_hebrew)
     Language.Russian -> res.getString(R.string.language_russian)
     Language.Catalan -> res.getString(R.string.language_catalan)
+}
+
+@Composable
+fun ScopeSettingsScreen() {
+    val navigation = LocalAppNavigation.current
+    SettingsMenuLink(
+        title = { Text(text = stringResource(R.string.manage_scopes)) },
+        onClick = { navigation.push(Screen.CreateScope) },
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Layers,
+                contentDescription = stringResource(R.string.select_language)
+            )
+        }
+    )
 }
 
 

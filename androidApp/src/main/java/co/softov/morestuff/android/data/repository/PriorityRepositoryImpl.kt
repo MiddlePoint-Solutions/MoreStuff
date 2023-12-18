@@ -1,9 +1,7 @@
 package co.softov.morestuff.android.data.repository
 
 import arrow.core.Either
-import arrow.core.rightIfNotNull
 import co.softov.morestuff.android.domain.model.Failure
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.android.domain.repository.TaskDoesNotExist
 import co.softov.morestuff.db.StuffDb
@@ -48,7 +46,7 @@ class PriorityRepositoryImpl(
 
     override suspend fun updateTasksPriorityScoreByAdding(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
             taskQueries.incrementTasksPriorityScore(priorityScore)
@@ -59,7 +57,7 @@ class PriorityRepositoryImpl(
 
     override suspend fun updateTasksPriorityScoreBySubtracting(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
             taskQueries.decrementTasksPriorityScore(priorityScore)
@@ -70,7 +68,7 @@ class PriorityRepositoryImpl(
 
     override suspend fun updateTaskPriority(
         taskId: Long,
-        priorityScore: Long
+        priorityScore: Long,
     ): Either<Failure, Long> {
         taskQueries.updateTaskPriorityScore(priorityScore, taskId)
         return Either.Right(priorityScore)

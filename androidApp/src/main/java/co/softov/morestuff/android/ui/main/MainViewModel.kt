@@ -39,8 +39,6 @@ class MainViewModel(
         )
     }.stateIn(viewModelScope, SharingStarted.Eagerly, Idle)
 
-    val creatingNewTask = MutableLiveData(false)
-
     init {
         loadData()
     }
@@ -51,10 +49,6 @@ class MainViewModel(
 
     fun onResume() {
         dispatchAppStoreAction(OnResumeAction)
-    }
-
-    fun shareTextToTask(taskId: Long, content: String) {
-        dispatchAppStoreAction(MessageAction.CreateUserTaskMessageAction(taskId, content))
     }
 
     fun shareContentToTask(taskId: Long, content: Shareable) {

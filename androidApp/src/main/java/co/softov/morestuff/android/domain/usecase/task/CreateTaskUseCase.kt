@@ -3,6 +3,7 @@ package co.softov.morestuff.android.domain.usecase.task
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 
@@ -14,6 +15,7 @@ data class TaskParams(
     val title: String,
     val priority: Priority,
     val taskType: TaskType,
+    val scopeId: Long = scopeAll.id
 )
 
 class CreateNewTaskUseCaseImpl(
@@ -23,7 +25,12 @@ class CreateNewTaskUseCaseImpl(
 
     override suspend fun invoke(params: TaskParams): TaskDomain = with(params) {
         val priorityScore = getDefaultPriorityScoreUseCase(priority)
-        taskRepository.createTask(title, priorityScore, taskType)
+        taskRepository.createTask(
+            title = title,
+            priorityScore = priorityScore,
+            taskType = taskType,
+            scopeId = if (scopeId == scopeAll.id) null else scopeId
+        )
     }
 } 
 

@@ -143,8 +143,15 @@
     <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
-
-
+    <string name="sure_delete_scope">Are you sure you want to delete\nthe following scope?</string>
+    <string name="create_new_scope">Create new Scope</string>
+    <string name="confirm">Confirm</string>
+    <string name="edit_scope_name">Edit Scope Name</string>
+    <string name="task_scopes">Task Scopes</string>
+    <string name="create_scope">Create Scope</string>
+    <string name="add_to_scope">Add to Scope</string>
+    <string name="manage_scopes">Manage Scopes</string>
+    <string name="remove_from_scope">Remove from current scope</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our goal"</string>
@@ -204,10 +211,10 @@
     <string name="cd_lowest_priority_hint_icon">Lowest Priority hint icon</string>
     <string name="cd_low_priority_hint_icon">Low Priority hint icon</string>
     <string name="cd_high_priority_hint_icon">High Priority hint icon</string>
-    <string name="review_hint_high_priority">High Priority</string>
-    <string name="review_hint_low_priority">Low Priority</string>
-    <string name="review_hint_highest_priority">Highest Priority</string>
-    <string name="review_hint_lowest_priority">Lowest Priority</string>
+    <string name="review_hint_high_priority">High</string>
+    <string name="review_hint_low_priority">Low</string>
+    <string name="review_hint_highest_priority">Highest</string>
+    <string name="review_hint_lowest_priority">Lowest</string>
     <string name="cd_app_logo">app logo</string>
     <string name="cd_notifications_permission_image">Notifications permission image</string>
     <string name="notification_permission_rationale">MoreStuff needs the notification permission to enable setting schedules and reminders for the stuff that you don\'t want to forget…\nYou can also enable the permission while using the app.</string>
@@ -216,8 +223,11 @@
     <string name="cd_close_search">Close search</string>
 
     <string name="date_connector">of</string>
-
-
+    <string name="cd_delete_tasks">Delete tasks</string>
+    <string name="cd_complete_tasks">Complete tasks</string>
+    <string name="cd_more_options">More options</string>
+    <string name="cd_open_settings">Open settings</string>
+    <string name="cd_search_tasks">Search tasks</string>
 
 
 </resources>
