@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.ui.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class TaskUiModel(
     val id: Long,
     val title: String,
@@ -12,4 +15,5 @@ data class TaskUiModel(
     val hasSchedule: Boolean,
     val hasReminder: Boolean,
     val isSelected: Boolean,
+    val hasScope: Boolean
 )

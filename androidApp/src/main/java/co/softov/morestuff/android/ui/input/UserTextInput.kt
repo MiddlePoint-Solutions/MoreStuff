@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,36 +49,49 @@ fun UserTextInput(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
-    sendAction: (String) -> Unit = {},
-    actionsContent: @Composable () -> Unit = {},
+    actionsContent: @Composable BoxScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = remember { FocusRequester() },
+    startWithFocus: Boolean = false
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
     val boxWeight = LocalBoxWeight.current
 
+    LaunchedEffect(Unit) {
+        if (startWithFocus) {
+            focusRequester.requestFocus()
+        }
+    }
+
     Surface(
-        modifier = modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp, end = 10.dp, bottom = 6.dp)
             .animateContentSize(), shape = RoundedCornerShape(42), color = backgroundColor
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().defaultMinSize(minHeight = 42.dp).semantics {
-                contentDescription = a11ylabel
-            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 42.dp)
+                .semantics {
+                    contentDescription = a11ylabel
+                },
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
             BasicTextField(value = value,
                 onValueChange = onValueChange,
-                modifier = Modifier.clearFocusOnKeyboardDismiss().focusRequester(focusRequester)
-                    .weight(0.88f).align(Alignment.CenterVertically)
+                modifier = Modifier
+                    .clearFocusOnKeyboardDismiss()
+                    .focusRequester(focusRequester)
+                    .weight(0.88f)
+                    .align(Alignment.CenterVertically)
                     .padding(start = 28.dp, end = 4.dp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text
                 ),
-                keyboardActions = KeyboardActions { sendAction(value.text) },
                 maxLines = 4,
                 cursorBrush = SolidColor(LocalContentColor.current),
                 textStyle = LocalTextStyle.current.copy(
@@ -102,8 +117,10 @@ fun UserTextInput(
                 })
 
             Box(
-                modifier = Modifier.weight(if (value.text.isBlank()) boxWeight else 0.15f)
-                    .align(Alignment.Bottom).padding(end = 8.dp)
+                modifier = Modifier
+                    .weight(if (value.text.isBlank()) boxWeight else 0.15f)
+                    .align(Alignment.Bottom)
+                    .padding(end = 8.dp)
             ) {
                 actionsContent()
             }

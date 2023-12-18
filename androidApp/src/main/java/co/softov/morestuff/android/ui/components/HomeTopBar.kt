@@ -12,52 +12,74 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.ui.home.HomeUiModel
 import co.softov.morestuff.android.ui.model.Digit
 import co.softov.morestuff.android.ui.model.compareTo
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    model: HomeUiModel,
+    selectedTaskCount: Int,
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
-    searchSelected: () -> Unit,
+    searchAction: () -> Unit,
     clearTaskSelection: () -> Unit,
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    containerColor: State<Color>,
+    removeSelectedTasksFromScope: () -> Unit,
+    selectScope: () -> Unit,
+    scrollBehavior: TopAppBarScrollBehavior,
 ) {
 
-    val taskSelectionActive = remember(model) { model.taskSelectionActive }
+    val taskSelectionActive = remember(selectedTaskCount) { selectedTaskCount > 0 }
     val transition = updateTransition(taskSelectionActive, label = "Selection state")
+    var showMenu by remember { mutableStateOf(false) }
+
+    val scrollContainerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+    val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
+    val containerColor = remember { mutableStateOf(defaultContainerColor) }
+
+    LaunchedEffect(scrollBehavior, selectedTaskCount) {
+        snapshotFlow { (scrollBehavior.state.overlappedFraction > 0.2f || selectedTaskCount > 0) }
+            .collect { enable ->
+                containerColor.value = if (enable) scrollContainerColor else defaultContainerColor
+            }
+    }
 
     TopAppBar(
         title = {
@@ -83,7 +105,7 @@ fun HomeTopBar(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                AnimatedCounter(count = model.selectedTaskIds.size)
+                                AnimatedCounter(count = selectedTaskCount)
                             }
                         }
                     }
@@ -97,20 +119,51 @@ fun HomeTopBar(
                 IconButton(onClick = deleteSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
-                        contentDescription = stringResource(R.string.cd_priority_review)
+                        contentDescription = stringResource(R.string.cd_delete_tasks)
                     )
                 }
+
                 IconButton(onClick = completeSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Done,
-                        contentDescription = stringResource(R.string.cd_priority_review)
+                        contentDescription = stringResource(R.string.cd_complete_tasks)
                     )
                 }
+
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Rounded.MoreVert,
+                        contentDescription = stringResource(R.string.cd_more_options)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.add_to_scope)) },
+                        onClick = {
+                            selectScope()
+                            showMenu = false
+                        },
+                        leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.remove_from_scope)) },
+                        onClick = {
+                            removeSelectedTasksFromScope()
+                            showMenu = false
+                            clearTaskSelection()
+                        },
+                        leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) }
+                    )
+                }
+
             } else {
-                IconButton(onClick = searchSelected) {
+                IconButton(onClick = searchAction) {
                     Icon(
                         imageVector = Icons.Rounded.Search,
-                        contentDescription = stringResource(R.string.cd_priority_review)
+                        contentDescription = stringResource(R.string.cd_search_tasks)
                     )
                 }
 
@@ -124,14 +177,14 @@ fun HomeTopBar(
                 IconButton(onClick = settingsSelected) {
                     Icon(
                         imageVector = Icons.Rounded.Settings,
-                        contentDescription = stringResource(R.string.cd_priority_review)
+                        contentDescription = stringResource(R.string.cd_open_settings)
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor.value),
-            scrollBehavior = scrollBehavior
-        )
+        scrollBehavior = scrollBehavior
+    )
 }
 
 @Composable
@@ -175,16 +228,17 @@ private fun AnimatedCounter(count: Int) {
 @Composable
 private fun Preview() {
     MoreStuffTheme {
-        val previewContainerColor = remember { mutableStateOf(Color.Blue) }
         HomeTopBar(
-            model = HomeUiModel(),
+            selectedTaskCount = 0,
             reviewSelected = {},
             settingsSelected = {},
-            searchSelected = { },
+            searchAction = { },
             clearTaskSelection = {},
             completeSelectedTasks = {},
             deleteSelectedTasks = {},
-            containerColor = previewContainerColor
+            selectScope = {},
+            removeSelectedTasksFromScope = {},
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         )
     }
 }

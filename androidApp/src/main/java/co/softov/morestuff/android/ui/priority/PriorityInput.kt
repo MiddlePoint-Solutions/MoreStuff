@@ -51,7 +51,9 @@ private fun PriorityInputContent(
     onTimeChange: (Int, Int) -> Unit = { _, _ -> },
     onDateChange: (Long) -> Unit = {},
 ) {
-    Column {
+    Column(
+        modifier = modifier
+    ) {
 
         val showPlanInput by remember(model.priority) {
             derivedStateOf { model.priority is PriorityUiModel.Plan }
@@ -59,7 +61,7 @@ private fun PriorityInputContent(
 
         AnimatedVisibility(
             showPlanInput,
-            modifier = modifier.fillMaxWidth(),
+//            modifier = modifier.fillMaxWidth(),
             enter = slideInVertically { it * 2 },
             exit = slideOutVertically { (it * 1.5).toInt() }
         ) {
@@ -79,7 +81,8 @@ private fun PriorityInputContent(
     }
 
     Surface(
-        modifier = Modifier.zIndex(3f),
+//        modifier = modifier.zIndex(3f),
+        modifier = modifier,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {

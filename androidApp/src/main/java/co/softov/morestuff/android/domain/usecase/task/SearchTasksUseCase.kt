@@ -5,13 +5,13 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 
 interface SearchTasksUseCase {
-    operator fun invoke(searchText: String): Flow<List<TaskDomain>>
+    operator fun invoke(searchText: String, activeOnly: Boolean): Flow<List<TaskDomain>>
 }
 
 class SearchTasksUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : SearchTasksUseCase {
-    override fun invoke(searchText: String): Flow<List<TaskDomain>> {
-        return taskRepository.searchTasks(searchText)
+    override fun invoke(searchText: String, activeOnly: Boolean): Flow<List<TaskDomain>> {
+        return taskRepository.searchTasks(searchText, activeOnly)
     }
 }

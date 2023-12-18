@@ -6,10 +6,17 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.enums.ContentType
+import co.softov.morestuff.android.domain.enums.TaskType
+import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.model.Message
+import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
+import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
+import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
@@ -26,28 +33,34 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import timber.log.Timber
 
 class UserInputViewModel(
+    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
+    private val getScopesUseCase: GetScopesUseCase,
+    private val createTaskUseCase: CreateTaskUseCase,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
-    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
     private val messageUiMapper: MessageUiMapper,
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
+    val scopes = MutableStateFlow<List<ScopeDomain>>(listOf())
 
-    private val lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
+    private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
         .drop(1)
-        .distinctUntilChanged { old, new -> old.id == new.id }
-        .map { message ->
-            messageUiMapper.internalMap(message)
-
-        }.onEach { uiMessage ->
-            Timber.d("Adding message: ${uiMessage.id} ")
-            messages.update {
-                it.toMutableList().apply { add(0, uiMessage) }
+        .distinctUntilChanged { old, new -> old?.id == new?.id }
+        .map { message -> message?.let(messageUiMapper::map) }
+        .onEach { message ->
+            message?.let {
+                messages.update { messages ->
+                    messages.toMutableList().apply { add(0, it) }
+                }
+                delay(1500)
+                messages.update { messages ->
+                    messages.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
+                }
             }
         }.stateIn(
             scope = viewModelScope,
@@ -55,10 +68,27 @@ class UserInputViewModel(
             initialValue = null
         )
 
+    val priorityModel = MutableStateFlow(
+        PriorityInputUiModel(
+            priority = PriorityUiModel.Now,
+            planTime = createPlanTime()
+        )
+    )
 
-    override fun onLoadData() {
+    var currentScope by mutableStateOf(scopeAll)
+        private set
+
+    fun load(context: ChatContext) {
+        // TODO: add messages according to chat context
         messages.update {
             listOf(createAppMessage("What can I do for you today?"))
+        }
+
+        viewModelScope.launch {
+            getScopesUseCase().onRight { scopeList ->
+                scopes.update { scopeList }
+                currentScope = scopeList.first { scope -> scope.id == context.scopeId }
+            }
         }
     }
 
@@ -69,18 +99,8 @@ class UserInputViewModel(
             createTime = timeManager.getCreateTime(),
             content = content,
         )
-        return messageUiMapper.internalMap(message)
+        return messageUiMapper.map(message)
     }
-
-    val priorityModel = MutableStateFlow(
-        PriorityInputUiModel(
-            priority = PriorityUiModel.Now,
-            planTime = createPlanTime()
-        )
-    )
-
-    var userInput by mutableStateOf("")
-        private set
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
         PriorityUiModel.Plan(localDateTime = timeManager.getDefaultPlanTime())
@@ -117,16 +137,18 @@ class UserInputViewModel(
         }
     }
 
-    suspend fun createNewTask(title: String) {
-        dispatchSuspend(
-            TaskAction.CreateUserTaskAction(title.trim(), priorityModel.value.mapToDomain())
-        )
-        userInput = ""
-
-        delay(1000)
-        messages.update {
-            it.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
-        }
+    /**
+     * Creates a new task and returns its id.
+     * The taskId can then be used for navigation.
+     *
+     * @return TaskId of the newly created task
+     */
+    suspend fun createNewTask(title: String): Long {
+        val priority = priorityModel.value.mapToDomain()
+        val params = TaskParams(title, priority, TaskType.User, currentScope.id)
+        val task = createTaskUseCase(params)
+        dispatchAppStoreAction(TaskAction.TaskCreatedAction(task, priority))
+        return task.id
     }
 
     fun setNowPriority() {
@@ -141,8 +163,8 @@ class UserInputViewModel(
         priorityChanged(createPlanModel())
     }
 
-    fun updateUserInput(input: String) {
-        userInput = input
+    fun setCurrentScope(scopeId: Long) {
+        currentScope = scopes.value.first { it.id == scopeId }
     }
 
     private fun priorityChanged(priority: PriorityUiModel) {
@@ -155,4 +177,6 @@ class UserInputViewModel(
             )
         }
     }
+
+
 }

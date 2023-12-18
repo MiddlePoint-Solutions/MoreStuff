@@ -1,10 +1,7 @@
 package co.softov.morestuff.android.ui.model.map
 
-import co.softov.morestuff.android.domain.model.ReviewTasks
-import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.model.TaskUiModel
 
 class TaskUiMapper(
@@ -22,7 +19,8 @@ class TaskUiMapper(
             extraDetails = input.extraDetails,
             hasSchedule = input.hasSchedule,
             hasReminder = input.hasReminder,
-            isSelected = selected
+            isSelected = selected,
+            hasScope = input.hasScope
         )
     }
 

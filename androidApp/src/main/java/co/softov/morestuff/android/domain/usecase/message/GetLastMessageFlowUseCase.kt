@@ -6,13 +6,13 @@ import co.softov.morestuff.android.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
 interface GetLastMessageFlowUseCase {
-    operator fun invoke(contentType: ContentType): Flow<Message>
+    operator fun invoke(contentType: ContentType): Flow<Message?>
 }
 
 class GetLastMessageFlowUseCaseImpl(
     private val messageRepository: MessageRepository
 ) : GetLastMessageFlowUseCase {
-    override fun invoke(contentType: ContentType): Flow<Message> {
+    override fun invoke(contentType: ContentType): Flow<Message?> {
         return messageRepository.getLastMessageFlow(contentType)
     }
 }

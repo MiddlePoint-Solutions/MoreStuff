@@ -5,9 +5,9 @@ import arrow.core.left
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskReorderFailure
 import co.softov.morestuff.android.domain.repository.PriorityRepository
-import co.softov.morestuff.android.domain.repository.TaskRepository
 
 val NA: Nothing? = null
+
 
 interface ReorderTaskUseCase {
     suspend operator fun invoke(
@@ -19,7 +19,7 @@ interface ReorderTaskUseCase {
 
 class ReorderTaskUseCaseImpl(
     private val priorityRepository: PriorityRepository,
-    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase
+    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
 ) : ReorderTaskUseCase {
     override suspend operator fun invoke(
         taskId: Long,

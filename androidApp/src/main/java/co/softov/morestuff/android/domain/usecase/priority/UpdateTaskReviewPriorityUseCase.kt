@@ -22,7 +22,7 @@ class UpdateTaskReviewPriorityUseCaseImpl(
 
     override suspend fun invoke(
         taskId: Long,
-        actionType: PriorityActionType
+        actionType: PriorityActionType,
     ): Either<Failure, Long> = when (actionType) {
         PriorityActionType.Now -> {
             val score = getDefaultPriorityScoreUseCase(Priority.Now())
