@@ -162,6 +162,7 @@ fun TaskSchedule(
                     Icon(
                         Icons.Sharp.Close,
                         contentDescription = stringResource(R.string.cd_cancel_schedule),
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }

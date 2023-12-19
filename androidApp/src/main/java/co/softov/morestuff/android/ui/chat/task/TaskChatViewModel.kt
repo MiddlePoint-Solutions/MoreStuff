@@ -199,7 +199,7 @@ class TaskChatViewModel(
         return if (timeString != null) {
             timeFormatter.formatToDateTime(timeString) ?: "Format Error"
         } else {
-            "Invalid Date"
+            ""
         }
     }
 

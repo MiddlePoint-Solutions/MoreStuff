@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -253,6 +254,8 @@ private fun TaskChatContent(
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
                                 contentDescription = stringResource(R.string.cd_schedule_icon),
+                                tint = MaterialTheme.colorScheme.secondary
+
                             )
                         },
                     )
@@ -283,7 +286,10 @@ private fun TaskChatContent(
                     scrollState = scrollState,
                 )
 
-                if (task.isComplete) {
+                AnimatedVisibility(
+                    visible = task.isComplete,
+                    modifier = Modifier.background(Color.Transparent)
+                ) {
                     AppChatItem(
                         message = MessageUiModel(
                             id = Random.nextLong(),
@@ -297,6 +303,7 @@ private fun TaskChatContent(
                         ),
                         chatActions
                     )
+                    Spacer(modifier = Modifier.padding(bottom = 80.dp))
                 }
 
                 AnimatedVisibility(
