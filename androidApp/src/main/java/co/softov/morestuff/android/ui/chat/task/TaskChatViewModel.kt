@@ -195,5 +195,12 @@ class TaskChatViewModel(
         super.onCleared()
         Timber.d("onCleared")
     }
+    fun formatCompleteTime(timeString: String?): String {
+        return if (timeString != null) {
+            timeFormatter.formatToDateTime(timeString) ?: "Format Error"
+        } else {
+            "Invalid Date"
+        }
+    }
 
 }

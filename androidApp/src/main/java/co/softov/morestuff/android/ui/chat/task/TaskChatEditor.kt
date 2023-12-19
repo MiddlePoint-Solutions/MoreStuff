@@ -152,7 +152,7 @@ fun TaskChatEditor(
                             .onFocusChanged { focusState ->
                                 isEditing.value = focusState.isFocused
                             }
-                            .padding(end = if (isEditing.value || showSchedule) 55.dp else 12.dp, bottom = 18.dp),
+                            .padding(end = if (isEditing.value || showSchedule) 55.dp else 12.dp, bottom = 20.dp),
                         enabled = !isComplete,
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
