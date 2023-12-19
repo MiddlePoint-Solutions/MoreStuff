@@ -18,9 +18,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -42,9 +46,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.TaskDomain
@@ -191,7 +198,6 @@ private fun TaskChatContent(
     cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
 ) {
-
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
     var showSchedule by remember { mutableStateOf(false) }
@@ -202,12 +208,12 @@ private fun TaskChatContent(
             Timber.d("Image picker uri is NULL!")
         }
     }
+    val isEditing = remember { mutableStateOf(false) }
+
 
     Scaffold(
         topBar = {
-            TaskTopAppBar(
-                onBackPressed = onBack,
-            )
+            TaskTopAppBar(onBackPressed = onBack)
         },
         modifier = modifier.navigationBarsPadding(),
         containerColor = Color.Transparent,
@@ -227,39 +233,44 @@ private fun TaskChatContent(
                     taskTitle = taskTitle,
                     onTitleChange = updateTaskTitle,
                     toggleTaskComplete = toggleTaskComplete,
-                    showSchedule = showSchedule,
-                    setShowSchedule = { showSchedule = it },
-                    task = task
-                ) {
-                    if (showSchedule) {
-                        TaskSchedule(
-                            model = schedule,
-                            actionText = stringResource(id = R.string.task_chat_schedule_action),
-                            onTimeChange = updatePlanTime,
-                            onDateChange = updatePlanDate,
-                            createSchedule = createPlanSchedule,
-                            cancelSchedule = cancelActiveSchedule,
-                        )
-                    }
-
-
-                    // TODO: uncomment this when we have proper support for reminders
-                    /*TaskSchedule(
-                        model = reminder,
-                        actionText = stringResource(R.string.task_chat_reminder_action),
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
-                                contentDescription = stringResource(R.string.cd_reminder_icon),
-                            )
-                        },
+                    isEditing = isEditing,
+                    showSchedule = showSchedule
+                )
+                AnimatedVisibility(visible = showSchedule) {
+                    TaskSchedule(
+                        model = schedule,
+                        actionText = stringResource(id = R.string.task_chat_schedule_action),
                         onTimeChange = updatePlanTime,
                         onDateChange = updatePlanDate,
                         createSchedule = createPlanSchedule,
                         cancelSchedule = cancelActiveSchedule,
-                    )*/
-
+                        icon = {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                                contentDescription = stringResource(R.string.cd_schedule_icon),
+                            )
+                        },
+                    )
                 }
+                /*{
+                    // TODO: uncomment this when we have proper support for reminders
+                    TaskSchedule(
+                    model = reminder,
+                    actionText = stringResource(R.string.task_chat_reminder_action),
+                    icon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
+                            contentDescription = stringResource(R.string.cd_reminder_icon),
+                        )
+                    },
+                    onTimeChange = updatePlanTime,
+                    onDateChange = updatePlanDate,
+                    createSchedule = createPlanSchedule,
+                    cancelSchedule = cancelActiveSchedule,
+                    )
+                }*/
+
+
                 Messages(
                     messages = messages,
                     actions = chatActions,
@@ -292,9 +303,53 @@ private fun TaskChatContent(
                     )
                 }
             }
+            if (!task.isComplete) {
+                AnimatedVisibility(visible = !isEditing.value) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 45.dp, end = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            space = 10.dp,
+                            alignment = Alignment.End
+                        )
+                    ) {
+                        if (task.hasSchedule && !showSchedule) {
+                            Surface(
+                                modifier = Modifier.size(width = 42.dp, height = 30.dp),
+                                color = MaterialTheme.colorScheme.secondaryContainer,
+                                shape = RoundedCornerShape(33.dp),
+                                shadowElevation = 2.dp
+                            ) {
+                                IconButton(onClick = { showSchedule = !showSchedule }) {
+                                    Icon(
+                                        imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
+                                        contentDescription = stringResource(R.string.cd_schedule_icon),
+                                        modifier = Modifier.padding(5.dp)
+                                    )
+                                }
+                            }
+                        }
+                        Surface(
+                            modifier = Modifier.size(width = 42.dp, height = 30.dp),
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(33.dp),
+                            shadowElevation = 2.dp
+                        ) {
+                            IconButton(onClick = { showSchedule = !showSchedule }) {
+                                Icon(
+                                    imageVector = if (showSchedule) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                                    contentDescription = if (showSchedule) "Hide Schedule" else "Show Schedule"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
+
 
 @Composable
 private fun TaskChatInput(

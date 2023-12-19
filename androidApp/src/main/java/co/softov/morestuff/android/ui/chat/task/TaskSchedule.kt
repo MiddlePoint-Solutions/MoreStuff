@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -51,6 +52,7 @@ fun TaskSchedule(
     onDateChange: (Long) -> Unit,
     createSchedule: () -> Unit,
     cancelSchedule: () -> Unit,
+    icon: @Composable () -> Unit = {},
 ) {
 
     var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -59,9 +61,13 @@ fun TaskSchedule(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 5.dp),
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(start = 12.dp, top = 17.dp, bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        icon()
+
+        Spacer(modifier = Modifier.width(13.dp))
         when (val schedule = model()) {
             null -> {
                 PriorityButton(
