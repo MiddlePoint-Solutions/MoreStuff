@@ -12,7 +12,6 @@ junitJupiter = "5.10.0"
 junitPlatformCommons = "1.10.0"
 turbine = "1.0.0"
 multiplatformSettingsNoArg = "1.0.0"
-jsoup = "1.13.1"
 coilCompose = "2.5.0"
 kotlinxSerializationJson = "1.6.0"
 decompose = "2.1.4"
@@ -54,6 +53,8 @@ konfettiCompose = "2.0.2"
 aboutLibrariesVersion = "10.8.3"
 telephotoVersion = "0.5.0"
 lottie = "6.1.0"
+kSoup ="0.3.0"
+ktor = "2.3.7"
 
 [plugins]
 kotlinPlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -93,7 +94,6 @@ junitPlatformCommons = { module = "org.junit.platform:junit-platform-commons", v
 kotlinxCoroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
@@ -160,7 +160,9 @@ androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref =
 konfettiCompose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfettiCompose" }
 telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
-
+kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
+ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktorClient = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 
 [bundles]
 # AndroidX and Compose
@@ -245,7 +247,6 @@ utils = [
     "preferenceKtx",
     "settingsUiM3",
     "settingsStoragePreferences",
-    "jsoup",
     "decompose",
     "extensionsComposeJetpack",
     "parcelable",
@@ -263,6 +264,9 @@ utils = [
     "timber",
     "telephoto",
     "konfettiCompose",
+    "kSoup",
+    "ktor",
+    "ktorClient"
 ]
 
 # About Libraries
