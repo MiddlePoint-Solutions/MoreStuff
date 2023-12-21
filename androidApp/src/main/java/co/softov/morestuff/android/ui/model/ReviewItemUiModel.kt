@@ -1,5 +1,8 @@
 package co.softov.morestuff.android.ui.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class ReviewItemUiModel(
     val id: Long,
     val createTime: String,
