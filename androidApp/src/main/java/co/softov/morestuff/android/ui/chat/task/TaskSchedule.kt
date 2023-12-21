@@ -1,10 +1,12 @@
 package co.softov.morestuff.android.ui.chat.task
 
 import android.content.res.Configuration
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,9 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,14 +59,15 @@ fun TaskSchedule(
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(start = 12.dp, top = 17.dp, bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         icon()
 
         Spacer(modifier = Modifier.width(13.dp))
-
         when (val schedule = model()) {
             null -> {
                 PriorityButton(
@@ -161,6 +162,7 @@ fun TaskSchedule(
                     Icon(
                         Icons.Sharp.Close,
                         contentDescription = stringResource(R.string.cd_cancel_schedule),
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
@@ -185,12 +187,6 @@ private fun TaskSchedulePreview() {
                     localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                     displayDate = "Saturday, July 29",
                     displayTime = "15:30"
-                )
-            },
-            icon = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                    contentDescription = "",
                 )
             },
             actionText = "Schedule",

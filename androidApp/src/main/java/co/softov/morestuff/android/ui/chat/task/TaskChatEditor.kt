@@ -1,6 +1,5 @@
 package co.softov.morestuff.android.ui.chat.task
 
-import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,11 +31,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -47,11 +43,9 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.keyboardAsState
-import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable
 fun TaskChatEditor(
@@ -61,21 +55,23 @@ fun TaskChatEditor(
     modifier: Modifier = Modifier,
     toggleTaskComplete: () -> Unit = {},
     taskOptions: @Composable ColumnScope.() -> Unit = {},
+    isEditing: MutableState<Boolean>,
+    showSchedule: Boolean
+
 ) {
-    var isEditing by remember { mutableStateOf(false) }
     val isKeyboardOpen by keyboardAsState()
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(isKeyboardOpen) {
         if (!isKeyboardOpen) {
             focusManager.clearFocus()
-            isEditing = false
+            isEditing.value = false
         }
     }
 
-    BackHandler(isEditing) {
+    BackHandler(isEditing.value) {
         focusManager.clearFocus()
-        isEditing = false
+        isEditing.value = false
     }
 
     Surface(
@@ -85,9 +81,8 @@ fun TaskChatEditor(
         Box(
             modifier = Modifier
                 .animateContentSize(animationSpec = tween())
-                .padding(vertical = 7.dp)
                 .then(
-                    if (isEditing) {
+                    if (isEditing.value) {
                         Modifier
                             .fillMaxHeight(0.7f)
                     } else {
@@ -98,7 +93,7 @@ fun TaskChatEditor(
 
             val toggleModifier by rememberUpdatedState(
                 Modifier.then(
-                    if (isEditing) {
+                    if (isEditing.value) {
                         Modifier.alpha(0.5f)
                     } else {
                         Modifier
@@ -155,8 +150,9 @@ fun TaskChatEditor(
                         modifier = Modifier
                             .fillMaxWidth()
                             .onFocusChanged { focusState ->
-                                isEditing = focusState.isFocused
-                            },
+                                isEditing.value = focusState.isFocused
+                            }
+                            .padding(end = if (isEditing.value || showSchedule) 55.dp else 12.dp, bottom = 20.dp),
                         enabled = !isComplete,
                         keyboardOptions = KeyboardOptions(
                             capitalization = KeyboardCapitalization.Sentences,
@@ -166,19 +162,17 @@ fun TaskChatEditor(
                         keyboardActions = KeyboardActions {
                             focusManager.clearFocus()
                         },
-                        minLines = 2,
-                        maxLines = 4,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                        minLines = 1,
+                        maxLines = if (isEditing.value || showSchedule) 4 else 1,
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                         ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
                 AnimatedVisibility(
-                    visible = !isComplete && !isEditing,
+                    visible = !isComplete && !isEditing.value,
                     modifier = Modifier.padding(horizontal = 16.dp),
                 ) {
                     Column(content = taskOptions)
@@ -188,7 +182,8 @@ fun TaskChatEditor(
     }
 }
 
-@Preview(
+
+/*@Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
 )
@@ -202,7 +197,8 @@ fun TaskChatTopBarPreview() {
         TaskChatEditor(
             isComplete = false,
             taskTitle = { "Hello There this should be a very long text so that we can test how it looks" },
-            onTitleChange = {}
+            onTitleChange = {},
+            isEditing =
         )
     }
-}
+}*/
