@@ -55,8 +55,8 @@ import org.koin.dsl.module
 
 val dataModule = module {
 
-    single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = get()) }
-    single<PdfHandler> { PdfHandlerImpl(timeManager = get(), context = get()) }
+    single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = androidApplication()) }
+    single<PdfHandler> { PdfHandlerImpl(timeManager = get(), context = androidApplication()) }
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 

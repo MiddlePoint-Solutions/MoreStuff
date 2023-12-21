@@ -14,6 +14,4 @@ sealed class ChatScreen : Parcelable {
     @Parcelize
     data class ImagePreview(val imagePath: String, val title: String) : ChatScreen()
 
-    @Parcelize
-    data class PdfPreview(val imagePath: String, val title: String) : ChatScreen()
 }

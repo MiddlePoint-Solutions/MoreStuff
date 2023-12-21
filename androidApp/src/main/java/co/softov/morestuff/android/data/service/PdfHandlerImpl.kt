@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import co.softov.morestuff.android.domain.service.PdfHandler
@@ -18,30 +19,31 @@ import java.nio.file.Path
 
 class PdfHandlerImpl(
     private val context: Context,
-    private val timeManager: TimeManager
+    private val timeManager: TimeManager,
 ) : PdfHandler {
 
-override suspend fun savePdf(uri: String): String? = withContext(Dispatchers.IO) {
-    try {
-        val originalFileName = getOriginalFileName(uri.toUri()) ?: "PDF_Default.pdf"
-        val pdfFile = createPdfFile(originalFileName).toFile()
+    override suspend fun savePdf(uri: String): String? = withContext(Dispatchers.IO) {
+        try {
+            val originalFileName = getOriginalFileName(uri.toUri()) ?: "PDF_Default.pdf"
+            val pdfFile = createPdfFile(originalFileName).toFile()
 
-        context.contentResolver.openInputStream(uri.toUri())?.use { inputStream ->
-            FileOutputStream(pdfFile).use { outputStream ->
-                inputStream.copyTo(outputStream)
+            context.contentResolver.openInputStream(uri.toUri())?.use { inputStream ->
+                FileOutputStream(pdfFile).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
             }
+            pdfFile.absolutePath
+        } catch (e: Exception) {
+            Timber.e(e, "Error handling PDF")
+            null
         }
-        pdfFile.absolutePath
-    } catch (e: Exception) {
-        Timber.e(e, "Error handling PDF")
-        null
     }
-}
 
     private fun createPdfFile(originalFileName: String): Path {
-    val pdfFileName = if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
-    return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
-}
+        val pdfFileName =
+            if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
+        return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
+    }
 
     override fun sharePdf(pdfPath: String) {
         val packageName = context.packageName
@@ -60,6 +62,7 @@ override suspend fun savePdf(uri: String): String? = withContext(Dispatchers.IO)
 
         context.startActivity(chooserIntent)
     }
+
     private fun getOriginalFileName(uri: Uri): String? {
         var fileName: String? = null
 
@@ -77,5 +80,32 @@ override suspend fun savePdf(uri: String): String? = withContext(Dispatchers.IO)
 
         return fileName
     }
+
+    override fun openPdf(pdfPath: String) {
+        val pdfFile = if (pdfPath.startsWith("/")) {
+            File(pdfPath)
+        } else {
+            File(context.cacheDir, pdfPath)
+        }
+
+        Timber.d("openPdf - File path: ${pdfFile.absolutePath}")
+        if (pdfFile.exists()) {
+            val pdfUri: Uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                pdfFile
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = pdfUri
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            context.startActivity(intent)
+        } else {
+            Toast.makeText(context, "PDF file not found", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 }

@@ -212,4 +212,7 @@ class TaskChatViewModel(
         }
     }
 
+    fun openPdf(pdfPath: String) {
+        pdfHandler.openPdf(pdfPath)
+    }
 }

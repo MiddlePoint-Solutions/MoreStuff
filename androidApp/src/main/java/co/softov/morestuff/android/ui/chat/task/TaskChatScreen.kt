@@ -76,7 +76,6 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
-import co.softov.morestuff.android.ui.pdf.PdfScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
@@ -145,8 +144,8 @@ fun TaskChatScreen(
                     },
                     onPdfSelected = {
                         val path = it.messageData?.filePath ?: ""
-                        val title = it.content
-                        navigation.push(ChatScreen.PdfPreview(path, title))
+                        Timber.d("openPdf2 - Trying to open URI: $path")
+                        viewModel.openPdf(path)
                     },
                     shareImage = { imagePath -> shareImage(imagePath) },
                     sharePdf = { pdfPath -> sharePdf(pdfPath) },
@@ -199,14 +198,6 @@ fun TaskChatScreen(
                     onBack = navigation::pop,
                     onSendImage = shareImage,
                     title = screen.title,
-                )
-            }
-
-            is ChatScreen.PdfPreview -> {
-                PdfScreen(
-                    imagePath = screen.imagePath,
-                    onBack = navigation::pop,
-                    onSendPdf = sharePdf,
                 )
             }
         }
