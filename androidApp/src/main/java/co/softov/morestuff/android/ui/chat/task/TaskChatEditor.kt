@@ -164,7 +164,7 @@ fun TaskChatEditor(
                         },
                         minLines = 1,
                         maxLines = if (isEditing.value || showSchedule) 4 else 1,
-                        textStyle = MaterialTheme.typography.headlineMedium.copy(
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                         ),
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
