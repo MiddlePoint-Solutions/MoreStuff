@@ -33,8 +33,9 @@ fun OpenGraphView(openGraphResult: OpenGraphResult) {
         modifier = Modifier
             .scale(0.9f)
             .clip(RoundedCornerShape(10.dp))
-            .background(BackgroundOpenGraphColor())
-            .padding(7.dp)
+            .background(
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.1f)
+            ).padding(7.dp)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -53,14 +54,18 @@ fun OpenGraphView(openGraphResult: OpenGraphResult) {
 
             if (openGraphResult.image != null) {
                 Timber.d("Loading image: ${openGraphResult.image}")
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(top = 8.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .padding(top = 8.dp)
+                ) {
                     Image(
                         painter = rememberAsyncImagePainter(openGraphResult.image),
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(6.dp)),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(6.dp)),
                         contentScale = ContentScale.Crop
                     )
                 }
@@ -68,11 +73,3 @@ fun OpenGraphView(openGraphResult: OpenGraphResult) {
         }
     }
 }
-@Composable
-fun BackgroundOpenGraphColor(): Color {
-    val lightPrimary = Color(0xFF6A7BD4)
-    val darkPrimary = Color(0x66FFFFFF)
-    val isDarkTheme = isDarkTheme()
-    return if (isDarkTheme) darkPrimary else lightPrimary
-}
-

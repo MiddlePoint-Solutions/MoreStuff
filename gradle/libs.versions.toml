@@ -12,7 +12,6 @@ junitJupiter = "5.10.0"
 junitPlatformCommons = "1.10.0"
 turbine = "1.0.0"
 multiplatformSettingsNoArg = "1.0.0"
-jsoup = "1.13.1"
 coilCompose = "2.5.0"
 kotlinxSerializationJson = "1.6.0"
 decompose = "2.1.4"
@@ -95,7 +94,6 @@ junitPlatformCommons = { module = "org.junit.platform:junit-platform-commons", v
 kotlinxCoroutinesTest = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 kotlinxSerializationJson = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 kotlinSerialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
@@ -249,7 +247,6 @@ utils = [
     "preferenceKtx",
     "settingsUiM3",
     "settingsStoragePreferences",
-    "jsoup",
     "decompose",
     "extensionsComposeJetpack",
     "parcelable",
