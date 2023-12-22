@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.pdf
 
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
@@ -36,6 +37,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toFile
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.items.MessageTime
@@ -78,10 +80,10 @@ fun MessagePDF(
 
     Surface(
         shape = RoundedCornerShape(
-            topStart = 10.dp,
-            topEnd = 10.dp,
-            bottomEnd = 7.dp,
-            bottomStart = 10.dp
+            topStart = 14.dp,
+            topEnd = 14.dp,
+            bottomEnd = 5.dp,
+            bottomStart = 14.dp
         ),
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
@@ -95,8 +97,9 @@ fun MessagePDF(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            BoxWithConstraints(modifier = Modifier.weight(1f)) {
-                val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
+            BoxWithConstraints(modifier = Modifier.weight(0.8f)) {
+                val scaleFactor = 0.75f
+                val width = with(LocalDensity.current) { maxWidth.toPx() * scaleFactor }.toInt()
                 val height = (width * sqrt(2f)).toInt()
                 renderer?.let {
                     PDFPageItem(
@@ -116,8 +119,9 @@ fun MessagePDF(
                 text = pdfFileName,
                 modifier = Modifier
                     .weight(2f)
-                    .padding(8.dp),
-                textAlign = TextAlign.Start
+                    .padding(4.dp),
+                textAlign = TextAlign.Start,
+                fontSize = 12.sp
             )
             MessageTime(
                 formattedTimeOnly = message.formattedTimeOnly,
@@ -126,6 +130,7 @@ fun MessagePDF(
         }
     }
 }
+
 @Composable
 private fun getFileNameFromUri(uri: Uri): String? {
     val context = LocalContext.current
@@ -139,8 +144,7 @@ private fun getFileNameFromUri(uri: Uri): String? {
                 fileName = it.getString(nameIndex)
             }
         }
-    }
-    else if (uri.scheme.equals("file", ignoreCase = true)) {
+    } else if (uri.scheme.equals("file", ignoreCase = true)) {
         fileName = uri.lastPathSegment
     }
 
@@ -157,8 +161,10 @@ fun PDFPageItem(
     imageLoader: ImageLoader,
     scope: CoroutineScope,
     mutex: Mutex,
-
-    ) {
+    scale: Float = 0.9f,
+    offsetX: Float = 45f,
+    offsetY: Float = 10f,
+) {
     val cacheKey = MemoryCache.Key("$uri-$index-${width}x${height}")
     val cacheValue: Bitmap? = imageLoader.memoryCache?.get(cacheKey)?.bitmap
 
@@ -169,7 +175,16 @@ fun PDFPageItem(
                 val destinationBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
                 mutex.withLock {
                     renderer?.openPage(index)?.use { page ->
-                        page.render(destinationBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                        val matrix = Matrix().apply {
+                            postScale(scale, scale)
+                            postTranslate(-offsetX * scale, -offsetY * scale)
+                        }
+                        page.render(
+                            destinationBitmap,
+                            null,
+                            matrix,
+                            PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
+                        )
                     }
                 }
                 bitmap = destinationBitmap
@@ -185,8 +200,11 @@ fun PDFPageItem(
             .build()
 
         Image(
-            modifier = Modifier.background(Color.White).aspectRatio(1f / sqrt(2f)).fillMaxWidth(),
-            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .background(Color.White)
+                .aspectRatio(1f / sqrt(2f))
+                .fillMaxWidth(),
+            contentScale = ContentScale.Crop,
             painter = rememberAsyncImagePainter(request),
             contentDescription = "Page ${index + 1}"
         )
