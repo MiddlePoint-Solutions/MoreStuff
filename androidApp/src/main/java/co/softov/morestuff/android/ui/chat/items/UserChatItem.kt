@@ -47,7 +47,7 @@ import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.items.MockData.messageUiModel
 import co.softov.morestuff.android.ui.model.MessageUiModel
-import co.softov.morestuff.android.ui.pdf.MessagePdf
+import co.softov.morestuff.android.ui.pdf.MessagePDF
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.utils.appendUrlsWithStyle
 import co.softov.morestuff.android.ui.utils.urlPattern
@@ -116,7 +116,7 @@ fun MessageContent(
     when {
         message.isPdfMessage -> {
             message.messageData?.filePath?.let { filePath ->
-                MessagePdf(
+                MessagePDF(
                     pdfUri = Uri.parse(filePath),
                     actions = actions,
                     showMenu = showMenu,

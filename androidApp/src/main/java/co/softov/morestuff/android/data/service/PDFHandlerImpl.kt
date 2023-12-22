@@ -7,8 +7,7 @@ import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import co.softov.morestuff.android.domain.service.PdfHandler
-import co.softov.morestuff.android.domain.service.TimeManager
+import co.softov.morestuff.android.domain.service.PDFHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -17,15 +16,14 @@ import java.io.FileOutputStream
 import java.nio.file.Path
 
 
-class PdfHandlerImpl(
+class PDFHandlerImpl(
     private val context: Context,
-    private val timeManager: TimeManager,
-) : PdfHandler {
+) : PDFHandler {
 
-    override suspend fun savePdf(uri: String): String? = withContext(Dispatchers.IO) {
+    override suspend fun savePDF(uri: String): String? = withContext(Dispatchers.IO) {
         try {
             val originalFileName = getOriginalFileName(uri.toUri()) ?: "PDF_Default.pdf"
-            val pdfFile = createPdfFile(originalFileName).toFile()
+            val pdfFile = createPDFFile(originalFileName).toFile()
 
             context.contentResolver.openInputStream(uri.toUri())?.use { inputStream ->
                 FileOutputStream(pdfFile).use { outputStream ->
@@ -39,13 +37,13 @@ class PdfHandlerImpl(
         }
     }
 
-    private fun createPdfFile(originalFileName: String): Path {
+    private fun createPDFFile(originalFileName: String): Path {
         val pdfFileName =
             if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
         return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
     }
 
-    override fun sharePdf(pdfPath: String) {
+    override fun sharePDF(pdfPath: String) {
         val packageName = context.packageName
         val file = File(pdfPath)
         val contentUri = FileProvider.getUriForFile(context, "$packageName.fileprovider", file)
@@ -81,7 +79,7 @@ class PdfHandlerImpl(
         return fileName
     }
 
-    override fun openPdf(pdfPath: String) {
+    override fun openPDF(pdfPath: String) {
         val pdfFile = if (pdfPath.startsWith("/")) {
             File(pdfPath)
         } else {

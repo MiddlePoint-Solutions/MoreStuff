@@ -144,7 +144,6 @@ fun TaskChatScreen(
                     },
                     onPdfSelected = {
                         val path = it.messageData?.filePath ?: ""
-                        Timber.d("openPdf2 - Trying to open URI: $path")
                         viewModel.openPdf(path)
                     },
                     shareImage = { imagePath -> shareImage(imagePath) },

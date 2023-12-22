@@ -9,7 +9,7 @@ import co.softov.morestuff.android.domain.model.MessageData
 import co.softov.morestuff.android.domain.model.SavePdfFailure
 import co.softov.morestuff.android.domain.service.TimeManager
 
-interface CreatePdfMessageUseCase {
+interface CreatePDFMessageUseCase {
     suspend operator fun invoke(
         taskId: Long,
         scheduleId: Long = 0,
@@ -18,11 +18,11 @@ interface CreatePdfMessageUseCase {
         message: String,
     ): Either<Failure, Message>
 }
-class CreatePdfMessageUseCaseImpl(
-    private val saveUserPdfUseCase: SaveUserPdfUseCase,
+class CreatePDFMessageUseCaseImpl(
+    private val saveUserPdfUseCase: SaveUserPDFUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
     private val timeManager: TimeManager,
-) : CreatePdfMessageUseCase {
+) : CreatePDFMessageUseCase {
 
     override suspend fun invoke(
         taskId: Long,
@@ -33,13 +33,13 @@ class CreatePdfMessageUseCaseImpl(
     ): Either<Failure, Message> {
 
         return when (val pdfResult = saveUserPdfUseCase(filePath)) {
-            is Either.Left -> Either.Left(SavePdfFailure(pdfResult.value))
+            is Either.Left -> Either.Left(SavePdfFailure(pdfResult.toString()))
             is Either.Right -> {
                 val pdfPath = pdfResult.value
                 val creationTime = timeManager.getCreateTime()
                 val messageData = MessageData(taskId, pdfPath, creationTime, MessageDataType.Pdf)
 
-                createMessageUseCase.invoke(taskId, message, contentType, messageData, scheduleId)
+                createMessageUseCase(taskId, message, contentType, messageData, scheduleId)
             }
         }
     }

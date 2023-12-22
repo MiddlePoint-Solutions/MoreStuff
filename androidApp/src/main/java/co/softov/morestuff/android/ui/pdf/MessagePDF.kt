@@ -1,13 +1,18 @@
 package co.softov.morestuff.android.ui.pdf
 
+import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,13 +20,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
@@ -30,17 +40,23 @@ import androidx.core.net.toFile
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.items.MessageTime
 import co.softov.morestuff.android.ui.model.MessageUiModel
+import coil.ImageLoader
+import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
+import coil.memory.MemoryCache
+import coil.request.ImageRequest
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.File
 import kotlin.math.sqrt
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessagePdf(
+fun MessagePDF(
     pdfUri: Uri,
     actions: ChatActions,
     message: MessageUiModel,
@@ -83,7 +99,7 @@ fun MessagePdf(
                 val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
                 val height = (width * sqrt(2f)).toInt()
                 renderer?.let {
-                    PdfPageItem(
+                    PDFPageItem(
                         index = 0,
                         uri = fileUri,
                         renderer = it,
@@ -131,6 +147,50 @@ private fun getFileNameFromUri(uri: Uri): String? {
     return fileName
 }
 
+@Composable
+fun PDFPageItem(
+    index: Int,
+    uri: Uri,
+    renderer: PdfRenderer?,
+    width: Int,
+    height: Int,
+    imageLoader: ImageLoader,
+    scope: CoroutineScope,
+    mutex: Mutex,
 
+    ) {
+    val cacheKey = MemoryCache.Key("$uri-$index-${width}x${height}")
+    val cacheValue: Bitmap? = imageLoader.memoryCache?.get(cacheKey)?.bitmap
+
+    var bitmap by remember { mutableStateOf(cacheValue) }
+    if (bitmap == null) {
+        DisposableEffect(uri, index) {
+            val job = scope.launch(Dispatchers.IO) {
+                val destinationBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                mutex.withLock {
+                    renderer?.openPage(index)?.use { page ->
+                        page.render(destinationBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+                    }
+                }
+                bitmap = destinationBitmap
+            }
+            onDispose { job.cancel() }
+        }
+        Box(modifier = Modifier.background(Color.White).aspectRatio(1f / sqrt(2f)).fillMaxWidth())
+    } else {
+        val request = ImageRequest.Builder(LocalContext.current)
+            .size(width, height)
+            .memoryCacheKey(cacheKey)
+            .data(bitmap)
+            .build()
+
+        Image(
+            modifier = Modifier.background(Color.White).aspectRatio(1f / sqrt(2f)).fillMaxWidth(),
+            contentScale = ContentScale.Fit,
+            painter = rememberAsyncImagePainter(request),
+            contentDescription = "Page ${index + 1}"
+        )
+    }
+}
 
 
