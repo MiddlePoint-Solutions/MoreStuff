@@ -5,6 +5,7 @@ import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.HintTaskProviderImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.OpenGraphFetcherImpl
+import co.softov.morestuff.android.data.service.PDFHandlerImpl
 import co.softov.morestuff.android.data.service.ShareTaskMessageImpl
 import co.softov.morestuff.android.data.service.TimeManagerImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
@@ -24,6 +25,7 @@ import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.OpenGraphFetcher
+import co.softov.morestuff.android.domain.service.PDFHandler
 import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
@@ -37,6 +39,8 @@ import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseC
 import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.CreatePDFMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreatePDFMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
@@ -57,6 +61,8 @@ import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUse
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCase
 import co.softov.morestuff.android.domain.usecase.message.SaveUserImageUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.message.SaveUserPDFUseCase
+import co.softov.morestuff.android.domain.usecase.message.SaveUserPDFUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
@@ -202,6 +208,7 @@ val serviceModule = module {
 val featuresModule = module {
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     factoryOf(::ImageHandlerImpl) bind ImageHandler::class
+    factoryOf(::PDFHandlerImpl) bind PDFHandler::class
     factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
     factoryOf(::ShareTaskMessageImpl) bind ShareTaskMessage::class
 }
@@ -318,9 +325,11 @@ val messageUseCases = module {
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
     factoryOf(::SaveUserImageUseCaseImpl) bind SaveUserImageUseCase::class
+    factoryOf(::SaveUserPDFUseCaseImpl) bind SaveUserPDFUseCase::class
     factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
     factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
+    factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
     factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
 }
 

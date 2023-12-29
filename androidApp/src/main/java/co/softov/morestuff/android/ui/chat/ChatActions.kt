@@ -10,6 +10,8 @@ data class ChatActions(
     val copyMessage: (MessageUiModel) -> Unit = {},
     val deleteMessage: (MessageUiModel) -> Unit = {},
     val onImageSelected: (MessageUiModel) -> Unit = {},
+    val onPdfSelected: (MessageUiModel) -> Unit = {},
     val shareImage: (imagePath: String) -> Unit = {},
+    val sharePdf: (pdfPath: String) -> Unit = {},
     val shareMessage: (MessageUiModel) -> Unit = {},
 )

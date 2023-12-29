@@ -55,12 +55,15 @@ private fun getContextMenuItems(
     }
 
     return if (message.messageData?.filePath != null) {
+        val shareAction = if (message.isPdfMessage) {
+            { actions.sharePdf(message.messageData.filePath); close() }
+        } else {
+            { actions.shareImage(message.messageData.filePath); close() }
+        }
+
         listOf(
             ContextMenuItem(stringResource(R.string.delete), Icons.Default.Delete, deleteAction),
-            ContextMenuItem(stringResource(R.string.share), Icons.Default.Share) {
-                actions.shareImage(message.messageData.filePath)
-                close()
-            },
+            ContextMenuItem(stringResource(R.string.share), Icons.Default.Share, shareAction)
         )
     } else {
         listOf(
