@@ -12,6 +12,7 @@ import co.softov.morestuff.android.domain.redux.store.Action
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.message.CreateImageMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
+import co.softov.morestuff.android.domain.usecase.message.CreatePDFMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateScheduleMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import co.softov.morestuff.android.domain.usecase.message.DeleteMessageUseCase
@@ -30,6 +31,12 @@ sealed class MessageAction : Action.FeatureAction() {
         val message: String
     ) : MessageAction()
 
+    internal data class CreatePDFMessageAction(
+        val taskId: Long,
+        val filePath: String,
+        val message: String
+    ) : MessageAction()
+
     data class DeleteMessageAction(val messageId: Long) : MessageAction()
 }
 
@@ -39,6 +46,7 @@ class MessageMiddleware(
     private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
     private val createImageMessageUseCase: CreateImageMessageUseCase,
+    private val createPDFMessageUseCase: CreatePDFMessageUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
 ) : Middleware<AppState> {
 
@@ -77,6 +85,16 @@ class MessageMiddleware(
                     contentType = ContentType.TASK_MESSAGE,
                     filePath = action.filePath,
                     action.message
+                )
+            }
+
+            is MessageAction.CreatePDFMessageAction -> scope.launch {
+                createPDFMessageUseCase(
+                    taskId = action.taskId,
+                    scheduleId = 0,
+                    contentType = ContentType.TASK_MESSAGE,
+                    filePath = action.filePath,
+                    message = action.message
                 )
             }
 

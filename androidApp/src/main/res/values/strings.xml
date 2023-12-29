@@ -143,6 +143,10 @@
     <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
+    <string name="select_image">Select Image</string>
+    <string name="select_pdf">Select PDF</string>
+
+
     <string name="sure_delete_scope">Are you sure you want to delete\nthe following scope?</string>
     <string name="create_new_scope">Create new Scope</string>
     <string name="confirm">Confirm</string>

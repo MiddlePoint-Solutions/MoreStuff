@@ -9,4 +9,7 @@ sealed class Shareable : Parcelable {
 
     @Parcelize
     data class Image(val uris: String, val message: String) : Shareable()
+
+    @Parcelize
+    data class Pdf(val uris: String,val message: String) : Shareable()
 }

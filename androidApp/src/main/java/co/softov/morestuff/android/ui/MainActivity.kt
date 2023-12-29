@@ -111,15 +111,24 @@ class MainActivity : ComponentActivity() {
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 Timber.d("intent.type: ${intent.type}")
-                if ("text/plain" == intent.type) {
-                    intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-                        Screen.Share(Shareable.Text(it), it)
+                when {
+                    "text/plain" == intent.type -> {
+                        intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
+                            Screen.Share(Shareable.Text(it), it)
+                        }
                     }
-                } else if (intent.type?.startsWith("image/") == true) {
-                    intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-                        Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
+                    intent.type?.startsWith("image/") == true -> {
+                        intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+                            Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
+                        }
                     }
-                } else null
+                    "application/pdf" == intent.type -> {
+                        intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+                            Screen.Share(Shareable.Pdf(it.toString(),""), it.toString())
+                        }
+                    }
+                    else -> null
+                }
             }
 
             ACTION_NOTIFICATION_REMINDER -> {
@@ -132,6 +141,7 @@ class MainActivity : ComponentActivity() {
 
             else -> null
         }
+
 
 
     @SuppressLint("BatteryLife")

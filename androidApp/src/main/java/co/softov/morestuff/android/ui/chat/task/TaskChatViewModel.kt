@@ -19,6 +19,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
+import co.softov.morestuff.android.domain.service.PDFHandler
 import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
@@ -43,6 +44,7 @@ class TaskChatViewModel(
     private val taskId: Long,
     private val clipboardHelper: ClipboardHelper,
     private val imageHandler: ImageHandler,
+    private val pdfHandler: PDFHandler,
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     private val shareTaskMessage: ShareTaskMessage,
@@ -129,6 +131,10 @@ class TaskChatViewModel(
         dispatchAppStoreAction(MessageAction.CreateImageMessageAction(taskId, uris, message))
     }
 
+    fun sendPdfMessageForTask(uris: String, message: String) {
+        dispatchAppStoreAction(MessageAction.CreatePDFMessageAction(taskId, uris, message))
+    }
+
     fun createOneTimeSchedule() {
         createScheduleModel().run {
             dispatchAppStoreAction(
@@ -171,6 +177,9 @@ class TaskChatViewModel(
     fun shareImage(imagePath: String) {
         imageHandler.shareImage(imagePath)
     }
+    fun sharePdf(pdfPath: String) {
+        pdfHandler.sharePDF(pdfPath)
+    }
 
     private fun createModelForSchedule(scheduleDomain: ScheduleDomain?) =
         scheduleDomain?.scheduleLocalTime?.let {
@@ -203,4 +212,7 @@ class TaskChatViewModel(
         }
     }
 
+    fun openPdf(pdfPath: String) {
+        pdfHandler.openPDF(pdfPath)
+    }
 }
