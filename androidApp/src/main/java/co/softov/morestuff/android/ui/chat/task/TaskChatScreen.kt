@@ -30,7 +30,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +41,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -99,20 +99,20 @@ fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-) {
-
-    val navigation = remember { StackNavigation<ChatScreen>() }
-    val viewModel: TaskChatViewModel = koinViewModel(
+    viewModel: TaskChatViewModel = koinViewModel(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
+) {
+
+    val navigation = remember { StackNavigation<ChatScreen>() }
+
     val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
         viewModel.shareImage(imagePath)
     }
     val sharePdf by rememberUpdatedState<(String) -> Unit> { pdfPath ->
         viewModel.sharePdf(pdfPath)
     }
-
 
     ChildStack(
         source = navigation,
@@ -125,8 +125,8 @@ fun TaskChatScreen(
         when (screen) {
             is ChatScreen.TaskChat -> {
 
-                val task by viewModel.task.collectAsStateWithLifecycle()
-                val messages by viewModel.messages.collectAsStateWithLifecycle()
+                val task by viewModel.task.collectAsState()
+                val messages by viewModel.messages.collectAsState()
                 val formattedCompleteTime = viewModel.formatCompleteTime(task.completeTime)
 
                 val chatActions = ChatActions(
@@ -153,31 +153,17 @@ fun TaskChatScreen(
 
                 TaskChatContent(
                     task = task,
-                    taskTitle = { viewModel.taskTitle },
-                    schedule = { viewModel.scheduleModel },
-                    reminder = { viewModel.reminderModel },
                     messages = messages,
                     chatActions = chatActions,
                     modifier = modifier,
                     onBack = onBack,
                     sendTaskMessage = viewModel::sendTaskChatMessage,
-                    updateTaskTitle = viewModel::updateTaskTitle,
-                    toggleTaskComplete = viewModel::toggleTaskComplete,
-                    updatePlanTime = viewModel::updatePlanTime,
-                    updatePlanDate = viewModel::updatePlanDate,
-                    createPlanSchedule = viewModel::createOneTimeSchedule,
-                    cancelActiveSchedule = viewModel::cancelActiveSchedule,
-                    imagePicked = {
-                        navigation.push(ChatScreen.ImageImport(it.toString()))
-                    },
+                    imagePicked = { navigation.push(ChatScreen.ImageImport(it.toString())) },
                     pdfPicked = { uri ->
                         viewModel.sendPdfMessageForTask(uri.toString(), message = "")
                     },
                     completeTaskMessage = stringResource(R.string.snack_task_completed) + " " + formattedCompleteTime
-
                 )
-
-
             }
 
             is ChatScreen.ImageImport -> {
@@ -206,27 +192,17 @@ fun TaskChatScreen(
 @Composable
 private fun TaskChatContent(
     task: TaskDomain,
-    taskTitle: () -> String,
     chatActions: ChatActions,
     modifier: Modifier = Modifier,
     messages: List<MessageUiModel> = listOf(),
     onBack: () -> Unit = {},
-    schedule: () -> ScheduleUiModel? = { null },
-    reminder: () -> ScheduleUiModel? = { null },
     sendTaskMessage: (String) -> Unit = {},
-    updateTaskTitle: (String) -> Unit = {},
-    toggleTaskComplete: () -> Unit = {},
-    updatePlanTime: (Int, Int) -> Unit = { _, _ -> },
-    updatePlanDate: (Long) -> Unit = {},
-    createPlanSchedule: () -> Unit = {},
-    cancelActiveSchedule: () -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
     pdfPicked: (Uri) -> Unit = {},
     completeTaskMessage: String,
 ) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
-    var showSchedule by remember { mutableStateOf(false) }
     val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
             imagePicked(uri)
@@ -234,8 +210,6 @@ private fun TaskChatContent(
             Timber.d("Image picker uri is NULL!")
         }
     }
-    val isEditing = remember { mutableStateOf(false) }
-
 
     val pickPdf = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
@@ -263,50 +237,7 @@ private fun TaskChatContent(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                TaskChatEditor(
-                    isComplete = task.isComplete,
-                    taskTitle = taskTitle,
-                    onTitleChange = updateTaskTitle,
-                    toggleTaskComplete = toggleTaskComplete,
-                    isEditing = isEditing,
-                    showSchedule = showSchedule
-                )
-                AnimatedVisibility(visible = showSchedule) {
-                    TaskSchedule(
-                        model = schedule,
-                        actionText = stringResource(id = R.string.task_chat_schedule_action),
-                        onTimeChange = updatePlanTime,
-                        onDateChange = updatePlanDate,
-                        createSchedule = createPlanSchedule,
-                        cancelSchedule = cancelActiveSchedule,
-                        icon = {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                                contentDescription = stringResource(R.string.cd_schedule_icon),
-                                tint = MaterialTheme.colorScheme.secondary
-
-                            )
-                        },
-                    )
-                }
-                /*{
-                    // TODO: uncomment this when we have proper support for reminders
-                    TaskSchedule(
-                    model = reminder,
-                    actionText = stringResource(R.string.task_chat_reminder_action),
-                    icon = {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
-                            contentDescription = stringResource(R.string.cd_reminder_icon),
-                        )
-                    },
-                    onTimeChange = updatePlanTime,
-                    onDateChange = updatePlanDate,
-                    createSchedule = createPlanSchedule,
-                    cancelSchedule = cancelActiveSchedule,
-                    )
-                }*/
-
+                TaskDetails(taskId = task.id)
 
                 Messages(
                     messages = messages,
@@ -361,49 +292,6 @@ private fun TaskChatContent(
                             .fillMaxWidth()
                             .background(Color.Transparent),
                     )
-                }
-            }
-            if (!task.isComplete) {
-                AnimatedVisibility(visible = !isEditing.value) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 45.dp, end = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            space = 10.dp,
-                            alignment = Alignment.End
-                        )
-                    ) {
-                        if (task.hasSchedule && !showSchedule) {
-                            Surface(
-                                modifier = Modifier.size(width = 35.dp, height = 35.dp),
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                shape = CircleShape,
-                                shadowElevation = 2.dp
-                            ) {
-                                IconButton(onClick = { showSchedule = !showSchedule }) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                                        contentDescription = stringResource(R.string.cd_schedule_icon),
-                                        modifier = Modifier.padding(5.dp)
-                                    )
-                                }
-                            }
-                        }
-                        Surface(
-                            modifier = Modifier.size(width = 35.dp, height = 35.dp),
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            shape = CircleShape,
-                            shadowElevation = 2.dp
-                        ) {
-                            IconButton(onClick = { showSchedule = !showSchedule }) {
-                                Icon(
-                                    imageVector = if (showSchedule) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                    contentDescription = if (showSchedule) "Hide Schedule" else "Show Schedule"
-                                )
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -542,14 +430,6 @@ fun TaskChatPreview() {
     MoreStuffTheme {
         TaskChatContent(
             task = TaskDomain(),
-            taskTitle = { "This is TaskChat!" },
-            schedule = {
-                ScheduleUiModel(
-                    localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                    displayDate = "Saturday, July 29",
-                    displayTime = "15:30"
-                )
-            },
             chatActions = ChatActions(),
             completeTaskMessage = ""
         )

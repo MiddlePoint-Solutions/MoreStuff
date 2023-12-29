@@ -46,7 +46,7 @@ import kotlinx.datetime.toLocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskSchedule(
-    model: () -> ScheduleUiModel?,
+    model: ScheduleUiModel?,
     actionText: String,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
@@ -68,7 +68,7 @@ fun TaskSchedule(
         icon()
 
         Spacer(modifier = Modifier.width(13.dp))
-        when (val schedule = model()) {
+        when (model) {
             null -> {
                 PriorityButton(
                     onClick = createSchedule,
@@ -80,7 +80,7 @@ fun TaskSchedule(
             else -> {
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
-                        initialSelectedDateMillis = schedule.epochMs
+                        initialSelectedDateMillis = model.epochMs
                     )
 
                     PriorityDatePicker(
@@ -97,8 +97,8 @@ fun TaskSchedule(
 
                 if (showTimePickerDialog) {
                     val timePickerState = rememberTimePickerState(
-                        initialHour = schedule.hour,
-                        initialMinute = schedule.minute
+                        initialHour = model.hour,
+                        initialMinute = model.minute
                     )
                     PriorityTimePicker(
                         dismissTimePicker = { showTimePickerDialog = false },
@@ -122,7 +122,7 @@ fun TaskSchedule(
                     )
                 ) {
                     Text(
-                        text = schedule.displayDate,
+                        text = model.displayDate,
                         style = TextStyle(
                             fontSize = 14.sp,
                             lineHeight = 28.sp,
@@ -143,7 +143,7 @@ fun TaskSchedule(
                     )
                 ) {
                     Text(
-                        text = schedule.displayTime,
+                        text = model.displayTime,
                         style = TextStyle(
                             fontSize = 14.sp,
                             lineHeight = 28.sp,
@@ -182,13 +182,11 @@ fun TaskSchedule(
 private fun TaskSchedulePreview() {
     MoreStuffTheme {
         TaskSchedule(
-            model = {
-                ScheduleUiModel(
-                    localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
-                    displayDate = "Saturday, July 29",
-                    displayTime = "15:30"
-                )
-            },
+            model = ScheduleUiModel(
+                localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+                displayDate = "Saturday, July 29",
+                displayTime = "15:30"
+            ),
             actionText = "Schedule",
             onDateChange = {},
             onTimeChange = { _, _ -> },

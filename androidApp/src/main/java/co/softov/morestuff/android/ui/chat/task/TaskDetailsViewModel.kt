@@ -40,97 +40,110 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import timber.log.Timber
 
-class TaskChatViewModel(
+class TaskDetailsViewModel(
     private val taskId: Long,
-    private val clipboardHelper: ClipboardHelper,
-    private val imageHandler: ImageHandler,
-    private val pdfHandler: PDFHandler,
+    private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
-    private val shareTaskMessage: ShareTaskMessage,
-    private val messageUiMapper: MessageUiMapper,
-    getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase,
-    getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase,
     getTaskFlow: GetTaskFlowUseCase,
-    devTools: DevTools,
 ) : NoStateViewModel() {
 
     init {
-        Timber.d("TaskChatViewModel: $taskId")
+        Timber.d("TaskDetailsViewModel: $taskId")
+        viewModelScope.launch {
+            taskTitle = getTaskFlow(taskId = taskId).first().title
+        }
     }
 
     val task: StateFlow<TaskDomain> = getTaskFlow(taskId)
+        .onEach { task ->
+            scheduleModel = createModelForSchedule(task.schedule.firstOrNull { it.isOneTime() })
+            reminderModel = createModelForSchedule(task.schedule.firstOrNull { it.isReminder() })
+            taskTitle = task.title
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
             initialValue = TaskDomain()
         )
 
-    val messages: StateFlow<List<MessageUiModel>> = flow {
-        while (true) {
-            val messages = if (devTools.showDebugMessages) {
-                getTaskMessagesFlowUseCase(taskId = taskId).first()
-            } else {
-                getTaskChatMessagesUseCase(taskId = taskId).first()
-            }
+    var scheduleModel by mutableStateOf<ScheduleUiModel?>(null)
+        private set
 
-            val formattedMessages = messageUiMapper.map(messages)
+    var reminderModel by mutableStateOf<ScheduleUiModel?>(null)
+        private set
 
-            emit(formattedMessages)
-        }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = listOf()
-    )
+    var taskTitle by mutableStateOf("")
+        private set
 
     fun scheduleResponse(scheduleId: Long, replyType: ReplyType) {
         dispatchAppStoreAction(UserResponseAction(scheduleId, replyType))
     }
 
-    fun sendTaskChatMessage(content: String) {
-        dispatchAppStoreAction(MessageAction.CreateUserTaskMessageAction(taskId, content))
+    fun updateTaskTitle(title: String) {
+        taskTitle = title
+        if (title.isNotEmpty()) {
+            dispatchAppStoreAction(TaskAction.UpdateTaskTitleAction(taskId, title))
+        }
     }
 
-    fun sendImageMessageForTask(uris: String, message: String) {
-        dispatchAppStoreAction(MessageAction.CreateImageMessageAction(taskId, uris, message))
+    fun toggleTaskComplete() {
+        dispatchAppStoreAction(
+            TaskAction.CompleteTasksAction(
+                taskIds = listOf(taskId),
+                !task.value.isComplete
+            )
+        )
     }
 
-    fun sendPdfMessageForTask(uris: String, message: String) {
-        dispatchAppStoreAction(MessageAction.CreatePDFMessageAction(taskId, uris, message))
+    fun createOneTimeSchedule() {
+        createScheduleModel().run {
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, localDateTime)
+            )
+        }
     }
 
-    fun copyToClipboard(text: String) {
-        clipboardHelper.copyToClipboard(text)
+    fun updatePlanTime(hour: Int, minute: Int) {
+        scheduleModel?.let {
+            val updatedPlanTime = timeManager.localDateTime(it.localDateTime, hour, minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
     }
 
-    fun deleteMessage(messageId: Long) {
-        dispatchAppStoreAction(MessageAction.DeleteMessageAction(messageId))
+    fun updatePlanDate(dateMillis: Long) {
+        scheduleModel?.let {
+            val updatedPlanTime =
+                timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
+            dispatchAppStoreAction(
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
+            )
+        }
     }
 
-    fun shareImage(imagePath: String) {
-        imageHandler.shareImage(imagePath)
-    }
-    fun sharePdf(pdfPath: String) {
-        pdfHandler.sharePDF(pdfPath)
+    fun cancelActiveSchedule() {
+        dispatchAppStoreAction(ScheduleAction.CancelActiveScheduleAction(taskId))
     }
 
-    fun shareMessage(message: MessageUiModel) {
-        shareTaskMessage.shareMessage(message)
-    }
+    private fun createModelForSchedule(scheduleDomain: ScheduleDomain?) =
+        scheduleDomain?.scheduleLocalTime?.let {
+            val localTime = scheduleDomain.scheduleLocalTime.toLocalDateTime()
+            createScheduleModel(localTime)
+        }
+
+
+    private fun createScheduleModel(
+        time: LocalDateTime = timeManager.getDefaultPlanTime(),
+    ) = ScheduleUiModel(
+        localDateTime = time,
+        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
+    )
 
     override fun onCleared() {
         super.onCleared()
         Timber.d("onCleared")
     }
-    fun formatCompleteTime(timeString: String?): String {
-        return if (timeString != null) {
-            timeFormatter.formatToDateTime(timeString) ?: "Format Error"
-        } else {
-            ""
-        }
-    }
 
-    fun openPdf(pdfPath: String) {
-        pdfHandler.openPDF(pdfPath)
-    }
 }
