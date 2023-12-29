@@ -9,6 +9,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.PopupProperties
@@ -24,15 +25,13 @@ fun ShowContextMenu(
     actions: ChatActions,
     close: () -> Unit,
 ) {
-    val contextMenuItems =
-        getContextMenuItems(message, actions, close)
-
     DropdownMenu(
         expanded = showMenu,
         onDismissRequest = close,
         modifier = modifier,
-        properties = PopupProperties(focusable = false)
     ) {
+        val contextMenuItems = getContextMenuItems(message, actions, close)
+
         contextMenuItems.forEach { item ->
             DropdownMenuItem(
                 text = { Text(text = item.label) },
@@ -56,9 +55,15 @@ private fun getContextMenuItems(
 
     return if (message.messageData?.filePath != null) {
         val shareAction = if (message.isPdfMessage) {
-            { actions.sharePdf(message.messageData.filePath); close() }
+            {
+                actions.sharePdf(message.messageData.filePath)
+                close()
+            }
         } else {
-            { actions.shareImage(message.messageData.filePath); close() }
+            {
+                actions.shareImage(message.messageData.filePath)
+                close()
+            }
         }
 
         listOf(

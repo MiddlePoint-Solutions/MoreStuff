@@ -62,7 +62,7 @@ fun MessagePDF(
     pdfUri: Uri,
     actions: ChatActions,
     message: MessageUiModel,
-    showMenu: MutableState<Boolean>,
+    showMenu: () -> Unit,
 ) {
     val imageLoader = LocalContext.current.imageLoader
     val rendererScope = rememberCoroutineScope()
@@ -90,7 +90,7 @@ fun MessagePDF(
             .padding(2.dp)
             .combinedClickable(
                 onClick = { actions.onPdfSelected(message) },
-                onLongClick = { showMenu.value = true }
+                onLongClick = showMenu
             )
     ) {
         Row(

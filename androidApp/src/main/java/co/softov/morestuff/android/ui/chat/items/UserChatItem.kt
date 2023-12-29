@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -63,7 +64,7 @@ fun UserChatItem(
     message: MessageUiModel,
     actions: ChatActions,
 ) {
-    val showMenu = remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
     val isNewUserTask by remember {
         derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
     }
@@ -79,19 +80,18 @@ fun UserChatItem(
             Box(
                 modifier = Modifier
                     .padding(end = 5.dp, bottom = 4.dp)
-                    .clickable { showMenu.value = true }
+                    .clickable { showMenu = true }
             ) {
                 MessageContent(
                     message = message,
                     actions = actions,
-                    showMenu = showMenu,
+                    showMenu = { showMenu = true },
                 )
-
                 ShowContextMenu(
                     message,
-                    showMenu = showMenu.value,
+                    showMenu = showMenu,
                     actions = actions,
-                    close = { showMenu.value = false },
+                    close = { showMenu = false },
                 )
             }
         }
@@ -111,7 +111,7 @@ fun UserChatItem(
 fun MessageContent(
     message: MessageUiModel,
     actions: ChatActions,
-    showMenu: MutableState<Boolean>,
+    showMenu: () -> Unit,
 ) {
     when {
         message.isPdfMessage -> {
@@ -132,7 +132,6 @@ fun MessageContent(
                 showMenu = showMenu,
             )
         }
-
 
         else -> {
             Surface(
@@ -183,7 +182,7 @@ private fun OpenGraphContent(message: MessageUiModel) {
 fun MessageImage(
     message: MessageUiModel,
     actions: ChatActions,
-    showMenu: MutableState<Boolean>,
+    showMenu: () -> Unit,
 ) {
     Surface(
         shape = RoundedCornerShape(
@@ -218,7 +217,7 @@ fun MessageImage(
                     .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
                     .combinedClickable(
                         onClick = { actions.onImageSelected(message) },
-                        onLongClick = { showMenu.value = true }
+                        onLongClick = showMenu
                     )
                     .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
                     .clip(RoundedCornerShape(8.dp)),
@@ -252,7 +251,7 @@ fun MessageImage(
 @Composable
 fun MessageText(
     message: MessageUiModel,
-    showMenu: MutableState<Boolean>,
+    showMenu: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val (content, url) = handleUrlText(message.content)
@@ -267,7 +266,7 @@ fun MessageText(
                         onClick = {
                             scope.launch { uriHandler.openUri(it) }
                         },
-                        onLongClick = { showMenu.value = true }
+                        onLongClick = showMenu
                     )
                 } ?: this
             },
