@@ -29,7 +29,7 @@ fun ScopeTabs(
     containerColor: Color,
 ) {
     val selectedTabColor = MaterialTheme.colorScheme.primary
-    val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+    val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
 
     CustomScrollableTabRow(
         selectedTabIndex = currentPage,
