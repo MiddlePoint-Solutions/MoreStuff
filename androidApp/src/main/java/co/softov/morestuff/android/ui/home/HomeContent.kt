@@ -46,10 +46,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -74,6 +76,7 @@ import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
@@ -86,12 +89,16 @@ import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -194,20 +201,18 @@ fun HomeContent(
     val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
     val navigation = LocalAppNavigation.current
-    var taskOptions by remember { mutableLongStateOf(0) }
     var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
 
     val model by viewModel.uiModel.collectAsState()
     val scopes by viewModel.scopes.collectAsState()
     val selectedTasks by viewModel.selectedTasks.collectAsState()
 
+    val states by rememberUpdatedState(newValue = scopes.map { rememberLazyListState() })
     val pagerState = rememberPagerState(pageCount = { scopes.size })
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { pagerState.currentPage }
-            .collect {
-                viewModel.selectScope(scopes[it].id)
-            }
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.selectScope(scopes[pagerState.currentPage].id)
+        states[pagerState.currentPage].scrollToItem(0)
     }
 
     BackHandler(selectedTasks.isNotEmpty()) {
@@ -234,41 +239,9 @@ fun HomeContent(
         }
     }
 
-    if (taskOptions > 0) {
-        val sheetState = rememberModalBottomSheetState()
-        val dismissDialog = { taskOptions = 0 }
-        TaskOptionsDialog(
-            sheetState = sheetState,
-            dismissDialog = dismissDialog,
-            completeTask = {
-                showTaskCompleteAnimation = taskOptions
-                coroutineScope.launch {
-                    viewModel.completeTask(taskOptions)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToTop = {
-                coroutineScope.launch {
-                    viewModel.moveToTop(taskOptions)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            },
-            moveToBottom = {
-                coroutineScope.launch {
-                    viewModel.moveToBottom(taskOptions)
-                    sheetState.hide()
-                    dismissDialog()
-                }
-            }
-        )
-    }
-
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-
         Column {
             Row(
                 modifier = Modifier
@@ -290,7 +263,8 @@ fun HomeContent(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                beyondBoundsPageCount = 1
+                beyondBoundsPageCount = 1,
+                key = { scopes[it].id }
             ) {
 
                 val scopeViewModel = koinViewModel<ScopeViewModel>(
@@ -303,7 +277,6 @@ fun HomeContent(
                     }
                 )
 
-                val priorityScrollState = rememberLazyListState()
                 val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
 
                 val showEmptyState by remember(scopeTasks.size) {
@@ -337,49 +310,48 @@ fun HomeContent(
                             }
                         },
                         onItemLongClick = viewModel::toggleTaskSelection,
-                        showTaskOptions = { taskId -> taskOptions = taskId },
-                        toggleQuickReminder = viewModel::toggleQuickReminder,
-                        listState = priorityScrollState,
-                        taskSelectionActive = selectedTasks::isNotEmpty,
+                        listState = states[it],
                         modifier = Modifier.padding(bottom = 20.dp),
                     )
                 }
-
-                if (showTaskInput) {
-                    val taskInputBottomSheetState =
-                        rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-                    val chatContext = remember { ChatContext.Main(model.selectedScopeId) }
-
-                    BackHandler(onBack = {
-                        coroutineScope.launch {
-                            taskInputBottomSheetState.hide()
-                        }
-                    })
-
-                    TaskInputBottomSheet(
-                        onDismissRequest = { showTaskInput = false },
-                        sheetState = taskInputBottomSheetState,
-                        context = chatContext,
-                        onNewTaskCreated = { _, priority ->
-                            coroutineScope.launch {
-                                delay(300)
-                                when (priority) {
-                                    PriorityUiModel.Later -> {
-                                        priorityScrollState.scrollToItem(index = scopeTasks.size - 1)
-                                    }
-
-                                    PriorityUiModel.Now -> {
-                                        priorityScrollState.animateScrollToItem(index = 0)
-                                    }
-
-                                    is PriorityUiModel.Plan -> {}
-                                }
-                            }
-                        },
-                    )
-                }
             }
+        }
+
+        if (showTaskInput) {
+            val taskInputBottomSheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = true
+            )
+
+            val context = remember { ChatContext.Main(model.selectedScopeId) }
+
+            BackHandler(onBack = {
+                coroutineScope.launch {
+                    taskInputBottomSheetState.hide()
+                }
+            })
+
+            TaskInputBottomSheet(
+                onDismissRequest = { showTaskInput = false },
+                sheetState = taskInputBottomSheetState,
+                context = context,
+                onNewTaskCreated = { _, priority ->
+                    coroutineScope.launch {
+                        when (priority) {
+                            PriorityUiModel.Later -> {
+                                val itemCount =
+                                    states[pagerState.currentPage].layoutInfo.totalItemsCount
+                                states[pagerState.currentPage].scrollToItem(itemCount - 1)
+                            }
+
+                            PriorityUiModel.Now -> {
+                                states[pagerState.currentPage].animateScrollToItem(index = 0)
+                            }
+
+                            is PriorityUiModel.Plan -> {}
+                        }
+                    }
+                },
+            )
         }
 
         if (showTaskCompleteAnimation > 0 && model.confettiEnabled) {
@@ -395,9 +367,7 @@ fun HomeContent(
         }
 
         FloatingActionButton(
-            onClick = {
-                showTaskInput = true
-            },
+            onClick = { showTaskInput = true },
             modifier = Modifier
                 .padding(20.dp)
                 .align(Alignment.BottomEnd),

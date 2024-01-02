@@ -39,6 +39,7 @@ import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -61,7 +62,7 @@ fun TaskSchedule(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainerElevation)
             .padding(start = 12.dp, top = 17.dp, bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

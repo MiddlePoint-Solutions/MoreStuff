@@ -49,13 +49,9 @@ fun ScopeContent(
     tasks: List<TaskUiModel>,
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
-    showTaskOptions: (taskId: Long) -> Unit,
-    toggleQuickReminder: (taskId: Long) -> Unit,
-    taskSelectionActive: () -> Boolean,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
 ) {
-
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = listState,

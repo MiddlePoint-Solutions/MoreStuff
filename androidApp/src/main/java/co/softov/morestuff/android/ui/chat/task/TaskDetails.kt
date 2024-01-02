@@ -73,6 +73,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.keyboardAsState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -109,7 +110,7 @@ fun TaskDetails(
     Box {
         Surface(
             modifier = modifier,
-            color = MaterialTheme.colorScheme.surfaceVariant
+            color = MaterialTheme.colorScheme.surfaceContainerElevation
         ) {
             Box(
                 modifier = Modifier
@@ -157,9 +158,8 @@ fun TaskDetails(
                                         Icon(
                                             imageVector = Icons.Filled.CheckCircle,
                                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .then(toggleModifier)
+                                            modifier = Modifier.fillMaxSize().then(toggleModifier),
+                                            tint = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
 
@@ -167,9 +167,8 @@ fun TaskDetails(
                                         Icon(
                                             imageVector = Icons.Outlined.Circle,
                                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .then(toggleModifier)
+                                            modifier = Modifier.fillMaxSize().then(toggleModifier),
+                                            tint = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
                                 }
