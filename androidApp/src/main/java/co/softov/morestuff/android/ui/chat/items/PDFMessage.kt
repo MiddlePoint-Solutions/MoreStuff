@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.pdf
+package co.softov.morestuff.android.ui.chat.items
 
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -22,7 +22,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toFile
 import co.softov.morestuff.android.ui.chat.ChatActions
-import co.softov.morestuff.android.ui.chat.items.MessageTime
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
@@ -58,7 +56,7 @@ import kotlin.math.sqrt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun MessagePDF(
+fun PDFMessage(
     pdfUri: Uri,
     actions: ChatActions,
     message: MessageUiModel,

@@ -2,7 +2,13 @@ package co.softov.morestuff.android.ui.components
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -39,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -54,6 +61,7 @@ import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
+    containerColor: Color,
     selectedTaskCount: Int,
     reviewSelected: () -> Unit,
     settingsSelected: () -> Unit,
@@ -69,17 +77,6 @@ fun HomeTopBar(
     val taskSelectionActive = remember(selectedTaskCount) { selectedTaskCount > 0 }
     val transition = updateTransition(taskSelectionActive, label = "Selection state")
     var showMenu by remember { mutableStateOf(false) }
-
-    val scrollContainerColor = MaterialTheme.colorScheme.surfaceContainerElevation
-    val defaultContainerColor = MaterialTheme.colorScheme.surfaceContainer
-    val containerColor = remember { mutableStateOf(defaultContainerColor) }
-
-    LaunchedEffect(scrollBehavior, selectedTaskCount) {
-        snapshotFlow { (scrollBehavior.state.overlappedFraction > 0.2f || selectedTaskCount > 0) }
-            .collect { enable ->
-                containerColor.value = if (enable) scrollContainerColor else defaultContainerColor
-            }
-    }
 
     TopAppBar(
         title = {
@@ -182,7 +179,7 @@ fun HomeTopBar(
                 }
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor.value),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
         scrollBehavior = scrollBehavior
     )
 }
@@ -229,6 +226,7 @@ private fun AnimatedCounter(count: Int) {
 private fun Preview() {
     MoreStuffTheme {
         HomeTopBar(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
             selectedTaskCount = 0,
             reviewSelected = {},
             settingsSelected = {},

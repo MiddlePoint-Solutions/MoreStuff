@@ -3,9 +3,12 @@ package co.softov.morestuff.android.ui.schedule
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -66,30 +69,23 @@ fun ScopeContent(
                 derivedStateOf { index == tasks.lastIndex }
             }
 
-            if (!taskSelectionActive()) {
-                SwipeablePriorityItem(
-                    showTaskOptions,
-                    item,
-                    toggleQuickReminder,
-                ) {
-                    PriorityItem(
-                        task = item,
-                        onClick = { onItemClick(item.id) },
-                        onLongClick = { onItemLongClick(item.id) }
+            PriorityItem(
+                task = item,
+                onClick = { onItemClick(item.id) },
+                onLongClick = { onItemLongClick(item.id) }
+            )
+
+            Row(
+                modifier = Modifier.fillParentMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (!isLast) {
+                    Divider(
+                        thickness = Dp.Hairline,
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        color = MaterialTheme.colorScheme.surface
                     )
                 }
-            } else {
-                PriorityItem(
-                    task = item,
-                    onClick = { onItemClick(item.id) },
-                    onLongClick = { onItemLongClick(item.id) }
-                )
-            }
-
-            if (!isLast) {
-                Divider(
-                    thickness = Dp.Hairline
-                )
             }
         }
     }
