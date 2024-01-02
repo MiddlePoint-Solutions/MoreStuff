@@ -133,11 +133,11 @@ fun MoreStuffSettingTheme(
 
 val ColorScheme.surfaceContainer: Color
     @Composable
-    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp)
+    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
 
 val ColorScheme.surfaceContainerElevation: Color
     @Composable
-    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(6.dp)
 @Composable
 fun isDarkTheme(): Boolean {
     val darkTheme = when (LocalTheme.current) {

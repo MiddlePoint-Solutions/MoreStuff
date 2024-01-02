@@ -3,6 +3,9 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +55,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +81,8 @@ import co.softov.morestuff.android.ui.scope.CreateScopeButton
 import co.softov.morestuff.android.ui.scope.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
+import co.softov.morestuff.android.ui.theme.surfaceContainer
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
@@ -102,11 +110,22 @@ fun HomeScreen(
     val selectedTasks by viewModel.selectedTasks.collectAsState()
     val model by viewModel.uiModel.collectAsState()
 
+    val topBarContainerColor by animateColorAsState(
+        targetValue = if (scrollBehavior.state.overlappedFraction > 0.2f || selectedTasks.isNotEmpty()) {
+            MaterialTheme.colorScheme.surfaceContainerElevation
+        } else {
+            MaterialTheme.colorScheme.surfaceContainer
+        },
+        animationSpec = tween(durationMillis = 150, easing = LinearEasing),
+        label = "TopBar color animation"
+    )
+
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         topAppBarScrollBehavior = scrollBehavior,
         topBar = {
             HomeTopBar(
+                containerColor = topBarContainerColor,
                 selectedTaskCount = selectedTasks.size,
                 reviewSelected = { navigation.push(Screen.Review(model.selectedScopeId)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
@@ -121,6 +140,7 @@ fun HomeScreen(
         },
         content = {
             HomeContent(
+                scopesContainerColor = topBarContainerColor,
                 snackbarHostState = snackbarHostState,
                 modifier = Modifier.padding(it),
             )
@@ -166,6 +186,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
+    scopesContainerColor: Color,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
@@ -249,113 +270,116 @@ fun HomeContent(
     ) {
 
         Column {
-            ScopeTabs(
-                currentPage = pagerState.currentPage,
-                scopes = scopes,
-                onScopeSelected = { index, _ ->
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(index)
-                    }
-                }
-            )
-
-            Divider(
-                thickness = Dp.Hairline
-            )
+            Row(
+                modifier = Modifier
+                    .shadow(1.dp)
+                    .padding(bottom = 0.5.dp)
+            ) {
+                ScopeTabs(
+                    currentPage = pagerState.currentPage,
+                    scopes = scopes,
+                    onScopeSelected = { index, _ ->
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                    containerColor = scopesContainerColor
+                )
+            }
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                pageContent = {
+                beyondBoundsPageCount = 1
+            ) {
 
-                    val scopeViewModel = koinViewModel<ScopeViewModel>(
-                        key = "Scope$it",
-                        parameters = {
-                            parametersOf(
-                                scopes[it].id,
-                                viewModel.selectedTasks
+                val scopeViewModel = koinViewModel<ScopeViewModel>(
+                    key = "Scope$it",
+                    parameters = {
+                        parametersOf(
+                            scopes[it].id,
+                            viewModel.selectedTasks
+                        )
+                    }
+                )
+
+                val priorityScrollState = rememberLazyListState()
+                val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
+
+                val showEmptyState by remember(scopeTasks.size) {
+                    derivedStateOf { scopeTasks.isEmpty() }
+                }
+
+                if (showEmptyState) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 180.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TextButton(onClick = { showTaskInput = true }) {
+                            Text(
+                                stringResource(R.string.empty_priority_list_cta),
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
                             )
                         }
+                    }
+                } else {
+                    ScopeContent(
+                        tasks = scopeTasks,
+                        onItemClick = { taskId ->
+                            if (selectedTasks.isNotEmpty()) {
+                                viewModel.toggleTaskSelection(taskId)
+                            } else {
+                                navigation.push(Screen.TaskChat(taskId))
+                            }
+                        },
+                        onItemLongClick = viewModel::toggleTaskSelection,
+                        showTaskOptions = { taskId -> taskOptions = taskId },
+                        toggleQuickReminder = viewModel::toggleQuickReminder,
+                        listState = priorityScrollState,
+                        taskSelectionActive = selectedTasks::isNotEmpty,
+                        modifier = Modifier.padding(bottom = 20.dp),
                     )
-
-                    val priorityScrollState = rememberLazyListState()
-                    val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
-
-                    val showEmptyState by remember(scopeTasks.size) {
-                        derivedStateOf { scopeTasks.isEmpty() }
-                    }
-
-                    if (showEmptyState) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(bottom = 180.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            TextButton(onClick = { showTaskInput = true }) {
-                                Text(
-                                    stringResource(R.string.empty_priority_list_cta),
-                                    style = MaterialTheme.typography.titleLarge.copy(
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                )
-                            }
-                        }
-                    } else {
-                        ScopeContent(
-                            tasks = scopeTasks,
-                            onItemClick = { taskId ->
-                                if (selectedTasks.isNotEmpty()) {
-                                    viewModel.toggleTaskSelection(taskId)
-                                } else {
-                                    navigation.push(Screen.TaskChat(taskId))
-                                }
-                            },
-                            onItemLongClick = viewModel::toggleTaskSelection,
-                            showTaskOptions = { taskId -> taskOptions = taskId },
-                            toggleQuickReminder = viewModel::toggleQuickReminder,
-                            listState = priorityScrollState,
-                            taskSelectionActive = selectedTasks::isNotEmpty,
-                            modifier = Modifier.padding(bottom = 20.dp),
-                        )
-                    }
-
-                    if (showTaskInput) {
-                        val taskInputBottomSheetState =
-                            rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-                        val chatContext = remember { ChatContext.Main(model.selectedScopeId) }
-
-                        BackHandler(onBack = {
-                            coroutineScope.launch {
-                                taskInputBottomSheetState.hide()
-                            }
-                        })
-
-                        TaskInputBottomSheet(
-                            onDismissRequest = { showTaskInput = false },
-                            sheetState = taskInputBottomSheetState,
-                            context = chatContext,
-                            onNewTaskCreated = { _, priority ->
-                                coroutineScope.launch {
-                                    delay(300)
-                                    when (priority) {
-                                        PriorityUiModel.Later -> {
-                                            priorityScrollState.scrollToItem(index = scopeTasks.size - 1)
-                                        }
-
-                                        PriorityUiModel.Now -> {
-                                            priorityScrollState.animateScrollToItem(index = 0)
-                                        }
-
-                                        is PriorityUiModel.Plan -> {}
-                                    }
-                                }
-                            },
-                        )
-                    }
                 }
-            )
+
+                if (showTaskInput) {
+                    val taskInputBottomSheetState =
+                        rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+                    val chatContext = remember { ChatContext.Main(model.selectedScopeId) }
+
+                    BackHandler(onBack = {
+                        coroutineScope.launch {
+                            taskInputBottomSheetState.hide()
+                        }
+                    })
+
+                    TaskInputBottomSheet(
+                        onDismissRequest = { showTaskInput = false },
+                        sheetState = taskInputBottomSheetState,
+                        context = chatContext,
+                        onNewTaskCreated = { _, priority ->
+                            coroutineScope.launch {
+                                delay(300)
+                                when (priority) {
+                                    PriorityUiModel.Later -> {
+                                        priorityScrollState.scrollToItem(index = scopeTasks.size - 1)
+                                    }
+
+                                    PriorityUiModel.Now -> {
+                                        priorityScrollState.animateScrollToItem(index = 0)
+                                    }
+
+                                    is PriorityUiModel.Plan -> {}
+                                }
+                            }
+                        },
+                    )
+                }
+            }
         }
 
         if (showTaskCompleteAnimation > 0 && model.confettiEnabled) {
