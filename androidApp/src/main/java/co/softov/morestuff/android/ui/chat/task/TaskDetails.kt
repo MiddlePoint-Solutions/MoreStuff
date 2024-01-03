@@ -11,6 +11,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -69,6 +71,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.keyboardAsState
@@ -107,14 +110,13 @@ fun TaskDetails(
         isEditing = false
     }
 
-    Box {
+    Box(modifier = modifier) {
         Surface(
-            modifier = modifier,
-            color = MaterialTheme.colorScheme.surfaceContainerElevation
+            modifier = Modifier.padding(bottom = 18.dp).animateContentSize(),
+            color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(
                 modifier = Modifier
-                    .animateContentSize()
                     .then(
                         if (isEditing) {
                             Modifier.fillMaxHeight(0.7f)
@@ -158,7 +160,9 @@ fun TaskDetails(
                                         Icon(
                                             imageVector = Icons.Filled.CheckCircle,
                                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                                            modifier = Modifier.fillMaxSize().then(toggleModifier),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .then(toggleModifier),
                                             tint = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
@@ -167,7 +171,9 @@ fun TaskDetails(
                                         Icon(
                                             imageVector = Icons.Outlined.Circle,
                                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                                            modifier = Modifier.fillMaxSize().then(toggleModifier),
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .then(toggleModifier),
                                             tint = MaterialTheme.colorScheme.onSurface
                                         )
                                     }
@@ -248,7 +254,7 @@ fun TaskDetails(
                                         Icon(
                                             imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
                                             contentDescription = stringResource(R.string.cd_schedule_icon),
-                                            tint = MaterialTheme.colorScheme.secondary
+                                            tint = MaterialTheme.colorScheme.inverseSurface
                                         )
                                     },
                                 )
@@ -263,19 +269,19 @@ fun TaskDetails(
             visible = !isEditing && !task.isComplete,
             modifier = Modifier
                 .padding(end = 12.dp)
-                .offset(y = 22.dp)
                 .align(Alignment.BottomEnd),
             enter = fadeIn(),
             exit = fadeOut()
         ) {
             Row(
+                modifier = Modifier.background(Color.Transparent),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 if (task.hasSchedule && !showSchedule) {
                     Surface(
                         modifier = Modifier.size(width = 35.dp, height = 35.dp),
-                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        color = MaterialTheme.colorScheme.inverseSurface,
                         shape = CircleShape,
                     ) {
                         IconButton(onClick = { showSchedule = !showSchedule }) {
@@ -290,7 +296,7 @@ fun TaskDetails(
                 FilledIconButton(
                     onClick = { showSchedule = !showSchedule },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        containerColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
                     Icon(
