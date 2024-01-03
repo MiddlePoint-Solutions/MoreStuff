@@ -107,6 +107,7 @@ fun TaskChatScreen(
     ChildStack(
         source = navigation,
         initialStack = { listOf(ChatScreen.TaskChat) },
+        modifier = Modifier.background(Color.Transparent),
         key = "TaskChatStack",
         handleBackButton = true,
         animation = stackAnimation(scale() + fade()),
@@ -216,16 +217,15 @@ private fun TaskChatContent(
         containerColor = Color.Transparent,
     ) { scaffoldPadding ->
         Box(
-            Modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(top = scaffoldPadding.calculateTopPadding())
-                .animateContentSize()
+//                .animateContentSize()
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
-                TaskDetails(taskId = task.id)
+
 
                 Messages(
                     messages = messages,
@@ -282,6 +282,11 @@ private fun TaskChatContent(
                     )
                 }
             }
+
+            TaskDetails( // TODO: this should be above the messages, maybe a box inside the column below?
+                taskId = task.id,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 }
@@ -401,7 +406,7 @@ private fun TaskTopAppBar(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
     }
