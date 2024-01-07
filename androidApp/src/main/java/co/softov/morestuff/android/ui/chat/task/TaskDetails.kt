@@ -281,7 +281,7 @@ fun TaskDetails(
                 if (task.hasSchedule && !showSchedule) {
                     Surface(
                         modifier = Modifier.size(width = 35.dp, height = 35.dp),
-                        color = MaterialTheme.colorScheme.inverseSurface,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = CircleShape,
                     ) {
                         IconButton(onClick = { showSchedule = !showSchedule }) {
@@ -296,7 +296,7 @@ fun TaskDetails(
                 FilledIconButton(
                     onClick = { showSchedule = !showSchedule },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
                     Icon(
