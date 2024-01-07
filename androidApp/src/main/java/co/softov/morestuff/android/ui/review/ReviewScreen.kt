@@ -182,7 +182,7 @@ fun ReviewContent(
                         ReviewDragHint()
                     }
 
-                    LaunchedEffect(key1 = model.round) {
+                    LaunchedEffect(model.round) {
                         visibleState.targetState = true
                     }
                 }
