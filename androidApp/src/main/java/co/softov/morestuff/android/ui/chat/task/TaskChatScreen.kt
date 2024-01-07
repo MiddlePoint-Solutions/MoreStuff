@@ -220,12 +220,10 @@ private fun TaskChatContent(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = scaffoldPadding.calculateTopPadding())
-//                .animateContentSize()
         ) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-
 
                 Messages(
                     messages = messages,
@@ -283,9 +281,10 @@ private fun TaskChatContent(
                 }
             }
 
-            TaskDetails( // TODO: this should be above the messages, maybe a box inside the column below?
+            TaskDetails(
                 taskId = task.id,
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
             )
         }
     }

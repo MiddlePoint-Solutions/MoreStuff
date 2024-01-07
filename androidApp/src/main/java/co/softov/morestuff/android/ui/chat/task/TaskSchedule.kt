@@ -62,7 +62,7 @@ fun TaskSchedule(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainerElevation)
+            .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(start = 12.dp, top = 17.dp, bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
