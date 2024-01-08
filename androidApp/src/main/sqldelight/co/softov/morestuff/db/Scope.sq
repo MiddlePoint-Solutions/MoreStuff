@@ -3,7 +3,7 @@ import kotlin.Int;
 CREATE TABLE scope (
     scope_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     scope_uid TEXT NOT NULL,
-    scope_name TEXT UNIQUE NOT NULL ,
+    scope_name TEXT UNIQUE NOT NULL,
     scope_order INTEGER AS Int NOT NULL
 );
 
