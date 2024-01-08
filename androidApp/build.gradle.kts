@@ -38,8 +38,8 @@ android {
         compileSdk = 34
         minSdk = 26
         targetSdk = 34
-        versionCode = 23
-        versionName = "0.5.2"
+        versionCode = 24
+        versionName = "0.5.3"
         vectorDrawables {
             useSupportLibrary = true
         }
