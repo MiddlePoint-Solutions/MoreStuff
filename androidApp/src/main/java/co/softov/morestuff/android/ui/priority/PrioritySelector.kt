@@ -45,7 +45,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(100.dp)
+                .width(110.dp)
                 .height(47.dp),
             selected = nowSelected,
             onClick = onNowSelected,
@@ -67,7 +67,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(130.dp)
+                .width(110.dp)
                 .height(47.dp),
             selected = laterSelected,
             onClick = onLaterSelected,
@@ -89,7 +89,7 @@ fun PrioritySelector(
 
         PriorityButton(
             modifier = Modifier
-                .width(100.dp)
+                .width(110.dp)
                 .height(47.dp),
             selected = planSelected,
             onClick = onPlanSelected,

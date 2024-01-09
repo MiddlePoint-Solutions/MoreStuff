@@ -67,7 +67,7 @@
     <string name="textfield_desc">Entrada de texto</string>
     <string name="priority_now">Ahora</string>
     <string name="priority_plan">Plan</string>
-    <string name="priority_later">Más tarde</string>
+    <string name="priority_later">Tarde</string>
     <string name="done">Hecho</string>
     <string name="new_messages">Inicio</string>
     <string name="cd_navigate_back">Navegar hacia atrás</string>
