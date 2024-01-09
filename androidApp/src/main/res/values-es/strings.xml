@@ -154,6 +154,19 @@
     <string name="debug_messages">Mensajes de depuración</string>
     <string name="join_community">Únete a nuestra comunidad y ayuda a dar forma a MoreStuff!</string>
     <string name="set_review_time">Programar hora de la revisión</string>
+    <string name="select_image">Seleccionar Imagen</string>
+    <string name="select_pdf">Seleccionar PDF</string>
+
+
+    <string name="sure_delete_scope">Estás seguro que quieres eliminar\nel siguiente scope?</string>
+    <string name="create_new_scope">Crear nuevo Scope</string>
+    <string name="confirm">Confirmar</string>
+    <string name="edit_scope_name">Editar nombre del Scope </string>
+    <string name="task_scopes">Task Scopes</string>
+    <string name="create_scope">Crear Scope</string>
+    <string name="add_to_scope">Añadir al Scope</string>
+    <string name="manage_scopes">Configurar Scopes</string>
+    <string name="remove_from_scope">Eliminar del Scope actual</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Nuestro objetivo"</string>
@@ -225,4 +238,9 @@
     <string name="cd_close_search">Cerrar búsqueda</string>
 
     <string name="date_connector">de</string>
+    <string name="cd_delete_tasks">Eliminar tareas</string>
+    <string name="cd_complete_tasks">Completar tareas</string>
+    <string name="cd_more_options">Más opciones</string>
+    <string name="cd_open_settings">Abrir ajustes</string>
+    <string name="cd_search_tasks">Buscar tareas</string>
 </resources>
