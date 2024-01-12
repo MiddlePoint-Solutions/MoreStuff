@@ -143,6 +143,17 @@
     <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
+    <string name="can_i_do_for_you_today">What can I do for you today?</string>
+    <string name="added_new_task">Added new task!</string>
+    <string name="developer_settings">Developer Settings</string>
+
+    <string name="test_onboarding">Test on Boarding</string>
+    <string name="test_review_notifications">Test Review Notification</string>
+    <string name="export_database">Export Database</string>
+    <string name="import_database">Import Database</string>
+    <string name="debug_messages">Debug Messages</string>
+    <string name="join_community">Join our community &amp; Help shape MoreStuff!</string>
+    <string name="set_review_time">Set review Time</string>
     <string name="select_image">Select Image</string>
     <string name="select_pdf">Select PDF</string>
 

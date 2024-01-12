@@ -116,7 +116,7 @@ fun SearchBar(
         Column {
             Row(
                 modifier = Modifier
-                    .padding(top = 16.dp, start = 10.dp, end = 10.dp)
+                    .padding(top = 16.dp, start = 4.dp, end = 4.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -247,7 +247,7 @@ private fun SearchFilterChip(
             containerColor = unselectedColor,
             selectedContainerColor = selectedColor,
         ),
-        modifier = Modifier.padding(end = 7.dp),
+        modifier = Modifier.padding(end = 3.dp),
         shape = CircleShape,
         border = transparentBorder
 
