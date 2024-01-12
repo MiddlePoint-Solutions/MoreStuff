@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.app.features.VoiceToTextParserImpl
+import co.softov.morestuff.android.data.service.AppMessagesProviderImpl
 import co.softov.morestuff.android.data.service.ClipboardHelperImpl
 import co.softov.morestuff.android.data.service.HintTaskProviderImpl
 import co.softov.morestuff.android.data.service.ImageHandlerImpl
@@ -21,6 +22,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ScopeMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
+import co.softov.morestuff.android.domain.service.AppMessagesProvider
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.service.ImageHandler
@@ -65,6 +67,14 @@ import co.softov.morestuff.android.domain.usecase.message.SaveUserPDFUseCase
 import co.softov.morestuff.android.domain.usecase.message.SaveUserPDFUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCase
 import co.softov.morestuff.android.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
+import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskAbovePriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.priority.GetTaskBelowPriorityScoreUseCase
@@ -77,30 +87,44 @@ import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleU
 import co.softov.morestuff.android.domain.usecase.schedule.CancelActiveScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateOneTimeScheduleUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.CreateScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleWorkUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleWorkUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
+import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCase
+import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
+import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingUseCase
@@ -111,6 +135,8 @@ import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.GetAppThemeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCase
 import co.softov.morestuff.android.domain.usecase.settings.SaveUserSettingUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCase
 import co.softov.morestuff.android.domain.usecase.task.ClearTaskNotificationsUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
@@ -127,28 +153,6 @@ import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithSchedul
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.priority.GetHighestPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.priority.GetLowestPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.priority.GetPlanPriorityScoreUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.schedule.CreateReminderUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
-import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCase
-import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCase
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetReviewTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
@@ -161,8 +165,6 @@ import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUs
 import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
-import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCase
-import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
@@ -203,6 +205,8 @@ val useCaseModules
 
 val serviceModule = module {
     factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
+    factoryOf(::AppMessagesProviderImpl) bind AppMessagesProvider::class
+
 }
 
 val featuresModule = module {

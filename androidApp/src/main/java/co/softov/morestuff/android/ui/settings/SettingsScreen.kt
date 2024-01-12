@@ -371,7 +371,7 @@ fun About(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Join our community & Help shape MoreStuff! ",
+                text = stringResource(id = R.string.join_community),
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -470,7 +470,7 @@ fun ReviewTimeSelector(
     SettingsMenuLink(
         title = {
             Column {
-                Text(text = "Set Review Time")
+                Text(text =stringResource(R.string.set_review_time))
                 selectedTimeState.value.let {
                     Text(
                         text = "${it.first}:${String.format("%02d", it.second)}",

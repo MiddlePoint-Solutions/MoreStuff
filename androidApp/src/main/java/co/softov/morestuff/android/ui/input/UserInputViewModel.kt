@@ -12,6 +12,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.service.AppMessagesProvider
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
@@ -43,6 +44,8 @@ class UserInputViewModel(
     private val timeManager: TimeManager,
     private val timeFormatter: TimeFormatter,
     private val messageUiMapper: MessageUiMapper,
+    private val appMessagesProvider: AppMessagesProvider
+
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
@@ -59,7 +62,7 @@ class UserInputViewModel(
                 }
                 delay(1500)
                 messages.update { messages ->
-                    messages.toMutableList().apply { add(0, createAppMessage("Added new task!")) }
+                    messages.toMutableList().apply { add(0, createAppMessage(appMessagesProvider.getNewTaskAddedMessage())) }
                 }
             }
         }.stateIn(
@@ -81,7 +84,7 @@ class UserInputViewModel(
     fun load(context: ChatContext) {
         // TODO: add messages according to chat context
         messages.update {
-            listOf(createAppMessage("What can I do for you today?"))
+            listOf(createAppMessage(appMessagesProvider.getWhatCanIDoForYouMessage()))
         }
 
         viewModelScope.launch {
