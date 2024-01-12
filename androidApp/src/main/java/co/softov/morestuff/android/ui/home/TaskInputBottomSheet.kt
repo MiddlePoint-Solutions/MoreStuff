@@ -3,21 +3,14 @@ package co.softov.morestuff.android.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -35,10 +28,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.PopupProperties
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,7 +48,7 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import com.arkivanov.decompose.router.stack.push
-import kotlinx.coroutines.delay
+import com.baec23.ludwig.component.fadinglazy.FadingLazyRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -67,7 +60,7 @@ fun TaskInputBottomSheet(
     context: ChatContext,
     onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
 ) {
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
 
@@ -86,7 +79,7 @@ fun TaskInputBottomSheet(
         ChatActions(
             taskChatAction = {
                 navigation.push(Screen.TaskChat(it))
-                scope.launch {
+                coroutineScope.launch {
                     sheetState.hide()
                 }
             }
@@ -104,37 +97,23 @@ fun TaskInputBottomSheet(
             ) {
                 BottomSheetDefaults.DragHandle()
 
-                FilterChip(
-                    selected = true,
-                    onClick = { expanded = !expanded },
-                    label = {
+                FadingLazyRow {
+                    items(scopes.size) { index ->
+                        val scope = scopes[index]
                         Text(
-                            text = viewModel.currentScope.name,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.sizeIn(minWidth = 48.dp)
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Localized Description",
-                            modifier = Modifier.size(FilterChipDefaults.IconSize)
-                        )
-                    }
-                )
+                            text = scope.name,
+                            modifier = Modifier
+                                .clickable {
+                                    viewModel.setCurrentScope(scope.id)
+                                    expanded = false
+                                }
+                                .padding(horizontal = 15.dp),
+                            fontWeight = if (viewModel.currentScope.id == scope.id) FontWeight.Bold else FontWeight.Normal,
+                            fontSize = if (viewModel.currentScope.id == scope.id) 20.sp else 15.sp,
+                            color = if (viewModel.currentScope.id == scope.id) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(
+                                alpha = 0.2f
+                            )
 
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    properties = PopupProperties(focusable = false)
-                ) {
-                    scopes.forEach { scope ->
-                        DropdownMenuItem(
-                            text = { Text(scope.name) },
-                            onClick = {
-                                viewModel.setCurrentScope(scope.id)
-                                expanded = false
-                            },
                         )
                     }
                 }
@@ -209,10 +188,13 @@ fun TaskInputBottomSheet(
                                                 exit = fadeOut()
                                             ) {
                                                 SendIcon(onClick = {
-                                                    scope.launch {
+                                                    coroutineScope.launch {
                                                         val taskId =
                                                             viewModel.createNewTask(userInputValue.text)
-                                                        onNewTaskCreated(taskId, priorityModel.priority)
+                                                        onNewTaskCreated(
+                                                            taskId,
+                                                            priorityModel.priority
+                                                        )
                                                         userInputValue = userInputValue.copy("")
                                                     }
                                                 })

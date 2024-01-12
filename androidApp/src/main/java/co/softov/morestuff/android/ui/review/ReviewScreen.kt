@@ -1,22 +1,59 @@
 package co.softov.morestuff.android.ui.review
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Remove
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,10 +63,10 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -41,21 +78,24 @@ import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewScreen
-import co.softov.morestuff.android.ui.review.swipeable.*
+import co.softov.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import co.softov.morestuff.android.ui.review.swipeable.SwipeDirection
+import co.softov.morestuff.android.ui.review.swipeable.SwipeableCardState
+import co.softov.morestuff.android.ui.review.swipeable.firstVisibleStateOrNull
+import co.softov.morestuff.android.ui.review.swipeable.lastSwipedItem
+import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
+import co.softov.morestuff.android.ui.review.swipeable.swipableCard
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.baec23.ludwig.component.fadinglazy.FadingLazyRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
-    scopeId: Long
+    scopeId: Long,
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
@@ -248,7 +288,7 @@ private fun PriorityReviewTopBar(
     navigateUp: () -> Unit = {},
 ) {
 
-    val scope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
 
     Column(modifier = modifier) {
@@ -285,7 +325,7 @@ private fun PriorityReviewTopBar(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(onClick = {
-                        scope.launch {
+                        coroutineScope.launch {
                             toggleReviewHint()
                             showMenu = false
                         }
@@ -312,43 +352,27 @@ private fun PriorityReviewTopBar(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            FilterChip(
-                selected = expanded,
-                onClick = { expanded = !expanded },
-                label = {
+            FadingLazyRow {
+                items(scopes.size) { index ->
+                    val scope = scopes[index]
                     Text(
-                        text = currentScope.name,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.sizeIn(minWidth = 48.dp)
-                    )
-                },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowDropDown,
-                        contentDescription = "Localized Description",
-                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                    )
-                }
-            )
-
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
-                properties = PopupProperties(focusable = true)
-            ) {
-                scopes.forEach { scope ->
-                    DropdownMenuItem(
-                        text = { Text(scope.name) },
-                        onClick = {
-                            setCurrentScope(scope.id)
-                            expanded = false
-                        },
+                        text = scope.name,
+                        modifier = Modifier
+                            .clickable {
+                                setCurrentScope(scope.id)
+                                expanded = false
+                            }
+                            .padding(horizontal = 15.dp),
+                        fontWeight = if (currentScope.id == scope.id) FontWeight.Bold else FontWeight.Normal,
+                        fontSize = if (currentScope.id == scope.id) 20.sp else 15.sp,
+                        color = if (currentScope.id == scope.id) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(
+                            alpha = 0.2f
+                        )
                     )
                 }
             }
         }
     }
-
 }
 
 
