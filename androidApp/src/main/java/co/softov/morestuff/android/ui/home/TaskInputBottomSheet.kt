@@ -3,10 +3,10 @@ package co.softov.morestuff.android.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomSheetDefaults
@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,10 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,6 +36,7 @@ import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
+import co.softov.morestuff.android.ui.components.ScopeCarousel
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
@@ -48,7 +46,6 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import com.arkivanov.decompose.router.stack.push
-import com.baec23.ludwig.component.fadinglazy.FadingLazyRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -91,32 +88,23 @@ fun TaskInputBottomSheet(
         modifier = Modifier.fillMaxHeight(0.95f),
         sheetState = sheetState,
         dragHandle = {
-            var expanded by remember { mutableStateOf(false) }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 BottomSheetDefaults.DragHandle()
 
-                FadingLazyRow {
-                    items(scopes.size) { index ->
-                        val scope = scopes[index]
-                        Text(
-                            text = scope.name,
-                            modifier = Modifier
-                                .clickable {
-                                    viewModel.setCurrentScope(scope.id)
-                                    expanded = false
-                                }
-                                .padding(horizontal = 15.dp),
-                            fontWeight = if (viewModel.currentScope.id == scope.id) FontWeight.Bold else FontWeight.Normal,
-                            fontSize = if (viewModel.currentScope.id == scope.id) 20.sp else 15.sp,
-                            color = if (viewModel.currentScope.id == scope.id) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(
-                                alpha = 0.2f
-                            )
+                ScopeCarousel(
+                    scopes = scopes,
+                    currentScope = viewModel.currentScope.id,
+                    onScopeSelected = { scopeId ->
+                        viewModel.setCurrentScope(scopeId)
+                    },
+                    modifier = Modifier
+                        .height(70.dp)
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
 
-                        )
-                    }
-                }
+                )
             }
         },
         content = {
@@ -210,3 +198,9 @@ fun TaskInputBottomSheet(
         }
     )
 }
+
+
+
+
+
+

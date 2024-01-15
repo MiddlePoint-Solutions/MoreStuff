@@ -6,7 +6,6 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,7 +62,6 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,6 +71,7 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
+import co.softov.morestuff.android.ui.components.ScopeCarousel
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
@@ -88,7 +87,6 @@ import co.softov.morestuff.android.ui.review.swipeable.swipableCard
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
-import com.baec23.ludwig.component.fadinglazy.FadingLazyRow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -157,7 +155,8 @@ fun ReviewContent(
                         isReviewHintActive = viewModel.reviewHintEnabled,
                         modifier = Modifier.constrainAs(topBar) {
                             top.linkTo(parent.top)
-                        }
+                        },
+                        scopeId = scopeId
                     )
 
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
@@ -286,6 +285,7 @@ private fun PriorityReviewTopBar(
     isReviewHintActive: Boolean,
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
+    scopeId: Long,
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -341,37 +341,29 @@ private fun PriorityReviewTopBar(
                         })
 
                 }
-
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
         )
 
-        var expanded by remember { mutableStateOf(false) }
-
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            FadingLazyRow {
-                items(scopes.size) { index ->
-                    val scope = scopes[index]
-                    Text(
-                        text = scope.name,
-                        modifier = Modifier
-                            .clickable {
-                                setCurrentScope(scope.id)
-                                expanded = false
-                            }
-                            .padding(horizontal = 15.dp),
-                        fontWeight = if (currentScope.id == scope.id) FontWeight.Bold else FontWeight.Normal,
-                        fontSize = if (currentScope.id == scope.id) 20.sp else 15.sp,
-                        color = if (currentScope.id == scope.id) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(
-                            alpha = 0.2f
-                        )
-                    )
-                }
-            }
+        val initialIndex = scopes.indexOfFirst { it.id == scopeId }.coerceAtLeast(0)
+        LaunchedEffect(scopeId) {
+            setCurrentScope(scopes.getOrNull(initialIndex)?.id ?: currentScope.id)
         }
+
+        ScopeCarousel(
+            scopes = scopes,
+            currentScope = currentScope.id,
+            onScopeSelected = { scopeId ->
+                setCurrentScope(scopeId)
+            },
+            modifier = Modifier
+                .height(70.dp)
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 30.dp)
+                .fillMaxWidth()
+
+        )
+
     }
 }
 
