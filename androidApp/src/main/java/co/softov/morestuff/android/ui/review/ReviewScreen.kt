@@ -346,12 +346,10 @@ private fun PriorityReviewTopBar(
         )
 
         val initialIndex = scopes.indexOfFirst { it.id == scopeId }.coerceAtLeast(0)
-        LaunchedEffect(scopeId) {
-            setCurrentScope(scopes.getOrNull(initialIndex)?.id ?: currentScope.id)
-        }
 
         ScopeCarousel(
             scopes = scopes,
+            initialIndex = initialIndex,
             currentScope = currentScope.id,
             onScopeSelected = { scopeId ->
                 setCurrentScope(scopeId)
@@ -361,9 +359,7 @@ private fun PriorityReviewTopBar(
                 .padding(horizontal = 8.dp)
                 .padding(bottom = 30.dp)
                 .fillMaxWidth()
-
         )
-
     }
 }
 

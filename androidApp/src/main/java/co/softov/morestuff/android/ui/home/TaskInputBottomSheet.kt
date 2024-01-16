@@ -95,6 +95,7 @@ fun TaskInputBottomSheet(
 
                 ScopeCarousel(
                     scopes = scopes,
+                    initialIndex = 0,
                     currentScope = viewModel.currentScope.id,
                     onScopeSelected = { scopeId ->
                         viewModel.setCurrentScope(scopeId)

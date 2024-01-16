@@ -31,6 +31,7 @@ fun ScopeCarousel(
     scopes: List<ScopeDomain>,
     currentScope: Long,
     onScopeSelected: (Long) -> Unit,
+    initialIndex: Int,
     modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints {
@@ -39,17 +40,17 @@ fun ScopeCarousel(
         val halfItemWidth = itemWidth / 2
         val centerPadding = screenWidth / 2 - halfItemWidth
 
-        val initialIndex = currentScope.let { id ->
+        val page = currentScope.let { id ->
             scopes.indexOfFirst { it.id == id }.coerceAtLeast(0)
         }
 
         val pagerState = rememberPagerState(
-            initialPage = 0,
+            initialPage = initialIndex,
             pageCount = { scopes.size }
         )
 
         LaunchedEffect(currentScope) {
-            pagerState.animateScrollToPage(initialIndex)
+            pagerState.animateScrollToPage(page)
         }
 
 
@@ -97,10 +98,11 @@ private fun ScopeCarouselItem(
             onSelectScope(scopeId)
         }
     }
-    Column(modifier = modifier
-        .clickable {
-            onSelectScope(scopeId)
-        },
+    Column(
+        modifier = modifier
+            .clickable {
+                onSelectScope(scopeId)
+            },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -110,7 +112,8 @@ private fun ScopeCarouselItem(
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             fontSize = if (isSelected) 20.sp else 15.sp,
             color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary.copy(
-                alpha = 0.2f),
+                alpha = 0.2f
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

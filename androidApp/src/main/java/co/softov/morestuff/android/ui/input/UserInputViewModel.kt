@@ -90,7 +90,8 @@ class UserInputViewModel(
         viewModelScope.launch {
             getScopesUseCase().onRight { scopeList ->
                 scopes.update { scopeList }
-                currentScope = scopeList.first { scope -> scope.id == context.scopeId }
+                val initialIndex = scopeList.indexOfFirst { it.id == context.scopeId }
+                currentScope = scopeList.getOrNull(initialIndex) ?: scopeAll
             }
         }
     }
