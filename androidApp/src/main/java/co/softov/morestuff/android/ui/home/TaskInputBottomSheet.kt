@@ -93,16 +93,17 @@ fun TaskInputBottomSheet(
             ) {
                 BottomSheetDefaults.DragHandle()
 
+                val initialIndex = scopes.indexOfFirst { it.id == viewModel.currentScope.id }.coerceAtLeast(0)
+
                 ScopeCarousel(
                     scopes = scopes,
-                    initialIndex = 0,
+                    initialIndex = initialIndex,
                     currentScope = viewModel.currentScope.id,
                     onScopeSelected = { scopeId ->
                         viewModel.setCurrentScope(scopeId)
                     },
                     modifier = Modifier
                         .height(70.dp)
-                        .padding(horizontal = 8.dp)
                         .fillMaxWidth()
 
                 )

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -74,6 +75,7 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.components.ScopeCarousel
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
+import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewScreen
@@ -84,11 +86,13 @@ import co.softov.morestuff.android.ui.review.swipeable.firstVisibleStateOrNull
 import co.softov.morestuff.android.ui.review.swipeable.lastSwipedItem
 import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.swipableCard
+import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ReviewScreen(
@@ -114,6 +118,7 @@ fun ReviewContent(
     scopeId: Long,
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
+
     val scope = rememberCoroutineScope()
     var showReviewHelpScreen by remember { mutableStateOf(false) }
     val showTaskChat = remember { MutableTransitionState(false) }
@@ -133,6 +138,7 @@ fun ReviewContent(
     ) {
 
         val model by viewModel.uiModel.collectAsState()
+        val initialIndex = viewModel.scopes.indexOfFirst { it.id == model.currentScope.id }.coerceAtLeast(0)
 
         ConstraintLayout(
             modifier
@@ -143,12 +149,13 @@ fun ReviewContent(
             val (topBar, cards, controls) = createRefs()
 
             when (model.round) {
+
                 is ReviewRound.Review -> {
 
                     PriorityReviewTopBar(
                         currentScope = model.currentScope,
                         scopes = viewModel.scopes,
-                        setCurrentScope = viewModel::setCurrentScope,
+                        //setCurrentScope = viewModel::setCurrentScope,
                         navigateUp = onBack,
                         toggleReviewHint = viewModel::toggleHintArrowPriority,
                         showReviewHelpScreen = { showReviewHelpScreen = true },
@@ -156,9 +163,10 @@ fun ReviewContent(
                         modifier = Modifier.constrainAs(topBar) {
                             top.linkTo(parent.top)
                         },
-                        scopeId = scopeId
-                    )
+                        scopeId = scopeId,
+                        initialIndex = initialIndex
 
+                    )
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
                     val visibleState = remember(model.round) { MutableTransitionState(false) }
@@ -279,15 +287,15 @@ fun ReviewContent(
 private fun PriorityReviewTopBar(
     currentScope: ScopeDomain,
     scopes: List<ScopeDomain>,
-    setCurrentScope: (Long) -> Unit,
     toggleReviewHint: () -> Unit,
     showReviewHelpScreen: () -> Unit,
     isReviewHintActive: Boolean,
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
     scopeId: Long,
+    initialIndex: Int,
 ) {
-
+    val viewModel: ReviewViewModel = koinViewModel()
     val coroutineScope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
 
@@ -344,19 +352,15 @@ private fun PriorityReviewTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
         )
-
-        val initialIndex = scopes.indexOfFirst { it.id == scopeId }.coerceAtLeast(0)
-
         ScopeCarousel(
             scopes = scopes,
             initialIndex = initialIndex,
-            currentScope = currentScope.id,
+            currentScope = scopeId,
             onScopeSelected = { scopeId ->
-                setCurrentScope(scopeId)
+                viewModel.setCurrentScope(scopeId)
             },
             modifier = Modifier
-                .height(70.dp)
-                .padding(horizontal = 8.dp)
+                .height(75.dp)
                 .padding(bottom = 30.dp)
                 .fillMaxWidth()
         )
