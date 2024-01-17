@@ -2,6 +2,8 @@ package co.softov.morestuff.android.ui.scope
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
@@ -12,21 +14,24 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,9 +43,11 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,6 +55,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -67,8 +75,13 @@ import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
 import java.util.UUID
 
@@ -108,12 +121,6 @@ fun CreateScopesScreen(onBack: () -> Unit) {
             )
             ManageScopeList(
                 scopes = scopes,
-                onScopeSelected = { scopeId ->
-                    homeViewModel.handleEvent(HomeUiEvent.ScopeSelected(scopeId))
-                    homeViewModel.addSelectedTasksToScope(scopeId)
-                    homeViewModel.clearSelectedTasks()
-                },
-                hideSheet = {},
                 onEditScope = { scopeId, scopeName ->
                     selectScopeId = scopeId
                     updateScopeName = TextFieldValue(scopeName)
@@ -122,6 +129,12 @@ fun CreateScopesScreen(onBack: () -> Unit) {
                 onDeleteScope = { scopeId ->
                     selectScopeId = scopeId
                     isDeleteDialogOpen.value = true
+                },
+                reorderScope = { scopeId, newPosition ->
+                    homeViewModel.reorderScope(
+                        scopeId,
+                        newPosition
+                    )
                 }
             )
         }
@@ -190,12 +203,35 @@ fun CreateScopesScreen(onBack: () -> Unit) {
 @Composable
 fun ManageScopeList(
     scopes: List<ScopeDomain>,
-    onScopeSelected: (Long) -> Unit,
     onEditScope: (Long, String) -> Unit,
     onDeleteScope: (Long) -> Unit,
-    hideSheet: () -> Unit,
+    reorderScope: (Long, Int) -> Unit,
 ) {
-    val scrollState = rememberLazyListState()
+    val menuVisibility = remember(scopes) {
+        mutableStateMapOf<Long, Boolean>().apply {
+            scopes.forEach { scope ->
+                put(scope.id, false)
+            }
+        }
+    }
+
+    val data = remember { mutableStateOf(scopes) }
+    val state = rememberReorderableLazyListState(
+        onMove = { from, to ->
+            data.value = data.value.toMutableList().apply {
+                val movedItem = removeAt(from.index)
+                add(to.index, movedItem)
+            }
+        },
+        onDragEnd = { startIndex, endIndex ->
+            val movedItem = data.value[endIndex]
+            reorderScope(movedItem.id, endIndex)
+        }
+    )
+
+    LaunchedEffect(scopes) {
+        data.value = scopes
+    }
 
     Text(
         text = stringResource(R.string.task_scopes),
@@ -204,48 +240,81 @@ fun ManageScopeList(
         fontWeight = FontWeight(400),
         modifier = Modifier.padding(start = 10.dp)
     )
+    Spacer(Modifier.height(20.dp))
     LazyColumn(
-        state = scrollState
+        state = state.listState,
+        modifier = Modifier
+            .reorderable(state)
+            .detectReorderAfterLongPress(state)
     ) {
-        items(scopes.size) { index ->
-            val scope = scopes[index]
-            ListItem(
-                modifier = Modifier.clickable {
-                    onScopeSelected(scope.id)
-                    hideSheet()
-                },
-                headlineContent = {
-                    Text(scope.name)
-                },
-                trailingContent = {
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (scope.id != 1L) {
-                            IconButton(onClick = { onEditScope(scope.id, scope.name) }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Edit,
-                                    contentDescription = "Edit"
-                                )
-                            }
-                            Spacer(Modifier.width(10.dp))
+        items(data.value.size, { index -> data.value[index].id }) { index ->
+            val scope = data.value[index]
+            ReorderableItem(state, key = scope.id) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 30.dp else 0.dp, label = "")
+                val backgroundColor = animateColorAsState(
+                    targetValue = if (isDragging) MaterialTheme.colorScheme.surfaceContainerElevation else Color.Transparent,
+                    label = ""
+                )
 
-                            IconButton(onClick = { onDeleteScope(scope.id) }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Delete,
-                                    contentDescription = "Delete",
-                                    tint = Color(0xFFFFB0CF)
+                ListItem(
+                    modifier = Modifier
+                        .shadow(elevation.value)
+                        .clickable {},
+                    leadingContent = {
+                        Icon(Icons.Default.DragHandle, contentDescription = "Move")
+                    },
+                    headlineContent = {
+                        Text(scope.name)
+                    },
+                    trailingContent = {
+                        Row(
+                            horizontalArrangement = Arrangement.End,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (scope.id != 1L) {
+                                IconButton(onClick = {
+                                    menuVisibility[scope.id] = !menuVisibility[scope.id]!!
+                                }) {
+                                    Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+                                }
+                            }
+                            DropdownMenu(
+                                expanded = menuVisibility[scope.id] == true,
+                                onDismissRequest = { menuVisibility[scope.id] = false }
+                            ) {
+                                DropdownMenuItem(onClick = {
+                                    onEditScope(scope.id, scope.name)
+                                    menuVisibility[scope.id] = false
+                                },
+                                    text = { Text(text = stringResource(R.string.edit_scope_name)) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Edit,
+                                            contentDescription = "Edit"
+                                        )
+                                    }
                                 )
+                                DropdownMenuItem(onClick = {
+                                    onDeleteScope(scope.id)
+                                    menuVisibility[scope.id] = false
+                                },
+                                    text = { Text(text = stringResource(R.string.delete)) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Filled.Delete,
+                                            contentDescription = "Delete",
+                                            tint = Color(0xFFFFB0CF)
+                                        )
+                                    }
+                                )
+
                             }
                         }
-                    }
-                },
-                colors = ListItemDefaults.colors(
-                    containerColor = Color.Transparent
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = backgroundColor.value
+                    )
                 )
-            )
-            if (index < scopes.size - 1) {
                 Divider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     thickness = Dp.Hairline
