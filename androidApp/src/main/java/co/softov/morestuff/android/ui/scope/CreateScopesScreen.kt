@@ -224,9 +224,22 @@ fun ManageScopeList(
             }
         },
         onDragEnd = { startIndex, endIndex ->
-            val movedItem = data.value[endIndex]
-            reorderScope(movedItem.id, endIndex)
+            val mutableList = data.value.toMutableList()
+
+            if (mutableList[endIndex].id == 1L) {
+                val itemWithIdOne = mutableList.removeAt(endIndex)
+                mutableList.add(0, itemWithIdOne)
+
+                val originalList = scopes.toMutableList()
+                originalList.removeAt(0)
+                originalList.add(startIndex, scopes[0])
+                data.value = originalList
+            } else {
+                val movedItem = data.value[endIndex]
+                reorderScope(movedItem.id, endIndex)
+            }
         }
+
     )
 
     LaunchedEffect(scopes) {
