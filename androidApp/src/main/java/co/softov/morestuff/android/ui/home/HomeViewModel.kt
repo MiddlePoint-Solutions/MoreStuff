@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.home
 
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.scopeAll
@@ -9,6 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.usecase.scope.GetLastCreatedScopeIdUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState.Complete
@@ -24,6 +26,7 @@ import timber.log.Timber
 
 class HomeViewModel(
     getScopesFlowUseCase: GetScopesFlowUseCase,
+    private val getLastCreatedScopeIdUseCase: GetLastCreatedScopeIdUseCase,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
@@ -212,6 +215,20 @@ class HomeViewModel(
         viewModelScope.launch {
             dispatchAppStoreAction(ScopeAction.CreateScopeAction(uid, name))
             delay(500)
+
+            val lastScopeId = getLastCreatedScopeIdUseCase()
+            if (lastScopeId != null) {
+                val selectedTaskIds = selectedTasks.value
+                if (selectedTaskIds.isNotEmpty()) {
+                    dispatchAppStoreAction(
+                        TaskAction.AddTasksToScopeAction(
+                            selectedTaskIds,
+                            lastScopeId
+                        )
+                    )
+                    clearSelectedTasks()
+                }
+            }
         }
     }
 

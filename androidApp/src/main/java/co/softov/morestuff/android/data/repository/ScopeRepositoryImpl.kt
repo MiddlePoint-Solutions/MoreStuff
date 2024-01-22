@@ -11,7 +11,6 @@ import co.softov.morestuff.android.domain.repository.ScopeRepository
 import co.softov.morestuff.db.StuffDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 
 class ScopeRepositoryImpl(
     database: StuffDb,
@@ -98,5 +97,13 @@ class ScopeRepositoryImpl(
                 .executeAsOne()
                 .right()
         }
+
+    override suspend fun getLastCreatedScopeId(): Long? {
+        return try {
+            scopeQueries.lastInsertRowId().executeAsOne()
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 }
