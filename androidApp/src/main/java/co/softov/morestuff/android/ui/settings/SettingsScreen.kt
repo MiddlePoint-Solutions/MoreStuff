@@ -548,7 +548,7 @@ fun ScopeSettingsScreen() {
     val navigation = LocalAppNavigation.current
     SettingsMenuLink(
         title = { Text(text = stringResource(R.string.manage_scopes)) },
-        onClick = { navigation.push(Screen.CreateScope) },
+        onClick = { navigation.push(Screen.CreateScope()) },
         icon = {
             Icon(
                 imageVector = Icons.Default.Layers,

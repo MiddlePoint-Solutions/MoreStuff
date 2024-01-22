@@ -7,7 +7,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -69,7 +68,6 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -381,6 +379,7 @@ private fun TaskChatInput(
                                 }
                             }
                         },
+                        inputHint = R.string.task_chat_input_hint
                     )
                 }
             },

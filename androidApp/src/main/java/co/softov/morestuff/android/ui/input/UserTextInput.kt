@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -52,7 +51,8 @@ fun UserTextInput(
     actionsContent: @Composable BoxScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    startWithFocus: Boolean = false
+    startWithFocus: Boolean = false,
+    inputHint: Int
 ) {
 
     val a11ylabel = stringResource(id = R.string.textfield_desc)
@@ -104,7 +104,7 @@ fun UserTextInput(
                     ) {
                         if (value.text.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.main_input_hint),
+                                text = stringResource(inputHint/*R.string.main_input_hint*/),
                                 modifier = Modifier.align(Alignment.CenterStart),
                                 style = LocalTextStyle.current.copy(
                                     color = LocalContentColor.current.copy(alpha = 0.6f),
@@ -141,6 +141,7 @@ private fun Preview() {
         UserTextInput(
             value = TextFieldValue(text = ""),
             onValueChange = {},
+            inputHint = 1
         )
     }
 }

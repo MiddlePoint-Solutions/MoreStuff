@@ -101,6 +101,10 @@
     <string name="cd_task_message_icon">Task message icon</string>
     <string name="create_new_chat">Create New Chat</string>
     <string name="main_input_hint">Create new task</string>
+    <string name="create_scope_input_hint">Create new scope</string>
+    <string name="task_chat_input_hint">Write notes</string>
+
+
     <string name="cd_complete_task">Complete task</string>
     <string name="complete">Complete</string>
     <string name="completed">Completed</string>

@@ -38,6 +38,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -75,7 +76,10 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateScopesScreen(onBack: () -> Unit) {
+fun CreateScopesScreen(
+    onBack: () -> Unit,
+    userInputActiveInitially: Boolean,
+) {
     val homeViewModel: HomeViewModel = koinViewModel()
     val scopes by homeViewModel.scopes.collectAsState()
     val coroutineScope = rememberCoroutineScope()
@@ -83,7 +87,7 @@ fun CreateScopesScreen(onBack: () -> Unit) {
     val isDeleteDialogOpen = remember { mutableStateOf(false) }
     var selectScopeId by remember { mutableStateOf<Long?>(null) }
     var updateScopeName by remember { mutableStateOf(TextFieldValue()) }
-    var isUserInputActive by remember { mutableStateOf(false) }
+    var isUserInputActive by remember { mutableStateOf(userInputActiveInitially) }
     val focusRequester = remember { FocusRequester() }
 
 
@@ -318,6 +322,12 @@ fun UserInputComponent(
         mutableStateOf(newScopeName.text.isBlank())
     }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+        delay(300)
+    }
+
     Box {
         UserInput(
             textContent = {
@@ -353,8 +363,9 @@ fun UserInputComponent(
                             }
                         }
                     },
+                    inputHint = R.string.create_scope_input_hint
 
-                    )
+                )
             })
     }
 

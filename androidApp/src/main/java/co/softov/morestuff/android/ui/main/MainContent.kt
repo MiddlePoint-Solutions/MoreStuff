@@ -65,7 +65,7 @@ fun MainContent(
             Home -> HomeScreen()
             is Review -> ReviewScreen(scopeId = screen.scopeId)
             Settings -> SettingsScreen()
-            Screen.CreateScope -> CreateScopesScreen(onBack = navigation::pop)
+           is Screen.CreateScope -> CreateScopesScreen(onBack = navigation::pop, userInputActiveInitially = screen.userInputActiveInitially)
 
             is TaskChat -> TaskChatScreen(
                 taskId = screen.taskId,

@@ -42,6 +42,7 @@ import androidx.compose.ui.window.PopupProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -55,7 +56,6 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import com.arkivanov.decompose.router.stack.push
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -218,7 +218,8 @@ fun TaskInputBottomSheet(
                                                 })
                                             }
                                         }
-                                    }
+                                    },
+                                    inputHint = R.string.main_input_hint
                                 )
                             }
                         }
