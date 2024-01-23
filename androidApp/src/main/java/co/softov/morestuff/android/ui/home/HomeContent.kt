@@ -76,10 +76,8 @@ import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
-import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
-import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.scope.CreateScopeButton
 import co.softov.morestuff.android.ui.scope.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
@@ -88,10 +86,6 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
@@ -209,10 +203,17 @@ fun HomeContent(
 
     val states by rememberUpdatedState(newValue = scopes.map { rememberLazyListState() })
     val pagerState = rememberPagerState(pageCount = { scopes.size })
+    var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
 
-    LaunchedEffect(pagerState.currentPage) {
-        viewModel.selectScope(scopes[pagerState.currentPage].id)
-        states[pagerState.currentPage].scrollToItem(0)
+    LaunchedEffect(Unit) {
+        snapshotFlow { pagerState.currentPage }
+            .collect { page ->
+                if (currentScopePage != page) {
+                    launch { states[currentScopePage].scrollToItem(0) }
+                    currentScopePage = page
+                }
+                viewModel.selectScope(scopes[page].id)
+            }
     }
 
     BackHandler(selectedTasks.isNotEmpty()) {
@@ -265,13 +266,13 @@ fun HomeContent(
                 modifier = Modifier.fillMaxSize(),
                 beyondBoundsPageCount = 1,
                 key = { scopes[it].id }
-            ) {
+            ) { page ->
 
                 val scopeViewModel = koinViewModel<ScopeViewModel>(
-                    key = "Scope$it",
+                    key = "Scope$page",
                     parameters = {
                         parametersOf(
-                            scopes[it].id,
+                            scopes[page].id,
                             viewModel.selectedTasks
                         )
                     }
@@ -310,7 +311,7 @@ fun HomeContent(
                             }
                         },
                         onItemLongClick = viewModel::toggleTaskSelection,
-                        listState = states[it],
+                        listState = states[page],
                         modifier = Modifier.padding(bottom = 20.dp),
                     )
                 }
