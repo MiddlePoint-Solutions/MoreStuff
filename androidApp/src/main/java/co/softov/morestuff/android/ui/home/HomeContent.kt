@@ -46,7 +46,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +53,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -76,10 +74,8 @@ import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
-import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
-import co.softov.morestuff.android.ui.schedule.TaskOptionsDialog
 import co.softov.morestuff.android.ui.scope.CreateScopeButton
 import co.softov.morestuff.android.ui.scope.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
@@ -88,17 +84,12 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,6 +102,13 @@ fun HomeScreen(
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showScopeSelection by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var showScopeChangeConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var pendingScopeChange: Long? by rememberSaveable { mutableStateOf(null) }
+    val onScopeSelected: (Long) -> Unit = { scopeId ->
+        pendingScopeChange = scopeId
+        showScopeChangeConfirmationDialog = true
+    }
+
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -182,9 +180,26 @@ fun HomeScreen(
         val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ScopeSelectionBottomSheet(
             onDismissRequest = { showScopeSelection = false },
-            addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
+            addSelectedTasksToScope = onScopeSelected,
             scopes = scopes,
             sheetState = scopeSelectionSheetState,
+        )
+    }
+    if (showScopeChangeConfirmationDialog && pendingScopeChange != null) {
+        val scopeName = viewModel.scopes.value.find { it.id == pendingScopeChange }?.name ?: ""
+        ConfirmScopeChangeDialog(
+            scopeName = scopeName,
+            onDismiss = {
+                showScopeChangeConfirmationDialog = false
+                showScopeSelection = true
+            },
+            onConfirm = {
+                pendingScopeChange?.let { scopeId ->
+                    viewModel.addSelectedTasksToScope(scopeId)
+                    pendingScopeChange = null
+                }
+                showScopeChangeConfirmationDialog = false
+            }
         )
     }
 }
@@ -487,6 +502,34 @@ private fun ConfirmDeleteDialog(
         confirmButton = {
             TextButton(onClick = onConfirm) {
                 Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+fun ConfirmScopeChangeDialog(
+    scopeName: String,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.confirm_scope_change)) },
+        text = {
+            Text(
+                text = stringResource(R.string.sure_move_task_to_scope, scopeName),
+                textAlign = TextAlign.Start
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {

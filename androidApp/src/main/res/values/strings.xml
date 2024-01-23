@@ -159,6 +159,9 @@
 
 
     <string name="sure_delete_scope">Are you sure you want to delete\nthe following scope?</string>
+    <string name="sure_move_task_to_scope">Are you sure you want to move\nthe following task to "%1$s" scope?</string>
+    <string name="confirm_scope_change">Confirm scope change</string>
+
     <string name="create_new_scope">Create new Scope</string>
     <string name="confirm">Confirm</string>
     <string name="edit_scope_name">Edit Scope Name</string>
