@@ -92,6 +92,8 @@
     <string name="snack_task_archived">Task archived</string>
     <string name="undo">Undo</string>
     <string name="snack_task_completed">Task completed</string>
+    <string name="snack_task_moved_to_new_scope">Task moved to new scope</string>
+
     <string name="title_activity_share">ShareActivity</string>
     <string name="select_chat">Select Chat</string>
     <string name="cd_search_chats">Search Chats</string>

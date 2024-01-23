@@ -46,7 +46,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +53,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -92,7 +90,6 @@ import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -232,6 +229,18 @@ fun HomeContent(
                     when (it) {
                         SnackbarResult.Dismissed -> viewModel.resetNotification()
                         SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
+                    }
+                }
+            }
+            NotificationState.TaskMovedToNewScope -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(R.string.snack_task_moved_to_new_scope),
+                    actionLabel = resources.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
+                ).also {
+                    when (it) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> viewModel.undoMovedTask()
                     }
                 }
             }
