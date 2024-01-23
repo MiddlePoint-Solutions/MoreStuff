@@ -75,6 +75,7 @@ import co.softov.morestuff.android.ui.home.HomeViewModel
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.theme.md_theme_light_error
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -224,21 +225,30 @@ fun ManageScopeList(
             }
         },
         onDragEnd = { startIndex, endIndex ->
+            // Create a mutable copy of the current list of elements
             val mutableList = data.value.toMutableList()
 
+            // Check if the element at the endIndex has an id equal to 1L
             if (mutableList[endIndex].id == 1L) {
+                // If the dragged item has id 1L, move it to the top of the list
                 val itemWithIdOne = mutableList.removeAt(endIndex)
                 mutableList.add(0, itemWithIdOne)
 
+                // Create a copy of the original list of elements
                 val originalList = scopes.toMutableList()
+                // Remove the first element (with id 1L) from the copy
                 originalList.removeAt(0)
+                // Add the first element back at the startIndex
                 originalList.add(startIndex, scopes[0])
+                // Update the data.value with the reorganized list
                 data.value = originalList
             } else {
+                // If the dragged item doesn't have id 1L, notify the reorder function
                 val movedItem = data.value[endIndex]
                 reorderScope(movedItem.id, endIndex)
             }
         }
+
 
     )
 
@@ -316,7 +326,7 @@ fun ManageScopeList(
                                         Icon(
                                             imageVector = Icons.Filled.Delete,
                                             contentDescription = "Delete",
-                                            tint = Color(0xFFFFB0CF)
+                                            tint = md_theme_light_error
                                         )
                                     }
                                 )
