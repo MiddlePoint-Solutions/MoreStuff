@@ -56,12 +56,12 @@ fun TaskInputBottomSheet(
     sheetState: SheetState,
     context: ChatContext,
     onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
+    viewModel: UserInputViewModel = koinViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
 
-    val viewModel: UserInputViewModel = koinViewModel()
     val messages by viewModel.messages.collectAsStateWithLifecycle()
     val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
     val scopes by viewModel.scopes.collectAsState()
@@ -87,29 +87,17 @@ fun TaskInputBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = Modifier.fillMaxHeight(0.95f),
         sheetState = sheetState,
-        dragHandle = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                BottomSheetDefaults.DragHandle()
-
-                val initialIndex = scopes.indexOfFirst { it.id == viewModel.currentScope.id }.coerceAtLeast(0)
-
-                ScopeCarousel(
-                    scopes = scopes,
-                    initialIndex = initialIndex,
-                    currentScope = viewModel.currentScope.id,
-                    onScopeSelected = { scopeId ->
-                        viewModel.setCurrentScope(scopeId)
-                    },
-                    modifier = Modifier
-                        .height(70.dp)
-                        .fillMaxWidth()
-
-                )
-            }
-        },
         content = {
+
+            ScopeCarousel(
+                scopes = scopes,
+                currentScope = viewModel.currentScope.id,
+                onScopeSelected = viewModel::setCurrentScope,
+                modifier = Modifier
+                    .height(70.dp)
+                    .fillMaxWidth()
+            )
+
             ConstraintLayout {
 
                 val (chat, input) = createRefs()

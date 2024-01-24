@@ -1,19 +1,17 @@
 package co.softov.morestuff.android.ui.components
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
@@ -21,166 +19,113 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import timber.log.Timber
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
 fun ScopeCarousel(
     scopes: List<ScopeDomain>,
     currentScope: Long,
     onScopeSelected: (Long) -> Unit,
-    initialIndex: Int,
     modifier: Modifier = Modifier,
 ) {
+
+    if (scopes.isEmpty()) {
+        return
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
     BoxWithConstraints {
         val screenWidth = maxWidth
-        val itemWidth = screenWidth / 3
+        val itemWidth = (screenWidth.value / 3.5).dp
         val halfItemWidth = itemWidth / 2
-        val centerPadding = screenWidth / 2 - halfItemWidth
-        var isSelected by remember { mutableStateOf(false) }
-        val pagerState = rememberPagerState(initialPage = initialIndex, pageCount = { scopes.size })
+        val centerPadding = ((screenWidth / 2) - halfItemWidth) + 20.dp
 
-        // Animar al HorizontalPager cuando el currentScope cambia externamente
-        LaunchedEffect(currentScope) {
-            val targetPage = scopes.indexOfFirst { it.id == currentScope }.coerceAtLeast(0)
-            pagerState.animateScrollToPage(targetPage)
+        val pagerState = rememberPagerState(
+            initialPage = scopes.indexOfFirst { it.id == currentScope },
+            pageCount = { scopes.size }
+        )
+
+        LaunchedEffect(Unit) {
+            snapshotFlow { pagerState.currentPage }
+                .debounce(300)
+                .collect { onScopeSelected(scopes[it].id) }
         }
-
-        // Observar cambios en la página actual del HorizontalPager
-        LaunchedEffect(pagerState.currentPage) {
-            val selectedScopeId = scopes.getOrNull(pagerState.currentPage)?.id
-            if (selectedScopeId != null && selectedScopeId != currentScope) {
-                onScopeSelected(selectedScopeId)
-            }
-        }
-
 
         HorizontalPager(
             state = pagerState,
             modifier = modifier,
             contentPadding = PaddingValues(start = centerPadding, end = centerPadding)
         ) { page ->
-            scopes.getOrNull(page)?.let { scope ->
-                ScopeCarouselItem(
-                    scopeId = scope.id,
-                    scopeName = scope.name,
-                    onSelectScope = onScopeSelected,
-                    isSelected = page == pagerState.currentPage,
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .fillMaxHeight()
-                        .width(itemWidth),
-                )
-            }
+            val scope = scopes[page]
+            ScopeCarouselItem(
+                scope = scope,
+                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(page) } },
+                isSelected = page == pagerState.currentPage,
+                modifier = Modifier
+                    .padding(2.dp)
+                    .widthIn(min = itemWidth, max = itemWidth + 50.dp),
+            )
         }
     }
 }
 
-
-
 @Composable
 private fun ScopeCarouselItem(
-    scopeId: Long,
-    scopeName: String,
-    onSelectScope: (Long) -> Unit,
+    scope: ScopeDomain,
+    onClick: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val alphaAnimatable = remember { Animatable(if (isSelected) 1f else 0.2f) }
 
-    LaunchedEffect(isSelected) {
-        alphaAnimatable.animateTo(
-            targetValue = if (isSelected) 1f else 0.2f,
-            animationSpec = tween(durationMillis = 500)
-        )
-    }
-    /*LaunchedEffect(isSelected) {
-        if (isSelected) {
-            onSelectScope(scopeId)
+    val currentState by remember(isSelected) { mutableStateOf(isSelected) }
+    val transition = updateTransition(currentState, label = "scope item state")
+
+    val alphaState by transition.animateFloat(label = "text alpha") { state ->
+        when (state) {
+            true -> 1f
+            false -> 0.2f
         }
-    }*/
+    }
+
+    val fontState by transition.animateInt(label = "text font") { state ->
+        when (state) {
+            false -> 15
+            true -> 20
+        }
+    }
 
     Column(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures {
-                    onSelectScope(scopeId)
-                }
-            },
+        modifier = modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+            onClick = onClick
+        ),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = scopeName,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            fontSize = if (isSelected) 20.sp else 15.sp,
-            color = if (isSelected) {
-                MaterialTheme.colorScheme.secondary
-            } else {
-                MaterialTheme.colorScheme.secondary.copy(alpha = alphaAnimatable.value)
-            },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            text = scope.name,
+            modifier = Modifier.graphicsLayer { alpha = alphaState },
+            style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp),
+            fontSize = fontState.sp,
+            color = MaterialTheme.colorScheme.secondary,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
         )
     }
 }
-
-
-/*LaunchedEffect(currentScope, isSelected) {
-    val targetPage = scopes.indexOfFirst { it.id == currentScope }.coerceAtLeast(0)
-    pagerState.animateScrollToPage(targetPage)
-
-    if (isSelected) {
-        onScopeSelected(currentScope)
-    }
-}*/
-
-
-/* val currentPage = currentScope.let { id ->
-     scopes.indexOfFirst { it.id == id }.coerceAtLeast(0)
- }
- LaunchedEffect(currentScope) {
-     pagerState.animateScrollToPage(currentPage)
- }*/
-
-/* HorizontalPager(
-                 state = pagerState,
-                 modifier = modifier,
-                 contentPadding = PaddingValues(
-                     start = centerPadding,
-                     end = centerPadding
-                 )
-             ) { page ->
-                 val scope = scopes.getOrNull(page)
-                 Row(
-                     modifier = Modifier
-                         .fillMaxWidth()
-                         .padding(horizontal = 2.dp)
-                 ) {
-                     if (scope != null) {
-                         ScopeCarouselItem(
-                             scopeId = scope.id,
-                             scopeName = scope.name,
-                             onSelectScope = onScopeSelected,
-                             isSelected = page == pagerState.currentPage,
-                             modifier = Modifier
-                                 .padding(2.dp)
-                                 .fillMaxHeight()
-                                 .width(itemWidth),
-                         )
-                     }
-                 }
-             }*/

@@ -90,6 +90,7 @@ import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -138,7 +139,6 @@ fun ReviewContent(
     ) {
 
         val model by viewModel.uiModel.collectAsState()
-        val initialIndex = viewModel.scopes.indexOfFirst { it.id == model.currentScope.id }.coerceAtLeast(0)
 
         ConstraintLayout(
             modifier
@@ -164,8 +164,6 @@ fun ReviewContent(
                             top.linkTo(parent.top)
                         },
                         scopeId = scopeId,
-                        initialIndex = initialIndex
-
                     )
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
@@ -293,7 +291,6 @@ private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
     scopeId: Long,
-    initialIndex: Int,
 ) {
     val viewModel: ReviewViewModel = koinViewModel()
     val coroutineScope = rememberCoroutineScope()
@@ -352,13 +349,11 @@ private fun PriorityReviewTopBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
         )
+
         ScopeCarousel(
             scopes = scopes,
-            initialIndex = initialIndex,
             currentScope = scopeId,
-            onScopeSelected = { scopeId ->
-                viewModel.setCurrentScope(scopeId)
-            },
+            onScopeSelected = viewModel::setCurrentScope,
             modifier = Modifier
                 .height(75.dp)
                 .padding(bottom = 30.dp)

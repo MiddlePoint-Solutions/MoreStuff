@@ -45,7 +45,6 @@ class UserInputViewModel(
     private val timeFormatter: TimeFormatter,
     private val messageUiMapper: MessageUiMapper,
     private val appMessagesProvider: AppMessagesProvider
-
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
