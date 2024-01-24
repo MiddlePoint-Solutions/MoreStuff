@@ -45,7 +45,6 @@ class UserInputViewModel(
     private val timeFormatter: TimeFormatter,
     private val messageUiMapper: MessageUiMapper,
     private val appMessagesProvider: AppMessagesProvider
-
 ) : NoStateViewModel() {
 
     val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
@@ -90,7 +89,8 @@ class UserInputViewModel(
         viewModelScope.launch {
             getScopesUseCase().onRight { scopeList ->
                 scopes.update { scopeList }
-                currentScope = scopeList.first { scope -> scope.id == context.scopeId }
+                val initialIndex = scopeList.indexOfFirst { it.id == context.scopeId }
+                currentScope = scopeList.getOrNull(initialIndex) ?: scopeAll
             }
         }
     }

@@ -50,6 +50,7 @@ class ReviewViewModel(
             getScopesUseCase().onRight {
                 scopes = it
                 setCurrentScope(scopeId)
+
             }
         }
     }
