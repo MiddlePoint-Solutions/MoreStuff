@@ -55,7 +55,6 @@ telephotoVersion = "0.5.0"
 lottie = "6.1.0"
 kSoup ="0.3.0"
 ktor = "2.3.7"
-ludwig = "1.0.3"
 
 [plugins]
 kotlinPlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -164,7 +163,6 @@ lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
 ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorClient = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ludwig = { module = "com.github.baec23.ludwig:component", version.ref = "ludwig" }
 
 [bundles]
 # AndroidX and Compose
@@ -201,7 +199,6 @@ compose = [
     "constraintLayoutCompose",
     "uiToolingPreview",
     "uiTooling",
-    "ludwig"
 ]
 
 # Testing
