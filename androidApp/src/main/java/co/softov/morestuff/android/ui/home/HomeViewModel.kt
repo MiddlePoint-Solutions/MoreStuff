@@ -10,21 +10,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.ui.home.HomeUiEvent.AddSelectedTasksToScope
-import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
-import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
-import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteTask
-import co.softov.morestuff.android.ui.home.HomeUiEvent.CreateScope
-import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteScope
-import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasks
-import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasksFromScope
-import co.softov.morestuff.android.ui.home.HomeUiEvent.ScopeSelected
-import co.softov.morestuff.android.ui.home.HomeUiEvent.SetConfettiEnabled
-import co.softov.morestuff.android.ui.home.HomeUiEvent.SetNotification
-import co.softov.morestuff.android.ui.home.HomeUiEvent.ToggleTaskSelection
-import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoComplete
-import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoMoveTasks
-import co.softov.morestuff.android.ui.home.HomeUiEvent.UpdateScopeName
+import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState.Complete
 import co.softov.morestuff.android.ui.model.NotificationState.None
 import co.softov.morestuff.android.ui.model.NotificationState.TaskMovedToNewScope
@@ -170,6 +156,7 @@ class HomeViewModel(
                 dispatchAppStoreAction((ScopeAction.UpdateScopeOrderAction(event.scopeId, event.newPosition)))
                 this
             }
+
         }
     }
 
