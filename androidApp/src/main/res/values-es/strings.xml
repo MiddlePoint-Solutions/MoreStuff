@@ -93,6 +93,7 @@
     <string name="snack_task_archived">Tarea archivada</string>
     <string name="undo">Deshacer</string>
     <string name="snack_task_completed">Tarea Completada</string>
+    <string name="snack_task_moved_to_new_scope">Tarea movida a un nuevo scope</string>
     <string name="title_activity_share">Compartir Actividad</string>
     <string name="select_chat">Seleccionar Chat</string>
     <string name="cd_search_chats">Buscar Chats</string>

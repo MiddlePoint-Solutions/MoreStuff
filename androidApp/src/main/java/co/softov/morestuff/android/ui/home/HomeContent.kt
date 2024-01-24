@@ -92,7 +92,6 @@ import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -232,6 +231,18 @@ fun HomeContent(
                     when (it) {
                         SnackbarResult.Dismissed -> viewModel.resetNotification()
                         SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
+                    }
+                }
+            }
+            NotificationState.TaskMovedToNewScope -> {
+                snackbarHostState.showSnackbar(
+                    message = resources.getString(R.string.snack_task_moved_to_new_scope),
+                    actionLabel = resources.getString(R.string.undo),
+                    duration = SnackbarDuration.Long
+                ).also {
+                    when (it) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> viewModel.undoMovedTask()
                     }
                 }
             }

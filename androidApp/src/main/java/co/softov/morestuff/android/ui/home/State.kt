@@ -9,8 +9,10 @@ import co.softov.morestuff.android.ui.model.NotificationState
 data class HomeUiModel(
     val confettiEnabled: Boolean = true,
     val recentlyCompletedTasks: List<Long> = listOf(),
+    val recentlyMovedTasks: List<Long> = listOf(),
     val notification: NotificationState = NotificationState.None,
     val selectedScopeId: Long = 0,
+    val lastScopeId: Long? = null
 ) : BaseViewState
 
 @Immutable
@@ -30,4 +32,6 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class DeleteScope(val scopeId: Long) : HomeUiEvent()
     data class UpdateScopeName(val scopeId: Long, val newName: String) : HomeUiEvent()
     data class ReorderScope(val scopeId: Long, val newPosition: Int) : HomeUiEvent()
+    data class UndoMoveTasks( val scopeId: Long) : HomeUiEvent()
+
 }
