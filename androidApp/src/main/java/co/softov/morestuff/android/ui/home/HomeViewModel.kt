@@ -135,6 +135,11 @@ class HomeViewModel(
             }
 
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
+
+            is ReorderScope -> {
+                dispatchAppStoreAction((ScopeAction.UpdateScopeOrderAction(event.scopeId, event.newPosition)))
+                this
+            }
         }
     }
 
@@ -231,5 +236,11 @@ class HomeViewModel(
         }
     }
 
+    fun reorderScope(scopeId: Long, newPosition: Int) {
+        viewModelScope.launch {
+            sendEvent(ReorderScope(scopeId, newPosition))
+        }
+    }
 }
+
 
