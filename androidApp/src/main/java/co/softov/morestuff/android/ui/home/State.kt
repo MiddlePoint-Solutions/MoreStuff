@@ -27,11 +27,7 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class SetNotification(val notification: NotificationState) : HomeUiEvent()
     data class AddSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
     data object DeleteSelectedTasksFromScope : HomeUiEvent()
-    data class CreateScope(val uid: String, val name: String) : HomeUiEvent()
     data class ScopeSelected(val scopeId: Long) : HomeUiEvent()
-    data class DeleteScope(val scopeId: Long) : HomeUiEvent()
-    data class UpdateScopeName(val scopeId: Long, val newName: String) : HomeUiEvent()
-    data class ReorderScope(val scopeId: Long, val newPosition: Int) : HomeUiEvent()
     data class UndoMoveTasks( val scopeId: Long) : HomeUiEvent()
 
 }

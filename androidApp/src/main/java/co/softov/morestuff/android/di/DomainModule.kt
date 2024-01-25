@@ -123,8 +123,8 @@ import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCaseImpl
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCase
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopesOrderUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopesOrderUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCase
 import co.softov.morestuff.android.domain.usecase.settings.CheckFirstTimeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingUseCase
@@ -294,7 +294,7 @@ val scopeUseCases = module{
     factoryOf(::DeleteScopeUseCaseImpl) bind DeleteScopeUseCase::class
     factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
     factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
-    factoryOf(::UpdateScopeOrderUseCaseImpl) bind UpdateScopeOrderUseCase::class
+    factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
 }
 
