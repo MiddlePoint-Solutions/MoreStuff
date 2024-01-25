@@ -11,9 +11,8 @@ import co.softov.morestuff.android.domain.redux.store.Next
 import co.softov.morestuff.android.domain.redux.store.NoOp
 import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
 import co.softov.morestuff.android.domain.usecase.scope.DeleteScopeUseCase
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
-import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeOrderUseCase
+import co.softov.morestuff.android.domain.usecase.scope.UpdateScopesOrderUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -21,14 +20,14 @@ sealed class ScopeAction : Action.FeatureAction() {
     data class CreateScopeAction(val scopeUid: String, val name: String) : ScopeAction()
     data class DeleteScopeAction(val scopeId: Long) : ScopeAction()
     data class UpdateScopeNameAction(val scopeId: Long, val newName: String) : ScopeAction()
-    data class UpdateScopeOrderAction(val scopeId: Long, val order: Int) : ScopeAction()
+    data class UpdateScopeOrderAction(val scopes: List<ScopeDomain>) : ScopeAction()
 }
 
 class ScopeMiddleware(
     private val createScopeUseCase: CreateScopeUseCase,
     private val deleteScopeUseCase: DeleteScopeUseCase,
     private val updateScopeNameUseCase: UpdateScopeNameUseCase,
-    private val updateScopeOrderUseCase: UpdateScopeOrderUseCase
+    private val updateScopesOrderUseCase: UpdateScopesOrderUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -58,7 +57,7 @@ class ScopeMiddleware(
             }
 
             is UpdateScopeOrderAction -> scope.launch {
-                updateScopeOrderUseCase(action.scopeId, action.order)
+                updateScopesOrderUseCase(action.scopes)
             }
 
             else -> NoOp

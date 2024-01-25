@@ -279,11 +279,13 @@ fun HomeContent(
                 key = { scopes[it].id }
             ) { page ->
 
+                val scope = scopes[page]
+
                 val scopeViewModel = koinViewModel<ScopeViewModel>(
-                    key = "Scope$page",
+                    key = "Scope${scope.id}",
                     parameters = {
                         parametersOf(
-                            scopes[page].id,
+                            scope.id,
                             viewModel.selectedTasks
                         )
                     }
@@ -420,8 +422,7 @@ fun ScopeSelectionBottomSheet(
                         }
                     )
                     CreateScopeButton(
-                        isUserInputActive = false,
-                        onButtonClick = {
+                        onClick = {
                             navigation.push(Screen.CreateScope)
                             coroutineScope.launch {
                                 sheetState.hide()
