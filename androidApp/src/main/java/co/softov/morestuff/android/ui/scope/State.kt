@@ -1,0 +1,12 @@
+package co.softov.morestuff.android.ui.scope
+
+import androidx.compose.runtime.Immutable
+import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
+
+@Immutable
+sealed class ScopesUiEvent : BaseViewEvent {
+    data class CreateScope(val uid: String, val name: String) : ScopesUiEvent()
+    data class DeleteScope(val scopeId: Long) : ScopesUiEvent()
+    data class UpdateScopeName(val scopeId: Long, val newName: String) : ScopesUiEvent()
+    data class ReorderScope(val fromIndex: Int, val toIndex: Int, val isFinal: Boolean) : ScopesUiEvent()
+}

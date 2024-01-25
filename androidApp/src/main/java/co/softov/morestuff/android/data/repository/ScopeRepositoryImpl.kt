@@ -11,7 +11,6 @@ import co.softov.morestuff.android.domain.repository.ScopeRepository
 import co.softov.morestuff.db.StuffDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 
 class ScopeRepositoryImpl(
     database: StuffDb,
@@ -74,6 +73,7 @@ class ScopeRepositoryImpl(
                 .right()
         }
 
+    // TODO: consider passing the entire list of scopes that will update their order
     override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, ScopeDomain> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeOrder(
@@ -99,4 +99,14 @@ class ScopeRepositoryImpl(
                 .right()
         }
 
+    override suspend fun updateScopesOrder(scopesOrder: List<Pair<Long, Int>>) {
+        scopeQueries.transaction {
+            scopesOrder.forEach {
+                scopeQueries.updateScopeOrder(
+                    scopeId = it.first,
+                    scopeOrder = it.second
+                )
+            }
+        }
+    }
 }

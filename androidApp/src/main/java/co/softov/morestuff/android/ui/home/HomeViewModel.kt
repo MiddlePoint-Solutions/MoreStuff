@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.getAndUpdate
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,6 +32,9 @@ class HomeViewModel(
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
     val scopes = getScopesFlowUseCase()
+        .onEach { scopes ->
+            Timber.d("Scope order: ${scopes.map { it.name }}")
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
@@ -133,39 +137,10 @@ class HomeViewModel(
                 this
             }
 
-            is CreateScope -> {
-                createScope(event.uid, event.name)
-                this
-            }
-
             is ScopeSelected -> copy(selectedScopeId = event.scopeId)
-
-            is DeleteScope -> {
-                dispatchAppStoreAction(ScopeAction.DeleteScopeAction(event.scopeId))
-                this
-            }
-
-            is UpdateScopeName -> {
-                updateScopeName(event.scopeId, event.newName)
-                this
-            }
 
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
 
-            is ReorderScope -> {
-                dispatchAppStoreAction((ScopeAction.UpdateScopeOrderAction(event.scopeId, event.newPosition)))
-                this
-            }
-
-        }
-    }
-
-    fun handleEvent(event: HomeUiEvent) {
-        when (event) {
-            is CreateScope -> createScope(event.uid, event.name)
-            is ScopeSelected -> selectScope(event.scopeId)
-            is UpdateScopeName -> updateScopeName(event.scopeId, event.newName)
-            else -> {}
         }
     }
 
@@ -187,25 +162,6 @@ class HomeViewModel(
     fun undoMovedTask() {
         val scopeId = state.lastScopeId
         scopeId?.let { UndoMoveTasks(it) }?.let { sendEvent(it) }
-    }
-
-
-    fun moveToTop(taskId: Long) {
-        dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(
-                taskId,
-                PriorityActionType.Now,
-            )
-        )
-    }
-
-    fun moveToBottom(taskId: Long) {
-        dispatchAppStoreAction(
-            PriorityAction.TaskPriorityUpdateAction(
-                taskId,
-                PriorityActionType.Later,
-            )
-        )
     }
 
     fun resetNotification() {
@@ -236,34 +192,11 @@ class HomeViewModel(
         sendEvent(DeleteSelectedTasksFromScope)
     }
 
-    private fun createScope(uid: String, name: String) {
-        viewModelScope.launch {
-            dispatchAppStoreAction(ScopeAction.CreateScopeAction(uid, name))
-            delay(500)
-        }
-    }
-
     fun selectScope(scopeId: Long) {
         Timber.d("Updating scopeId")
         sendEvent(ScopeSelected(scopeId))
     }
 
-    fun deleteScopes(scopeId: Long) {
-        sendEvent(DeleteScope(scopeId))
-    }
-
-    private fun updateScopeName(scopeId: Long, newName: String) {
-        viewModelScope.launch {
-            dispatchAppStoreAction(ScopeAction.UpdateScopeNameAction(scopeId, newName))
-            delay(500)
-        }
-    }
-
-    fun reorderScope(scopeId: Long, newPosition: Int) {
-        viewModelScope.launch {
-            sendEvent(ReorderScope(scopeId, newPosition))
-        }
-    }
 }
 
 
