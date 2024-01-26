@@ -20,6 +20,7 @@ import co.softov.morestuff.android.domain.usecase.task.AddTasksToScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
+import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTasksScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
@@ -59,7 +60,7 @@ class TaskMiddleware(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val createHintTaskUseCase: CreateHintTaskUseCase,
     private val deleteTasksUseCase: DeleteTasksUseCase,
-    private val removeTasksFromScopeUseCase: UpdateTasksScopeUseCase,
+    private val removeTasksFromScopeUseCase: RemoveTasksFromScopeUseCase,
     private val updateTasksScopeUseCase: UpdateTasksScopeUseCase,
 ) : Middleware<AppState> {
 
