@@ -5,14 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.TaskType
-import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.scopeAll
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
-import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -36,7 +30,7 @@ class ShareViewModel(
     var query by mutableStateOf("")
         private set
 
-    val tasks = getActiveTasksFlowUseCase(scopeAll.id)
+    val tasks = getActiveTasksFlowUseCase()
         .map { taskUiMapper.map(it) }
         .stateIn(
             scope = viewModelScope,

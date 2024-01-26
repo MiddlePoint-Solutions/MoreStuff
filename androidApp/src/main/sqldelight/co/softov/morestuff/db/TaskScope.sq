@@ -15,4 +15,4 @@ WHERE task_id IN :task_ids;
 
 remove:
 DELETE FROM task_scope
-WHERE task_id = :task_id AND scope_id = :scope_id;
+WHERE task_id IN :task_id AND scope_id = :scope_id;

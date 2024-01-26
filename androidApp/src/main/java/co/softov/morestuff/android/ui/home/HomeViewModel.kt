@@ -3,7 +3,7 @@ package co.softov.morestuff.android.ui.home
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.model.scopeAll
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
@@ -28,7 +28,7 @@ class HomeViewModel(
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
-    val initialState = state["Scopes"] ?: listOf(scopeAll)
+    val initialState = state["Scopes"] ?: listOf(defaultScope)
 
     val scopes = getScopesFlowUseCase()
         .onEach { scopes ->

@@ -10,7 +10,7 @@ import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.model.scopeAll
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.AppMessagesProvider
 import co.softov.morestuff.android.domain.service.TimeManager
@@ -77,7 +77,7 @@ class UserInputViewModel(
         )
     )
 
-    var currentScope by mutableStateOf(scopeAll)
+    var currentScope by mutableStateOf(defaultScope)
         private set
 
     fun load(context: ChatContext) {
@@ -90,7 +90,7 @@ class UserInputViewModel(
             getScopesUseCase().onRight { scopeList ->
                 scopes.update { scopeList }
                 val initialIndex = scopeList.indexOfFirst { it.id == context.scopeId }
-                currentScope = scopeList.getOrNull(initialIndex) ?: scopeAll
+                currentScope = scopeList.getOrNull(initialIndex) ?: defaultScope
             }
         }
     }

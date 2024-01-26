@@ -4,6 +4,7 @@ import co.softov.morestuff.android.domain.repository.TaskRepository
 import co.softov.morestuff.android.domain.createTaskForTest
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -21,7 +22,7 @@ class CreateNewTaskUseCaseTest {
 
     @Test
     fun `create new task use case`() = runBlocking {
-        val taskParams = TaskParams("title", Priority.Now(), TaskType.User)
+        val taskParams = TaskParams("title", Priority.Now(), TaskType.User, defaultScope.id)
         val task = createTaskForTest()
         coEvery { taskRepository.createTask(any(), any(), any(), any()) } returns task
         coEvery { getDefaultPriorityScoreUseCase(taskParams.priority) } returns 0

@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
@@ -30,7 +29,7 @@ class ScopesViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = listOf(scopeAll)
+            initialValue = listOf()
         )
 
     var scopesState by mutableStateOf<List<ScopeDomain>>(listOf())
@@ -39,7 +38,7 @@ class ScopesViewModel(
     fun handleEvent(event: ScopesUiEvent) {
         when (event) {
             is CreateScope -> {
-                dispatchAppStoreAction(ScopeAction.CreateScopeAction(event.uid, event.name))
+                dispatchAppStoreAction(ScopeAction.CreateScopeAction(event.name))
             }
 
             is UpdateScopeName -> {

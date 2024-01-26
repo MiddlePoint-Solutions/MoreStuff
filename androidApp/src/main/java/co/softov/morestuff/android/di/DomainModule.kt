@@ -121,6 +121,8 @@ import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.scope.InitScopesUseCase
+import co.softov.morestuff.android.domain.usecase.scope.InitScopesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCase
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopeNameUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.scope.UpdateScopesOrderUseCase
@@ -149,6 +151,8 @@ import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksFlowUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.GetScopeActiveTasksFlowUseCase
+import co.softov.morestuff.android.domain.usecase.task.GetScopeActiveTasksFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
@@ -261,6 +265,7 @@ val taskUseCases = module {
     factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
     factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
     factoryOf(::GetActiveTasksFlowUseCaseImpl) bind GetActiveTasksFlowUseCase::class
+    factoryOf(::GetScopeActiveTasksFlowUseCaseImpl) bind GetScopeActiveTasksFlowUseCase::class
     factoryOf(::GetCompletedTasksUseCaseImpl) bind GetCompletedTasksUseCase::class
     factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
     factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
@@ -299,6 +304,7 @@ val scopeUseCases = module{
     factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
     factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
+    factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
 }
 
 val scheduleUseCases = module {

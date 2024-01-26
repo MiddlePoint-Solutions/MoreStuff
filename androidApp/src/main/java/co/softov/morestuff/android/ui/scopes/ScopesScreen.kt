@@ -387,12 +387,7 @@ private fun ScopeInputComponent(
                                 exit = fadeOut()
                             ) {
                                 SendIcon(onClick = {
-                                    handleUiEvent(
-                                        CreateScope(
-                                            UUID.randomUUID().toString(),
-                                            newScopeName.text
-                                        )
-                                    )
+                                    handleUiEvent(CreateScope(newScopeName.text))
                                     newScopeName = newScopeName.copy("")
                                 })
                             }

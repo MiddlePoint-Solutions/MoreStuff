@@ -3,7 +3,6 @@ package co.softov.morestuff.android.domain.usecase.task
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.repository.TaskRepository
 
 interface GetTasksWithoutScheduleUseCase {
@@ -15,6 +14,6 @@ class GetTasksWithoutScheduleUseCaseImpl(
 ) : GetTasksWithoutScheduleUseCase {
 
     override suspend fun invoke(scopeId: Long): Either<Failure, List<TaskDomain>> =
-        taskRepository.getTasksWithoutSchedule(scopeId != scopeAll.id, scopeId)
+        taskRepository.getTasksWithoutSchedule(scopeId)
 }
 

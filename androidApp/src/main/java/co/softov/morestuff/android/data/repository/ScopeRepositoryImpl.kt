@@ -7,10 +7,12 @@ import arrow.core.right
 import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.repository.ScopeRepository
 import co.softov.morestuff.db.StuffDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 
 class ScopeRepositoryImpl(
     database: StuffDb,
@@ -18,11 +20,28 @@ class ScopeRepositoryImpl(
 ) : ScopeRepository {
 
     private val scopeQueries = database.scopeQueries
+    private val taskQueries = database.taskQueries
+    private val taskScopeQueries = database.taskScopeQueries
 
-    override suspend fun createScope(uid: String, name: String): Either<Failure, ScopeDomain?> {
+    override suspend fun initScopes() {
+        scopeQueries.transaction {
+            val allScope = scopeQueries.selectScope(defaultScope.id).executeAsOneOrNull()
+            if (allScope != null) {
+                scopeQueries.updateScopeName("Stuff", allScope.scope_id)
+                val tasks = taskQueries.selectTasksWithoutScope().executeAsList()
+                tasks.forEach {
+                    taskScopeQueries.insert(it.id, allScope.scope_id)
+                }
+            } else {
+                scopeQueries.createScope(UUID.randomUUID().toString(), "Stuff", 1)
+            }
+        }
+    }
+
+    override suspend fun createScope(name: String): Either<Failure, ScopeDomain?> {
         return scopeQueries.transactionWithResult {
             val count = scopeQueries.countScopes().executeAsOne().toInt()
-            scopeQueries.createScope(uid, name, count)
+            scopeQueries.createScope(UUID.randomUUID().toString(), name, count)
             val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
             scopeQueries
                 .selectScope(scopeId, dataMappers.scopeDbMapper)
