@@ -101,9 +101,9 @@ fun HomeScreen(
 
     val navigation = LocalAppNavigation.current
     val snackbarHostState = remember { SnackbarHostState() }
-    var isSearchActive by rememberSaveable { mutableStateOf(false) }
-    var showScopeSelection by rememberSaveable { mutableStateOf(false) }
-    var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var showScopeSelection by remember { mutableStateOf(false) }
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
