@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.scope
+package co.softov.morestuff.android.ui.scopes
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +9,10 @@ import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.CreateScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.DeleteScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.ReorderScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.UpdateScopeName
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.UpdateScopeName
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn

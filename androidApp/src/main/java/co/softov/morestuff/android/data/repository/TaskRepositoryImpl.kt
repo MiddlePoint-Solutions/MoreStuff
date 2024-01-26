@@ -246,6 +246,10 @@ class TaskRepositoryImpl(
         }
     }
 
+    override suspend fun updateTasksScope(taskIds: List<Long>, scopeId: Long) {
+        taskScopeQueries.update(scope_id = scopeId, task_ids = taskIds)
+    }
+
     private fun combinedTaskFlow(tasksFlow: Flow<List<TaskDomain>>): Flow<List<TaskDomain>> {
         val schedulesFlow =
             scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)

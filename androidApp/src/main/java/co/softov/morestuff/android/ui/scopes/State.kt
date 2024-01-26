@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.scope
+package co.softov.morestuff.android.ui.scopes
 
 import androidx.compose.runtime.Immutable
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent

@@ -3,13 +3,9 @@ package co.softov.morestuff.android.ui.home
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.enums.PriorityActionType
-import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
-import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.*
@@ -19,7 +15,6 @@ import co.softov.morestuff.android.ui.model.NotificationState.TaskMovedToNewScop
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -111,7 +106,7 @@ class HomeViewModel(
             is AddSelectedTasksToScope -> {
                 val selectedTasks = selectedTasks.getAndUpdate { listOf() }
                 dispatchAppStoreAction(
-                    TaskAction.AddTasksToScopeAction(
+                    TaskAction.UpdateTasksToScopeAction(
                         selectedTasks,
                         event.scopeId
                     )

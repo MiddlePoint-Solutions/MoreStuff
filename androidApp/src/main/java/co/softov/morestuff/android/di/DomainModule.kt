@@ -166,6 +166,7 @@ import co.softov.morestuff.android.domain.usecase.task.GetTasksWithoutScheduleUs
 import co.softov.morestuff.android.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.IncrementTaskPriorityScoreUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdateTasksScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.ReorderTaskUseCaseImpl
@@ -179,6 +180,7 @@ import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUs
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskPriorityScoreUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.task.UpdateTasksScopeUseCaseImpl
 import co.softov.morestuff.android.domain.util.TimeFormatter
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -271,6 +273,7 @@ val taskUseCases = module {
     factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
     factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
     factoryOf(::RemoveTasksFromScopeUseCaseImpl) bind RemoveTasksFromScopeUseCase::class
+    factoryOf(::UpdateTasksScopeUseCaseImpl) bind UpdateTasksScopeUseCase::class
 
     // Task priority score
     factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
