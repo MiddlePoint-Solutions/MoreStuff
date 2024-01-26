@@ -1,8 +1,10 @@
 package co.softov.morestuff.android.ui.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.enums.PriorityActionType
+import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.PriorityAction
@@ -26,19 +28,21 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class HomeViewModel(
+    state: SavedStateHandle,
     getScopesFlowUseCase: GetScopesFlowUseCase,
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
+    val initialState = state["Scopes"] ?: listOf(scopeAll)
 
     val scopes = getScopesFlowUseCase()
         .onEach { scopes ->
             Timber.d("Scope order: ${scopes.map { it.name }}")
-        }
-        .stateIn(
+            state["Scopes"] = scopes
+        }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = listOf(scopeAll)
+            initialValue = initialState
         )
 
     init {
