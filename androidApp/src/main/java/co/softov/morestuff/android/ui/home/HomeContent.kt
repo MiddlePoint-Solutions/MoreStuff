@@ -135,7 +135,6 @@ fun HomeScreen(
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
                 selectScope = { showScopeSelection = true },
-                removeSelectedTasksFromScope = viewModel::removeSelectedTaskFromScope
             )
         },
         content = {
