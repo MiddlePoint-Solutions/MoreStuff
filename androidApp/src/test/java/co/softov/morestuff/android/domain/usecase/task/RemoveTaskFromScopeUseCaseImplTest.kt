@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class RemoveTaskFromScopeUseCaseTest {
     private val taskRepository: TaskRepository = mockk(relaxed = true)
-    private val useCase: RemoveTasksFromScopeUseCase = RemoveTasksFromScopeUseCaseImpl(taskRepository)
+    private val useCase = RemoveTasksFromScopeUseCaseImpl(taskRepository)
 
     @Test
     fun `remove task from scope`() = runBlocking {

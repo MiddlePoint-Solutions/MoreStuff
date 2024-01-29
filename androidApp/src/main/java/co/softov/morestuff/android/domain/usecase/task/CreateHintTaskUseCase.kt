@@ -3,7 +3,7 @@ package co.softov.morestuff.android.domain.usecase.task
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
-import co.softov.morestuff.android.domain.model.TaskDomain
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.usecase.message.CreateMessageUseCase
 
@@ -22,7 +22,8 @@ class CreateHintTaskUseCaseImpl(
 
         hintTasks.forEach { hintTask ->
             val priorityParams = Priority.Now()
-            val taskParams = TaskParams(hintTask.taskTitle, priorityParams, TaskType.User)
+            val taskParams =
+                TaskParams(hintTask.taskTitle, priorityParams, TaskType.User, defaultScope.id)
             val createdTask = createTaskUseCase(taskParams)
 
             hintTask.taskMessages.forEach { messageHint ->

@@ -78,12 +78,15 @@ class TaskRepositoryImpl(
         }
     }
 
-    override fun getActiveTasksFlow(scoped: Boolean, scopeId: Long): Flow<List<TaskDomain>> {
-        val tasksFlow = when (scoped) {
-            true -> taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
-            false -> taskQueries.selectAllActive(mapper.taskDbMapper)
-        }.asFlow().mapToList(Dispatchers.IO)
+    override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
+        val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
+            .asFlow().mapToList(Dispatchers.IO)
+        return combinedTaskFlow(tasksFlow)
+    }
 
+    override fun getScopeActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
+        val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
+            .asFlow().mapToList(Dispatchers.IO)
         return combinedTaskFlow(tasksFlow)
     }
 
@@ -144,21 +147,13 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun getTasksWithoutSchedule(
-        scoped: Boolean,
         scopeId: Long
     ): Either<Failure, List<TaskDomain>> {
-        val tasksWithoutSchedule = when (scoped) {
-            true -> taskQueries.getActiveTaskWithoutScheduleByScopeId(
-                scope_id = scopeId,
-                schedule_types = listOf(ScheduleType.OneTime),
-                mapper = mapper.taskDbMapper
-            )
-
-            false -> taskQueries.getActiveTaskWithoutSchedule(
-                schedule_types = listOf(ScheduleType.OneTime),
-                mapper = mapper.taskDbMapper
-            )
-        }.executeAsList()
+        val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutScheduleByScopeId(
+            scope_id = scopeId,
+            schedule_types = listOf(ScheduleType.OneTime),
+            mapper = mapper.taskDbMapper
+        ).executeAsList()
 
         val firstTaskMessagesWithType =
             messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
@@ -241,9 +236,11 @@ class TaskRepositoryImpl(
     }
 
     override suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long) {
-        taskScopeQueries.transaction {
-            taskIds.forEach { taskScopeQueries.remove(it, scopeId) }
-        }
+        taskScopeQueries.remove(taskIds, scopeId)
+    }
+
+    override suspend fun updateTasksScope(taskIds: List<Long>, scopeId: Long) {
+        taskScopeQueries.update(scope_id = scopeId, task_ids = taskIds)
     }
 
     private fun combinedTaskFlow(tasksFlow: Flow<List<TaskDomain>>): Flow<List<TaskDomain>> {

@@ -4,7 +4,7 @@ import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.Priority
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.middleware.TaskAction.AddTasksToScopeAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction.UpdateTasksToScopeAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CompleteTasksAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateHintTask
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction.CreateUserTaskAction
@@ -21,6 +21,7 @@ import co.softov.morestuff.android.domain.usecase.task.CreateHintTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.DeleteTasksUseCase
 import co.softov.morestuff.android.domain.usecase.task.RemoveTasksFromScopeUseCase
+import co.softov.morestuff.android.domain.usecase.task.UpdateTasksScopeUseCase
 import co.softov.morestuff.android.domain.usecase.task.SetTaskCompleteUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.usecase.task.UpdateTaskTitleUseCase
@@ -48,7 +49,7 @@ sealed class TaskAction : Action.FeatureAction() {
         val priority: Priority,
     ) : TaskAction()
 
-    data class AddTasksToScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
+    data class UpdateTasksToScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
     data class RemoveTasksFromScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
 
 }
@@ -59,8 +60,8 @@ class TaskMiddleware(
     private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
     private val createHintTaskUseCase: CreateHintTaskUseCase,
     private val deleteTasksUseCase: DeleteTasksUseCase,
-    private val addTasksToScopeUseCase: AddTasksToScopeUseCase,
     private val removeTasksFromScopeUseCase: RemoveTasksFromScopeUseCase,
+    private val updateTasksScopeUseCase: UpdateTasksScopeUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -97,8 +98,8 @@ class TaskMiddleware(
                 deleteTasksUseCase(action.taskIds)
             }
 
-            is AddTasksToScopeAction -> scope.launch {
-                addTasksToScopeUseCase(action.taskIds, action.scopeId)
+            is UpdateTasksToScopeAction -> scope.launch {
+                updateTasksScopeUseCase(action.taskIds, action.scopeId)
             }
 
             is RemoveTasksFromScopeAction -> scope.launch {
@@ -110,4 +111,3 @@ class TaskMiddleware(
         return next(state, action, dispatch)
     }
 }
-

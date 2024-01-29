@@ -1,8 +1,7 @@
-package co.softov.morestuff.android.ui.scope
+package co.softov.morestuff.android.ui.scopes
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -72,9 +71,8 @@ import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.*
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.*
 import co.softov.morestuff.android.ui.theme.md_theme_light_error
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.burnoutcrew.reorderable.ReorderableItem
@@ -389,12 +387,7 @@ private fun ScopeInputComponent(
                                 exit = fadeOut()
                             ) {
                                 SendIcon(onClick = {
-                                    handleUiEvent(
-                                        CreateScope(
-                                            UUID.randomUUID().toString(),
-                                            newScopeName.text
-                                        )
-                                    )
+                                    handleUiEvent(CreateScope(newScopeName.text))
                                     newScopeName = newScopeName.copy("")
                                 })
                             }

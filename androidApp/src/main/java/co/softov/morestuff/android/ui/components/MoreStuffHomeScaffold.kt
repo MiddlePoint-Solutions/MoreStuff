@@ -16,19 +16,13 @@ fun MoreStuffHomeScaffold(
     content: @Composable (PaddingValues) -> Unit,
     topBar: @Composable () -> Unit = {},
 ) {
-    val dismissSnackbarState = rememberDismissState(
-        confirmValueChange = { _ ->
-            snackbarHostState.currentSnackbarData?.dismiss()
-            true
-        }
-    )
     Scaffold(
         modifier = Modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 SwipeToDismiss(
-                    state = dismissSnackbarState,
+                    state = rememberDismissState(),
                     background = {},
                     dismissContent = { Snackbar(snackbarData = data) },
                     modifier = Modifier.fillMaxWidth(),

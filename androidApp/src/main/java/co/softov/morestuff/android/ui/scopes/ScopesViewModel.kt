@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.scope
+package co.softov.morestuff.android.ui.scopes
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,13 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.model.scopeAll
 import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.CreateScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.DeleteScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.ReorderScope
-import co.softov.morestuff.android.ui.scope.ScopesUiEvent.UpdateScopeName
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
+import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.UpdateScopeName
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -30,7 +29,7 @@ class ScopesViewModel(
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = listOf(scopeAll)
+            initialValue = listOf()
         )
 
     var scopesState by mutableStateOf<List<ScopeDomain>>(listOf())
@@ -39,7 +38,7 @@ class ScopesViewModel(
     fun handleEvent(event: ScopesUiEvent) {
         when (event) {
             is CreateScope -> {
-                dispatchAppStoreAction(ScopeAction.CreateScopeAction(event.uid, event.name))
+                dispatchAppStoreAction(ScopeAction.CreateScopeAction(event.name))
             }
 
             is UpdateScopeName -> {
