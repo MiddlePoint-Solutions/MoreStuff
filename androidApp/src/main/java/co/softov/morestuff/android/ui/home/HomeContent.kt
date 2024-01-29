@@ -86,12 +86,14 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -140,11 +142,47 @@ fun HomeScreen(
         content = {
             HomeContent(
                 scopesContainerColor = topBarContainerColor,
-                snackbarHostState = snackbarHostState,
                 modifier = Modifier.padding(it),
             )
         },
     )
+
+    val resources = LocalContext.current.resources
+    LaunchedEffect(Unit) {
+        viewModel.notifications.collectLatest {
+
+            Timber.d("Notification: $it")
+
+            when (val notification = it) {
+                is NotificationState.Complete -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.snack_task_completed),
+                        actionLabel = resources.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    )
+                    when (result) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> launch { notification.action() }
+                    }
+                }
+
+                is NotificationState.TaskMovedToNewScope -> {
+                    snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.snack_task_moved_to_new_scope),
+                        actionLabel = resources.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    ).also {
+                        when (it) {
+                            SnackbarResult.Dismissed -> viewModel.resetNotification()
+                            SnackbarResult.ActionPerformed -> launch { notification.action() }
+                        }
+                    }
+                }
+
+                NotificationState.None -> {}
+            }
+        }
+    }
 
     if (showDeleteConfirmationDialog) {
         ConfirmDeleteDialog(
@@ -186,7 +224,6 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     scopesContainerColor: Color,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -216,38 +253,6 @@ fun HomeContent(
 
     BackHandler(selectedTasks.isNotEmpty()) {
         viewModel.clearSelectedTasks()
-    }
-
-    val resources = LocalContext.current.resources
-    LaunchedEffect(model.notification) {
-        when (model.notification) {
-            NotificationState.Complete -> {
-                snackbarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_completed),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
-                    }
-                }
-            }
-            NotificationState.TaskMovedToNewScope -> {
-                snackbarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_moved_to_new_scope),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoMovedTask()
-                    }
-                }
-            }
-
-            NotificationState.None -> {}
-        }
     }
 
     Box(
