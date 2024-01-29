@@ -4,7 +4,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
 import co.softov.morestuff.android.domain.enums.PriorityActionType
 import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.model.scopeAll
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 
 sealed class ReviewRound {
@@ -14,8 +14,8 @@ sealed class ReviewRound {
 }
 
 data class ReviewModel(
-    val round: ReviewRound = ReviewRound.Review(scopeId = scopeAll.id),
-    val currentScope: ScopeDomain = scopeAll,
+    val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
+    val currentScope: ScopeDomain = defaultScope,
     val items: List<ReviewItemUiModel> = listOf(),
     val actions: List<Pair<ReviewItemUiModel, PriorityActionType>> = listOf()
 ) : BaseViewState

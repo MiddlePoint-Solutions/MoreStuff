@@ -12,11 +12,9 @@ class CreateScopeUseCaseTest {
 
     @Test
     fun `create scope`() = runBlocking {
-        val scopeUid = "uniqueScopeId"
         val name = "Test Scope"
+        useCase(name)
 
-        useCase(scopeUid, name)
-
-        coVerify(exactly = 1) { scopeRepository.createScope(scopeUid, name) }
+        coVerify(exactly = 1) { scopeRepository.createScope(name) }
     }
 }

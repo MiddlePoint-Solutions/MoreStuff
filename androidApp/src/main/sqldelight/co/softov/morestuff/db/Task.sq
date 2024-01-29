@@ -89,7 +89,6 @@ WHERE id = :task_id AND EXISTS (
     WHERE task_id = :task_id
 );
 
-
 decrementTasksPriorityScore:
 UPDATE task
 SET priority_score = priority_score - 1
@@ -146,5 +145,13 @@ JOIN task_scope ON task.id = task_scope.task_id
 WHERE task_scope.scope_id = :scope_id
   AND task.complete_time IS NULL
 ORDER BY task.priority_score DESC;
+
+selectTasksWithoutScope:
+SELECT *
+FROM task
+WHERE id NOT IN (
+   SELECT task_id
+   FROM task_scope
+);
 
 

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -52,7 +53,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -78,20 +78,22 @@ import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
-import co.softov.morestuff.android.ui.scope.CreateScopeButton
-import co.softov.morestuff.android.ui.scope.ScopeTabs
+import co.softov.morestuff.android.ui.scopes.CreateScopeButton
+import co.softov.morestuff.android.ui.scopes.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,9 +103,9 @@ fun HomeScreen(
 
     val navigation = LocalAppNavigation.current
     val snackbarHostState = remember { SnackbarHostState() }
-    var isSearchActive by rememberSaveable { mutableStateOf(false) }
-    var showScopeSelection by rememberSaveable { mutableStateOf(false) }
-    var showDeleteConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var showScopeSelection by remember { mutableStateOf(false) }
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -135,17 +137,52 @@ fun HomeScreen(
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
                 selectScope = { showScopeSelection = true },
-                removeSelectedTasksFromScope = viewModel::removeSelectedTaskFromScope
             )
         },
         content = {
             HomeContent(
                 scopesContainerColor = topBarContainerColor,
-                snackbarHostState = snackbarHostState,
                 modifier = Modifier.padding(it),
             )
         },
     )
+
+    val resources = LocalContext.current.resources
+    LaunchedEffect(Unit) {
+        viewModel.notifications.collectLatest {
+
+            Timber.d("Notification: $it")
+
+            when (val notification = it) {
+                is NotificationState.Complete -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.snack_task_completed),
+                        actionLabel = resources.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    )
+                    when (result) {
+                        SnackbarResult.Dismissed -> viewModel.resetNotification()
+                        SnackbarResult.ActionPerformed -> launch { notification.action() }
+                    }
+                }
+
+                is NotificationState.TaskMovedToNewScope -> {
+                    snackbarHostState.showSnackbar(
+                        message = resources.getString(R.string.snack_task_moved_to_new_scope),
+                        actionLabel = resources.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    ).also {
+                        when (it) {
+                            SnackbarResult.Dismissed -> viewModel.resetNotification()
+                            SnackbarResult.ActionPerformed -> launch { notification.action() }
+                        }
+                    }
+                }
+
+                NotificationState.None -> {}
+            }
+        }
+    }
 
     if (showDeleteConfirmationDialog) {
         ConfirmDeleteDialog(
@@ -187,7 +224,6 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     scopesContainerColor: Color,
-    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -217,38 +253,6 @@ fun HomeContent(
 
     BackHandler(selectedTasks.isNotEmpty()) {
         viewModel.clearSelectedTasks()
-    }
-
-    val resources = LocalContext.current.resources
-    LaunchedEffect(model.notification) {
-        when (model.notification) {
-            NotificationState.Complete -> {
-                snackbarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_completed),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoLastCompleted()
-                    }
-                }
-            }
-            NotificationState.TaskMovedToNewScope -> {
-                snackbarHostState.showSnackbar(
-                    message = resources.getString(R.string.snack_task_moved_to_new_scope),
-                    actionLabel = resources.getString(R.string.undo),
-                    duration = SnackbarDuration.Long
-                ).also {
-                    when (it) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> viewModel.undoMovedTask()
-                    }
-                }
-            }
-
-            NotificationState.None -> {}
-        }
     }
 
     Box(
@@ -459,10 +463,9 @@ fun ScopeList(
         state = scrollState
     ) {
         items(
-            scopes.size,
-            key = { "Scope$it" }
-        ) {
-            val scope = scopes[it]
+            items = scopes,
+            key = { "Scope${it.id}" }
+        ) { scope ->
             ListItem(
                 modifier = Modifier.clickable {
                     onScopeSelected(scope.id)
@@ -472,7 +475,7 @@ fun ScopeList(
                     Text(scope.name)
                 },
             )
-            if (it < scopes.size - 1) {
+            if (scopes.last().id == scope.id) {
                 Divider(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     thickness = Dp.Hairline
@@ -481,7 +484,6 @@ fun ScopeList(
         }
     }
 }
-
 
 @Composable
 private fun ConfirmDeleteDialog(

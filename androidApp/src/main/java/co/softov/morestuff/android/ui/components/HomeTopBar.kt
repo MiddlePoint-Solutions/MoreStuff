@@ -70,7 +70,6 @@ fun HomeTopBar(
     clearTaskSelection: () -> Unit,
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
-    removeSelectedTasksFromScope: () -> Unit,
     selectScope: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
 ) {
@@ -148,15 +147,6 @@ fun HomeTopBar(
                             showMenu = false
                         },
                         leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.remove_from_scope)) },
-                        onClick = {
-                            removeSelectedTasksFromScope()
-                            showMenu = false
-                            clearTaskSelection()
-                        },
-                        leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) }
                     )
                 }
 
@@ -239,7 +229,6 @@ private fun Preview() {
             completeSelectedTasks = {},
             deleteSelectedTasks = {},
             selectScope = {},
-            removeSelectedTasksFromScope = {},
             scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         )
     }

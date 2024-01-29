@@ -13,9 +13,9 @@ data class ScopeDomain(
     val order: Int,
 ) : Parcelable
 
-val scopeAll = ScopeDomain(
+val defaultScope = ScopeDomain(
     id = 1,
     uid = "",
-    name = "All",
+    name = "Stuff",
     order = 0,
 )
