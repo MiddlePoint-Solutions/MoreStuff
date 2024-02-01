@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -75,7 +74,6 @@ import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.components.ScopeCarousel
 import co.softov.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import co.softov.morestuff.android.ui.compose.SlideAnimation
-import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.ReviewItemUiModel
 import co.softov.morestuff.android.ui.onboarding.OnBoardingReviewScreen
@@ -86,19 +84,16 @@ import co.softov.morestuff.android.ui.review.swipeable.firstVisibleStateOrNull
 import co.softov.morestuff.android.ui.review.swipeable.lastSwipedItem
 import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.swipableCard
-import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.theme.reviewIconTint
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun ReviewScreen(
     modifier: Modifier = Modifier,
-    scopeId: Long,
+    currentScopeId: Long,
 ) {
     val navigation = LocalAppNavigation.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
@@ -106,7 +101,7 @@ fun ReviewScreen(
         ReviewContent(
             onBack = navigation::pop,
             modifier = modifier,
-            scopeId = scopeId
+            currentScopeId = currentScopeId
         )
     }
 }
@@ -116,7 +111,7 @@ fun ReviewScreen(
 fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    scopeId: Long,
+    currentScopeId: Long,
     viewModel: ReviewViewModel = koinViewModel(),
 ) {
 
@@ -129,7 +124,7 @@ fun ReviewContent(
     var showReviewDragHints by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.load(scopeId)
+        viewModel.load(currentScopeId)
     }
 
     Box(
@@ -153,9 +148,7 @@ fun ReviewContent(
                 is ReviewRound.Review -> {
 
                     PriorityReviewTopBar(
-                        currentScope = model.currentScope,
                         scopes = viewModel.scopes,
-                        //setCurrentScope = viewModel::setCurrentScope,
                         navigateUp = onBack,
                         toggleReviewHint = viewModel::toggleHintArrowPriority,
                         showReviewHelpScreen = { showReviewHelpScreen = true },
@@ -163,7 +156,7 @@ fun ReviewContent(
                         modifier = Modifier.constrainAs(topBar) {
                             top.linkTo(parent.top)
                         },
-                        scopeId = scopeId,
+                        currentScopeId = currentScopeId,
                     )
                     val states = model.items.map { it to rememberSwipeableCardState(model.round) }
 
@@ -283,14 +276,13 @@ fun ReviewContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-    currentScope: ScopeDomain,
     scopes: List<ScopeDomain>,
     toggleReviewHint: () -> Unit,
     showReviewHelpScreen: () -> Unit,
     isReviewHintActive: Boolean,
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
-    scopeId: Long,
+    currentScopeId: Long,
 ) {
     val viewModel: ReviewViewModel = koinViewModel()
     val coroutineScope = rememberCoroutineScope()
@@ -352,7 +344,7 @@ private fun PriorityReviewTopBar(
 
         ScopeCarousel(
             scopes = scopes,
-            currentScope = scopeId,
+            currentScopeId = currentScopeId,
             onScopeSelected = viewModel::setCurrentScope,
             modifier = Modifier
                 .height(75.dp)
