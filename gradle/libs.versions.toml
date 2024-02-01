@@ -1,8 +1,8 @@
 [versions]
 coreKtx = "1.12.0"
-lifecycleRuntimeKtx = "2.6.2"
-activityCompose = "1.8.1"
-composeBom = "2023.10.00"
+lifecycleRuntimeKtx = "2.7.0"
+activityCompose = "1.8.2"
+composeBom = "2024.01.00"
 drawerlayout = "1.2.0"
 reorderable = "0.9.6"
 settingsUiM3 = "0.22.0"
@@ -13,20 +13,20 @@ junitPlatformCommons = "1.10.0"
 turbine = "1.0.0"
 multiplatformSettingsNoArg = "1.0.0"
 coilCompose = "2.5.0"
-kotlinxSerializationJson = "1.6.0"
-decompose = "2.1.4"
+kotlinxSerializationJson = "1.6.2"
+decompose = "2.2.2"
 extensionsComposeJetpack = "2.1.4"
-parcelable = "1.2.0"
-androidGradlePlugin = "8.2.0-rc03"
-moleculeGradlePlugin = "1.2.1"
+parcelable = "1.3.0"
+androidGradlePlugin = "8.2.2"
+moleculeGradlePlugin = "1.3.1"
 accompanist = "0.32.0"
-kotlin = "1.9.10"
+kotlin = "1.9.21"
 arrow = "1.2.1"
-kotlinxDatetime = "0.4.1"
+kotlinxDatetime = "0.5.0"
 coroutines = "1.7.3"
-okhttp = "4.11.0"
-sqldelight = "2.0.0"
-firebaseBom = "32.5.0"
+okhttp = "4.12.0"
+sqldelight = "2.0.1"
+firebaseBom = "32.7.1"
 googleServices = "4.4.0"
 koinGradle = "3.2.0"
 koinBom = "3.5.1"
@@ -36,18 +36,17 @@ timber = "5.0.1"
 appcompat = "1.6.1"
 palette = "1.0.0"
 pagingKtx = "3.2.1"
-workKtx = "2.8.1"
+workKtx = "2.9.0"
 constraintLayout = "2.1.4"
-activityKtx = "1.8.1"
+activityKtx = "1.8.2"
 fragmentKtx = "1.6.2"
 constraintLayoutCompose = "1.0.1"
-lifecycle = "2.6.2"
+lifecycle = "2.7.0"
 preferenceKtx = "1.2.1"
 testCore = "1.5.0"
 extJUnit = "1.1.5"
 espressoCore = "3.5.1"
 firebaseCrashlyticsPlugin = "2.9.9"
-sqldelightPlugin = "2.0.0"
 androidAppStartup = "1.1.1"
 konfettiCompose = "2.0.2"
 aboutLibrariesVersion = "10.8.3"
@@ -55,12 +54,13 @@ telephotoVersion = "0.5.0"
 lottie = "6.1.0"
 kSoup ="0.3.0"
 ktor = "2.3.7"
+sqliteAndroid = "3.45.0"
 
 [plugins]
 kotlinPlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 parcelizePlugin = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 androidApplicationPlugin = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-sqldelightPlugin = { id = "app.cash.sqldelight", version.ref = "sqldelightPlugin" }
+sqldelightPlugin = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 moleculePlugin = { id = "app.cash.molecule", version.ref = "moleculeGradlePlugin" }
@@ -70,7 +70,6 @@ aboutLibrariesPlugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref 
 [libraries]
 gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
-sqldelightPlugin = { module = "app.cash.sqldelight:gradle-plugin", version.ref = "sqldelightPlugin" }
 firebaseCrashlyticsPlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
 aboutLibrariesPlugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibrariesVersion" }
 moleculePlugin = { module = "app.cash.molecule:molecule-gradle-plugin", version.ref = "moleculeGradlePlugin" }
@@ -117,7 +116,7 @@ sqldelightAndroidDriver = { module = "app.cash.sqldelight:android-driver", versi
 sqldelightAndroidPagingExt = { module = "app.cash.sqldelight:androidx-paging3-extensions", version.ref = "sqldelight" }
 sqldelightPrimitiveAdapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
 sqldelightCoroutinesJvmExt = { module = "app.cash.sqldelight:coroutines-extensions-jvm", version.ref = "sqldelight" }
-sqldelightTestSqlDriver = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight_sqlite_dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect", version.ref = "sqldelight" }
 firebaseBom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 firebaseAnalytics = { module = "com.google.firebase:firebase-analytics-ktx" }
@@ -163,6 +162,7 @@ lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
 ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorClient = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 
 [bundles]
 # AndroidX and Compose
@@ -231,7 +231,6 @@ sqldelight = [
     "sqldelightCoroutinesJvmExt",
     "sqldelightPrimitiveAdapters",
     "sqldelightAndroidPagingExt",
-    "sqldelightTestSqlDriver",
 ]
 
 # Firebase

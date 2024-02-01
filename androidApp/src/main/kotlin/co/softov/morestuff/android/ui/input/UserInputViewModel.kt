@@ -81,17 +81,16 @@ class UserInputViewModel(
         private set
 
     fun load(context: ChatContext) {
+        viewModelScope.launch {
+            getScopesUseCase().onRight { scopeList ->
+                scopes.value = scopeList
+                currentScope = scopeList.firstOrNull { it.id == context.scopeId } ?: defaultScope
+            }
+        }
+
         // TODO: add messages according to chat context
         messages.update {
             listOf(createAppMessage(appMessagesProvider.getWhatCanIDoForYouMessage()))
-        }
-
-        viewModelScope.launch {
-            getScopesUseCase().onRight { scopeList ->
-                scopes.update { scopeList }
-                val initialIndex = scopeList.indexOfFirst { it.id == context.scopeId }
-                currentScope = scopeList.getOrNull(initialIndex) ?: defaultScope
-            }
         }
     }
 
