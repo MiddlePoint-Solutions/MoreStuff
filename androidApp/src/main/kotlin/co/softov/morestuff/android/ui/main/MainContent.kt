@@ -63,7 +63,7 @@ fun MainContent(
             )
 
             Home -> HomeScreen()
-            is Review -> ReviewScreen(scopeId = screen.scopeId)
+            is Review -> ReviewScreen(currentScopeId = screen.scopeId)
             Settings -> SettingsScreen()
             Screen.CreateScope -> ScopesScreen(onBack = navigation::pop)
 

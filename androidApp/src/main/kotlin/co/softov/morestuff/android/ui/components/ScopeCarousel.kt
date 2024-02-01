@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ScopeCarousel(
     scopes: List<ScopeDomain>,
-    currentScope: Long,
+    currentScopeId: Long,
     onScopeSelected: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -56,7 +56,7 @@ fun ScopeCarousel(
         val centerPadding = ((screenWidth / 2) - halfItemWidth) + 20.dp
 
         val pagerState = rememberPagerState(
-            initialPage = scopes.indexOfFirst { it.id == currentScope },
+            initialPage = scopes.indexOfFirst { it.id == currentScopeId },
             pageCount = { scopes.size }
         )
 

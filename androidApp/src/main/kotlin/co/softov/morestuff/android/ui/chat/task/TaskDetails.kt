@@ -57,6 +57,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -77,10 +78,16 @@ import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.keyboardAsState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
+@OptIn(FlowPreview::class)
 @Composable
 fun TaskDetails(
     taskId: Long,
@@ -92,7 +99,7 @@ fun TaskDetails(
     )
 ) {
 
-    val task by viewModel.task.collectAsStateWithLifecycle()
+    val task by viewModel.task.collectAsState()
     val isKeyboardOpen by keyboardAsState()
     val focusManager = LocalFocusManager.current
     var isEditing by remember { mutableStateOf(false) }
@@ -112,7 +119,9 @@ fun TaskDetails(
 
     Box(modifier = modifier) {
         Surface(
-            modifier = Modifier.padding(bottom = 18.dp).animateContentSize(),
+            modifier = Modifier
+                .padding(bottom = 18.dp)
+                .animateContentSize(),
             color = MaterialTheme.colorScheme.primaryContainer
         ) {
             Box(
@@ -219,11 +228,15 @@ fun TaskDetails(
                             onTextLayout = {
                                 if (isEditing || (firstTime && viewModel.taskTitle.isNotEmpty())) {
                                     firstTime = false
-                                    showEllipsis = it.lineCount > 1
-                                    lineEnd = it.getLineEnd(0, visibleEnd = true)
+                                    showEllipsis = it.lineCount > 2
+                                    lineEnd = if (showEllipsis) {
+                                        it.getLineEnd(1, visibleEnd = true)
+                                    } else {
+                                        it.getLineEnd(0, visibleEnd = true)
+                                    }
                                 }
                             },
-                            maxLines = if (isEditing || showSchedule) 4 else 1,
+                            maxLines = if (isEditing || showSchedule) 4 else 2,
                             textStyle = MaterialTheme.typography.headlineSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                             ),
