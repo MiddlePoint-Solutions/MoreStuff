@@ -23,12 +23,6 @@ object Env {
     const val Release = "release"
 }
 
-repositories {
-    gradlePluginPortal()
-    google()
-    mavenCentral()
-}
-
 android {
 
     namespace = "co.softov.morestuff.android"
@@ -93,7 +87,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.4"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     testOptions {
@@ -102,9 +96,10 @@ android {
         }
     }
     packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
+        resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+        jniLibs.excludes.add("lib/mips/libsqlite3x.so")
+        jniLibs.excludes.add("lib/mips64/libsqlite3x.so")
+        jniLibs.excludes.add("lib/armeabi/libsqlite3x.so")
     }
 }
 
@@ -134,9 +129,9 @@ sqldelight {
     databases {
         create("StuffDb") {
             packageName.set("co.softov.morestuff.db")
+            dialect(libs.sqldelight.sqlite.dialect)
             schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
             verifyMigrations.set(true)
-            dialect("app.cash.sqldelight:sqlite-3-18-dialect:2.0.0")
         }
     }
 }
@@ -156,6 +151,7 @@ dependencies {
     implementation(libs.bundles.firebase)
     implementation(libs.bundles.utils)
     implementation(libs.bundles.aboutLibraries)
+    implementation(libs.sqliteAndroid)
 
     debugImplementation(libs.uiTestManifest)
 }

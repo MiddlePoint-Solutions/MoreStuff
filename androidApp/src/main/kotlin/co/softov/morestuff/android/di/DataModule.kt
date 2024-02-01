@@ -46,6 +46,7 @@ import co.softov.morestuff.db.StuffDb
 import co.softov.morestuff.db.Task
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
+import io.requery.android.database.sqlite.RequerySQLiteOpenHelperFactory
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.factoryOf
@@ -137,7 +138,8 @@ internal fun createDatabase(context: Context): StuffDb {
         AndroidSqliteDriver(
             StuffDb.Schema,
             context,
-            Constants.DATABASE_NAME
+            Constants.DATABASE_NAME,
+            factory = RequerySQLiteOpenHelperFactory()
         ),
         taskAdapter = Task.Adapter(
             task_typeAdapter = EnumColumnAdapter()
