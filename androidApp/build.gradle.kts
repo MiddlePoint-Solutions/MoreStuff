@@ -74,6 +74,7 @@ android {
             versionNameSuffix = "-staging"
             signingConfig = signingConfigs.getByName(Env.Staging)
             matchingFallbacks += listOf(Env.Release, Env.Dev)
+            isDebuggable = true
         }
     }
 

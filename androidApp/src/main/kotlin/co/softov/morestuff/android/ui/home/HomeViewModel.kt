@@ -160,7 +160,6 @@ class HomeViewModel(
     }
 
     fun selectScope(scopeId: Long) {
-        Timber.d("Updating scopeId")
         sendEvent(ScopeSelected(scopeId))
     }
 
