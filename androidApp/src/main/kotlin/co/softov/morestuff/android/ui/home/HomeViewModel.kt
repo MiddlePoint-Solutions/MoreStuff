@@ -1,45 +1,59 @@
 package co.softov.morestuff.android.ui.home
 
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
+import app.cash.molecule.launchMolecule
+import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.domain.model.defaultScope
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.NotificationState.TaskMovedToNewScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
+class HomeViewModel2(
+    savedState: SavedStateHandle
+) : MoleculeViewModel<HomeUiEvent, HomeScopeState>() {
+
+    private val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
+
+    @Composable
+    override fun models(events: Flow<HomeUiEvent>): HomeScopeState {
+        return homeScopeModel(initialState, events)
+    }
+}
+
 class HomeViewModel(
-    state: SavedStateHandle,
-    getScopesFlowUseCase: GetScopesFlowUseCase,
+    savedState: SavedStateHandle
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
-    private val initialState = state["Scopes"] ?: listOf(defaultScope)
+    private val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
+    private val eventsFlow: MutableSharedFlow<HomeUiEvent> = MutableSharedFlow(5)
+
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
-    internal val notifications =  MutableSharedFlow<NotificationState>()
+    internal val notifications = MutableSharedFlow<NotificationState>()
 
-    val scopes = getScopesFlowUseCase()
-        .onEach { scopes ->
-            Timber.d("Scope order: ${scopes.map { it.name }}")
-            state["Scopes"] = scopes
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = initialState
-        )
+//    val scopeState: StateFlow<HomeScopeState> =
+//        viewModelScope.launchMolecule(RecompositionMode.ContextClock) {
+//            homeScopeModel(initialState, eventsFlow)
+//        }
+//        .onEach { state -> savedState["Scopes"] = state }
+//        .stateIn(viewModelScope, SharingStarted.Eagerly, initialState)
 
     init {
         loadData()
@@ -94,13 +108,17 @@ class HomeViewModel(
                     )
                 )
 
-                val fromScope = scopes.value.first { it.id == selectedScopeId }
-                val notificaiton = TaskMovedToNewScope(
-                    from = fromScope,
-                    action = { sendEvent(UndoMoveTasks(fromScope.id, selectedTasks)) }
-                )
-
-                launch { notifications.emit(notificaiton) }
+                // TODO: this does not handle cases where tasks are moved from different scopes.
+//                val fromScope =
+//                    scopeState.value.scopes.first { scope -> scope.id == selectedScopeId }
+//                val notification = TaskMovedToNewScope(
+//                    from = fromScope,
+//                    action = {
+//                        // sendEvent(UndoMoveTasks(fromScope.id, selectedTasks))
+//                    }
+//                )
+//
+//                launch { notifications.emit(notification) }
                 this
             }
 
@@ -159,8 +177,9 @@ class HomeViewModel(
         sendEvent(DeleteSelectedTasksFromScope)
     }
 
-    fun selectScope(scopeId: Long) {
-        sendEvent(ScopeSelected(scopeId))
+    fun scopeIndexChanged(index: Int) {
+        // TODO: emit changed scope index
+//        launch { eventsFlow.emit(ScopeSelected(scopeId)) }
     }
 
 }

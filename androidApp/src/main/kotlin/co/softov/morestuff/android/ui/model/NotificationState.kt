@@ -5,8 +5,6 @@ import co.softov.morestuff.android.domain.model.ScopeDomain
 
 @Immutable
 sealed class NotificationState {
-    data object None : NotificationState()
-
     @Immutable
     data class Complete(
         val action: () -> Unit

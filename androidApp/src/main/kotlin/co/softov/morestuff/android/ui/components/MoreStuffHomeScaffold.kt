@@ -12,12 +12,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 @Composable
 fun MoreStuffHomeScaffold(
     snackbarHostState: SnackbarHostState,
-    topAppBarScrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
     content: @Composable (PaddingValues) -> Unit,
     topBar: @Composable () -> Unit = {},
 ) {
     Scaffold(
-        modifier = Modifier.nestedScroll(topAppBarScrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
