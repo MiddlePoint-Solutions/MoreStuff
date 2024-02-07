@@ -67,6 +67,7 @@ import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.model.show
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
 import co.softov.morestuff.android.ui.scopes.ScopeTabs
@@ -112,7 +113,7 @@ fun HomeScreen(
             )
         },
         content = {
-            if(scopesModel.scopes.isNotEmpty()) {
+            if (scopesModel.scopes.isNotEmpty()) {
                 HomeContent(
                     scopesModel = scopesModel,
                     onViewEvent = viewModel2::take,
@@ -124,32 +125,10 @@ fun HomeScreen(
 
     val resources = LocalContext.current.resources
     LaunchedEffect(Unit) {
-        viewModel.notifications.collectLatest {
-            when (val notification = it) {
-                is NotificationState.Complete -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = resources.getString(R.string.snack_task_completed),
-                        actionLabel = resources.getString(R.string.undo),
-                        duration = SnackbarDuration.Short
-                    )
-                    when (result) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> launch { notification.action() }
-                    }
-                }
-
-                is NotificationState.TaskMovedToNewScope -> {
-                    snackbarHostState.showSnackbar(
-                        message = resources.getString(R.string.snack_task_moved_to_new_scope),
-                        actionLabel = resources.getString(R.string.undo),
-                        duration = SnackbarDuration.Short
-                    ).also {
-                        when (it) {
-                            SnackbarResult.Dismissed -> viewModel.resetNotification()
-                            SnackbarResult.ActionPerformed -> launch { notification.action() }
-                        }
-                    }
-                }
+        viewModel.notifications.collectLatest { notification ->
+            when (notification.show(snackbarHostState, resources)) {
+                SnackbarResult.Dismissed -> {}
+                SnackbarResult.ActionPerformed -> launch { notification.action() }
             }
         }
     }

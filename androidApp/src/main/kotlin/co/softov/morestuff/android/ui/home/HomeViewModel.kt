@@ -14,6 +14,7 @@ import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.ui.home.HomeUiEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.NotificationState.TaskMovedToNewScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,14 +27,18 @@ import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
 class HomeViewModel2(
-    savedState: SavedStateHandle
+    private val savedState: SavedStateHandle
 ) : MoleculeViewModel<HomeUiEvent, HomeScopeState>() {
 
-    private val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
+    override val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
 
     @Composable
     override fun models(events: Flow<HomeUiEvent>): HomeScopeState {
         return homeScopeModel(initialState, events)
+    }
+
+    override fun onSaveState(model: HomeScopeState) {
+        savedState["Scopes"] = model
     }
 }
 
@@ -41,19 +46,9 @@ class HomeViewModel(
     savedState: SavedStateHandle
 ) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
-    private val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
-    private val eventsFlow: MutableSharedFlow<HomeUiEvent> = MutableSharedFlow(5)
-
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
-    internal val notifications = MutableSharedFlow<NotificationState>()
-
-//    val scopeState: StateFlow<HomeScopeState> =
-//        viewModelScope.launchMolecule(RecompositionMode.ContextClock) {
-//            homeScopeModel(initialState, eventsFlow)
-//        }
-//        .onEach { state -> savedState["Scopes"] = state }
-//        .stateIn(viewModelScope, SharingStarted.Eagerly, initialState)
+    internal val notifications = MutableSharedFlow<NotificationState>(replay = 1)
 
     init {
         loadData()
@@ -80,9 +75,10 @@ class HomeViewModel(
             CompleteSelectedTasks -> {
                 val completedTasks = selectedTasks.getAndUpdate { listOf() }
                 dispatchAppStoreAction(TaskAction.CompleteTasksAction(completedTasks, true))
-//                notification = Complete(
-//                    action = { sendEvent(UndoComplete(completedTasks)) }
-//                )
+                notifications.tryEmit(
+                    NotificationState.Complete(action = { sendEvent(UndoComplete(completedTasks)) }
+                    ))
+
                 this
             }
 
@@ -159,10 +155,6 @@ class HomeViewModel(
 
     fun toggleTaskSelection(taskId: Long) {
         sendEvent(ToggleTaskSelection(taskId))
-    }
-
-    fun resetNotification() {
-//        notification = None
     }
 
     fun clearSelectedTasks() {
