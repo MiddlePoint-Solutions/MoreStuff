@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 
 @Composable
-fun homeScopeModel(
+fun homeModel(
     initialState: HomeScopeState,
     events: Flow<HomeUiEvent>,
     getScopesFlowUseCase: GetScopesFlowUseCase = koinInject()
@@ -34,7 +34,6 @@ fun homeScopeModel(
                 HomeUiEvent.ClearTaskSelection -> TODO()
                 HomeUiEvent.CompleteSelectedTasks -> TODO()
                 HomeUiEvent.DeleteSelectedTasks -> TODO()
-                HomeUiEvent.DeleteSelectedTasksFromScope -> TODO()
                 is HomeUiEvent.MoveSelectedTasksToScope -> TODO()
                 is HomeUiEvent.ScopeSelected -> currentScopeId = it.scopeId
                 is HomeUiEvent.SetConfettiEnabled -> TODO()

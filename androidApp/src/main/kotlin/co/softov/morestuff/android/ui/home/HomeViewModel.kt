@@ -1,50 +1,25 @@
 package co.softov.morestuff.android.ui.home
 
-import androidx.compose.runtime.Composable
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
-import app.cash.molecule.RecompositionMode
-import app.cash.molecule.launchMolecule
-import app.cash.molecule.moleculeFlow
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
-import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.ui.home.HomeUiEvent.*
+import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
+import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
+import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasks
+import co.softov.morestuff.android.ui.home.HomeUiEvent.MoveSelectedTasksToScope
+import co.softov.morestuff.android.ui.home.HomeUiEvent.ScopeSelected
+import co.softov.morestuff.android.ui.home.HomeUiEvent.SetConfettiEnabled
+import co.softov.morestuff.android.ui.home.HomeUiEvent.ToggleTaskSelection
+import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoComplete
+import co.softov.morestuff.android.ui.home.HomeUiEvent.UndoMoveTasks
 import co.softov.morestuff.android.ui.model.NotificationState
-import co.softov.morestuff.android.ui.model.NotificationState.TaskMovedToNewScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.getAndUpdate
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
 
-class HomeViewModel2(
-    private val savedState: SavedStateHandle
-) : MoleculeViewModel<HomeUiEvent, HomeScopeState>() {
-
-    override val initialState: HomeScopeState = savedState["Scopes"] ?: HomeScopeState()
-
-    @Composable
-    override fun models(events: Flow<HomeUiEvent>): HomeScopeState {
-        return homeScopeModel(initialState, events)
-    }
-
-    override fun onSaveState(model: HomeScopeState) {
-        savedState["Scopes"] = model
-    }
-}
-
-class HomeViewModel(
-    savedState: SavedStateHandle
-) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
+class HomeViewModel: BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
@@ -78,7 +53,6 @@ class HomeViewModel(
                 notifications.tryEmit(
                     NotificationState.Complete(action = { sendEvent(UndoComplete(completedTasks)) }
                     ))
-
                 this
             }
 
@@ -98,10 +72,7 @@ class HomeViewModel(
             is MoveSelectedTasksToScope -> {
                 val selectedTasks = selectedTasks.getAndUpdate { listOf() }
                 dispatchAppStoreAction(
-                    TaskAction.UpdateTasksToScopeAction(
-                        selectedTasks,
-                        event.scopeId
-                    )
+                    TaskAction.UpdateTasksToScopeAction(selectedTasks, event.scopeId)
                 )
 
                 // TODO: this does not handle cases where tasks are moved from different scopes.
@@ -121,15 +92,6 @@ class HomeViewModel(
             is UndoMoveTasks -> {
                 dispatchAppStoreAction(
                     TaskAction.UpdateTasksToScopeAction(event.tasks, event.fromScopeId)
-                )
-//                notification = None
-                this
-            }
-
-            is DeleteSelectedTasksFromScope -> {
-                val selectedTasks = selectedTasks.getAndUpdate { listOf() }
-                dispatchAppStoreAction(
-                    TaskAction.RemoveTasksFromScopeAction(selectedTasks, selectedScopeId)
                 )
                 this
             }
@@ -163,15 +125,6 @@ class HomeViewModel(
 
     fun addSelectedTasksToScope(scopeId: Long) {
         sendEvent(MoveSelectedTasksToScope(scopeId))
-    }
-
-    fun removeSelectedTaskFromScope() {
-        sendEvent(DeleteSelectedTasksFromScope)
-    }
-
-    fun scopeIndexChanged(index: Int) {
-        // TODO: emit changed scope index
-//        launch { eventsFlow.emit(ScopeSelected(scopeId)) }
     }
 
 }

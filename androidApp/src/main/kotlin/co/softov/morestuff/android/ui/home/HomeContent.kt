@@ -6,34 +6,26 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,20 +44,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
-import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
-import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.show
 import co.softov.morestuff.android.ui.schedule.ScopeContent
@@ -79,13 +66,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    viewModel2: HomeViewModel2 = koinViewModel()
+    homePresenter: HomePresenter = koinViewModel()
 ) {
 
     val navigation = LocalAppNavigation.current
@@ -95,7 +81,7 @@ fun HomeScreen(
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
     val selectedTasks by viewModel.selectedTasks.collectAsState()
-    val scopesModel by viewModel2.models.collectAsState()
+    val scopesModel by homePresenter.models.collectAsState()
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
@@ -116,7 +102,7 @@ fun HomeScreen(
             if (scopesModel.scopes.isNotEmpty()) {
                 HomeContent(
                     scopesModel = scopesModel,
-                    onViewEvent = viewModel2::take,
+                    onEvent = homePresenter::take,
                     modifier = Modifier.padding(it),
                 )
             }
@@ -167,12 +153,11 @@ fun HomeScreen(
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
     scopesModel: HomeScopeState,
-    onViewEvent: (HomeUiEvent) -> Unit,
+    onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
@@ -194,7 +179,7 @@ fun HomeContent(
                     currentScopePage = page
                 }
                 // TODO: should probably just use the page and let the viewmodel handle the scopeid
-                onViewEvent(HomeUiEvent.ScopeSelected(scopesModel.scopes[page].id))
+                onEvent(HomeUiEvent.ScopeSelected(scopesModel.scopes[page].id))
             }
     }
 
@@ -351,7 +336,6 @@ private fun ConfirmDeleteDialog(
         }
     )
 }
-
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,

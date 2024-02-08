@@ -3,7 +3,7 @@ package co.softov.morestuff.android.di
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.chat.task.TaskDetailsViewModel
 import co.softov.morestuff.android.ui.home.HomeViewModel
-import co.softov.morestuff.android.ui.home.HomeViewModel2
+import co.softov.morestuff.android.ui.home.HomePresenter
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.VoiceToTextViewModel
 import co.softov.morestuff.android.ui.main.MainViewModel
@@ -28,7 +28,7 @@ val presentationModule = module {
     viewModelOf(::ReviewViewModel)
     viewModelOf(::ScopeViewModel)
     viewModelOf(::HomeViewModel)
-    viewModelOf(::HomeViewModel2)
+    viewModelOf(::HomePresenter)
     viewModelOf(::TaskChatViewModel)
     viewModelOf(::PlanViewModel)
     viewModelOf(::ShareViewModel)

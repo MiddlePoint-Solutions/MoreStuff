@@ -36,10 +36,10 @@ fun ScopeTabs(
         edgePadding = 18.dp,
         containerColor = containerColor,
         indicator = { tabPositions ->
-            if(tabPositions.isNotEmpty()){
+            tabPositions.getOrNull(currentPage)?.let {
                 CustomIndicator(
                     modifier = Modifier.tabIndicatorOffset(
-                        currentTabPosition = tabPositions[currentPage],
+                        currentTabPosition = it,
                     ),
                     color = selectedTabColor,
                     height = 4.dp,
