@@ -45,8 +45,7 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
         }
     }
 
-    fun loadData(message: String? = null) {
-        onLoadData(message)
+    fun loadData() {
         store.state
             .onEach { onAppStateChange(it) }
             .launchIn(viewModelScope)
@@ -64,8 +63,6 @@ class BaseViewModel<ViewState : BaseViewState, ViewEvent : BaseViewEvent>(
     protected suspend fun dispatchSuspend(action: Action) {
         store.dispatchSuspend(action)
     }
-
-    protected open fun onLoadData(message: String? = null) {}
 
     protected open fun onLoadData(appState: AppState) {}
 

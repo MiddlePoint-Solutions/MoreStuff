@@ -1,7 +1,9 @@
 package co.softov.morestuff.android.ui.main
 
 import android.net.Uri
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
 import co.softov.morestuff.android.domain.nav.Screen.Home
@@ -42,6 +44,7 @@ fun MainContent(
 
     ChildStack(
         source = navigation,
+        modifier = Modifier.fillMaxSize(),
         initialStack = {
             when (initialScreen) {
                 OnBoarding -> listOf(OnBoarding)

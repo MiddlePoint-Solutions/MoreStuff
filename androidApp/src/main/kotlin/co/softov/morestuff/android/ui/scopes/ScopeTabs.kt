@@ -36,14 +36,16 @@ fun ScopeTabs(
         edgePadding = 18.dp,
         containerColor = containerColor,
         indicator = { tabPositions ->
-            CustomIndicator(
-                modifier = Modifier.tabIndicatorOffset(
-                    currentTabPosition = tabPositions[currentPage],
-                ),
-                color = selectedTabColor,
-                height = 4.dp,
-                cornerRadius = 12.dp
-            )
+            tabPositions.getOrNull(currentPage)?.let {
+                CustomIndicator(
+                    modifier = Modifier.tabIndicatorOffset(
+                        currentTabPosition = it,
+                    ),
+                    color = selectedTabColor,
+                    height = 4.dp,
+                    cornerRadius = 12.dp
+                )
+            }
         },
         divider = {}
     ) {

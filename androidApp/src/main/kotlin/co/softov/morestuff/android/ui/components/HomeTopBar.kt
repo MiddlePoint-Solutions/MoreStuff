@@ -71,7 +71,6 @@ fun HomeTopBar(
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
     selectScope: () -> Unit,
-    scrollBehavior: TopAppBarScrollBehavior,
 ) {
 
     val taskSelectionActive = remember(selectedTaskCount) { selectedTaskCount > 0 }
@@ -174,7 +173,6 @@ fun HomeTopBar(
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(containerColor = containerColor),
-        scrollBehavior = scrollBehavior
     )
 }
 
@@ -229,7 +227,6 @@ private fun Preview() {
             completeSelectedTasks = {},
             deleteSelectedTasks = {},
             selectScope = {},
-            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         )
     }
 }
