@@ -3,7 +3,6 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -75,6 +74,7 @@ fun HomeScreen(
     homePresenter: HomePresenter = koinViewModel()
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppNavigation.current
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by remember { mutableStateOf(false) }
@@ -144,12 +144,17 @@ fun HomeScreen(
     }
 
     if (showScopeSelection) {
-        val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ScopeSelectionBottomSheet(
-            onDismissRequest = { showScopeSelection = false },
+            onDismissRequest = {
+                coroutineScope.launch {
+                    sheetState.hide()
+                    showScopeSelection = false
+                }
+            },
             addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
             scopes = scopesModel.scopes,
-            sheetState = scopeSelectionSheetState,
+            sheetState = sheetState,
         )
     }
 }
