@@ -20,7 +20,6 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class ToggleTaskSelection(val taskId: Long) : HomeUiEvent()
     data class SetConfettiEnabled(val enabled: Boolean) : HomeUiEvent()
     data class MoveSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
-    data object DeleteSelectedTasksFromScope : HomeUiEvent()
     data class ScopeSelected(val scopeId: Long) : HomeUiEvent()
     data class UndoMoveTasks(val fromScopeId: Long, val tasks: List<Long>) : HomeUiEvent()
 

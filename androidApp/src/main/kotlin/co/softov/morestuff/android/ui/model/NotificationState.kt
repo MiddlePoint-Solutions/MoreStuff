@@ -1,20 +1,41 @@
 package co.softov.morestuff.android.ui.model
 
+import android.content.res.Resources
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Immutable
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.ui.model.NotificationState.*
 
 @Immutable
-sealed class NotificationState {
-    data object None : NotificationState()
-
+sealed class NotificationState(open val action: () -> Unit = {}) {
     @Immutable
     data class Complete(
-        val action: () -> Unit
-    ) : NotificationState()
+        override val action: () -> Unit
+    ) : NotificationState(action)
 
     @Immutable
     data class TaskMovedToNewScope(
-        val from: ScopeDomain,
-        val action: () -> Unit,
-    ) : NotificationState()
+        override val action: () -> Unit,
+    ) : NotificationState(action)
 }
+
+suspend fun NotificationState.show(
+    hostState: SnackbarHostState,
+    resources: Resources,
+): SnackbarResult =
+    when (this) {
+        is Complete -> hostState.showSnackbar(
+            message = resources.getString(R.string.snack_task_completed),
+            actionLabel = resources.getString(R.string.undo),
+            duration = SnackbarDuration.Short
+        )
+
+        is TaskMovedToNewScope -> hostState.showSnackbar(
+            message = resources.getString(R.string.snack_task_moved_to_new_scope),
+            actionLabel = resources.getString(R.string.undo),
+            duration = SnackbarDuration.Short
+        )
+    }

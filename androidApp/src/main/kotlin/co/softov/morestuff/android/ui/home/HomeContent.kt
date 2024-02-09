@@ -3,44 +3,29 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,7 +33,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,47 +42,36 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
-import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
-import co.softov.morestuff.android.ui.model.NotificationState
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.model.show
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeViewModel
-import co.softov.morestuff.android.ui.scopes.CreateScopeButton
 import co.softov.morestuff.android.ui.scopes.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
-import co.softov.morestuff.android.ui.utils.explode
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import nl.dionsegijn.konfetti.compose.KonfettiView
-import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
-import nl.dionsegijn.konfetti.core.PartySystem
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
+    homePresenter: HomePresenter = koinViewModel()
 ) {
 
     val navigation = LocalAppNavigation.current
@@ -107,32 +80,18 @@ fun HomeScreen(
     var showScopeSelection by remember { mutableStateOf(false) }
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
     val selectedTasks by viewModel.selectedTasks.collectAsState()
-    val model by viewModel.uiModel.collectAsState()
-
-    val topBarContainerColor by animateColorAsState(
-        targetValue = if (scrollBehavior.state.overlappedFraction > 0.2f || selectedTasks.isNotEmpty()) {
-            MaterialTheme.colorScheme.surfaceContainerElevation
-        } else {
-            MaterialTheme.colorScheme.surfaceContainer
-        },
-        animationSpec = tween(durationMillis = 150, easing = LinearEasing),
-        label = "TopBar color animation"
-    )
+    val scopesModel by homePresenter.models.collectAsState()
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
-        topAppBarScrollBehavior = scrollBehavior,
         topBar = {
             HomeTopBar(
-                containerColor = topBarContainerColor,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
                 selectedTaskCount = selectedTasks.size,
-                reviewSelected = { navigation.push(Screen.Review(model.selectedScopeId)) },
+                reviewSelected = { navigation.push(Screen.Review(scopesModel.currentScopeId)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
                 searchAction = { isSearchActive = true },
-                scrollBehavior = scrollBehavior,
                 clearTaskSelection = viewModel::clearSelectedTasks,
                 completeSelectedTasks = viewModel::completeSelectedTasks,
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
@@ -140,46 +99,22 @@ fun HomeScreen(
             )
         },
         content = {
-            HomeContent(
-                scopesContainerColor = topBarContainerColor,
-                modifier = Modifier.padding(it),
-            )
+            if (scopesModel.scopes.isNotEmpty()) {
+                HomeContent(
+                    scopesModel = scopesModel,
+                    onEvent = homePresenter::take,
+                    modifier = Modifier.padding(it),
+                )
+            }
         },
     )
 
     val resources = LocalContext.current.resources
     LaunchedEffect(Unit) {
-        viewModel.notifications.collectLatest {
-
-            Timber.d("Notification: $it")
-
-            when (val notification = it) {
-                is NotificationState.Complete -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = resources.getString(R.string.snack_task_completed),
-                        actionLabel = resources.getString(R.string.undo),
-                        duration = SnackbarDuration.Short
-                    )
-                    when (result) {
-                        SnackbarResult.Dismissed -> viewModel.resetNotification()
-                        SnackbarResult.ActionPerformed -> launch { notification.action() }
-                    }
-                }
-
-                is NotificationState.TaskMovedToNewScope -> {
-                    snackbarHostState.showSnackbar(
-                        message = resources.getString(R.string.snack_task_moved_to_new_scope),
-                        actionLabel = resources.getString(R.string.undo),
-                        duration = SnackbarDuration.Short
-                    ).also {
-                        when (it) {
-                            SnackbarResult.Dismissed -> viewModel.resetNotification()
-                            SnackbarResult.ActionPerformed -> launch { notification.action() }
-                        }
-                    }
-                }
-
-                NotificationState.None -> {}
+        viewModel.notifications.collectLatest { notification ->
+            when (notification.show(snackbarHostState, resources)) {
+                SnackbarResult.Dismissed -> {}
+                SnackbarResult.ActionPerformed -> launch { notification.action() }
             }
         }
     }
@@ -208,36 +143,32 @@ fun HomeScreen(
     }
 
     if (showScopeSelection) {
-        val scopes by viewModel.scopes.collectAsState()
         val scopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ScopeSelectionBottomSheet(
             onDismissRequest = { showScopeSelection = false },
             addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
-            scopes = scopes,
+            scopes = scopesModel.scopes,
             sheetState = scopeSelectionSheetState,
         )
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
-    scopesContainerColor: Color,
+    scopesModel: HomeScopeState,
+    onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
     val navigation = LocalAppNavigation.current
-    var showTaskCompleteAnimation by remember { mutableLongStateOf(0) }
 
-    val model by viewModel.uiModel.collectAsState()
-    val scopes by viewModel.scopes.collectAsState()
     val selectedTasks by viewModel.selectedTasks.collectAsState()
 
-    val states by rememberUpdatedState(newValue = scopes.map { rememberLazyListState() })
-    val pagerState = rememberPagerState(pageCount = { scopes.size })
+    val states by rememberUpdatedState(newValue = scopesModel.scopes.map { rememberLazyListState() })
+    val pagerState = rememberPagerState(pageCount = { scopesModel.scopes.size })
     var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
 
     LaunchedEffect(Unit) {
@@ -247,7 +178,8 @@ fun HomeContent(
                     launch { states[currentScopePage].scrollToItem(0) }
                     currentScopePage = page
                 }
-                viewModel.selectScope(scopes[page].id)
+                // TODO: should probably just use the page and let the viewmodel handle the scopeid
+                onEvent(HomeUiEvent.ScopeSelected(scopesModel.scopes[page].id))
             }
     }
 
@@ -266,33 +198,27 @@ fun HomeContent(
             ) {
                 ScopeTabs(
                     currentPage = pagerState.currentPage,
-                    scopes = scopes,
+                    scopes = scopesModel.scopes,
                     onScopeSelected = { index, _ ->
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     },
-                    containerColor = scopesContainerColor
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
                 )
             }
 
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                beyondBoundsPageCount = 1,
-                key = { scopes[it].id }
+                key = { scopesModel.scopes[it].id }
             ) { page ->
 
-                val scope = scopes[page]
+                val scope = scopesModel.scopes[page]
 
                 val scopeViewModel = koinViewModel<ScopeViewModel>(
                     key = "Scope${scope.id}",
-                    parameters = {
-                        parametersOf(
-                            scope.id,
-                            viewModel.selectedTasks
-                        )
-                    }
+                    parameters = { parametersOf(scope.id, viewModel.selectedTasks) }
                 )
 
                 val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
@@ -329,7 +255,6 @@ fun HomeContent(
                         },
                         onItemLongClick = viewModel::toggleTaskSelection,
                         listState = states[page],
-                        modifier = Modifier.padding(bottom = 20.dp),
                     )
                 }
             }
@@ -340,7 +265,7 @@ fun HomeContent(
                 skipPartiallyExpanded = true
             )
 
-            val context = remember { ChatContext.Main(model.selectedScopeId) }
+            val context = remember { ChatContext.Main(scopesModel.currentScopeId) }
 
             BackHandler(onBack = {
                 coroutineScope.launch {
@@ -372,18 +297,6 @@ fun HomeContent(
             )
         }
 
-        if (showTaskCompleteAnimation > 0 && model.confettiEnabled) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = explode(),
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(system: PartySystem, activeSystems: Int) {
-                        if (activeSystems == 0) showTaskCompleteAnimation = 0
-                    }
-                }
-            )
-        }
-
         FloatingActionButton(
             onClick = { showTaskInput = true },
             modifier = Modifier
@@ -393,94 +306,6 @@ fun HomeContent(
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
-        }
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ScopeSelectionBottomSheet(
-    onDismissRequest: () -> Unit,
-    addSelectedTasksToScope: (Long) -> Unit,
-    scopes: List<ScopeDomain>,
-    sheetState: SheetState,
-) {
-    val coroutineScope = rememberCoroutineScope()
-    val navigation = LocalAppNavigation.current
-    ModalBottomSheet(
-        content = {
-            BoxWithConstraints {
-                Column(
-                    verticalArrangement = Arrangement.Bottom
-                ) {
-                    ScopeList(
-                        scopes = scopes,
-                        onScopeSelected = addSelectedTasksToScope,
-                        modifier = Modifier.height(216.dp),
-                        hideSheet = {
-                            coroutineScope.launch {
-                                sheetState.hide()
-                                onDismissRequest()
-                            }
-                        }
-                    )
-                    CreateScopeButton(
-                        onClick = {
-                            navigation.push(Screen.CreateScope)
-                            coroutineScope.launch {
-                                sheetState.hide()
-                                onDismissRequest()
-                            }
-                        }
-                    )
-                }
-            }
-
-        },
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState
-    )
-}
-
-@Composable
-fun ScopeList(
-    scopes: List<ScopeDomain>,
-    onScopeSelected: (Long) -> Unit,
-    modifier: Modifier,
-    hideSheet: () -> Unit,
-) {
-    val scrollState = rememberLazyListState()
-
-    Text(
-        text = (stringResource(R.string.add_to_scope)),
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = 22.sp,
-        fontWeight = FontWeight(400),
-        modifier = Modifier.padding(start = 10.dp)
-    )
-    LazyColumn(
-        state = scrollState
-    ) {
-        items(
-            items = scopes,
-            key = { "Scope${it.id}" }
-        ) { scope ->
-            ListItem(
-                modifier = Modifier.clickable {
-                    onScopeSelected(scope.id)
-                    hideSheet()
-                },
-                headlineContent = {
-                    Text(scope.name)
-                },
-            )
-            if (scopes.last().id == scope.id) {
-                Divider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = Dp.Hairline
-                )
-            }
         }
     }
 }
@@ -511,7 +336,6 @@ private fun ConfirmDeleteDialog(
         }
     )
 }
-
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,

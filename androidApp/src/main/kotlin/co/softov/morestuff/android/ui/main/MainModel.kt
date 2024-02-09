@@ -4,7 +4,7 @@ import co.softov.morestuff.android.domain.enums.AppTheme
 
 sealed class MainStates {
 
-    data object Idle: MainStates()
+    data object Loading: MainStates()
 
     data class Ready(
         val theme: AppTheme = AppTheme.System,
