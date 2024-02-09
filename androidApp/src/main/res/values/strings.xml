@@ -165,7 +165,7 @@
     <string name="confirm">Confirm</string>
     <string name="edit_scope_name">Edit Scope Name</string>
     <string name="task_scopes">Task Scopes</string>
-    <string name="create_scope">Create Scope</string>
+    <string name="title_scopes">Scopes</string>
     <string name="add_to_scope">Choose Scope</string>
     <string name="manage_scopes">Manage Scopes</string>
     <string name="remove_from_scope">Remove from current scope</string>
@@ -245,6 +245,10 @@
     <string name="cd_more_options">More options</string>
     <string name="cd_open_settings">Open settings</string>
     <string name="cd_search_tasks">Search tasks</string>
+    <string name="cd_scopes_icon">Scopes Icon</string>
+    <string name="cd_move_icon">Move icon</string>
+    <string name="cd_dots_menu">Menu</string>
+    <string name="scopes_description">Use scopes to logically separate your stuff</string>
 
 
 </resources>
