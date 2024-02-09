@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.home
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -30,7 +31,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +56,8 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.show
 import co.softov.morestuff.android.ui.schedule.ScopeContent
-import co.softov.morestuff.android.ui.schedule.ScopeViewModel
+import co.softov.morestuff.android.ui.schedule.ScopeTasksModels
+import co.softov.morestuff.android.ui.schedule.ScopeTasksPresenter
 import co.softov.morestuff.android.ui.scopes.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
@@ -155,7 +156,7 @@ fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeContent(
+private fun HomeContent(
     scopesModel: HomeScopeState,
     onEvent: (HomeUiEvent) -> Unit,
     modifier: Modifier = Modifier,
@@ -216,46 +217,50 @@ fun HomeContent(
 
                 val scope = scopesModel.scopes[page]
 
-                val scopeViewModel = koinViewModel<ScopeViewModel>(
+                val scopeViewModel = koinViewModel<ScopeTasksPresenter>(
                     key = "Scope${scope.id}",
                     parameters = { parametersOf(scope.id, viewModel.selectedTasks) }
                 )
 
-                val scopeTasks by scopeViewModel.scopeTasks.collectAsState()
+                val scopeTasks by scopeViewModel.models.collectAsState()
 
-                val showEmptyState by remember(scopeTasks.size) {
-                    derivedStateOf { scopeTasks.isEmpty() }
-                }
-
-                if (showEmptyState) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 180.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        TextButton(onClick = { showTaskInput = true }) {
-                            Text(
-                                stringResource(R.string.empty_priority_list_cta),
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                when (val model = scopeTasks) {
+                    is ScopeTasksModels.Data -> {
+                        if (model.tasks.isEmpty()) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(bottom = 180.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                TextButton(onClick = { showTaskInput = true }) {
+                                    Text(
+                                        stringResource(R.string.empty_priority_list_cta),
+                                        style = MaterialTheme.typography.titleLarge.copy(
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    )
+                                }
+                            }
+                        } else {
+                            ScopeContent(
+                                tasks = model.tasks,
+                                onItemClick = { taskId ->
+                                    if (selectedTasks.isNotEmpty()) {
+                                        viewModel.toggleTaskSelection(taskId)
+                                    } else {
+                                        navigation.push(Screen.TaskChat(taskId))
+                                    }
+                                },
+                                onItemLongClick = viewModel::toggleTaskSelection,
+                                listState = states[page],
                             )
                         }
                     }
-                } else {
-                    ScopeContent(
-                        tasks = scopeTasks,
-                        onItemClick = { taskId ->
-                            if (selectedTasks.isNotEmpty()) {
-                                viewModel.toggleTaskSelection(taskId)
-                            } else {
-                                navigation.push(Screen.TaskChat(taskId))
-                            }
-                        },
-                        onItemLongClick = viewModel::toggleTaskSelection,
-                        listState = states[page],
-                    )
+
+                    ScopeTasksModels.Loading -> {
+
+                    }
                 }
             }
         }
