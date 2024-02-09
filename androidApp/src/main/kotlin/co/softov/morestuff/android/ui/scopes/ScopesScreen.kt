@@ -1,16 +1,11 @@
 package co.softov.morestuff.android.ui.scopes
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -54,9 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -67,6 +60,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.ui.components.CreateScopeButton
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
@@ -306,7 +300,7 @@ private fun Scopes(
                                 Text(text = scope.name)
                             },
                             trailingContent = {
-                                if (scope.id != 1L) {
+                                if (scope.id != defaultScope.id) {
                                     IconButton(onClick = {
                                         menuVisibility[scope.id] = !menuVisibility[scope.id]!!
                                     }) {
@@ -325,7 +319,7 @@ private fun Scopes(
                                         onEditScope(scope.id, scope.name)
                                         menuVisibility[scope.id] = false
                                     },
-                                        text = { Text(text = stringResource(R.string.edit_scope_name)) },
+                                        text = { Text(text = stringResource(R.string.edit_scope)) },
                                         leadingIcon = {
                                             Icon(
                                                 imageVector = Icons.Filled.Edit,
@@ -377,7 +371,7 @@ private fun EditScopeDialog(
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.edit_scope_name)) },
+        title = { Text(text = stringResource(R.string.edit_scope)) },
         text = {
             TextField(
                 value = dialogText,
@@ -392,26 +386,55 @@ private fun EditScopeDialog(
         confirmButton = {
             Button(
                 onClick = { onConfirm(dialogText) },
+                enabled = dialogText.isNotBlank()
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.save))
             }
         },
-        dismissButton = {
+    )
+}
+
+@Composable
+private fun CreateScopeDialog(
+    onDismissRequest: () -> Unit,
+    scopeName: String,
+    onConfirm: (String) -> Unit,
+) {
+
+    var dialogText by remember { mutableStateOf(scopeName) }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = stringResource(R.string.edit_scope)) },
+        text = {
+            TextField(
+                value = dialogText,
+                onValueChange = { dialogText = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Sentences
+                )
+            )
+        },
+
+        confirmButton = {
             Button(
-                onClick = onDismissRequest
+                onClick = { onConfirm(dialogText) },
+                enabled = dialogText.isNotBlank()
             ) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.save))
             }
-        }
+        },
     )
 }
 
 @Composable
 private fun ScopeInputComponent(
     focusRequester: FocusRequester,
-    handleUiEvent: (ScopesUiEvent) -> Unit,
+    onEvent: (ScopesUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     var newScopeName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
@@ -441,17 +464,15 @@ private fun ScopeInputComponent(
                                 exit = fadeOut()
                             ) {
                                 SendIcon(onClick = {
-                                    handleUiEvent(CreateScope(newScopeName.text))
+                                    onEvent(CreateScope(newScopeName.text))
                                     newScopeName = newScopeName.copy("")
                                 })
                             }
                         }
                     },
-
-                    )
+                )
             })
     }
-
 }
 
 @Composable
