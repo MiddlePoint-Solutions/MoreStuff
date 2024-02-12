@@ -4,6 +4,7 @@ import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
+import co.softov.morestuff.android.domain.usecase.scope.CreateScopeUseCase
 import co.softov.morestuff.android.ui.home.HomeUiEvent.ClearTaskSelection
 import co.softov.morestuff.android.ui.home.HomeUiEvent.CompleteSelectedTasks
 import co.softov.morestuff.android.ui.home.HomeUiEvent.DeleteSelectedTasks
@@ -19,7 +20,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.flow.update
 
-class HomeViewModel: BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
+class HomeViewModel(
+    private val createScopeUseCase: CreateScopeUseCase
+) : BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
     val selectedTasks = MutableStateFlow<List<Long>>(listOf())
 
@@ -100,6 +103,14 @@ class HomeViewModel: BaseViewModel<HomeUiModel, HomeUiEvent>(HomeUiModel()) {
 
             is SetConfettiEnabled -> state.copy(confettiEnabled = event.enabled)
 
+            is HomeUiEvent.CreateScopeForSelectedTasks -> {
+                launch {
+                    createScopeUseCase(event.title).onRight {
+                        sendEvent(MoveSelectedTasksToScope(it.id))
+                    }
+                }
+                state
+            }
         }
     }
 

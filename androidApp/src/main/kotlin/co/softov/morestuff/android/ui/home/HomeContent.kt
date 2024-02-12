@@ -154,6 +154,7 @@ fun HomeScreen(
             addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
             scopes = scopesModel.scopes,
             sheetState = sheetState,
+            createNewScope = { viewModel.sendEvent(HomeUiEvent.CreateScopeForSelectedTasks(it)) }
         )
     }
 }
@@ -175,6 +176,7 @@ private fun HomeContent(
     val states by rememberUpdatedState(newValue = scopesModel.scopes.map { rememberLazyListState() })
     val pagerState = rememberPagerState(pageCount = { scopesModel.scopes.size })
     var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
+    val scopes by rememberUpdatedState(newValue = scopesModel.scopes)
 
     LaunchedEffect(Unit) {
         snapshotFlow { pagerState.currentPage }
@@ -184,7 +186,7 @@ private fun HomeContent(
                     currentScopePage = page
                 }
                 // TODO: should probably just use the page and let the viewmodel handle the scopeid
-                onEvent(HomeUiEvent.ScopeSelected(scopesModel.scopes[page].id))
+                onEvent(HomeUiEvent.ScopeSelected(scopes[page].id))
             }
     }
 

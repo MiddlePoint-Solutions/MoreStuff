@@ -25,6 +25,11 @@ SELECT scope.*
 FROM scope
 ORDER BY scope_order ASC;
 
+selectScopeByName:
+SELECT *
+FROM scope
+WHERE scope_name = :name;
+
 updateScopeName:
 UPDATE scope
 SET scope_name = :scopeName

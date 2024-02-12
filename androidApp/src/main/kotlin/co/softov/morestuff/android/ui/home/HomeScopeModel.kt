@@ -40,6 +40,7 @@ fun homeModel(
                 is HomeUiEvent.ToggleTaskSelection -> TODO()
                 is HomeUiEvent.UndoComplete -> TODO()
                 is HomeUiEvent.UndoMoveTasks -> TODO()
+                is HomeUiEvent.CreateScopeForSelectedTasks -> TODO()
             }
         }
     }

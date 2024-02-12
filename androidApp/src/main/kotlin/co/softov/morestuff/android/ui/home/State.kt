@@ -22,5 +22,6 @@ sealed class HomeUiEvent : BaseViewEvent {
     data class MoveSelectedTasksToScope(val scopeId: Long) : HomeUiEvent()
     data class ScopeSelected(val scopeId: Long) : HomeUiEvent()
     data class UndoMoveTasks(val fromScopeId: Long, val tasks: List<Long>) : HomeUiEvent()
+    data class CreateScopeForSelectedTasks(val title: String) : HomeUiEvent()
 
 }
