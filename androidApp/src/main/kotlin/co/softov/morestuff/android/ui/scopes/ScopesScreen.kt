@@ -3,6 +3,7 @@ package co.softov.morestuff.android.ui.scopes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,12 +45,12 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
@@ -61,17 +62,27 @@ import androidx.constraintlayout.compose.Dimension
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.defaultScope
+import co.softov.morestuff.android.domain.nav.ScopeScreen
+import co.softov.morestuff.android.domain.nav.ScopeScreen.*
 import co.softov.morestuff.android.ui.components.CreateScopeButton
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.*
 import co.softov.morestuff.android.ui.theme.md_theme_light_error
 import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorder
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
@@ -79,21 +90,52 @@ import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
 
+@Composable
+fun ScopesScreen(
+    onBack: () -> Unit,
+    viewModel: ScopesViewModel = koinViewModel()
+) {
+
+    val navigation = remember { StackNavigation<ScopeScreen>() }
+
+    ChildStack(
+        source = navigation,
+        initialStack = { listOf(Root) },
+        modifier = Modifier.background(Color.Transparent),
+        key = "ScopesStack",
+        handleBackButton = true,
+        animation = stackAnimation(slide()),
+    ) { screen ->
+        when (screen) {
+            Root -> ScopesContent(
+                onBack = onBack,
+                onCreateScope = { navigation.push(Create) },
+                onEvent = viewModel::handleEvent
+            )
+
+            Create -> CreateScopeScreen(
+                onBack = navigation::pop,
+                onSaveScope = { title ->
+                    viewModel.handleEvent(CreateScope(title))
+                    navigation.pop()
+                }
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScopesScreen(
-    onBack: () -> Unit
+fun ScopesContent(
+    onBack: () -> Unit,
+    onCreateScope: () -> Unit,
+    onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-    val viewModel: ScopesViewModel = koinViewModel()
-    val coroutineScope = rememberCoroutineScope()
     var isEditDialogOpen by remember { mutableStateOf(false) }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
     var selectScopeId by remember { mutableLongStateOf(0) }
     var updateScopeName by remember { mutableStateOf("") }
-    var isUserInputActive by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
 
     Scaffold(
         topBar = {
@@ -145,7 +187,7 @@ fun ScopesScreen(
                 )
 
                 Text(
-                    text = stringResource(R.string.scopes_description),
+                    text = stringResource(R.string.description_scopes),
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -153,8 +195,7 @@ fun ScopesScreen(
                     modifier = Modifier.height(16.dp)
                 )
 
-                Scopes(
-                    scopes = viewModel.scopesState,
+                OrderedScopesList(
                     onEditScope = { scopeId, scopeName ->
                         selectScopeId = scopeId
                         updateScopeName = scopeName
@@ -163,8 +204,7 @@ fun ScopesScreen(
                     onDeleteScope = { scopeId ->
                         selectScopeId = scopeId
                         isDeleteDialogOpen = true
-                    },
-                    handleUiEvent = viewModel::handleEvent
+                    }
                 )
             }
 
@@ -173,44 +213,16 @@ fun ScopesScreen(
                     .constrainAs(action) { bottom.linkTo(parent.bottom) }
                     .padding(vertical = 16.dp)
             ) {
-
-                CreateScopeButton(
-                    onClick = {
-                        // TODO: show dialog
-                        isUserInputActive = true
-                        coroutineScope.launch {
-                            delay(100)
-                        }
-                    }
-                )
-
-                when (isUserInputActive) {
-                    true -> {
-//                    BackHandler {
-//                        isUserInputActive = false
-//                    }
-//                    ScopeInputComponent(
-//                        focusRequester = focusRequester,
-//                        handleUiEvent = viewModel::handleEvent,
-//                        modifier = Modifier.fillMaxWidth()
-//                    )
-                    }
-
-                    false -> {
-
-                    }
-                }
+                CreateScopeButton(onClick = onCreateScope)
             }
         }
-
-
 
         if (isEditDialogOpen) {
             EditScopeDialog(
                 onDismissRequest = { isEditDialogOpen = false },
                 scopeName = updateScopeName,
                 onConfirm = { newName ->
-                    viewModel.handleEvent(UpdateScopeName(selectScopeId, newName))
+                    onEvent(UpdateScopeName(selectScopeId, newName))
                     isEditDialogOpen = false
                 }
             )
@@ -220,7 +232,7 @@ fun ScopesScreen(
             DeleteScopeDialog(
                 onDismissRequest = { isDeleteDialogOpen = false },
                 onConfirm = {
-                    viewModel.handleEvent(DeleteScope(selectScopeId))
+                    onEvent(DeleteScope(selectScopeId))
                     isDeleteDialogOpen = false
                 },
             )
@@ -230,23 +242,23 @@ fun ScopesScreen(
 }
 
 @Composable
-private fun Scopes(
-    scopes: List<ScopeDomain>,
+private fun OrderedScopesList(
     onEditScope: (Long, String) -> Unit,
     onDeleteScope: (Long) -> Unit,
-    handleUiEvent: (ScopesUiEvent) -> Unit,
+    viewModel: ScopesViewModel = koinViewModel()
 ) {
-    val menuVisibility = remember(scopes) {
+
+    val menuVisibility = remember(viewModel.scopesState) {
         mutableStateMapOf<Long, Boolean>().apply {
-            scopes.forEach { scope ->
+            viewModel.scopesState.forEach { scope ->
                 put(scope.id, false)
             }
         }
     }
 
     val reorderState = rememberReorderableLazyListState(
-        onMove = { from, to -> handleUiEvent(ReorderScope(from.index, to.index, false)) },
-        onDragEnd = { from, to -> handleUiEvent(ReorderScope(from, to, true)) }
+        onMove = { from, to -> viewModel.handleEvent(ReorderScope(from.index, to.index, false)) },
+        onDragEnd = { from, to -> viewModel.handleEvent(ReorderScope(from, to, true)) }
     )
 
     Column(
@@ -272,7 +284,7 @@ private fun Scopes(
                 .detectReorderAfterLongPress(reorderState)
         ) {
             items(
-                items = scopes,
+                items = viewModel.scopesState,
                 key = { scope -> scope.id }
             ) { scope ->
 

@@ -1,12 +1,12 @@
 package co.softov.morestuff.android.domain.nav
 
 import com.arkivanov.essenty.parcelable.Parcelable
-import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.parcelize.Parcelize
 
 sealed class ChatScreen : Parcelable {
 
     @Parcelize
-    object TaskChat : ChatScreen()
+    data object TaskChat : ChatScreen()
 
     @Parcelize
     data class ImageImport(val uri: String) : ChatScreen()

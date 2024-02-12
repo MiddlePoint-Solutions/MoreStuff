@@ -53,7 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
-import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.domain.model.Shareable
 import co.softov.morestuff.android.ui.home.TaskInputBottomSheet
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.schedule.PriorityItem

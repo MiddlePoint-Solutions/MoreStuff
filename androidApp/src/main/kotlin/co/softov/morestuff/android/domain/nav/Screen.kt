@@ -2,6 +2,7 @@ package co.softov.morestuff.android.domain.nav
 
 import android.net.Uri
 import android.os.Parcelable
+import co.softov.morestuff.android.domain.model.Shareable
 import kotlinx.parcelize.Parcelize
 
 

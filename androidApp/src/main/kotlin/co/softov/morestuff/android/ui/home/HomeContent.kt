@@ -57,7 +57,6 @@ import co.softov.morestuff.android.ui.model.show
 import co.softov.morestuff.android.ui.schedule.ScopeContent
 import co.softov.morestuff.android.ui.schedule.ScopeTasksModels
 import co.softov.morestuff.android.ui.schedule.ScopeTasksPresenter
-import co.softov.morestuff.android.ui.scopes.ScopeTabs
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
