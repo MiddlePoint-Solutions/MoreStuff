@@ -1,14 +1,12 @@
 package co.softov.morestuff.android.ui.scopes
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.slideIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,17 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -48,87 +45,158 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ScopeDomain
+import co.softov.morestuff.android.domain.model.defaultScope
+import co.softov.morestuff.android.domain.nav.ScopeScreen
+import co.softov.morestuff.android.domain.nav.ScopeScreen.*
+import co.softov.morestuff.android.ui.components.CreateScopeButton
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserTextInput
 import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.*
 import co.softov.morestuff.android.ui.theme.md_theme_light_error
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import co.softov.morestuff.android.ui.theme.surfaceContainer
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorder
 import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 import org.burnoutcrew.reorderable.reorderable
 import org.koin.androidx.compose.koinViewModel
-import java.util.UUID
 
+@Composable
+fun ScopesScreen(
+    onBack: () -> Unit,
+    initialScreen: ScopeScreen = Root,
+    viewModel: ScopesViewModel = koinViewModel()
+) {
+
+    val navigation = remember { StackNavigation<ScopeScreen>() }
+
+    ChildStack(
+        source = navigation,
+        initialStack = { listOf(initialScreen) },
+        modifier = Modifier.background(Color.Transparent),
+        key = "ScopesStack",
+        handleBackButton = true,
+        animation = stackAnimation(slide()),
+    ) { screen ->
+        when (screen) {
+            Root -> ScopesContent(
+                onBack = onBack,
+                onCreateScope = { navigation.push(Create) },
+                onEvent = viewModel::handleEvent
+            )
+
+            Create -> CreateScopeScreen(
+                onBack = navigation::pop,
+                onSaveScope = { title ->
+                    viewModel.handleEvent(CreateScope(title))
+                    navigation.pop()
+                }
+            )
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScopesScreen(
-    onBack: () -> Unit
+fun ScopesContent(
+    onBack: () -> Unit,
+    onCreateScope: () -> Unit,
+    onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-    val viewModel: ScopesViewModel = koinViewModel()
-    val coroutineScope = rememberCoroutineScope()
     var isEditDialogOpen by remember { mutableStateOf(false) }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
     var selectScopeId by remember { mutableLongStateOf(0) }
     var updateScopeName by remember { mutableStateOf("") }
-    var isUserInputActive by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = (stringResource(R.string.create_scope))) },
+                title = { Text(text = (stringResource(R.string.title_scopes))) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.cd_navigate_back)
                         )
                     }
                 },
-                actions = {},
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+                )
             )
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        Box(
+        ConstraintLayout(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(it),
         ) {
+
+            val (content, action) = createRefs()
+
             Column(
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.TopCenter)
+                modifier = Modifier.constrainAs(content) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(action.top)
+                    height = Dimension.fillToConstraints
+                },
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
 
-                Scopes(
-                    scopes = viewModel.scopesState,
+                Icon(
+                    imageVector = Icons.Filled.ModeStandby,
+                    contentDescription = stringResource(R.string.cd_scopes_icon),
+                    modifier = Modifier
+                        .padding(top = 20.dp)
+                        .size(60.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+
+                Text(
+                    text = stringResource(R.string.description_scopes),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(
+                    modifier = Modifier.height(16.dp)
+                )
+
+                OrderedScopesList(
                     onEditScope = { scopeId, scopeName ->
                         selectScopeId = scopeId
                         updateScopeName = scopeName
@@ -137,40 +205,16 @@ fun ScopesScreen(
                     onDeleteScope = { scopeId ->
                         selectScopeId = scopeId
                         isDeleteDialogOpen = true
-                    },
-                    handleUiEvent = viewModel::handleEvent
+                    }
                 )
             }
 
-            Column(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                    .constrainAs(action) { bottom.linkTo(parent.bottom) }
+                    .padding(vertical = 16.dp)
             ) {
-                when (isUserInputActive) {
-                    true -> {
-                        BackHandler {
-                            isUserInputActive = false
-                        }
-                        ScopeInputComponent(
-                            focusRequester = focusRequester,
-                            handleUiEvent = viewModel::handleEvent,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-
-                    false -> {
-                        CreateScopeButton(
-                            onClick = {
-                                isUserInputActive = true
-                                coroutineScope.launch {
-                                    delay(100)
-                                    focusRequester.requestFocus()
-                                }
-                            }
-                        )
-                    }
-                }
+                CreateScopeButton(onClick = onCreateScope)
             }
         }
 
@@ -179,7 +223,7 @@ fun ScopesScreen(
                 onDismissRequest = { isEditDialogOpen = false },
                 scopeName = updateScopeName,
                 onConfirm = { newName ->
-                    viewModel.handleEvent(UpdateScopeName(selectScopeId, newName))
+                    onEvent(UpdateScopeName(selectScopeId, newName))
                     isEditDialogOpen = false
                 }
             )
@@ -189,7 +233,7 @@ fun ScopesScreen(
             DeleteScopeDialog(
                 onDismissRequest = { isDeleteDialogOpen = false },
                 onConfirm = {
-                    viewModel.handleEvent(DeleteScope(selectScopeId))
+                    onEvent(DeleteScope(selectScopeId))
                     isDeleteDialogOpen = false
                 },
             )
@@ -198,114 +242,131 @@ fun ScopesScreen(
     }
 }
 
-// TODO(Alex): refactor menu visibility in this function
 @Composable
-private fun Scopes(
-    scopes: List<ScopeDomain>,
+private fun OrderedScopesList(
     onEditScope: (Long, String) -> Unit,
     onDeleteScope: (Long) -> Unit,
-    handleUiEvent: (ScopesUiEvent) -> Unit,
+    viewModel: ScopesViewModel = koinViewModel()
 ) {
-    val menuVisibility = remember(scopes) {
+
+    val menuVisibility = remember(viewModel.scopesState) {
         mutableStateMapOf<Long, Boolean>().apply {
-            scopes.forEach { scope ->
+            viewModel.scopesState.forEach { scope ->
                 put(scope.id, false)
             }
         }
     }
 
     val reorderState = rememberReorderableLazyListState(
-        onMove = { from, to -> handleUiEvent(ReorderScope(from.index, to.index, false)) },
-        onDragEnd = { from, to -> handleUiEvent(ReorderScope(from, to, true)) }
+        onMove = { from, to -> viewModel.handleEvent(ReorderScope(from.index, to.index, false)) },
+        onDragEnd = { from, to -> viewModel.handleEvent(ReorderScope(from, to, true)) }
     )
 
-    Text(
-        text = stringResource(R.string.task_scopes),
-        color = MaterialTheme.colorScheme.primary,
-        fontSize = 22.sp,
-        fontWeight = FontWeight(400),
-        modifier = Modifier.padding(start = 10.dp)
-    )
-
-    Spacer(Modifier.height(20.dp))
-
-    LazyColumn(
-        state = reorderState.listState,
-        modifier = Modifier
-            .reorderable(reorderState)
-            .detectReorderAfterLongPress(reorderState)
+    Column(
+        modifier = Modifier.padding(top = 20.dp)
     ) {
-        items(
-            items = scopes,
-            key = { scope -> scope.id }
-        ) { scope ->
 
-            ReorderableItem(
-                state = reorderState,
-                key = scope.id
-            ) { isDragging ->
+        Text(
+            text = stringResource(R.string.title_scopes),
+            modifier = Modifier.padding(start = 16.dp),
+            color = MaterialTheme.colorScheme.primary,
+            style = MaterialTheme.typography.bodyLarge
+        )
 
-                val elevation by animateDpAsState(if (isDragging) 30.dp else 0.dp, label = "")
+        Spacer(
+            modifier = Modifier.height(10.dp)
+        )
 
-                ListItem(
-                    modifier = Modifier.shadow(elevation),
-                    leadingContent = {
-                        Icon(Icons.Default.DragHandle, contentDescription = "Move")
-                    },
-                    headlineContent = { Text(scope.name) },
-                    trailingContent = {
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (scope.id != 1L) {
-                                IconButton(onClick = {
-                                    menuVisibility[scope.id] = !menuVisibility[scope.id]!!
-                                }) {
-                                    Icon(Icons.Default.MoreVert, contentDescription = "Menu")
+        LazyColumn(
+            state = reorderState.listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .reorderable(reorderState)
+                .detectReorderAfterLongPress(reorderState)
+        ) {
+            items(
+                items = viewModel.scopesState,
+                key = { scope -> scope.id }
+            ) { scope ->
+
+                ReorderableItem(
+                    state = reorderState,
+                    key = scope.id
+                ) {
+
+                    Column(
+                        modifier = Modifier.background(
+                            color = MaterialTheme.colorScheme.surfaceContainerElevation
+                        )
+                    ) {
+                        ListItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            leadingContent = {
+                                Icon(
+                                    imageVector = Icons.Default.DragHandle,
+                                    modifier = Modifier.detectReorder(reorderState),
+                                    contentDescription = stringResource(R.string.cd_move_icon),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            },
+                            headlineContent = {
+                                Text(text = scope.name)
+                            },
+                            trailingContent = {
+                                if (scope.id != defaultScope.id) {
+                                    IconButton(onClick = {
+                                        menuVisibility[scope.id] = !menuVisibility[scope.id]!!
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Default.MoreVert,
+                                            contentDescription = stringResource(R.string.cd_dots_menu),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
                                 }
-                            }
-                            DropdownMenu(
-                                expanded = menuVisibility[scope.id] == true,
-                                onDismissRequest = { menuVisibility[scope.id] = false }
-                            ) {
-                                DropdownMenuItem(onClick = {
-                                    onEditScope(scope.id, scope.name)
-                                    menuVisibility[scope.id] = false
-                                },
-                                    text = { Text(text = stringResource(R.string.edit_scope_name)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Edit,
-                                            contentDescription = "Edit"
-                                        )
-                                    }
-                                )
-                                DropdownMenuItem(onClick = {
-                                    onDeleteScope(scope.id)
-                                    menuVisibility[scope.id] = false
-                                },
-                                    text = { Text(text = stringResource(R.string.delete)) },
-                                    leadingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.Delete,
-                                            contentDescription = "Delete",
-                                            tint = md_theme_light_error
-                                        )
-                                    }
-                                )
+                                DropdownMenu(
+                                    expanded = menuVisibility[scope.id] == true,
+                                    onDismissRequest = { menuVisibility[scope.id] = false }
+                                ) {
+                                    DropdownMenuItem(onClick = {
+                                        onEditScope(scope.id, scope.name)
+                                        menuVisibility[scope.id] = false
+                                    },
+                                        text = { Text(text = stringResource(R.string.edit_scope)) },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.Edit,
+                                                contentDescription = "Edit"
+                                            )
+                                        }
+                                    )
+                                    DropdownMenuItem(onClick = {
+                                        onDeleteScope(scope.id)
+                                        menuVisibility[scope.id] = false
+                                    },
+                                        text = { Text(text = stringResource(R.string.delete)) },
+                                        leadingIcon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.Delete,
+                                                contentDescription = "Delete",
+                                                tint = md_theme_light_error
+                                            )
+                                        }
+                                    )
 
-                            }
-                        }
-                    },
-                    colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
-                )
-                Divider(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    thickness = Dp.Hairline
-                )
+                                }
+                            },
+                            colors = ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+                            )
+                        )
+
+                        Divider(
+                            modifier = Modifier.padding(start = 45.dp),
+                            thickness = Dp.Hairline
+                        )
+                    }
+                }
             }
         }
     }
@@ -323,7 +384,7 @@ private fun EditScopeDialog(
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.edit_scope_name)) },
+        title = { Text(text = stringResource(R.string.edit_scope)) },
         text = {
             TextField(
                 value = dialogText,
@@ -338,26 +399,55 @@ private fun EditScopeDialog(
         confirmButton = {
             Button(
                 onClick = { onConfirm(dialogText) },
+                enabled = dialogText.isNotBlank()
             ) {
-                Text(stringResource(R.string.confirm))
+                Text(stringResource(R.string.save))
             }
         },
-        dismissButton = {
+    )
+}
+
+@Composable
+private fun CreateScopeDialog(
+    onDismissRequest: () -> Unit,
+    scopeName: String,
+    onConfirm: (String) -> Unit,
+) {
+
+    var dialogText by remember { mutableStateOf(scopeName) }
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = stringResource(R.string.edit_scope)) },
+        text = {
+            TextField(
+                value = dialogText,
+                onValueChange = { dialogText = it },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    capitalization = KeyboardCapitalization.Sentences
+                )
+            )
+        },
+
+        confirmButton = {
             Button(
-                onClick = onDismissRequest
+                onClick = { onConfirm(dialogText) },
+                enabled = dialogText.isNotBlank()
             ) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.save))
             }
-        }
+        },
     )
 }
 
 @Composable
 private fun ScopeInputComponent(
     focusRequester: FocusRequester,
-    handleUiEvent: (ScopesUiEvent) -> Unit,
+    onEvent: (ScopesUiEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
     var newScopeName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(TextFieldValue())
     }
@@ -387,39 +477,14 @@ private fun ScopeInputComponent(
                                 exit = fadeOut()
                             ) {
                                 SendIcon(onClick = {
-                                    handleUiEvent(CreateScope(newScopeName.text))
+                                    onEvent(CreateScope(newScopeName.text))
                                     newScopeName = newScopeName.copy("")
                                 })
                             }
                         }
                     },
-
-                    )
+                )
             })
-    }
-
-}
-
-@Composable
-fun CreateScopeButton(
-    onClick: () -> Unit,
-) {
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(50)
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.add_circle),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-            contentDescription = "Create",
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-        Text(stringResource(R.string.create_new_scope))
     }
 }
 

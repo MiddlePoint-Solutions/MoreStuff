@@ -5,14 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.domain.nav.Screen
-import co.softov.morestuff.android.domain.nav.Screen.AboutLibraries
-import co.softov.morestuff.android.domain.nav.Screen.Home
-import co.softov.morestuff.android.domain.nav.Screen.OnBoarding
-import co.softov.morestuff.android.domain.nav.Screen.Review
-import co.softov.morestuff.android.domain.nav.Screen.Settings
-import co.softov.morestuff.android.domain.nav.Screen.Share
-import co.softov.morestuff.android.domain.nav.Screen.TaskChat
-import co.softov.morestuff.android.domain.nav.Shareable
+import co.softov.morestuff.android.domain.model.Shareable
+import co.softov.morestuff.android.domain.nav.ScopeScreen
+import co.softov.morestuff.android.domain.nav.Screen.*
 import co.softov.morestuff.android.ui.chat.task.TaskChatScreen
 import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.image.ImageImportScreen
@@ -20,6 +15,7 @@ import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
 import co.softov.morestuff.android.ui.review.ReviewScreen
+import co.softov.morestuff.android.ui.scopes.CreateScopeScreen
 import co.softov.morestuff.android.ui.scopes.ScopesScreen
 import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
@@ -66,16 +62,24 @@ fun MainContent(
             )
 
             Home -> HomeScreen()
+
             is Review -> ReviewScreen(currentScopeId = screen.scopeId)
+
             Settings -> SettingsScreen()
-            Screen.CreateScope -> ScopesScreen(onBack = navigation::pop)
+
+            Scopes -> ScopesScreen(onBack = navigation::pop)
+
+            is CreateScope -> CreateScopeScreen(
+                onBack = navigation::pop,
+                onSaveScope = screen.onSave
+            )
 
             is TaskChat -> TaskChatScreen(
                 taskId = screen.taskId,
                 onBack = navigation::pop
             )
 
-            is Screen.ImagePreview -> {
+            is ImagePreview -> {
                 ImageImportScreen(
                     imageUri = screen.imageUri,
                     onImport = { message ->
@@ -95,7 +99,7 @@ fun MainContent(
                     shareable = screen.shareable,
                 ) { taskId, shareable ->
                     if (shareable is Shareable.Image) {
-                        navigation.push(Screen.ImagePreview(Uri.parse(shareable.uris), taskId))
+                        navigation.push(ImagePreview(Uri.parse(shareable.uris), taskId))
                     } else {
                         navigation.replaceCurrent(
                             TaskChat(taskId),

@@ -3,9 +3,11 @@ package co.softov.morestuff.android.data.repository
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
+import arrow.core.left
 import arrow.core.right
 import co.softov.morestuff.android.data.mapper.DataMappers
 import co.softov.morestuff.android.domain.model.Failure
+import co.softov.morestuff.android.domain.model.ScopeAlreadyExists
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.repository.ScopeRepository
@@ -38,14 +40,21 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun createScope(name: String): Either<Failure, ScopeDomain?> {
+    override suspend fun createScope(name: String): Either<Failure, ScopeDomain> {
         return scopeQueries.transactionWithResult {
+
+            scopeQueries
+                .selectScopeByName(name, dataMappers.scopeDbMapper)
+                .executeAsOneOrNull()?.let { existingScope ->
+                    return@transactionWithResult existingScope.right()
+                }
+
             val count = scopeQueries.countScopes().executeAsOne().toInt()
             scopeQueries.createScope(UUID.randomUUID().toString(), name, count)
             val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
             scopeQueries
                 .selectScope(scopeId, dataMappers.scopeDbMapper)
-                .executeAsOneOrNull()
+                .executeAsOne()
                 .right()
         }
     }

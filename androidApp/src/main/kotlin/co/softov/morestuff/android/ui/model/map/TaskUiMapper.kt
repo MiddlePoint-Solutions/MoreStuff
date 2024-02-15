@@ -7,7 +7,7 @@ import co.softov.morestuff.android.ui.model.TaskUiModel
 class TaskUiMapper(
     private val timeFormatter: TimeFormatter,
 ) {
-    private fun internalMap(input: TaskDomain, position: Int, selected: Boolean): TaskUiModel {
+    private fun internalMap(input: TaskDomain, position: Int): TaskUiModel {
         return TaskUiModel(
             id = input.id,
             createTime = timeFormatter.formatToDateTime(input.createTime) ?: "",
@@ -19,14 +19,13 @@ class TaskUiMapper(
             extraDetails = input.extraDetails,
             hasSchedule = input.hasSchedule,
             hasReminder = input.hasReminder,
-            isSelected = selected,
             hasScope = input.hasScope
         )
     }
 
-    fun map(input: List<TaskDomain>, selectedIds: List<Long> = listOf()): List<TaskUiModel> {
+    fun map(input: List<TaskDomain>): List<TaskUiModel> {
         return input.mapIndexed { index, task ->
-            internalMap(task, index + 1, selectedIds.contains(task.id))
+            internalMap(task, index + 1)
         }
     }
 }

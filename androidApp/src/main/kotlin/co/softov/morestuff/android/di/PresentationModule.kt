@@ -2,7 +2,7 @@ package co.softov.morestuff.android.di
 
 import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
 import co.softov.morestuff.android.ui.chat.task.TaskDetailsViewModel
-import co.softov.morestuff.android.ui.home.HomeViewModel
+import co.softov.morestuff.android.ui.home.AppPresenter
 import co.softov.morestuff.android.ui.home.HomePresenter
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.VoiceToTextViewModel
@@ -19,6 +19,7 @@ import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import co.softov.morestuff.android.ui.share.ShareViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val presentationModule = module {
@@ -26,7 +27,6 @@ val presentationModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::ReviewViewModel)
-    viewModelOf(::HomeViewModel)
     viewModelOf(::HomePresenter)
     viewModelOf(::ScopeTasksPresenter)
     viewModelOf(::TaskChatViewModel)
@@ -36,6 +36,8 @@ val presentationModule = module {
     viewModelOf(::VoiceToTextViewModel)
     viewModelOf(::TaskDetailsViewModel)
     viewModelOf(::ScopesViewModel)
+
+    singleOf(::AppPresenter)
 
     factoryOf(::ReviewTasksMapper)
     factoryOf(::TaskUiMapper)

@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode.ContextClock
 import app.cash.molecule.launchMolecule
 import app.cash.molecule.moleculeFlow
+import co.softov.morestuff.android.domain.redux.AppStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -16,6 +17,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import org.koin.core.component.inject
+import org.koin.java.KoinJavaComponent.inject
 
 abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 

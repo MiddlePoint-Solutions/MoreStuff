@@ -161,11 +161,11 @@
 
     <string name="sure_delete_scope">Estás seguro que quieres eliminar\nel siguiente scope?</string>
     <string name="create_new_scope">Crear nuevo Scope</string>
-    <string name="confirm">Confirmar</string>
-    <string name="edit_scope_name">Editar nombre del Scope </string>
+    <string name="save">Confirmar</string>
+    <string name="edit_scope">Editar nombre del Scope </string>
     <string name="task_scopes">Task Scopes</string>
-    <string name="create_scope">Crear Scope</string>
-    <string name="add_to_scope">Añadir al Scope</string>
+    <string name="title_scopes">Crear Scope</string>
+    <string name="choose_scope">Añadir al Scope</string>
     <string name="manage_scopes">Configurar Scopes</string>
     <string name="remove_from_scope">Eliminar del Scope actual</string>
 

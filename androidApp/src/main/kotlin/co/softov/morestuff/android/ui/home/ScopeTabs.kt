@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.scopes
+package co.softov.morestuff.android.ui.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
