@@ -45,6 +45,7 @@ fun PriorityItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selected: Boolean = false,
 ) {
     Box(
         modifier = Modifier
@@ -63,7 +64,7 @@ fun PriorityItem(
             Box(modifier = Modifier) {
                 TaskProfile(task.title)
 
-                if (task.isSelected) {
+                if (selected) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
@@ -140,9 +141,9 @@ fun PriorityItemPreview() {
                 extraDetails = true,
                 hasSchedule = true,
                 hasReminder = true,
-                isSelected = true,
                 hasScope = false,
             ),
+            selected = true,
             onClick = {},
             onLongClick = {}
         )

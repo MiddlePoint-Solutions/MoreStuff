@@ -20,7 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -72,6 +72,7 @@ import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainer
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -122,7 +123,7 @@ private fun SettingsContent(
     MoreStuffSettingTheme {
         Scaffold(
             topBar = { SettingsTopBar(onBack = onBack) },
-            containerColor = Color.Transparent
+            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
         ) {
             Column(
                 modifier = Modifier
@@ -547,11 +548,11 @@ private fun Language.displayTitle(res: Resources): String = when (this) {
 fun ScopeSettingsScreen() {
     val navigation = LocalAppNavigation.current
     SettingsMenuLink(
-        title = { Text(text = stringResource(R.string.manage_scopes)) },
-        onClick = { navigation.push(Screen.CreateScope) },
+        title = { Text(text = stringResource(R.string.title_scopes)) },
+        onClick = { navigation.push(Screen.Scopes) },
         icon = {
             Icon(
-                imageVector = Icons.Default.Layers,
+                imageVector = Icons.Default.ModeStandby,
                 contentDescription = stringResource(R.string.select_language)
             )
         }

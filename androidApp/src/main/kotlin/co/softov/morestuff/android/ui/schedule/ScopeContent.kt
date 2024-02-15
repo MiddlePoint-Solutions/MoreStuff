@@ -21,6 +21,7 @@ import co.softov.morestuff.android.ui.model.TaskUiModel
 @Composable
 fun ScopeContent(
     tasks: List<TaskUiModel>,
+    selectedTasks: List<Long>,
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -40,8 +41,13 @@ fun ScopeContent(
                 derivedStateOf { index == tasks.lastIndex }
             }
 
+            val selected by remember(selectedTasks) {
+                derivedStateOf { selectedTasks.contains(item.id) }
+            }
+
             PriorityItem(
                 task = item,
+                selected = selected,
                 onClick = { onItemClick(item.id) },
                 onLongClick = { onItemLongClick(item.id) }
             )

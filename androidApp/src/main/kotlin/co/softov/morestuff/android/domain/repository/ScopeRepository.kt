@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ScopeRepository {
     suspend fun initScopes()
-    suspend fun createScope(name: String): Either<Failure, ScopeDomain?>
+    suspend fun createScope(name: String): Either<Failure, ScopeDomain>
     suspend fun deleteScope(id: Long): Either<Failure, ScopeDomain>
     suspend fun getScopes(): Either<Failure, List<ScopeDomain>>
     fun getScopesFlow(): Flow<List<ScopeDomain>>

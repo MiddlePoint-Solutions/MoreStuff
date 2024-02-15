@@ -8,6 +8,9 @@ plugins {
 }
 
 kotlin {
+
+    applyDefaultHierarchyTemplate()
+
     androidTarget()
 
     val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =

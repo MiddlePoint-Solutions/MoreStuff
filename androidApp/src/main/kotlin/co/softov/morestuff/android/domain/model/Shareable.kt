@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.domain.nav
+package co.softov.morestuff.android.domain.model
 import kotlinx.parcelize.Parcelize
 import android.os.Parcelable
 

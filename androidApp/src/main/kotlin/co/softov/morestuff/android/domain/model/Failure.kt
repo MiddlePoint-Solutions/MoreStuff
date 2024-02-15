@@ -16,3 +16,5 @@ data class SavePdfFailure(val message: String?) : Failure
 data class OpenGraphMetadataFetchFailure(val message: String?) : FeatureFailure
 
 data object TaskReminderCancelled : FeatureFailure
+
+data object ScopeAlreadyExists: Failure
