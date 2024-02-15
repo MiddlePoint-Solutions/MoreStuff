@@ -39,7 +39,7 @@ import co.softov.morestuff.android.ui.theme.surfaceContainer
 @Composable
 fun CompletePriorityItem(
     task: TaskUiModel,
-    onClick: (taskId: Long) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isDragging: Boolean = false,
 ) {
@@ -50,7 +50,7 @@ fun CompletePriorityItem(
             .heightIn(max = 90.dp)
             .shadow(elevation = elevation)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable { onClick(task.id) }
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = modifier
@@ -116,7 +116,7 @@ fun CompletePriorityItem(
     name = "Light"
 )
 @Composable
-fun CompletePriorityItem() {
+fun CompletePriorityItemPreview() {
     MoreStuffTheme {
         CompletePriorityItem(
             task = TaskUiModel(
@@ -130,7 +130,6 @@ fun CompletePriorityItem() {
                 extraDetails = true,
                 hasSchedule = true,
                 hasReminder = true,
-                isSelected = true,
                 hasScope = false,
             ),
             onClick = {}

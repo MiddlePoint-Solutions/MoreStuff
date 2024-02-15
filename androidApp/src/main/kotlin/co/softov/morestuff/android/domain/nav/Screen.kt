@@ -33,5 +33,8 @@ sealed class Screen : Parcelable {
     data class ImagePreview(val imageUri: Uri, val taskId: Long) : Screen()
 
     @Parcelize
-    data object CreateScope : Screen()
+    data object Scopes : Screen()
+
+    @Parcelize
+    data class CreateScope(val onSave: (String) -> Unit) : Screen()
 }

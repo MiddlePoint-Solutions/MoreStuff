@@ -12,12 +12,12 @@ import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import co.softov.morestuff.android.ui.schedule.ScopeTasksModels.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
 @Composable
 fun scopeTasksModel(
     scopeId: Long,
-    selectedTasksFlow: Flow<List<Long>>,
     getScopeActiveTasksFlowUseCase: GetScopeActiveTasksFlowUseCase = koinInject(),
     taskMapper: TaskUiMapper = koinInject()
 ): ScopeTasksModels {
@@ -26,7 +26,7 @@ fun scopeTasksModel(
 
     LaunchedEffect(Unit) {
         getScopeActiveTasksFlowUseCase(scopeId)
-            .combine(selectedTasksFlow) { tasks, selected -> taskMapper.map(tasks, selected) }
+            .map(taskMapper::map)
             .collect { tasks = it }
     }
 

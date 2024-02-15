@@ -51,6 +51,7 @@ import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.components.HomeTopBar
 import co.softov.morestuff.android.ui.components.MoreStuffHomeScaffold
+import co.softov.morestuff.android.ui.home.HomeEvent.*
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.show
@@ -60,6 +61,7 @@ import co.softov.morestuff.android.ui.schedule.ScopeTasksPresenter
 import co.softov.morestuff.android.ui.search.SearchBar
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
+import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -69,7 +71,6 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = koinViewModel(),
     homePresenter: HomePresenter = koinViewModel()
 ) {
 
@@ -80,28 +81,27 @@ fun HomeScreen(
     var showScopeSelection by remember { mutableStateOf(false) }
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
-    val selectedTasks by viewModel.selectedTasks.collectAsState()
-    val scopesModel by homePresenter.models.collectAsState()
+    val model by homePresenter.models.collectAsState()
 
     MoreStuffHomeScaffold(
         snackbarHostState = snackbarHostState,
         topBar = {
             HomeTopBar(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
-                selectedTaskCount = selectedTasks.size,
-                reviewSelected = { navigation.push(Screen.Review(scopesModel.currentScopeId)) },
+                selectedTaskCount = model.selectedTasks.size,
+                reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
                 settingsSelected = { navigation.push(Screen.Settings) },
                 searchAction = { isSearchActive = true },
-                clearTaskSelection = viewModel::clearSelectedTasks,
-                completeSelectedTasks = viewModel::completeSelectedTasks,
+                clearTaskSelection = { homePresenter.take(ClearTaskSelection) },
+                completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
                 deleteSelectedTasks = { showDeleteConfirmationDialog = true },
                 selectScope = { showScopeSelection = true },
             )
         },
         content = {
-            if (scopesModel.scopes.isNotEmpty()) {
+            if (model.scopes.isNotEmpty()) {
                 HomeContent(
-                    scopesModel = scopesModel,
+                    model = model,
                     onEvent = homePresenter::take,
                     modifier = Modifier.padding(it),
                 )
@@ -111,10 +111,11 @@ fun HomeScreen(
 
     val resources = LocalContext.current.resources
     LaunchedEffect(Unit) {
-        viewModel.notifications.collectLatest { notification ->
-            when (notification.show(snackbarHostState, resources)) {
-                SnackbarResult.Dismissed -> {}
-                SnackbarResult.ActionPerformed -> launch { notification.action() }
+        homePresenter.notifications.collectLatest { notification ->
+            notification.show(snackbarHostState, resources).let { result ->
+                if (result == SnackbarResult.ActionPerformed) {
+                    launch { notification.action() }
+                }
             }
         }
     }
@@ -123,9 +124,8 @@ fun HomeScreen(
         ConfirmDeleteDialog(
             onDismiss = { showDeleteConfirmationDialog = false },
             onConfirm = {
-                viewModel.deleteSelectedTasks()
+                homePresenter.take(DeleteSelectedTasks)
                 showDeleteConfirmationDialog = false
-                viewModel.clearSelectedTasks()
             }
         )
     }
@@ -151,10 +151,16 @@ fun HomeScreen(
                     showScopeSelection = false
                 }
             },
-            addSelectedTasksToScope = viewModel::addSelectedTasksToScope,
-            scopes = scopesModel.scopes,
+            scopes = model.scopes,
             sheetState = sheetState,
-            createNewScope = { viewModel.sendEvent(HomeUiEvent.CreateScopeForSelectedTasks(it)) }
+            addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
+            createNewScope = {
+                val createScopeScreen = Screen.CreateScope {
+                    homePresenter.take(CreateScopeForSelectedTasks(it))
+                    navigation.pop()
+                }
+                navigation.push(createScopeScreen)
+            }
         )
     }
 }
@@ -162,21 +168,20 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun HomeContent(
-    scopesModel: HomeScopeState,
-    onEvent: (HomeUiEvent) -> Unit,
+    model: HomeState,
+    onEvent: (HomeEvent) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = koinViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
     val navigation = LocalAppNavigation.current
 
-    val selectedTasks by viewModel.selectedTasks.collectAsState()
+    val selectedTasks = model.selectedTasks
 
-    val states by rememberUpdatedState(newValue = scopesModel.scopes.map { rememberLazyListState() })
-    val pagerState = rememberPagerState(pageCount = { scopesModel.scopes.size })
+    val states by rememberUpdatedState(newValue = model.scopes.map { rememberLazyListState() })
+    val pagerState = rememberPagerState(pageCount = { model.scopes.size })
     var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
-    val scopes by rememberUpdatedState(newValue = scopesModel.scopes)
+    val scopes by rememberUpdatedState(newValue = model.scopes)
 
     LaunchedEffect(Unit) {
         snapshotFlow { pagerState.currentPage }
@@ -186,12 +191,12 @@ private fun HomeContent(
                     currentScopePage = page
                 }
                 // TODO: should probably just use the page and let the viewmodel handle the scopeid
-                onEvent(HomeUiEvent.ScopeSelected(scopes[page].id))
+                onEvent(ScopeSelected(scopes[page].id))
             }
     }
 
     BackHandler(selectedTasks.isNotEmpty()) {
-        viewModel.clearSelectedTasks()
+        onEvent(ClearTaskSelection)
     }
 
     Box(
@@ -205,7 +210,7 @@ private fun HomeContent(
             ) {
                 ScopeTabs(
                     currentPage = pagerState.currentPage,
-                    scopes = scopesModel.scopes,
+                    scopes = model.scopes,
                     onScopeSelected = { index, _ ->
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
@@ -218,21 +223,21 @@ private fun HomeContent(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                key = { scopesModel.scopes[it].id }
+                key = { model.scopes[it].id }
             ) { page ->
 
-                val scope = scopesModel.scopes[page]
+                val scope = model.scopes[page]
 
                 val scopeViewModel = koinViewModel<ScopeTasksPresenter>(
                     key = "Scope${scope.id}",
-                    parameters = { parametersOf(scope.id, viewModel.selectedTasks) }
+                    parameters = { parametersOf(scope.id) }
                 )
 
                 val scopeTasks by scopeViewModel.models.collectAsState()
 
-                when (val model = scopeTasks) {
+                when (val tasksModel = scopeTasks) {
                     is ScopeTasksModels.Data -> {
-                        if (model.tasks.isEmpty()) {
+                        if (tasksModel.tasks.isEmpty()) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -250,15 +255,16 @@ private fun HomeContent(
                             }
                         } else {
                             ScopeContent(
-                                tasks = model.tasks,
+                                tasks = tasksModel.tasks,
+                                selectedTasks = selectedTasks,
                                 onItemClick = { taskId ->
                                     if (selectedTasks.isNotEmpty()) {
-                                        viewModel.toggleTaskSelection(taskId)
+                                        onEvent(ToggleTaskSelection(taskId))
                                     } else {
                                         navigation.push(Screen.TaskChat(taskId))
                                     }
                                 },
-                                onItemLongClick = viewModel::toggleTaskSelection,
+                                onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
                                 listState = states[page],
                             )
                         }
@@ -276,7 +282,7 @@ private fun HomeContent(
                 skipPartiallyExpanded = true
             )
 
-            val context = remember { ChatContext.Main(scopesModel.currentScopeId) }
+            val context = remember { ChatContext.Main(model.currentScopeId) }
 
             BackHandler(onBack = {
                 coroutineScope.launch {

@@ -93,6 +93,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ScopesScreen(
     onBack: () -> Unit,
+    initialScreen: ScopeScreen = Root,
     viewModel: ScopesViewModel = koinViewModel()
 ) {
 
@@ -100,7 +101,7 @@ fun ScopesScreen(
 
     ChildStack(
         source = navigation,
-        initialStack = { listOf(Root) },
+        initialStack = { listOf(initialScreen) },
         modifier = Modifier.background(Color.Transparent),
         key = "ScopesStack",
         handleBackButton = true,

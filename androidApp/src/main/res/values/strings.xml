@@ -167,7 +167,7 @@
     <string name="task_scopes">Task Scopes</string>
     <string name="title_scopes">Scopes</string>
     <string name="title_create_scope">Create Scope</string>
-    <string name="add_to_scope">Choose Scope</string>
+    <string name="choose_scope">Choose Scope</string>
     <string name="manage_scopes">Manage Scopes</string>
     <string name="remove_from_scope">Remove from current scope</string>
 
@@ -252,6 +252,7 @@
 
     <string name="description_scopes">Use scopes to logically separate your stuff</string>
     <string name="description_create_scope">Keep it Short &amp; Simple</string>
+    <string name="cd_add_new_scope">Add new scope</string>
 
 
 </resources>

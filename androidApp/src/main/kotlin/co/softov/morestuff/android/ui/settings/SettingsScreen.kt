@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Button
@@ -550,7 +549,7 @@ fun ScopeSettingsScreen() {
     val navigation = LocalAppNavigation.current
     SettingsMenuLink(
         title = { Text(text = stringResource(R.string.title_scopes)) },
-        onClick = { navigation.push(Screen.CreateScope) },
+        onClick = { navigation.push(Screen.Scopes) },
         icon = {
             Icon(
                 imageVector = Icons.Default.ModeStandby,

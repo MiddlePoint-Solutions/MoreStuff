@@ -174,16 +174,12 @@ fun SearchBar(
                                     when {
                                         task.isComplete -> CompletePriorityItem(
                                             task = task,
-                                            onClick = { taskId ->
-                                                showTaskChat(taskId)
-                                            }
+                                            onClick = { showTaskChat(task.id) }
                                         )
 
                                         else -> PriorityItem(
                                             task = task,
-                                            onClick = {
-                                                showTaskChat(task.id)
-                                            },
+                                            onClick = { showTaskChat(task.id) },
                                             onLongClick = {},
                                         )
                                     }
