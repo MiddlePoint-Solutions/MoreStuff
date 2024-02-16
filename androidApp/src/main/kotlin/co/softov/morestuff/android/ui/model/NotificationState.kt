@@ -14,14 +14,10 @@ import kotlinx.parcelize.Parcelize
 @Immutable
 sealed class NotificationState(open val action: () -> Unit = {}) : Parcelable {
     @Immutable
-    data class Complete(
-        override val action: () -> Unit
-    ) : NotificationState(action)
+    data class Complete(override val action: () -> Unit) : NotificationState(action)
 
     @Immutable
-    data class TaskMovedToScope(
-        override val action: () -> Unit,
-    ) : NotificationState(action)
+    data class TaskMovedToScope(val scopeTitle: String) : NotificationState()
 }
 
 suspend fun NotificationState.show(
@@ -36,8 +32,9 @@ suspend fun NotificationState.show(
         )
 
         is TaskMovedToScope -> hostState.showSnackbar(
-            message = resources.getString(R.string.snack_task_moved_to_new_scope),
-            actionLabel = resources.getString(R.string.undo),
+            message = resources.getString(R.string.snack_task_moved_to_new_scope).let {
+                "$it $scopeTitle"
+            },
             duration = SnackbarDuration.Short
         )
     }

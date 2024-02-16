@@ -16,6 +16,7 @@ import co.softov.morestuff.android.ui.home.HomeEvent.*
 import co.softov.morestuff.android.ui.model.NotificationState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
@@ -53,7 +54,7 @@ fun homeModel(
                     val notification = NotificationState.Complete {
                         store.dispatch(TaskAction.CompleteTasksAction(completed, false))
                     }
-                    notifications.tryEmit(notification)
+                    launch { notifications.emit(notification) }
                 }
 
                 DeleteSelectedTasks -> {
@@ -67,17 +68,20 @@ fun homeModel(
                     store.dispatch(
                         TaskAction.UpdateTasksToScopeAction(moved, event.scopeId)
                     )
-                    val notification = NotificationState.TaskMovedToScope({})
-                    notifications.tryEmit(notification)
+                    val scopeTitle = scopes.firstOrNull { it.id == event.scopeId }?.name ?: ""
+                    val notification = NotificationState.TaskMovedToScope(scopeTitle)
+                    launch { notifications.emit(notification) }
                 }
 
                 is CreateScopeForSelectedTasks -> {
+                    val selected = selectedTasks.toList()
+                    selectedTasks = listOf()
                     createScopeUseCase(event.title).onRight { scope ->
                         store.dispatch(
-                            TaskAction.UpdateTasksToScopeAction(selectedTasks, scope.id)
+                            TaskAction.UpdateTasksToScopeAction(selected, scope.id)
                         )
-                        val notification = NotificationState.TaskMovedToScope({})
-                        notifications.tryEmit(notification)
+                        val notification = NotificationState.TaskMovedToScope(scope.name)
+                        launch { notifications.emit(notification) }
                     }
                 }
 
