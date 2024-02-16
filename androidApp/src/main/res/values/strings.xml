@@ -90,9 +90,11 @@
     <string name="cd_plan_scheduling_requires_your_permission">Plan scheduling requires your permission</string>
     <string name="mr_stuff_image">MR.Stuff image</string>
     <string name="snack_task_archived">Task archived</string>
+
+    <string name="show">Show</string>
     <string name="undo">Undo</string>
     <string name="snack_task_completed">Task completed</string>
-    <string name="snack_task_moved_to_new_scope">Task moved to new scope</string>
+    <string name="snack_task_moved_to_new_scope">Task moved to scope</string>
 
     <string name="title_activity_share">ShareActivity</string>
     <string name="select_chat">Select Chat</string>

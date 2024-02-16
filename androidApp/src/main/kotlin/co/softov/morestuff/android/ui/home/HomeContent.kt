@@ -187,7 +187,7 @@ private fun HomeContent(
         snapshotFlow { pagerState.currentPage }
             .collect { page ->
                 if (currentScopePage != page) {
-                    launch { states[currentScopePage].scrollToItem(0) }
+                    launch { states[currentScopePage].animateScrollToItem(0) }
                     currentScopePage = page
                 }
                 // TODO: should probably just use the page and let the viewmodel handle the scopeid

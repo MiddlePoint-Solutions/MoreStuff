@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.SharedFlow
 
 class AppPresenter {
 
-    val notifications = MutableSharedFlow<NotificationState>(1)
+    val notifications = MutableSharedFlow<NotificationState>()
 
 }
