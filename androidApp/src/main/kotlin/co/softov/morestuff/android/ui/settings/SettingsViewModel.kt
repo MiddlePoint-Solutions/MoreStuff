@@ -36,7 +36,6 @@ class SettingsViewModel(
                 it.copy(
                     appTheme = appTheme,
                     snoozeLimit = snoozeLimit,
-                    confettiEnabled = enableConfetti,
                     devSettings = BuildConfig.DEBUG || devSettings,
                     reviewTime = reviewTime,
                     inputVoiceLanguage = voiceInputLanguage
@@ -51,10 +50,6 @@ class SettingsViewModel(
 
     fun selectAppTheme(index: Int) {
         dispatchAppStoreAction(SettingAction.SetAppTheme(AppTheme[index]))
-    }
-
-    fun enableConfetti(enable: Boolean) {
-        dispatchAppStoreAction(SettingAction.EnableConfetti(enable))
     }
 
     fun enableDevSettings() {
