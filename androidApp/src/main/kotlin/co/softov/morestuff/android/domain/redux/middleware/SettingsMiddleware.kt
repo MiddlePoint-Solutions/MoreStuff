@@ -3,7 +3,6 @@ package co.softov.morestuff.android.domain.redux.middleware
 import co.softov.morestuff.android.domain.enums.AppSetting
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.redux.state.SettingAction
-import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
 import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableDevSettings
 import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
 import co.softov.morestuff.android.domain.redux.state.SettingAction.OnBoardingComplete
@@ -47,10 +46,6 @@ class SettingsMiddleware(
 
             is SetAppTheme -> scope.launch {
                 saveUserSettingUseCase(AppSetting.Theme, action.theme.name)
-            }
-
-            is EnableConfetti -> scope.launch {
-                saveUserSettingUseCase(AppSetting.Confetti, action.enable)
             }
 
             is OnBoardingComplete -> scope.launch {

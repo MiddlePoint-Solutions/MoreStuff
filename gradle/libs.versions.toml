@@ -48,7 +48,6 @@ extJUnit = "1.1.5"
 espressoCore = "3.5.1"
 firebaseCrashlyticsPlugin = "2.9.9"
 androidAppStartup = "1.1.1"
-konfettiCompose = "2.0.2"
 aboutLibrariesVersion = "10.8.3"
 telephotoVersion = "0.5.0"
 lottie = "6.1.0"
@@ -156,7 +155,6 @@ testRules = { module = "androidx.test:rules", version.ref = "testCore" }
 extJUnit = { module = "androidx.test.ext:junit-ktx", version.ref = "extJUnit" }
 espressoCore = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
 androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref = "androidAppStartup" }
-konfettiCompose = { module = "nl.dionsegijn:konfetti-compose", version.ref = "konfettiCompose" }
 telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
@@ -262,7 +260,6 @@ utils = [
     "koinAndroidxCompose",
     "timber",
     "telephoto",
-    "konfettiCompose",
     "kSoup",
     "ktor",
     "ktorClient"
