@@ -20,7 +20,6 @@ class UserRepositoryImpl(
             isFirstTime = getSetting(FirstTime, isFirstTime),
             appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
-            enableConfetti = getSetting(Confetti, enableConfetti),
             reviewTime = getSetting(ReviewTime, reviewTime),
             enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
             voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
@@ -33,7 +32,6 @@ class UserRepositoryImpl(
             FirstTime -> settings.putBoolean(setting.key, settingValue as Boolean)
             Theme -> settings.putString(setting.key, settingValue as String)
             SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
-            Confetti -> settings.putBoolean(setting.key, settingValue as Boolean)
             DevSettings -> settings.putBoolean(setting.key, settingValue as Boolean)
             ReviewTime -> settings.putString(
                 setting.key,
@@ -50,7 +48,6 @@ class UserRepositoryImpl(
             FirstTime -> getSetting(setting, setting.defaultValue as Boolean)
             Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
             SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
-            Confetti -> getSetting(setting, setting.defaultValue as Boolean)
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
             ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
@@ -65,7 +62,6 @@ class UserRepositoryImpl(
             FirstTime -> settings.getBoolean(setting.key, defaultValue as Boolean)
             Theme -> settings.getString(setting.key, defaultValue as String)
             SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
-            Confetti -> settings.getBoolean(setting.key, defaultValue as Boolean)
             DevSettings -> settings.getBoolean(setting.key, defaultValue as Boolean)
             is ReviewTime -> {
                 val timeStr = settings.getString(setting.key, setting.defaultValue.toString())

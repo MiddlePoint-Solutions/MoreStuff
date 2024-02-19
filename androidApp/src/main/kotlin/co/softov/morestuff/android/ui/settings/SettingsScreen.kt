@@ -95,7 +95,6 @@ fun SettingsScreen(
         newValue = SettingsActions(
             selectAppTheme = viewModel::selectAppTheme,
             setSnoozeLimit = viewModel::onSnoozeLimitChanged,
-            enableConfetti = viewModel::enableConfetti,
             enableDevSettings = viewModel::enableDevSettings,
             onTimeSelected = viewModel::setReviewTime,
             inputVoiceLanguage = viewModel::selectLanguage
@@ -134,11 +133,6 @@ private fun SettingsContent(
                 SelectTheme(
                     themeSelected = actions.selectAppTheme,
                     defaultValue = { model.appTheme.ordinal }
-                )
-
-                EnableConfetti(
-                    defaultValue = { model.confettiEnabled },
-                    valueChanged = actions.enableConfetti,
                 )
 
                 ReviewTimeSelector(
@@ -194,7 +188,9 @@ fun SettingsTopBar(onBack: () -> Unit) {
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        )
     )
 }
 
@@ -207,7 +203,7 @@ fun SelectTheme(
     val resources = LocalContext.current.resources
 
     val themeOptions = remember {
-        AppTheme.values().map { it.displayTitle(resources) }
+        AppTheme.entries.map { it.displayTitle(resources) }
     }
 
     val state = rememberAppSettingState(
@@ -238,38 +234,6 @@ private fun AppTheme.displayTitle(res: Resources): String = when (this) {
     AppTheme.System -> res.getString(R.string.theme_system)
     AppTheme.Light -> res.getString(R.string.theme_light)
     AppTheme.Dark -> res.getString(R.string.theme_dark)
-}
-
-@Composable
-fun EnableConfetti(
-    defaultValue: () -> Boolean,
-    valueChanged: (Boolean) -> Unit,
-) {
-
-    val state = rememberAppSettingState(
-        defaultValue = defaultValue,
-        valueChanged = valueChanged
-    )
-
-    Column(
-        horizontalAlignment = Alignment.Start,
-    ) {
-        SettingsSwitch(
-            state = state,
-            modifier = Modifier.padding(end = 16.dp),
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Celebration,
-                    contentDescription = stringResource(R.string.enable_confetti)
-                )
-            },
-            title = {
-                Text(
-                    text = stringResource(R.string.enable_confetti),
-                )
-            },
-        )
-    }
 }
 
 @Composable

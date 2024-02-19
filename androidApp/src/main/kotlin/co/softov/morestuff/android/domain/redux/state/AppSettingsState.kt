@@ -1,7 +1,6 @@
 package co.softov.morestuff.android.domain.redux.state
 
 import co.softov.morestuff.android.domain.enums.AppSetting
-import co.softov.morestuff.android.domain.enums.AppSetting.Confetti
 import co.softov.morestuff.android.domain.enums.AppSetting.DevSettings
 import co.softov.morestuff.android.domain.enums.AppSetting.FirstTime
 import co.softov.morestuff.android.domain.enums.AppSetting.ReviewTime
@@ -10,7 +9,6 @@ import co.softov.morestuff.android.domain.enums.AppSetting.Theme
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.redux.AppState
-import co.softov.morestuff.android.domain.redux.state.SettingAction.EnableConfetti
 import co.softov.morestuff.android.domain.redux.state.SettingAction.InitSettings
 import co.softov.morestuff.android.domain.redux.state.SettingAction.OnBoardingComplete
 import co.softov.morestuff.android.domain.redux.state.SettingAction.SetAppTheme
@@ -22,7 +20,6 @@ data class AppSettings(
     val isFirstTime: Boolean = FirstTime.defaultValue,
     val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
-    val enableConfetti: Boolean = Confetti.defaultValue,
     val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
     val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
     val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
@@ -33,7 +30,6 @@ sealed class SettingAction : Action.FeatureAction() {
     data class EnableDevSettings(val enable: Boolean) : SettingAction()
     data class SetSnoozeLimit(val amount: Int) : SettingAction()
     data class SetAppTheme(val theme: AppTheme) : SettingAction()
-    data class EnableConfetti(val enable: Boolean) : SettingAction()
     data object OnBoardingComplete : SettingAction()
     data class SetReviewTimeAction(val hour: Int, val minute: Int, val replaceExisting: Boolean) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
@@ -53,7 +49,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is InitSettings -> action.settings
         is SetSnoozeLimit -> copy(snoozeLimit = action.amount)
         is SetAppTheme -> copy(appTheme = action.theme)
-        is EnableConfetti -> copy(enableConfetti = action.enable)
         OnBoardingComplete -> copy(isFirstTime = false)
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
         is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
