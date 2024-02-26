@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -17,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import co.softov.morestuff.android.ui.model.TaskUiModel
+import co.softov.morestuff.android.ui.theme.divider
 
 @Composable
 fun ScopeContent(
@@ -36,7 +38,6 @@ fun ScopeContent(
             key = { _, task -> task.id }
         ) { index, item ->
 
-            // TODO: Better move this into the UI mapped model
             val isLast by remember(index) {
                 derivedStateOf { index == tasks.lastIndex }
             }
@@ -57,10 +58,9 @@ fun ScopeContent(
                 horizontalArrangement = Arrangement.End
             ) {
                 if (!isLast) {
-                    Divider(
-                        thickness = Dp.Hairline,
+                    HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(0.8f),
-                        color = MaterialTheme.colorScheme.surface
+                        color = MaterialTheme.colorScheme.divider
                     )
                 }
             }
