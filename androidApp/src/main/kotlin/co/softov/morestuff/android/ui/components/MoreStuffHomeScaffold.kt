@@ -40,22 +40,6 @@ fun MoreStuffHomeScaffold(
         },
         content = content,
         topBar = topBar,
-        bottomBar = {
-            Row(
-                modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "")
-                }
-
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.AutoMirrored.Default.Chat, contentDescription = "")
-                }
-            }
-        }
     )
 }
 
