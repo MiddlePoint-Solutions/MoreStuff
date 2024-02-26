@@ -228,9 +228,6 @@ private fun SearchFilterChip(
         animationSpec = tween(durationMillis = 200),
         label = ""
     )
-    val transparentBorder = filterChipBorder(
-        borderColor = Color.Transparent,
-    )
 
     FilterChip(
         selected = filter == selectedFilter,
@@ -245,8 +242,6 @@ private fun SearchFilterChip(
         ),
         modifier = Modifier.padding(end = 3.dp),
         shape = CircleShape,
-        border = transparentBorder
-
     )
 }
 

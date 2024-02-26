@@ -1,7 +1,16 @@
 package co.softov.morestuff.android.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,16 +28,34 @@ fun MoreStuffHomeScaffold(
         containerColor = Color.Transparent,
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
-                SwipeToDismiss(
-                    state = rememberDismissState(),
-                    background = {},
-                    dismissContent = { Snackbar(snackbarData = data) },
+                SwipeToDismissBox(
+                    state = rememberSwipeToDismissBoxState(),
+                    backgroundContent = {},
                     modifier = Modifier.fillMaxWidth(),
+                    content = {
+                        Snackbar(snackbarData = data)
+                    }
                 )
             }
         },
         content = content,
-        topBar = topBar
+        topBar = topBar,
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.AutoMirrored.Default.List, contentDescription = "")
+                }
+
+                IconButton(onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.AutoMirrored.Default.Chat, contentDescription = "")
+                }
+            }
+        }
     )
 }
 
