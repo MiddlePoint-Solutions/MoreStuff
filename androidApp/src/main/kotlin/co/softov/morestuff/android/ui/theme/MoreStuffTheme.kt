@@ -138,6 +138,11 @@ val ColorScheme.surfaceContainer: Color
 val ColorScheme.surfaceContainerElevation: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(7.dp)
+
+val ColorScheme.divider: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(7.dp)
+
 @Composable
 fun isDarkTheme(): Boolean {
     val darkTheme = when (LocalTheme.current) {
