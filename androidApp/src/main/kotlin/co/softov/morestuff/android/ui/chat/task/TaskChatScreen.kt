@@ -7,7 +7,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -59,6 +58,7 @@ import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
+import co.softov.morestuff.android.ui.chat.task.ChatEvent.*
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
@@ -69,7 +69,6 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -89,20 +88,13 @@ fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskChatViewModel = koinViewModel(
+    viewModel: ChatPresenter = koinViewModel(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
 ) {
 
     val navigation = remember { StackNavigation<ChatScreen>() }
-
-    val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
-        viewModel.shareImage(imagePath)
-    }
-    val sharePdf by rememberUpdatedState<(String) -> Unit> { pdfPath ->
-        viewModel.sharePdf(pdfPath)
-    }
 
     ChildStack(
         source = navigation,
@@ -116,18 +108,14 @@ fun TaskChatScreen(
         when (screen) {
             is ChatScreen.TaskChat -> {
 
-                val task by viewModel.task.collectAsState()
-                val messages by viewModel.messages.collectAsState()
-                val formattedCompleteTime = viewModel.formatCompleteTime(task.completeTime)
+                val model by viewModel.models.collectAsState()
 
                 val chatActions = ChatActions(
-                    scheduleAction = viewModel::scheduleResponse,
-                    copyMessage = { message ->
-                        viewModel.copyToClipboard(message.content)
+                    scheduleAction = { scheduleId, replyType ->
+                        viewModel.take(ScheduleResponse(scheduleId, replyType))
                     },
-                    deleteMessage = { message ->
-                        viewModel.deleteMessage(messageId = message.id)
-                    },
+                    copyMessage = { viewModel.take(CopyText(it.content)) },
+                    deleteMessage = { viewModel.take(DeleteMessage(it)) },
                     onImageSelected = {
                         val path = it.messageData?.filePath ?: ""
                         val title = it.content
@@ -135,25 +123,25 @@ fun TaskChatScreen(
                     },
                     onPdfSelected = {
                         val path = it.messageData?.filePath ?: ""
-                        viewModel.openPdf(path)
+                        viewModel.take(OpenDocument(path))
                     },
-                    shareImage = { imagePath -> shareImage(imagePath) },
-                    sharePdf = { pdfPath -> sharePdf(pdfPath) },
-                    shareMessage = viewModel::shareMessage
+                    shareImage = { viewModel.take(ShareImage(it)) },
+                    sharePdf = { viewModel.take(ShareDocument(it)) },
+                    shareMessage = { viewModel.take(ShareMessage(it)) }
                 )
 
                 TaskChatContent(
-                    task = task,
-                    messages = messages,
+                    task = model.task,
+                    messages = model.messages,
                     chatActions = chatActions,
                     modifier = modifier,
                     onBack = onBack,
-                    sendTaskMessage = viewModel::sendTaskChatMessage,
+                    sendTaskMessage = { viewModel.take(InputText(it)) },
                     imagePicked = { navigation.push(ChatScreen.ImageImport(it.toString())) },
                     pdfPicked = { uri ->
-                        viewModel.sendPdfMessageForTask(uri.toString(), message = "")
+                        viewModel.take(InputDocument(uri.toString(), title = ""))
                     },
-                    completeTaskMessage = stringResource(R.string.snack_task_completed) + " " + formattedCompleteTime
+                    completeTaskMessage = stringResource(R.string.snack_task_completed) + " " + model.completedTime
                 )
             }
 
@@ -161,7 +149,7 @@ fun TaskChatScreen(
                 ImageImportScreen(
                     imageUri = Uri.parse(screen.uri),
                     onImport = { title ->
-                        viewModel.sendImageMessageForTask(screen.uri, title)
+                        viewModel.take(InputImage(screen.uri, title))
                         navigation.pop()
                     },
                     onBack = navigation::pop
@@ -172,7 +160,7 @@ fun TaskChatScreen(
                 ImagePreviewScreen(
                     imagePath = screen.imagePath,
                     onBack = navigation::pop,
-                    onSendImage = shareImage,
+                    onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
                     title = screen.title,
                 )
             }

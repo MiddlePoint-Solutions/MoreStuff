@@ -1,7 +1,10 @@
 package co.softov.morestuff.android.domain.model
 
 import co.softov.morestuff.android.domain.enums.TaskType
+import com.arkivanov.essenty.parcelable.Parcelable
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class TaskDomain(
     val id: Long = 0L,
     val uuid: String = "",
@@ -13,7 +16,7 @@ data class TaskDomain(
     val schedule: List<ScheduleDomain> = listOf(),
     val scope: List<ScopeDomain> = listOf(),
     val extraDetails: Boolean = false,
-) {
+) : Parcelable {
 
     val isComplete: Boolean get() = completeTime != null
     val hasSchedule: Boolean get() = schedule.any { it.isOneTime() }

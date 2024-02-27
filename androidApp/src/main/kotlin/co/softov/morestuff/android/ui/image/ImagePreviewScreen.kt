@@ -39,7 +39,7 @@ fun ImagePreviewScreen(
     imagePath: String,
     title: String,
     onBack: () -> Unit,
-    onSendImage: (String) -> Unit,
+    onSendImage: () -> Unit,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -66,7 +66,7 @@ fun ImagePreviewScreen(
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             actions = {
-                IconButton(onClick = { onSendImage(imagePath) }) {
+                IconButton(onClick = onSendImage) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = stringResource(R.string.cd_share),
