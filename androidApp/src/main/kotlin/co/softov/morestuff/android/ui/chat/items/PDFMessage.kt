@@ -75,7 +75,6 @@ fun PDFMessage(
     }
     val pdfFileName = getFileNameFromUri(fileUri) ?: "PDF Unknown"
 
-
     Surface(
         shape = RoundedCornerShape(
             topStart = 14.dp,

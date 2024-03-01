@@ -141,7 +141,6 @@ fun PriorityItemPreview() {
                 extraDetails = true,
                 hasSchedule = true,
                 hasReminder = true,
-                hasScope = false,
             ),
             selected = true,
             onClick = {},

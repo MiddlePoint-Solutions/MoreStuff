@@ -1,7 +1,10 @@
 package co.softov.morestuff.android.domain.model
 
+import com.arkivanov.essenty.parcelable.Parcelable
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
+@Parcelize
 @Serializable
 data class OpenGraphResult(
     val title: String? = null,
@@ -10,5 +13,5 @@ data class OpenGraphResult(
     val image: String? = null,
     val siteName: String? = null,
     val type: String? = null
-)
+): Parcelable
 

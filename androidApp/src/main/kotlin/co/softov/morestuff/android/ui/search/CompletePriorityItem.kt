@@ -130,7 +130,6 @@ fun CompletePriorityItemPreview() {
                 extraDetails = true,
                 hasSchedule = true,
                 hasReminder = true,
-                hasScope = false,
             ),
             onClick = {}
         )
