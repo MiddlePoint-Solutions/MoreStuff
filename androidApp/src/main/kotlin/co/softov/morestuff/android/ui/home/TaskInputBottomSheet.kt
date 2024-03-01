@@ -3,11 +3,22 @@ package co.softov.morestuff.android.ui.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imeNestedScroll
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -21,13 +32,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.ui.chat.ChatActions
@@ -41,6 +58,7 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
+import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -83,18 +101,44 @@ fun TaskInputBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        modifier = Modifier.fillMaxHeight(0.95f),
         sheetState = sheetState,
+        shape = RectangleShape,
+        dragHandle = null,
         content = {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
 
-            ScopeCarousel(
-                scopes = scopes,
-                currentScopeId = context.scopeId,
-                onScopeSelected = viewModel::setCurrentScope,
-                modifier = Modifier
-                    .height(70.dp)
-                    .fillMaxWidth()
-            )
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    tonalElevation = 8.dp,
+                    shadowElevation = 2.dp
+                ) {
+                    ScopeCarousel(
+                        scopes = scopes,
+                        currentScopeId = context.scopeId,
+                        onScopeSelected = viewModel::setCurrentScope,
+                        modifier = Modifier
+                            .height(60.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
+                Surface(
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    shape = RoundedCornerShape(topEndPercent = 50, bottomEndPercent = 50),
+                    tonalElevation = 10.dp,
+                    shadowElevation = 2.dp
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.ModeStandby,
+                        contentDescription = stringResource(R.string.cd_scopes_icon),
+                        modifier = Modifier
+                            .size(38.dp)
+                            .padding(start = 4.dp)
+                    )
+                }
+            }
 
             ConstraintLayout {
 

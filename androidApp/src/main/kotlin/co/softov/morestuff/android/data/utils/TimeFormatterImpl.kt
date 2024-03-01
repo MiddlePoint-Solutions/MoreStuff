@@ -29,8 +29,7 @@ class TimeFormatterImpl(
         }
     }
     override fun formatTimeDayMonthInDeviceLanguage(timeString: String?): String? {
-        val dateConnector = context.getString(R.string.date_connector)
-        return formatTime(timeString, "d '$dateConnector' MMMM")
+        return formatTime(timeString, "MMMM d")
     }
 
     override fun formatTimeOnly(timeString: String?): String? {
