@@ -24,5 +24,4 @@ sealed class HomeEvent {
     data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
     data class ScopeSelected(val scopeId: Long) : HomeEvent()
     data class CreateScopeForSelectedTasks(val title: String) : HomeEvent()
-
 }

@@ -124,6 +124,7 @@ fun HomeTopBar(
                         contentDescription = stringResource(R.string.cd_more_options)
                     )
                 }
+
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }

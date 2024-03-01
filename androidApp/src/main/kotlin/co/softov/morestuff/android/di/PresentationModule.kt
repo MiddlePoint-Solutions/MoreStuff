@@ -1,6 +1,6 @@
 package co.softov.morestuff.android.di
 
-import co.softov.morestuff.android.ui.chat.task.TaskChatViewModel
+import co.softov.morestuff.android.ui.chat.task.TaskChatPresenter
 import co.softov.morestuff.android.ui.chat.task.TaskDetailsViewModel
 import co.softov.morestuff.android.ui.home.AppPresenter
 import co.softov.morestuff.android.ui.home.HomePresenter
@@ -29,7 +29,7 @@ val presentationModule = module {
     viewModelOf(::ReviewViewModel)
     viewModelOf(::HomePresenter)
     viewModelOf(::ScopeTasksPresenter)
-    viewModelOf(::TaskChatViewModel)
+    viewModelOf(::TaskChatPresenter)
     viewModelOf(::PlanViewModel)
     viewModelOf(::ShareViewModel)
     viewModelOf(::SearchViewModel)

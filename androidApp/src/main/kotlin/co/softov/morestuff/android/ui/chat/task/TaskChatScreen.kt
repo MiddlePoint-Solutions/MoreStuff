@@ -7,7 +7,6 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -22,8 +21,12 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,7 +45,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -54,11 +56,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.ContentType
-import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.nav.ChatScreen
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.chat.items.AppChatItem
+import co.softov.morestuff.android.ui.chat.task.TaskChatEvent.*
+import co.softov.morestuff.android.ui.components.ConfirmDeleteDialog
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.image.ImagePreviewScreen
@@ -69,7 +72,6 @@ import co.softov.morestuff.android.ui.input.VoiceToTextInput
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
@@ -89,20 +91,13 @@ fun TaskChatScreen(
     taskId: Long,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TaskChatViewModel = koinViewModel(
+    viewModel: TaskChatPresenter = koinViewModel(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
 ) {
 
     val navigation = remember { StackNavigation<ChatScreen>() }
-
-    val shareImage by rememberUpdatedState<(String) -> Unit> { imagePath ->
-        viewModel.shareImage(imagePath)
-    }
-    val sharePdf by rememberUpdatedState<(String) -> Unit> { pdfPath ->
-        viewModel.sharePdf(pdfPath)
-    }
 
     ChildStack(
         source = navigation,
@@ -116,18 +111,14 @@ fun TaskChatScreen(
         when (screen) {
             is ChatScreen.TaskChat -> {
 
-                val task by viewModel.task.collectAsState()
-                val messages by viewModel.messages.collectAsState()
-                val formattedCompleteTime = viewModel.formatCompleteTime(task.completeTime)
+                val model by viewModel.models.collectAsState()
 
                 val chatActions = ChatActions(
-                    scheduleAction = viewModel::scheduleResponse,
-                    copyMessage = { message ->
-                        viewModel.copyToClipboard(message.content)
+                    scheduleAction = { scheduleId, replyType ->
+                        viewModel.take(ScheduleResponse(scheduleId, replyType))
                     },
-                    deleteMessage = { message ->
-                        viewModel.deleteMessage(messageId = message.id)
-                    },
+                    copyMessage = { viewModel.take(CopyText(it.content)) },
+                    deleteMessage = { viewModel.take(DeleteMessage(it)) },
                     onImageSelected = {
                         val path = it.messageData?.filePath ?: ""
                         val title = it.content
@@ -135,25 +126,24 @@ fun TaskChatScreen(
                     },
                     onPdfSelected = {
                         val path = it.messageData?.filePath ?: ""
-                        viewModel.openPdf(path)
+                        viewModel.take(OpenDocument(path))
                     },
-                    shareImage = { imagePath -> shareImage(imagePath) },
-                    sharePdf = { pdfPath -> sharePdf(pdfPath) },
-                    shareMessage = viewModel::shareMessage
+                    shareImage = { viewModel.take(ShareImage(it)) },
+                    sharePdf = { viewModel.take(ShareDocument(it)) },
+                    shareMessage = { viewModel.take(ShareMessage(it)) }
                 )
 
                 TaskChatContent(
-                    task = task,
-                    messages = messages,
+                    model = model,
+                    onEvent = viewModel::take,
                     chatActions = chatActions,
                     modifier = modifier,
                     onBack = onBack,
-                    sendTaskMessage = viewModel::sendTaskChatMessage,
+                    sendTaskMessage = { viewModel.take(InputText(it)) },
                     imagePicked = { navigation.push(ChatScreen.ImageImport(it.toString())) },
                     pdfPicked = { uri ->
-                        viewModel.sendPdfMessageForTask(uri.toString(), message = "")
-                    },
-                    completeTaskMessage = stringResource(R.string.snack_task_completed) + " " + formattedCompleteTime
+                        viewModel.take(InputDocument(uri.toString(), title = ""))
+                    }
                 )
             }
 
@@ -161,7 +151,7 @@ fun TaskChatScreen(
                 ImageImportScreen(
                     imageUri = Uri.parse(screen.uri),
                     onImport = { title ->
-                        viewModel.sendImageMessageForTask(screen.uri, title)
+                        viewModel.take(InputImage(screen.uri, title))
                         navigation.pop()
                     },
                     onBack = navigation::pop
@@ -172,7 +162,7 @@ fun TaskChatScreen(
                 ImagePreviewScreen(
                     imagePath = screen.imagePath,
                     onBack = navigation::pop,
-                    onSendImage = shareImage,
+                    onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
                     title = screen.title,
                 )
             }
@@ -182,18 +172,23 @@ fun TaskChatScreen(
 
 @Composable
 private fun TaskChatContent(
-    task: TaskDomain,
+    model: TaskChatState,
     chatActions: ChatActions,
+    onEvent: (TaskChatEvent) -> Unit,
     modifier: Modifier = Modifier,
-    messages: List<MessageUiModel> = listOf(),
     onBack: () -> Unit = {},
     sendTaskMessage: (String) -> Unit = {},
     imagePicked: (Uri) -> Unit = {},
     pdfPicked: (Uri) -> Unit = {},
-    completeTaskMessage: String,
 ) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
+
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+
+    val task = model.task
+    val messages = model.messages
+
     val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
             imagePicked(uri)
@@ -210,9 +205,15 @@ private fun TaskChatContent(
         }
     }
 
-
     Scaffold(
-        topBar = { TaskTopAppBar(onBackPressed = onBack) },
+        topBar = {
+            TaskTopAppBar(
+                isComplete = task.isComplete,
+                onBack = onBack,
+                onDelete = { showDeleteConfirmationDialog = true },
+                onToggleComplete = { onEvent(ToggleTaskComplete) }
+            )
+        },
         modifier = modifier.navigationBarsPadding(),
         containerColor = Color.Transparent,
     ) { scaffoldPadding ->
@@ -243,7 +244,10 @@ private fun TaskChatContent(
                             scheduleId = 0L,
                             contentType = ContentType.APP_TASK_MESSAGE,
                             createTime = "",
-                            content = completeTaskMessage,
+                            content = stringResource(
+                                R.string.task_chat_complete_message_with_date,
+                                task.completeTime
+                            ),
                             formattedTime = "",
                             formattedTimeOnly = ""
                         ),
@@ -283,10 +287,20 @@ private fun TaskChatContent(
 
             TaskDetails(
                 taskId = task.id,
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
+    }
+
+    if (showDeleteConfirmationDialog) {
+        ConfirmDeleteDialog(
+            onDismiss = { showDeleteConfirmationDialog = false },
+            onConfirm = {
+                onEvent(DeleteTask)
+                onBack()
+                showDeleteConfirmationDialog = false
+            }
+        )
     }
 }
 
@@ -391,18 +405,77 @@ private fun TaskChatInput(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskTopAppBar(
-    onBackPressed: () -> Unit,
+    isComplete: Boolean,
+    onBack: () -> Unit,
+    onDelete: () -> Unit,
+    onToggleComplete: () -> Unit,
 ) {
     Surface {
         TopAppBar(
             title = { },
             navigationIcon = {
-                IconButton(onClick = onBackPressed) {
+                IconButton(onClick = onBack) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.cd_navigate_back)
                     )
                 }
+            },
+            actions = {
+
+                var showMenu by remember { mutableStateOf(false) }
+
+                IconButton(onClick = { showMenu = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.MoreVert,
+                        contentDescription = stringResource(R.string.cd_more_options)
+                    )
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+
+                    DropdownMenuItem(
+                        text = {
+                            if (isComplete) {
+                                Text(stringResource(R.string.restore))
+                            } else {
+                                Text(stringResource(R.string.complete))
+                            }
+
+                        },
+                        onClick = {
+                            onToggleComplete()
+                            showMenu = false
+                        },
+                        leadingIcon = {
+                            if (isComplete) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.Undo,
+                                    contentDescription = stringResource(R.string.cd_undo)
+                                )
+                            } else {
+                                Icon(
+                                    Icons.Filled.Done,
+                                    contentDescription = stringResource(R.string.cd_task_done_icon)
+                                )
+                            }
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.delete)) },
+                        onClick = {
+                            onDelete()
+                            showMenu = false
+                        },
+                        leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) }
+                    )
+                }
+
+
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -423,9 +496,9 @@ private fun TaskTopAppBar(
 fun TaskChatPreview() {
     MoreStuffTheme {
         TaskChatContent(
-            task = TaskDomain(),
+            model = TaskChatState(),
             chatActions = ChatActions(),
-            completeTaskMessage = ""
+            onEvent = {},
         )
     }
 }

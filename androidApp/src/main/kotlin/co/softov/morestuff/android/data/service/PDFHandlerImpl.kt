@@ -80,6 +80,7 @@ class PDFHandlerImpl(
     }
 
     override fun openPDF(pdfPath: String) {
+
         val pdfFile = if (pdfPath.startsWith("/")) {
             File(pdfPath)
         } else {
@@ -88,18 +89,23 @@ class PDFHandlerImpl(
 
         Timber.d("openPdf - File path: ${pdfFile.absolutePath}")
         if (pdfFile.exists()) {
-            val pdfUri: Uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                pdfFile
-            )
+            try {
+                val pdfUri: Uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    pdfFile
+                )
 
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = pdfUri
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    data = pdfUri
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Error while opening ${pdfFile.name}", Toast.LENGTH_SHORT).show()
             }
 
-            context.startActivity(intent)
         } else {
             Toast.makeText(context, "PDF file not found", Toast.LENGTH_SHORT).show()
         }
