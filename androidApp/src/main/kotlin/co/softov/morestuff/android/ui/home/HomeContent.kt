@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -76,7 +77,7 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppNavigation.current
     val snackbarHostState = remember { SnackbarHostState() }
-    var isSearchActive by remember { mutableStateOf(false) }
+    var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showScopeSelection by remember { mutableStateOf(false) }
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
@@ -189,7 +190,6 @@ private fun HomeContent(
                     launch { states[currentScopePage].animateScrollToItem(0) }
                     currentScopePage = page
                 }
-                // TODO: should probably just use the page and let the viewmodel handle the scopeid
                 onEvent(ScopeSelected(scopes[page].id))
             }
     }
