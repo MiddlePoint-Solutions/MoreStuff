@@ -22,12 +22,9 @@ import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 
 @Composable
-fun AboutLibrariesScreen() {
-
-    val navigation = LocalAppNavigation.current
-
+fun AboutLibrariesScreen(onBack: () -> Unit) {
     Scaffold(
-        topBar = { AboutTopBar(onBack = navigation::pop) }
+        topBar = { AboutTopBar(onBack = onBack) }
     ) {
         LibrariesContainer(
             modifier = Modifier

@@ -3,8 +3,10 @@ package co.softov.morestuff.android.ui.settings
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,28 +14,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,6 +59,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.BuildConfig
 import co.softov.morestuff.android.R
@@ -67,15 +70,22 @@ import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.domain.nav.SettingScreen
+import co.softov.morestuff.android.domain.nav.SettingScreen.*
+import co.softov.morestuff.android.ui.components.SettingsTopBar
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
+import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
+import co.softov.morestuff.android.ui.scopes.ScopesContent
+import co.softov.morestuff.android.ui.scopes.ScopesScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
-import com.alorma.compose.settings.ui.SettingsSwitch
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.delay
@@ -88,7 +98,7 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
 
-    val navigation = LocalAppNavigation.current
+    val navigation = remember { StackNavigation<SettingScreen>() }
     val model by viewModel.model.collectAsStateWithLifecycle()
 
     val actions by rememberUpdatedState(
@@ -101,19 +111,43 @@ fun SettingsScreen(
         )
     )
 
-    SettingsContent(
-        onBack = navigation::pop,
-        model = model,
-        actions = actions,
-        showLibraries = { navigation.push(Screen.AboutLibraries) },
-    )
+    ChildStack(
+        source = navigation,
+        initialStack = { listOf(Root) },
+        modifier = Modifier.background(Color.Transparent),
+        key = "SettingsStack",
+        handleBackButton = true,
+        animation = stackAnimation(slide()),
+    ) { screen ->
+
+        when (screen) {
+            Root -> {
+                SettingsContent(
+                    onBack = navigation::pop,
+                    model = model,
+                    actions = actions,
+                    showDevSettings = { navigation.push(Developer) },
+                    showScopesSettings = { navigation.push(Scopes) },
+                    showLibraries = { navigation.push(AboutLibraries) },
+                )
+            }
+
+            Developer -> DevSettingsScreen(onBack = navigation::pop)
+
+            Scopes -> ScopesScreen(onBack = navigation::pop)
+
+            AboutLibraries -> AboutLibrariesScreen(onBack = navigation::pop)
+        }
+    }
 }
 
 @Composable
 private fun SettingsContent(
     onBack: () -> Unit,
-    showLibraries: () -> Unit,
     model: SettingsModel,
+    showLibraries: () -> Unit,
+    showDevSettings: () -> Unit,
+    showScopesSettings: () -> Unit,
     actions: SettingsActions,
 ) {
 
@@ -121,38 +155,69 @@ private fun SettingsContent(
 
     MoreStuffSettingTheme {
         Scaffold(
-            topBar = { SettingsTopBar(onBack = onBack) },
-            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+            topBar = {
+                SettingsTopBar(
+                    onBack = onBack,
+                    title = stringResource(id = R.string.settings)
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
-            Column(
+            ConstraintLayout(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(it)
                     .verticalScroll(scrollState)
             ) {
-                SelectTheme(
-                    themeSelected = actions.selectAppTheme,
-                    defaultValue = { model.appTheme.ordinal }
-                )
 
-                ReviewTimeSelector(
-                    valueChanged = actions.onTimeSelected,
-                    defaultValue = model.reviewTime,
-                )
-                SelectLanguage(
-                    languageSelected = actions.inputVoiceLanguage,
-                    defaultValue = { model.inputVoiceLanguage.ordinal }
-                )
-                ScopeSettingsScreen()
+                val (settings, about) = createRefs()
 
-                if (model.devSettings) {
-                    DevSettings()
+                Column(
+                    modifier = Modifier.constrainAs(settings) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(about.top)
+                        height = Dimension.fillToConstraints
+                    }
+                ) {
+                    SelectTheme(
+                        themeSelected = actions.selectAppTheme,
+                        defaultValue = { model.appTheme.ordinal }
+                    )
+
+                    ReviewTimeSelector(
+                        valueChanged = actions.onTimeSelected,
+                        defaultValue = model.reviewTime,
+                    )
+                    SelectLanguage(
+                        languageSelected = actions.inputVoiceLanguage,
+                        defaultValue = { model.inputVoiceLanguage.ordinal }
+                    )
+
+                    ScopeSettings(onClick = showScopesSettings)
+
+                    if (model.devSettings) {
+                        SettingsMenuLink(
+                            title = {
+                                Text(text = stringResource(id = R.string.developer_settings))
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.DeveloperBoard,
+                                    contentDescription = ""
+                                )
+                            },
+                            onClick = showDevSettings,
+                        )
+                    }
                 }
 
                 About(
                     devSettingsEnabled = model.devSettings,
                     enableDevSettings = actions.enableDevSettings,
-                    showLibraries = showLibraries
+                    showLibraries = showLibraries,
+                    modifier = Modifier.constrainAs(about) {
+                        bottom.linkTo(parent.bottom)
+                    }
                 )
             }
 
@@ -162,40 +227,7 @@ private fun SettingsContent(
 }
 
 @Composable
-fun SettingsDivider() {
-    Divider(
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        thickness = 1.dp,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SettingsTopBar(onBack: () -> Unit) {
-    TopAppBar(
-        title = {
-            Text(
-                text = stringResource(id = R.string.settings),
-                style = MaterialTheme.typography.titleLarge,
-            )
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.cd_navigate_back),
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    )
-}
-
-@Composable
-fun SelectTheme(
+private fun SelectTheme(
     themeSelected: (Int) -> Unit,
     defaultValue: () -> Int,
 ) {
@@ -237,7 +269,7 @@ private fun AppTheme.displayTitle(res: Resources): String = when (this) {
 }
 
 @Composable
-fun About(
+private fun About(
     modifier: Modifier = Modifier,
     devSettingsEnabled: Boolean,
     enableDevSettings: () -> Unit,
@@ -249,33 +281,83 @@ fun About(
     val scope = rememberCoroutineScope()
     var devSettingsCounter by remember { mutableIntStateOf(7) }
 
-    Surface {
+    Surface(modifier = modifier) {
+        HorizontalDivider()
+
         Column(
-            modifier = modifier
-                .padding(16.dp)
-                .padding(bottom = 23.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
         ) {
 
+            Text(
+                text = stringResource(id = R.string.join_community),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+            )
+
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center
             ) {
-                SettingsDivider()
+                IconButton(
+                    onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
+                        contentDescription = "Discord Icon",
+                        modifier = Modifier.size(36.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                IconButton(
+                    onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_telegram),
+                        contentDescription = "Telegram Icon",
+                        modifier = Modifier.size(36.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp)
+                    .padding(top = 16.dp),
             ) {
                 Text(
-                    text = stringResource(R.string.version),
-                    fontSize = 16.sp,
-                    color = MaterialTheme.colorScheme.onBackground
+                    text = stringResource(R.string.privacy_policy),
+                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = { uriHandler.openUri(PRIVACY_POLICY_LINK) })
                 )
-                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+            ) {
                 Text(
-                    text = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    text = stringResource(R.string.open_source_libraries),
+                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
+                    modifier = Modifier.clickable(onClick = showLibraries)
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+            ) {
+                Text(
+                    text = "V${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.clickable {
                         val toast: Toast
                         if (!devSettingsEnabled) {
@@ -310,98 +392,17 @@ fun About(
                             toast.cancel()
                         }
                     },
-                    fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-            ) {
-                Text(
-                    text = stringResource(R.string.privacy_policy),
-                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                    modifier = Modifier.clickable(onClick = { uriHandler.openUri(PRIVACY_POLICY_LINK) })
-                )
-                Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = stringResource(R.string.open_source_libraries),
-                    style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
-                    modifier = Modifier.clickable(onClick = showLibraries)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(id = R.string.join_community),
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
-                        contentDescription = "Discord Icon",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Discord Server",
-                        style = TextStyle(
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
-                }
-                Button(
-                    onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer
-                    ),
-                    shape = RoundedCornerShape(15.dp),
-                ) {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(R.drawable.ic_telegram),
-                        contentDescription = "Telegram Icon",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Telegram Page",
-                        style = TextStyle(
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    )
-
-                }
-            }
         }
     }
 }
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ReviewTimeSelector(
+private fun ReviewTimeSelector(
     valueChanged: (hour: Int, minute: Int) -> Unit,
     defaultValue: Pair<Int, Int>,
     modifier: Modifier = Modifier,
@@ -435,7 +436,7 @@ fun ReviewTimeSelector(
     SettingsMenuLink(
         title = {
             Column {
-                Text(text =stringResource(R.string.set_review_time))
+                Text(text = stringResource(R.string.set_review_time))
                 selectedTimeState.value.let {
                     Text(
                         text = "${it.first}:${String.format("%02d", it.second)}",
@@ -456,7 +457,7 @@ fun ReviewTimeSelector(
 }
 
 @Composable
-fun SelectLanguage(
+private fun SelectLanguage(
     languageSelected: (Int) -> Unit,
     defaultValue: () -> Int,
 ) {
@@ -509,11 +510,10 @@ private fun Language.displayTitle(res: Resources): String = when (this) {
 }
 
 @Composable
-fun ScopeSettingsScreen() {
-    val navigation = LocalAppNavigation.current
+private fun ScopeSettings(onClick: () -> Unit) {
     SettingsMenuLink(
         title = { Text(text = stringResource(R.string.title_scopes)) },
-        onClick = { navigation.push(Screen.Scopes) },
+        onClick = onClick,
         icon = {
             Icon(
                 imageVector = Icons.Default.ModeStandby,
@@ -522,7 +522,6 @@ fun ScopeSettingsScreen() {
         }
     )
 }
-
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
@@ -538,6 +537,8 @@ private fun SettingsPreviewDark() {
         SettingsContent(
             onBack = {},
             showLibraries = {},
+            showDevSettings = {},
+            showScopesSettings = {},
             model = SettingsModel(),
             actions = SettingsActions()
         )

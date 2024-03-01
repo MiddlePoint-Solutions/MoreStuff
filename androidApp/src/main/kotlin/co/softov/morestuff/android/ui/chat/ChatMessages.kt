@@ -81,7 +81,9 @@ fun Messages(
             ) { index, item ->
 
                 val nextMessage = messages.getOrNull(index + 1)
-                val isLastMessageOfDay = item.formattedTime != nextMessage?.formattedTime
+                val isLastMessageOfDay = remember(nextMessage) {
+                    item.formattedTime != nextMessage?.formattedTime
+                }
 
                 Column {
                     if (isLastMessageOfDay) {
