@@ -11,6 +11,7 @@ import co.softov.morestuff.android.domain.enums.MessageDataType
 import co.softov.morestuff.android.domain.redux.AppStore
 import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction
+import co.softov.morestuff.android.domain.redux.middleware.TaskAction
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.ImageHandler
 import co.softov.morestuff.android.domain.service.PDFHandler
@@ -18,40 +19,38 @@ import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
 import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
-import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.chat.task.ChatEvent.*
+import co.softov.morestuff.android.ui.chat.task.TaskChatEvent.*
 import co.softov.morestuff.android.ui.model.map.MessageUiMapper
+import co.softov.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
 @Composable
-fun chatModel(
+fun taskChatModel(
     taskId: Long,
-    initialState: ChatState,
-    events: Flow<ChatEvent>,
+    initialState: TaskChatState,
+    events: Flow<TaskChatEvent>,
     store: AppStore = koinInject(),
     clipboardHelper: ClipboardHelper = koinInject(),
     imageHandler: ImageHandler = koinInject(),
     pdfHandler: PDFHandler = koinInject(),
-    timeFormatter: TimeFormatter = koinInject(),
+    taskUiMapper: TaskUiMapper = koinInject(),
     shareTaskMessage: ShareTaskMessage = koinInject(),
     messageUiMapper: MessageUiMapper = koinInject(),
     getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
     getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
     getTaskFlow: GetTaskFlowUseCase = koinInject(),
     devTools: DevTools = koinInject(),
-): ChatState {
+): TaskChatState {
 
     var task by remember { mutableStateOf(initialState.task) }
     var messages by remember { mutableStateOf(initialState.messages) }
 
-    val completeTime = remember(task.completeTime) {
-        task.completeTime?.let { timeFormatter.formatToDateTime(it) ?: "Format Error" }
-    }
-
     LaunchedEffect(Unit) {
-        getTaskFlow(taskId).collect { task = it }
+        getTaskFlow(taskId)
+            .map(taskUiMapper::map)
+            .collect { task = it }
     }
 
     LaunchedEffect(Unit) {
@@ -121,14 +120,22 @@ fun chatModel(
                     is ShareDocument -> {
                         pdfHandler.sharePDF(path)
                     }
+
+                    is DeleteTask -> {
+                        store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
+                    }
+
+                    is ToggleTaskComplete -> {
+                        val complete = !task.isComplete
+                        store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
+                    }
                 }
             }
         }
     }
 
-    return ChatState(
+    return TaskChatState(
         task = task,
-        completedTime = completeTime,
         messages = messages
     )
 }

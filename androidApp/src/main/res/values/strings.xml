@@ -12,6 +12,7 @@
     <string name="text_created_time_placeholder">Created: %s</string>
     <string name="text_completed_time_placeholder">Completed: %s</string>
     <string name="text_scheduled_time_placeholder">Scheduled for: %s</string>
+    <string name="task_chat_complete_message_with_date">Completed on %s</string>
 
     <!--  Menu options  -->
     <string name="menu_title_settings">Settings</string>
@@ -107,6 +108,7 @@
     <string name="main_input_hint">Create new task</string>
     <string name="cd_complete_task">Complete task</string>
     <string name="complete">Complete</string>
+    <string name="restore">Restore</string>
     <string name="completed">Completed</string>
     <string name="move_to_top">Move to Top</string>
     <string name="cd_move_to_top">Move task to top</string>
@@ -138,7 +140,7 @@
     <string name="cd_reminder_icon">Reminder Icon</string>
     <string name="task_chat_reminder_action">Reminder</string>
     <string name="cd_show_task_chat">Show task chat</string>
-    <string name="select_language">Select Input Voice Language</string>
+    <string name="select_language">Voice Input Language</string>
     <string name="language_english">English</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_hebrew">Hebrew</string>
@@ -255,6 +257,7 @@
     <string name="description_scopes">Use scopes to logically separate your stuff</string>
     <string name="description_create_scope">Keep it Short &amp; Simple</string>
     <string name="cd_add_new_scope">Add new scope</string>
+    <string name="cd_undo">Undo</string>
 
 
 </resources>
