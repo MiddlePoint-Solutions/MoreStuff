@@ -110,8 +110,6 @@ fun MainContent(
                     }
                 }
             }
-
-            is AboutLibraries -> AboutLibrariesScreen()
         }
     }
 }

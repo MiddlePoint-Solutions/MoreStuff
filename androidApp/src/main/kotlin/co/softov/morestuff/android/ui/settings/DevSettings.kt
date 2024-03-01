@@ -6,20 +6,19 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,22 +31,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.nav.Screen
+import co.softov.morestuff.android.ui.components.SettingsTopBar
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
-import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
+
+@Composable
+fun DevSettingsScreen(
+    onBack: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            SettingsTopBar(
+                onBack = onBack,
+                title = stringResource(id = R.string.developer_settings)
+            )
+        }
+    ) {
+        Box(modifier = Modifier.padding(it)) {
+            DevSettings()
+        }
+    }
+}
 
 @Composable
 fun DevSettings(
@@ -107,34 +121,14 @@ fun DevSettings(
 
 
     val navigation = LocalAppNavigation.current
-    SettingsGroup(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(imageVector = Icons.Default.DeveloperBoard, contentDescription = "")
-                Spacer(modifier = Modifier.width(20.dp))
-                Text(
-                    text = stringResource(id = R.string.developer_settings),
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        lineHeight = 28.sp,
-                        fontWeight = FontWeight(400),
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                )
-            }
-        }
-    ) {
-
+    Column {
         SettingsMenuLink(
             title = { Text(text = stringResource(id = R.string.test_onboarding)) },
             onClick = { navigation.replaceAll(Screen.OnBoarding) },
         )
 
         SettingsMenuLink(
-            title = { Text(text = stringResource(id = R.string.test_review_notifications))},
+            title = { Text(text = stringResource(id = R.string.test_review_notifications)) },
             onClick = devTools::testReviewNotification,
         )
 
