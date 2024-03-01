@@ -70,8 +70,9 @@ fun Messages(
         LazyColumn(
             reverseLayout = true,
             modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
             state = scrollState,
-            contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
+            contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp)
         ) {
             itemsIndexed(
                 items = messages,
@@ -86,7 +87,7 @@ fun Messages(
                     if (isLastMessageOfDay) {
                         Row(
                             modifier = Modifier
-                                .padding(horizontal = 16.dp, vertical = 36.dp)
+                                .padding(horizontal = 16.dp, vertical = 20.dp)
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
                         ) {
