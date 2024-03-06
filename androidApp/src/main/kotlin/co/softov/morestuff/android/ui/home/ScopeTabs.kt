@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.ui.compose.CustomScrollableTabRow
 import co.softov.morestuff.android.ui.compose.TabRowDefaults.tabIndicatorOffset
+import co.softov.morestuff.android.ui.utils.containsEmoji
 
 @Composable
 fun ScopeTabs(
@@ -58,10 +60,19 @@ fun ScopeTabs(
                     shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
                 ),
                 text = {
+
+                    val size = remember(index, scope) {
+                        if (scope.name.length == 1 && containsEmoji(scope.name)) {
+                            18.sp
+                        } else {
+                            15.sp
+                        }
+                    }
+
                     Text(
                         text = scope.name,
                         style = TextStyle(
-                            fontSize = 15.sp,
+                            fontSize = size,
                             fontWeight = FontWeight.Medium,
                         ),
                         color = if (index == currentPage) selectedTabColor else unselectedTabColor

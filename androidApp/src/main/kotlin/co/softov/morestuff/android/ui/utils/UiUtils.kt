@@ -53,3 +53,20 @@ fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pat
         append(content.substring(lastEnd))
     }
 }
+
+/**
+ * Checks if a String contains Emojis
+ *
+ * @param str is the parameter String to check
+ * @return True if String contains any Emojis, otherwise false
+ */
+fun containsEmoji(str: String): Boolean {
+    val length = str.length
+    for (i in 0 until length) {
+        val type = Character.getType(str[i])
+        if (type == Character.SURROGATE.toInt() || type == Character.OTHER_SYMBOL.toInt()) {
+            return true
+        }
+    }
+    return false
+}
