@@ -221,12 +221,7 @@ fun MessageTime(
     formattedTimeOnly?.let {
         Text(
             text = it,
-            style = TextStyle(
-                fontSize = 10.sp,
-                lineHeight = 28.sp,
-                fontWeight = FontWeight(400),
-                color = textColor
-            ),
+            style = MaterialTheme.typography.bodySmall.copy(color = textColor),
             modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
         )
     }
