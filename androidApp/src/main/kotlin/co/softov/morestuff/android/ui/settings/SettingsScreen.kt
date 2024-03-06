@@ -95,6 +95,7 @@ import java.util.Locale
 
 @Composable
 fun SettingsScreen(
+    onBack: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
 
@@ -123,7 +124,7 @@ fun SettingsScreen(
         when (screen) {
             Root -> {
                 SettingsContent(
-                    onBack = navigation::pop,
+                    onBack = onBack,
                     model = model,
                     actions = actions,
                     showDevSettings = { navigation.push(Developer) },
