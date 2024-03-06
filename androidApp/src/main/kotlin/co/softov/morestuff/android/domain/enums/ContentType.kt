@@ -8,6 +8,6 @@ enum class ContentType(val value: Int) {
     APP_TASK_MESSAGE(202);
 
     companion object {
-        fun withValue(value: Int) = run { values().first { it.value == value } }
+        fun withValue(value: Int) = run { entries.first { it.value == value } }
     }
 }

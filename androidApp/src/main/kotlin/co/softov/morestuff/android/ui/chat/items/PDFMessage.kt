@@ -10,7 +10,9 @@ import android.provider.OpenableColumns
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,10 +36,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toFile
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import coil.ImageLoader
@@ -107,34 +111,48 @@ fun PDFMessage(
                 onLongClick = showMenu
             )
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            BoxWithConstraints(modifier = Modifier.weight(0.8f)) {
-                val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
-                PDFPageItem(
-                    uri = fileUri,
-                    renderer = renderer,
-                    width = width,
-                    height = width,
-                    imageLoader = imageLoader,
-                )
+        Box {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                BoxWithConstraints(modifier = Modifier.weight(0.8f)) {
+                    val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
+                    PDFPageItem(
+                        uri = fileUri,
+                        renderer = renderer,
+                        width = width,
+                        height = width,
+                        imageLoader = imageLoader,
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(2f)
+                ) {
+                    Text(
+                        text = pdfFileName,
+                        textAlign = TextAlign.Start,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Text(
+                        text = stringResource(R.string.filetype_pdf),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
+                    )
+                }
             }
 
-            Text(
-                text = pdfFileName,
-                modifier = Modifier
-                    .weight(2f)
-                    .padding(4.dp),
-                textAlign = TextAlign.Start,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyLarge
-            )
             MessageTime(
                 formattedTimeOnly = message.formattedTimeOnly,
-                modifier = Modifier.align(Alignment.Bottom)
+                modifier = Modifier.align(Alignment.BottomEnd)
             )
+
         }
     }
 }
