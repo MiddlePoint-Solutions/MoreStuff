@@ -65,7 +65,7 @@ fun MainContent(
 
             is Review -> ReviewScreen(currentScopeId = screen.scopeId)
 
-            Settings -> SettingsScreen()
+            Settings -> SettingsScreen(onBack = navigation::pop)
 
             Scopes -> ScopesScreen(onBack = navigation::pop)
 
