@@ -57,9 +57,10 @@ private fun isAutoScrollingEnabled(
 @Composable
 fun Messages(
     messages: List<MessageUiModel>,
+    scrollState: LazyListState,
     actions: ChatActions,
     modifier: Modifier = Modifier,
-    scrollState: LazyListState,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val scope = rememberCoroutineScope()
     var itemsCount by remember { mutableIntStateOf(0) }
@@ -72,7 +73,7 @@ fun Messages(
             modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             state = scrollState,
-            contentPadding = PaddingValues(top = 20.dp, bottom = 20.dp)
+            contentPadding = contentPadding
         ) {
             itemsIndexed(
                 items = messages,
