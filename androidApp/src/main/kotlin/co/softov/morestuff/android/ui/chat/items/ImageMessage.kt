@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -51,6 +52,7 @@ fun ImageMessage(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End
         ) {
+
             val uri by remember {
                 derivedStateOf { Uri.parse(message.messageData?.filePath) }
             }
@@ -77,21 +79,21 @@ fun ImageMessage(
                 contentScale = ContentScale.Inside
             )
             if (message.content.isNotEmpty()) {
-                MessageText(
-                    showMenu = showMenu,
-                    message = message,
+                Text(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .align(Alignment.Start)
                         .padding(
                             start = 14.dp,
                             end = 15.dp,
-                        )
+                            bottom = 3.dp
+                        ),
+                    text = message.content,
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
             Row(Modifier.align(Alignment.End)) {
                 MessageTime(
-                    formattedTimeOnly = MockData.messageUiModel.formattedTimeOnly,
+                    formattedTimeOnly = message.formattedTimeOnly,
                     modifier = Modifier
                 )
             }

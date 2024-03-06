@@ -111,7 +111,6 @@ fun MoreStuffTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
     ) {
         content()
     }
@@ -125,7 +124,6 @@ fun MoreStuffSettingTheme(
     val colorScheme =  if (darkTheme) DarkColors else LightColors
     MaterialTheme(
         colorScheme = colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
-        typography = Typography,
     ) {
         content()
     }

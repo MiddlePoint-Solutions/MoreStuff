@@ -1,6 +1,7 @@
 package co.softov.morestuff.android.ui.chat.items
 
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
@@ -8,10 +9,10 @@ import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -34,10 +36,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toFile
+import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.chat.ChatActions
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import coil.ImageLoader
@@ -45,13 +49,13 @@ import coil.compose.rememberAsyncImagePainter
 import coil.imageLoader
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
-import kotlin.math.sqrt
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -62,17 +66,34 @@ fun PDFMessage(
     message: MessageUiModel,
     showMenu: () -> Unit,
 ) {
+
     val imageLoader = LocalContext.current.imageLoader
-    val rendererScope = rememberCoroutineScope()
-    val mutex = remember { Mutex() }
-    val fileUri = if (pdfUri.scheme != "file") Uri.fromFile(File(pdfUri.path ?: "")) else pdfUri
-    val renderer by produceState<PdfRenderer?>(null, fileUri) {
-        rendererScope.launch(Dispatchers.IO) {
-            val input =
-                ParcelFileDescriptor.open(fileUri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY)
-            value = PdfRenderer(input)
+
+    val fileUri by remember {
+        derivedStateOf {
+            if (pdfUri.scheme != "file") {
+                Uri.fromFile(File(pdfUri.path ?: ""))
+            } else {
+                pdfUri
+            }
         }
     }
+
+    var renderer: PdfRenderer? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) {
+            try {
+                val file = ParcelFileDescriptor.open(
+                    fileUri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
+                )
+                renderer = PdfRenderer(file)
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+    }
+
     val pdfFileName = getFileNameFromUri(fileUri) ?: "PDF Unknown"
 
     Surface(
@@ -90,40 +111,48 @@ fun PDFMessage(
                 onLongClick = showMenu
             )
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            BoxWithConstraints(modifier = Modifier.weight(0.8f)) {
-                val scaleFactor = 0.75f
-                val width = with(LocalDensity.current) { maxWidth.toPx() * scaleFactor }.toInt()
-                val height = (width * sqrt(2f)).toInt()
-                renderer?.let {
+        Box {
+            Row(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                BoxWithConstraints(modifier = Modifier.weight(0.8f)) {
+                    val width = with(LocalDensity.current) { maxWidth.toPx() }.toInt()
                     PDFPageItem(
-                        index = 0,
                         uri = fileUri,
-                        renderer = it,
+                        renderer = renderer,
                         width = width,
-                        height = height,
+                        height = width,
                         imageLoader = imageLoader,
-                        scope = rendererScope,
-                        mutex = mutex,
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(2f)
+                ) {
+                    Text(
+                        text = pdfFileName,
+                        textAlign = TextAlign.Start,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+
+                    Text(
+                        text = stringResource(R.string.filetype_pdf),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.outlineVariant
+                        )
                     )
                 }
             }
 
-            Text(
-                text = pdfFileName,
-                modifier = Modifier
-                    .weight(2f)
-                    .padding(4.dp),
-                textAlign = TextAlign.Start,
-                fontSize = 12.sp
-            )
             MessageTime(
                 formattedTimeOnly = message.formattedTimeOnly,
-                modifier = Modifier.padding(end = 8.dp).align(Alignment.Bottom)
+                modifier = Modifier.align(Alignment.BottomEnd)
             )
+
         }
     }
 }
@@ -150,62 +179,60 @@ private fun getFileNameFromUri(uri: Uri): String? {
 
 @Composable
 fun PDFPageItem(
-    index: Int,
     uri: Uri,
     renderer: PdfRenderer?,
     width: Int,
     height: Int,
     imageLoader: ImageLoader,
-    scope: CoroutineScope,
-    mutex: Mutex,
-    scale: Float = 0.9f,
-    offsetX: Float = 45f,
-    offsetY: Float = 10f,
+    scale: Float = 0.38f,
 ) {
-    val cacheKey = MemoryCache.Key("$uri-$index-${width}x${height}")
-    val cacheValue: Bitmap? = imageLoader.memoryCache?.get(cacheKey)?.bitmap
 
-    var bitmap by remember { mutableStateOf(cacheValue) }
-    if (bitmap == null) {
-        DisposableEffect(uri, index) {
-            val job = scope.launch(Dispatchers.IO) {
-                val destinationBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+    val context = LocalContext.current
+    val mutex = remember { Mutex() }
+    val cacheKey = remember { MemoryCache.Key("$uri-$scale-${width}x${height}") }
+    var bitmap: Bitmap? by remember {
+        mutableStateOf(imageLoader.memoryCache?.get(cacheKey)?.bitmap)
+    }
+
+    if (renderer != null) {
+        LaunchedEffect(Unit) {
+            withContext(Dispatchers.IO) {
+                val destBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(destBitmap)
+                canvas.drawColor(android.graphics.Color.WHITE)
+                canvas.drawBitmap(destBitmap, 0f, 0f, null)
                 mutex.withLock {
-                    renderer?.openPage(index)?.use { page ->
+                    renderer.openPage(0)?.use { page ->
                         val matrix = Matrix().apply {
-                            postScale(scale, scale)
-                            postTranslate(-offsetX * scale, -offsetY * scale)
+                            preScale(scale, scale)
                         }
                         page.render(
-                            destinationBitmap,
+                            destBitmap,
                             null,
                             matrix,
                             PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY
                         )
+
+                        bitmap = destBitmap
                     }
+                    renderer.close()
                 }
-                bitmap = destinationBitmap
             }
-            onDispose { job.cancel() }
         }
-        Box(modifier = Modifier.background(Color.White).aspectRatio(1f / sqrt(2f)).fillMaxWidth())
-    } else {
-        val request = ImageRequest.Builder(LocalContext.current)
-            .size(width, height)
-            .memoryCacheKey(cacheKey)
-            .data(bitmap)
-            .build()
-
-        Image(
-            modifier = Modifier
-                .background(Color.White)
-                .aspectRatio(1f / sqrt(2f))
-                .fillMaxWidth(),
-            contentScale = ContentScale.Crop,
-            painter = rememberAsyncImagePainter(request),
-            contentDescription = "Page ${index + 1}"
-        )
     }
+
+    val request = ImageRequest.Builder(context)
+        .size(width)
+        .crossfade(true)
+        .memoryCacheKey(cacheKey)
+        .data(bitmap)
+        .build()
+
+    Image(
+        modifier = Modifier.aspectRatio(1f),
+        contentScale = ContentScale.Crop,
+        painter = rememberAsyncImagePainter(request),
+        contentDescription = "PDF preview"
+    )
+
 }
-
-
