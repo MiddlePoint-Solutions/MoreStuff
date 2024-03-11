@@ -4,7 +4,7 @@ interface Scheduler {
 
     fun scheduleAtExact(scheduleId: Long, scheduleTime: String)
     fun schedulePlannedPriorityWorker()
-    fun scheduleReviewWorker()
+    fun scheduleReviewWorker(hour: Int, minute: Int)
     fun cancelSchedule(scheduleId: Long)
     fun cancelPlannedPriorityUpdate()
     fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean)

@@ -10,7 +10,7 @@ import co.softov.morestuff.android.app.receiver.createReviewIntent
 import co.softov.morestuff.android.app.receiver.createReviewPendingIntent
 import co.softov.morestuff.android.app.work.ScheduleWorker
 import co.softov.morestuff.android.app.work.PlannedPriorityUpdateWorker
-import co.softov.morestuff.android.app.work.ScheduleReviewNotificationWorker
+import co.softov.morestuff.android.app.work.ReviewNotificationWorker
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.data.utils.inEpochMilliseconds
 import co.softov.morestuff.android.domain.service.Scheduler
@@ -62,19 +62,31 @@ class SchedulerImpl(
         }
     }
 
-    override fun scheduleReviewWorker() {
-        PeriodicWorkRequestBuilder<ScheduleReviewNotificationWorker>(
-            repeatInterval = 30,
-            repeatIntervalTimeUnit = TimeUnit.MINUTES,
-            flexTimeInterval = 5,
-            flexTimeIntervalUnit = TimeUnit.MINUTES
-        ).build().also { request ->
-            workManager.enqueueUniquePeriodicWork(
-                PRIORITY_REVIEW_WORK,
-                ExistingPeriodicWorkPolicy.KEEP,
-                request
-            )
+    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+
+        val currentTime = timeManager.nowLocalDateTime
+
+        val scheduleTime = when {
+            currentTime.hour > hour -> timeManager.tomorrowLocalDateTimeString(hour, minute)
+            currentTime.hour < hour -> timeManager.todayLocalDateTimeString(hour, minute)
+            currentTime.minute > minute -> timeManager.tomorrowLocalDateTimeString(hour, minute)
+            else -> timeManager.todayLocalDateTimeString(hour, minute)
         }
+
+        val delayTimeMillis =
+            scheduleTime.inEpochMilliseconds - timeManager.nowUtcInstant.toEpochMilliseconds()
+
+        val workConstraints = Constraints.Builder().apply {
+            setTriggerContentMaxDelay(1, TimeUnit.MINUTES)
+        }.build()
+
+        val work = OneTimeWorkRequestBuilder<ReviewNotificationWorker>().apply {
+            setInitialDelay(delayTimeMillis, TimeUnit.MILLISECONDS)
+            setConstraints(workConstraints)
+            addTag(PRIORITY_REVIEW_WORK)
+        }.build()
+
+        workManager.enqueueUniqueWork(PRIORITY_REVIEW_WORK, ExistingWorkPolicy.REPLACE, work)
     }
 
     override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {

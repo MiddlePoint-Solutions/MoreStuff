@@ -57,7 +57,7 @@ class SettingsViewModel(
     }
 
     fun setReviewTime(hour: Int, minute: Int) {
-        dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute, true))
+        dispatchAppStoreAction(SettingAction.SetReviewTimeAction(hour, minute))
     }
 
     fun selectLanguage(index: Int) {
