@@ -20,7 +20,7 @@ class BootCompleteSchedulerUseCaseImpl(
 ) : BootCompleteSchedulerUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
-        scheduleWorkUseCase()
+//        scheduleWorkUseCase()
         return when (val result = getActiveSchedulesUseCase()) {
             is Either.Left -> result
             is Either.Right -> {

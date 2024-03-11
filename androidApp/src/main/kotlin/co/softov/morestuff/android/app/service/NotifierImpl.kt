@@ -54,7 +54,6 @@ class NotifierImpl(
         private const val SUMMARY_ID = 99999
     }
 
-
     init {
         createNotificationChannels()
         appPerson = Person.Builder().setBot(true).setImportant(true).setName("Mr.Stuff").build()
