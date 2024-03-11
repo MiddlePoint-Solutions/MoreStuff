@@ -68,8 +68,7 @@ class NotificationMiddleware(
             is SettingAction.SetReviewTimeAction -> scope.launch {
                 updateReviewNotificationScheduleUseCase(
                     action.hour,
-                    action.minute,
-                    action.replaceExisting
+                    action.minute
                 )
             }
 

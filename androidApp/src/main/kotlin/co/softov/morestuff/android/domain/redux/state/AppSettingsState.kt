@@ -31,7 +31,7 @@ sealed class SettingAction : Action.FeatureAction() {
     data class SetSnoozeLimit(val amount: Int) : SettingAction()
     data class SetAppTheme(val theme: AppTheme) : SettingAction()
     data object OnBoardingComplete : SettingAction()
-    data class SetReviewTimeAction(val hour: Int, val minute: Int, val replaceExisting: Boolean) : SettingAction()
+    data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
     data class SetVoiceLanguage(val language: Language) : SettingAction()
 

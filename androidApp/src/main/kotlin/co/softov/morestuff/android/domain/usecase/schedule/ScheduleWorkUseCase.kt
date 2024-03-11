@@ -3,19 +3,19 @@ package co.softov.morestuff.android.domain.usecase.schedule
 import arrow.core.Either
 import co.softov.morestuff.android.domain.model.Failure
 import co.softov.morestuff.android.domain.service.Scheduler
-import co.softov.morestuff.android.domain.usecase.settings.GetAppSettingsUseCase
 
 interface ScheduleWorkUseCase {
-    suspend operator fun invoke(): Either<Failure, Boolean>
+    suspend operator fun invoke(reviewTime: Pair<Int, Int>): Either<Failure, Boolean>
 }
 
 class ScheduleWorkUseCaseImpl(
     private val scheduler: Scheduler,
+    private val updateReviewNotificationScheduleUseCase: UpdateReviewNotificationScheduleUseCase
 ) : ScheduleWorkUseCase {
 
-    override suspend fun invoke(): Either<Failure, Boolean> {
+    override suspend fun invoke(reviewTime: Pair<Int, Int>): Either<Failure, Boolean> {
         scheduler.schedulePlannedPriorityWorker()
-        scheduler.scheduleReviewWorker()
+        updateReviewNotificationScheduleUseCase(reviewTime.first, reviewTime.second)
         return Either.Right(true)
     }
 }
