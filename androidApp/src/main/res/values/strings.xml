@@ -164,7 +164,7 @@
     <string name="select_pdf">Select PDF</string>
 
 
-    <string name="sure_delete_scope">Are you sure you want to delete\nthe following scope?</string>
+    <string name="sure_delete_scope">Are you sure you want to delete\n%s scope?</string>
     <string name="create_new_scope">Create Scope</string>
     <string name="save">Save</string>
     <string name="edit_scope">Edit Scope</string>
@@ -259,6 +259,7 @@
     <string name="cd_add_new_scope">Add new scope</string>
     <string name="cd_undo">Undo</string>
     <string name="filetype_pdf">PDF</string>
+    <string name="delete_scope">Delete Scope?</string>
 
 
 </resources>
