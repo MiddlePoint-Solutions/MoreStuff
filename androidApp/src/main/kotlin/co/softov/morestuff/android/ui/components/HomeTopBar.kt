@@ -104,13 +104,6 @@ fun HomeTopBar(
         },
         actions = {
             if (taskSelectionActive) {
-                IconButton(onClick = deleteSelectedTasks) {
-                    Icon(
-                        imageVector = Icons.Rounded.Delete,
-                        contentDescription = stringResource(R.string.cd_delete_tasks)
-                    )
-                }
-
                 IconButton(onClick = completeSelectedTasks) {
                     Icon(
                         imageVector = Icons.Rounded.Done,
@@ -118,27 +111,19 @@ fun HomeTopBar(
                     )
                 }
 
-                IconButton(onClick = { showMenu = true }) {
+                IconButton(onClick = deleteSelectedTasks) {
                     Icon(
-                        imageVector = Icons.Rounded.MoreVert,
-                        contentDescription = stringResource(R.string.cd_more_options)
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = stringResource(R.string.cd_delete_tasks)
                     )
                 }
 
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.choose_scope)) },
-                        onClick = {
-                            selectScope()
-                            showMenu = false
-                        },
-                        leadingIcon = { Icon(Icons.Filled.Add, contentDescription = null) }
+                IconButton(onClick = selectScope) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_scope_add),
+                        contentDescription = stringResource(R.string.choose_scope)
                     )
                 }
-
             } else {
                 IconButton(onClick = searchAction) {
                     Icon(
