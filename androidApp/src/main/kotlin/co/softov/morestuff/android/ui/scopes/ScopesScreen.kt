@@ -1,9 +1,5 @@
 package co.softov.morestuff.android.ui.scopes
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,19 +37,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -65,19 +57,10 @@ import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.nav.ScopeScreen
 import co.softov.morestuff.android.domain.nav.ScopeScreen.*
 import co.softov.morestuff.android.ui.components.CreateScopeButton
-import co.softov.morestuff.android.ui.components.SendIcon
-import co.softov.morestuff.android.ui.input.UserInput
-import co.softov.morestuff.android.ui.input.UserTextInput
-import co.softov.morestuff.android.ui.input.VoiceToTextInput
-import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.*
 import co.softov.morestuff.android.ui.theme.md_theme_light_error
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
@@ -135,8 +118,7 @@ fun ScopesContent(
 
     var isEditDialogOpen by remember { mutableStateOf(false) }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
-    var selectScopeId by remember { mutableLongStateOf(0) }
-    var updateScopeName by remember { mutableStateOf("") }
+    var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
 
     Scaffold(
         topBar = {
@@ -197,13 +179,12 @@ fun ScopesContent(
                 )
 
                 OrderedScopesList(
-                    onEditScope = { scopeId, scopeName ->
-                        selectScopeId = scopeId
-                        updateScopeName = scopeName
+                    onEditScope = { scope ->
+                        selectedScope = scope
                         isEditDialogOpen = true
                     },
                     onDeleteScope = { scopeId ->
-                        selectScopeId = scopeId
+                        selectedScope = scopeId
                         isDeleteDialogOpen = true
                     }
                 )
@@ -219,21 +200,24 @@ fun ScopesContent(
         }
 
         if (isEditDialogOpen) {
+            val scope = selectedScope ?: error("Scope is null")
             EditScopeDialog(
                 onDismissRequest = { isEditDialogOpen = false },
-                scopeName = updateScopeName,
+                scopeName = scope.name,
                 onConfirm = { newName ->
-                    onEvent(UpdateScopeName(selectScopeId, newName))
+                    onEvent(UpdateScopeName(scope.id, newName))
                     isEditDialogOpen = false
                 }
             )
         }
 
         if (isDeleteDialogOpen) {
+            val scope = selectedScope ?: error("Scope is null")
             DeleteScopeDialog(
                 onDismissRequest = { isDeleteDialogOpen = false },
+                scopeName = scope.name,
                 onConfirm = {
-                    onEvent(DeleteScope(selectScopeId))
+                    onEvent(DeleteScope(scope.id))
                     isDeleteDialogOpen = false
                 },
             )
@@ -244,8 +228,8 @@ fun ScopesContent(
 
 @Composable
 private fun OrderedScopesList(
-    onEditScope: (Long, String) -> Unit,
-    onDeleteScope: (Long) -> Unit,
+    onEditScope: (ScopeDomain) -> Unit,
+    onDeleteScope: (ScopeDomain) -> Unit,
     viewModel: ScopesViewModel = koinViewModel()
 ) {
 
@@ -329,7 +313,7 @@ private fun OrderedScopesList(
                                     onDismissRequest = { menuVisibility[scope.id] = false }
                                 ) {
                                     DropdownMenuItem(onClick = {
-                                        onEditScope(scope.id, scope.name)
+                                        onEditScope(scope)
                                         menuVisibility[scope.id] = false
                                     },
                                         text = { Text(text = stringResource(R.string.edit_scope)) },
@@ -341,7 +325,7 @@ private fun OrderedScopesList(
                                         }
                                     )
                                     DropdownMenuItem(onClick = {
-                                        onDeleteScope(scope.id)
+                                        onDeleteScope(scope)
                                         menuVisibility[scope.id] = false
                                     },
                                         text = { Text(text = stringResource(R.string.delete)) },
@@ -408,98 +392,19 @@ private fun EditScopeDialog(
 }
 
 @Composable
-private fun CreateScopeDialog(
-    onDismissRequest: () -> Unit,
-    scopeName: String,
-    onConfirm: (String) -> Unit,
-) {
-
-    var dialogText by remember { mutableStateOf(scopeName) }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.edit_scope)) },
-        text = {
-            TextField(
-                value = dialogText,
-                onValueChange = { dialogText = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    capitalization = KeyboardCapitalization.Sentences
-                )
-            )
-        },
-
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(dialogText) },
-                enabled = dialogText.isNotBlank()
-            ) {
-                Text(stringResource(R.string.save))
-            }
-        },
-    )
-}
-
-@Composable
-private fun ScopeInputComponent(
-    focusRequester: FocusRequester,
-    onEvent: (ScopesUiEvent) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-
-    var newScopeName by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue())
-    }
-    val isTextEmpty = remember(newScopeName.text) {
-        mutableStateOf(newScopeName.text.isBlank())
-    }
-
-    Box {
-        UserInput(
-            textContent = {
-                UserTextInput(
-                    value = newScopeName,
-                    onValueChange = { newScopeName = it },
-                    focusRequester = focusRequester,
-                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                    actionsContent = {
-                        if (isTextEmpty.value) {
-                            VoiceToTextInput(
-                                onUpdateValue = {
-                                    newScopeName = newScopeName.copy("")
-                                }
-                            )
-                        } else {
-                            AnimatedVisibility(
-                                visible = !isTextEmpty.value,
-                                enter = fadeIn(),
-                                exit = fadeOut()
-                            ) {
-                                SendIcon(onClick = {
-                                    onEvent(CreateScope(newScopeName.text))
-                                    newScopeName = newScopeName.copy("")
-                                })
-                            }
-                        }
-                    },
-                )
-            })
-    }
-}
-
-@Composable
 private fun DeleteScopeDialog(
     onDismissRequest: () -> Unit,
+    scopeName: String,
     onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.confirm_delete)) },
+        title = { Text(stringResource(R.string.delete_scope)) },
         text = {
             Text(
-                text = stringResource(R.string.sure_delete_scope),
-                textAlign = TextAlign.Start
+                text = stringResource(R.string.sure_delete_scope, scopeName),
+                textAlign = TextAlign.Start,
+                style = MaterialTheme.typography.bodyLarge
             )
         },
 

@@ -159,7 +159,7 @@
     <string name="select_pdf">Seleccionar PDF</string>
 
 
-    <string name="sure_delete_scope">Estás seguro que quieres eliminar\nel siguiente scope?</string>
+    <string name="sure_delete_scope">Estás seguro que quieres eliminar\n%s scope?</string>
     <string name="create_new_scope">Crear nuevo Scope</string>
     <string name="save">Confirmar</string>
     <string name="edit_scope">Editar nombre del Scope </string>
