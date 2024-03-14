@@ -147,7 +147,8 @@ class UserInputViewModel(
      */
     suspend fun createNewTask(title: String): Long {
         val priority = priorityModel.value.mapToDomain()
-        val params = TaskParams(title, priority, TaskType.User, currentScope.id)
+        val trimmedTitle = title.trim()
+        val params = TaskParams(trimmedTitle, priority, TaskType.User, currentScope.id)
         val task = createTaskUseCase(params)
         dispatchAppStoreAction(TaskAction.TaskCreatedAction(task, priority))
         return task.id

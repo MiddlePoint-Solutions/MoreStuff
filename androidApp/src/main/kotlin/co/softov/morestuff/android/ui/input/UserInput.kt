@@ -20,7 +20,6 @@ fun UserInput(
             .navigationBarsPadding()
     ) {
         priorityContent()
-
         textContent()
     }
 }
