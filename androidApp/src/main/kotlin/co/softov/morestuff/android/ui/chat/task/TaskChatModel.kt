@@ -76,15 +76,21 @@ fun taskChatModel(
                     }
 
                     is InputDocument -> {
-                        store.dispatch(MessageAction.CreatePDFMessageAction(taskId, path, title))
+                        store.dispatch(
+                            MessageAction.CreatePDFMessageAction(taskId, path, title.trim())
+                        )
                     }
 
                     is InputImage -> {
-                        store.dispatch(MessageAction.CreateImageMessageAction(taskId, path, title))
+                        store.dispatch(
+                            MessageAction.CreateImageMessageAction(taskId, path, title.trim())
+                        )
                     }
 
                     is InputText -> {
-                        store.dispatch(MessageAction.CreateUserTaskMessageAction(taskId, content))
+                        store.dispatch(
+                            MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
+                        )
                     }
 
                     is OpenDocument -> {

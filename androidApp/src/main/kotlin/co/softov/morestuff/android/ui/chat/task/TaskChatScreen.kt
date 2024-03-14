@@ -173,7 +173,6 @@ fun TaskChatScreen(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun TaskChatContent(
     model: TaskChatState,
