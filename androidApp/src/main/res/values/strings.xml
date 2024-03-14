@@ -260,6 +260,7 @@
     <string name="cd_undo">Undo</string>
     <string name="filetype_pdf">PDF</string>
     <string name="delete_scope">Delete Scope?</string>
+    <string name="title_edit_scope">Edit Scope</string>
 
 
 </resources>
