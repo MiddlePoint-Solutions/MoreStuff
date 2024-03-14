@@ -13,6 +13,7 @@ import co.softov.morestuff.android.ui.home.HomeScreen
 import co.softov.morestuff.android.ui.image.ImageImportScreen
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
+import co.softov.morestuff.android.ui.navigation.LocalComponentContext
 import co.softov.morestuff.android.ui.onboarding.OnBoardingScreen
 import co.softov.morestuff.android.ui.review.ReviewScreen
 import co.softov.morestuff.android.ui.scopes.CreateScopeScreen
@@ -20,16 +21,20 @@ import co.softov.morestuff.android.ui.scopes.ScopesScreen
 import co.softov.morestuff.android.ui.settings.AboutLibrariesScreen
 import co.softov.morestuff.android.ui.settings.SettingsScreen
 import co.softov.morestuff.android.ui.share.ShareScreen
+import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun MainContent(
     initialScreen: Screen?,

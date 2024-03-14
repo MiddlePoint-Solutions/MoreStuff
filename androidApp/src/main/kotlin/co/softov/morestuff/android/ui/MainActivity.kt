@@ -32,16 +32,15 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import org.koin.android.ext.android.inject
 import org.koin.androidx.compose.KoinAndroidContext
+import org.koin.compose.KoinContext
 import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    @OptIn(KoinExperimentalAPI::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        showBatteryOptimizationRequest()
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val rootComponentContext = defaultComponentContext()
@@ -49,30 +48,30 @@ class MainActivity : AppCompatActivity() {
         val viewModel: MainViewModel by inject<MainViewModel>()
 
         setContent {
+            KoinContext {
+                val stateModel by viewModel.states.collectAsState()
 
-            val stateModel by viewModel.states.collectAsState()
-
-            ProvideComponentContext(rootComponentContext) {
+                ProvideComponentContext(rootComponentContext) {
 
 
-                val navigation = remember { StackNavigation<Screen>() }
+                    val navigation = remember { StackNavigation<Screen>() }
 
-                ProvideAppTheme(viewModel.appTheme) {
-                    MoreStuffTheme {
-                        Surface(
-                            color = MaterialTheme.colorScheme.surfaceContainer
-                        ) {
-                            ProvideAppNavigation(navigation) {
-                                when (val model = stateModel) {
-                                    MainStates.Loading -> {}
-                                    is MainStates.Ready -> {
-                                        val initialScreen = if (model.showOnBoarding) {
-                                            Screen.OnBoarding
-                                        } else {
-                                            handleLaunchIntent(intent)
-                                        }
+                    ProvideAppTheme(viewModel.appTheme) {
 
-                                        KoinAndroidContext {
+                        MoreStuffTheme {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainer
+                            ) {
+                                ProvideAppNavigation(navigation) {
+                                    when (val model = stateModel) {
+                                        MainStates.Loading -> {}
+                                        is MainStates.Ready -> {
+                                            val initialScreen = if (model.showOnBoarding) {
+                                                Screen.OnBoarding
+                                            } else {
+                                                handleLaunchIntent(intent)
+                                            }
+
                                             MainContent(
                                                 initialScreen = initialScreen,
                                                 shareContent = viewModel::shareContentToTask
@@ -83,20 +82,20 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
-                }
 
-                DisposableEffect(Unit) {
-                    val listener = Consumer<Intent> {
-                        val screen = handleLaunchIntent(it)
-                        Timber.d("onNewIntent: $screen")
-                        if (screen != null) {
-                            navigation.navigate {
-                                listOf(Screen.Home, screen)
+                    DisposableEffect(Unit) {
+                        val listener = Consumer<Intent> {
+                            val screen = handleLaunchIntent(it)
+                            Timber.d("onNewIntent: $screen")
+                            if (screen != null) {
+                                navigation.navigate {
+                                    listOf(Screen.Home, screen)
+                                }
                             }
                         }
+                        addOnNewIntentListener(listener)
+                        onDispose { removeOnNewIntentListener(listener) }
                     }
-                    addOnNewIntentListener(listener)
-                    onDispose { removeOnNewIntentListener(listener) }
                 }
             }
         }
