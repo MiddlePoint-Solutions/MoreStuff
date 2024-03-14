@@ -155,7 +155,7 @@ fun CreateScopeScreen(
             ) {
                 ScopeTitleEditor(
                     title = scopeTitle,
-                    onTitleChange = { title -> scopeTitle = title },
+                    onTitleChange = { title -> scopeTitle = title.trim() },
                     modifier = Modifier.focusRequester(focusRequester)
                 )
             }
