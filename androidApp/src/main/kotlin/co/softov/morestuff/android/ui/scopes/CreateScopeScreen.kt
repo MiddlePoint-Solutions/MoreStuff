@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,7 +72,7 @@ fun CreateScopeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = (stringResource(R.string.title_create_scope))) },
+                title = { Text(text = (stringResource(R.string.add_scope))) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -122,7 +123,7 @@ fun CreateScopeScreen(
             ) {
 
                 Icon(
-                    imageVector = Icons.Filled.ModeStandby,
+                    painter = painterResource(id = R.drawable.ic_scope_add),
                     contentDescription = stringResource(R.string.cd_scopes_icon),
                     modifier = Modifier
                         .padding(top = 20.dp)

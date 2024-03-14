@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Edit
@@ -132,6 +133,14 @@ fun ScopesContent(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = onCreateScope) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = stringResource(R.string.cd_add_new_scope)
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
                 )
@@ -139,91 +148,72 @@ fun ScopesContent(
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainer
     ) {
-        ConstraintLayout(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            val (content, action) = createRefs()
-
-            Column(
-                modifier = Modifier.constrainAs(content) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(action.top)
-                    height = Dimension.fillToConstraints
-                },
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-
-                Icon(
-                    imageVector = Icons.Filled.ModeStandby,
-                    contentDescription = stringResource(R.string.cd_scopes_icon),
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .size(60.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                Text(
-                    text = stringResource(R.string.description_scopes),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-
-                OrderedScopesList(
-                    onEditScope = { scope ->
-                        selectedScope = scope
-                        isEditDialogOpen = true
-                    },
-                    onDeleteScope = { scopeId ->
-                        selectedScope = scopeId
-                        isDeleteDialogOpen = true
-                    }
-                )
-            }
-
-            Box(
+            Icon(
+                imageVector = Icons.Filled.ModeStandby,
+                contentDescription = stringResource(R.string.cd_scopes_icon),
                 modifier = Modifier
-                    .constrainAs(action) { bottom.linkTo(parent.bottom) }
-                    .padding(vertical = 16.dp)
-            ) {
-                CreateScopeButton(onClick = onCreateScope)
-            }
-        }
+                    .padding(top = 20.dp)
+                    .size(60.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
 
-        if (isEditDialogOpen) {
-            val scope = selectedScope ?: error("Scope is null")
-            EditScopeDialog(
-                onDismissRequest = { isEditDialogOpen = false },
-                scopeName = scope.name,
-                onConfirm = { newName ->
-                    onEvent(UpdateScopeName(scope.id, newName))
-                    isEditDialogOpen = false
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            Text(
+                text = stringResource(R.string.description_scopes),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
+
+            OrderedScopesList(
+                onEditScope = { scope ->
+                    selectedScope = scope
+                    isEditDialogOpen = true
+                },
+                onDeleteScope = { scopeId ->
+                    selectedScope = scopeId
+                    isDeleteDialogOpen = true
                 }
             )
         }
-
-        if (isDeleteDialogOpen) {
-            val scope = selectedScope ?: error("Scope is null")
-            DeleteScopeDialog(
-                onDismissRequest = { isDeleteDialogOpen = false },
-                scopeName = scope.name,
-                onConfirm = {
-                    onEvent(DeleteScope(scope.id))
-                    isDeleteDialogOpen = false
-                },
-            )
-        }
-
     }
+
+    if (isEditDialogOpen) {
+        val scope = selectedScope ?: error("Scope is null")
+        EditScopeDialog(
+            onDismissRequest = { isEditDialogOpen = false },
+            scopeName = scope.name,
+            onConfirm = { newName ->
+                onEvent(UpdateScopeName(scope.id, newName))
+                isEditDialogOpen = false
+            }
+        )
+    }
+
+    if (isDeleteDialogOpen) {
+        val scope = selectedScope ?: error("Scope is null")
+        DeleteScopeDialog(
+            onDismissRequest = { isDeleteDialogOpen = false },
+            scopeName = scope.name,
+            onConfirm = {
+                onEvent(DeleteScope(scope.id))
+                isDeleteDialogOpen = false
+            },
+        )
+    }
+
 }
 
 @Composable
