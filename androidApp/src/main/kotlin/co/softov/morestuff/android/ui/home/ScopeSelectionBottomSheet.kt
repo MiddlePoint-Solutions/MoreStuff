@@ -70,11 +70,9 @@ private fun ScopeSelection(
             title = {
                 Text(
                     text = stringResource(R.string.choose_scope),
+                    modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineSmall.copy(textAlign = TextAlign.Center),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             },
             actions = {
