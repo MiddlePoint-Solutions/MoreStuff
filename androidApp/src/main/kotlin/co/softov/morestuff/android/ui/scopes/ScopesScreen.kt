@@ -95,6 +95,7 @@ fun ScopesScreen(
             Root -> ScopesContent(
                 onBack = onBack,
                 onCreateScope = { navigation.push(Create) },
+                onEditScope = { scope -> navigation.push(Edit(scope)) },
                 onEvent = viewModel::handleEvent
             )
 
@@ -102,6 +103,15 @@ fun ScopesScreen(
                 onBack = navigation::pop,
                 onSaveScope = { title ->
                     viewModel.handleEvent(CreateScope(title))
+                    navigation.pop()
+                }
+            )
+
+            is Edit -> EditScopeScreen(
+                scope = screen.scope,
+                onBack = navigation::pop,
+                onSaveScope = { title ->
+                    viewModel.handleEvent(UpdateScopeName(screen.scope.id, title))
                     navigation.pop()
                 }
             )
@@ -114,10 +124,10 @@ fun ScopesScreen(
 fun ScopesContent(
     onBack: () -> Unit,
     onCreateScope: () -> Unit,
+    onEditScope: (ScopeDomain) -> Unit,
     onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-    var isEditDialogOpen by remember { mutableStateOf(false) }
     var isDeleteDialogOpen by remember { mutableStateOf(false) }
     var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
 
@@ -178,28 +188,13 @@ fun ScopesContent(
             )
 
             OrderedScopesList(
-                onEditScope = { scope ->
-                    selectedScope = scope
-                    isEditDialogOpen = true
-                },
+                onEditScope = onEditScope,
                 onDeleteScope = { scopeId ->
                     selectedScope = scopeId
                     isDeleteDialogOpen = true
                 }
             )
         }
-    }
-
-    if (isEditDialogOpen) {
-        val scope = selectedScope ?: error("Scope is null")
-        EditScopeDialog(
-            onDismissRequest = { isEditDialogOpen = false },
-            scopeName = scope.name,
-            onConfirm = { newName ->
-                onEvent(UpdateScopeName(scope.id, newName))
-                isEditDialogOpen = false
-            }
-        )
     }
 
     if (isDeleteDialogOpen) {
@@ -344,41 +339,6 @@ private fun OrderedScopesList(
             }
         }
     }
-}
-
-
-@Composable
-private fun EditScopeDialog(
-    onDismissRequest: () -> Unit,
-    scopeName: String,
-    onConfirm: (String) -> Unit,
-) {
-
-    var dialogText by remember { mutableStateOf(scopeName) }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.edit_scope)) },
-        text = {
-            TextField(
-                value = dialogText,
-                onValueChange = { dialogText = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    capitalization = KeyboardCapitalization.Sentences
-                )
-            )
-        },
-
-        confirmButton = {
-            Button(
-                onClick = { onConfirm(dialogText) },
-                enabled = dialogText.isNotBlank()
-            ) {
-                Text(stringResource(R.string.save))
-            }
-        },
-    )
 }
 
 @Composable
