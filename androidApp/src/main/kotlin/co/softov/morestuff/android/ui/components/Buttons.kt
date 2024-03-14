@@ -35,7 +35,7 @@ fun CreateScopeButton(
         )
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Text(
-            text = stringResource(R.string.create_new_scope),
+            text = stringResource(R.string.add_scope),
             style = MaterialTheme.typography.bodyLarge
         )
     }
