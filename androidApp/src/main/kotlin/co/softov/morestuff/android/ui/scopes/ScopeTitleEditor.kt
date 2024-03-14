@@ -26,7 +26,7 @@ fun ScopeTitleEditor(
     modifier: Modifier = Modifier,
 ) {
     CompositionLocalProvider(
-        LocalTextStyle provides MaterialTheme.typography.titleMedium.copy(
+        LocalTextStyle provides MaterialTheme.typography.displayLarge.copy(
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         ),
@@ -34,16 +34,19 @@ fun ScopeTitleEditor(
     ) {
         BasicTextField(
             value = title,
-            onValueChange = onTitleChange,
+            onValueChange = {
+                val input = it.trim()
+                if (input.length <= 9) {
+                    onTitleChange(input)
+                }
+            },
             modifier = modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 autoCorrect = false,
                 imeAction = ImeAction.Done
             ),
-            textStyle = LocalTextStyle.current.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-            ),
+            textStyle = LocalTextStyle.current,
             singleLine = true,
             cursorBrush = SolidColor(LocalContentColor.current),
         ) { innerTextField ->
