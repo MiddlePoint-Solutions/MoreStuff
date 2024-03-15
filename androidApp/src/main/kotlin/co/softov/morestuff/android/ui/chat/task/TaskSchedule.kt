@@ -39,7 +39,6 @@ import co.softov.morestuff.android.ui.priority.PriorityButton
 import co.softov.morestuff.android.ui.priority.PriorityDatePicker
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -81,7 +80,7 @@ fun TaskSchedule(
             else -> {
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
-                        initialSelectedDateMillis = model.epochMs
+                        initialSelectedDateMillis = model.epochMsUtc
                     )
 
                     PriorityDatePicker(

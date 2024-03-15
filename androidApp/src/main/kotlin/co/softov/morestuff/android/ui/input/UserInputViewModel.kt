@@ -118,7 +118,7 @@ class UserInputViewModel(
 
     fun updatePlanTime(hour: Int, minute: Int) {
         with(priorityModel.value.planTime) {
-            updatePlan(hour, minute, epochMs)
+            updatePlan(hour, minute, epochMsUtc)
         }
     }
 
