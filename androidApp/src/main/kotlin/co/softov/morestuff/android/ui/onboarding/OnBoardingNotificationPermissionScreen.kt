@@ -132,6 +132,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
             Text(
                 text = stringResource(R.string.onboarding_notification_permission_subtitle),
                 modifier = Modifier
+                    .fillMaxWidth()
                     .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
