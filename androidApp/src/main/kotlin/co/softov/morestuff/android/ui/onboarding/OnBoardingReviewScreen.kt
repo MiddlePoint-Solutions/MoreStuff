@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,15 +76,25 @@ fun OnBoardingReviewScreen(
                 color = MaterialTheme.colorScheme.primary,
             )
 
-            Text(
-                text = stringResource(R.string.onboarding_review_subtitle),
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.secondary,
-            )
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.onboarding_review_subtitle),
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+                Text(
+                    text = "High ⬆\uFE0F Low ⬇\uFE0F More ➡\uFE0F Less ⬅\uFE0F",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
 
             AnimatedVisibility(
                 visible = showExample,

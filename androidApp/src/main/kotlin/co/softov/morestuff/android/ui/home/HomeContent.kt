@@ -245,7 +245,7 @@ private fun HomeContent(
                             ) {
                                 TextButton(onClick = { showTaskInput = true }) {
                                     Text(
-                                        stringResource(R.string.empty_priority_list_cta),
+                                        stringResource(R.string.cta_lets_go),
                                         style = MaterialTheme.typography.titleLarge.copy(
                                             color = MaterialTheme.colorScheme.onSurface
                                         )

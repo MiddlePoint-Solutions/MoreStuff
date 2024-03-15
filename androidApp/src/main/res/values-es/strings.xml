@@ -191,7 +191,7 @@
     <string name="record_audio_permission_title">Permiso para grabar audio</string>
     <string name="record_audio_permission_description">Grabar audio es necesario para que esta funcionalidad esté disponible\nPor favor concede el permiso</string>
     <string name="voice_to_text_listening">Escuchando</string>
-    <string name="empty_priority_list_cta">¡Vamos! :)</string>
+    <string name="cta_lets_go">¡Vamos! :)</string>
     <string name="cd_share_to_new_task">Compartir a una nueva tarea</string>
     <string name="dev_settings_already_enabled">¡Ya has activado los ajustes de desarrollador!</string>
     <string name="developer_settings_enabled">¡Ajustes de desarrollador activados!</string>
@@ -201,7 +201,7 @@
     <string name="onboarding_schedule_review_title">Programar Revisión</string>
     <string name="onboarding_schedule_review_subtitle">Adquiera el hábito de las revisiones diarias estableciendo su horario preferido</string>
     <string name="add_reminder">Añadir Recordatorio</string>
-    <string name="onboarding_review_title">Prioriza &amp; Revisa</string>
+    <string name="onboarding_review_title">Revisa</string>
     <string name="onboarding_review_subtitle">Desliza para fijar la prioridad</string>
 
     <!--  OnBoarding review tasks  -->
