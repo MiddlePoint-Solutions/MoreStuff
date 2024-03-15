@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 
 class GetActiveSchedulesUseCaseImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
-    private val getActiveSchedulesImpl = GetActiveSchedulesUseCaseImpl(scheduleRepository)
+    private val getActiveSchedulesImpl = GetAllActiveSchedulesUseCaseImpl(scheduleRepository)
 
     @Test
     fun `gets active schedules `() = runBlocking {

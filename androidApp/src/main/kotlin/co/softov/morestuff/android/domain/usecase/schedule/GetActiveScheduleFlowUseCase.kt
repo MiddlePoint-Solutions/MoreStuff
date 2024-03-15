@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.Flow
 interface GetActiveScheduleFlowUseCase {
     operator fun invoke(
         taskId: Long,
-        scheduleType: List<ScheduleType> = ScheduleType.values().asList()
+        scheduleType: List<ScheduleType> = ScheduleType.entries
     ): Flow<List<ScheduleDomain>>
+
 }
 
 class GetActiveScheduleFlowUseCaseImpl(

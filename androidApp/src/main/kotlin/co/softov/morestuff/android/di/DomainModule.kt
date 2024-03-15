@@ -95,12 +95,12 @@ import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlow
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveScheduleFlowUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriority
 import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.GetAllActiveSchedulesUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetAllActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCase
-import co.softov.morestuff.android.domain.usecase.schedule.GetTaskActiveSchedulesUseCaseImpl
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCase
+import co.softov.morestuff.android.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import co.softov.morestuff.android.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
 import co.softov.morestuff.android.domain.usecase.schedule.ScheduleAtTimeUseCase
@@ -308,14 +308,14 @@ val scopeUseCases = module{
 }
 
 val scheduleUseCases = module {
-    factoryOf(::GetTaskActiveSchedulesUseCaseImpl) bind GetTaskActiveSchedulesUseCase::class
+    factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
     factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
     factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
     factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
     factoryOf(::ToggleQuickReminderUseCaseImpl) bind ToggleQuickReminderUseCase::class
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
-    factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
+    factoryOf(::GetAllActiveSchedulesUseCaseImpl) bind GetAllActiveSchedulesUseCase::class
     factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
     factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
     factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
