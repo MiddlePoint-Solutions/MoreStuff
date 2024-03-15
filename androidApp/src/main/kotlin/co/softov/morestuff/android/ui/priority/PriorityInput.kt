@@ -61,7 +61,6 @@ private fun PriorityInputContent(
 
         AnimatedVisibility(
             showPlanInput,
-//            modifier = modifier.fillMaxWidth(),
             enter = slideInVertically { it * 2 },
             exit = slideOutVertically { (it * 1.5).toInt() }
         ) {
@@ -81,7 +80,6 @@ private fun PriorityInputContent(
     }
 
     Surface(
-//        modifier = modifier.zIndex(3f),
         modifier = modifier,
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant
