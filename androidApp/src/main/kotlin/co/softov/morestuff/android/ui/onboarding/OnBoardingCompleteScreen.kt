@@ -48,13 +48,13 @@ fun OnBoardingCompleteScreen(onFinish: () -> Unit) {
         Image(
             painter = painterResource(id = R.drawable.onboarding_workspace),
             modifier = Modifier.align(Alignment.Center),
-            contentDescription = "notifications",
+            contentDescription = "Workspace desk image",
             contentScale = ContentScale.FillBounds
         )
 
         OnboardingButton(
             onClick = onFinish,
-            title = stringResource(id = R.string.button_ready),
+            title = stringResource(id = R.string.finish),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 100.dp)

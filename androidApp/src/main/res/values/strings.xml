@@ -176,8 +176,8 @@
     <string name="remove_from_scope">Remove from current scope</string>
 
     <!--  onBoarding  -->
-    <string name="onboarding_welcome_title">"Our goal"</string>
-    <string name="onboarding_welcome_subtitle1">to help you</string>
+    <string name="onboarding_welcome_title">"Our Intention"</string>
+    <string name="onboarding_welcome_subtitle1">is to help</string>
     <string name="onboarding_welcome_subtitle2">organize &amp; prioritize</string>
     <string name="onboarding_welcome_subtitle3">your stuff</string>
     <string name="onboarding_notification_permission_title">Allow Notifications</string>
@@ -197,7 +197,7 @@
     <string name="record_audio_permission_title">Record Audio Permission</string>
     <string name="record_audio_permission_description">Recording audio is required for this feature to be available.\nPlease grant the permission</string>
     <string name="voice_to_text_listening">Listening</string>
-    <string name="empty_priority_list_cta">Let\'s Go! :)</string>
+    <string name="cta_lets_go">Let\'s Go! :)</string>
     <string name="cd_share_to_new_task">Share to new task</string>
     <string name="dev_settings_already_enabled">You have already enabled developer settings!</string>
     <string name="developer_settings_enabled">Developer settings enabled!</string>
@@ -207,7 +207,7 @@
     <string name="onboarding_schedule_review_title">Schedule Review</string>
     <string name="onboarding_schedule_review_subtitle">Get into the habit of daily reviews by setting your preferred time</string>
     <string name="add_reminder">Add reminder</string>
-    <string name="onboarding_review_title">Prioritize &amp; Review</string>
+    <string name="onboarding_review_title">Review</string>
     <string name="onboarding_review_subtitle">Swipe to set priority</string>
 
     <!--  OnBoarding review tasks  -->
