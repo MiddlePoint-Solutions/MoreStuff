@@ -79,11 +79,12 @@ class ScheduleRepositoryImpl(
     override suspend fun getActiveSchedulesForTasks(
         taskIds: List<Long>,
         scheduleType: List<ScheduleType>
-    ): Either<Failure, List<ScheduleDomain>> = scheduleQueries.selectActiveScheduleByTaskId(
-        taskIds,
-        scheduleType,
-        mapper = mapper.scheduleDbMapper
-    ).executeAsList().right()
+    ): Either<Failure, List<ScheduleDomain>> =
+        scheduleQueries.selectActiveScheduleByTaskId(
+            taskIds,
+            scheduleType,
+            mapper = mapper.scheduleDbMapper
+        ).executeAsList().right()
 
     override fun getActiveSchedulesForTaskFlow(
         taskIds: List<Long>,

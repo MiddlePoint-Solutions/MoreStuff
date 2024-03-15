@@ -43,7 +43,10 @@ sealed class ScheduleAction : Action.FeatureAction() {
     data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
     data class ToggleReminderScheduleAction(val taskId: Long) : ScheduleAction()
     data class CreateReminderScheduleAction(val taskId: Long) : ScheduleAction()
-    data class CancelReminderScheduleAction(val taskId: Long) : ScheduleAction()
+    data class CancelScheduleAction(
+        val taskIds: List<Long>,
+        val scheduleType: List<ScheduleType> = ScheduleType.entries.toList()
+    ) : ScheduleAction()
 
     internal data class ScheduleCreatedAction(val schedule: ScheduleDomain) : ScheduleAction()
 
@@ -91,7 +94,7 @@ class ScheduleMiddleware(
 
             is TaskAction.CompleteTasksAction -> scope.launch {
                 if (action.complete) {
-                    cancelActiveScheduleUseCase(action.taskIds)
+                    dispatch(CancelScheduleAction(action.taskIds))
                 }
             }
 
@@ -171,8 +174,8 @@ class ScheduleMiddleware(
                 }
             }
 
-            is CancelReminderScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.Reminder))
+            is CancelScheduleAction -> scope.launch {
+                cancelActiveScheduleUseCase(action.taskIds, action.scheduleType)
             }
 
             else -> NoOp

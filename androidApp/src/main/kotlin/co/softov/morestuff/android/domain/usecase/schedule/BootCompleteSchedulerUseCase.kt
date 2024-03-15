@@ -14,14 +14,14 @@ interface BootCompleteSchedulerUseCase {
 
 class BootCompleteSchedulerUseCaseImpl(
     private val scheduleWorkUseCase: ScheduleWorkUseCase,
-    private val getActiveSchedulesUseCase: GetActiveSchedulesUseCase,
+    private val getAllActiveSchedulesUseCase: GetAllActiveSchedulesUseCase,
     private val scheduler: Scheduler,
     private val timeManager: TimeManager,
 ) : BootCompleteSchedulerUseCase {
 
     override suspend fun invoke(): Either<Failure, Boolean> {
 //        scheduleWorkUseCase()
-        return when (val result = getActiveSchedulesUseCase()) {
+        return when (val result = getAllActiveSchedulesUseCase()) {
             is Either.Left -> result
             is Either.Right -> {
 //                reschedule(result.value.toMutableList()) // Joseph: do we really need to reschedule here? unless they are exact schedule.

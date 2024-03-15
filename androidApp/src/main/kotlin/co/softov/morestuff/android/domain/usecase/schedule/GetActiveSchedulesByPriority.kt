@@ -13,7 +13,7 @@ interface GetActiveSchedulesByPriority {
 }
 
 class GetActiveSchedulesByPriorityImpl(
-    private val getActiveSchedulesUseCase: GetActiveSchedulesUseCase
+    private val getAllActiveSchedulesUseCase: GetAllActiveSchedulesUseCase
 ) : GetActiveSchedulesByPriority {
 
     override suspend fun invoke(
@@ -25,7 +25,7 @@ class GetActiveSchedulesByPriorityImpl(
                 // TODO(Joseph) fetch schedules that are active in the past hour
                 // This should also take into account previous active schedules that have been left behind.
             }
-            getActiveSchedulesUseCase()
+            getAllActiveSchedulesUseCase()
         }
         is Priority.Later -> TODO("Implement get tomorrow priority")
         is Priority.Plan -> TODO("Implement get Later priority")

@@ -71,6 +71,7 @@ val dataModule = module {
     single {
         WorkManager.getInstance(androidApplication())
     }
+
     single { NotificationManagerCompat.from(androidApplication()) }
 
     //Time
