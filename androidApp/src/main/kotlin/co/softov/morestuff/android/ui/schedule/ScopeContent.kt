@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,7 +15,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
+import co.softov.morestuff.android.ui.compose.simpleVerticalScrollbar
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.theme.divider
 
@@ -30,7 +29,9 @@ fun ScopeContent(
     listState: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .simpleVerticalScrollbar(listState),
         state = listState,
     ) {
         itemsIndexed(
