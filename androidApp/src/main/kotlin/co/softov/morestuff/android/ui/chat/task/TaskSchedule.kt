@@ -80,7 +80,7 @@ fun TaskSchedule(
             else -> {
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
-                        initialSelectedDateMillis = model.epochMsUtc
+                        initialSelectedDateMillis = model.utcTimeMillis
                     )
 
                     PriorityDatePicker(
