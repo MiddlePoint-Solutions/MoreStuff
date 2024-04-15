@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.data.utils.toDayStartUtcTimeMillis
 import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ScheduleType
@@ -138,7 +139,8 @@ class TaskDetailsViewModel(
     ) = ScheduleUiModel(
         localDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error"
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error",
+        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis()
     )
 
     override fun onCleared() {

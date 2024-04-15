@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
+import co.softov.morestuff.android.data.utils.toDayStartUtcTimeMillis
 import co.softov.morestuff.android.domain.enums.ContentType
 import co.softov.morestuff.android.domain.enums.TaskType
 import co.softov.morestuff.android.domain.model.ChatContext
@@ -116,7 +117,8 @@ class UserInputViewModel(
     ) = ScheduleUiModel(
         localDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--"
+        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
+        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis()
     )
 
     private fun updatePlan(hour: Int, minute: Int, dateMillis: Long) {

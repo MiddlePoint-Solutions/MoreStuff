@@ -14,5 +14,5 @@ data class ScheduleUiModel(
     val hour: Int = localDateTime.hour,
     val minute: Int = localDateTime.minute,
     val utcTimeMillis: Long = localDateTime.toInstant(TimeZone.UTC).toEpochMilliseconds(),
-    val dayStartUtcTimeMillis: Long = localDateTime.toDayStartUtcTimeMillis()
+    val dayStartUtcTimeMillis: Long,
 )

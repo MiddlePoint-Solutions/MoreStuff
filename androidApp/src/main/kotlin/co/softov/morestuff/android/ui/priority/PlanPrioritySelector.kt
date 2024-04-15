@@ -136,7 +136,7 @@ private fun Preview() {
         PlanPrioritySelector(
             PriorityInputUiModel(
                 priority = PriorityUiModel.Now,
-                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00")
+                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00", dayStartUtcTimeMillis = 0)
             )
         )
     }
