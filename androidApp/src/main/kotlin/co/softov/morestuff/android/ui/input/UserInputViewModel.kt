@@ -19,9 +19,12 @@ import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.*
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.model.PriorityUiModel.*
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import co.softov.morestuff.android.ui.model.mapToDomain
@@ -72,7 +75,7 @@ class UserInputViewModel(
 
     val priorityModel = MutableStateFlow(
         PriorityInputUiModel(
-            priority = PriorityUiModel.Now,
+            priority = Now,
             planTime = createPlanTime()
         )
     )
@@ -105,7 +108,7 @@ class UserInputViewModel(
     }
 
     private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        PriorityUiModel.Plan(localDateTime = timeManager.getDefaultPlanTime())
+        Plan(localDateTime = timeManager.getDefaultPlanTime())
     }
 
     private fun createPlanTime(
@@ -116,21 +119,9 @@ class UserInputViewModel(
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--"
     )
 
-    fun updatePlanTime(hour: Int, minute: Int) {
-        with(priorityModel.value.planTime) {
-            updatePlan(hour, minute, utcTimeMillis)
-        }
-    }
-
-    fun updatePlanDate(dateMillis: Long) {
-        with(priorityModel.value.planTime) {
-            updatePlan(hour, minute, dateMillis)
-        }
-    }
-
     private fun updatePlan(hour: Int, minute: Int, dateMillis: Long) {
         priorityModel.update { model ->
-            (model.priority as? PriorityUiModel.Plan)?.let { plan ->
+            (model.priority as? Plan)?.let { plan ->
                 val updatedTime = timeManager.epochMillisToLocalDateTime(dateMillis, hour, minute)
                 val priority = plan.copy(localDateTime = updatedTime)
                 val planTime = createPlanTime(updatedTime)
@@ -154,18 +145,6 @@ class UserInputViewModel(
         return task.id
     }
 
-    fun setNowPriority() {
-        priorityChanged(PriorityUiModel.Now)
-    }
-
-    fun setLaterPriority() {
-        priorityChanged(PriorityUiModel.Later)
-    }
-
-    fun setPlanPriority() {
-        priorityChanged(createPlanModel())
-    }
-
     fun setCurrentScope(scopeId: Long) {
         currentScope = scopes.value.first { it.id == scopeId }
     }
@@ -174,10 +153,25 @@ class UserInputViewModel(
         priorityModel.update {
             PriorityInputUiModel(
                 priority = priority,
-                planTime = (priority as? PriorityUiModel.Plan)?.let { plan ->
+                planTime = (priority as? Plan)?.let { plan ->
                     createPlanTime(plan.localDateTime)
                 } ?: it.planTime,
             )
         }
     }
+
+    fun onEvent(event: TaskInputEvent) {
+        when(event) {
+            SetLaterPriority -> priorityChanged(Later)
+            SetNowPriority -> priorityChanged(Now)
+            SetPlanPriority -> priorityChanged(createPlanModel())
+            is UpdatePlanDate -> with(priorityModel.value.planTime) {
+                updatePlan(hour, minute, event.utcTimeMillis)
+            }
+            is UpdatePlanTime -> with(priorityModel.value.planTime) {
+                updatePlan(event.hour, event.minute, utcTimeMillis)
+            }
+        }
+    }
+
 }

@@ -1,22 +1,22 @@
-package co.softov.morestuff.android.ui.input
+package co.softov.morestuff.android.ui.input.voice
 
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
 import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
-import co.softov.morestuff.android.ui.input.VoiceToTextUiEvent.ReportError
-import co.softov.morestuff.android.ui.input.VoiceToTextUiEvent.SetDetectedLanguage
-import co.softov.morestuff.android.ui.input.VoiceToTextUiEvent.StartListening
-import co.softov.morestuff.android.ui.input.VoiceToTextUiEvent.StopListening
-import co.softov.morestuff.android.ui.input.VoiceToTextUiEvent.UpdateSpokenText
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.ReportError
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.SetDetectedLanguage
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.StartListening
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.StopListening
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.UpdateSpokenText
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.util.Locale
 
 class VoiceToTextViewModel(
     private val voiceToTextParser: VoiceToTextParser
-    ) : BaseViewModel<VoiceToTextUiModel, VoiceToTextUiEvent>(VoiceToTextUiModel()) {
+) : BaseViewModel<VoiceToTextUiModel, VoiceToTextUiEvent>(VoiceToTextUiModel()) {
 
     init {
         loadData()
@@ -47,15 +47,18 @@ class VoiceToTextViewModel(
                 voiceToTextParser.startListening(state.detectedLanguage)
                 state.copy(isListening = true)
             }
+
             StopListening -> {
                 voiceToTextParser.stopListening()
                 state.copy(isListening = false)
             }
+
             is SetDetectedLanguage -> state.copy(detectedLanguage = event.language)
             is UpdateSpokenText -> {
                 voiceToTextParser.clearSpokenText()
                 state.copy(spokenText = event.text)
             }
+
             is ReportError -> state.copy(error = event.errorMessage)
         }
     }
@@ -68,6 +71,7 @@ class VoiceToTextViewModel(
         sendEvent(StopListening)
 
     }
+
     fun displayLanguageName(): String {
         return if (state.detectedLanguage == Language.Device) {
             Locale.getDefault().displayLanguage

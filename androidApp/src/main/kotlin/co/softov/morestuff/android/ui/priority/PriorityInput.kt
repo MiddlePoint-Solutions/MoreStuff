@@ -17,39 +17,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.*
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 
 @Composable
 fun PriorityInput(
     model: PriorityInputUiModel,
-    onNowSelected: () -> Unit,
-    onLaterSelected: () -> Unit,
-    onPlanSelected: () -> Unit,
-    onTimeChange: (Int, Int) -> Unit,
-    onDateChange: (Long) -> Unit,
+    onEvent: (TaskInputEvent) -> Unit,
     modifier: Modifier = Modifier,
-) {
-    PriorityInputContent(
-        model = model,
-        modifier = modifier,
-        onNowSelected = onNowSelected,
-        onLaterSelected = onLaterSelected,
-        onPlanSelected = onPlanSelected,
-        onTimeChange = onTimeChange,
-        onDateChange = onDateChange,
-    )
-}
-
-@Composable
-private fun PriorityInputContent(
-    model: PriorityInputUiModel,
-    modifier: Modifier = Modifier,
-    onNowSelected: () -> Unit = {},
-    onLaterSelected: () -> Unit = {},
-    onPlanSelected: () -> Unit = {},
-    onTimeChange: (Int, Int) -> Unit = { _, _ -> },
-    onDateChange: (Long) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -72,8 +49,8 @@ private fun PriorityInputContent(
                 PlanPrioritySelector(
                     model = model,
                     modifier = Modifier.fillMaxWidth(),
-                    onDateChange = onDateChange,
-                    onTimeChange = onTimeChange
+                    onDateChange = { onEvent(UpdatePlanDate(it)) },
+                    onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) }
                 )
             }
         }
@@ -86,9 +63,9 @@ private fun PriorityInputContent(
     ) {
         PrioritySelector(
             priority = model.priority,
-            onNowSelected = onNowSelected,
-            onLaterSelected = onLaterSelected,
-            onPlanSelected = onPlanSelected,
+            onNowSelected = { onEvent(SetNowPriority) },
+            onLaterSelected = { onEvent(SetLaterPriority) },
+            onPlanSelected = { onEvent(SetPlanPriority) },
         )
     }
 }

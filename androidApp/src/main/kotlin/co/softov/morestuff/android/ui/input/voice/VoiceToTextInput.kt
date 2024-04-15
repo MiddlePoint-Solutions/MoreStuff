@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.input
+package co.softov.morestuff.android.ui.input.voice
 
 import android.Manifest
 import androidx.compose.animation.core.LinearEasing
