@@ -6,32 +6,26 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,9 +36,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -52,8 +44,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,18 +59,17 @@ import co.softov.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.enums.Language
-import co.softov.morestuff.android.domain.nav.Screen
 import co.softov.morestuff.android.domain.nav.SettingScreen
-import co.softov.morestuff.android.domain.nav.SettingScreen.*
+import co.softov.morestuff.android.domain.nav.SettingScreen.AboutLibraries
+import co.softov.morestuff.android.domain.nav.SettingScreen.Developer
+import co.softov.morestuff.android.domain.nav.SettingScreen.Root
+import co.softov.morestuff.android.domain.nav.SettingScreen.Scopes
 import co.softov.morestuff.android.ui.components.SettingsTopBar
-import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
-import co.softov.morestuff.android.ui.scopes.ScopesContent
 import co.softov.morestuff.android.ui.scopes.ScopesScreen
 import co.softov.morestuff.android.ui.theme.MoreStuffSettingTheme
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.slide
@@ -100,17 +89,8 @@ fun SettingsScreen(
 ) {
 
     val navigation = remember { StackNavigation<SettingScreen>() }
-    val model by viewModel.model.collectAsStateWithLifecycle()
+    val model by viewModel.models.collectAsStateWithLifecycle()
 
-    val actions by rememberUpdatedState(
-        newValue = SettingsActions(
-            selectAppTheme = viewModel::selectAppTheme,
-            setSnoozeLimit = viewModel::onSnoozeLimitChanged,
-            enableDevSettings = viewModel::enableDevSettings,
-            onTimeSelected = viewModel::setReviewTime,
-            inputVoiceLanguage = viewModel::selectLanguage
-        )
-    )
 
     ChildStack(
         source = navigation,
@@ -126,7 +106,17 @@ fun SettingsScreen(
                 SettingsContent(
                     onBack = onBack,
                     model = model,
-                    actions = actions,
+                    selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
+                    setReviewTime = { hour, minute ->
+                        viewModel.take(
+                            SettingsEvent.SetReviewTime(
+                                hour,
+                                minute
+                            )
+                        )
+                    },
+                    selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
+                    enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
                     showDevSettings = { navigation.push(Developer) },
                     showScopesSettings = { navigation.push(Scopes) },
                     showLibraries = { navigation.push(AboutLibraries) },
@@ -145,11 +135,14 @@ fun SettingsScreen(
 @Composable
 private fun SettingsContent(
     onBack: () -> Unit,
-    model: SettingsModel,
+    model: SettingsState,
+    selectAppTheme: (Int) -> Unit,
+    setReviewTime: (Int, Int) -> Unit,
+    selectLanguage: (Int) -> Unit,
+    enableDevSettings: () -> Unit,
     showLibraries: () -> Unit,
     showDevSettings: () -> Unit,
-    showScopesSettings: () -> Unit,
-    actions: SettingsActions,
+    showScopesSettings: () -> Unit
 ) {
 
     val scrollState = rememberScrollState()
@@ -181,16 +174,16 @@ private fun SettingsContent(
                     }
                 ) {
                     SelectTheme(
-                        themeSelected = actions.selectAppTheme,
+                        themeSelected = selectAppTheme,
                         defaultValue = { model.appTheme.ordinal }
                     )
 
                     ReviewTimeSelector(
-                        valueChanged = actions.onTimeSelected,
+                        valueChanged = setReviewTime,
                         defaultValue = model.reviewTime,
                     )
                     SelectLanguage(
-                        languageSelected = actions.inputVoiceLanguage,
+                        languageSelected = selectLanguage,
                         defaultValue = { model.inputVoiceLanguage.ordinal }
                     )
 
@@ -214,7 +207,7 @@ private fun SettingsContent(
 
                 About(
                     devSettingsEnabled = model.devSettings,
-                    enableDevSettings = actions.enableDevSettings,
+                    enableDevSettings = enableDevSettings,
                     showLibraries = showLibraries,
                     modifier = Modifier.constrainAs(about) {
                         bottom.linkTo(parent.bottom)
@@ -540,8 +533,13 @@ private fun SettingsPreviewDark() {
             showLibraries = {},
             showDevSettings = {},
             showScopesSettings = {},
-            model = SettingsModel(),
-            actions = SettingsActions()
+            model = SettingsState(),
+            enableDevSettings = {},
+            selectAppTheme = {},
+            selectLanguage = {},
+            setReviewTime = { _, _ -> }
+
+
         )
     }
 }

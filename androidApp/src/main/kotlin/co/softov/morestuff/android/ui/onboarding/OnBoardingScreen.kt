@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import co.softov.morestuff.android.domain.nav.OnBoarding
 import co.softov.morestuff.android.domain.nav.OnBoarding.*
 import co.softov.morestuff.android.ui.navigation.ChildPages
+import co.softov.morestuff.android.ui.settings.SettingsEvent
 import co.softov.morestuff.android.ui.settings.SettingsViewModel
 import co.softov.morestuff.android.ui.utils.requiresNotificationsPermission
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -48,11 +49,11 @@ fun OnBoardingScreen(
             Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
             NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
             ReviewReminder -> {
-                val reviewTime by viewModel.model.collectAsState()
+                val reviewTime by viewModel.models.collectAsState()
                 OnBoardingReviewNotificationScreen(
                     onNext = navigation::selectNext,
                     currentReviewTime = { reviewTime.reviewTime },
-                    onReviewTimeChange = { viewModel.setReviewTime(it.first, it.second) }
+                    onReviewTimeChange = { viewModel.take(SettingsEvent.SetReviewTime(it.first, it.second)) }
                 )
             }
             ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
