@@ -36,7 +36,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +60,10 @@ import co.softov.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import co.softov.morestuff.android.domain.enums.AppTheme
 import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.nav.SettingScreen
-import co.softov.morestuff.android.domain.nav.SettingScreen.*
+import co.softov.morestuff.android.domain.nav.SettingScreen.AboutLibraries
+import co.softov.morestuff.android.domain.nav.SettingScreen.Developer
+import co.softov.morestuff.android.domain.nav.SettingScreen.Root
+import co.softov.morestuff.android.domain.nav.SettingScreen.Scopes
 import co.softov.morestuff.android.ui.components.SettingsTopBar
 import co.softov.morestuff.android.ui.navigation.ChildStack
 import co.softov.morestuff.android.ui.priority.PriorityTimePicker
@@ -89,22 +91,6 @@ fun SettingsScreen(
     val navigation = remember { StackNavigation<SettingScreen>() }
     val model by viewModel.models.collectAsStateWithLifecycle()
 
-    val actions by rememberUpdatedState(
-        newValue = SettingsActions(
-            selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },//viewModel::selectAppTheme,
-            setSnoozeLimit = { limit -> viewModel.take(SettingsEvent.ChangeSnoozeLimit(limit)) },
-            enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
-            onTimeSelected = { hour, minute ->
-                viewModel.take(
-                    SettingsEvent.SetReviewTime(
-                        hour,
-                        minute
-                    )
-                )
-            },
-            inputVoiceLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-        )
-    )
 
     ChildStack(
         source = navigation,
@@ -120,7 +106,17 @@ fun SettingsScreen(
                 SettingsContent(
                     onBack = onBack,
                     model = model,
-                    actions = actions,
+                    selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
+                    setReviewTime = { hour, minute ->
+                        viewModel.take(
+                            SettingsEvent.SetReviewTime(
+                                hour,
+                                minute
+                            )
+                        )
+                    },
+                    selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
+                    enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
                     showDevSettings = { navigation.push(Developer) },
                     showScopesSettings = { navigation.push(Scopes) },
                     showLibraries = { navigation.push(AboutLibraries) },
@@ -140,10 +136,13 @@ fun SettingsScreen(
 private fun SettingsContent(
     onBack: () -> Unit,
     model: SettingsState,
+    selectAppTheme: (Int) -> Unit,
+    setReviewTime: (Int, Int) -> Unit,
+    selectLanguage: (Int) -> Unit,
+    enableDevSettings: () -> Unit,
     showLibraries: () -> Unit,
     showDevSettings: () -> Unit,
-    showScopesSettings: () -> Unit,
-    actions: SettingsActions,
+    showScopesSettings: () -> Unit
 ) {
 
     val scrollState = rememberScrollState()
@@ -175,16 +174,16 @@ private fun SettingsContent(
                     }
                 ) {
                     SelectTheme(
-                        themeSelected = actions.selectAppTheme,
+                        themeSelected = selectAppTheme,
                         defaultValue = { model.appTheme.ordinal }
                     )
 
                     ReviewTimeSelector(
-                        valueChanged = actions.onTimeSelected,
+                        valueChanged = setReviewTime,
                         defaultValue = model.reviewTime,
                     )
                     SelectLanguage(
-                        languageSelected = actions.inputVoiceLanguage,
+                        languageSelected = selectLanguage,
                         defaultValue = { model.inputVoiceLanguage.ordinal }
                     )
 
@@ -208,7 +207,7 @@ private fun SettingsContent(
 
                 About(
                     devSettingsEnabled = model.devSettings,
-                    enableDevSettings = actions.enableDevSettings,
+                    enableDevSettings = enableDevSettings,
                     showLibraries = showLibraries,
                     modifier = Modifier.constrainAs(about) {
                         bottom.linkTo(parent.bottom)
@@ -535,7 +534,12 @@ private fun SettingsPreviewDark() {
             showDevSettings = {},
             showScopesSettings = {},
             model = SettingsState(),
-            actions = SettingsActions()
+            enableDevSettings = {},
+            selectAppTheme = {},
+            selectLanguage = {},
+            setReviewTime = { _, _ -> }
+
+
         )
     }
 }
