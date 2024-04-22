@@ -90,16 +90,17 @@ fun SetSchedulePriorityButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = CircleShape,
+    backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
     content: @Composable () -> Unit,
 ) {
 
-    val backgroundColor by animateColorAsState(
-        targetValue = MaterialTheme.colorScheme.primary.copy(alpha = 0.12F),
+    val backgroundColorState by animateColorAsState(
+        targetValue = backgroundColor.copy(alpha = 0.12F),
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Background Color Animation"
     )
 
-    val textColor by animateColorAsState(
+    val textColorState by animateColorAsState(
         targetValue = MaterialTheme.colorScheme.primary,
         animationSpec = tween(300, easing = FastOutSlowInEasing),
         label = "Text Color Animation"
@@ -109,8 +110,8 @@ fun SetSchedulePriorityButton(
         modifier = modifier,
         shape = shape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            contentColor = textColor
+            containerColor = backgroundColorState,
+            contentColor = textColorState
         ),
         onClick = onClick,
         enabled = enabled,

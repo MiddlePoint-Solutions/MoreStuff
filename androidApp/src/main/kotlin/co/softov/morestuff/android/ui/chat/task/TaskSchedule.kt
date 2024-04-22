@@ -80,7 +80,7 @@ fun TaskSchedule(
             else -> {
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
-                        initialSelectedDateMillis = model.utcTimeMillis
+                        initialSelectedDateMillis = model.scheduleUtcTimeMillis
                     )
 
                     PriorityDatePicker(
@@ -183,10 +183,11 @@ private fun TaskSchedulePreview() {
     MoreStuffTheme {
         TaskSchedule(
             model = ScheduleUiModel(
-                localDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
+                scheduleLocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.UTC),
                 displayDate = "Saturday, July 29",
                 displayTime = "15:30",
-                dayStartUtcTimeMillis = 0
+                dayStartUtcTimeMillis = 0,
+                currentUtcTimeMillis = 0
             ),
             actionText = "Schedule",
             onDateChange = {},

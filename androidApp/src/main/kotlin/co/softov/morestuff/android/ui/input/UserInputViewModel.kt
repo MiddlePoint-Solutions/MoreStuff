@@ -115,10 +115,11 @@ class UserInputViewModel(
     private fun createPlanTime(
         time: LocalDateTime = timeManager.getDefaultPlanTime(),
     ) = ScheduleUiModel(
-        localDateTime = time,
+        scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
-        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis()
+        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
+        currentUtcTimeMillis = timeManager.nowUtcMillis
     )
 
     private fun updatePlan(hour: Int, minute: Int, dateMillis: Long) {
@@ -171,7 +172,7 @@ class UserInputViewModel(
                 updatePlan(hour, minute, event.utcTimeMillis)
             }
             is UpdatePlanTime -> with(priorityModel.value.planTime) {
-                updatePlan(event.hour, event.minute, utcTimeMillis)
+                updatePlan(event.hour, event.minute, scheduleUtcTimeMillis)
             }
         }
     }
