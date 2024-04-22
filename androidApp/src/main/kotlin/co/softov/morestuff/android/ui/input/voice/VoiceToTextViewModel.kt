@@ -1,22 +1,56 @@
-package co.softov.morestuff.android.ui.input.voice
+package co.softov.morestuff.android.ui.input
 
-import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewModel
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.SavedStateHandle
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.domain.enums.Language
-import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.ReportError
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.SetDetectedLanguage
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.StartListening
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.StopListening
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent.UpdateSpokenText
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.Flow
+import timber.log.Timber
 import java.util.Locale
 
+
 class VoiceToTextViewModel(
+    private val voiceToTextParser: VoiceToTextParser,
+    private val savedState: SavedStateHandle,
+) : MoleculeViewModel<VoiceToTextUiEvent, VoiceToTextState>() {
+
+    override val initialState: VoiceToTextState = savedState["voice"] ?: VoiceToTextState()
+
+    @Composable
+    override fun models(events: Flow<VoiceToTextUiEvent>): VoiceToTextState {
+        return voiceToTextModel(
+            initialState = initialState,
+            events = events,
+            voiceToTextParser = voiceToTextParser,
+        )
+    }
+    override fun onSaveState(model: VoiceToTextState) {
+        savedState["voice"] = model
+        Timber.d("language Saved state: $model")
+    }
+}
+
+@Composable
+fun displayLanguageName(viewModel: VoiceToTextViewModel): String {
+    val state by viewModel.models.collectAsState()
+    Timber.d("Displaying language: ${state.detectedLanguage}")
+    return if (state.detectedLanguage == Language.Device) {
+        val defaultLanguage = Locale.getDefault().displayLanguage
+        Timber.d("language set to device default: $defaultLanguage")
+        defaultLanguage
+    } else {
+        Timber.d("language explicitly set to: ${state.detectedLanguage.name}")
+        state.detectedLanguage.name
+    }
+}
+
+
+/*class VoiceToTextViewModel(
     private val voiceToTextParser: VoiceToTextParser
-) : BaseViewModel<VoiceToTextUiModel, VoiceToTextUiEvent>(VoiceToTextUiModel()) {
+    ) : BaseViewModel<VoiceToTextUiModel, VoiceToTextUiEvent>(VoiceToTextUiModel()) {
 
     init {
         loadData()
@@ -47,18 +81,15 @@ class VoiceToTextViewModel(
                 voiceToTextParser.startListening(state.detectedLanguage)
                 state.copy(isListening = true)
             }
-
             StopListening -> {
                 voiceToTextParser.stopListening()
                 state.copy(isListening = false)
             }
-
             is SetDetectedLanguage -> state.copy(detectedLanguage = event.language)
             is UpdateSpokenText -> {
                 voiceToTextParser.clearSpokenText()
                 state.copy(spokenText = event.text)
             }
-
             is ReportError -> state.copy(error = event.errorMessage)
         }
     }
@@ -71,7 +102,6 @@ class VoiceToTextViewModel(
         sendEvent(StopListening)
 
     }
-
     fun displayLanguageName(): String {
         return if (state.detectedLanguage == Language.Device) {
             Locale.getDefault().displayLanguage
@@ -83,4 +113,4 @@ class VoiceToTextViewModel(
     fun clearInput() {
         sendEvent(UpdateSpokenText(""))
     }
-}
+}*/

@@ -25,6 +25,7 @@ import co.softov.morestuff.android.data.service.ImageHandlerImpl
 import co.softov.morestuff.android.data.service.PDFHandlerImpl
 import co.softov.morestuff.android.data.utils.TimeFormatterImpl
 import co.softov.morestuff.android.domain.DevTools
+import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.repository.MessageRepository
 import co.softov.morestuff.android.domain.repository.PriorityRepository
 import co.softov.morestuff.android.domain.repository.ScheduleRepository
@@ -58,6 +59,8 @@ val dataModule = module {
 
     single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = androidApplication()) }
     single<PDFHandler> { PDFHandlerImpl(context = androidApplication()) }
+
+    single { AppState() }
 
     single<Settings> { SharedPreferencesSettings(getSharedPreferences(androidContext())) }
 
