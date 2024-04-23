@@ -48,7 +48,7 @@ import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
-import co.softov.morestuff.android.ui.input.VoiceToTextInput
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.priority.PriorityInput
@@ -171,11 +171,7 @@ fun TaskInputBottomSheet(
                         priorityContent = {
                             PriorityInput(
                                 model = priorityModel,
-                                onNowSelected = viewModel::setNowPriority,
-                                onLaterSelected = viewModel::setLaterPriority,
-                                onPlanSelected = viewModel::setPlanPriority,
-                                onTimeChange = viewModel::updatePlanTime,
-                                onDateChange = viewModel::updatePlanDate,
+                                onEvent = viewModel::onEvent,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },

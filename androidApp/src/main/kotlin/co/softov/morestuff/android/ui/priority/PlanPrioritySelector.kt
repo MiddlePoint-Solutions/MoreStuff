@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
@@ -31,7 +30,6 @@ import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 
 @Composable
@@ -50,10 +48,10 @@ fun PlanPrioritySelector(
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planTime.epochMsUtc,
+            initialSelectedDateMillis = planTime.utcTimeMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return true // TODO: this should be checked against the current day
+                    return utcTimeMillis >= planTime.dayStartUtcTimeMillis
                 }
 
                 override fun isSelectableYear(year: Int): Boolean {
@@ -138,7 +136,7 @@ private fun Preview() {
         PlanPrioritySelector(
             PriorityInputUiModel(
                 priority = PriorityUiModel.Now,
-                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00")
+                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00", dayStartUtcTimeMillis = 0)
             )
         )
     }

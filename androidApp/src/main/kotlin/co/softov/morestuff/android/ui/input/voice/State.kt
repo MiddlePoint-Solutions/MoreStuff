@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.input
+package co.softov.morestuff.android.ui.input.voice
 
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewState
