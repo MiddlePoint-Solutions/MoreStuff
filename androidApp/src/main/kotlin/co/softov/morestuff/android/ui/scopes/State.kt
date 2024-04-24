@@ -2,6 +2,17 @@ package co.softov.morestuff.android.ui.scopes
 
 import androidx.compose.runtime.Immutable
 import co.softov.morestuff.android.app.presentation.viewmodel.BaseViewEvent
+import co.softov.morestuff.android.domain.model.ScopeDomain
+import com.arkivanov.essenty.parcelable.Parcelable
+import kotlinx.parcelize.Parcelize
+
+
+@Parcelize
+@Immutable
+data class ScopesState(
+    val scopes: List<ScopeDomain> = listOf()
+) : Parcelable
+
 
 @Immutable
 sealed class ScopesUiEvent : BaseViewEvent {
