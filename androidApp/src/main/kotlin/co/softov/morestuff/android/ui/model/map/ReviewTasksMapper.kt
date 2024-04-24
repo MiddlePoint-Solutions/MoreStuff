@@ -10,7 +10,7 @@ class ReviewTasksMapper(
     private val timeFormatter: TimeFormatter,
     private val timeManager: TimeManager,
 ) {
-    private fun internalMap(input: TaskDomain, position: Int, count: Int): ReviewItemUiModel {
+    fun internalMap(input: TaskDomain, position: Int, count: Int): ReviewItemUiModel {
         val inputDateTime = timeManager.nowLocalDateTimeString
 
         val createTime: String
