@@ -23,16 +23,6 @@ class TimeManagerImplTest {
     }
 
     @Test
-    fun `utcStringToLocalDateTime should convert UTC string to LocalDateTime`() {
-        val utcTime = "2023-03-27T12:00:00.000Z"
-        val localDateTime = timeManager.utcStringToLocalDateTime(utcTime)
-        assertNotNull(localDateTime)
-        val instant = Instant.parse(utcTime)
-        val expectedLocalDateTime = instant.toLocalDateTime(timeManager.currentTimeZone)
-        assertEquals(expectedLocalDateTime, localDateTime)
-    }
-
-    @Test
     fun `isToday should return true if the input date is today `() {
         val localTime = timeManager.nowLocalDateTime
         val result = timeManager.isToday(localTime.toString())

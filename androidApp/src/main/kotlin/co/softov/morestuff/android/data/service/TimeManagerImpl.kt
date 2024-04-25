@@ -38,14 +38,6 @@ class TimeManagerImpl : TimeManager {
             .toLocalDateTime(currentTimeZone)
             .toString()
 
-    override fun utcStringToLocalDateTime(time: String): LocalDateTime {
-        return time.toInstant().toLocalDateTime(currentTimeZone)
-    }
-
-    override fun localDateTimeStringToUtc(time: String): Instant {
-        return time.toLocalDateTime().toInstant(currentTimeZone)
-    }
-
     override fun localDateTimeToUtc(localDateTime: LocalDateTime): Instant {
         return localDateTime.toInstant(currentTimeZone)
     }
@@ -142,7 +134,7 @@ class TimeManagerImpl : TimeManager {
             }
 
             else -> {
-                nextHour = if(now.hour < 23) now.hour + 1 else 0
+                nextHour = if (now.hour < 23) now.hour + 1 else 0
                 nextQuarterHour = 0
             }
         }
@@ -155,8 +147,10 @@ class TimeManagerImpl : TimeManager {
         else -> RelativeDateDisplay.Date
     }
 
-    override fun epochMillisToLocalDateTime(epochMillis: Long, hour: Int, minute: Int) =
-        Instant.fromEpochMilliseconds(epochMillis).toLocalDateTime(currentTimeZone).run {
-            localDateTime(this, hour, minute)
-        }
+    override fun utcMillisToLocalDateTime(utcMillis: Long, hour: Int, minute: Int) =
+        localDateTime(
+            Instant.fromEpochMilliseconds(utcMillis).toLocalDateTime(currentTimeZone),
+            hour,
+            minute
+        )
 }

@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,17 +47,18 @@ fun PlanPrioritySelector(
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
     val planTime by remember(model.planTime) { mutableStateOf(model.planTime) }
+    val isPastTime by remember(planTime) { derivedStateOf { planTime.isTimeInPast } }
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planTime.utcTimeMillis,
+            initialSelectedDateMillis = planTime.scheduleUtcTimeMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                     return utcTimeMillis >= planTime.dayStartUtcTimeMillis
                 }
 
                 override fun isSelectableYear(year: Int): Boolean {
-                    return year >= planTime.localDateTime.year
+                    return year >= planTime.scheduleLocalDateTime.year
                 }
 
             }
@@ -94,11 +97,7 @@ fun PlanPrioritySelector(
             ) {
                 Text(
                     text = planTime.displayDate,
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        lineHeight = 16.sp,
-                        fontWeight = FontWeight(500),
-                    )
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -106,14 +105,15 @@ fun PlanPrioritySelector(
 
             SetSchedulePriorityButton(
                 onClick = { showTimePickerDialog = true },
+                backgroundColor = if (isPastTime) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                }
             ) {
                 Text(
                     text = planTime.displayTime,
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        lineHeight = 16.sp,
-                        fontWeight = FontWeight(500),
-                    )
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -136,7 +136,14 @@ private fun Preview() {
         PlanPrioritySelector(
             PriorityInputUiModel(
                 priority = PriorityUiModel.Now,
-                planTime = ScheduleUiModel(time, "Jan, 31 2007", "00:00", dayStartUtcTimeMillis = 0)
+                planTime = ScheduleUiModel(
+                    time,
+                    "Jan, 31 2007",
+                    "00:00",
+                    dayStartUtcTimeMillis = 0,
+                    scheduleUtcTimeMillis = 1,
+                    currentUtcTimeMillis = 0
+                )
             )
         )
     }
