@@ -8,6 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.softov.morestuff.android.domain.redux.AppState
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextState
+import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
