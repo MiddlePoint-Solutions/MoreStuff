@@ -21,7 +21,7 @@ fun scopesModel(
 ): ScopesState {
     var scopesState by remember { mutableStateOf(initialState.scopes) }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         getScopesFlowUseCase().collect { newScopes ->
             scopesState = newScopes
         }
