@@ -23,9 +23,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.DoneAll
-import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Remove
@@ -85,7 +85,6 @@ import co.softov.morestuff.android.ui.review.swipeable.lastSwipedItem
 import co.softov.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import co.softov.morestuff.android.ui.review.swipeable.swipableCard
 import co.softov.morestuff.android.ui.theme.reviewIconTint
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.router.stack.pop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -122,10 +121,8 @@ fun ReviewContent(
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var showReviewDragHints by remember { mutableStateOf(false) }
+    val model by viewModel.models.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.load(currentScopeId)
-    }
 
     Box(
         modifier = Modifier
@@ -133,7 +130,7 @@ fun ReviewContent(
             .systemBarsPadding()
     ) {
 
-        val model by viewModel.uiModel.collectAsState()
+
 
         ConstraintLayout(
             modifier
@@ -148,11 +145,11 @@ fun ReviewContent(
                 is ReviewRound.Review -> {
 
                     PriorityReviewTopBar(
-                        scopes = viewModel.scopes,
+                        scopes = model.scopes,
                         navigateUp = onBack,
-                        toggleReviewHint = viewModel::toggleHintArrowPriority,
+                        toggleReviewHint = { viewModel.take(ReviewViewEvent.ToggleReviewHint) },
                         showReviewHelpScreen = { showReviewHelpScreen = true },
-                        isReviewHintActive = viewModel.reviewHintEnabled,
+                        isReviewHintActive = model.reviewHintEnabled,
                         modifier = Modifier.constrainAs(topBar) {
                             top.linkTo(parent.top)
                         },
@@ -181,7 +178,7 @@ fun ReviewContent(
                         ReviewSwipeControls(
                             lastItemSwiped = { states.lastSwipedItem() },
                             firstVisibleState = { states.firstVisibleStateOrNull() },
-                            undoAction = viewModel::undo,
+                            undoAction = { viewModel.take(ReviewViewEvent.Undo(it)) },
                         )
                     }
 
@@ -193,7 +190,7 @@ fun ReviewContent(
                             },
                         states = states,
                         onSwiped = { schedule, direction ->
-                            viewModel.onTaskSwiped(schedule, direction)
+                            viewModel.take(ReviewViewEvent.ItemSwipe(schedule, direction))
                         },
                         onDrag = { isDragging ->
                             showReviewDragHints = isDragging
@@ -201,7 +198,7 @@ fun ReviewContent(
                         onComplete = {
                             scope.launch {
                                 states.firstVisibleStateOrNull()?.onComplete()
-                                viewModel.completeTask(it)
+                                viewModel.take(ReviewViewEvent.CompleteTask(it))
                             }
                         },
                         showTaskChat = { taskId ->
@@ -213,7 +210,7 @@ fun ReviewContent(
                     )
 
                     AnimatedVisibility(
-                        visible = showReviewDragHints && viewModel.reviewHintEnabled,
+                        visible = showReviewDragHints && model.reviewHintEnabled,
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
@@ -283,8 +280,9 @@ private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
     currentScopeId: Long,
+    viewModel: ReviewViewModel = koinViewModel()
 ) {
-    val viewModel: ReviewViewModel = koinViewModel()
+
     val coroutineScope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
 
@@ -298,7 +296,7 @@ private fun PriorityReviewTopBar(
             navigationIcon = {
                 IconButton(onClick = navigateUp) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.cd_navigate_back)
                     )
                 }
@@ -306,7 +304,7 @@ private fun PriorityReviewTopBar(
             actions = {
                 IconButton(onClick = showReviewHelpScreen) {
                     Icon(
-                        imageVector = Icons.Default.Help,
+                        imageVector = Icons.AutoMirrored.Filled.Help,
                         contentDescription = stringResource(R.string.help)
                     )
                 }
@@ -345,7 +343,7 @@ private fun PriorityReviewTopBar(
         ScopeCarousel(
             scopes = scopes,
             currentScopeId = currentScopeId,
-            onScopeSelected = viewModel::setCurrentScope,
+            onScopeSelected = { viewModel.take(ReviewViewEvent.LoadScope(it)) },
             modifier = Modifier
                 .height(75.dp)
                 .padding(bottom = 30.dp)
