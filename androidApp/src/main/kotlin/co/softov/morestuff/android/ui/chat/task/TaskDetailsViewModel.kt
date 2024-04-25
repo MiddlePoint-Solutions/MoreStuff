@@ -7,33 +7,22 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.toDayStartUtcTimeMillis
-import co.softov.morestuff.android.domain.DevTools
 import co.softov.morestuff.android.domain.enums.ReplyType
 import co.softov.morestuff.android.domain.enums.ScheduleType
 import co.softov.morestuff.android.domain.model.ScheduleDomain
 import co.softov.morestuff.android.domain.model.TaskDomain
 import co.softov.morestuff.android.domain.model.isOneTime
 import co.softov.morestuff.android.domain.model.isReminder
-import co.softov.morestuff.android.domain.redux.middleware.MessageAction
 import co.softov.morestuff.android.domain.redux.middleware.ReminderAction.UserResponseAction
 import co.softov.morestuff.android.domain.redux.middleware.ScheduleAction
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.service.ClipboardHelper
-import co.softov.morestuff.android.domain.service.ImageHandler
-import co.softov.morestuff.android.domain.service.PDFHandler
-import co.softov.morestuff.android.domain.service.ShareTaskMessage
 import co.softov.morestuff.android.domain.service.TimeManager
-import co.softov.morestuff.android.domain.usecase.message.GetTaskChatMessagesUseCase
-import co.softov.morestuff.android.domain.usecase.message.GetTaskMessagesFlowUseCase
 import co.softov.morestuff.android.domain.usecase.task.GetTaskFlowUseCase
 import co.softov.morestuff.android.domain.util.TimeFormatter
-import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
-import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -99,14 +88,14 @@ class TaskDetailsViewModel(
     fun createOneTimeSchedule() {
         createScheduleModel().run {
             dispatchAppStoreAction(
-                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, localDateTime)
+                ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, scheduleLocalDateTime)
             )
         }
     }
 
     fun updatePlanTime(hour: Int, minute: Int) {
         scheduleModel?.let {
-            val updatedPlanTime = timeManager.localDateTime(it.localDateTime, hour, minute)
+            val updatedPlanTime = timeManager.localDateTime(it.scheduleLocalDateTime, hour, minute)
             dispatchAppStoreAction(
                 ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
             )
@@ -116,7 +105,7 @@ class TaskDetailsViewModel(
     fun updatePlanDate(dateMillis: Long) {
         scheduleModel?.let {
             val updatedPlanTime =
-                timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
+                timeManager.utcMillisToLocalDateTime(dateMillis, it.hour, it.minute)
             dispatchAppStoreAction(
                 ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
             )
@@ -137,10 +126,12 @@ class TaskDetailsViewModel(
     private fun createScheduleModel(
         time: LocalDateTime = timeManager.getDefaultPlanTime(),
     ) = ScheduleUiModel(
-        localDateTime = time,
+        scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error",
-        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis()
+        scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
+        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
+        currentUtcTimeMillis = timeManager.nowUtcMillis
     )
 
     override fun onCleared() {
