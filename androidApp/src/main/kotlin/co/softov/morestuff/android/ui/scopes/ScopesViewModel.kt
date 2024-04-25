@@ -1,74 +1,26 @@
 package co.softov.morestuff.android.ui.scopes
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.model.ScopeDomain
-import co.softov.morestuff.android.domain.redux.middleware.ScopeAction
-import co.softov.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
-import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
-import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
-import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
-import co.softov.morestuff.android.ui.scopes.ScopesUiEvent.UpdateScopeName
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
-import timber.log.Timber
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.SavedStateHandle
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import kotlinx.coroutines.flow.Flow
+
 
 class ScopesViewModel(
-    getScopesFlowUseCase: GetScopesFlowUseCase,
-) : NoStateViewModel() {
+    private val savedState: SavedStateHandle,
+) : MoleculeViewModel<ScopesUiEvent, ScopesState>() {
 
-    private val scopes = getScopesFlowUseCase()
-        .onEach { scopes ->
-            Timber.d("reorderScope, update: ${scopes.map { it.name }}")
-            scopesState = scopes
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = listOf()
+    override val initialState: ScopesState = savedState["Scopes"] ?: ScopesState()
+
+    @Composable
+    override fun models(events: Flow<ScopesUiEvent>): ScopesState {
+        return scopesModel(
+            initialState = initialState,
+            events = events,
         )
-
-    var scopesState by mutableStateOf<List<ScopeDomain>>(listOf())
-        private set
-
-    fun handleEvent(event: ScopesUiEvent) {
-        when (event) {
-            is CreateScope -> {
-                dispatchAppStoreAction(ScopeAction.CreateScopeAction(event.name))
-            }
-
-            is UpdateScopeName -> {
-                dispatchAppStoreAction(
-                    ScopeAction.UpdateScopeNameAction(
-                        event.scopeId,
-                        event.newName
-                    )
-                )
-            }
-
-            is DeleteScope -> {
-                dispatchAppStoreAction(ScopeAction.DeleteScopeAction(event.scopeId))
-            }
-
-            is ReorderScope -> {
-                when {
-                    event.isFinal -> if (event.fromIndex != event.toIndex) {
-                        dispatchAppStoreAction((ScopeAction.UpdateScopeOrderAction(scopesState)))
-                    }
-                    else -> updateScopeOrder(event.fromIndex, event.toIndex)
-                }
-            }
-        }
     }
 
-    private fun updateScopeOrder(fromPosition: Int, toPosition: Int) {
-        scopesState = scopesState.toMutableList().apply {
-            add(toPosition, removeAt(fromPosition))
-        }
+    override fun onSaveState(model: ScopesState) {
+        savedState["Scopes"] = model
     }
-
 }
