@@ -41,7 +41,6 @@ fun reviewModel(
         launch {
             getScopesUseCase().onRight {
                 scopes = it
-                currentScope.id
             }
         }
     }
@@ -97,34 +96,20 @@ fun reviewModel(
                     actions = actions.filterNot { it.first.id == event.item.id }
                 }
 
-               is ReviewViewEvent.ToggleReviewHint -> {
+                is ReviewViewEvent.ToggleReviewHint -> {
                     reviewHintEnabled = !reviewHintEnabled
                     store.dispatch(SettingAction.EnableReviewHint(reviewHintEnabled))
                 }
 
                 is ReviewViewEvent.LoadScope -> {
-                    launch {
-                        val scopesResult = getScopesUseCase()
-                        if (scopesResult is Either.Right) {
-                            scopes = scopesResult.value
-                            val scope = scopes.firstOrNull { it.id == event.scopeId }
-                            if (scope != null && (currentScope.id != scope.id || items.isEmpty())) {
-                                val taskResult = getReviewTasksUseCase(scope.id)
-                                if (taskResult is Either.Right) {
-                                    val tasks = taskResult.value
-                                    val mappedTasks = tasks.tasks.mapIndexed { index, task ->
-                                        reviewTasksMapper.internalMap(
-                                            task,
-                                            index + 1,
-                                            tasks.tasks.size
-                                        )
-                                    }.shuffled()
-                                    items = mappedTasks
-                                    currentScope = scope
-                                    round = ReviewRound.Review(scope.id)
-                                }
-                            }
-                        }
+                    val taskResult = getReviewTasksUseCase(event.scopeId)
+                    if (taskResult is Either.Right) {
+                        val tasks = taskResult.value
+                        items = tasks.tasks.mapIndexed { index, task ->
+                            reviewTasksMapper.map(task, index + 1, tasks.tasks.size)
+                        }.shuffled()
+                        currentScope = scopes.firstOrNull { it.id == event.scopeId } ?: currentScope
+                        round = ReviewRound.Review(event.scopeId)
                     }
                 }
             }
