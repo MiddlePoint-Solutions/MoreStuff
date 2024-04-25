@@ -47,7 +47,7 @@ fun PlanPrioritySelector(
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
     val planTime by remember(model.planTime) { mutableStateOf(model.planTime) }
-    val isPastTime by remember(model.planTime) { derivedStateOf { planTime.isTimeInPast } }
+    val isPastTime by remember(planTime) { derivedStateOf { planTime.isTimeInPast } }
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(

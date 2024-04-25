@@ -10,7 +10,7 @@ data class ScheduleUiModel(
     val scheduleLocalDateTime: LocalDateTime,
     val displayDate: String,
     val displayTime: String,
-    val scheduleUtcTimeMillis: Long = scheduleLocalDateTime.toInstant(TimeZone.UTC).toEpochMilliseconds(),
+    val scheduleUtcTimeMillis: Long,
     val dayStartUtcTimeMillis: Long,
     val currentUtcTimeMillis: Long,
 ) {
@@ -19,6 +19,6 @@ data class ScheduleUiModel(
     val minute: Int get() = scheduleLocalDateTime.minute
 
     val isTimeInPast: Boolean
-        get() = currentUtcTimeMillis >= scheduleUtcTimeMillis
+        get() = scheduleUtcTimeMillis <= currentUtcTimeMillis
 
 }

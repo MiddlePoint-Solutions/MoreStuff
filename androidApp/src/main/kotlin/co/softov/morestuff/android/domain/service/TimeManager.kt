@@ -62,17 +62,7 @@ interface TimeManager {
     fun getCreateTime(): String
 
     /**
-    Converts a UTC time string to LocalDateTime.
-     */
-    fun utcStringToLocalDateTime(time: String): LocalDateTime
-
-    /**
-    Converts a LocalDateTime string to UTC Instant.
-     */
-    fun localDateTimeStringToUtc(time: String): Instant
-
-    /**
-    Converts a LocalDateTime string to UTC Instant.
+    Converts a LocalDateTime to UTC Instant.
      */
     fun localDateTimeToUtc(localDateTime: LocalDateTime): Instant
 
@@ -145,5 +135,5 @@ interface TimeManager {
 
     fun getRelativeDate(timeString: String): RelativeDateDisplay
 
-    fun epochMillisToLocalDateTime(epochMillis: Long, hour: Int = 0, minute: Int = 0): LocalDateTime
+    fun utcMillisToLocalDateTime(utcMillis: Long, hour: Int = 0, minute: Int = 0): LocalDateTime
 }

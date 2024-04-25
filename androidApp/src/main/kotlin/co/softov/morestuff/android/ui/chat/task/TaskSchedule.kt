@@ -187,6 +187,7 @@ private fun TaskSchedulePreview() {
                 displayDate = "Saturday, July 29",
                 displayTime = "15:30",
                 dayStartUtcTimeMillis = 0,
+                scheduleUtcTimeMillis = 0,
                 currentUtcTimeMillis = 0
             ),
             actionText = "Schedule",

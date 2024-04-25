@@ -105,7 +105,7 @@ class TaskDetailsViewModel(
     fun updatePlanDate(dateMillis: Long) {
         scheduleModel?.let {
             val updatedPlanTime =
-                timeManager.epochMillisToLocalDateTime(dateMillis, it.hour, it.minute)
+                timeManager.utcMillisToLocalDateTime(dateMillis, it.hour, it.minute)
             dispatchAppStoreAction(
                 ScheduleAction.RescheduleTaskAction(taskId, ScheduleType.OneTime, updatedPlanTime)
             )
@@ -129,6 +129,7 @@ class TaskDetailsViewModel(
         scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error",
+        scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
         dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
         currentUtcTimeMillis = timeManager.nowUtcMillis
     )

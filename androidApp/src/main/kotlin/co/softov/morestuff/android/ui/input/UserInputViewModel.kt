@@ -40,6 +40,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import timber.log.Timber
 
 class UserInputViewModel(
     getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
@@ -65,7 +68,12 @@ class UserInputViewModel(
                 }
                 delay(1500)
                 messages.update { messages ->
-                    messages.toMutableList().apply { add(0, createAppMessage(appMessagesProvider.getNewTaskAddedMessage())) }
+                    messages.toMutableList().apply {
+                        add(
+                            0,
+                            createAppMessage(appMessagesProvider.getNewTaskAddedMessage())
+                        )
+                    }
                 }
             }
         }.stateIn(
@@ -118,18 +126,33 @@ class UserInputViewModel(
         scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
         displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
+        scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
         dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
         currentUtcTimeMillis = timeManager.nowUtcMillis
     )
 
-    private fun updatePlan(hour: Int, minute: Int, dateMillis: Long) {
+    private fun updatePlanDate(dateMillis: Long) {
         priorityModel.update { model ->
-            (model.priority as? Plan)?.let { plan ->
-                val updatedTime = timeManager.epochMillisToLocalDateTime(dateMillis, hour, minute)
-                val priority = plan.copy(localDateTime = updatedTime)
-                val planTime = createPlanTime(updatedTime)
-                PriorityInputUiModel(priority, planTime)
-            } ?: model
+            val updatedTime = timeManager.utcMillisToLocalDateTime(
+                dateMillis,
+                model.planTime.hour,
+                model.planTime.minute
+            )
+            val planTime = createPlanTime(updatedTime)
+            PriorityInputUiModel(Plan(updatedTime), planTime)
+        }
+    }
+
+    private fun updatePlanTime(hour: Int, minute: Int) {
+        priorityModel.update { model ->
+            val updatedTime = timeManager.localDateTime(
+                model.planTime.scheduleLocalDateTime,
+                hour,
+                minute
+            )
+            val planTime = createPlanTime(updatedTime)
+            Timber.d("updatedTime: $updatedTime \n planTime: $planTime")
+            PriorityInputUiModel(Plan(updatedTime), planTime)
         }
     }
 
@@ -156,24 +179,18 @@ class UserInputViewModel(
         priorityModel.update {
             PriorityInputUiModel(
                 priority = priority,
-                planTime = (priority as? Plan)?.let { plan ->
-                    createPlanTime(plan.localDateTime)
-                } ?: it.planTime,
+                planTime = createPlanTime(),
             )
         }
     }
 
     fun onEvent(event: TaskInputEvent) {
-        when(event) {
+        when (event) {
             SetLaterPriority -> priorityChanged(Later)
             SetNowPriority -> priorityChanged(Now)
             SetPlanPriority -> priorityChanged(createPlanModel())
-            is UpdatePlanDate -> with(priorityModel.value.planTime) {
-                updatePlan(hour, minute, event.utcTimeMillis)
-            }
-            is UpdatePlanTime -> with(priorityModel.value.planTime) {
-                updatePlan(event.hour, event.minute, scheduleUtcTimeMillis)
-            }
+            is UpdatePlanDate -> updatePlanDate(event.utcTimeMillis)
+            is UpdatePlanTime -> updatePlanTime(event.hour, event.minute)
         }
     }
 
