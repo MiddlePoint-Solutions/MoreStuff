@@ -12,13 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.FilterChipDefaults.filterChipBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +26,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,11 +43,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.enums.FilterType
 import co.softov.morestuff.android.ui.schedule.PriorityItem
-import co.softov.morestuff.android.ui.theme.surfaceContainer
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @ExperimentalMaterial3Api
@@ -58,10 +58,11 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = koinViewModel(),
 ) {
-
+    val model by viewModel.models.collectAsState()
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
-    val searchResult by viewModel.searchResults.collectAsStateWithLifecycle()
     val focusRequester = remember { FocusRequester() }
+    var searchQuery by remember { mutableStateOf(model.query) }
+
 
     LaunchedEffect(Unit) {
         isSearchActive = true
@@ -71,14 +72,23 @@ fun SearchBar(
     val exitSearch by rememberUpdatedState(
         newValue = {
             onSearchClose()
-            viewModel.reset()
+            viewModel.take(SearchEvent.ResetSearch)
         }
     )
 
+    var searchJob by remember { mutableStateOf<Job?>(null) }
+    LaunchedEffect(searchQuery) {
+        searchJob?.cancel()
+        searchJob = launch {
+            viewModel.take(SearchEvent.SetSearchQuery(searchQuery))
+        }
+    }
+
+
     SearchBar(
         modifier = Modifier.focusRequester(focusRequester),
-        query = viewModel.query,
-        onQueryChange = viewModel::setSearchQuery,
+        query = searchQuery,
+        onQueryChange = { newQuery -> searchQuery = newQuery },
         onSearch = { },
         active = isSearchActive,
         onActiveChange = { isActive ->
@@ -92,14 +102,14 @@ fun SearchBar(
                 exitSearch()
             }) {
                 Icon(
-                    Icons.Default.ArrowBack,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(id = R.string.cd_navigate_back)
                 )
             }
         },
         trailingIcon = {
-            if (viewModel.query.isNotEmpty()) {
-                IconButton(onClick = viewModel::clearSearchQuery) {
+            if (model.query.isNotEmpty()) {
+                IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
                     Icon(
                         Icons.Default.Close,
                         contentDescription = stringResource(R.string.cd_clear_search_query)
@@ -123,25 +133,43 @@ fun SearchBar(
 
                 SearchFilterChip(
                     filter = FilterType.Scheduled,
-                    selectedFilter = viewModel.filter,
-                    onFilterSelected = viewModel::setSearchFilter
+                    selectedFilter = model.filter,
+                    onFilterSelected = { selectedFilter ->
+                        viewModel.take(
+                            SearchEvent.SetSearchFilter(
+                                selectedFilter
+                            )
+                        )
+                    }
                 )
 
                 SearchFilterChip(
                     filter = FilterType.Reminder,
-                    selectedFilter = viewModel.filter,
-                    onFilterSelected = viewModel::setSearchFilter
+                    selectedFilter = model.filter,
+                    onFilterSelected = { selectedFilter ->
+                        viewModel.take(
+                            SearchEvent.SetSearchFilter(
+                                selectedFilter
+                            )
+                        )
+                    }
                 )
 
                 SearchFilterChip(
                     filter = FilterType.Done,
-                    selectedFilter = viewModel.filter,
-                    onFilterSelected = viewModel::setSearchFilter
+                    selectedFilter = model.filter,
+                    onFilterSelected = { selectedFilter ->
+                        viewModel.take(
+                            SearchEvent.SetSearchFilter(
+                                selectedFilter
+                            )
+                        )
+                    }
                 )
             }
 
             Crossfade(
-                targetState = searchResult.isEmpty() && viewModel.query.isNotEmpty(),
+                targetState = model.searchResults.isEmpty() && model.query.isNotEmpty(),
                 label = "Search results fade animation"
             ) {
                 when (it) {
@@ -157,7 +185,7 @@ fun SearchBar(
 
                     false -> {
                         Crossfade(
-                            targetState = searchResult,
+                            targetState = model.searchResults,
                             label = "Search results fade"
                         ) { result ->
                             LazyColumn {

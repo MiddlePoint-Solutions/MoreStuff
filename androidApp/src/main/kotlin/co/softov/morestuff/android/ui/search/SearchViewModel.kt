@@ -1,117 +1,29 @@
 package co.softov.morestuff.android.ui.search
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
-import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import co.softov.morestuff.android.domain.enums.FilterType
-import co.softov.morestuff.android.domain.enums.ScheduleType
-import co.softov.morestuff.android.domain.model.TaskDomain
-import co.softov.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
-import co.softov.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
-import co.softov.morestuff.android.domain.usecase.task.SearchTasksUseCase
-import co.softov.morestuff.android.ui.model.TaskUiModel
-import co.softov.morestuff.android.ui.model.map.TaskUiMapper
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
+import androidx.compose.runtime.Composable
+import androidx.lifecycle.SavedStateHandle
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import kotlinx.coroutines.flow.Flow
+
 
 class SearchViewModel(
-    private val searchTasksUseCase: SearchTasksUseCase,
-    private val getCompletedTasksUseCase: GetCompletedTasksUseCase,
-    private val getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase,
-    private val taskUiMapper: TaskUiMapper,
-) : NoStateViewModel() {
+    private val savedState: SavedStateHandle,
+) : MoleculeViewModel<SearchEvent, SearchState>() {
 
-    var query by mutableStateOf("")
-        private set
-    var filter by mutableStateOf(FilterType.None)
-        private set
-
-    val searchResults = MutableStateFlow<List<TaskUiModel>>(listOf())
-
-    private var searchJob: Job? = null
-
-    init {
-        setSearchFilter(FilterType.None)
+    override val initialState: SearchState = savedState["Search"] ?: SearchState()
+    @Composable
+    override fun models(events: Flow<SearchEvent>): SearchState {
+        return searchModel(
+            initialState = initialState,
+            events = events,
+        )
     }
 
-    fun setSearchFilter(selected: FilterType) {
-        filter = if (filter != selected) selected else FilterType.None
-        loadTasksByFilter(query)
+    override fun onSaveState(model: SearchState) {
+        savedState["Search"] = model
     }
-
-    fun setSearchQuery(searchQuery: String) {
-        this.query = searchQuery
-        loadTasksByFilter(searchQuery)
-    }
-
-    fun clearSearchQuery() {
-        setSearchQuery("")
-    }
-
-    fun reset() {
-        clearSearchQuery()
-        setSearchFilter(FilterType.None)
-    }
-
-    private fun loadTasksByFilter(searchText: String = "") {
-        searchJob?.cancel()
-        when (filter) {
-            FilterType.Done -> loadCompletedTasks(searchText)
-            FilterType.Reminder -> loadTasksWithReminderSchedule(searchText)
-            FilterType.Scheduled -> loadActiveTasksWithOneTimeSchedule(searchText)
-            FilterType.None -> searchTasksWithNoFilter(searchText)
-        }
-    }
-
-
-    private fun searchTasksWithNoFilter(searchText: String) {
-        searchJob = viewModelScope.launch {
-            searchTasksUseCase(searchText, false)
-                .onEach { results ->
-                    searchResults.value = taskUiMapper.map(filterByQuery(results, searchText))
-                }.launchIn(this)
-        }
-    }
-
-
-    private fun loadCompletedTasks(searchText: String) {
-        searchJob = viewModelScope.launch {
-            getCompletedTasksUseCase()
-                .collect { results ->
-                    searchResults.value = taskUiMapper.map(filterByQuery(results, searchText))
-                }
-        }
-    }
-
-    private fun loadActiveTasksWithOneTimeSchedule(searchText: String) {
-        searchJob = viewModelScope.launch {
-            getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map {
-                searchResults.value = taskUiMapper.map(filterByQuery(it, searchText))
-            }
-        }
-    }
-
-    private fun loadTasksWithReminderSchedule(searchText: String) {
-        searchJob = viewModelScope.launch {
-            getActiveTasksWithScheduleUseCase(listOf(ScheduleType.Reminder)).map {
-                searchResults.value = taskUiMapper.map(filterByQuery(it, searchText))
-            }
-        }
-    }
-
-    private fun filterByQuery(
-        it: List<TaskDomain>,
-        searchText: String
-    ) = it.filter { task ->
-        task.title.contains(searchText, ignoreCase = true)
-    }
-
 }
+
 
 
 
