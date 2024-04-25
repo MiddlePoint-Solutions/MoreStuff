@@ -5,29 +5,21 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -41,14 +33,11 @@ import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -57,7 +46,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -72,20 +60,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.ui.compose.keyboardAsState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import timber.log.Timber
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -98,8 +78,8 @@ fun TaskDetails(
         parameters = { parametersOf(taskId) }
     )
 ) {
-
-    val task by viewModel.task.collectAsState()
+    val model by viewModel.models.collectAsState()
+    val task = model.task
     val isKeyboardOpen by keyboardAsState()
     val focusManager = LocalFocusManager.current
     var isEditing by remember { mutableStateOf(false) }
@@ -142,7 +122,7 @@ fun TaskDetails(
                         } else {
                             Modifier
                                 .alpha(1f)
-                                .clickable(onClick = viewModel::toggleTaskComplete)
+                                .clickable(onClick = { viewModel.take(TaskDetailsEvent.ToggleTaskComplete) })
                         }
                     )
                 )
@@ -194,19 +174,22 @@ fun TaskDetails(
                         var firstTime by remember { mutableStateOf(true) }
                         var showEllipsis by remember { mutableStateOf(false) }
                         var lineEnd by remember { mutableIntStateOf(0) }
-                        val uneditedText by remember(viewModel.taskTitle, showEllipsis) {
+                        val uneditedText by remember(model.taskTitle, showEllipsis) {
                             derivedStateOf {
                                 if (showEllipsis) {
-                                    viewModel.taskTitle.substring(0, lineEnd - 3) + "..."
+                                    model.taskTitle.substring(0, lineEnd - 3) + "..."
                                 } else {
-                                    viewModel.taskTitle
+                                    model.taskTitle
                                 }
                             }
                         }
-
+                        var title by remember { mutableStateOf(model.taskTitle) }
                         BasicTextField(
-                            value = if (isEditing || showSchedule) viewModel.taskTitle else uneditedText,
-                            onValueChange = viewModel::updateTaskTitle,
+                            value = if (isEditing || showSchedule) title else uneditedText,
+                            onValueChange = { newTitle ->
+                                title = newTitle
+                                viewModel.take(TaskDetailsEvent.UpdateTaskTitle(newTitle))
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .onFocusChanged {
@@ -226,7 +209,7 @@ fun TaskDetails(
                                 focusManager.clearFocus()
                             },
                             onTextLayout = {
-                                if (isEditing || (firstTime && viewModel.taskTitle.isNotEmpty())) {
+                                if (isEditing || (firstTime && model.taskTitle.isNotEmpty())) {
                                     firstTime = false
                                     showEllipsis = it.lineCount > 2
                                     lineEnd = if (showEllipsis) {
@@ -257,12 +240,25 @@ fun TaskDetails(
                         Column {
                             AnimatedVisibility(visible = showSchedule) {
                                 TaskSchedule(
-                                    model = viewModel.scheduleModel,
+                                    model = model.scheduleModel,
                                     actionText = stringResource(id = R.string.task_chat_schedule_action),
-                                    onTimeChange = viewModel::updatePlanTime,
-                                    onDateChange = viewModel::updatePlanDate,
-                                    createSchedule = viewModel::createOneTimeSchedule,
-                                    cancelSchedule = viewModel::cancelActiveSchedule,
+                                    onTimeChange = { hour, minute ->
+                                        viewModel.take(
+                                            TaskDetailsEvent.UpdatePlanTime(
+                                                hour,
+                                                minute
+                                            )
+                                        )
+                                    },
+                                    onDateChange = { date ->
+                                        viewModel.take(
+                                            TaskDetailsEvent.UpdatePlanDate(
+                                                date
+                                            )
+                                        )
+                                    },
+                                    createSchedule = { viewModel.take(TaskDetailsEvent.CreateOneTimeSchedule) },
+                                    cancelSchedule = { viewModel.take(TaskDetailsEvent.CancelActiveSchedule) },
                                     icon = {
                                         Icon(
                                             imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
