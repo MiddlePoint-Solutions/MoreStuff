@@ -1,0 +1,33 @@
+name: Create Staging Release
+
+on:
+  push:
+    branches: [ "staging/**" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: JDK setup
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: corretto
+          cache: gradle
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Assemble Staging Bundle
+        run: |
+          ./gradlew :androidApp:assembleStaging
+
+      - name: Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
+        with:
+          appId: ${{secrets.STAGING_FIREBASE_APP_ID}}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_APP_DISTRIBUTION_CREDENTIALS }}
+          groups: staging
+          file: androidApp/build/outputs/apk/staging/androidApp-staging.apk
