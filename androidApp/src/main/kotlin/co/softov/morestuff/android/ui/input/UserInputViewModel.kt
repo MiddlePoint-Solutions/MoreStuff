@@ -65,6 +65,8 @@ class UserInputViewModel(
 ) : MoleculeViewModel<TaskInputEvent, UserInputState>() {
     override val initialState: UserInputState = UserInputState.create(timeManager, timeFormatter)
 
+    // TODO: Add chat context
+
     @Composable
     override fun models(events: Flow<TaskInputEvent>): UserInputState {
         return userInputModel(
