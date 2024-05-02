@@ -46,11 +46,14 @@ import co.softov.morestuff.android.ui.chat.Messages
 import co.softov.morestuff.android.ui.components.ScopeCarousel
 import co.softov.morestuff.android.ui.components.SendIcon
 import co.softov.morestuff.android.ui.input.UserInput
+import co.softov.morestuff.android.ui.input.UserInputEvent
 import co.softov.morestuff.android.ui.input.UserInputViewModel
 import co.softov.morestuff.android.ui.input.UserTextInput
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent
 import co.softov.morestuff.android.ui.input.voice.VoiceToTextInput
 import co.softov.morestuff.android.ui.local.LocalAppNavigation
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.model.mapToDomain
 import co.softov.morestuff.android.ui.priority.PriorityInput
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
@@ -69,15 +72,25 @@ fun TaskInputBottomSheet(
     val coroutineScope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
     val scrollState = rememberLazyListState()
+    val model by viewModel.models.collectAsState()
 
-    val messages by viewModel.messages.collectAsStateWithLifecycle()
-    val priorityModel by viewModel.priorityModel.collectAsStateWithLifecycle()
-    val scopes by viewModel.scopes.collectAsState()
+    val messages = model.messages
+    val priorityModel = model.priorityModel
+    val scopes = model.scopes
 
-    LaunchedEffect(Unit) {
-        Timber.d("TaskInputBottomSheet: ${context.scopeId}")
-        viewModel.load(context)
+
+    LaunchedEffect(model.taskId) {
+        val taskId = model.taskId
+        if (taskId != null) {
+            onNewTaskCreated(taskId, priorityModel.priority)
+        }
     }
+
+    /* LaunchedEffect(Unit) {
+         Timber.d("TaskInputBottomSheet: ${context.scopeId}")
+         viewModel.load(context)
+     }*/
+
 
     val navigation = LocalAppNavigation.current
 
@@ -110,7 +123,13 @@ fun TaskInputBottomSheet(
                     ScopeCarousel(
                         scopes = scopes,
                         currentScopeId = context.scopeId,
-                        onScopeSelected = viewModel::setCurrentScope,
+                        onScopeSelected = { scopeId ->
+                            viewModel.take(
+                                TaskInputEvent.SetCurrentScope(
+                                    scopeId
+                                )
+                            )
+                        },
                         modifier = Modifier
                             .height(60.dp)
                             .fillMaxWidth()
@@ -171,7 +190,7 @@ fun TaskInputBottomSheet(
                         priorityContent = {
                             PriorityInput(
                                 model = priorityModel,
-                                onEvent = viewModel::onEvent,
+                                onEvent = viewModel::take,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         },
@@ -199,15 +218,16 @@ fun TaskInputBottomSheet(
                                             ) {
                                                 SendIcon(onClick = {
                                                     coroutineScope.launch {
-                                                        val taskId =
-                                                            viewModel.createNewTask(userInputValue.text)
-                                                        onNewTaskCreated(
-                                                            taskId,
-                                                            priorityModel.priority
+                                                        viewModel.take(
+                                                            TaskInputEvent.CreateNewTask(
+                                                                userInputValue.text
+                                                            )
                                                         )
+
                                                         userInputValue = userInputValue.copy("")
                                                     }
                                                 })
+
                                             }
                                         }
                                     }

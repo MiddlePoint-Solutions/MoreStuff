@@ -1,9 +1,11 @@
 package co.softov.morestuff.android.ui.input
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.toDayStartUtcTimeMillis
 import co.softov.morestuff.android.domain.enums.ContentType
@@ -20,16 +22,29 @@ import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
 import co.softov.morestuff.android.domain.usecase.task.CreateTaskUseCase
 import co.softov.morestuff.android.domain.usecase.task.TaskParams
 import co.softov.morestuff.android.domain.util.TimeFormatter
+import co.softov.morestuff.android.ui.home.HomeEvent
+import co.softov.morestuff.android.ui.home.HomeState
 import co.softov.morestuff.android.ui.input.task.TaskInputEvent
-import co.softov.morestuff.android.ui.input.task.TaskInputEvent.*
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.SetLaterPriority
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.SetNowPriority
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.SetPlanPriority
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.UpdatePlanDate
+import co.softov.morestuff.android.ui.input.task.TaskInputEvent.UpdatePlanTime
+import co.softov.morestuff.android.ui.input.task.UserInputState
 import co.softov.morestuff.android.ui.model.MessageUiModel
 import co.softov.morestuff.android.ui.model.PriorityInputUiModel
 import co.softov.morestuff.android.ui.model.PriorityUiModel
-import co.softov.morestuff.android.ui.model.PriorityUiModel.*
+import co.softov.morestuff.android.ui.model.PriorityUiModel.Later
+import co.softov.morestuff.android.ui.model.PriorityUiModel.Now
+import co.softov.morestuff.android.ui.model.PriorityUiModel.Plan
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import co.softov.morestuff.android.ui.model.mapToDomain
+import co.softov.morestuff.android.ui.review.ReviewState
+import co.softov.morestuff.android.ui.review.ReviewViewEvent
+import co.softov.morestuff.android.ui.review.reviewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,10 +55,27 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
+import org.koin.compose.koinInject
 import timber.log.Timber
 
+
+class UserInputViewModel(
+    timeManager: TimeManager,
+    timeFormatter: TimeFormatter,
+) : MoleculeViewModel<TaskInputEvent, UserInputState>() {
+    override val initialState: UserInputState = UserInputState.create(timeManager, timeFormatter)
+
+    @Composable
+    override fun models(events: Flow<TaskInputEvent>): UserInputState {
+        return userInputModel(
+            initialState = initialState,
+            events = events,
+        )
+    }
+}
+
+
+/*
 class UserInputViewModel(
     getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
     private val getScopesUseCase: GetScopesUseCase,
@@ -156,12 +188,15 @@ class UserInputViewModel(
         }
     }
 
-    /**
-     * Creates a new task and returns its id.
-     * The taskId can then be used for navigation.
-     *
-     * @return TaskId of the newly created task
-     */
+
+*/
+/**
+ * Creates a new task and returns its id.
+ * The taskId can then be used for navigation.
+ *
+ * @return TaskId of the newly created task
+ *//*
+
     suspend fun createNewTask(title: String): Long {
         val priority = priorityModel.value.mapToDomain()
         val trimmedTitle = title.trim()
@@ -195,3 +230,4 @@ class UserInputViewModel(
     }
 
 }
+*/

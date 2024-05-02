@@ -19,8 +19,12 @@ import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.db.StuffDb
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import timber.log.Timber
 import java.io.File
 
 class MessageRepositoryImpl(
@@ -62,11 +66,29 @@ class MessageRepositoryImpl(
         }
     }
 
-    override fun getLastMessageFlow(contentType: ContentType): Flow<Message?> =
+  /*  override fun getLastMessageFlow(contentType: ContentType): Flow<Message?> =
         messageQueries.selectLastTaskMessageByContentType(
             contentType.value,
             mapper = mapper.messageDbMapper
-        ).asFlow().mapToOneOrNull(Dispatchers.IO)
+        ).asFlow().mapToOneOrNull(Dispatchers.IO)*/
+  override fun getLastMessageFlow(contentType: ContentType): Flow<Message?> =
+      messageQueries.selectLastTaskMessageByContentType(
+          contentType.value,
+          mapper = mapper.messageDbMapper
+      ).asFlow().mapToOneOrNull(Dispatchers.IO)
+          .onEach { message ->
+              if (message != null) {
+                  Timber.d("keymessage Retrieved last message: ${message.id} for contentType: ${contentType.value}")
+              } else {
+                  Timber.d("keymessage No message found for contentType: ${contentType.value}")
+              }
+          }
+          .onStart {
+              Timber.d("keymessage Starting to fetch last message for contentType: ${contentType.value}")
+          }
+          .catch { exception ->
+              Timber.e(exception, "keymessage Error fetching last message for contentType: ${contentType.value}")
+          }
 
 
     override suspend fun createMessage(
