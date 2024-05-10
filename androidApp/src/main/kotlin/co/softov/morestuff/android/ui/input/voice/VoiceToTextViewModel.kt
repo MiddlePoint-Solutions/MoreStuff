@@ -1,4 +1,4 @@
-package co.softov.morestuff.android.ui.input
+package co.softov.morestuff.android.ui.input.voice
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -7,8 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.domain.enums.Language
 import co.softov.morestuff.android.domain.service.VoiceToTextParser
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextState
-import co.softov.morestuff.android.ui.input.voice.VoiceToTextUiEvent
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.util.Locale
