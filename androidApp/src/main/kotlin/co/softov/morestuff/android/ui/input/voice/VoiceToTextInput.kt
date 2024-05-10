@@ -56,19 +56,19 @@ fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
 ) {
     val viewModel: VoiceToTextViewModel = koinViewModel()
-    val recordingState by viewModel.uiModel.collectAsState()
+    val recordingState by viewModel.models.collectAsState()
     LaunchedEffect(recordingState.spokenText) {
         if (recordingState.spokenText.isNotEmpty()) {
             onUpdateValue(recordingState.spokenText)
-            viewModel.clearInput()
+            viewModel.take(VoiceToTextUiEvent.UpdateSpokenText(""))
         }
     }
 
     VoiceToTextInputContent(
         recordingState = recordingState,
-        startListening = { viewModel.startListening() },
-        stopListening = viewModel::stopListening,
-        selectedLanguage = viewModel.displayLanguageName()
+        startListening = { viewModel.take(VoiceToTextUiEvent.StartListening) },
+        stopListening = { viewModel.take(VoiceToTextUiEvent.StopListening) },
+        selectedLanguage = displayLanguageName(viewModel)
     )
 }
 
@@ -76,7 +76,7 @@ fun VoiceToTextInput(
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun VoiceToTextInputContent(
-    recordingState: VoiceToTextUiModel,
+    recordingState: VoiceToTextState,
     startListening: () -> Unit,
     stopListening: () -> Unit,
     selectedLanguage: String,

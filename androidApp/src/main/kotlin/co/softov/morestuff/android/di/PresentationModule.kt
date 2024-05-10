@@ -36,7 +36,6 @@ val presentationModule = module {
     viewModelOf(::VoiceToTextViewModel)
     viewModelOf(::TaskDetailsViewModel)
     viewModelOf(::ScopesViewModel)
-
     singleOf(::AppPresenter)
 
     factoryOf(::ReviewTasksMapper)
