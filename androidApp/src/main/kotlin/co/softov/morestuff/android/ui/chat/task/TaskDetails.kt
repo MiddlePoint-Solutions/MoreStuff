@@ -11,6 +11,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,9 +48,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -61,23 +66,28 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.softov.morestuff.android.R
+import co.softov.morestuff.android.ui.chat.task.TaskDetailsEvent.*
 import co.softov.morestuff.android.ui.compose.keyboardAsState
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
-@OptIn(FlowPreview::class)
 @Composable
 fun TaskDetails(
     taskId: Long,
     modifier: Modifier = Modifier,
     taskOptions: @Composable ColumnScope.() -> Unit = {},
-    viewModel: TaskDetailsViewModel = koinViewModel(
+) {
+
+    val viewModel = koinViewModel<TaskDetailsViewModel>(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
-) {
+
     val model by viewModel.models.collectAsState()
     val task = model.task
     val isKeyboardOpen by keyboardAsState()
@@ -122,7 +132,8 @@ fun TaskDetails(
                         } else {
                             Modifier
                                 .alpha(1f)
-                                .clickable(onClick = { viewModel.take(TaskDetailsEvent.ToggleTaskComplete) })
+                                .clip(CircleShape)
+                                .clickable { viewModel.take(ToggleTaskComplete) }
                         }
                     )
                 )
@@ -170,35 +181,39 @@ fun TaskDetails(
                             }
                         }
 
-
                         var firstTime by remember { mutableStateOf(true) }
                         var showEllipsis by remember { mutableStateOf(false) }
-                        var lineEnd by remember { mutableIntStateOf(0) }
-                        val uneditedText by remember(model.taskTitle, showEllipsis) {
+                        var lineEnd by remember(model.taskTitle) { mutableIntStateOf(0) }
+
+                        var editingTitle by remember(model.taskTitle) {
+                            mutableStateOf(model.taskTitle)
+                        }
+
+                        val displayTitle by remember(editingTitle) {
                             derivedStateOf {
                                 if (showEllipsis) {
-                                    model.taskTitle.substring(0, lineEnd - 3) + "..."
+                                    editingTitle.substring(0, lineEnd - 3) + "..."
                                 } else {
-                                    model.taskTitle
+                                    editingTitle
                                 }
                             }
                         }
-                        var title by remember { mutableStateOf(model.taskTitle) }
+
                         BasicTextField(
-                            value = if (isEditing || showSchedule) title else uneditedText,
+                            value = if (isEditing || showSchedule) editingTitle else displayTitle,
                             onValueChange = { newTitle ->
-                                title = newTitle
-                                viewModel.take(TaskDetailsEvent.UpdateTaskTitle(newTitle))
+                                editingTitle = newTitle
+                                viewModel.take(UpdateTaskTitle(newTitle))
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(end = 20.dp)
                                 .onFocusChanged {
                                     isEditing = it.isFocused
                                     if (it.isFocused) {
                                         showSchedule = false
                                     }
-                                }
-                                .padding(end = 20.dp),
+                                },
                             enabled = !task.isComplete,
                             keyboardOptions = KeyboardOptions(
                                 capitalization = KeyboardCapitalization.Sentences,
@@ -243,22 +258,13 @@ fun TaskDetails(
                                     model = model.scheduleModel,
                                     actionText = stringResource(id = R.string.task_chat_schedule_action),
                                     onTimeChange = { hour, minute ->
-                                        viewModel.take(
-                                            TaskDetailsEvent.UpdatePlanTime(
-                                                hour,
-                                                minute
-                                            )
-                                        )
+                                        viewModel.take(UpdatePlanTime(hour, minute))
                                     },
                                     onDateChange = { date ->
-                                        viewModel.take(
-                                            TaskDetailsEvent.UpdatePlanDate(
-                                                date
-                                            )
-                                        )
+                                        viewModel.take(UpdatePlanDate(date))
                                     },
-                                    createSchedule = { viewModel.take(TaskDetailsEvent.CreateOneTimeSchedule) },
-                                    cancelSchedule = { viewModel.take(TaskDetailsEvent.CancelActiveSchedule) },
+                                    createSchedule = { viewModel.take(CreateOneTimeSchedule) },
+                                    cancelSchedule = { viewModel.take(CancelActiveSchedule) },
                                     icon = {
                                         Icon(
                                             imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
@@ -317,7 +323,6 @@ fun TaskDetails(
         }
     }
 }
-
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,

@@ -53,6 +53,7 @@ fun MainContent(
                 else -> listOf(Home, initialScreen)
             }
         },
+        key = "MainChildStack",
         handleBackButton = true,
         animation = stackAnimation(slide() + fade()),
     ) { screen ->

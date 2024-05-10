@@ -27,19 +27,20 @@ import org.koin.compose.koinInject
 @Composable
 fun taskDetailsModel(
     taskId: Long,
+    initialState: TaskDetailsState,
+    events: Flow<TaskDetailsEvent>,
     timeManager: TimeManager = koinInject(),
     timeFormatter: TimeFormatter = koinInject(),
     getTaskFlow: GetTaskFlowUseCase = koinInject(),
     store: AppStore = koinInject(),
-    events: Flow<TaskDetailsEvent>,
-    initialState: TaskDetailsState = TaskDetailsState()
 ): TaskDetailsState {
+
     var task by remember { mutableStateOf(initialState.task) }
     var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
     var reminderModel by remember { mutableStateOf(initialState.reminderModel) }
     var taskTitle by remember { mutableStateOf(initialState.taskTitle) }
 
-    LaunchedEffect(taskId) {
+    LaunchedEffect(Unit) {
         getTaskFlow(taskId).collect { updatedTask ->
             task = updatedTask
             scheduleModel = createModelForSchedule(
@@ -148,7 +149,6 @@ fun taskDetailsModel(
         taskTitle = taskTitle
     )
 }
-
 
 private fun createModelForSchedule(
     scheduleDomain: ScheduleDomain?, timeManager: TimeManager,
