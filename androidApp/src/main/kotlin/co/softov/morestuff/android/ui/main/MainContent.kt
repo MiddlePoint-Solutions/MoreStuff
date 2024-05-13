@@ -33,14 +33,14 @@ import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.essenty.backhandler.BackHandlerOwner
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
-@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun MainContent(
     initialScreen: Screen?,
     shareContent: (taskId: Long, content: Shareable) -> Unit,
+    onBoardingComplete: () -> Unit,
 ) {
-    val viewModel: MainViewModel = koinViewModel()
     val navigation = LocalAppNavigation.current
 
     ChildStack(
@@ -61,9 +61,8 @@ fun MainContent(
 
             OnBoarding -> OnBoardingScreen(
                 onBoardingComplete = {
+                    onBoardingComplete()
                     navigation.replaceCurrent(Home)
-                    viewModel.onBoardingCompleted()
-                    viewModel.sendHintTask()
                 }
             )
 

@@ -22,6 +22,7 @@ import co.softov.morestuff.android.domain.model.Shareable
 import co.softov.morestuff.android.ui.local.ProvideAppNavigation
 import co.softov.morestuff.android.ui.local.ProvideAppTheme
 import co.softov.morestuff.android.ui.main.MainContent
+import co.softov.morestuff.android.ui.main.MainEvent
 import co.softov.morestuff.android.ui.main.MainState
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
@@ -46,34 +47,38 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             KoinContext {
-                val stateModel by viewModel.states.collectAsState()
+
+                val model by viewModel.models.collectAsState()
 
                 ProvideComponentContext(rootComponentContext) {
 
-
                     val navigation = remember { StackNavigation<Screen>() }
 
-                    ProvideAppTheme(viewModel.appTheme) {
+                    ProvideAppTheme(model.theme) {
 
                         MoreStuffTheme {
                             Surface(
                                 color = MaterialTheme.colorScheme.surfaceContainer
                             ) {
                                 ProvideAppNavigation(navigation) {
-                                    when (val model = stateModel) {
-                                        MainState.Loading -> {}
-                                        is MainState.Ready -> {
-                                            val initialScreen = if (model.showOnBoarding) {
-                                                Screen.OnBoarding
-                                            } else {
-                                                handleLaunchIntent(intent)
-                                            }
-
-                                            MainContent(
-                                                initialScreen = initialScreen,
-                                                shareContent = viewModel::shareContentToTask
-                                            )
+                                    if (model.ready) {
+                                        val initialScreen = if (model.showOnBoarding) {
+                                            Screen.OnBoarding
+                                        } else {
+                                            handleLaunchIntent(intent)
                                         }
+
+                                        MainContent(
+                                            initialScreen = initialScreen,
+                                            shareContent = { taskId, content ->
+                                                viewModel.take(
+                                                    MainEvent.ShareContent(taskId, content)
+                                                )
+                                            },
+                                            onBoardingComplete = {
+                                                viewModel.take(MainEvent.OnBoardingComplete)
+                                            }
+                                        )
                                     }
                                 }
                             }

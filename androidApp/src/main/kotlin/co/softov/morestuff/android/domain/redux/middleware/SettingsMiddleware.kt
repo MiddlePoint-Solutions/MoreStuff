@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 class SettingsMiddleware(
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val saveUserSettingUseCase: SaveUserSettingUseCase,
-
     ) : Middleware<AppState> {
 
     override fun invoke(
@@ -50,17 +49,21 @@ class SettingsMiddleware(
 
             is OnBoardingComplete -> scope.launch {
                 saveUserSettingUseCase(AppSetting.FirstTime, false)
+                dispatch(TaskAction.CreateHintTask)
             }
 
             is SettingAction.SetReviewTimeAction -> scope.launch {
                 saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
             }
+
             is SettingAction.EnableReviewHint -> scope.launch {
                 saveUserSettingUseCase(AppSetting.ShowHintArrowPriority, action.enable)
             }
+
             is SettingAction.SetVoiceLanguage -> scope.launch {
                 saveUserSettingUseCase(AppSetting.VoiceInputLanguage, action.language.name)
             }
+
             else -> NoOp
         }
 
