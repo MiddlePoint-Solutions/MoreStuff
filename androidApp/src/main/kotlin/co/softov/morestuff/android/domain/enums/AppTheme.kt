@@ -6,7 +6,7 @@ enum class AppTheme {
     Dark;
 
     companion object {
-        operator fun get(index: Int): AppTheme = values()[index]
+        operator fun get(index: Int): AppTheme = entries[index]
     }
 }
 

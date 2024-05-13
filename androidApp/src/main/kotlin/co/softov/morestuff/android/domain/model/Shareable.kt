@@ -5,7 +5,7 @@ import android.os.Parcelable
 @Parcelize
 sealed class Shareable : Parcelable {
     @Parcelize
-    data class Text(val content: String) : Shareable()
+    data class Text(val message: String) : Shareable()
 
     @Parcelize
     data class Image(val uris: String, val message: String) : Shareable()
