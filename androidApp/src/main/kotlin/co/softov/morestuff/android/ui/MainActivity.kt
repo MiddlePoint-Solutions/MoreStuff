@@ -22,18 +22,16 @@ import co.softov.morestuff.android.domain.model.Shareable
 import co.softov.morestuff.android.ui.local.ProvideAppNavigation
 import co.softov.morestuff.android.ui.local.ProvideAppTheme
 import co.softov.morestuff.android.ui.main.MainContent
-import co.softov.morestuff.android.ui.main.MainStates
+import co.softov.morestuff.android.ui.main.MainEvent
+import co.softov.morestuff.android.ui.main.MainState
 import co.softov.morestuff.android.ui.main.MainViewModel
 import co.softov.morestuff.android.ui.navigation.ProvideComponentContext
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import com.arkivanov.decompose.defaultComponentContext
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.navigate
 import org.koin.android.ext.android.inject
-import org.koin.androidx.compose.KoinAndroidContext
 import org.koin.compose.KoinContext
-import org.koin.core.annotation.KoinExperimentalAPI
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
@@ -49,34 +47,38 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             KoinContext {
-                val stateModel by viewModel.states.collectAsState()
+
+                val model by viewModel.models.collectAsState()
 
                 ProvideComponentContext(rootComponentContext) {
 
-
                     val navigation = remember { StackNavigation<Screen>() }
 
-                    ProvideAppTheme(viewModel.appTheme) {
+                    ProvideAppTheme(model.theme) {
 
                         MoreStuffTheme {
                             Surface(
                                 color = MaterialTheme.colorScheme.surfaceContainer
                             ) {
                                 ProvideAppNavigation(navigation) {
-                                    when (val model = stateModel) {
-                                        MainStates.Loading -> {}
-                                        is MainStates.Ready -> {
-                                            val initialScreen = if (model.showOnBoarding) {
-                                                Screen.OnBoarding
-                                            } else {
-                                                handleLaunchIntent(intent)
-                                            }
-
-                                            MainContent(
-                                                initialScreen = initialScreen,
-                                                shareContent = viewModel::shareContentToTask
-                                            )
+                                    if (model.ready) {
+                                        val initialScreen = if (model.showOnBoarding) {
+                                            Screen.OnBoarding
+                                        } else {
+                                            handleLaunchIntent(intent)
                                         }
+
+                                        MainContent(
+                                            initialScreen = initialScreen,
+                                            shareContent = { taskId, content ->
+                                                viewModel.take(
+                                                    MainEvent.ShareContent(taskId, content)
+                                                )
+                                            },
+                                            onBoardingComplete = {
+                                                viewModel.take(MainEvent.OnBoardingComplete)
+                                            }
+                                        )
                                     }
                                 }
                             }
