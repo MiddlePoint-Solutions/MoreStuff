@@ -58,8 +58,8 @@ import co.softov.morestuff.android.ui.home.TaskInputBottomSheet
 import co.softov.morestuff.android.ui.model.TaskUiModel
 import co.softov.morestuff.android.ui.schedule.PriorityItem
 import co.softov.morestuff.android.ui.schedule.TaskProfile
+import co.softov.morestuff.android.ui.share.ShareEvent.*
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
-import co.softov.morestuff.android.ui.theme.surfaceContainer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -72,12 +72,12 @@ import org.koin.androidx.compose.koinViewModel
 fun ShareScreen(
     onBack: () -> Unit,
     shareable: Shareable,
-    shareViewModel: ShareViewModel = koinViewModel(),
+    viewModel: ShareViewModel = koinViewModel(),
     shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
     var isSearchActive by remember { mutableStateOf(false) }
 
-    val tasks by shareViewModel.tasks.collectAsState()
+    val state by viewModel.models.collectAsState()
 
     Scaffold(
         topBar = {
@@ -110,7 +110,7 @@ fun ShareScreen(
         content = {
             ShareContent(
                 shareable = shareable,
-                tasks = tasks,
+                tasks = state.tasks,
                 shareToTask = { taskId -> shareToExistingTask(taskId, shareable) },
                 modifier = Modifier.padding(it),
             )
@@ -124,15 +124,14 @@ fun ShareScreen(
     ) {
 
         var searchQuery by remember(isSearchActive) { mutableStateOf("") }
-        val searchTasks by shareViewModel.searchResults.collectAsState()
 
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
             snapshotFlow { searchQuery }
-                .onEach { shareViewModel.updateSearchQuery(it) }
-                .onCompletion { shareViewModel.resetSearchQuery() }
+                .onEach { viewModel.take(UpdateSearchQuery(it)) }
+                .onCompletion { viewModel.take(ClearSearchQuery) }
                 .collect()
         }
 
@@ -164,7 +163,7 @@ fun ShareScreen(
             },
             content = {
                 Crossfade(
-                    targetState = searchTasks,
+                    targetState = state.searchResults,
                     animationSpec = tween(durationMillis = 150),
                     label = "Search results crossfade"
                 ) {
