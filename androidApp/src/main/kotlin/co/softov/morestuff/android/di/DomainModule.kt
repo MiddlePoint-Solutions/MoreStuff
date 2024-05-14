@@ -22,7 +22,7 @@ import co.softov.morestuff.android.domain.redux.middleware.ScheduleMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.ScopeMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.SettingsMiddleware
 import co.softov.morestuff.android.domain.redux.middleware.TaskMiddleware
-import co.softov.morestuff.android.domain.service.AppMessagesProvider
+import co.softov.morestuff.android.domain.service.AppMessageProvider
 import co.softov.morestuff.android.domain.service.ClipboardHelper
 import co.softov.morestuff.android.domain.service.HintTaskProvider
 import co.softov.morestuff.android.domain.service.ImageHandler
@@ -211,7 +211,7 @@ val useCaseModules
 
 val serviceModule = module {
     factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
-    factoryOf(::AppMessagesProviderImpl) bind AppMessagesProvider::class
+    factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
 
 }
 

@@ -1,9 +1,11 @@
 package co.softov.morestuff.android.ui.input
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
+import co.softov.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
 import co.softov.morestuff.android.app.presentation.viewmodel.NoStateViewModel
 import co.softov.morestuff.android.data.utils.toDayStartUtcTimeMillis
 import co.softov.morestuff.android.domain.enums.ContentType
@@ -13,7 +15,7 @@ import co.softov.morestuff.android.domain.model.Message
 import co.softov.morestuff.android.domain.model.ScopeDomain
 import co.softov.morestuff.android.domain.model.defaultScope
 import co.softov.morestuff.android.domain.redux.middleware.TaskAction
-import co.softov.morestuff.android.domain.service.AppMessagesProvider
+import co.softov.morestuff.android.domain.service.AppMessageProvider
 import co.softov.morestuff.android.domain.service.TimeManager
 import co.softov.morestuff.android.domain.usecase.message.GetLastMessageFlowUseCase
 import co.softov.morestuff.android.domain.usecase.scope.GetScopesUseCase
@@ -30,6 +32,7 @@ import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.model.map.MessageUiMapper
 import co.softov.morestuff.android.ui.model.mapToDomain
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,158 +43,187 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import timber.log.Timber
 
 class UserInputViewModel(
-    getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
-    private val getScopesUseCase: GetScopesUseCase,
-    private val createTaskUseCase: CreateTaskUseCase,
-    private val timeManager: TimeManager,
-    private val timeFormatter: TimeFormatter,
-    private val messageUiMapper: MessageUiMapper,
-    private val appMessagesProvider: AppMessagesProvider
+  private val chatContext: ChatContext
+) : MoleculeViewModel<UserInputEvent, UserInputState>() {
+
+  override val initialState: UserInputState = UserInputState()
+
+  @Composable
+  override fun models(events: Flow<UserInputEvent>): UserInputState {
+    return userInputModel(initialState, chatContext, events)
+  }
+}
+
+data class UserInputState(
+  val messages: List<MessageUiModel> = listOf(),
+  val scopes: List<ScopeDomain> = listOf(),
+  val priority: PriorityUiModel = Now,
+  val planTime: ScheduleUiModel? = null,
+  val lastCreatedTaskId: Long? = null,
+)
+
+sealed class UserInputEvent {
+  data object SetNowPriority : UserInputEvent()
+  data object SetLaterPriority : UserInputEvent()
+  data object SetPlanPriority : UserInputEvent()
+  data class UpdatePlanDate(val utcTimeMillis: Long) : UserInputEvent()
+  data class UpdatePlanTime(val hour: Int, val minute: Int) : UserInputEvent()
+  data class SetCurrentScope(val scopeId: Long): UserInputEvent()
+  data class CreateNewTask(val title: String): UserInputEvent()
+}
+
+
+class UserInputViewModel2(
+  getLastMessageFlowUseCase: GetLastMessageFlowUseCase,
+  private val getScopesUseCase: GetScopesUseCase,
+  private val createTaskUseCase: CreateTaskUseCase,
+  private val timeManager: TimeManager,
+  private val timeFormatter: TimeFormatter,
+  private val messageUiMapper: MessageUiMapper,
+  private val appMessageProvider: AppMessageProvider
 ) : NoStateViewModel() {
 
-    val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
-    val scopes = MutableStateFlow<List<ScopeDomain>>(listOf())
+  val messages = MutableStateFlow<List<MessageUiModel>>(listOf())
+  val scopes = MutableStateFlow<List<ScopeDomain>>(listOf())
 
-    private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
-        .drop(1)
-        .distinctUntilChanged { old, new -> old?.id == new?.id }
-        .map { message -> message?.let(messageUiMapper::map) }
-        .onEach { message ->
-            message?.let {
-                messages.update { messages ->
-                    messages.toMutableList().apply { add(0, it) }
-                }
-                delay(1500)
-                messages.update { messages ->
-                    messages.toMutableList().apply {
-                        add(
-                            0,
-                            createAppMessage(appMessagesProvider.getNewTaskAddedMessage())
-                        )
-                    }
-                }
-            }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = null
-        )
-
-    val priorityModel = MutableStateFlow(
-        PriorityInputUiModel(
-            priority = Now,
-            planTime = createPlanTime()
-        )
+  private val _lastTaskMessage = getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
+    .drop(1)
+    .distinctUntilChanged { old, new -> old?.id == new?.id }
+    .map { message -> message?.let(messageUiMapper::map) }
+    .onEach { message ->
+      message?.let {
+        messages.update { messages ->
+          messages.toMutableList().apply { add(0, it) }
+        }
+        delay(1500)
+        messages.update { messages ->
+          messages.toMutableList().apply {
+            add(
+              0,
+              createAppMessage(appMessageProvider.getNewTaskAddedMessage())
+            )
+          }
+        }
+      }
+    }.stateIn(
+      scope = viewModelScope,
+      started = SharingStarted.Eagerly,
+      initialValue = null
     )
 
-    var currentScope by mutableStateOf(defaultScope)
-        private set
-
-    fun load(context: ChatContext) {
-        viewModelScope.launch {
-            getScopesUseCase().onRight { scopeList ->
-                scopes.value = scopeList
-                currentScope = scopeList.firstOrNull { it.id == context.scopeId } ?: defaultScope
-            }
-        }
-
-        // TODO: add messages according to chat context
-        messages.update {
-            listOf(createAppMessage(appMessagesProvider.getWhatCanIDoForYouMessage()))
-        }
-    }
-
-    private fun createAppMessage(content: String): MessageUiModel {
-        val message = Message(
-            id = timeManager.nowUtcMillis,
-            contentType = ContentType.APP_TASK_MESSAGE,
-            createTime = timeManager.getCreateTime(),
-            content = content,
-        )
-        return messageUiMapper.map(message)
-    }
-
-    private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
-        Plan(localDateTime = timeManager.getDefaultPlanTime())
-    }
-
-    private fun createPlanTime(
-        time: LocalDateTime = timeManager.getDefaultPlanTime(),
-    ) = ScheduleUiModel(
-        scheduleLocalDateTime = time,
-        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
-        scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
-        dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
-        currentUtcTimeMillis = timeManager.nowUtcMillis
+  val priorityModel = MutableStateFlow(
+    PriorityInputUiModel(
+      priority = Now,
+      planTime = createPlanTime()
     )
+  )
 
-    private fun updatePlanDate(dateMillis: Long) {
-        priorityModel.update { model ->
-            val updatedTime = timeManager.utcMillisToLocalDateTime(
-                dateMillis,
-                model.planTime.hour,
-                model.planTime.minute
-            )
-            val planTime = createPlanTime(updatedTime)
-            PriorityInputUiModel(Plan(updatedTime), planTime)
-        }
+  var currentScope by mutableStateOf(defaultScope)
+    private set
+
+  fun load(context: ChatContext) {
+    viewModelScope.launch {
+      getScopesUseCase().onRight { scopeList ->
+        scopes.value = scopeList
+        currentScope = scopeList.firstOrNull { it.id == context.scopeId } ?: defaultScope
+      }
     }
 
-    private fun updatePlanTime(hour: Int, minute: Int) {
-        priorityModel.update { model ->
-            val updatedTime = timeManager.localDateTime(
-                model.planTime.scheduleLocalDateTime,
-                hour,
-                minute
-            )
-            val planTime = createPlanTime(updatedTime)
-            Timber.d("updatedTime: $updatedTime \n planTime: $planTime")
-            PriorityInputUiModel(Plan(updatedTime), planTime)
-        }
+    // TODO: add messages according to chat context
+    messages.update {
+      listOf(createAppMessage(appMessageProvider.getWhatCanIDoForYouMessage()))
     }
+  }
 
-    /**
-     * Creates a new task and returns its id.
-     * The taskId can then be used for navigation.
-     *
-     * @return TaskId of the newly created task
-     */
-    suspend fun createNewTask(title: String): Long {
-        val priority = priorityModel.value.mapToDomain()
-        val trimmedTitle = title.trim()
-        val params = TaskParams(trimmedTitle, priority, TaskType.User, currentScope.id)
-        val task = createTaskUseCase(params)
-        dispatchAppStoreAction(TaskAction.TaskCreatedAction(task, priority))
-        return task.id
-    }
+  private fun createAppMessage(content: String): MessageUiModel {
+    val message = Message(
+      id = timeManager.nowUtcMillis,
+      contentType = ContentType.APP_TASK_MESSAGE,
+      createTime = timeManager.getCreateTime(),
+      content = content,
+    )
+    return messageUiMapper.map(message)
+  }
 
-    fun setCurrentScope(scopeId: Long) {
-        currentScope = scopes.value.first { it.id == scopeId }
-    }
+  private fun createPlanModel() = timeManager.getDefaultPlanTime().run {
+    Plan(localDateTime = timeManager.getDefaultPlanTime())
+  }
 
-    private fun priorityChanged(priority: PriorityUiModel) {
-        priorityModel.update {
-            PriorityInputUiModel(
-                priority = priority,
-                planTime = createPlanTime(),
-            )
-        }
-    }
+  private fun createPlanTime(
+    time: LocalDateTime = timeManager.getDefaultPlanTime(),
+  ) = ScheduleUiModel(
+    scheduleLocalDateTime = time,
+    displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
+    displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
+    scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
+    dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
+    currentUtcTimeMillis = timeManager.nowUtcMillis
+  )
 
-    fun onEvent(event: TaskInputEvent) {
-        when (event) {
-            SetLaterPriority -> priorityChanged(Later)
-            SetNowPriority -> priorityChanged(Now)
-            SetPlanPriority -> priorityChanged(createPlanModel())
-            is UpdatePlanDate -> updatePlanDate(event.utcTimeMillis)
-            is UpdatePlanTime -> updatePlanTime(event.hour, event.minute)
-        }
+  private fun updatePlanDate(dateMillis: Long) {
+    priorityModel.update { model ->
+      val updatedTime = timeManager.utcMillisToLocalDateTime(
+        dateMillis,
+        model.planTime.hour,
+        model.planTime.minute
+      )
+      val planTime = createPlanTime(updatedTime)
+      PriorityInputUiModel(Plan(updatedTime), planTime)
     }
+  }
+
+  private fun updatePlanTime(hour: Int, minute: Int) {
+    priorityModel.update { model ->
+      val updatedTime = timeManager.localDateTime(
+        model.planTime.scheduleLocalDateTime,
+        hour,
+        minute
+      )
+      val planTime = createPlanTime(updatedTime)
+      Timber.d("updatedTime: $updatedTime \n planTime: $planTime")
+      PriorityInputUiModel(Plan(updatedTime), planTime)
+    }
+  }
+
+  /**
+   * Creates a new task and returns its id.
+   * The taskId can then be used for navigation.
+   *
+   * @return TaskId of the newly created task
+   */
+  suspend fun createNewTask(title: String): Long {
+    val priority = priorityModel.value.priority.mapToDomain()
+    val trimmedTitle = title.trim()
+    val params = TaskParams(trimmedTitle, priority, TaskType.User, currentScope.id)
+    val task = createTaskUseCase(params)
+    dispatchAppStoreAction(TaskAction.TaskCreatedAction(task, priority))
+    return task.id
+  }
+
+  fun setCurrentScope(scopeId: Long) {
+    currentScope = scopes.value.first { it.id == scopeId }
+  }
+
+  private fun priorityChanged(priority: PriorityUiModel) {
+    priorityModel.update {
+      PriorityInputUiModel(
+        priority = priority,
+        planTime = createPlanTime(),
+      )
+    }
+  }
+
+  fun onEvent(event: TaskInputEvent) {
+    when (event) {
+      SetLaterPriority -> priorityChanged(Later)
+      SetNowPriority -> priorityChanged(Now)
+      SetPlanPriority -> priorityChanged(createPlanModel())
+      is UpdatePlanDate -> updatePlanDate(event.utcTimeMillis)
+      is UpdatePlanTime -> updatePlanTime(event.hour, event.minute)
+    }
+  }
 
 }

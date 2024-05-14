@@ -21,13 +21,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import co.softov.morestuff.android.ui.model.PriorityInputUiModel
-import co.softov.morestuff.android.ui.model.PriorityUiModel
 import co.softov.morestuff.android.ui.model.ScheduleUiModel
 import co.softov.morestuff.android.ui.theme.MoreStuffTheme
 import kotlinx.datetime.Clock
@@ -37,7 +32,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun PlanPrioritySelector(
-    model: PriorityInputUiModel,
+    scheduleModel: ScheduleUiModel,
     modifier: Modifier = Modifier,
     onDateChange: (Long) -> Unit = {},
     onTimeChange: (Int, Int) -> Unit = { _, _ -> },
@@ -46,21 +41,19 @@ fun PlanPrioritySelector(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
-    val planTime by remember(model.planTime) { mutableStateOf(model.planTime) }
-    val isPastTime by remember(planTime) { derivedStateOf { planTime.isTimeInPast } }
+    val isPastTime by remember(scheduleModel) { derivedStateOf { scheduleModel.isTimeInPast } }
 
     if (showDatePickerDialog) {
         val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = planTime.scheduleUtcTimeMillis,
+            initialSelectedDateMillis = scheduleModel.scheduleUtcTimeMillis,
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                    return utcTimeMillis >= planTime.dayStartUtcTimeMillis
+                    return utcTimeMillis >= scheduleModel.dayStartUtcTimeMillis
                 }
 
                 override fun isSelectableYear(year: Int): Boolean {
-                    return year >= planTime.scheduleLocalDateTime.year
+                    return year >= scheduleModel.scheduleLocalDateTime.year
                 }
-
             }
         )
 
@@ -73,8 +66,8 @@ fun PlanPrioritySelector(
 
     if (showTimePickerDialog) {
         val timePickerState = rememberTimePickerState(
-            initialHour = planTime.hour,
-            initialMinute = planTime.minute
+            initialHour = scheduleModel.hour,
+            initialMinute = scheduleModel.minute
         )
         PriorityTimePicker(
             dismissTimePicker = { showTimePickerDialog = false },
@@ -96,7 +89,7 @@ fun PlanPrioritySelector(
                 onClick = { showDatePickerDialog = true },
             ) {
                 Text(
-                    text = planTime.displayDate,
+                    text = scheduleModel.displayDate,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -112,7 +105,7 @@ fun PlanPrioritySelector(
                 }
             ) {
                 Text(
-                    text = planTime.displayTime,
+                    text = scheduleModel.displayTime,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -134,16 +127,13 @@ private fun Preview() {
     val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     MoreStuffTheme {
         PlanPrioritySelector(
-            PriorityInputUiModel(
-                priority = PriorityUiModel.Now,
-                planTime = ScheduleUiModel(
-                    time,
-                    "Jan, 31 2007",
-                    "00:00",
-                    dayStartUtcTimeMillis = 0,
-                    scheduleUtcTimeMillis = 1,
-                    currentUtcTimeMillis = 0
-                )
+            scheduleModel = ScheduleUiModel(
+                time,
+                "Jan, 31 2007",
+                "00:00",
+                dayStartUtcTimeMillis = 0,
+                scheduleUtcTimeMillis = 1,
+                currentUtcTimeMillis = 0
             )
         )
     }

@@ -12,12 +12,12 @@ sealed class PriorityUiModel {
 }
 @Immutable
 data class PriorityInputUiModel(
-    val priority: PriorityUiModel,
-    val planTime: ScheduleUiModel,
+    val priority: PriorityUiModel = PriorityUiModel.Now,
+    val planTime: ScheduleUiModel, // TODO: this should probably be nullable or at least deconstruct members
 )
 
-fun PriorityInputUiModel.mapToDomain() = when (priority) {
+fun PriorityUiModel.mapToDomain() = when (this) {
     PriorityUiModel.Later -> Priority.Later()
     PriorityUiModel.Now -> Priority.Now()
-    is PriorityUiModel.Plan -> Priority.Plan(priority.localDateTime)
+    is PriorityUiModel.Plan -> Priority.Plan(localDateTime)
 }
