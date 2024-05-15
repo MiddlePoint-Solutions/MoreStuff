@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.CreationExtras
 import co.softov.morestuff.android.R
 import co.softov.morestuff.android.domain.model.ChatContext
 import co.softov.morestuff.android.domain.nav.Screen
@@ -56,6 +57,7 @@ import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import timber.log.Timber
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,27 +66,16 @@ fun TaskInputBottomSheet(
   sheetState: SheetState,
   context: ChatContext,
   onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
+  viewModel: UserInputViewModel = koinViewModel()
 ) {
-
-  val viewModel: UserInputViewModel = koinViewModel { parametersOf(context) }
 
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()
-
-  val state by viewModel.models.collectAsStateWithLifecycle()
-
-  val messages = state.messages
-  val priority = state.priority
-  val schedule = state.planTime
-  val scopes = state.scopes
-
   val navigation = LocalAppNavigation.current
 
-  LaunchedEffect(state.lastCreatedTaskId) {
-    state.lastCreatedTaskId?.let { taskId ->
-      onNewTaskCreated(taskId, priority)
-    }
+  LaunchedEffect(context) {
+    viewModel.take(UserInputEvent.LoadContext(context))
   }
 
   val chatActions = remember {
@@ -104,6 +95,25 @@ fun TaskInputBottomSheet(
     shape = RectangleShape,
     dragHandle = null,
     content = {
+
+      val state by viewModel.models.collectAsStateWithLifecycle()
+
+      val messages = state.messages
+      val priority = state.priority
+      val schedule = state.planTime
+      val scopes = state.scopes
+
+      val onTaskCreated by remember(state.lastCreatedTaskId) {
+        mutableStateOf(state.lastCreatedTaskId)
+      }
+
+      LaunchedEffect(onTaskCreated) {
+        Timber.d("LaunchedEffect: $onTaskCreated")
+        onTaskCreated?.let { taskId ->
+          onNewTaskCreated(taskId, priority)
+        }
+      }
+
       Box(
         modifier = Modifier.fillMaxWidth()
       ) {
@@ -204,12 +214,14 @@ fun TaskInputBottomSheet(
                         enter = fadeIn(),
                         exit = fadeOut()
                       ) {
-                        SendIcon(onClick = {
-                          viewModel.take(UserInputEvent.CreateNewTask(userInputValue.text))
-                          coroutineScope.launch {
-                            userInputValue = userInputValue.copy("")
+                        SendIcon(
+                          onClick = {
+                            viewModel.take(UserInputEvent.CreateNewTask(userInputValue.text))
+                            coroutineScope.launch {
+                              userInputValue = userInputValue.copy("")
+                            }
                           }
-                        })
+                        )
                       }
                     }
                   }

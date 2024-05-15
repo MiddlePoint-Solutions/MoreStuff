@@ -33,13 +33,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 
 @Composable
 fun userInputModel(
   initialState: UserInputState,
-  chatContext: ChatContext,
   events: Flow<UserInputEvent>,
   store: AppStore = koinInject(),
   getLastMessageFlowUseCase: GetLastMessageFlowUseCase = koinInject(),
@@ -51,6 +51,7 @@ fun userInputModel(
   appMessageProvider: AppMessageProvider = koinInject()
 ): UserInputState {
 
+  var context by remember { mutableStateOf<ChatContext?>(null) }
   var messages by remember { mutableStateOf(listOf<MessageUiModel>()) }
   var scopes by remember { mutableStateOf((listOf<ScopeDomain>())) }
   var currentScope by remember { mutableStateOf(defaultScope) }
@@ -61,23 +62,23 @@ fun userInputModel(
   LaunchedEffect(Unit) {
     getScopesUseCase().onRight { scopesList ->
       scopes = scopesList
-      currentScope = scopesList.firstOrNull { it.id == chatContext.scopeId } ?: defaultScope
+      currentScope = scopesList.firstOrNull { it.id == context?.scopeId } ?: defaultScope
     }
   }
 
-  LaunchedEffect(Unit) {
+  LaunchedEffect(context) {
     val intro = createAppMessage(
       appMessageProvider.getWhatCanIDoForYouMessage(),
       timeManager,
       messageUiMapper
     )
-    messages = messages.toMutableList().apply { add(0, intro) }
+    messages = mutableListOf<MessageUiModel>().apply { add(0, intro) }
 
     getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
       .drop(1)
       .distinctUntilChanged { old, new -> old?.id == new?.id }
       .map { message -> message?.let(messageUiMapper::map) }
-      .onEach { message ->
+      .collect { message ->
         message?.let {
           messages = messages.toMutableList().apply { add(0, it) }
           delay(1500)
@@ -137,6 +138,16 @@ fun userInputModel(
           val task = createTaskUseCase(params)
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
           lastCreatedTaskId = task.id
+          launch {
+            // Hack for not using the same taskId in share screen.
+            // This will be solved when adding new navigation with decompose router
+            delay(300)
+            lastCreatedTaskId = null
+          }
+        }
+
+        is UserInputEvent.LoadContext -> {
+          context = event.context
         }
       }
     }
