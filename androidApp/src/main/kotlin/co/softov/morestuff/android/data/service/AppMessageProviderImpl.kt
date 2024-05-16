@@ -3,9 +3,9 @@ package co.softov.morestuff.android.data.service
 import android.content.Context
 import android.content.res.Resources
 import co.softov.morestuff.android.R
-import co.softov.morestuff.android.domain.service.AppMessagesProvider
+import co.softov.morestuff.android.domain.service.AppMessageProvider
 
-class AppMessagesProviderImpl(context: Context) : AppMessagesProvider {
+class AppMessagesProviderImpl(context: Context) : AppMessageProvider {
     private val resources: Resources = context.resources
 
     override fun getNewTaskAddedMessage(): String {
