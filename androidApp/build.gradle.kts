@@ -25,7 +25,7 @@ object Env {
 
 android {
 
-    namespace = "co.softov.morestuff.android"
+    namespace = "io.middlepoint.morestuff.android"
 
     defaultConfig {
         applicationId = "io.middlepoint.morestuff"
@@ -129,7 +129,7 @@ tasks.withType<KotlinCompile>().configureEach {
 sqldelight {
     databases {
         create("StuffDb") {
-            packageName.set("co.softov.morestuff.db")
+            packageName.set("io.middlepoint.morestuff.db")
             dialect(libs.sqldelight.sqlite.dialect)
             schemaOutputDirectory.set(file("src/main/sqldelight/databases"))
             verifyMigrations.set(true)

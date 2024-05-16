@@ -55,7 +55,7 @@
             android:exported="false"
             tools:node="merge">
             <meta-data
-                android:name="co.softov.morestuff.android.app.startup.KoinInitializer"
+                android:name="io.middlepoint.morestuff.android.app.startup.KoinInitializer"
                 android:value="androidx.startup" />
         </provider>
 
