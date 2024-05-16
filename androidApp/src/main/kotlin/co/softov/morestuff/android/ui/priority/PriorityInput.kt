@@ -16,56 +16,56 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import co.softov.morestuff.android.ui.input.task.TaskInputEvent
-import co.softov.morestuff.android.ui.input.task.TaskInputEvent.*
-import co.softov.morestuff.android.ui.model.PriorityInputUiModel
+import co.softov.morestuff.android.ui.input.UserInputEvent
 import co.softov.morestuff.android.ui.model.PriorityUiModel
+import co.softov.morestuff.android.ui.model.ScheduleUiModel
 
 @Composable
 fun PriorityInput(
-    model: PriorityInputUiModel,
-    onEvent: (TaskInputEvent) -> Unit,
-    modifier: Modifier = Modifier,
+  priority: PriorityUiModel,
+  schedule: ScheduleUiModel?,
+  onEvent: (UserInputEvent) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-    ) {
+  Column(
+    modifier = modifier
+  ) {
 
-        val showPlanInput by remember(model.priority) {
-            derivedStateOf { model.priority is PriorityUiModel.Plan }
-        }
-
-        AnimatedVisibility(
-            showPlanInput,
-            enter = slideInVertically { it * 2 },
-            exit = slideOutVertically { (it * 1.5).toInt() }
-        ) {
-
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-
-                PlanPrioritySelector(
-                    model = model,
-                    modifier = Modifier.fillMaxWidth(),
-                    onDateChange = { onEvent(UpdatePlanDate(it)) },
-                    onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) }
-                )
-            }
-        }
+    val showPlanInput by remember(priority) {
+      derivedStateOf { priority is PriorityUiModel.Plan }
     }
 
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant
+    AnimatedVisibility(
+      showPlanInput,
+      enter = slideInVertically { it * 2 },
+      exit = slideOutVertically { (it * 1.5).toInt() }
     ) {
-        PrioritySelector(
-            priority = model.priority,
-            onNowSelected = { onEvent(SetNowPriority) },
-            onLaterSelected = { onEvent(SetLaterPriority) },
-            onPlanSelected = { onEvent(SetPlanPriority) },
-        )
+
+      Box(
+        contentAlignment = Alignment.Center
+      ) {
+        if (schedule != null) {
+          PlanPrioritySelector(
+            scheduleModel = schedule,
+            modifier = Modifier.fillMaxWidth(),
+            onDateChange = { onEvent(UserInputEvent.UpdatePlanDate(it)) },
+            onTimeChange = { h, m -> onEvent(UserInputEvent.UpdatePlanTime(h, m)) }
+          )
+        }
+      }
     }
+  }
+
+  Surface(
+    modifier = modifier,
+    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+    color = MaterialTheme.colorScheme.surfaceVariant
+  ) {
+    PrioritySelector(
+      priority = priority,
+      onNowSelected = { onEvent(UserInputEvent.SetNowPriority) },
+      onLaterSelected = { onEvent(UserInputEvent.SetLaterPriority) },
+      onPlanSelected = { onEvent(UserInputEvent.SetPlanPriority) },
+    )
+  }
 }

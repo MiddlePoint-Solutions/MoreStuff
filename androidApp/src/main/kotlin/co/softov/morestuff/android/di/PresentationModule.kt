@@ -25,7 +25,6 @@ val presentationModule = module {
     viewModelOf(::UserInputViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
-//    viewModelOf(::MainViewModel2)
     viewModelOf(::ReviewViewModel)
     viewModelOf(::HomePresenter)
     viewModelOf(::ScopeTasksPresenter)
