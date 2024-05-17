@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.android.data.service
 import android.content.Context
 import android.content.res.Resources
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.service.AppMessageProvider
+import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 
 class AppMessagesProviderImpl(context: Context) : AppMessageProvider {
     private val resources: Resources = context.resources

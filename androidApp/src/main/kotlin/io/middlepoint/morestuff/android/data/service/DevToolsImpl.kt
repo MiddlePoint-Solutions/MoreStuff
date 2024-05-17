@@ -1,11 +1,11 @@
 package io.middlepoint.morestuff.android.data.service
 
 import android.net.Uri
-import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
-import io.middlepoint.morestuff.android.domain.DevTools
-import io.middlepoint.morestuff.android.domain.service.DataMigrationHelper
-import io.middlepoint.morestuff.android.domain.service.Notifier
 import com.russhwolf.settings.Settings
+import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
+import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.service.DataMigrationHelper
+import io.middlepoint.morestuff.shared.domain.service.Notifier
 import timber.log.Timber
 
 class DevToolsImpl(

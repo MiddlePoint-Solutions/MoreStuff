@@ -12,7 +12,7 @@ import io.middlepoint.morestuff.android.app.work.ScheduleWorker
 import io.middlepoint.morestuff.android.app.work.PlannedPriorityUpdateWorker
 import io.middlepoint.morestuff.android.app.work.ReviewNotificationWorker
 import io.middlepoint.morestuff.android.domain.service.TimeManager
-import io.middlepoint.morestuff.android.data.utils.inEpochMilliseconds
+import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
 import io.middlepoint.morestuff.android.domain.service.Scheduler
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

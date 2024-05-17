@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.android.data.service
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import io.middlepoint.morestuff.android.domain.service.ClipboardHelper
+import io.middlepoint.morestuff.shared.domain.service.ClipboardHelper
 
 class ClipboardHelperImpl(private val context: Context): ClipboardHelper {
     override fun copyToClipboard(text: String) {

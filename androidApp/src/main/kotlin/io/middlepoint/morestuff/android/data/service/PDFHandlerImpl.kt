@@ -7,7 +7,7 @@ import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import io.middlepoint.morestuff.android.domain.service.PDFHandler
+import io.middlepoint.morestuff.shared.domain.service.PDFHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

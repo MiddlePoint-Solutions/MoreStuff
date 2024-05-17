@@ -9,7 +9,6 @@ import io.middlepoint.morestuff.android.data.service.OpenGraphFetcherImpl
 import io.middlepoint.morestuff.android.data.service.PDFHandlerImpl
 import io.middlepoint.morestuff.android.data.service.ShareTaskMessageImpl
 import io.middlepoint.morestuff.android.data.service.TimeManagerImpl
-import io.middlepoint.morestuff.android.data.utils.TimeFormatterImpl
 import io.middlepoint.morestuff.android.domain.redux.AppStore
 import io.middlepoint.morestuff.android.domain.redux.middleware.DevMiddleware
 import io.middlepoint.morestuff.android.domain.redux.middleware.ErrorMiddleware

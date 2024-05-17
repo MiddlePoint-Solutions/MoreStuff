@@ -1,0 +1,79 @@
+import io.middlepoint.morestuff.android.domain.enums.ScheduleType;
+import kotlin.Boolean;
+
+CREATE TABLE schedule(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    task_id INTEGER NOT NULL,
+    create_time TEXT NOT NULL,
+    schedule_time_local TEXT,
+    schedule_time_utc TEXT,
+    timezone TEXT NOT NULL,
+    active INTEGER AS Boolean NOT NULL DEFAULT 1,
+    schedule_type TEXT AS ScheduleType NOT NULL,
+    FOREIGN KEY(task_id) REFERENCES task(id)
+    );
+
+selectAll:
+SELECT *
+FROM schedule
+ORDER BY datetime(create_time);
+
+selectScheduleById:
+SELECT *
+FROM schedule
+WHERE id = ?;
+
+selectSchedulesById:
+SELECT *
+FROM schedule
+WHERE id IN :schedule_ids;
+
+selectSchedulesByTaskId:
+SELECT *
+FROM schedule
+WHERE task_id = ?;
+
+selectActiveScheduleByTaskId:
+SELECT *
+FROM schedule
+WHERE task_id IN :task_ids
+AND active = 1
+AND schedule_type IN :schedule_types
+ORDER BY id DESC;
+
+selectActiveSchedules:
+SELECT *
+FROM schedule
+WHERE active = 1 AND schedule_type IN :schedule_types
+ORDER BY schedule_time_local;
+
+selectActiveSchedulesByTaskId:
+SELECT *
+FROM schedule
+WHERE active = 1 AND task_id = :task_id
+ORDER BY schedule_time_local;
+
+selectActiveSchedulesFromStartToEndTime:
+SELECT *
+FROM schedule
+WHERE active = 1
+AND schedule_time_local BETWEEN :startTime AND :endTime
+ORDER BY schedule_time_local;
+
+countTaskSchedulesByTime:
+SELECT COUNT(*)
+FROM schedule
+WHERE task_id = :task_id
+AND schedule_time_local BETWEEN :start AND :end;
+
+insertSchedule:
+INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone, schedule_type)
+VALUES ?;
+
+updateScheduleActive:
+UPDATE schedule
+SET active = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

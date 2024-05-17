@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.android.data.service
 
 import android.content.Context
 import android.content.Intent
-import io.middlepoint.morestuff.android.domain.service.ShareTaskMessage
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.domain.service.ShareTaskMessage
 
 class ShareTaskMessageImpl(
     private val context: Context,

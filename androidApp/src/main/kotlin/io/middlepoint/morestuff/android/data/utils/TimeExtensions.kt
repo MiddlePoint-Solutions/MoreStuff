@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.android.data.utils
 
-import io.middlepoint.morestuff.android.domain.model.ScheduleDomain
-import io.middlepoint.morestuff.android.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import kotlinx.datetime.*
 
 val ScheduleDomain.scheduleLocalDateTime: LocalDateTime? get() = scheduleLocalTime?.toLocalDateTime()

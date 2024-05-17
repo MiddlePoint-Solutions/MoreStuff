@@ -2,7 +2,7 @@
 -renamesourcefileattribute SourceFile
 -keeppackagenames org.jsoup.nodes
 
--keep class io.middlepoint.morestuff.android.domain.model.OpenGraphResult
+-keep class io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 
 -dontwarn kotlinx.serialization.KSerializer
 -dontwarn kotlinx.serialization.Serializable

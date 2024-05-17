@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.android.ui.model.map
 
-import io.middlepoint.morestuff.android.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.android.domain.util.TimeFormatter
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
 

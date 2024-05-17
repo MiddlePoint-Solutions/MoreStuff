@@ -2,9 +2,7 @@ package io.middlepoint.morestuff.android.data.utils
 
 import android.content.Context
 import android.text.format.DateFormat.is24HourFormat
-import androidx.compose.ui.res.stringResource
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.util.TimeFormatter
+import io.middlepoint.morestuff.shared.domain.util.TimeFormatter
 import kotlinx.datetime.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime

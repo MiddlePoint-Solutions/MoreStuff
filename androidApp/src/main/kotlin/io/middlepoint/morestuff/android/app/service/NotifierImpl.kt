@@ -23,12 +23,12 @@ import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Compan
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.android.app.receiver.createReplyIntent
 import io.middlepoint.morestuff.android.app.receiver.randomRequestCode
-import io.middlepoint.morestuff.android.data.utils.inEpochMilliseconds
+import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
 import io.middlepoint.morestuff.android.domain.enums.ContentType
 import io.middlepoint.morestuff.android.domain.enums.ReplyType
 import io.middlepoint.morestuff.android.domain.enums.ReplyType.*
 import io.middlepoint.morestuff.android.domain.model.Defaults
-import io.middlepoint.morestuff.android.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.android.domain.service.Notifier
 import io.middlepoint.morestuff.android.domain.service.Notifier.Companion.GROUP_KEY_REMINDERS
 import io.middlepoint.morestuff.android.domain.service.Notifier.Companion.REMINDERS_CHANNEL_ID
@@ -204,9 +204,9 @@ class NotifierImpl(
     }
 
     private fun addMessage(
-        style: NotificationCompat.MessagingStyle,
-        message: Message,
-        time: Long
+      style: NotificationCompat.MessagingStyle,
+      message: Message,
+      time: Long
     ) {
         style.addMessage(
             message.content, time, getMessagePerson(message.contentType)

@@ -3,9 +3,9 @@ package io.middlepoint.morestuff.android.data.service
 import android.content.Context
 import android.content.res.Resources
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.HintMessage
-import io.middlepoint.morestuff.android.domain.model.HintTask
-import io.middlepoint.morestuff.android.domain.service.HintTaskProvider
+import io.middlepoint.morestuff.shared.domain.model.HintMessage
+import io.middlepoint.morestuff.shared.domain.model.HintTask
+import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 
 
 class HintTaskProviderImpl(context: Context) : HintTaskProvider {

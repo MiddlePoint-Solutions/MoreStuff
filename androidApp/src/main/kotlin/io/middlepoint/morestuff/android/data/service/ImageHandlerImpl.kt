@@ -5,11 +5,11 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.media.ExifInterface
+import androidx.exifinterface.media.ExifInterface
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import io.middlepoint.morestuff.android.domain.service.ImageHandler
-import io.middlepoint.morestuff.android.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.service.ImageHandler
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

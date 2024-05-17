@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.data.service
 
-import io.middlepoint.morestuff.android.domain.enums.RelativeDateDisplay
-import io.middlepoint.morestuff.android.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.enums.RelativeDateDisplay
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.datetime.*
 import java.time.DayOfWeek
 import kotlin.time.Duration.Companion.days

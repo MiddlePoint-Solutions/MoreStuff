@@ -6,11 +6,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.data.utils.toDayStartUtcTimeMillis
+import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.android.domain.enums.ContentType
 import io.middlepoint.morestuff.android.domain.enums.TaskType
 import io.middlepoint.morestuff.android.domain.model.ChatContext
-import io.middlepoint.morestuff.android.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.android.domain.model.ScopeDomain
 import io.middlepoint.morestuff.android.domain.model.defaultScope
 import io.middlepoint.morestuff.android.domain.redux.AppStore
@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject

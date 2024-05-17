@@ -1,0 +1,18 @@
+CREATE TABLE task_scope (
+    task_id INTEGER NOT NULL REFERENCES task(id),
+    scope_id INTEGER NOT NULL REFERENCES scope(scope_id),
+    PRIMARY KEY (task_id, scope_id)
+);
+
+insert:
+INSERT OR IGNORE INTO task_scope (task_id, scope_id)
+VALUES (:task_id, :scope_id);
+
+update:
+UPDATE task_scope
+SET scope_id = :scope_id
+WHERE task_id IN :task_ids;
+
+remove:
+DELETE FROM task_scope
+WHERE task_id IN :task_id AND scope_id = :scope_id;

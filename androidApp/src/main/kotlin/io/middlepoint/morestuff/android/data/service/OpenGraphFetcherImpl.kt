@@ -1,16 +1,18 @@
 package io.middlepoint.morestuff.android.data.service
 
-import io.middlepoint.morestuff.android.domain.model.OpenGraphResult
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
+import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import io.middlepoint.morestuff.android.domain.service.OpenGraphFetcher
 import java.util.Locale
 
 

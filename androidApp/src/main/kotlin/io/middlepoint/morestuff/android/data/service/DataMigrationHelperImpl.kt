@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.data.service
 
 import android.content.Context
 import android.net.Uri
-import io.middlepoint.morestuff.android.domain.service.DataMigrationHelper
+import io.middlepoint.morestuff.shared.domain.service.DataMigrationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber

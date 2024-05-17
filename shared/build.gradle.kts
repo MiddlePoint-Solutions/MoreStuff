@@ -1,64 +1,142 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
-    kotlin("plugin.serialization")
-    id("kotlin-parcelize")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.compose)
+    alias(libs.plugins.sqldelight)
+    alias(libs.plugins.buildKonfig)
+    alias(libs.plugins.libres)
+}
+
+buildkonfig {
+    packageName = "io.middlepoint.morestuff"
+    defaultConfigs {
+
+    }
 }
 
 kotlin {
-
-    applyDefaultHierarchyTemplate()
+    jvmToolchain(20)
 
     androidTarget()
 
-    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
-            ::iosArm64
-        else
-            ::iosX64
+    // spotless:off
+    val iOSBinaryFlags =
+        listOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreText",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+        )
+    // spotless:on
 
-    iosTarget("ios") {
+    iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
+    iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
+    iosSimulatorArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
 
+    applyDefaultHierarchyTemplate()
+
+    cocoapods {
+        summary = "Some description for the Shared Module"
+        homepage = "Link to the Shared Module homepage"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../iosApp/Podfile")
+
+        framework {
+            baseName = "shared"
+            isStatic = true
+            linkerOpts("-lsqlite3")
+            export(libs.decompose.router)
+        }
     }
 
     sourceSets {
-        val commonMain by getting {
+        commonMain.dependencies {
+            implementation(libs.bundles.compose)
+            implementation(compose.materialIconsExtended)
+            implementation(libs.libres)
+            implementation(libs.bundles.kotlinx)
+            implementation(libs.stately.isolate)
+            implementation(libs.stately.iso.collections)
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.multiplatform.settings)
+            implementation(libs.store5)
+            implementation(libs.sqldelight.coroutines.extensions)
+            implementation(libs.sqldelight.primitive.adapters)
+
+            api(libs.arrow.core)
+            api(libs.kermit)
+            api(libs.koin.core)
+            api(libs.koin.compose)
+            api(libs.decompose.router)
+
+            // You will probably need to also bring in decompose and essenty
+            implementation(libs.decompose)
+            implementation(libs.decompose.compose.multiplatform)
+            implementation(libs.essenty.parcelable)
+            implementation(libs.molecule.runtime)
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.mockk.common)
+            implementation(libs.multiplatform.settings.test)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.core)
+            api(compose.preview)
+            api(compose.uiTooling)
+            implementation(libs.androidx.security.crypto)
+            implementation(libs.sqldelight.driver.android)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.androidx.test)
+            implementation(libs.koin.android)
+        }
+
+        val androidUnitTest by getting {
             dependencies {
-                //Logger
-                implementation("io.github.aakira:napier:1.5.0")
-                //Key-Value storage
-                //implementation("com.russhwolf:multiplatform-settings:1.0.0")
-                implementation(libs.multiplatformSettingsNoArg)
-
-                val decompose = "2.1.0-compose-experimental-alpha-02"
-
-                // Decompose-router
-//                implementation("io.github.xxfast:decompose-router:0.2.1")
-//                implementation("com.arkivanov.decompose:decompose:$decompose")
-//                implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decompose")
-//                implementation("com.arkivanov.essenty:parcelable:1.1.0")
+                implementation(libs.kotlin.test.junit5)
+                implementation(libs.mockk)
+                implementation(libs.junit.jupiter)
+                implementation(libs.junit.platform.commons)
             }
         }
 
-        val androidMain by getting
-        val iosMain by getting
+        iosMain.dependencies {
+            implementation(libs.sqldelight.driver.native)
+            implementation(libs.ktor.client.darwin)
+        }
     }
 }
 
 android {
-    compileSdk = 34
+    namespace = "io.middlepoint.morestuff.android"
+    compileSdk = libs.versions.android.sdk.compile.get().toInt()
 
-    defaultConfig {
-        minSdk = 26
-        targetSdk = 34
-    }
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "co.softov.morestuff.shared.android"
+    sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    defaultConfig { minSdk = libs.versions.android.sdk.min.get().toInt() }
+
+    testOptions { unitTests.all { it.useJUnitPlatform() } }
+}
+
+sqldelight {
+    databases {
+        create("StuffDb") {
+            packageName.set("io.middlepoint.morestuff.db")
+            dialect(libs.sqldelight.sqlite.dialect)
+            schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
+            verifyMigrations.set(true)
+        }
     }
 }
