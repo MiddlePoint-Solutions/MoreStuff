@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.settings
+package io.middlepoint.morestuff.shared.domain.usecase.settings
 
 import io.middlepoint.morestuff.shared.domain.redux.state.AppSettings
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository

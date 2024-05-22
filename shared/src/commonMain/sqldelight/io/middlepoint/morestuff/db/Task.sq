@@ -1,4 +1,5 @@
-import io.middlepoint.morestuff.android.domain.enums.TaskType;
+import io.middlepoint.morestuff.shared.domain.enums.TaskType;
+
 
 
 CREATE TABLE task(

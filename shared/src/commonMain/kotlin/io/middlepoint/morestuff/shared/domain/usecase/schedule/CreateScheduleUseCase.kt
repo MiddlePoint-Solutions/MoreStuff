@@ -7,7 +7,6 @@ import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.datetime.LocalDateTime
-import timber.log.Timber
 
 interface CreateScheduleUseCase {
     suspend operator fun invoke(
@@ -39,7 +38,6 @@ class CreateScheduleUseCaseImpl(
             active = true,
             scheduleType = scheduleType,
         )
-        Timber.d("### $scheduleType Scheduling, task $taskId = -> ${schedule.scheduleLocalTime}} ###")
         return scheduleRepository.createSchedule(schedule)
     }
 }

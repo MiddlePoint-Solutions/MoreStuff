@@ -1,21 +1,22 @@
 package io.middlepoint.morestuff.shared.domain.model
 
+import androidx.compose.runtime.Immutable
 import com.arkivanov.essenty.parcelable.Parcelable
-import kotlinx.parcelize.Parcelize
-import javax.annotation.concurrent.Immutable
+import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 @Immutable
 data class ScopeDomain(
-    val id: Long,
-    val uid: String,
-    val name: String,
-    val order: Int,
-): Parcelable
+  val id: Long,
+  val uid: String,
+  val name: String,
+  val order: Int,
+)
 
 val defaultScope = ScopeDomain(
-    id = 1,
-    uid = "",
-    name = "Stuff",
-    order = 0,
+  id = 1,
+  uid = "",
+  name = "Stuff",
+  order = 0,
 )

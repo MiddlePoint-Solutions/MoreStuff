@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.main
 
-import io.middlepoint.morestuff.android.domain.enums.AppTheme
-import io.middlepoint.morestuff.android.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.enums.AppTheme
+import io.middlepoint.morestuff.shared.domain.model.Shareable
 
 data class MainState(
     val ready: Boolean = false,

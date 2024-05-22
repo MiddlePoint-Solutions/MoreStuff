@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.search
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.enums.FilterType
+import io.middlepoint.morestuff.shared.domain.enums.FilterType
 import io.middlepoint.morestuff.android.ui.model.TaskUiModel
 import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.parcelize.Parcelize

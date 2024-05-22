@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType

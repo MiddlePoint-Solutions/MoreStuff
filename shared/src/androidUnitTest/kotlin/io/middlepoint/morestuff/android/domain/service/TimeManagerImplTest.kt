@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.service
+package io.middlepoint.morestuff.shared.domain.service
 
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import kotlinx.datetime.Instant

@@ -39,8 +39,8 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.CreationExtras
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.ChatContext
-import io.middlepoint.morestuff.android.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.model.ChatContext
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.chat.Messages
 import io.middlepoint.morestuff.android.ui.components.ScopeCarousel

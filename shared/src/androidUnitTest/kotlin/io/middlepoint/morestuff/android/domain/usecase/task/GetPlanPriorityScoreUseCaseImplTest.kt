@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.task
+package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetHighestPriorityScoreUseCase

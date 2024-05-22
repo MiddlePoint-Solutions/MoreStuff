@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.chat
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
 
 @Immutable

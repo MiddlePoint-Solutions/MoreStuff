@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.ui.input
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
-import io.middlepoint.morestuff.android.domain.model.ChatContext
+import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import kotlinx.coroutines.flow.Flow
 
 class UserInputViewModel : MoleculeViewModel<UserInputEvent, UserInputState>() {

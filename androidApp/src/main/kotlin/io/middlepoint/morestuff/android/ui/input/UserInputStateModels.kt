@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.input
 
-import io.middlepoint.morestuff.android.domain.model.ChatContext
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.ChatContext
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
 import io.middlepoint.morestuff.android.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.android.ui.model.ScheduleUiModel

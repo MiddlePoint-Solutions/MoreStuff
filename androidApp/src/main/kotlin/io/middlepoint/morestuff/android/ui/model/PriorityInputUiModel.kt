@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.model
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.model.Priority
+import io.middlepoint.morestuff.shared.domain.model.Priority
 import kotlinx.datetime.LocalDateTime
 
 @Immutable

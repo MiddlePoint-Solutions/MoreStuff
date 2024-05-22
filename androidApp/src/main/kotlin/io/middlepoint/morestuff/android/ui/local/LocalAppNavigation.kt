@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import io.middlepoint.morestuff.android.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import com.arkivanov.decompose.router.stack.StackNavigation
 
 val LocalAppNavigation = compositionLocalOf<StackNavigation<Screen>> {

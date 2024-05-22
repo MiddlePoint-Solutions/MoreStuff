@@ -6,8 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import io.middlepoint.morestuff.android.domain.nav.OnBoarding
-import io.middlepoint.morestuff.android.domain.nav.OnBoarding.*
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.*
 import io.middlepoint.morestuff.android.ui.navigation.ChildPages
 import io.middlepoint.morestuff.android.ui.settings.SettingsEvent
 import io.middlepoint.morestuff.android.ui.settings.SettingsViewModel

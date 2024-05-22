@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.redux.AppState
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.service.VoiceToTextParser
+import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull

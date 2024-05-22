@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.android.app.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import io.middlepoint.morestuff.android.domain.usecase.schedule.BootCompleteSchedulerUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.BootCompleteSchedulerUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

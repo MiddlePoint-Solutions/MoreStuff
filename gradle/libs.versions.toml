@@ -44,7 +44,7 @@ lottie = "6.1.0"
 kSoup ="0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.4.0"
+agp = "8.4.1"
 kotlin = "1.9.23"
 
 android_sdk_compile = "34"
@@ -71,7 +71,7 @@ koin-compose = "1.1.2"
 sqldelight = "2.0.2"
 arrow = "1.2.1"
 sentry = "0.5.0"
-buildKonfig = "0.15.1"
+buildConfig = "5.3.5"
 spotless = "6.23.3"
 ktfmt = "0.44"
 stately = "2.0.6"
@@ -120,6 +120,7 @@ androidx-test = { module = "androidx.test:core", version.ref = "androidx-test" }
 
 # Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
@@ -228,8 +229,6 @@ androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref =
 telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
-ktor = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktorClient = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterfaceVersion" }
 
@@ -253,7 +252,7 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 libres = { id = "io.github.skeptick.libres", version.ref = "libres" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
-buildKonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildKonfig" }
+buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 molecule-gradle-plugin = { id = "app.cash.molecule", version.ref = "molecule" }
 

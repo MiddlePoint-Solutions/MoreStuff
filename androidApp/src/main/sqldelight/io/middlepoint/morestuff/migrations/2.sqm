@@ -1,4 +1,4 @@
-import io.middlepoint.morestuff.android.domain.enums.ScheduleType;
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType;
 import kotlin.Boolean;
 
 CREATE TABLE schedule_migration (

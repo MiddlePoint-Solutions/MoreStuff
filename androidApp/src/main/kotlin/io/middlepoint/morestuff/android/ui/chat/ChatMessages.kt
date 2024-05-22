@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.android.ui.chat.items.AppChatItem
 import io.middlepoint.morestuff.android.ui.chat.items.TaskReminderItem
 import io.middlepoint.morestuff.android.ui.chat.items.UserChatItem

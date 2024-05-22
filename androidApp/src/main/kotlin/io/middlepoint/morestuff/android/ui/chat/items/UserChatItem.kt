@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.chat.items.MockData.messageUiModel
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel

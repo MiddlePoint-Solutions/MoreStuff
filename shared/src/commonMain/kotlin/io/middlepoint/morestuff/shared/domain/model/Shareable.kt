@@ -1,15 +1,13 @@
 package io.middlepoint.morestuff.shared.domain.model
-import kotlinx.parcelize.Parcelize
-import android.os.Parcelable
 
-@Parcelize
+import com.arkivanov.essenty.parcelable.Parcelable
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed class Shareable : Parcelable {
-    @Parcelize
-    data class Text(val message: String) : Shareable()
+  data class Text(val message: String) : Shareable()
 
-    @Parcelize
-    data class Image(val uris: String, val message: String) : Shareable()
+  data class Image(val uris: String, val message: String) : Shareable()
 
-    @Parcelize
-    data class Pdf(val uris: String,val message: String) : Shareable()
+  data class Pdf(val uris: String, val message: String) : Shareable()
 }

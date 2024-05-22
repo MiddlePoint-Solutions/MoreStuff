@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.task
+package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.mockk.coEvery
@@ -17,7 +17,7 @@ class GetTaskFlowUseCaseImplTest {
     fun `given taskId, when invoke is called, then should return a task flow`() {
 
         val taskId = 1L
-        val expectedTask = io.middlepoint.morestuff.android.domain.createTaskForTest()
+        val expectedTask = io.middlepoint.morestuff.shared.domain.createTaskForTest()
 
         coEvery { taskRepository.getTaskFlow(taskId) } returns flowOf(expectedTask)
 

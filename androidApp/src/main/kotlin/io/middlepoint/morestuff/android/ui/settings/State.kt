@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.android.ui.settings
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.BaseViewState
-import io.middlepoint.morestuff.android.domain.enums.AppTheme
-import io.middlepoint.morestuff.android.domain.enums.Language
+import io.middlepoint.morestuff.shared.domain.enums.AppTheme
+import io.middlepoint.morestuff.shared.domain.enums.Language
 
 @Immutable
 data class SettingsState(

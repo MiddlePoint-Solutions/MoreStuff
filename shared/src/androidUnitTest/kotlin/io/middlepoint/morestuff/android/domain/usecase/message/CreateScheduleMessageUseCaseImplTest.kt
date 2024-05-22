@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.message
+package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
 import arrow.core.right
@@ -26,8 +26,8 @@ class CreateScheduleMessageUseCaseImplTest {
     )
     val scheduleId = 1L
     val taskId = 1L
-    val task = io.middlepoint.morestuff.android.domain.createTaskForTest()
-    val message = io.middlepoint.morestuff.android.domain.createMessageForTest()
+    val task = io.middlepoint.morestuff.shared.domain.createTaskForTest()
+    val message = io.middlepoint.morestuff.shared.domain.createMessageForTest()
     val messageData: MessageData? = null
 
     coEvery { getScheduleTaskUseCase(scheduleId) } returns Either.Right(task)

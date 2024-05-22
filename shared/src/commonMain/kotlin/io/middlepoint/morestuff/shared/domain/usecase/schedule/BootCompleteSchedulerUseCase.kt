@@ -3,10 +3,9 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import timber.log.Timber
 
 interface BootCompleteSchedulerUseCase {
     suspend operator fun invoke(): Either<Failure, Boolean>
@@ -32,14 +31,11 @@ class BootCompleteSchedulerUseCaseImpl(
 
     private fun reschedule(activeSchedules: MutableList<ScheduleDomain>) {
         val currentTime = timeManager.nowLocalDateTime
-        Timber.d("BootComplete, Current time: $currentTime")
-        Timber.d("BootComplete, active schedules: ${activeSchedules.size}")
 
         val futureSchedules = activeSchedules.filter { schedule ->
             schedule.scheduleLocalDateTime?.let { it > currentTime } ?: false
         }
 
-        Timber.d("BootComplete, rescheduling future tasks: ${futureSchedules.size}")
         futureSchedules.forEach { schedule ->
             schedule.scheduleLocalTime?.let { time ->
                 scheduler.scheduleAtExact(schedule.id, time)

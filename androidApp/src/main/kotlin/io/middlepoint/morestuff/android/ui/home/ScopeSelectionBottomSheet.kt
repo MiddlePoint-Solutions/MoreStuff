@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
-import io.middlepoint.morestuff.android.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
 
 @OptIn(ExperimentalMaterial3Api::class)

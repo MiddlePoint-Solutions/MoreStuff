@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.Parcelable
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.KEY_REPLY_EXTRA
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.KEY_SCHEDULE_ID
-import io.middlepoint.morestuff.android.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch

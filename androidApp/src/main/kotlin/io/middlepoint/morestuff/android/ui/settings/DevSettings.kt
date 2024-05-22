@@ -34,8 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.DevTools
-import io.middlepoint.morestuff.android.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
 import com.alorma.compose.settings.ui.SettingsMenuLink

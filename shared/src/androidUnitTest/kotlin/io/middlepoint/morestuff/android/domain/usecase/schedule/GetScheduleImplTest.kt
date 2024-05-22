@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.createScheduleForTest
@@ -15,7 +15,7 @@ class GetScheduleImplTest {
     private val scheduleRepository = mockk<ScheduleRepository>()
     private val getScheduleImpl = GetScheduleImpl(scheduleRepository)
     private val schedule =
-      io.middlepoint.morestuff.android.domain.createScheduleForTest(scheduleType = ScheduleType.OneTime)
+      io.middlepoint.morestuff.shared.domain.createScheduleForTest(scheduleType = ScheduleType.OneTime)
 
     @Test
     fun `returns schedule`() = runBlocking {

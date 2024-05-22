@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.app.features
+package io.middlepoint.morestuff.shared.data
 
 import android.app.Application
 import android.content.Intent
@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.enums.Language
-import io.middlepoint.morestuff.android.domain.service.VoiceToTextParser
+import io.middlepoint.morestuff.shared.domain.enums.Language
+import io.middlepoint.morestuff.shared.domain.model.VoiceToTextParserState
+import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -130,10 +130,3 @@ class VoiceToTextParserImpl(
     }
 
 }
-
-@Immutable
-data class VoiceToTextParserState(
-    val spokenText: String = "",
-    val isSpeaking: Boolean = false,
-    val error: String? = null,
-)

@@ -24,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.enums.ScheduleType
-import io.middlepoint.morestuff.android.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.android.ui.model.TaskUiModel
 
 @Composable

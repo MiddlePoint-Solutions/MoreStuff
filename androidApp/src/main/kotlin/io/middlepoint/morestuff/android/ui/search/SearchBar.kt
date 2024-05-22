@@ -44,7 +44,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.enums.FilterType
+import io.middlepoint.morestuff.shared.domain.enums.FilterType
 import io.middlepoint.morestuff.android.ui.schedule.PriorityItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

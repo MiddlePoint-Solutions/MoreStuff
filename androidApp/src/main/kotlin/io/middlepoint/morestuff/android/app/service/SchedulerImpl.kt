@@ -3,29 +3,31 @@ package io.middlepoint.morestuff.android.app.service
 import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver
 import io.middlepoint.morestuff.android.app.receiver.createCancelReviewPendingIntent
 import io.middlepoint.morestuff.android.app.receiver.createReviewIntent
 import io.middlepoint.morestuff.android.app.receiver.createReviewPendingIntent
-import io.middlepoint.morestuff.android.app.work.ScheduleWorker
-import io.middlepoint.morestuff.android.app.work.PlannedPriorityUpdateWorker
+import io.middlepoint.morestuff.shared.work.PlannedPriorityUpdateWorker
 import io.middlepoint.morestuff.android.app.work.ReviewNotificationWorker
-import io.middlepoint.morestuff.android.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
-import io.middlepoint.morestuff.android.domain.service.Scheduler
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import io.middlepoint.morestuff.shared.domain.service.Scheduler
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.work.ScheduleWorker
 import timber.log.Timber
-import java.util.*
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class SchedulerImpl(
     private val context: Context,
     private val timeManager: TimeManager,
-) : Scheduler, KoinComponent {
-
-    private val workManager: WorkManager by inject()
+    private val workManager: WorkManager
+) : Scheduler {
 
     override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
         val data = ScheduleWorker.createWorkerData(scheduleId)

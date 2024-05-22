@@ -145,7 +145,6 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.palette)
     implementation(libs.pagingKtx)
-    implementation(libs.workKtx)
     implementation(libs.coreKtx)
     implementation(libs.activityKtx)
     implementation(libs.fragmentKtx)
@@ -222,9 +221,6 @@ dependencies {
     implementation(libs.koinAndroidxCompose)
     implementation(libs.timber)
     implementation(libs.telephoto)
-    implementation(libs.kSoup)
-    implementation(libs.ktor)
-    implementation(libs.ktorClient)
 
     // About Libraries
     implementation(libs.aboutLibrariesCore)

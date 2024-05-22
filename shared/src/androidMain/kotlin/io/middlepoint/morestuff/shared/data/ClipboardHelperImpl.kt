@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.data.service
+package io.middlepoint.morestuff.shared.data
 
 import android.content.ClipData
 import android.content.ClipboardManager

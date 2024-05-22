@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.task
+package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
@@ -18,7 +18,7 @@ class GetCompletedTasksUseCaseImplTest {
         val mockTaskRepository: TaskRepository = mockk()
         val getCompletedTasksImpl = GetCompletedTasksUseCaseImpl(mockTaskRepository)
         val completeTasks: List<TaskDomain> =
-          io.middlepoint.morestuff.android.domain.createListOfTasks(2)
+          io.middlepoint.morestuff.shared.domain.createListOfTasks(2)
 
         coEvery { mockTaskRepository.getCompleteTasksFlow() } returns flowOf(completeTasks)
 

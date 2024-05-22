@@ -36,6 +36,7 @@ val presentationModule = module {
     viewModelOf(::ScopesViewModel)
     singleOf(::AppPresenter)
 
+
     factoryOf(::ReviewTasksMapper)
     factoryOf(::TaskUiMapper)
     factoryOf(::MessageUiMapper)

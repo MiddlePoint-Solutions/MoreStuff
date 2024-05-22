@@ -1,8 +1,8 @@
 package io.middlepoint.morestuff.android.ui.chat.task
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.enums.ReplyType
-import io.middlepoint.morestuff.android.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
 import io.middlepoint.morestuff.android.ui.model.TaskUiModel
 import com.arkivanov.essenty.parcelable.Parcelable

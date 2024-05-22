@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.createScheduleForTest
@@ -19,7 +19,7 @@ class GetActiveScheduleImplTest {
     fun `returns active schedule for a task`() = runBlocking {
         val taskId = listOf(1L)
         val schedule = listOf(
-          io.middlepoint.morestuff.android.domain.createScheduleForTest(
+          io.middlepoint.morestuff.shared.domain.createScheduleForTest(
             scheduleType = ScheduleType.OneTime
           )
         )

@@ -3,9 +3,9 @@ package io.middlepoint.morestuff.android.app.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.middlepoint.morestuff.android.BuildConfig
-import io.middlepoint.morestuff.android.domain.redux.AppState
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.store.Action
+import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

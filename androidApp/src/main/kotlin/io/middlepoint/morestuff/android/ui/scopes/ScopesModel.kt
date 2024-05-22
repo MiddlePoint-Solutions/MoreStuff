@@ -6,9 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.middleware.ScopeAction
-import io.middlepoint.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 

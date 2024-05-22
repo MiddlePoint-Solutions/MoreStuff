@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.task
+package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
@@ -22,7 +22,7 @@ class CreateNewTaskUseCaseTest {
     @Test
     fun `create new task use case`() = runBlocking {
         val taskParams = TaskParams("title", Priority.Now(), TaskType.User, defaultScope.id)
-        val task = io.middlepoint.morestuff.android.domain.createTaskForTest()
+        val task = io.middlepoint.morestuff.shared.domain.createTaskForTest()
         coEvery { taskRepository.createTask(any(), any(), any(), any()) } returns task
         coEvery { getDefaultPriorityScoreUseCase(taskParams.priority) } returns 0
         val result = useCase.invoke(taskParams)

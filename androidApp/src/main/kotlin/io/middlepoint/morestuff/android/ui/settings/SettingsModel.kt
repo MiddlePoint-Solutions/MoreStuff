@@ -6,10 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.enums.AppTheme
-import io.middlepoint.morestuff.android.domain.enums.Language
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.enums.AppTheme
+import io.middlepoint.morestuff.shared.domain.enums.Language
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
 import kotlinx.coroutines.flow.Flow
 
 @Composable

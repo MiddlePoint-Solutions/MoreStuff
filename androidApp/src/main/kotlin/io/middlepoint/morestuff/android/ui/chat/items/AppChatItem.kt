@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
 

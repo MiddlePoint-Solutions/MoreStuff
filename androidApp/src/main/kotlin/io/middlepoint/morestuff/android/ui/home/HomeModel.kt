@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.middleware.TaskAction
-import io.middlepoint.morestuff.android.domain.usecase.scope.CreateScopeUseCase
-import io.middlepoint.morestuff.android.domain.usecase.scope.GetScopesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.android.ui.home.HomeEvent.*
 import io.middlepoint.morestuff.android.ui.model.NotificationState
 import kotlinx.coroutines.flow.Flow

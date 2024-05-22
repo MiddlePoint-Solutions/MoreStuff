@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.task
+package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
@@ -29,9 +29,9 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `verify that priority of tasks with schedule is updated`() = runTest {
-        val tasks = io.middlepoint.morestuff.android.domain.createListOfTasks(3)
+        val tasks = io.middlepoint.morestuff.shared.domain.createListOfTasks(3)
           .mapIndexed { index, task ->
-            val schedule = io.middlepoint.morestuff.android.domain.createScheduleForTest(
+            val schedule = io.middlepoint.morestuff.shared.domain.createScheduleForTest(
               taskId = task.id,
               scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00",
               scheduleType = ScheduleType.OneTime
@@ -40,7 +40,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
         }
 
         val schedules = tasks.mapIndexed { index, task ->
-          io.middlepoint.morestuff.android.domain.createScheduleForTest(
+          io.middlepoint.morestuff.shared.domain.createScheduleForTest(
             taskId = task.id,
             scheduleTimeLocal = "2023-06-15T0${index + 1}:00:00",
             scheduleType = ScheduleType.OneTime
@@ -80,7 +80,7 @@ internal class UpdatePlannedTasksPriorityUseCaseImplTest {
 
     @Test
     fun `verify that priority of tasks without schedule is not updated`() = runTest {
-        val tasksWithoutSchedule = io.middlepoint.morestuff.android.domain.createListOfTasks(2).map { it.copy(schedule = listOf()) }
+        val tasksWithoutSchedule = io.middlepoint.morestuff.shared.domain.createListOfTasks(2).map { it.copy(schedule = listOf()) }
 
         coEvery { getActiveTasksWithScheduleUseCase(any()) } returns tasksWithoutSchedule.right()
 

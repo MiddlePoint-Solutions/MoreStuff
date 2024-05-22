@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.enums.AppSetting
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import com.alorma.compose.settings.storage.base.SettingValueState
 
 @Composable

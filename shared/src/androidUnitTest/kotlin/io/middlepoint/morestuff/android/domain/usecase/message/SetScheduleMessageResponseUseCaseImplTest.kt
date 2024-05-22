@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.message
+package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType

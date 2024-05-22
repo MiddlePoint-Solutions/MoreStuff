@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
-import io.middlepoint.morestuff.android.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.android.ui.theme.surfaceContainer
 import io.middlepoint.morestuff.android.ui.theme.surfaceContainerElevation

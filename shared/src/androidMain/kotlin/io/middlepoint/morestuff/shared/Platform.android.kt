@@ -1,6 +1,10 @@
 package io.middlepoint.morestuff.shared
 
-actual class Platform actual constructor() {
-  actual val platform: String
-    get() = TODO("Not yet implemented")
-}
+import java.util.Locale
+
+
+actual typealias File = java.io.File
+
+actual fun generateUUID(): String = java.util.UUID.randomUUID().toString()
+
+actual typealias Uri = android.net.Uri

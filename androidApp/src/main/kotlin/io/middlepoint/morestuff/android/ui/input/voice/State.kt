@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.ui.input.voice
 
 import android.os.Parcelable
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.BaseViewEvent
-import io.middlepoint.morestuff.android.domain.enums.Language
+import io.middlepoint.morestuff.shared.domain.enums.Language
 import kotlinx.parcelize.Parcelize
 import javax.annotation.concurrent.Immutable
 

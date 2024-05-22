@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.android.ui.chat.items
 
-import io.middlepoint.morestuff.android.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel

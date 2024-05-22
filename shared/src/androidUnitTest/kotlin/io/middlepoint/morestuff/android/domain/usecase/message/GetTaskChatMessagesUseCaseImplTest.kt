@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.message
+package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import io.middlepoint.morestuff.shared.domain.createMessageForTest
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
@@ -20,9 +20,9 @@ class GetTaskChatMessagesUseCaseImplTest {
         val taskId = 1L
 
         val message1 =
-          io.middlepoint.morestuff.android.domain.createMessageForTest(id = 1, taskId = taskId)
+          io.middlepoint.morestuff.shared.domain.createMessageForTest(id = 1, taskId = taskId)
         val message2 =
-          io.middlepoint.morestuff.android.domain.createMessageForTest(id = 2, taskId = taskId)
+          io.middlepoint.morestuff.shared.domain.createMessageForTest(id = 2, taskId = taskId)
 
         coEvery { messageRepository.getTaskChatMessagesFlow(taskId) } returns flow {
             emit(listOf(message1, message2))

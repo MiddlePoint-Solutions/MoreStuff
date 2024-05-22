@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.redux.middleware
+package io.middlepoint.morestuff.shared.domain.redux.middleware
 
 //class TaskMiddlewareTest : KoinTest {
 

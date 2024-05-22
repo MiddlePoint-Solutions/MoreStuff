@@ -56,8 +56,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.enums.ContentType
-import io.middlepoint.morestuff.android.domain.nav.ChatScreen
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.chat.Messages
 import io.middlepoint.morestuff.android.ui.chat.items.AppChatItem

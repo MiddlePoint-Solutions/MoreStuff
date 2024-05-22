@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain
+package io.middlepoint.morestuff.shared.domain
 
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.AppState
@@ -12,8 +12,8 @@ suspend fun Middleware<AppState>.testWith(
     state: AppState,
     action: Action,
 ): Action = coroutineScope { invoke(state, action,
-  io.middlepoint.morestuff.android.domain.defaultDispatch(),
-  io.middlepoint.morestuff.android.domain.createNext(), this) }
+  io.middlepoint.morestuff.shared.domain.defaultDispatch(),
+  io.middlepoint.morestuff.shared.domain.createNext(), this) }
 
 suspend fun Middleware<AppState>.testActionDispatch(
     state: AppState,
@@ -21,8 +21,8 @@ suspend fun Middleware<AppState>.testActionDispatch(
     expected: Action
 ): Action =
     coroutineScope { invoke(state, action,
-      io.middlepoint.morestuff.android.domain.expectedDispatch(expected),
-      io.middlepoint.morestuff.android.domain.createNext(), this) }
+      io.middlepoint.morestuff.shared.domain.expectedDispatch(expected),
+      io.middlepoint.morestuff.shared.domain.createNext(), this) }
 
 private fun createNext(): Next<AppState> = { _, action, _ -> action }
 

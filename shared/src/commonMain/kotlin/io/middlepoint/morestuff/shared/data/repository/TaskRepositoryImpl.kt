@@ -7,15 +7,16 @@ import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
+import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.shared.generateUUID
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.TaskDb
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
-import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
+import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +25,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
-import java.util.UUID
 
 class TaskRepositoryImpl(
     database: StuffDb,
@@ -213,7 +213,7 @@ class TaskRepositoryImpl(
         taskType: TaskType,
     ) = TaskDb(
         id = 0,
-        uuid = UUID.randomUUID().toString(),
+        uuid = generateUUID(),
         title = title,
         create_time = timeManager.getCreateTime(),
         complete_time = null,

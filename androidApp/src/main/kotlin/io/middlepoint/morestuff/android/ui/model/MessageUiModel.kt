@@ -1,9 +1,9 @@
 package io.middlepoint.morestuff.android.ui.model
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.android.domain.enums.ContentType
-import io.middlepoint.morestuff.android.domain.enums.MessageDataType
-import io.middlepoint.morestuff.android.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import com.arkivanov.essenty.parcelable.Parcelable

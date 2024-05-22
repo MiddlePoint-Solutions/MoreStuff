@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
 
 @Composable

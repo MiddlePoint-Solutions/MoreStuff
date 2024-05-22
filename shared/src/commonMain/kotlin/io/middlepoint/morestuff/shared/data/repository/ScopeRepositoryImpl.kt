@@ -4,8 +4,9 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
 import arrow.core.right
-import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.shared.generateUUID
+import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
@@ -13,7 +14,6 @@ import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import java.util.UUID
 
 class ScopeRepositoryImpl(
     database: StuffDb,
@@ -34,7 +34,7 @@ class ScopeRepositoryImpl(
                     taskScopeQueries.insert(it.id, allScope.scope_id)
                 }
             } else {
-                scopeQueries.createScope(UUID.randomUUID().toString(), "Stuff", 1)
+                scopeQueries.createScope(generateUUID(), "Stuff", 1)
             }
         }
     }
@@ -49,7 +49,7 @@ class ScopeRepositoryImpl(
                 }
 
             val count = scopeQueries.countScopes().executeAsOne().toInt()
-            scopeQueries.createScope(UUID.randomUUID().toString(), name, count)
+            scopeQueries.createScope(generateUUID(), name, count)
             val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
             scopeQueries
                 .selectScope(scopeId, dataMappers.scopeDbMapper)

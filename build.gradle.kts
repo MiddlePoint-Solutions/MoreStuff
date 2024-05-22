@@ -23,7 +23,7 @@ plugins {
   alias(libs.plugins.android.library).apply(false)
   alias(libs.plugins.compose).apply(false)
   alias(libs.plugins.libres).apply(false)
-  alias(libs.plugins.buildKonfig).apply(false)
+  alias(libs.plugins.buildConfig).apply(false)
   alias(libs.plugins.kotlinx.serialization).apply(false)
   alias(libs.plugins.sqldelight).apply(false)
   alias(libs.plugins.spotless).apply(false)

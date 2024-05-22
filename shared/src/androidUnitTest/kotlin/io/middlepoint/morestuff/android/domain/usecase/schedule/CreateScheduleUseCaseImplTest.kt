@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import arrow.core.right
@@ -36,7 +36,7 @@ class CreateScheduleUseCaseImplTest {
     fun `creates schedule`() = runBlocking {
         val taskId = 1L
         val localTime = timeManager.nowLocalDateTime
-        val schedule = io.middlepoint.morestuff.android.domain.createScheduleUseCaseTest(
+        val schedule = io.middlepoint.morestuff.shared.domain.createScheduleUseCaseTest(
           createTime = createTime,
           scheduleTimeLocal = localTime.toString(),
           scheduleTimeUtc = timeManager.nowUtcInstantString,

@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.createScheduleForTest
@@ -24,7 +24,7 @@ class CancelActiveScheduleUseCaseImplTest {
         val taskId = listOf(1L)
         val scheduleId = 2L
         val schedules = listOf(
-          io.middlepoint.morestuff.android.domain.createScheduleForTest(
+          io.middlepoint.morestuff.shared.domain.createScheduleForTest(
             scheduleId,
             scheduleType = ScheduleType.OneTime
           )

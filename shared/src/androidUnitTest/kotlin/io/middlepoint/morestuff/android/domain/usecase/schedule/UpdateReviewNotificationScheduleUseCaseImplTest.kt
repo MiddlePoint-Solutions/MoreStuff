@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.schedule
+package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.mockk.coEvery

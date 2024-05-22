@@ -1,15 +1,15 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
 import com.arkivanov.essenty.parcelable.Parcelable
-import kotlinx.parcelize.Parcelize
-@Parcelize
+import kotlinx.serialization.Serializable
+
+@Serializable
 sealed class SettingScreen : Parcelable {
-    @Parcelize
-    data object Root : SettingScreen()
-    @Parcelize
-    data object Developer : SettingScreen()
-    @Parcelize
-    data object Scopes : SettingScreen()
-    @Parcelize
-    data object AboutLibraries : SettingScreen()
+  data object Root : SettingScreen()
+
+  data object Developer : SettingScreen()
+
+  data object Scopes : SettingScreen()
+
+  data object AboutLibraries : SettingScreen()
 }

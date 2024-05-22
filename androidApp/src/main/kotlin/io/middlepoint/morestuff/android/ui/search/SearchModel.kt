@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.android.domain.enums.FilterType
-import io.middlepoint.morestuff.android.domain.enums.ScheduleType
-import io.middlepoint.morestuff.android.domain.usecase.task.GetActiveTasksWithScheduleUseCase
-import io.middlepoint.morestuff.android.domain.usecase.task.GetCompletedTasksUseCase
-import io.middlepoint.morestuff.android.domain.usecase.task.SearchTasksUseCase
+import io.middlepoint.morestuff.shared.domain.enums.FilterType
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetActiveTasksWithScheduleUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetCompletedTasksUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow

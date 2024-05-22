@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
@@ -11,7 +12,6 @@ import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 sealed class ReminderAction : Action.FeatureAction() {
 
@@ -23,6 +23,7 @@ sealed class ReminderAction : Action.FeatureAction() {
 }
 
 class ReminderMiddleware(
+    private val logger: Logger,
     private val getScheduleUseCase: GetScheduleUseCase,
 ) : Middleware<AppState> {
 
@@ -41,7 +42,7 @@ class ReminderMiddleware(
                         dispatch(ScheduleReplyAction(schedule, action.replyType))
                     },
                     ifLeft = {
-                        Timber.e(it.toString())
+                        logger.e(it.toString())
                     }
                 )
             }

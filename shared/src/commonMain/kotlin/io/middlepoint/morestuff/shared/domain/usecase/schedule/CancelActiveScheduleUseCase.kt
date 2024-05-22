@@ -5,7 +5,6 @@ import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
-import timber.log.Timber
 
 interface CancelActiveScheduleUseCase {
     suspend operator fun invoke(
@@ -25,7 +24,6 @@ class CancelActiveScheduleUseCaseImpl(
         scheduleType: List<ScheduleType>
     ): Either<Failure, List<ScheduleDomain>> {
         return getActiveSchedule(taskIds, scheduleType).onRight { schedules ->
-            Timber.d("TEST: $taskIds, $scheduleType schedules ${schedules.map { it.taskId }}")
             schedules.forEach {
                 setScheduleFulfilled(it.id)
                 scheduler.cancelSchedule(it.id)

@@ -3,9 +3,9 @@ package io.middlepoint.morestuff.android.app.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.middleware.NotificationAction
-import io.middlepoint.morestuff.android.domain.redux.middleware.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get

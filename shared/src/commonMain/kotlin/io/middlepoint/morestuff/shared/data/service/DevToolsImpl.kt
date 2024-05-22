@@ -1,12 +1,11 @@
-package io.middlepoint.morestuff.android.data.service
+package io.middlepoint.morestuff.shared.data.service
 
-import android.net.Uri
+import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.service.DataMigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
-import timber.log.Timber
 
 class DevToolsImpl(
     private val settings: Settings,
@@ -24,15 +23,15 @@ class DevToolsImpl(
         notifier.showReviewNotification()
     }
 
-    override suspend fun exportData(uri: Uri) {
+    override suspend fun exportData(uri: String) {
         dataMigration.exportDatabase(uri).also {
-            Timber.d("exportData, finished: $it")
+            Logger.d("exportData, finished: $it")
         }
     }
 
-    override suspend fun importData(uri: Uri) {
+    override suspend fun importData(uri: String) {
         dataMigration.importDatabase(uri).also {
-            Timber.d("importData, finished: $it")
+            Logger.d("importData, finished: $it")
         }
     }
 }

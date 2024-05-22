@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain
+package io.middlepoint.morestuff.shared.domain
 
 import io.middlepoint.morestuff.shared.di.domainModules
 import org.junit.jupiter.api.AfterAll

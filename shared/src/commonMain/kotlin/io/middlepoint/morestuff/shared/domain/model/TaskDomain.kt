@@ -1,13 +1,10 @@
 package io.middlepoint.morestuff.shared.domain.model
 
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import com.arkivanov.essenty.parcelable.Parcelable
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.isOneTime
-import io.middlepoint.morestuff.shared.domain.model.isReminder
-import kotlinx.parcelize.Parcelize
+import io.middlepoint.morestuff.shared.domain.enums.TaskType
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class TaskDomain(
   val id: Long = 0L,
   val uuid: String = "",

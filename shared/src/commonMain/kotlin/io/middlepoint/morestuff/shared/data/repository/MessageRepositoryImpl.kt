@@ -9,6 +9,7 @@ import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.shared.File
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Message
@@ -22,7 +23,6 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.io.File
 
 class MessageRepositoryImpl(
     database: StuffDb,

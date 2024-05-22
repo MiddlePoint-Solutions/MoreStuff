@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch

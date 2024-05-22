@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import io.middlepoint.morestuff.android.domain.enums.AppTheme
+import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.android.ui.local.LocalTheme
 
 private val LightColors = lightColorScheme(

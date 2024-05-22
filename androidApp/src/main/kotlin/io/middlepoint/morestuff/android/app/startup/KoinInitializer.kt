@@ -2,10 +2,10 @@ package io.middlepoint.morestuff.android.app.startup
 
 import android.content.Context
 import androidx.startup.Initializer
-import io.middlepoint.morestuff.android.di.dataModule
-import io.middlepoint.morestuff.android.di.domainModules
-import io.middlepoint.morestuff.android.di.featuresModule
-import io.middlepoint.morestuff.android.di.presentationModule
+import io.middlepoint.morestuff.shared.di.dataModule
+import io.middlepoint.morestuff.shared.di.domainModules
+import io.middlepoint.morestuff.shared.di.featuresModule
+import io.middlepoint.morestuff.shared.di.presentationModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.KoinApplication

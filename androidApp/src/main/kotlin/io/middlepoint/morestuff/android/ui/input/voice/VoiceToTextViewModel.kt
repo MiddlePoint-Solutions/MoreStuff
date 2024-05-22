@@ -5,8 +5,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
-import io.middlepoint.morestuff.android.domain.enums.Language
-import io.middlepoint.morestuff.android.domain.service.VoiceToTextParser
+import io.middlepoint.morestuff.shared.domain.enums.Language
+import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.util.Locale

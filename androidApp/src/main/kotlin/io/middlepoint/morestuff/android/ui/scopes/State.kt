@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.ui.scopes
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.BaseViewEvent
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.parcelize.Parcelize
 

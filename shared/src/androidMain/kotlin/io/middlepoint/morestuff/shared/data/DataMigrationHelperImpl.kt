@@ -1,26 +1,25 @@
-package io.middlepoint.morestuff.android.data.service
+package io.middlepoint.morestuff.shared.data
 
 import android.content.Context
 import android.net.Uri
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.service.DataMigrationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-
 
 class DataMigrationHelperImpl(
     private val context: Context,
 ) : DataMigrationHelper {
 
-    override suspend fun exportDatabase(uri: Uri): Boolean = withContext(Dispatchers.IO) {
+    override suspend fun exportDatabase(uri: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val currentDBPath: String = context.getDatabasePath(DATABASE_NAME).absolutePath
             val currentDB = File(currentDBPath)
             if (currentDB.exists()) {
-                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                context.contentResolver.openOutputStream(Uri.parse(uri))?.use { outputStream ->
                     val src = FileInputStream(currentDB)
                     src.copyTo(outputStream)
                     src.close()
@@ -33,18 +32,18 @@ class DataMigrationHelperImpl(
         return@withContext false
     }
 
-    override suspend fun importDatabase(uri: Uri): Boolean  = withContext(Dispatchers.IO) {
-        Timber.d("importDatabase: $uri")
+    override suspend fun importDatabase(uri: String): Boolean  = withContext(Dispatchers.IO) {
+        Logger.d("importDatabase: $uri")
         try {
             val currentDBPath: String = context.getDatabasePath(DATABASE_NAME).absolutePath
             context.deleteDatabase(DATABASE_NAME)
             val currentDB = File(currentDBPath)
             currentDB.createNewFile()
-            Timber.d("importDatabase: $currentDB")
+            Logger.d("importDatabase: $currentDB")
             if (currentDB.exists()) {
-                Timber.d("importDatabase: exists")
-                context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                    Timber.d("importDatabase: inputStream ready")
+                Logger.d("importDatabase: exists")
+                context.contentResolver.openInputStream(Uri.parse(uri))?.use { inputStream ->
+                    Logger.d("importDatabase: inputStream ready")
                     val src = FileOutputStream(currentDB)
                     inputStream.copyTo(src)
                     src.close()
@@ -52,7 +51,7 @@ class DataMigrationHelperImpl(
                 }
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error attempting to import database")
+            Logger.e( "Error attempting to import database", e)
             e.printStackTrace()
         }
         return@withContext false

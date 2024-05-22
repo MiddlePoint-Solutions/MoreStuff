@@ -3,8 +3,8 @@ package io.middlepoint.morestuff.android.app.work
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import io.middlepoint.morestuff.android.domain.redux.AppStore
-import io.middlepoint.morestuff.android.domain.redux.middleware.PriorityAction
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityAction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber

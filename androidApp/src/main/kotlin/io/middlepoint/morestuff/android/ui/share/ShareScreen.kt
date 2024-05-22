@@ -18,7 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Divider
@@ -52,14 +52,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.domain.model.ChatContext
-import io.middlepoint.morestuff.android.domain.model.Shareable
 import io.middlepoint.morestuff.android.ui.home.TaskInputBottomSheet
 import io.middlepoint.morestuff.android.ui.model.TaskUiModel
 import io.middlepoint.morestuff.android.ui.schedule.PriorityItem
 import io.middlepoint.morestuff.android.ui.schedule.TaskProfile
 import io.middlepoint.morestuff.android.ui.share.ShareEvent.*
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.domain.model.ChatContext
+import io.middlepoint.morestuff.shared.domain.model.Shareable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -87,7 +87,7 @@ fun ShareScreen(
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = stringResource(R.string.cd_navigate_back)
                             )
                         }

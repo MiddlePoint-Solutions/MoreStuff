@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.android.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.android.ui.compose.CustomScrollableTabRow
 import io.middlepoint.morestuff.android.ui.compose.TabRowDefaults.tabIndicatorOffset
 import io.middlepoint.morestuff.android.ui.utils.containsEmoji

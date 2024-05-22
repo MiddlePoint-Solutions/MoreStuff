@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.message
+package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.createMessageForTest
@@ -23,7 +23,7 @@ class CreateMessageUseCaseImplTest {
         val title = "Test Message"
         val contentType = ContentType.CONFIRM_NEW_TASK
         val messageData: MessageData? = null
-        val expectedMessage = io.middlepoint.morestuff.android.domain.createMessageForTest()
+        val expectedMessage = io.middlepoint.morestuff.shared.domain.createMessageForTest()
 
         coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title) } returns expectedMessage.right()
         coEvery { checkForUrlMetadataUseCase(title, any()) } returns Unit.right()

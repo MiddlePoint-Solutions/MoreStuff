@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.domain.usecase.scope
+package io.middlepoint.morestuff.shared.domain.usecase.scope
 
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.mockk.coVerify
