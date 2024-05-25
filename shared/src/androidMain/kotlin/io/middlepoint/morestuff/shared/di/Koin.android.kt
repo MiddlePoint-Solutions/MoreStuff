@@ -42,6 +42,7 @@ import org.koin.dsl.module
 actual val platformModule: Module = module {
 
   factory { Logger.withTag(it.getOrNull() ?: "MoreStuffAndroid") }
+  factory<TimeFormatter> { TimeFormatterImpl(androidApplication()) }
 
   single<StuffDb> { createDatabase(androidContext()) }
 
@@ -52,7 +53,6 @@ actual val platformModule: Module = module {
 
   single { WorkManager.getInstance(androidApplication()) }
   single { NotificationManagerCompat.from(androidApplication()) }
-  single<TimeFormatter> { TimeFormatterImpl(androidApplication()) }
   single<ImageHandler> { ImageHandlerImpl(timeManager = get(), context = androidApplication()) }
   single<PDFHandler> { PDFHandlerImpl(context = androidApplication()) }
 

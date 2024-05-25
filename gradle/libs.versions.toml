@@ -1,6 +1,5 @@
 [versions]
 coreKtx = "1.12.0"
-lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.02.02"
 drawerlayout = "1.2.0"
@@ -31,7 +30,7 @@ constraintLayout = "2.1.4"
 activityKtx = "1.8.2"
 fragmentKtx = "1.6.2"
 constraintLayoutCompose = "1.0.1"
-lifecycle = "2.8.0"
+lifecycle = "2.7.0"
 preferenceKtx = "1.2.1"
 testCore = "1.5.0"
 extJUnit = "1.1.5"
@@ -162,12 +161,6 @@ turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 # OLD
 
-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-androidGradlePlugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
-firebaseCrashlyticsPlugin = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsPlugin" }
-aboutLibrariesPlugin = { module = "com.mikepenz.aboutlibraries.plugin:aboutlibraries-plugin", version.ref = "aboutLibrariesVersion" }
-moleculePlugin = { module = "app.cash.molecule:molecule-gradle-plugin", version.ref = "moleculeGradlePlugin" }
-
 aboutLibrariesCore = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibrariesVersion" }
 aboutLibrariesCompose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibrariesVersion" }
 androidxCoreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -235,13 +228,8 @@ androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterfa
 # END OLD
 
 [plugins]
-kotlinPlugin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-androidApplicationPlugin = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-sqldelightPlugin = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
-moleculePlugin = { id = "app.cash.molecule", version.ref = "moleculeGradlePlugin" }
-kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 aboutLibrariesPlugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibrariesVersion" }
 
 android-application = { id = "com.android.application", version.ref = "agp" }

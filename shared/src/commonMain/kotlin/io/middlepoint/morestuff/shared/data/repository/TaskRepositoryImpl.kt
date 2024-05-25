@@ -74,7 +74,7 @@ class TaskRepositoryImpl(
                 .asFlow()
                 .mapToList(Dispatchers.IO)
 
-        return taskFlow.combine(schedulesFlow) { task, schedules ->
+        return combine(taskFlow, schedulesFlow) { task, schedules ->
             task.copy(schedule = schedules)
         }
     }

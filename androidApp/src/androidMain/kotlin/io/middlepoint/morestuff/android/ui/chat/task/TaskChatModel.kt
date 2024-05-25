@@ -29,123 +29,125 @@ import org.koin.compose.koinInject
 
 @Composable
 fun taskChatModel(
-    taskId: Long,
-    initialState: TaskChatState,
-    events: Flow<TaskChatEvent>,
-    store: AppStore = koinInject(),
-    clipboardHelper: ClipboardHelper = koinInject(),
-    imageHandler: ImageHandler = koinInject(),
-    pdfHandler: PDFHandler = koinInject(),
-    taskUiMapper: TaskUiMapper = koinInject(),
-    shareTaskMessage: ShareTaskMessage = koinInject(),
-    messageUiMapper: MessageUiMapper = koinInject(),
-    getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
-    getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
-    getTaskFlow: GetTaskFlowUseCase = koinInject(),
-    devTools: DevTools = koinInject(),
-    logger: Logger = koinInject()
+  taskId: Long,
+  initialState: TaskChatState,
+  events: Flow<TaskChatEvent>,
+  store: AppStore = koinInject(),
+  clipboardHelper: ClipboardHelper = koinInject(),
+  imageHandler: ImageHandler = koinInject(),
+  pdfHandler: PDFHandler = koinInject(),
+  taskUiMapper: TaskUiMapper = koinInject(),
+  shareTaskMessage: ShareTaskMessage = koinInject(),
+  messageUiMapper: MessageUiMapper = koinInject(),
+  getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
+  getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
+  getTaskFlow: GetTaskFlowUseCase = koinInject(),
+  devTools: DevTools = koinInject(),
+  logger: Logger = koinInject()
 ): TaskChatState {
 
-    var task by remember { mutableStateOf(initialState.task) }
-    var messages by remember { mutableStateOf(initialState.messages) }
+  var task by remember { mutableStateOf(initialState.task) }
+  var messages by remember { mutableStateOf(initialState.messages) }
 
-    LaunchedEffect(Unit) {
-        getTaskFlow(taskId)
-            .map(taskUiMapper::map)
-            .collect { task = it }
+  LaunchedEffect(Unit) {
+    getTaskFlow(taskId)
+      .collect {
+        logger.d { "Task flow" }
+        task = taskUiMapper.map(it)
+      }
+  }
+
+  LaunchedEffect(Unit) {
+    val messagesFlow = when {
+      devTools.showDebugMessages -> getTaskMessagesFlowUseCase(taskId = taskId)
+      else -> getTaskChatMessagesUseCase(taskId = taskId)
     }
+    messagesFlow
+      .map(messageUiMapper::map)
+      .collect { messages = it }
+  }
 
-    LaunchedEffect(Unit) {
-        val messagesFlow = when {
-            devTools.showDebugMessages -> getTaskMessagesFlowUseCase(taskId = taskId)
-            else -> getTaskChatMessagesUseCase(taskId = taskId)
-        }
-        messagesFlow
-            .map(messageUiMapper::map)
-            .collect { messages = it }
-    }
+  LaunchedEffect(Unit) {
+    logger.d { "Inside LaunchedEffect" }
+    events.collect { event ->
+      logger.d { "Inside Collect: $event" }
+      with(event) {
+        when (this) {
+          is CopyText -> {
+            clipboardHelper.copyToClipboard(content)
+          }
 
-    LaunchedEffect(Unit) {
-        logger.d { "Inside LaunchedEffect" }
-        events.collect { event ->
-            logger.d { "Inside Collect: $event" }
-            with(event) {
-                when (this) {
-                    is CopyText -> {
-                        clipboardHelper.copyToClipboard(content)
-                    }
+          is DeleteMessage -> {
+            store.dispatch(MessageAction.DeleteMessageAction(message.id))
+          }
 
-                    is DeleteMessage -> {
-                        store.dispatch(MessageAction.DeleteMessageAction(message.id))
-                    }
+          is InputDocument -> {
+            store.dispatch(
+              MessageAction.CreatePDFMessageAction(taskId, path, title.trim())
+            )
+          }
 
-                    is InputDocument -> {
-                        store.dispatch(
-                            MessageAction.CreatePDFMessageAction(taskId, path, title.trim())
-                        )
-                    }
+          is InputImage -> {
+            store.dispatch(
+              MessageAction.CreateImageMessageAction(taskId, path, title.trim())
+            )
+          }
 
-                    is InputImage -> {
-                        store.dispatch(
-                            MessageAction.CreateImageMessageAction(taskId, path, title.trim())
-                        )
-                    }
+          is InputText -> {
+            store.dispatch(
+              MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
+            )
+          }
 
-                    is InputText -> {
-                        store.dispatch(
-                            MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
-                        )
-                    }
+          is OpenDocument -> {
+            pdfHandler.openPDF(path)
+          }
 
-                    is OpenDocument -> {
-                        pdfHandler.openPDF(path)
-                    }
+          is ShareMessage -> {
+            when (message.messageData?.messageType) {
+              MessageDataType.Image -> {
+                imageHandler.shareImage(message.messageData.filePath)
+              }
 
-                    is ShareMessage -> {
-                        when (message.messageData?.messageType) {
-                            MessageDataType.Image -> {
-                                imageHandler.shareImage(message.messageData.filePath)
-                            }
+              MessageDataType.Pdf -> {
+                pdfHandler.sharePDF(message.messageData.filePath)
+              }
 
-                            MessageDataType.Pdf -> {
-                                pdfHandler.sharePDF(message.messageData.filePath)
-                            }
-
-                            MessageDataType.Video -> {}
-                            MessageDataType.Audio -> {}
-                            null -> {
-                                shareTaskMessage.shareMessage(message.content)
-                            }
-                        }
-                    }
-
-                    is ShareImage -> {
-                        imageHandler.shareImage(path)
-                    }
-
-                    is ScheduleResponse -> {
-                        store.dispatch(ReminderAction.UserResponseAction(scheduleId, replyType))
-                    }
-
-                    is ShareDocument -> {
-                        pdfHandler.sharePDF(path)
-                    }
-
-                    is DeleteTask -> {
-                        store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
-                    }
-
-                    is ToggleTaskComplete -> {
-                        val complete = !task.isComplete
-                        store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
-                    }
-                }
+              MessageDataType.Video -> {}
+              MessageDataType.Audio -> {}
+              null -> {
+                shareTaskMessage.shareMessage(message.content)
+              }
             }
-        }
-    }
+          }
 
-    return TaskChatState(
-        task = task,
-        messages = messages
-    )
+          is ShareImage -> {
+            imageHandler.shareImage(path)
+          }
+
+          is ScheduleResponse -> {
+            store.dispatch(ReminderAction.UserResponseAction(scheduleId, replyType))
+          }
+
+          is ShareDocument -> {
+            pdfHandler.sharePDF(path)
+          }
+
+          is DeleteTask -> {
+            store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
+          }
+
+          is ToggleTaskComplete -> {
+            val complete = !task.isComplete
+            store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
+          }
+        }
+      }
+    }
+  }
+
+  return TaskChatState(
+    task = task,
+    messages = messages
+  )
 }
