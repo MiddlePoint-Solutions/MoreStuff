@@ -2,6 +2,8 @@ package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import arrow.core.Either
 import arrow.core.right
+import io.middlepoint.morestuff.android.domain.createScheduleForTest
+import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import io.mockk.coEvery
@@ -20,8 +22,8 @@ class GetScheduleTaskUseCaseImplTest {
         val scheduleId = 1L
         val taskId = 1L
         val schedule =
-          io.middlepoint.morestuff.shared.domain.createScheduleForTest(scheduleType = ScheduleType.OneTime)
-        val task = io.middlepoint.morestuff.shared.domain.createTaskForTest()
+          createScheduleForTest(scheduleType = ScheduleType.OneTime)
+        val task = createTaskForTest()
 
         coEvery { getScheduleUseCase(scheduleId) } returns schedule.right()
         coEvery { getTaskUseCase(taskId) } returns task.right()

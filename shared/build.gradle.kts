@@ -8,7 +8,6 @@ plugins {
   alias(libs.plugins.compose)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.buildConfig)
-  alias(libs.plugins.libres)
 }
 
 buildConfig {
@@ -49,7 +48,7 @@ kotlin {
       baseName = "shared"
       isStatic = true
       linkerOpts("-lsqlite3")
-      export(libs.decompose.router)
+//      export(libs.decompose.router)
     }
   }
 
@@ -58,7 +57,6 @@ kotlin {
       implementation(compose.components.resources)
       implementation(libs.bundles.compose)
       implementation(compose.materialIconsExtended)
-      implementation(libs.libres)
       implementation(libs.bundles.kotlinx)
       implementation(libs.stately.isolate)
       implementation(libs.stately.iso.collections)
@@ -76,7 +74,7 @@ kotlin {
       api(libs.kermit)
       api(libs.koin.core)
       api(libs.koin.compose)
-      api(libs.decompose.router)
+//      api(libs.decompose.router)
 
       // You will probably need to also bring in decompose and essenty
       implementation(libs.decompose)
@@ -117,6 +115,8 @@ kotlin {
         implementation(libs.mockk)
         implementation(libs.junit.jupiter)
         implementation(libs.junit.platform.commons)
+        implementation(libs.koinTest)
+        implementation(libs.koinTestJunit)
       }
     }
 
@@ -132,6 +132,7 @@ android {
   compileSdk = libs.versions.android.sdk.compile.get().toInt()
 
   sourceSets["main"].manifest.srcFile("src/main/AndroidManifest.xml")
+  sourceSets["main"].kotlin.srcDirs("src/main/kotlin")
   sourceSets["main"].res.srcDirs("src/main/res", "src/commonMain/resources")
   sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 

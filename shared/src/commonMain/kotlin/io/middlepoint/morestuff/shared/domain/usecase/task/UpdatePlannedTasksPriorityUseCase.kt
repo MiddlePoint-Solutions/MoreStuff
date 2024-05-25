@@ -3,8 +3,6 @@ package io.middlepoint.morestuff.shared.domain.usecase.task
 import kotlinx.datetime.toLocalDateTime
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetPlanPriorityScoreUseCase
-import timber.log.Timber
-
 
 interface UpdatePlannedTasksPriorityUseCase {
     suspend operator fun invoke()
@@ -17,11 +15,8 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
 ) : UpdatePlannedTasksPriorityUseCase {
 
     override suspend fun invoke() {
-        Timber.d("UpdatePlannedTasksPriorityUseCase")
         getActiveTasksWithScheduleUseCase(listOf(ScheduleType.OneTime)).map { tasks ->
-            Timber.d("UpdatePlannedTasksPriorityUseCase tasks: ${tasks.size}")
             tasks.forEach { task ->
-                Timber.d("UpdatePlannedTasksPriorityUseCase task: ${task.title}")
                 task.getScheduleOrNull()?.scheduleLocalTime?.let { scheduleLocalTime ->
                     val newPriorityScore = getPlanPriorityScoreUseCase(
                         scheduleTimeLocal = scheduleLocalTime.toLocalDateTime(),

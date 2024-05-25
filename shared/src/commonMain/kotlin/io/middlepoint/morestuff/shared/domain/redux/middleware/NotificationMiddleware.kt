@@ -21,7 +21,7 @@ sealed class NotificationAction : Action.FeatureAction() {
       val message: Message,
     ) : NotificationAction()
 
-    internal data object ShowReviewNotification : NotificationAction()
+    data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
         val scheduleId: Long,

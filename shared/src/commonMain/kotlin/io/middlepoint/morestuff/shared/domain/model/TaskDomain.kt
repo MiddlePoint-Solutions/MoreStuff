@@ -15,7 +15,7 @@ data class TaskDomain(
   val taskType: TaskType = TaskType.System,
   val schedule: List<ScheduleDomain> = listOf(),
   val extraDetails: Boolean = false,
-) : Parcelable {
+) {
 
     val isComplete: Boolean get() = completeTime != null
     val hasSchedule: Boolean get() = schedule.any { it.isOneTime() }

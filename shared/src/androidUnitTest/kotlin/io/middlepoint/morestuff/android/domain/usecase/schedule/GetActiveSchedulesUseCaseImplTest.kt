@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
-import io.middlepoint.morestuff.shared.domain.createListOfSchedulesForTest
+import io.middlepoint.morestuff.android.domain.createListOfSchedulesForTest
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -16,7 +16,7 @@ class GetActiveSchedulesUseCaseImplTest {
 
     @Test
     fun `gets active schedules `() = runBlocking {
-        val schedules = io.middlepoint.morestuff.shared.domain.createListOfSchedulesForTest(2)
+        val schedules = createListOfSchedulesForTest(2)
 
         coEvery { scheduleRepository.getActiveSchedules() } returns Either.Right(
             schedules

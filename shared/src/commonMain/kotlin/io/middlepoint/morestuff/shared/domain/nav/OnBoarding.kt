@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-sealed class OnBoarding : Parcelable {
+sealed class OnBoarding {
 
     data object Welcome : OnBoarding()
 

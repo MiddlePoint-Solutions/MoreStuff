@@ -21,17 +21,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 sealed class MessageAction : Action.FeatureAction() {
-    internal data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
-    internal data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
+    data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
+    data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
 
-    internal data class CreateImageMessageAction(
+    data class CreateImageMessageAction(
         val taskId: Long,
         val filePath: String,
         val message: String
     ) : MessageAction()
 
-    internal data class CreatePDFMessageAction(
+    data class CreatePDFMessageAction(
         val taskId: Long,
         val filePath: String,
         val message: String

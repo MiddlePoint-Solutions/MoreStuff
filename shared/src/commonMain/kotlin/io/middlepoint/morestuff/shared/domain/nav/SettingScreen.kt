@@ -4,7 +4,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class SettingScreen : Parcelable {
+sealed class SettingScreen {
   data object Root : SettingScreen()
 
   data object Developer : SettingScreen()

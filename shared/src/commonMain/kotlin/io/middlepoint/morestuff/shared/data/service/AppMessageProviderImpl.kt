@@ -6,15 +6,16 @@ import morestuff.shared.generated.resources.added_new_task
 import morestuff.shared.generated.resources.can_i_do_for_you_today
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getString
 
 @OptIn(ExperimentalResourceApi::class)
 class AppMessagesProviderImpl : AppMessageProvider {
 
-    override fun getNewTaskAddedMessage(): StringResource {
-        return Res.string.added_new_task
-    }
+  override suspend fun getNewTaskAddedMessage(): String {
+    return getString(Res.string.added_new_task)
+  }
 
-    override fun getWhatCanIDoForYouMessage(): StringResource {
-        return Res.string.can_i_do_for_you_today
-    }
+  override suspend fun getWhatCanIDoForYouMessage(): String {
+    return getString(Res.string.can_i_do_for_you_today)
+  }
 }

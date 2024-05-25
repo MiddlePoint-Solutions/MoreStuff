@@ -5,16 +5,16 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 //    alias(libs.plugins.androidApplicationPlugin)
 //    alias(libs.plugins.kotlinPlugin)
-//    alias(libs.plugins.parcelizePlugin)
 //    alias(libs.plugins.sqldelightPlugin)
 //    alias(libs.plugins.googleServicesPlugin)
 //    alias(libs.plugins.crashlyticsPlugin)
 //    alias(libs.plugins.moleculePlugin)
 //    alias(libs.plugins.kotlinSerialization)
-//    alias(libs.plugins.aboutLibrariesPlugin)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose)
+    alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.aboutLibrariesPlugin)
 }
 
 object Env {
@@ -84,8 +84,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_20
+        targetCompatibility = JavaVersion.VERSION_20
     }
 
     buildFeatures {
@@ -134,8 +134,8 @@ tasks.withType<KotlinCompile>().configureEach {
 dependencies {
     implementation(project(":shared"))
 
-    implementation(platform(libs.androidxComposeBom))
-    implementation(platform(libs.arrowBom))
+//    implementation(platform(libs.androidxComposeBom))
+//    implementation(platform(libs.arrowBom))
     implementation(platform(libs.koinBom))
     implementation(platform(libs.firebaseBom))
 
@@ -178,8 +178,6 @@ dependencies {
     testImplementation(libs.junit.platform.commons)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.turbine)
-    testImplementation(libs.koinTest)
-    testImplementation(libs.koinTestJunit)
     testImplementation(libs.testCore)
     testImplementation(libs.testRules)
 
@@ -207,7 +205,7 @@ dependencies {
     implementation(libs.settingsUiM3)
     implementation(libs.settingsStoragePreferences)
     implementation(libs.decompose)
-    implementation(libs.extensionsComposeJetpack)
+    implementation(libs.decompose.compose.multiplatform)
     implementation(libs.parcelable)
     implementation(libs.accompanistPermissions)
     implementation(libs.accompanistSystemUiController)

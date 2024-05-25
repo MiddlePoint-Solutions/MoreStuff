@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.priority
 
 import arrow.core.right
-import io.middlepoint.morestuff.shared.domain.createTaskForTest
+import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
@@ -63,11 +63,11 @@ class UpdateTaskReviewPriorityUseCaseTest {
             val taskPriorityScore = 100L
             val nextPriorityScore = 120L
             val expectedPriorityScore = 121L
-            val currentTask = io.middlepoint.morestuff.shared.domain.createTaskForTest(
+            val currentTask = createTaskForTest(
               id = taskId,
               priorityScore = taskPriorityScore
             )
-            val nextPriorityTask = io.middlepoint.morestuff.shared.domain.createTaskForTest(
+            val nextPriorityTask = createTaskForTest(
               id = 777L,
               priorityScore = nextPriorityScore
             )
@@ -88,11 +88,11 @@ class UpdateTaskReviewPriorityUseCaseTest {
             val taskPriorityScore = 100L
             val nextPriorityScore = 90L
             val expectedPriorityScore = 89L
-            val currentTask = io.middlepoint.morestuff.shared.domain.createTaskForTest(
+            val currentTask = createTaskForTest(
               id = taskId,
               priorityScore = taskPriorityScore
             )
-            val nextPriorityTask = io.middlepoint.morestuff.shared.domain.createTaskForTest(
+            val nextPriorityTask = createTaskForTest(
               id = 777L,
               priorityScore = nextPriorityScore
             )

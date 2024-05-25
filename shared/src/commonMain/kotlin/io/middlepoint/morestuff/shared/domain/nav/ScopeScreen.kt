@@ -5,7 +5,7 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ScopeScreen : Parcelable {
+sealed class ScopeScreen {
   data object Root : ScopeScreen()
   data object Create : ScopeScreen()
   data class Edit(val scope: ScopeDomain) : ScopeScreen()

@@ -1,10 +1,8 @@
-package io.middlepoint.morestuff.shared.domain.usecase.time
+package io.middlepoint.morestuff.android.domain.usecase.time
 
 
-import android.content.Context
-import io.middlepoint.morestuff.shared.domain.timeManager
-import io.middlepoint.morestuff.shared.data.utils.TimeFormatterImpl
-import io.middlepoint.morestuff.shared.domain.util.TimeFormatter
+import io.middlepoint.morestuff.android.domain.timeManager
+import io.middlepoint.morestuff.shared.data.TimeFormatterImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
@@ -34,7 +32,7 @@ internal class TimeFormatterImplTest {
         val outputJavaLocalDateTime = LocalDateTime.parse(formattedString, dateTimeFormatter)
         val outputLocalDateTime = outputJavaLocalDateTime.toKotlinLocalDateTime()
         val inputInstant = timeString.toInstant()
-        val inputLocalDateTime = inputInstant.toLocalDateTime(io.middlepoint.morestuff.shared.domain.timeManager.currentTimeZone)
+        val inputLocalDateTime = inputInstant.toLocalDateTime(timeManager.currentTimeZone)
         assertEquals(inputLocalDateTime, outputLocalDateTime)
     }
 
