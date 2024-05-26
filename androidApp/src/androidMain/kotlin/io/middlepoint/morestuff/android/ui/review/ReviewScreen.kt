@@ -68,8 +68,8 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import com.arkivanov.decompose.router.stack.pop
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
@@ -85,7 +85,7 @@ import io.middlepoint.morestuff.android.ui.review.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.android.ui.review.swipeable.swipableCard
 import io.middlepoint.morestuff.android.ui.theme.reviewIconTint
-import com.arkivanov.decompose.router.stack.pop
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

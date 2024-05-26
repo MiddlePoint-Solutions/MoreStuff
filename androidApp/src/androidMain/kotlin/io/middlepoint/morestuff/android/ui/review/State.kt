@@ -1,16 +1,15 @@
 package io.middlepoint.morestuff.android.ui.review
 
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.BaseViewEvent
+import android.os.Parcelable
+import io.middlepoint.morestuff.android.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
-import io.middlepoint.morestuff.android.ui.model.ReviewItemUiModel
-import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeDirection
-import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-sealed class ReviewRound : android.os.Parcelable {
+sealed class ReviewRound : Parcelable {
     data class Review(val scopeId: Long) : ReviewRound()
     data object Final : ReviewRound()
 }
@@ -23,7 +22,7 @@ data class ReviewState(
     val reviewHintEnabled: Boolean = false
 )
 
-sealed class ReviewViewEvent : BaseViewEvent {
+sealed class ReviewViewEvent {
     data class Undo(val item: ReviewItemUiModel) : ReviewViewEvent()
     data class ItemSwipe(
         val item: ReviewItemUiModel,

@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.android.ui.settings
 
+import MoreStuff.androidApp.BuildConfig
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.widget.Toast
@@ -60,7 +61,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import io.middlepoint.morestuff.android.BuildConfig
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK

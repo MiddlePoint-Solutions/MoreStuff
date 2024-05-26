@@ -1,28 +1,8 @@
 package io.middlepoint.morestuff.android.ui.share
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewModelScope
 import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.NoStateViewModel
-import io.middlepoint.morestuff.shared.domain.usecase.task.GetActiveTasksFlowUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
-import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class ShareViewModel : MoleculeViewModel<ShareEvent, ShareState>() {
 

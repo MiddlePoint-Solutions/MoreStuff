@@ -1,8 +1,8 @@
 package io.middlepoint.morestuff.android.app.startup
 
+import MoreStuff.androidApp.BuildConfig
 import android.content.Context
 import androidx.startup.Initializer
-import io.middlepoint.morestuff.android.BuildConfig
 import com.google.firebase.analytics.FirebaseAnalytics
 
 class FirebaseInitializer : Initializer<Unit> {
