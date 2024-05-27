@@ -29,7 +29,7 @@ workKtx = "2.9.0"
 constraintLayout = "2.1.4"
 activityKtx = "1.8.2"
 fragmentKtx = "1.6.2"
-constraintLayoutCompose = "1.0.1"
+#constraintLayoutCompose = "1.0.1"
 lifecycle = "2.7.0"
 preferenceKtx = "1.2.1"
 testCore = "1.5.0"
@@ -85,6 +85,8 @@ decompose = "3.0.0"
 essenty = "1.3.0"
 molecule = "1.3.1"
 exifinterfaceVersion = "1.3.6"
+constraintLayout-compose = "0.4.0"
+compose-settings = "2.4.0"
 
 
 [libraries]
@@ -168,8 +170,9 @@ androidxComposeBom = { module = "androidx.compose:compose-bom", version.ref = "c
 androidxDrawerlayout = { module = "androidx.drawerlayout:drawerlayout", version.ref = "drawerlayout" }
 reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "reorderable" }
 preferenceKtx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
-settingsUiM3 = { module = "com.github.alorma:compose-settings-ui-m3", version.ref = "settingsUiM3" }
-settingsStoragePreferences = { module = "com.github.alorma:compose-settings-storage-preferences", version.ref = "settingsStoragePreferences" }
+composeSettings-ui = { group = "com.github.alorma.compose-settings", name = "ui-tiles", version.ref = "compose-settings" }
+composeSettings-ui-extended = { group = "com.github.alorma.compose-settings", name = "ui-tiles-extended", version.ref = "compose-settings" }
+settingsStoragePreferences = { group = "com.github.alorma.compose-settings", name = "storage-base", version.ref = "compose-settings" }
 uiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview" }
 uiTooling = { module = "androidx.compose.ui:ui-tooling" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
@@ -204,7 +207,7 @@ workKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "workKtx" }
 coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 activityKtx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-constraintLayoutCompose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintLayoutCompose" }
+#constraintLayoutCompose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintLayoutCompose" }
 runtimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
@@ -222,6 +225,7 @@ androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref =
 telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
 lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
+constraintLayout-compose = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintLayout-compose" }
 sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterfaceVersion" }
 

@@ -76,7 +76,7 @@ import io.middlepoint.morestuff.android.ui.input.UserInput
 import io.middlepoint.morestuff.android.ui.input.UserTextInput
 import io.middlepoint.morestuff.android.ui.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
-import io.middlepoint.morestuff.android.ui.navigation.ChildStack
+import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen

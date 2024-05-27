@@ -42,6 +42,8 @@ import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
+import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
+import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
@@ -154,7 +156,7 @@ fun DevSettings(
 
 @Composable
 private fun DebugMessageSwitch(
-    state: AppSettingValueState<Boolean>,
+  state: AppSettingValueState<Boolean>,
 ) {
 
     Row(
@@ -164,7 +166,7 @@ private fun DebugMessageSwitch(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SettingsSwitch(
-            state = state,
+            state = state.value,
             icon = {
                 Icon(
                     imageVector = Icons.Default.Message,
@@ -179,14 +181,15 @@ private fun DebugMessageSwitch(
                 )
             },
             modifier = Modifier.padding(end = 16.dp),
+            onCheckedChange = { state.value = it }
         )
     }
 }
 
 @Composable
 private fun DebugRemindersSwitch(
-    enableState: AppSettingValueState<Boolean>,
-    timeState: AppSettingValueState<Float>,
+  enableState: AppSettingValueState<Boolean>,
+  timeState: AppSettingValueState<Float>,
 ) {
     Column {
         Row(
@@ -197,7 +200,7 @@ private fun DebugRemindersSwitch(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SettingsSwitch(
-                state = enableState,
+                state = enableState.value,
                 icon = {
                     Icon(
                         imageVector = Icons.Default.Notifications,
@@ -212,11 +215,12 @@ private fun DebugRemindersSwitch(
                     )
                 },
                 modifier = Modifier.padding(end = 16.dp),
+                onCheckedChange = { enableState.value = it }
             )
         }
 
         SettingsSlider(
-            state = timeState,
+            value = timeState.value,
             title = {
                 Text(
                     text = "Reminder delay ${timeState.value.toInt()}",
@@ -225,6 +229,7 @@ private fun DebugRemindersSwitch(
             steps = 60,
             valueRange = 1F..60F,
             modifier = Modifier.weight(1f),
+            onValueChange = { timeState.value = it }
         )
     }
 }

@@ -1,8 +1,8 @@
 package io.middlepoint.morestuff.android.ui.review
 
 import android.os.Parcelable
-import io.middlepoint.morestuff.android.ui.model.ReviewItemUiModel
-import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope

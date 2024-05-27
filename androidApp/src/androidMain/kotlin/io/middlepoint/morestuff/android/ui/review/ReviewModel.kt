@@ -15,7 +15,7 @@ import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetReviewTasksUseCase
 import io.middlepoint.morestuff.android.ui.model.map.ReviewTasksMapper
-import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject

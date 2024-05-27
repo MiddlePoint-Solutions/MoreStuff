@@ -193,7 +193,7 @@ dependencies {
   implementation(libs.composeMaterialIcons)
   implementation(libs.composeMaterialIconsExtended)
   implementation(libs.composeTooling)
-  implementation(libs.constraintLayoutCompose)
+//  implementation(libs.constraintLayoutCompose)
   implementation(libs.uiToolingPreview)
   implementation(libs.uiTooling)
   implementation(libs.androidx.exifinterface)
@@ -228,7 +228,7 @@ dependencies {
   // Utils
   implementation(libs.reorderable)
   implementation(libs.preferenceKtx)
-  implementation(libs.settingsUiM3)
+  implementation(libs.composeSettings.ui)
   implementation(libs.settingsStoragePreferences)
   implementation(libs.decompose)
   implementation(libs.decompose.compose.multiplatform)

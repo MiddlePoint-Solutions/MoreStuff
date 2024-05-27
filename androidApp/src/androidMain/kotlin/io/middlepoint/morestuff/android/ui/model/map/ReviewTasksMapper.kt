@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.android.ui.model.map
 
-import io.middlepoint.morestuff.android.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.domain.model.ReviewTasks
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.service.TimeManager

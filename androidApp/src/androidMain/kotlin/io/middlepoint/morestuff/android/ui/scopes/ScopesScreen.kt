@@ -53,7 +53,7 @@ import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.navigation.ChildStack
+import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope

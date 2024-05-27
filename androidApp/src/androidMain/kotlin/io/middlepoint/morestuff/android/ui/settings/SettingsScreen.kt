@@ -53,8 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.alorma.compose.settings.ui.SettingsList
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
@@ -66,7 +64,7 @@ import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.android.ui.navigation.ChildStack
+import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.priority.PriorityTimePicker
 import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffSettingTheme
@@ -78,6 +76,7 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
+import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -238,23 +237,24 @@ private fun SelectTheme(
     valueChanged = themeSelected,
   )
 
-  SettingsList(
-    state = state,
-    title = {
-      Text(
-        text = stringResource(R.string.select_theme),
-      )
-    },
-    items = themeOptions,
-    icon = {
-      Icon(
-        imageVector = Icons.Default.ColorLens,
-        contentDescription = stringResource(R.string.cd_select_theme)
-      )
-    },
-    closeDialogDelay = 0,
-    useSelectedValueAsSubtitle = false,
-  )
+  // TODO: SettingsList is not available anymore, need to implement the dialog ourselves
+//  SettingsList(
+//    state = state,
+//    title = {
+//      Text(
+//        text = stringResource(R.string.select_theme),
+//      )
+//    },
+//    items = themeOptions,
+//    icon = {
+//      Icon(
+//        imageVector = Icons.Default.ColorLens,
+//        contentDescription = stringResource(R.string.cd_select_theme)
+//      )
+//    },
+//    closeDialogDelay = 0,
+//    useSelectedValueAsSubtitle = false,
+//  )
 }
 
 private fun AppTheme.displayTitle(res: Resources): String = when (this) {
@@ -472,27 +472,28 @@ private fun SelectLanguage(
     languageOptions[state.value]
   }
 
-  SettingsList(
-    state = state,
-    title = {
-      Column {
-        Text(text = stringResource(R.string.select_language))
-        Text(
-          text = selectedLanguage,
-          fontSize = 12.sp
-        )
-      }
-    },
-    items = languageOptions,
-    icon = {
-      Icon(
-        imageVector = Icons.Default.Translate,
-        contentDescription = stringResource(R.string.select_language)
-      )
-    },
-    closeDialogDelay = 0,
-    useSelectedValueAsSubtitle = false,
-  )
+  // TODO:
+//  SettingsList(
+//    state = state,
+//    title = {
+//      Column {
+//        Text(text = stringResource(R.string.select_language))
+//        Text(
+//          text = selectedLanguage,
+//          fontSize = 12.sp
+//        )
+//      }
+//    },
+//    items = languageOptions,
+//    icon = {
+//      Icon(
+//        imageVector = Icons.Default.Translate,
+//        contentDescription = stringResource(R.string.select_language)
+//      )
+//    },
+//    closeDialogDelay = 0,
+//    useSelectedValueAsSubtitle = false,
+//  )
 }
 
 private fun Language.displayTitle(res: Resources): String = when (this) {

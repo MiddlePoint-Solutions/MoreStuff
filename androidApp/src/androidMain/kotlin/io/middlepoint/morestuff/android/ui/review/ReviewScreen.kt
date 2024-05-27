@@ -75,17 +75,18 @@ import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import io.middlepoint.morestuff.android.ui.compose.SlideAnimation
 import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
-import io.middlepoint.morestuff.android.ui.model.ReviewItemUiModel
-import io.middlepoint.morestuff.android.ui.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
-import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeDirection
-import io.middlepoint.morestuff.android.ui.review.swipeable.SwipeableCardState
-import io.middlepoint.morestuff.android.ui.review.swipeable.firstVisibleStateOrNull
-import io.middlepoint.morestuff.android.ui.review.swipeable.lastSwipedItem
-import io.middlepoint.morestuff.android.ui.review.swipeable.rememberSwipeableCardState
-import io.middlepoint.morestuff.android.ui.review.swipeable.swipableCard
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
+import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
+import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
 import io.middlepoint.morestuff.android.ui.theme.reviewIconTint
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

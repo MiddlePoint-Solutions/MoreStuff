@@ -16,8 +16,8 @@ import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.home.HomeScreen
 import io.middlepoint.morestuff.android.ui.image.ImageImportScreen
 import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
-import io.middlepoint.morestuff.android.ui.navigation.ChildStack
-import io.middlepoint.morestuff.android.ui.onboarding.OnBoardingScreen
+import io.middlepoint.morestuff.shared.navigation.ChildStack
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
 import io.middlepoint.morestuff.android.ui.review.ReviewScreen
 import io.middlepoint.morestuff.android.ui.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen

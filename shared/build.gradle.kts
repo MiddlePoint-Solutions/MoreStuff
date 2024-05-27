@@ -83,6 +83,11 @@ kotlin {
       implementation(libs.molecule.runtime)
 
       implementation(libs.kSoup)
+      api(libs.constraintLayout.compose)
+
+      api(libs.composeSettings.ui)
+      api(libs.composeSettings.ui.extended)
+      implementation(libs.settingsStoragePreferences)
     }
 
     commonTest.dependencies {
