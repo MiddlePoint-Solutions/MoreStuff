@@ -8,6 +8,7 @@ plugins {
   alias(libs.plugins.compose)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.buildConfig)
+  alias(libs.plugins.kotlin.parcelize)
 }
 
 buildConfig {
