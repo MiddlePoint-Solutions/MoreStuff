@@ -59,9 +59,11 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import io.github.xxfast.decompose.router.stack.RoutedContent
+import io.github.xxfast.decompose.router.stack.Router
+import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.ui.chat.ChatActions
 import io.middlepoint.morestuff.android.ui.chat.Messages
@@ -76,10 +78,10 @@ import io.middlepoint.morestuff.android.ui.input.UserInput
 import io.middlepoint.morestuff.android.ui.input.UserTextInput
 import io.middlepoint.morestuff.android.ui.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.android.ui.model.MessageUiModel
-import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
+import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -94,24 +96,23 @@ fun TaskChatScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    val navigation = remember { StackNavigation<ChatScreen>() }
+    val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) {
+        listOf(TaskChat)
+    }
 
     val viewModel: TaskChatPresenter = koinViewModel(
         key = "TaskChat$taskId",
         parameters = { parametersOf(taskId) }
     )
 
-    ChildStack(
-        source = navigation,
-        initialStack = { listOf(ChatScreen.TaskChat) },
+    RoutedContent(
+        router = router,
         modifier = Modifier.background(Color.Transparent),
-        key = "TaskChatStack",
-        handleBackButton = true,
         animation = stackAnimation(scale() + fade()),
     ) { screen ->
 
         when (screen) {
-            is ChatScreen.TaskChat -> {
+            is TaskChat -> {
 
                 val model by viewModel.models.collectAsState()
 
@@ -125,7 +126,7 @@ fun TaskChatScreen(
                         onImageSelected = {
                             val path = it.messageData?.filePath ?: ""
                             val title = it.content
-                            navigation.push(ChatScreen.ImagePreview(path, title))
+                            router.push(ImagePreview(path, title))
                         },
                         onPdfSelected = {
                             val path = it.messageData?.filePath ?: ""
@@ -144,28 +145,28 @@ fun TaskChatScreen(
                     modifier = modifier,
                     onBack = onBack,
                     sendTaskMessage = { viewModel.take(InputText(it)) },
-                    imagePicked = { navigation.push(ChatScreen.ImageImport(it.toString())) },
+                    imagePicked = { router.push(ImageImport(it.toString())) },
                     pdfPicked = { uri ->
                         viewModel.take(InputDocument(uri.toString(), title = ""))
                     }
                 )
             }
 
-            is ChatScreen.ImageImport -> {
+            is ImageImport -> {
                 ImageImportScreen(
                     imageUri = Uri.parse(screen.uri),
                     onImport = { title ->
                         viewModel.take(InputImage(screen.uri, title))
-                        navigation.pop()
+                        router.pop()
                     },
-                    onBack = navigation::pop
+                    onBack = router::pop
                 )
             }
 
-            is ChatScreen.ImagePreview -> {
+            is ImagePreview -> {
                 ImagePreviewScreen(
                     imagePath = screen.imagePath,
-                    onBack = navigation::pop,
+                    onBack = router::pop,
                     onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
                     title = screen.title,
                 )
