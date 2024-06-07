@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.kotlin.cocoapods)
   alias(libs.plugins.kotlinx.serialization)
   alias(libs.plugins.compose)
+  alias(libs.plugins.compose.compiler)
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlin.parcelize)
@@ -75,12 +76,12 @@ kotlin {
       api(libs.kermit)
       api(libs.koin.core)
       api(libs.koin.compose)
-//      api(libs.decompose.router)
+      api(libs.decompose.router)
 
       // You will probably need to also bring in decompose and essenty
       implementation(libs.decompose)
       implementation(libs.decompose.compose.multiplatform)
-      implementation(libs.essenty.parcelable)
+//      implementation(libs.essenty)
       implementation(libs.molecule.runtime)
 
       implementation(libs.kSoup)
@@ -102,8 +103,8 @@ kotlin {
       implementation(libs.androidx.activity.compose)
       implementation(libs.androidx.appcompat)
       implementation(libs.androidx.core)
-      api(compose.preview)
-      api(compose.uiTooling)
+//      api(compose.preview)
+//      api(compose.uiTooling)
       implementation(libs.androidx.security.crypto)
       implementation(libs.sqldelight.driver.android)
       implementation(libs.ktor.client.okhttp)

@@ -3,15 +3,14 @@ package io.middlepoint.morestuff.android.ui.local
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.staticCompositionLocalOf
 import io.middlepoint.morestuff.shared.domain.nav.Screen
-import com.arkivanov.decompose.router.stack.StackNavigation
+import io.github.xxfast.decompose.router.stack.Router
 
-val LocalAppNavigation = compositionLocalOf<StackNavigation<Screen>> {
+val LocalAppRouter = compositionLocalOf<Router<Screen>> {
     error("Navigation not provided!")
 }
 
 @Composable
-fun ProvideAppNavigation(navigator: StackNavigation<Screen>, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalAppNavigation provides navigator, content = content)
+fun ProvideAppRouter(router: Router<Screen>, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalAppRouter provides router, content = content)
 }

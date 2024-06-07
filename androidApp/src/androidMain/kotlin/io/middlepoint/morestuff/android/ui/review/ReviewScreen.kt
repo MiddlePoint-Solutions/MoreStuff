@@ -74,7 +74,7 @@ import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
 import io.middlepoint.morestuff.android.ui.compose.SlideAnimation
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
+import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
@@ -95,7 +95,7 @@ fun ReviewScreen(
     modifier: Modifier = Modifier,
     currentScopeId: Long,
 ) {
-    val navigation = LocalAppNavigation.current
+    val navigation = LocalAppRouter.current
     val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
     ProvideLocalViewModelStoreOwner(lifecycleOwner) {
         ReviewContent(

@@ -52,7 +52,7 @@ import io.middlepoint.morestuff.android.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.android.ui.components.HomeTopBar
 import io.middlepoint.morestuff.android.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.android.ui.home.HomeEvent.*
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
+import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.android.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.android.ui.model.show
 import io.middlepoint.morestuff.android.ui.schedule.ScopeContent
@@ -75,7 +75,7 @@ fun HomeScreen(
 ) {
 
     val coroutineScope = rememberCoroutineScope()
-    val navigation = LocalAppNavigation.current
+    val navigation = LocalAppRouter.current
     val snackbarHostState = remember { SnackbarHostState() }
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
     var showScopeSelection by remember { mutableStateOf(false) }
@@ -174,7 +174,7 @@ private fun HomeContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     var showTaskInput by remember { mutableStateOf(false) }
-    val navigation = LocalAppNavigation.current
+    val navigation = LocalAppRouter.current
 
     val selectedTasks = model.selectedTasks
 

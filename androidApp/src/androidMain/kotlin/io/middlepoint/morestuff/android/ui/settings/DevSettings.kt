@@ -37,7 +37,7 @@ import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
+import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -122,7 +122,7 @@ fun DevSettings(
     }
 
 
-    val navigation = LocalAppNavigation.current
+    val navigation = LocalAppRouter.current
     Column {
         SettingsMenuLink(
             title = { Text(text = stringResource(id = R.string.test_onboarding)) },

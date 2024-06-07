@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.model
 
-import com.arkivanov.essenty.parcelable.Parcelable
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import kotlinx.serialization.Serializable
 

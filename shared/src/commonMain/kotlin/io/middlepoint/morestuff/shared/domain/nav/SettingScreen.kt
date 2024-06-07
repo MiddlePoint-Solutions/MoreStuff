@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
-import com.arkivanov.essenty.parcelable.Parcelable
 import kotlinx.serialization.Serializable
 
 @Serializable

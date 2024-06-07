@@ -4,19 +4,23 @@ import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.stackAnimation
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.stack.animation.fade
+import com.arkivanov.decompose.extensions.compose.stack.animation.plus
+import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.slide
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import io.github.xxfast.decompose.router.LocalRouterContext
+import io.github.xxfast.decompose.router.stack.RoutedContent
+import io.github.xxfast.decompose.router.stack.Router
+import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.home.HomeScreen
 import io.middlepoint.morestuff.android.ui.image.ImageImportScreen
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
-import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
 import io.middlepoint.morestuff.android.ui.review.ReviewScreen
 import io.middlepoint.morestuff.android.ui.scopes.CreateScopeScreen
@@ -35,86 +39,89 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
 
+@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun MainContent(
-    initialScreen: Screen?,
-    shareContent: (taskId: Long, content: Shareable) -> Unit,
-    onBoardingComplete: () -> Unit,
+  initialScreen: Screen?,
+  shareContent: (taskId: Long, content: Shareable) -> Unit,
+  onBoardingComplete: () -> Unit,
 ) {
-    val navigation = LocalAppNavigation.current
 
-    ChildStack(
-        source = navigation,
-        modifier = Modifier.fillMaxSize(),
-        initialStack = {
-            when (initialScreen) {
-                OnBoarding -> listOf(OnBoarding)
-                null -> listOf(Home)
-                else -> listOf(Home, initialScreen)
-            }
-        },
-        key = "MainChildStack",
-        handleBackButton = true,
-        animation = stackAnimation(slide() + fade()),
-    ) { screen ->
-        when (screen) {
-
-            OnBoarding -> OnBoardingScreen(
-                onBoardingComplete = {
-                    onBoardingComplete()
-                    navigation.replaceCurrent(Home)
-                }
-            )
-
-            Home -> HomeScreen()
-
-            is Review -> ReviewScreen(currentScopeId = screen.scopeId)
-
-            Settings -> SettingsScreen(onBack = navigation::pop)
-
-            Scopes -> ScopesScreen(onBack = navigation::pop)
-
-            is CreateScope -> CreateScopeScreen(
-                onBack = navigation::pop,
-                onSaveScope = screen.onSave
-            )
-
-            is TaskChat -> TaskChatScreen(
-                taskId = screen.taskId,
-                onBack = navigation::pop
-            )
-
-            is ImagePreview -> {
-                ImageImportScreen(
-                    imageUri = Uri.parse(screen.imageUri),
-                    onImport = { message ->
-                        val shareableImage = Shareable.Image(screen.imageUri, message)
-                        shareContent(screen.taskId, shareableImage)
-                        navigation.replaceAll(Home, TaskChat(screen.taskId))
-                    },
-                    onBack = navigation::pop
-
-                )
-
-            }
-
-            is Share -> {
-                ShareScreen(
-                    onBack = navigation::pop,
-                    shareable = screen.shareable,
-                ) { taskId, shareable ->
-                    if (shareable is Shareable.Image) {
-                        navigation.push(ImagePreview(shareable.uris, taskId))
-                    } else {
-                        navigation.replaceCurrent(
-                            TaskChat(taskId),
-                            onComplete = {
-                                shareContent(taskId, shareable)
-                            }
-                        )
-                    }
-                }
-            }
-        }
+  val router: Router<Screen> = rememberRouter(Screen::class) {
+    when (initialScreen) {
+      OnBoarding -> listOf(OnBoarding)
+      null -> listOf(Home)
+      else -> listOf(Home, initialScreen)
     }
+  }
+
+  RoutedContent(
+    router = router,
+    modifier = Modifier.fillMaxSize(),
+    animation = predictiveBackAnimation(
+      fallbackAnimation = stackAnimation(slide() + fade()),
+      onBack = { router.pop() },
+      backHandler = LocalRouterContext.current.backHandler
+    ),
+  ) { screen ->
+    when (screen) {
+
+      OnBoarding -> OnBoardingScreen(
+        onBoardingComplete = {
+          onBoardingComplete()
+          router.replaceCurrent(Home)
+        }
+      )
+
+      Home -> HomeScreen()
+
+      is Review -> ReviewScreen(currentScopeId = screen.scopeId)
+
+      Settings -> SettingsScreen(onBack = router::pop)
+
+      Scopes -> ScopesScreen(onBack = router::pop)
+
+      is CreateScope -> CreateScopeScreen(
+        onBack = router::pop,
+        onSaveScope = screen.onSave
+      )
+
+      is TaskChat -> TaskChatScreen(
+        taskId = screen.taskId,
+        onBack = router::pop
+      )
+
+      is ImagePreview -> {
+        ImageImportScreen(
+          imageUri = Uri.parse(screen.imageUri),
+          onImport = { message ->
+            val shareableImage = Shareable.Image(screen.imageUri, message)
+            shareContent(screen.taskId, shareableImage)
+            router.replaceAll(Home, TaskChat(screen.taskId))
+          },
+          onBack = router::pop
+
+        )
+
+      }
+
+      is Share -> {
+        ShareScreen(
+          onBack = router::pop,
+          shareable = screen.shareable,
+        ) { taskId, shareable ->
+          if (shareable is Shareable.Image) {
+            router.push(ImagePreview(shareable.uris, taskId))
+          } else {
+            router.replaceCurrent(
+              TaskChat(taskId),
+              onComplete = {
+                shareContent(taskId, shareable)
+              }
+            )
+          }
+        }
+      }
+    }
+  }
 }

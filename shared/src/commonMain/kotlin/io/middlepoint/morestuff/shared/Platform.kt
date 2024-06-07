@@ -6,5 +6,3 @@ expect class File(path: String) {
 }
 
 expect fun generateUUID(): String
-
-expect abstract class Uri

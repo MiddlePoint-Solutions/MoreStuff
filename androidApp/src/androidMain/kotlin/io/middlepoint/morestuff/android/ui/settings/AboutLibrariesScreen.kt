@@ -16,8 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
-import com.arkivanov.decompose.router.stack.pop
 import com.mikepenz.aboutlibraries.ui.compose.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
 

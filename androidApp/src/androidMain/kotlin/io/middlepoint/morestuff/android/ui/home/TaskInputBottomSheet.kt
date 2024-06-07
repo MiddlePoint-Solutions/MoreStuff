@@ -37,8 +37,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.CreationExtras
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -51,13 +49,12 @@ import io.middlepoint.morestuff.android.ui.input.UserInputEvent
 import io.middlepoint.morestuff.android.ui.input.UserInputViewModel
 import io.middlepoint.morestuff.android.ui.input.UserTextInput
 import io.middlepoint.morestuff.android.ui.input.voice.VoiceToTextInput
-import io.middlepoint.morestuff.android.ui.local.LocalAppNavigation
+import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.android.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.android.ui.priority.PriorityInput
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 @Composable
@@ -73,7 +70,7 @@ fun TaskInputBottomSheet(
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()
-  val navigation = LocalAppNavigation.current
+  val navigation = LocalAppRouter.current
 
   LaunchedEffect(context) {
     viewModel.take(UserInputEvent.LoadContext(context))
