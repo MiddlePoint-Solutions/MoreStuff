@@ -49,11 +49,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import io.github.xxfast.decompose.router.stack.RoutedContent
+import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
@@ -80,38 +80,37 @@ fun ScopesScreen(
   viewModel: ScopesViewModel = koinViewModel()
 ) {
 
-  val navigation = remember { StackNavigation<ScopeScreen>() }
+  val router = rememberRouter(ScopeScreen::class) {
+    listOf(initialScreen)
+  }
 
-  ChildStack(
-    source = navigation,
-    initialStack = { listOf(initialScreen) },
+  RoutedContent(
+    router = router,
     modifier = Modifier.background(Color.Transparent),
-    key = "ScopesStack",
-    handleBackButton = true,
-    animation = stackAnimation(slide()),
+    animation = stackAnimation(slide())
   ) { screen ->
     when (screen) {
       Root -> ScopesContent(
         onBack = onBack,
-        onCreateScope = { navigation.push(Create) },
-        onEditScope = { scope -> navigation.push(Edit(scope)) },
+        onCreateScope = { router.push(Create) },
+        onEditScope = { scope -> router.push(Edit(scope)) },
         onEvent = { scopeId -> viewModel.take(DeleteScope(scopeId)) }
       )
 
       Create -> CreateScopeScreen(
-        onBack = navigation::pop,
+        onBack = router::pop,
         onSaveScope = { title ->
           viewModel.take(CreateScope(title))
-          navigation.pop()
+          router.pop()
         }
       )
 
       is Edit -> EditScopeScreen(
         scope = screen.scope,
-        onBack = navigation::pop,
+        onBack = router::pop,
         onSaveScope = { title ->
           viewModel.take(UpdateScopeName(screen.scope.id, title))
-          navigation.pop()
+          router.pop()
         }
       )
     }

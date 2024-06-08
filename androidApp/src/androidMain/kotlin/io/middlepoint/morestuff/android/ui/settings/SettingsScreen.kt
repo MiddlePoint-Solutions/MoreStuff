@@ -18,10 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.ModeStandby
-import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -56,15 +54,15 @@ import androidx.constraintlayout.compose.Dimension
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import io.github.xxfast.decompose.router.stack.RoutedContent
+import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.shared.navigation.ChildStack
 import io.middlepoint.morestuff.android.ui.priority.PriorityTimePicker
 import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
 import io.middlepoint.morestuff.android.ui.theme.MoreStuffSettingTheme
@@ -88,16 +86,14 @@ fun SettingsScreen(
   viewModel: SettingsViewModel = koinViewModel(),
 ) {
 
-  val navigation = remember { StackNavigation<SettingScreen>() }
+  val navigation = rememberRouter(SettingScreen::class) {
+    listOf(Root)
+  }
   val model by viewModel.models.collectAsState()
 
-
-  ChildStack(
-    source = navigation,
-    initialStack = { listOf(Root) },
+  RoutedContent(
+    router = navigation,
     modifier = Modifier.background(Color.Transparent),
-    key = "SettingsStack",
-    handleBackButton = true,
     animation = stackAnimation(slide()),
   ) { screen ->
 
