@@ -76,6 +76,7 @@ kotlin {
       api(libs.kermit)
       api(libs.koin.core)
       api(libs.koin.compose)
+      api(libs.koin.compose.viewmodel)
       api(libs.decompose.router)
 
       // You will probably need to also bring in decompose and essenty
@@ -103,8 +104,8 @@ kotlin {
       implementation(libs.androidx.activity.compose)
       implementation(libs.androidx.appcompat)
       implementation(libs.androidx.core)
-//      api(compose.preview)
-//      api(compose.uiTooling)
+      api(compose.preview)
+      api(compose.uiTooling)
       implementation(libs.androidx.security.crypto)
       implementation(libs.sqldelight.driver.android)
       implementation(libs.ktor.client.okhttp)

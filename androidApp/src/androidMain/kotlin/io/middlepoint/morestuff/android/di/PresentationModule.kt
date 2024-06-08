@@ -10,9 +10,9 @@ import io.middlepoint.morestuff.android.ui.input.UserInputViewModel
 import io.middlepoint.morestuff.android.ui.input.voice.VoiceToTextViewModel
 import io.middlepoint.morestuff.android.ui.main.MainViewModel
 import io.middlepoint.morestuff.android.ui.model.map.MessageUiMapper
-import io.middlepoint.morestuff.android.ui.model.map.ReviewTasksMapper
+import io.middlepoint.morestuff.shared.ui.model.ReviewTasksMapper
 import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.android.ui.review.ReviewViewModel
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewModel
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksPresenter
 import io.middlepoint.morestuff.android.ui.scopes.ScopesViewModel
 import io.middlepoint.morestuff.android.ui.search.SearchViewModel

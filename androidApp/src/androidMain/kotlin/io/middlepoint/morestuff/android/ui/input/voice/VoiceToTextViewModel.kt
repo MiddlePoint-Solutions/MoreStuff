@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.SavedStateHandle
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.Flow

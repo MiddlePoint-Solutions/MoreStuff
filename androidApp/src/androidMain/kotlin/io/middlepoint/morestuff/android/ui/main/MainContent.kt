@@ -22,7 +22,7 @@ import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.home.HomeScreen
 import io.middlepoint.morestuff.android.ui.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
-import io.middlepoint.morestuff.android.ui.review.ReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
 import io.middlepoint.morestuff.android.ui.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
 import io.middlepoint.morestuff.android.ui.settings.SettingsScreen
@@ -75,7 +75,7 @@ fun MainContent(
 
       Home -> HomeScreen()
 
-      is Review -> ReviewScreen(currentScopeId = screen.scopeId)
+      is Review -> ReviewScreen(onBack = router::pop, currentScopeId = screen.scopeId)
 
       Settings -> SettingsScreen(onBack = router::pop)
 

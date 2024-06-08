@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.review
+package io.middlepoint.morestuff.shared.ui.screen.review
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,7 +14,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetReviewTasksUseCase
-import io.middlepoint.morestuff.android.ui.model.map.ReviewTasksMapper
+import io.middlepoint.morestuff.shared.ui.model.ReviewTasksMapper
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

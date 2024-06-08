@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.android.ui.chat.task
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.SavedStateHandle
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 
 class TaskChatPresenter(

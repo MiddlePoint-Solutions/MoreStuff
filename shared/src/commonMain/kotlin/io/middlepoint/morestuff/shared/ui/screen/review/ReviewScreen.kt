@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.review
+package io.middlepoint.morestuff.shared.ui.screen.review
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -38,7 +37,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -59,51 +57,69 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.findViewTreeLifecycleOwner
-import com.arkivanov.decompose.router.stack.pop
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
-import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
-import io.middlepoint.morestuff.android.ui.compose.ProvideLocalViewModelStoreOwner
-import io.middlepoint.morestuff.android.ui.compose.SlideAnimation
-import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
-import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
-import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.github.xxfast.decompose.router.rememberOnRoute
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
+import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
-import io.middlepoint.morestuff.android.ui.theme.reviewIconTint
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.ui.components.TaskCard
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.button_close
+import morestuff.shared.generated.resources.cd_high_priority_hint_icon
+import morestuff.shared.generated.resources.cd_highest_priority_hint_icon
+import morestuff.shared.generated.resources.cd_low_priority_hint_icon
+import morestuff.shared.generated.resources.cd_lowest_priority_hint_icon
+import morestuff.shared.generated.resources.cd_navigate_back
+import morestuff.shared.generated.resources.disable_hint_arrow
+import morestuff.shared.generated.resources.enable_hint_arrow
+import morestuff.shared.generated.resources.help
+import morestuff.shared.generated.resources.ic_arrow_high
+import morestuff.shared.generated.resources.ic_arrow_low
+import morestuff.shared.generated.resources.ic_arrow_lowest
+import morestuff.shared.generated.resources.ic_arrow_up
+import morestuff.shared.generated.resources.ic_review_later_24px
+import morestuff.shared.generated.resources.ic_review_now_24px
+import morestuff.shared.generated.resources.ic_review_undo_24px
+import morestuff.shared.generated.resources.onboarding_review_all_done
+import morestuff.shared.generated.resources.priority_review
+import morestuff.shared.generated.resources.review_hint_high_priority
+import morestuff.shared.generated.resources.review_hint_highest_priority
+import morestuff.shared.generated.resources.review_hint_low_priority
+import morestuff.shared.generated.resources.review_hint_lowest_priority
+import morestuff.shared.generated.resources.show_hint_arrow_priority
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.LocalKoinApplication
+import org.koin.compose.LocalKoinScope
+import org.koin.compose.getKoin
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.Koin
 
 @Composable
 fun ReviewScreen(
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     currentScopeId: Long,
 ) {
-    val navigation = LocalAppRouter.current
-    val lifecycleOwner = LocalView.current.findViewTreeLifecycleOwner()
-    ProvideLocalViewModelStoreOwner(lifecycleOwner) {
-        ReviewContent(
-            onBack = navigation::pop,
-            modifier = modifier,
-            currentScopeId = currentScopeId
-        )
-    }
+    ReviewContent(
+        onBack = onBack,
+        modifier = modifier,
+        currentScopeId = currentScopeId
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,13 +128,15 @@ fun ReviewContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     currentScopeId: Long,
-    viewModel: ReviewViewModel = koinViewModel(),
 ) {
+
+    val koin = LocalKoinScope.current
+    val viewModel = rememberOnRoute(ReviewViewModel::class) {
+        koin.get()
+    }
 
     val scope = rememberCoroutineScope()
     var showReviewHelpScreen by remember { mutableStateOf(false) }
-    val showTaskChat = remember { MutableTransitionState(false) }
-    var currentTaskId by rememberSaveable { mutableStateOf<Long?>(null) }
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var showReviewDragHints by remember { mutableStateOf(false) }
@@ -203,10 +221,10 @@ fun ReviewContent(
                             }
                         },
                         showTaskChat = { taskId ->
-                            currentTaskId = taskId
+                            /*currentTaskId = taskId
                             scope.launch {
                                 showTaskChat.targetState = true
-                            }
+                            }*/
                         }
                     )
 
@@ -231,32 +249,13 @@ fun ReviewContent(
             }
         }
 
-
-        SlideAnimation(visibleState = showTaskChat) {
-            BackHandler(onBack = {
-                scope.launch {
-                    showTaskChat.targetState = false
-                }
-            })
-            currentTaskId?.let { taskId ->
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceContainer
-                ) {
-                    TaskChatScreen(
-                        taskId = taskId,
-                        onBack = { showTaskChat.targetState = false },
-                    )
-                }
-            }
-        }
-
         if (showReviewHelpScreen) {
             ModalBottomSheet(
                 onDismissRequest = { showReviewHelpScreen = false },
                 sheetState = bottomSheetState,
                 content = {
                     OnBoardingReviewScreen(
-                        nextButtonText = stringResource(R.string.button_close),
+                        nextButtonText = stringResource(Res.string.button_close),
                         onNext = {
                             scope.launch {
                                 bottomSheetState.hide()
@@ -281,8 +280,12 @@ private fun PriorityReviewTopBar(
     modifier: Modifier = Modifier,
     navigateUp: () -> Unit = {},
     currentScopeId: Long,
-    viewModel: ReviewViewModel = koinViewModel()
 ) {
+
+    val koin = LocalKoinScope.current
+    val viewModel = rememberOnRoute(ReviewViewModel::class) {
+        koin.get()
+    }
 
     val coroutineScope = rememberCoroutineScope()
     var showMenu by remember { mutableStateOf(false) }
@@ -291,14 +294,14 @@ private fun PriorityReviewTopBar(
         TopAppBar(
             title = {
                 Text(
-                    text = stringResource(id = R.string.priority_review),
+                    text = stringResource(Res.string.priority_review),
                 )
             },
             navigationIcon = {
                 IconButton(onClick = navigateUp) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_navigate_back)
+                        contentDescription = stringResource(Res.string.cd_navigate_back)
                     )
                 }
             },
@@ -306,13 +309,13 @@ private fun PriorityReviewTopBar(
                 IconButton(onClick = showReviewHelpScreen) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Help,
-                        contentDescription = stringResource(R.string.help)
+                        contentDescription = stringResource(Res.string.help)
                     )
                 }
                 IconButton(onClick = { showMenu = true }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = stringResource(R.string.show_hint_arrow_priority)
+                        contentDescription = stringResource(Res.string.show_hint_arrow_priority)
                     )
                 }
 
@@ -329,9 +332,9 @@ private fun PriorityReviewTopBar(
                         text = {
                             Text(
                                 text = if (isReviewHintActive) {
-                                    stringResource(R.string.disable_hint_arrow)
+                                    stringResource(Res.string.disable_hint_arrow)
                                 } else {
-                                    stringResource(R.string.enable_hint_arrow)
+                                    stringResource(Res.string.enable_hint_arrow)
                                 }
                             )
                         })
@@ -409,17 +412,17 @@ private fun ReviewSwipeControls(
 
             SecondaryReviewButton(
                 onClick = laterAction,
-                icon = ImageVector.vectorResource(id = R.drawable.ic_review_later_24px)
+                icon = vectorResource(Res.drawable.ic_review_later_24px)
             )
 
             SecondaryReviewButton(
                 onClick = undoLastAction,
-                icon = ImageVector.vectorResource(id = R.drawable.ic_review_undo_24px)
+                icon = vectorResource(Res.drawable.ic_review_undo_24px)
             )
 
             SecondaryReviewButton(
                 onClick = doneAction,
-                icon = ImageVector.vectorResource(id = R.drawable.ic_review_now_24px)
+                icon = vectorResource(Res.drawable.ic_review_now_24px)
             )
 
 
@@ -458,7 +461,7 @@ private fun TaskPrioritySwipe(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = stringResource(R.string.onboarding_review_all_done),
+                text = stringResource(Res.string.onboarding_review_all_done),
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 38.sp
                 ),
@@ -504,13 +507,13 @@ private fun ReviewDragHint() {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_up),
-                contentDescription = stringResource(R.string.cd_highest_priority_hint_icon),
+                imageVector = vectorResource(Res.drawable.ic_arrow_up),
+                contentDescription = stringResource(Res.string.cd_highest_priority_hint_icon),
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ReviewHintTitle(text = stringResource(R.string.review_hint_highest_priority))
+            ReviewHintTitle(text = stringResource(Res.string.review_hint_highest_priority))
         }
         Column(
             modifier = Modifier
@@ -523,11 +526,11 @@ private fun ReviewDragHint() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            ReviewHintTitle(text = stringResource(R.string.review_hint_lowest_priority))
+            ReviewHintTitle(text = stringResource(Res.string.review_hint_lowest_priority))
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_lowest),
-                contentDescription = stringResource(R.string.cd_lowest_priority_hint_icon),
+                imageVector = vectorResource(Res.drawable.ic_arrow_lowest),
+                contentDescription = stringResource(Res.string.cd_lowest_priority_hint_icon),
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onBackground,
             )
@@ -544,13 +547,13 @@ private fun ReviewDragHint() {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_high),
-                contentDescription = stringResource(R.string.cd_high_priority_hint_icon),
+                imageVector = vectorResource(Res.drawable.ic_arrow_high),
+                contentDescription = stringResource(Res.string.cd_high_priority_hint_icon),
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ReviewHintTitle(text = stringResource(R.string.review_hint_high_priority))
+            ReviewHintTitle(text = stringResource(Res.string.review_hint_high_priority))
         }
 
         Column(
@@ -565,13 +568,13 @@ private fun ReviewDragHint() {
             verticalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_low),
-                contentDescription = stringResource(R.string.cd_low_priority_hint_icon),
+                imageVector = vectorResource(Res.drawable.ic_arrow_low),
+                contentDescription = stringResource(Res.string.cd_low_priority_hint_icon),
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onBackground,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            ReviewHintTitle(text = stringResource(R.string.review_hint_low_priority))
+            ReviewHintTitle(text = stringResource(Res.string.review_hint_low_priority))
         }
     }
 }
@@ -634,17 +637,17 @@ private fun SecondaryReviewButton(
     }
 }
 
-/*@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-fun ReviewSwipeControlsPreview() {
-    MoreStuffTheme {
-        ReviewSwipeControls({ null }, { null }, {})
-    }
-}*/
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//fun ReviewSwipeControlsPreview() {
+//    MoreStuffTheme {
+//        ReviewSwipeControls({ null }, { null }, {})
+//    }
+//}

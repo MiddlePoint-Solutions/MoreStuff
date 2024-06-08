@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.main
 
 import androidx.compose.runtime.Composable
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 
 class MainViewModel : MoleculeViewModel<MainEvent, MainState>() {

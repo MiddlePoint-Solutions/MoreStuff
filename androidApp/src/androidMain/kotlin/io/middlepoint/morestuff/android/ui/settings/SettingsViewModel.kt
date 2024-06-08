@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.android.ui.settings
 
 import androidx.compose.runtime.Composable
-import io.middlepoint.morestuff.android.app.presentation.viewmodel.MoleculeViewModel
+import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import kotlinx.coroutines.flow.Flow
 

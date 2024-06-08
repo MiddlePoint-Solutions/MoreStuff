@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.review
+package io.middlepoint.morestuff.shared.ui.screen.review
 
 import android.os.Parcelable
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
@@ -14,12 +14,12 @@ sealed class ReviewRound : Parcelable {
     data object Final : ReviewRound()
 }
 data class ReviewState(
-    val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
-    val currentScope: ScopeDomain = defaultScope,
-    val items: List<ReviewItemUiModel> = listOf(),
-    val actions: List<Pair<ReviewItemUiModel, PriorityActionType>> = listOf(),
-    val scopes: List<ScopeDomain> = listOf(),
-    val reviewHintEnabled: Boolean = false
+  val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
+  val currentScope: ScopeDomain = defaultScope,
+  val items: List<ReviewItemUiModel> = listOf(),
+  val actions: List<Pair<ReviewItemUiModel, PriorityActionType>> = listOf(),
+  val scopes: List<ScopeDomain> = listOf(),
+  val reviewHintEnabled: Boolean = false
 )
 
 sealed class ReviewViewEvent {
