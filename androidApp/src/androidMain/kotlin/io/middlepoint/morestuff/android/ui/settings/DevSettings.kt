@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
+import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch

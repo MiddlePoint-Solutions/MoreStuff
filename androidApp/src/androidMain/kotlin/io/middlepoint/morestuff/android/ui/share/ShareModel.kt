@@ -8,8 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetActiveTasksFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
-import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
+import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.android.ui.share.ShareEvent.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -25,11 +24,11 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @Composable
 fun shareModel(
-    initialState: ShareState,
-    events: Flow<ShareEvent>,
-    getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase = koinInject(),
-    searchTasksUseCase: SearchTasksUseCase = koinInject(),
-    taskUiMapper: TaskUiMapper = koinInject(),
+  initialState: ShareState,
+  events: Flow<ShareEvent>,
+  getActiveTasksFlowUseCase: GetActiveTasksFlowUseCase = koinInject(),
+  searchTasksUseCase: SearchTasksUseCase = koinInject(),
+  taskUiMapper: TaskUiMapper = koinInject(),
 ): ShareState {
 
     var tasks by remember { mutableStateOf(initialState.tasks) }

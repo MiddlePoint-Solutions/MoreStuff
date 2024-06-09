@@ -48,19 +48,19 @@ import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.android.ui.components.ConfirmDeleteDialog
-import io.middlepoint.morestuff.android.ui.components.HomeTopBar
-import io.middlepoint.morestuff.android.ui.components.MoreStuffHomeScaffold
+import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
+import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
+import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.android.ui.home.HomeEvent.*
-import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
-import io.middlepoint.morestuff.android.ui.model.PriorityUiModel
-import io.middlepoint.morestuff.android.ui.model.show
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
+import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.android.ui.schedule.ScopeContent
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksPresenter
 import io.middlepoint.morestuff.android.ui.search.SearchBar
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainerElevation
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.flow.collectLatest
@@ -109,10 +109,9 @@ fun HomeScreen(
         },
     )
 
-    val resources = LocalContext.current.resources
     LaunchedEffect(Unit) {
         homePresenter.notifications.collectLatest { notification ->
-            notification.show(snackbarHostState, resources).let { result ->
+            notification.show(snackbarHostState).let { result ->
                 if (result == SnackbarResult.ActionPerformed) {
                     launch { notification.action() }
                 }

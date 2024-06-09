@@ -62,11 +62,11 @@ import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
-import io.middlepoint.morestuff.android.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.android.ui.priority.PriorityTimePicker
+import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
+import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffSettingTheme
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffSettingTheme
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen

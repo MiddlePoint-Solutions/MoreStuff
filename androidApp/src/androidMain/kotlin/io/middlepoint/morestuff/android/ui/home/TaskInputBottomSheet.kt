@@ -37,22 +37,21 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.android.R
+import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.android.ui.chat.ChatActions
-import io.middlepoint.morestuff.android.ui.chat.Messages
-import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
-import io.middlepoint.morestuff.android.ui.components.SendIcon
-import io.middlepoint.morestuff.android.ui.input.UserInput
-import io.middlepoint.morestuff.android.ui.input.UserInputEvent
-import io.middlepoint.morestuff.android.ui.input.UserInputViewModel
-import io.middlepoint.morestuff.android.ui.input.UserTextInput
-import io.middlepoint.morestuff.android.ui.input.voice.VoiceToTextInput
-import io.middlepoint.morestuff.android.ui.local.LocalAppRouter
-import io.middlepoint.morestuff.android.ui.model.PriorityUiModel
-import io.middlepoint.morestuff.android.ui.priority.PriorityInput
-import com.arkivanov.decompose.router.stack.push
+import io.middlepoint.morestuff.shared.ui.components.SendIcon
+import io.middlepoint.morestuff.shared.ui.components.input.UserInput
+import io.middlepoint.morestuff.shared.ui.components.input.UserInputEvent
+import io.middlepoint.morestuff.shared.ui.components.input.UserInputViewModel
+import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
+import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
+import io.middlepoint.morestuff.shared.ui.components.priority.PriorityInput
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -77,7 +76,7 @@ fun TaskInputBottomSheet(
   }
 
   val chatActions = remember {
-    ChatActions(
+    io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions(
       taskChatAction = {
         navigation.push(Screen.TaskChat(it))
         coroutineScope.launch {

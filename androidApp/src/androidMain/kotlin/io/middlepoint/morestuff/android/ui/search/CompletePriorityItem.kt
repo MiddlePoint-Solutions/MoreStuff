@@ -30,11 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
 import io.middlepoint.morestuff.android.ui.schedule.TaskItemBadges
 import io.middlepoint.morestuff.android.ui.schedule.TaskProfile
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainer
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 
 @Composable
 fun CompletePriorityItem(

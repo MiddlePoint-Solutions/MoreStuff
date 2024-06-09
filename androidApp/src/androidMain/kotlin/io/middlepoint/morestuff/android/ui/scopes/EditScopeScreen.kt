@@ -30,9 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -43,9 +40,8 @@ import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainer
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainerElevation
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged

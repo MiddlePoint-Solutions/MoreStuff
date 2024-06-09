@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetScopeActiveTasksFlowUseCase
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
-import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
+import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksModels.*
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 

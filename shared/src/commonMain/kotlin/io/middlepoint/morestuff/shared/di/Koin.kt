@@ -7,7 +7,7 @@ import org.koin.dsl.KoinAppDeclaration
 fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
   appDeclaration()
   modules(domainModules)
-  modules(platformModule, dataModule)
+  modules(platformModule, dataModule, presentationModule)
 }
 
 expect val platformModule: Module

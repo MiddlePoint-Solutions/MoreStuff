@@ -18,9 +18,8 @@ import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.ui.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.android.ui.home.HomeScreen
-import io.middlepoint.morestuff.android.ui.image.ImageImportScreen
+import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
 import io.middlepoint.morestuff.android.ui.scopes.CreateScopeScreen
@@ -38,6 +37,7 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -93,7 +93,7 @@ fun MainContent(
 
       is ImagePreview -> {
         ImageImportScreen(
-          imageUri = Uri.parse(screen.imageUri),
+          imageUri = screen.imageUri,
           onImport = { message ->
             val shareableImage = Shareable.Image(screen.imageUri, message)
             shareContent(screen.taskId, shareableImage)

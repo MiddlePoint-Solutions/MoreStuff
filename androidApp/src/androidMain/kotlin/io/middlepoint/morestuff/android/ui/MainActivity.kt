@@ -23,12 +23,12 @@ import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
-import io.middlepoint.morestuff.android.ui.local.ProvideAppRouter
-import io.middlepoint.morestuff.android.ui.local.ProvideAppTheme
+import io.middlepoint.morestuff.shared.ui.local.ProvideAppRouter
+import io.middlepoint.morestuff.shared.ui.local.ProvideAppTheme
 import io.middlepoint.morestuff.android.ui.main.MainContent
 import io.middlepoint.morestuff.android.ui.main.MainEvent
 import io.middlepoint.morestuff.android.ui.main.MainViewModel
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen

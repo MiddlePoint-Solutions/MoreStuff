@@ -15,9 +15,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import io.middlepoint.morestuff.android.ui.compose.simpleVerticalScrollbar
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
-import io.middlepoint.morestuff.android.ui.theme.divider
+import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.theme.divider
 
 @Composable
 fun ScopeContent(

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.android.ui.share
 
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 data class ShareState(
     val tasks: List<TaskUiModel> = listOf(),

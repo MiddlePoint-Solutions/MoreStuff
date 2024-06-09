@@ -58,8 +58,8 @@ import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
 import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.UpdateScopeName
-import io.middlepoint.morestuff.android.ui.theme.md_theme_light_error
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainerElevation
+import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.android.ui.schedule
 
-import io.middlepoint.morestuff.android.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 sealed class ScopeTasksModels {
     data object Loading : ScopeTasksModels()

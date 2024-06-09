@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,9 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainer
-import io.middlepoint.morestuff.android.ui.theme.surfaceContainerElevation
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged

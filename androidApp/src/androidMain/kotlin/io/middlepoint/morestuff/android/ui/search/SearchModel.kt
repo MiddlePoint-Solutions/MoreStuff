@@ -12,7 +12,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetActiveTasksWithScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetCompletedTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
-import io.middlepoint.morestuff.android.ui.model.map.TaskUiMapper
+import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first

@@ -1,0 +1,16 @@
+package io.middlepoint.morestuff.shared.ui.components
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.runtime.Composable
+
+@Composable
+fun ListIcon(listIconClick: () -> Unit) {
+    IconButton(
+        onClick = listIconClick
+    ) {
+        Icon(Icons.Default.List, contentDescription = null)
+    }
+}
