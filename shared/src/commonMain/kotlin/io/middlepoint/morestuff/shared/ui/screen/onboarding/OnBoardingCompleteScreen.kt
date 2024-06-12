@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import morestuff.shared.generated.resources.Res
 import morestuff.shared.generated.resources.finish
 import morestuff.shared.generated.resources.onboarding_complete_title
+import morestuff.shared.generated.resources.onboarding_workspace
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -46,12 +47,12 @@ fun OnBoardingCompleteScreen(onFinish: () -> Unit) {
             color = MaterialTheme.colorScheme.primary,
         )
 
-//        Image(
-//            painter = painterResource(Res.drawable.onboarding_workspace),
-//            modifier = Modifier.align(Alignment.Center),
-//            contentDescription = "Workspace desk image",
-//            contentScale = ContentScale.FillBounds
-//        )
+        Image(
+            painter = painterResource(Res.drawable.onboarding_workspace),
+            modifier = Modifier.align(Alignment.Center),
+            contentDescription = "Workspace desk image",
+            contentScale = ContentScale.FillBounds
+        )
 
         OnboardingButton(
             onClick = onFinish,

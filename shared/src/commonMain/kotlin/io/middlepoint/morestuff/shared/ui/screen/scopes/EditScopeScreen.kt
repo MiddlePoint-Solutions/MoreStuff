@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.scopes
+package io.middlepoint.morestuff.shared.ui.screen.scopes
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,21 +29,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_navigate_back
+import morestuff.shared.generated.resources.cd_scopes_icon
+import morestuff.shared.generated.resources.description_create_scope
+import morestuff.shared.generated.resources.save
+import morestuff.shared.generated.resources.title_edit_scope
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,12 +70,12 @@ fun EditScopeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.title_edit_scope)) },
+                title = { Text(text = stringResource(Res.string.title_edit_scope)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.cd_navigate_back)
+                            contentDescription = stringResource(Res.string.cd_navigate_back)
                         )
                     }
                 },
@@ -85,7 +86,7 @@ fun EditScopeScreen(
                             contentPadding = PaddingValues()
                         ) {
                             Text(
-                                text = stringResource(id = R.string.save).uppercase(),
+                                text = stringResource(Res.string.save).uppercase(),
                                 style = MaterialTheme.typography.bodyLarge.copy(
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -121,7 +122,7 @@ fun EditScopeScreen(
 
                 Icon(
                     imageVector = Icons.Filled.ModeStandby,
-                    contentDescription = stringResource(R.string.cd_scopes_icon),
+                    contentDescription = stringResource(Res.string.cd_scopes_icon),
                     modifier = Modifier
                         .padding(top = 20.dp)
                         .size(60.dp),
@@ -133,7 +134,7 @@ fun EditScopeScreen(
                 )
 
                 Text(
-                    text = stringResource(R.string.description_create_scope),
+                    text = stringResource(Res.string.description_create_scope),
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
                 )
@@ -160,21 +161,21 @@ fun EditScopeScreen(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-private fun Preview() {
-    MoreStuffTheme {
-        EditScopeScreen(
-            scope = defaultScope,
-            onBack = {},
-            onSaveScope = {}
-        )
-    }
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//private fun Preview() {
+//    MoreStuffTheme {
+//        EditScopeScreen(
+//            scope = defaultScope,
+//            onBack = {},
+//            onSaveScope = {}
+//        )
+//    }
+//}

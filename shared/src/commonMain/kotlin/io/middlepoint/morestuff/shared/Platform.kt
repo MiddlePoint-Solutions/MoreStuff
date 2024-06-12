@@ -6,3 +6,5 @@ expect class File(path: String) {
 }
 
 expect fun generateUUID(): String
+
+expect fun formatString(format: String, vararg args: Any): String

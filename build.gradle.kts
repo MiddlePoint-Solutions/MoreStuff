@@ -28,7 +28,7 @@ plugins {
   alias(libs.plugins.kotlinx.serialization).apply(false)
   alias(libs.plugins.sqldelight).apply(false)
   alias(libs.plugins.spotless).apply(false)
-  alias(libs.plugins.aboutLibrariesPlugin) apply false
+  alias(libs.plugins.aboutLibrariesPlugin).apply(false)
 }
 
 allprojects {

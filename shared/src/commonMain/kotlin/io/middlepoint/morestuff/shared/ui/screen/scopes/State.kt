@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.scopes
+package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
@@ -19,6 +19,5 @@ sealed class ScopesUiEvent {
 
   data class DeleteScope(val scopeId: Long) : ScopesUiEvent()
   data class UpdateScopeName(val scopeId: Long, val newName: String) : ScopesUiEvent()
-  data class ReorderScope(val fromIndex: Int, val toIndex: Int, val isFinal: Boolean) :
-    ScopesUiEvent()
+  data class ReorderScopes(val scopes: List<ScopeDomain>) : ScopesUiEvent()
 }

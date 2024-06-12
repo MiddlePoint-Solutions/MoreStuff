@@ -1,16 +1,13 @@
 package io.middlepoint.morestuff.android.ui.search
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.SavedStateHandle
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 
 
-class SearchViewModel(
-    private val savedState: SavedStateHandle,
-) : MoleculeViewModel<SearchEvent, SearchState>() {
+class SearchViewModel: MoleculeViewModel<SearchEvent, SearchState>() {
 
-    override val initialState: SearchState = savedState["Search"] ?: SearchState()
+    override val initialState: SearchState = SearchState()
     @Composable
     override fun models(events: Flow<SearchEvent>): SearchState {
         return searchModel(
@@ -19,9 +16,6 @@ class SearchViewModel(
         )
     }
 
-    override fun onSaveState(model: SearchState) {
-        savedState["Search"] = model
-    }
 }
 
 

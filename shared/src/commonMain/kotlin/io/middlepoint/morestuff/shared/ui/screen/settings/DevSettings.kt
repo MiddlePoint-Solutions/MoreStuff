@@ -1,10 +1,5 @@
-package io.middlepoint.morestuff.android.ui.settings
+package io.middlepoint.morestuff.shared.ui.screen.settings
 
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
@@ -21,30 +17,28 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.replaceAll
+import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
+import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import kotlinx.coroutines.launch
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.debug_messages
+import morestuff.shared.generated.resources.developer_settings
+import morestuff.shared.generated.resources.test_onboarding
+import morestuff.shared.generated.resources.test_review_notifications
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -55,7 +49,7 @@ fun DevSettingsScreen(
         topBar = {
             SettingsTopBar(
                 onBack = onBack,
-                title = stringResource(id = R.string.developer_settings)
+                title = stringResource(Res.string.developer_settings)
             )
         }
     ) {
@@ -72,77 +66,78 @@ fun DevSettings(
 
     val scope = rememberCoroutineScope()
 
-    var exportData by remember { mutableStateOf(false) }
-    if (exportData) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/octet-stream"
-            putExtra(Intent.EXTRA_TITLE, "morestuff.db")
-        }
-        val launcher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.data?.also { uri ->
-                    scope.launch {
-                        devTools.exportData(uri.toString())
-                    }
-                }
-            }
-            exportData = false
-        }
-
-        LaunchedEffect(Unit) {
-            launcher.launch(intent)
-        }
-    }
-
-    var importData by remember { mutableStateOf(false) }
-    if (importData) {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/octet-stream"
-        }
-        val launcher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result: ActivityResult ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.data?.also { uri ->
-                    scope.launch {
-                        devTools.importData(uri.toString())
-                    }
-                }
-            }
-            importData = false
-        }
-
-        LaunchedEffect(Unit) {
-            launcher.launch(intent)
-        }
-    }
+    // TODO: Import / export database
+//    var exportData by remember { mutableStateOf(false) }
+//    if (exportData) {
+//        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+//            addCategory(Intent.CATEGORY_OPENABLE)
+//            type = "application/octet-stream"
+//            putExtra(Intent.EXTRA_TITLE, "morestuff.db")
+//        }
+//        val launcher = rememberLauncherForActivityResult(
+//            contract = ActivityResultContracts.StartActivityForResult()
+//        ) { result: ActivityResult ->
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                result.data?.data?.also { uri ->
+//                    scope.launch {
+//                        devTools.exportData(uri.toString())
+//                    }
+//                }
+//            }
+//            exportData = false
+//        }
+//
+//        LaunchedEffect(Unit) {
+//            launcher.launch(intent)
+//        }
+//    }
+//
+//    var importData by remember { mutableStateOf(false) }
+//    if (importData) {
+//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//            addCategory(Intent.CATEGORY_OPENABLE)
+//            type = "application/octet-stream"
+//        }
+//        val launcher = rememberLauncherForActivityResult(
+//            contract = ActivityResultContracts.StartActivityForResult()
+//        ) { result: ActivityResult ->
+//            if (result.resultCode == Activity.RESULT_OK) {
+//                result.data?.data?.also { uri ->
+//                    scope.launch {
+//                        devTools.importData(uri.toString())
+//                    }
+//                }
+//            }
+//            importData = false
+//        }
+//
+//        LaunchedEffect(Unit) {
+//            launcher.launch(intent)
+//        }
+//    }
 
 
     val navigation = LocalAppRouter.current
     Column {
         SettingsMenuLink(
-            title = { Text(text = stringResource(id = R.string.test_onboarding)) },
+            title = { Text(text = stringResource(Res.string.test_onboarding)) },
             onClick = { navigation.replaceAll(Screen.OnBoarding) },
         )
 
         SettingsMenuLink(
-            title = { Text(text = stringResource(id = R.string.test_review_notifications)) },
+            title = { Text(text = stringResource(Res.string.test_review_notifications)) },
             onClick = devTools::testReviewNotification,
         )
 
-        SettingsMenuLink(
-            title = { Text(text = stringResource(id = R.string.export_database)) },
-            onClick = { exportData = true },
-        )
-
-        SettingsMenuLink(
-            title = { Text(text = stringResource(id = R.string.import_database)) },
-            onClick = { importData = true },
-        )
+//        SettingsMenuLink(
+//            title = { Text(text = stringResource(Res.string.export_database)) },
+//            onClick = { exportData = true },
+//        )
+//
+//        SettingsMenuLink(
+//            title = { Text(text = stringResource(Res.string.import_database)) },
+//            onClick = { importData = true },
+//        )
 
         DebugMessageSwitch(
             state = rememberAppSettingState(
@@ -169,13 +164,13 @@ private fun DebugMessageSwitch(
             state = state.value,
             icon = {
                 Icon(
-                    imageVector = Icons.Default.Message,
+                    imageVector = Icons.AutoMirrored.Filled.Message,
                     contentDescription = "Debug Messages"
                 )
             },
             title = {
                 Text(
-                    text = stringResource(id = R.string.debug_messages),
+                    text = stringResource(Res.string.debug_messages),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )

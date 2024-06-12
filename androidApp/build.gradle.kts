@@ -40,8 +40,6 @@ buildConfig {
         ?: error("buildConfig.versionCode undefined!")
     }
   )
-
-
 }
 
 object Env {
@@ -159,7 +157,7 @@ tasks.withType<KotlinCompile>().configureEach {
 }
 
 dependencies {
-  implementation(project(":shared"))
+  api(project(":shared"))
 
 //    implementation(platform(libs.androidxComposeBom))
 //    implementation(platform(libs.arrowBom))
@@ -229,8 +227,8 @@ dependencies {
   // Utils
   implementation(libs.reorderable)
   implementation(libs.preferenceKtx)
-  implementation(libs.composeSettings.ui)
-  implementation(libs.settingsStoragePreferences)
+//  implementation(libs.composeSettings.ui)
+//  implementation(libs.settingsStoragePreferences)
   implementation(libs.decompose)
   implementation(libs.decompose.compose.multiplatform)
   implementation(libs.parcelable)
@@ -248,8 +246,7 @@ dependencies {
   implementation(libs.telephoto)
 
   // About Libraries
-  implementation(libs.aboutLibrariesCore)
-  implementation(libs.aboutLibrariesCompose)
+
 
 
   debugImplementation(libs.uiTestManifest)

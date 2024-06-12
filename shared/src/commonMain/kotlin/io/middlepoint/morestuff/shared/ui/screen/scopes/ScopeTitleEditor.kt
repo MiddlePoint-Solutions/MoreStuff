@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.scopes
+package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField

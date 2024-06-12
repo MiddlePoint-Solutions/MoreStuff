@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.scopes
+package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,10 +14,10 @@ import org.koin.compose.koinInject
 
 @Composable
 fun scopesModel(
-    initialState: ScopesState,
-    events: Flow<ScopesUiEvent>,
-    store: AppStore = koinInject(),
-    getScopesFlowUseCase: GetScopesFlowUseCase = koinInject()
+  initialState: ScopesState,
+  events: Flow<ScopesUiEvent>,
+  store: AppStore = koinInject(),
+  getScopesFlowUseCase: GetScopesFlowUseCase = koinInject()
 ): ScopesState {
     var scopesState by remember { mutableStateOf(initialState.scopes) }
 
@@ -26,7 +26,6 @@ fun scopesModel(
             scopesState = newScopes
         }
     }
-
 
     LaunchedEffect(Unit) {
         events.collect { event ->
@@ -40,14 +39,8 @@ fun scopesModel(
                 is ScopesUiEvent.UpdateScopeName -> {
                     store.dispatch(ScopeAction.UpdateScopeNameAction(event.scopeId, event.newName))
                 }
-                is ScopesUiEvent.ReorderScope -> {
-                    if (event.isFinal) {
-                        store.dispatch(ScopeAction.UpdateScopeOrderAction(scopesState))
-                    } else {
-                        scopesState = scopesState.toMutableList().apply {
-                            add(event.toIndex, removeAt(event.fromIndex))
-                        }
-                    }
+                is ScopesUiEvent.ReorderScopes -> {
+                    store.dispatch(ScopeAction.UpdateScopeOrderAction(event.scopes))
                 }
             }
         }

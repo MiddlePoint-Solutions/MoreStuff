@@ -22,9 +22,9 @@ import io.middlepoint.morestuff.android.ui.home.HomeScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
-import io.middlepoint.morestuff.android.ui.scopes.CreateScopeScreen
-import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
-import io.middlepoint.morestuff.android.ui.settings.SettingsScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.android.ui.share.ShareScreen
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.nav.Screen

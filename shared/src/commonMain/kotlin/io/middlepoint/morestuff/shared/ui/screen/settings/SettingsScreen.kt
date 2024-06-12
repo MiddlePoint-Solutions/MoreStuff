@@ -1,9 +1,6 @@
-package io.middlepoint.morestuff.android.ui.settings
+package io.middlepoint.morestuff.shared.ui.screen.settings
 
-import MoreStuff.androidApp.BuildConfig
-import android.content.res.Configuration
-import android.content.res.Resources
-import android.widget.Toast
+import MoreStuff.shared.BuildConfig
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,6 +27,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -39,14 +38,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -56,43 +51,109 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.essenty.instancekeeper.InstanceKeeper
+import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.dokar.sonner.Toaster
+import com.dokar.sonner.rememberToasterState
+import io.github.xxfast.decompose.router.LocalRouterContext
+import io.github.xxfast.decompose.router.RouterContext
+import io.github.xxfast.decompose.router.key
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
-import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
-import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
-import io.middlepoint.morestuff.android.ui.scopes.ScopesScreen
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffSettingTheme
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
+import io.middlepoint.morestuff.shared.formatString
+import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
+import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import kotlinx.coroutines.delay
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffSettingTheme
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import java.util.Locale
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_schedule_icon
+import morestuff.shared.generated.resources.click_s_to_enable_developer_settings
+import morestuff.shared.generated.resources.dev_settings_already_enabled
+import morestuff.shared.generated.resources.developer_settings
+import morestuff.shared.generated.resources.developer_settings_enabled
+import morestuff.shared.generated.resources.ic_discord
+import morestuff.shared.generated.resources.ic_schedule
+import morestuff.shared.generated.resources.ic_telegram
+import morestuff.shared.generated.resources.join_community
+import morestuff.shared.generated.resources.language_catalan
+import morestuff.shared.generated.resources.language_device_default
+import morestuff.shared.generated.resources.language_english
+import morestuff.shared.generated.resources.language_hebrew
+import morestuff.shared.generated.resources.language_russian
+import morestuff.shared.generated.resources.language_spanish
+import morestuff.shared.generated.resources.open_source_libraries
+import morestuff.shared.generated.resources.privacy_policy
+import morestuff.shared.generated.resources.set_review_time
+import morestuff.shared.generated.resources.settings
+import morestuff.shared.generated.resources.title_scopes
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.LocalKoinApplication
+import org.koin.core.Koin
+import kotlin.reflect.KClass
+
+@Composable
+fun <T : Any> rememberOnRoute(
+  type: KClass<T>,
+  key: Any = type.key,
+  block: @DisallowComposableCalls (context: RouterContext, koin: Koin) -> T
+): T {
+  class RouteInstance(val instance: T) : InstanceKeeper.Instance
+
+  val routerContext: RouterContext = LocalRouterContext.current
+  val koin: Koin = LocalKoinApplication.current
+  val instanceKeeper: InstanceKeeper = routerContext.instanceKeeper
+  val routeInstance: RouteInstance = remember(key) {
+    instanceKeeper.getOrCreate(key) { RouteInstance(block(routerContext, koin)) }
+  }
+  return routeInstance.instance
+}
+
+@Composable
+fun <T : Any> koinInjectOnRoute(
+  type: KClass<T>,
+  key: Any = type.key,
+  block: @DisallowComposableCalls ((koin: Koin) -> T)? = null
+): T {
+  class RouteInstance(val instance: T) : InstanceKeeper.Instance
+
+  val routerContext: RouterContext = LocalRouterContext.current
+  val koin: Koin = LocalKoinApplication.current
+  val instanceKeeper: InstanceKeeper = routerContext.instanceKeeper
+  val routeInstance: RouteInstance = remember(key) {
+    instanceKeeper.getOrCreate(key) { RouteInstance(block?.invoke(koin) ?: koin.get(type)) }
+  }
+  return routeInstance.instance
+}
+
 
 @Composable
 fun SettingsScreen(
   onBack: () -> Unit,
-  viewModel: SettingsViewModel = koinViewModel(),
 ) {
 
-  val navigation = rememberRouter(SettingScreen::class) {
+  val router = rememberRouter(SettingScreen::class) {
     listOf(Root)
   }
+
+  val viewModel = koinInjectOnRoute(SettingsViewModel::class)
+
   val model by viewModel.models.collectAsState()
 
   RoutedContent(
-    router = navigation,
+    router = router,
     modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(slide()),
   ) { screen ->
@@ -113,23 +174,23 @@ fun SettingsScreen(
           },
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
           enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
-          showDevSettings = { navigation.push(Developer) },
-          showScopesSettings = { navigation.push(Scopes) },
-          showLibraries = { navigation.push(AboutLibraries) },
+          showDevSettings = { router.push(Developer) },
+          showScopesSettings = { router.push(Scopes) },
+          showLibraries = { router.push(AboutLibraries) },
         )
       }
 
-      Developer -> DevSettingsScreen(onBack = navigation::pop)
+      Developer -> DevSettingsScreen(onBack = router::pop)
 
-      Scopes -> ScopesScreen(onBack = navigation::pop)
+      Scopes -> ScopesScreen(onBack = router::pop)
 
-      AboutLibraries -> AboutLibrariesScreen(onBack = navigation::pop)
+      AboutLibraries -> AboutLibrariesScreen(onBack = router::pop)
     }
   }
 }
 
 @Composable
-private fun SettingsContent(
+fun SettingsContent(
   onBack: () -> Unit,
   model: SettingsState,
   selectAppTheme: (Int) -> Unit,
@@ -148,11 +209,12 @@ private fun SettingsContent(
       topBar = {
         SettingsTopBar(
           onBack = onBack,
-          title = stringResource(id = R.string.settings)
+          title = stringResource(Res.string.settings)
         )
       },
       containerColor = MaterialTheme.colorScheme.surface
     ) {
+
       ConstraintLayout(
         modifier = Modifier
           .fillMaxSize()
@@ -169,6 +231,7 @@ private fun SettingsContent(
             height = Dimension.fillToConstraints
           }
         ) {
+
           SelectTheme(
             themeSelected = selectAppTheme,
             defaultValue = { model.appTheme.ordinal }
@@ -188,7 +251,7 @@ private fun SettingsContent(
           if (model.devSettings) {
             SettingsMenuLink(
               title = {
-                Text(text = stringResource(id = R.string.developer_settings))
+                Text(text = stringResource(Res.string.developer_settings))
               },
               icon = {
                 Icon(
@@ -222,12 +285,6 @@ private fun SelectTheme(
   defaultValue: () -> Int,
 ) {
 
-  val resources = LocalContext.current.resources
-
-  val themeOptions = remember {
-    AppTheme.entries.map { it.displayTitle(resources) }
-  }
-
   val state = rememberAppSettingState(
     defaultValue = defaultValue,
     valueChanged = themeSelected,
@@ -238,14 +295,14 @@ private fun SelectTheme(
 //    state = state,
 //    title = {
 //      Text(
-//        text = stringResource(R.string.select_theme),
+//        text = stringResource(Res.string.select_theme),
 //      )
 //    },
 //    items = themeOptions,
 //    icon = {
 //      Icon(
 //        imageVector = Icons.Default.ColorLens,
-//        contentDescription = stringResource(R.string.cd_select_theme)
+//        contentDescription = stringResource(Res.string.cd_select_theme)
 //      )
 //    },
 //    closeDialogDelay = 0,
@@ -253,11 +310,6 @@ private fun SelectTheme(
 //  )
 }
 
-private fun AppTheme.displayTitle(res: Resources): String = when (this) {
-  AppTheme.System -> res.getString(R.string.theme_system)
-  AppTheme.Light -> res.getString(R.string.theme_light)
-  AppTheme.Dark -> res.getString(R.string.theme_dark)
-}
 
 @Composable
 private fun About(
@@ -268,8 +320,9 @@ private fun About(
 ) {
 
   val uriHandler = LocalUriHandler.current
-  val context = LocalContext.current
   val scope = rememberCoroutineScope()
+
+  val toaster = rememberToasterState()
   var devSettingsCounter by remember { mutableIntStateOf(7) }
 
   Surface(modifier = modifier) {
@@ -280,7 +333,7 @@ private fun About(
     ) {
 
       Text(
-        text = stringResource(id = R.string.join_community),
+        text = stringResource(Res.string.join_community),
         color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.fillMaxWidth(),
         style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
@@ -296,7 +349,7 @@ private fun About(
           onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
         ) {
           Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_discord),
+            imageVector = vectorResource(Res.drawable.ic_discord),
             contentDescription = "Discord Icon",
             modifier = Modifier.size(36.dp),
             tint = MaterialTheme.colorScheme.onSurface
@@ -309,7 +362,7 @@ private fun About(
           onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
         ) {
           Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_telegram),
+            imageVector = vectorResource(Res.drawable.ic_telegram),
             contentDescription = "Telegram Icon",
             modifier = Modifier.size(36.dp),
             tint = MaterialTheme.colorScheme.onSurface
@@ -323,7 +376,7 @@ private fun About(
           .padding(top = 16.dp),
       ) {
         Text(
-          text = stringResource(R.string.privacy_policy),
+          text = stringResource(Res.string.privacy_policy),
           style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
           modifier = Modifier.clickable(onClick = { uriHandler.openUri(PRIVACY_POLICY_LINK) })
         )
@@ -335,7 +388,7 @@ private fun About(
           .padding(top = 8.dp),
       ) {
         Text(
-          text = stringResource(R.string.open_source_libraries),
+          text = stringResource(Res.string.open_source_libraries),
           style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.Underline),
           modifier = Modifier.clickable(onClick = showLibraries)
         )
@@ -350,45 +403,45 @@ private fun About(
           text = "V${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
           style = MaterialTheme.typography.bodySmall,
           modifier = Modifier.clickable {
-            val toast: Toast
-            if (!devSettingsEnabled) {
-              if (devSettingsCounter > 1) {
-                devSettingsCounter -= 1
-                toast = Toast.makeText(
-                  context,
-                  context.resources.getString(
-                    R.string.click_s_to_enable_developer_settings,
-                    devSettingsCounter.toString()
-                  ),
-                  Toast.LENGTH_SHORT
-                )
-              } else {
-                enableDevSettings()
-                toast = Toast.makeText(
-                  context,
-                  context.resources.getText(R.string.developer_settings_enabled),
-                  Toast.LENGTH_SHORT
-                )
-              }
-            } else {
-              toast = Toast.makeText(
-                context,
-                context.resources.getText(R.string.dev_settings_already_enabled),
-                Toast.LENGTH_SHORT
-              )
-            }
             scope.launch {
-              toast.show()
-              delay(1000)
-              toast.cancel()
+              if (!devSettingsEnabled) {
+                if (devSettingsCounter > 1) {
+                  val message = getString(
+                    Res.string.click_s_to_enable_developer_settings,
+                    devSettingsCounter.toString()
+                  )
+                  devSettingsCounter -= 1
+                  toaster.show(message, id = "DevSettings")
+                } else {
+                  enableDevSettings()
+                  val message = getString(
+                    Res.string.developer_settings_enabled,
+                    devSettingsCounter.toString()
+                  )
+                  toaster.show(message, id = "DevSettings")
+                }
+              } else {
+                val message = getString(
+                  Res.string.dev_settings_already_enabled,
+                  devSettingsCounter.toString()
+                )
+                toaster.show(message, id = "DevSettings")
+              }
             }
-          },
-          color = MaterialTheme.colorScheme.onBackground
+          }
         )
       }
-
     }
   }
+
+  Toaster(
+    state = toaster
+  )
+}
+
+@Composable
+private fun showToast() {
+
 }
 
 @Composable
@@ -427,10 +480,10 @@ private fun ReviewTimeSelector(
   SettingsMenuLink(
     title = {
       Column {
-        Text(text = stringResource(R.string.set_review_time))
+        Text(text = stringResource(Res.string.set_review_time))
         selectedTimeState.value.let {
           Text(
-            text = "${it.first}:${String.format("%02d", it.second)}",
+            text = "${it.first}:${formatString("%02d", it.second)}",
             fontSize = 12.sp
 
           )
@@ -440,8 +493,8 @@ private fun ReviewTimeSelector(
     onClick = { showTimePickerDialog = true },
     icon = {
       Icon(
-        imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-        contentDescription = stringResource(R.string.cd_schedule_icon),
+        imageVector = vectorResource(Res.drawable.ic_schedule),
+        contentDescription = stringResource(Res.string.cd_schedule_icon),
       )
     },
   )
@@ -452,28 +505,27 @@ private fun SelectLanguage(
   languageSelected: (Int) -> Unit,
   defaultValue: () -> Int,
 ) {
-  val resources = LocalContext.current.resources
-  val languageOptions = remember {
-    Language.entries.map { it.displayTitle(resources) }
-  }
+//  val languageOptions = remember {
+//    Language.entries.map { it.displayTitle() }
+//  }
 
 
   val state = rememberAppSettingState(
     defaultValue = defaultValue,
     valueChanged = languageSelected,
   )
-  val selectedLanguage = if (Language.entries[state.value] == Language.Device) {
-    Locale.getDefault().displayLanguage
-  } else {
-    languageOptions[state.value]
-  }
+//  val selectedLanguage = if (Language.entries[state.value] == Language.Device) {
+//    Locale.current.toLanguageTag()
+//  } else {
+//    languageOptions[state.value]
+//  }
 
   // TODO:
 //  SettingsList(
 //    state = state,
 //    title = {
 //      Column {
-//        Text(text = stringResource(R.string.select_language))
+//        Text(text = stringResource(Res.string.select_language))
 //        Text(
 //          text = selectedLanguage,
 //          fontSize = 12.sp
@@ -484,7 +536,7 @@ private fun SelectLanguage(
 //    icon = {
 //      Icon(
 //        imageVector = Icons.Default.Translate,
-//        contentDescription = stringResource(R.string.select_language)
+//        contentDescription = stringResource(Res.string.select_language)
 //      )
 //    },
 //    closeDialogDelay = 0,
@@ -492,52 +544,50 @@ private fun SelectLanguage(
 //  )
 }
 
-private fun Language.displayTitle(res: Resources): String = when (this) {
-  Language.Device -> res.getString(R.string.language_device_default)
-  Language.English -> res.getString(R.string.language_english)
-  Language.Spanish -> res.getString(R.string.language_spanish)
-  Language.Hebrew -> res.getString(R.string.language_hebrew)
-  Language.Russian -> res.getString(R.string.language_russian)
-  Language.Catalan -> res.getString(R.string.language_catalan)
+private suspend fun Language.displayTitle(): String = when (this) {
+  Language.Device -> getString(Res.string.language_device_default)
+  Language.English -> getString(Res.string.language_english)
+  Language.Spanish -> getString(Res.string.language_spanish)
+  Language.Hebrew -> getString(Res.string.language_hebrew)
+  Language.Russian -> getString(Res.string.language_russian)
+  Language.Catalan -> getString(Res.string.language_catalan)
 }
 
 @Composable
 private fun ScopeSettings(onClick: () -> Unit) {
   SettingsMenuLink(
-    title = { Text(text = stringResource(R.string.title_scopes)) },
+    title = { Text(text = stringResource(Res.string.title_scopes)) },
     onClick = onClick,
     icon = {
       Icon(
         imageVector = Icons.Default.ModeStandby,
-        contentDescription = stringResource(R.string.select_language)
+        contentDescription = "Scopes"
       )
     }
   )
 }
 
-@Preview(
-  uiMode = Configuration.UI_MODE_NIGHT_YES,
-  name = "Dark"
-)
-@Preview(
-  uiMode = Configuration.UI_MODE_NIGHT_NO,
-  name = "Light"
-)
-@Composable
-private fun SettingsPreviewDark() {
-  MoreStuffTheme {
-    SettingsContent(
-      onBack = {},
-      showLibraries = {},
-      showDevSettings = {},
-      showScopesSettings = {},
-      model = SettingsState(),
-      enableDevSettings = {},
-      selectAppTheme = {},
-      selectLanguage = {},
-      setReviewTime = { _, _ -> }
-
-
-    )
-  }
-}
+//@Preview(
+//  uiMode = Configuration.UI_MODE_NIGHT_YES,
+//  name = "Dark"
+//)
+//@Preview(
+//  uiMode = Configuration.UI_MODE_NIGHT_NO,
+//  name = "Light"
+//)
+//@Composable
+//private fun SettingsPreviewDark() {
+//  MoreStuffTheme {
+//    SettingsContent(
+//      onBack = {},
+//      showLibraries = {},
+//      showDevSettings = {},
+//      showScopesSettings = {},
+//      model = SettingsState(),
+//      enableDevSettings = {},
+//      selectAppTheme = {},
+//      selectLanguage = {},
+//      setReviewTime = { _, _ -> }
+//    )
+//  }
+//}

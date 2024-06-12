@@ -1,5 +1,6 @@
-package io.middlepoint.morestuff.android.ui.scopes
+package io.middlepoint.morestuff.shared.ui.screen.scopes
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -43,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -53,25 +54,35 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.CreateScope
-import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.DeleteScope
-import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.ReorderScope
-import io.middlepoint.morestuff.android.ui.scopes.ScopesUiEvent.UpdateScopeName
-import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
-import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Root
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
-import org.koin.androidx.compose.koinViewModel
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.CreateScope
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.DeleteScope
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.ReorderScopes
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
+import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cancel
+import morestuff.shared.generated.resources.cd_add_new_scope
+import morestuff.shared.generated.resources.cd_dots_menu
+import morestuff.shared.generated.resources.cd_move_icon
+import morestuff.shared.generated.resources.cd_navigate_back
+import morestuff.shared.generated.resources.cd_scopes_icon
+import morestuff.shared.generated.resources.delete
+import morestuff.shared.generated.resources.delete_scope
+import morestuff.shared.generated.resources.description_scopes
+import morestuff.shared.generated.resources.edit_scope
+import morestuff.shared.generated.resources.sure_delete_scope
+import morestuff.shared.generated.resources.title_scopes
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun ScopesScreen(
@@ -132,12 +143,12 @@ fun ScopesContent(
   Scaffold(
     topBar = {
       TopAppBar(
-        title = { Text(text = (stringResource(R.string.title_scopes))) },
+        title = { Text(text = (stringResource(Res.string.title_scopes))) },
         navigationIcon = {
           IconButton(onClick = onBack) {
             Icon(
               imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-              contentDescription = stringResource(R.string.cd_navigate_back)
+              contentDescription = stringResource(Res.string.cd_navigate_back)
             )
           }
         },
@@ -145,7 +156,7 @@ fun ScopesContent(
           IconButton(onClick = onCreateScope) {
             Icon(
               imageVector = Icons.Filled.Add,
-              contentDescription = stringResource(R.string.cd_add_new_scope)
+              contentDescription = stringResource(Res.string.cd_add_new_scope)
             )
           }
         },
@@ -165,7 +176,7 @@ fun ScopesContent(
 
       Icon(
         imageVector = Icons.Filled.ModeStandby,
-        contentDescription = stringResource(R.string.cd_scopes_icon),
+        contentDescription = stringResource(Res.string.cd_scopes_icon),
         modifier = Modifier
           .padding(top = 20.dp)
           .size(60.dp),
@@ -177,7 +188,7 @@ fun ScopesContent(
       )
 
       Text(
-        text = stringResource(R.string.description_scopes),
+        text = stringResource(Res.string.description_scopes),
         color = MaterialTheme.colorScheme.onSurface
       )
 
@@ -210,24 +221,32 @@ fun ScopesContent(
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun OrderedScopesList(
   onEditScope: (ScopeDomain) -> Unit,
   onDeleteScope: (ScopeDomain) -> Unit,
   viewModel: ScopesViewModel = koinViewModel()
 ) {
-  val model = viewModel.models.collectAsState()
-  val menuVisibility = remember(model.value.scopes) {
+
+  val model by viewModel.models.collectAsState()
+  var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
+  val menuVisibility = remember(scopes) {
     mutableStateMapOf<Long, Boolean>().apply {
-      model.value.scopes.forEach { scope ->
+      model.scopes.forEach { scope ->
         put(scope.id, false)
       }
     }
   }
 
+  val listState = rememberLazyListState()
   val reorderState = rememberReorderableLazyListState(
-    onMove = { from, to -> viewModel.take(ReorderScope(from.index, to.index, false)) },
-    onDragEnd = { from, to -> viewModel.take(ReorderScope(from, to, true)) }
+    lazyListState = listState,
+    onMove = { from, to ->
+      scopes = scopes.toMutableList().apply {
+        add(to.index, removeAt(from.index))
+      }
+    }
   )
 
   Column(
@@ -235,7 +254,7 @@ private fun OrderedScopesList(
   ) {
 
     Text(
-      text = stringResource(R.string.title_scopes),
+      text = stringResource(Res.string.title_scopes),
       modifier = Modifier.padding(start = 16.dp),
       color = MaterialTheme.colorScheme.primary,
       style = MaterialTheme.typography.bodyLarge
@@ -246,14 +265,11 @@ private fun OrderedScopesList(
     )
 
     LazyColumn(
-      state = reorderState.listState,
-      modifier = Modifier
-        .fillMaxSize()
-        .reorderable(reorderState)
-        .detectReorderAfterLongPress(reorderState)
+      state = listState,
+      modifier = Modifier.fillMaxSize()
     ) {
       items(
-        items = model.value.scopes,
+        items = scopes,
         key = { scope -> scope.id }
       ) { scope ->
 
@@ -272,8 +288,12 @@ private fun OrderedScopesList(
               leadingContent = {
                 Icon(
                   imageVector = Icons.Default.DragHandle,
-                  modifier = Modifier.detectReorder(reorderState),
-                  contentDescription = stringResource(R.string.cd_move_icon),
+                  modifier = Modifier.draggableHandle(
+                    onDragStopped = {
+                      viewModel.take(ReorderScopes(scopes))
+                    }
+                  ),
+                  contentDescription = stringResource(Res.string.cd_move_icon),
                   tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
               },
@@ -287,7 +307,7 @@ private fun OrderedScopesList(
                   }) {
                     Icon(
                       imageVector = Icons.Default.MoreVert,
-                      contentDescription = stringResource(R.string.cd_dots_menu),
+                      contentDescription = stringResource(Res.string.cd_dots_menu),
                       tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                   }
@@ -300,7 +320,7 @@ private fun OrderedScopesList(
                     onEditScope(scope)
                     menuVisibility[scope.id] = false
                   },
-                    text = { Text(text = stringResource(R.string.edit_scope)) },
+                    text = { Text(text = stringResource(Res.string.edit_scope)) },
                     leadingIcon = {
                       Icon(
                         imageVector = Icons.Filled.Edit,
@@ -312,7 +332,7 @@ private fun OrderedScopesList(
                     onDeleteScope(scope)
                     menuVisibility[scope.id] = false
                   },
-                    text = { Text(text = stringResource(R.string.delete)) },
+                    text = { Text(text = stringResource(Res.string.delete)) },
                     leadingIcon = {
                       Icon(
                         imageVector = Icons.Filled.Delete,
@@ -348,10 +368,10 @@ private fun DeleteScopeDialog(
 ) {
   AlertDialog(
     onDismissRequest = onDismissRequest,
-    title = { Text(stringResource(R.string.delete_scope)) },
+    title = { Text(stringResource(Res.string.delete_scope)) },
     text = {
       Text(
-        text = stringResource(R.string.sure_delete_scope, scopeName),
+        text = stringResource(Res.string.sure_delete_scope, scopeName),
         textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyLarge
       )
@@ -363,14 +383,14 @@ private fun DeleteScopeDialog(
           onConfirm()
         },
       ) {
-        Text(stringResource(R.string.delete))
+        Text(stringResource(Res.string.delete))
       }
     },
     dismissButton = {
       Button(
         onClick = onDismissRequest
       ) {
-        Text(stringResource(R.string.cancel))
+        Text(stringResource(Res.string.cancel))
       }
     }
   )

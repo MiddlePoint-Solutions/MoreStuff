@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.settings
+package io.middlepoint.morestuff.shared.ui.screen.settings
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme

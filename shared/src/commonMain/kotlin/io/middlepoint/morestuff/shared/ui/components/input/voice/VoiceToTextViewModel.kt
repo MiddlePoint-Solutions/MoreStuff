@@ -10,11 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 class VoiceToTextViewModel(
   private val voiceToTextParser: VoiceToTextParser,
-  private val savedState: SavedStateHandle,
-  private val logger: Logger,
 ) : MoleculeViewModel<VoiceToTextUiEvent, VoiceToTextState>() {
 
-  override val initialState: VoiceToTextState = savedState["voice"] ?: VoiceToTextState()
+  override val initialState: VoiceToTextState = VoiceToTextState()
 
   @Composable
   override fun models(events: Flow<VoiceToTextUiEvent>): VoiceToTextState {
@@ -25,8 +23,4 @@ class VoiceToTextViewModel(
     )
   }
 
-  override fun onSaveState(model: VoiceToTextState) {
-    savedState["voice"] = model
-    logger.d("language Saved state: $model")
-  }
 }

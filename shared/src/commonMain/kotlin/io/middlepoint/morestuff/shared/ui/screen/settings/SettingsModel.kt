@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.settings
+package io.middlepoint.morestuff.shared.ui.screen.settings
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun settingsModel(
-    initialState: SettingsState,
-    events: Flow<SettingsEvent>,
-    store: AppStore
+  initialState: SettingsState,
+  events: Flow<SettingsEvent>,
+  store: AppStore
 ): SettingsState {
     var state by remember { mutableStateOf(initialState) }
 

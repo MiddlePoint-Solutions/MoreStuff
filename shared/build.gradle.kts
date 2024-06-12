@@ -1,4 +1,6 @@
 import com.android.build.gradle.options.parseBoolean
+import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.android.library)
@@ -10,12 +12,29 @@ plugins {
   alias(libs.plugins.sqldelight)
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlin.parcelize)
+  alias(libs.plugins.aboutLibrariesPlugin)
 }
 
 buildConfig {
   buildConfigField(
     name = "DEBUG",
     provider { property("buildConfig.debug") as? Boolean ?: false }
+  )
+
+  buildConfigField(
+    name = "VERSION_NAME",
+    provider {
+      property("buildConfig.versionName") as? String
+        ?: error("buildConfig.versionName undefined!")
+    }
+  )
+
+  buildConfigField(
+    name = "VERSION_CODE",
+    provider {
+      (property("buildConfig.versionCode") as? String)?.toInt()
+        ?: error("buildConfig.versionCode undefined!")
+    }
   )
 }
 
@@ -82,15 +101,21 @@ kotlin {
       // You will probably need to also bring in decompose and essenty
       implementation(libs.decompose)
       implementation(libs.decompose.compose.multiplatform)
-//      implementation(libs.essenty)
       implementation(libs.molecule.runtime)
 
       implementation(libs.kSoup)
       api(libs.constraintLayout.compose)
 
-      api(libs.composeSettings.ui)
-      api(libs.composeSettings.ui.extended)
+      implementation(libs.composeSettings.ui)
+      implementation(libs.composeSettings.ui.extended)
       implementation(libs.settingsStoragePreferences)
+      implementation(libs.sonner)
+
+      implementation(libs.reorderable)
+
+      // About
+      implementation(libs.aboutLibrariesCore)
+      implementation(libs.aboutLibrariesCompose)
     }
 
     commonTest.dependencies {
@@ -158,4 +183,13 @@ sqldelight {
       verifyMigrations.set(true)
     }
   }
+}
+
+// AboutLibraries
+configure<AboutLibrariesExtension> {
+  registerAndroidTasks = false
+}
+
+tasks.withType(KotlinCompile::class.java) {
+  dependsOn("exportLibraryDefinitions")
 }
