@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.home
 
-import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -19,13 +18,12 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_add_new_scope
+import morestuff.shared.generated.resources.choose_scope
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +65,7 @@ private fun ScopeSelection(
         CenterAlignedTopAppBar(
             title = {
                 Text(
-                    text = stringResource(R.string.choose_scope),
+                    text = stringResource(Res.string.choose_scope),
                     modifier = Modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineSmall,
@@ -77,7 +75,7 @@ private fun ScopeSelection(
                 IconButton(onClick = createNewScope) {
                     Icon(
                         imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.cd_add_new_scope),
+                        contentDescription = stringResource(Res.string.cd_add_new_scope),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -98,22 +96,21 @@ private fun ScopeSelection(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-private fun Preview() {
-    MoreStuffTheme {
-        ScopeSelection(
-            scopes = listOf(defaultScope),
-            onScopeSelected = {},
-            createNewScope = {}
-        )
-    }
-
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//private fun Preview() {
+//    MoreStuffTheme {
+//        ScopeSelection(
+//            scopes = listOf(defaultScope),
+//            onScopeSelected = {},
+//            createNewScope = {}
+//        )
+//    }
+//}

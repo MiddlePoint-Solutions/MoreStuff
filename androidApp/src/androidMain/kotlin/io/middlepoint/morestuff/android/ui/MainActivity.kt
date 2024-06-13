@@ -25,9 +25,9 @@ import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Compan
 import io.middlepoint.morestuff.android.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.shared.ui.local.ProvideAppRouter
 import io.middlepoint.morestuff.shared.ui.local.ProvideAppTheme
-import io.middlepoint.morestuff.android.ui.main.MainContent
-import io.middlepoint.morestuff.android.ui.main.MainEvent
-import io.middlepoint.morestuff.android.ui.main.MainViewModel
+import io.middlepoint.morestuff.shared.ui.screen.main.MainContent
+import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
+import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.defaultScope

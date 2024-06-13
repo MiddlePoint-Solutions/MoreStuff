@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.input
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -32,16 +32,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.arkivanov.decompose.router.stack.push
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserInputEvent
@@ -53,8 +51,10 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_scopes_icon
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +105,6 @@ fun TaskInputBottomSheet(
       }
 
       LaunchedEffect(onTaskCreated) {
-        Timber.d("LaunchedEffect: $onTaskCreated")
         onTaskCreated?.let { taskId ->
           onNewTaskCreated(taskId, priority)
         }
@@ -138,7 +137,7 @@ fun TaskInputBottomSheet(
         ) {
           Icon(
             imageVector = Icons.Filled.ModeStandby,
-            contentDescription = stringResource(R.string.cd_scopes_icon),
+            contentDescription = stringResource(Res.string.cd_scopes_icon),
             modifier = Modifier
               .size(38.dp)
               .padding(start = 4.dp)

@@ -1,7 +1,5 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.home
 
-import android.content.res.Configuration
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,31 +39,36 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
-import io.middlepoint.morestuff.android.ui.home.HomeEvent.*
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.show
-import io.middlepoint.morestuff.android.ui.schedule.ScopeContent
-import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksModels
-import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksPresenter
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksPresenter
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cta_lets_go
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -193,9 +196,10 @@ private fun HomeContent(
             }
     }
 
-    BackHandler(selectedTasks.isNotEmpty()) {
-        onEvent(ClearTaskSelection)
-    }
+    // TODO: handle clear task selection with back handler
+//    BackHandler(selectedTasks.isNotEmpty()) {
+//        onEvent(ClearTaskSelection)
+//    }
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -244,7 +248,7 @@ private fun HomeContent(
                             ) {
                                 TextButton(onClick = { showTaskInput = true }) {
                                     Text(
-                                        stringResource(R.string.cta_lets_go),
+                                        stringResource(Res.string.cta_lets_go),
                                         style = MaterialTheme.typography.titleLarge.copy(
                                             color = MaterialTheme.colorScheme.onSurface
                                         )
@@ -282,11 +286,12 @@ private fun HomeContent(
 
             val context = remember { ChatContext.Main(model.currentScopeId) }
 
-            BackHandler(onBack = {
-                coroutineScope.launch {
-                    taskInputBottomSheetState.hide()
-                }
-            })
+            // TODO: Handle hiding bottom sheet with back handler
+//            BackHandler(onBack = {
+//                coroutineScope.launch {
+//                    taskInputBottomSheetState.hide()
+//                }
+//            })
 
             TaskInputBottomSheet(
                 onDismissRequest = { showTaskInput = false },
@@ -325,17 +330,17 @@ private fun HomeContent(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-fun MainContentPreview() {
-    MoreStuffTheme {
-        HomeScreen()
-    }
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//fun MainContentPreview() {
+//    MoreStuffTheme {
+//        HomeScreen()
+//    }
+//}

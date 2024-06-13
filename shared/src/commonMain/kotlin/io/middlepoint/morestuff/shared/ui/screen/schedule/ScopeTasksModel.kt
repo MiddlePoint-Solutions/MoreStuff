@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.screen.schedule
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetScopeActiveTasksFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksModels.*
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.*
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject

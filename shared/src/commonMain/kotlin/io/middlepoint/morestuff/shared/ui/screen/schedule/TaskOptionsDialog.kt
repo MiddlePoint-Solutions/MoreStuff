@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.screen.schedule
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,15 +18,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.arrows_more_down_48px
+import morestuff.shared.generated.resources.arrows_more_up_48px
+import morestuff.shared.generated.resources.cd_complete_task
+import morestuff.shared.generated.resources.cd_move_task_to_bottom
+import morestuff.shared.generated.resources.cd_move_to_top
+import morestuff.shared.generated.resources.complete
+import morestuff.shared.generated.resources.move_to_bottom
+import morestuff.shared.generated.resources.move_to_top
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +50,7 @@ fun TaskOptionsDialog(
             onClick = completeTask,
             title = {
                 Text(
-                    text = stringResource(R.string.complete),
+                    text = stringResource(Res.string.complete),
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
@@ -56,7 +60,7 @@ fun TaskOptionsDialog(
             icon = {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = stringResource(R.string.cd_complete_task),
+                    contentDescription = stringResource(Res.string.cd_complete_task),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -65,7 +69,7 @@ fun TaskOptionsDialog(
             onClick = moveToTop,
             title = {
                 Text(
-                    text = stringResource(R.string.move_to_top),
+                    text = stringResource(Res.string.move_to_top),
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
@@ -75,8 +79,8 @@ fun TaskOptionsDialog(
             },
             icon = {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_up_48px),
-                    contentDescription = stringResource(R.string.cd_move_to_top),
+                    imageVector = vectorResource(Res.drawable.arrows_more_up_48px),
+                    contentDescription = stringResource(Res.string.cd_move_to_top),
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -86,7 +90,7 @@ fun TaskOptionsDialog(
             onClick = moveToBottom,
             title = {
                 Text(
-                    text = stringResource(R.string.move_to_bottom),
+                    text = stringResource(Res.string.move_to_bottom),
                     modifier = Modifier.fillMaxWidth(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
@@ -96,8 +100,8 @@ fun TaskOptionsDialog(
             },
             icon = {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.arrows_more_down_48px),
-                    contentDescription = stringResource(R.string.cd_move_task_to_bottom),
+                    imageVector = vectorResource(Res.drawable.arrows_more_down_48px),
+                    contentDescription = stringResource(Res.string.cd_move_task_to_bottom),
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -126,33 +130,33 @@ fun TaskOptionItem(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-private fun Preview() {
-    MoreStuffTheme {
-        TaskOptionItem(
-            onClick = { },
-            title = {
-                Text(
-                    text = stringResource(R.string.complete),
-                    modifier = Modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            },
-            icon = {
-                Icon(
-                    imageVector = Icons.Filled.CheckCircle,
-                    contentDescription = stringResource(R.string.cd_complete_task)
-                )
-            }
-        )
-    }
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//private fun Preview() {
+//    MoreStuffTheme {
+//        TaskOptionItem(
+//            onClick = { },
+//            title = {
+//                Text(
+//                    text = stringResource(Res.string.complete),
+//                    modifier = Modifier.fillMaxWidth(),
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 18.sp
+//                )
+//            },
+//            icon = {
+//                Icon(
+//                    imageVector = Icons.Filled.CheckCircle,
+//                    contentDescription = stringResource(Res.string.cd_complete_task)
+//                )
+//            }
+//        )
+//    }
+//}

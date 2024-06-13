@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,7 +12,7 @@ import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
-import io.middlepoint.morestuff.android.ui.home.HomeEvent.*
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +23,7 @@ import org.koin.compose.koinInject
 fun homeModel(
   initialState: HomeState,
   events: Flow<HomeEvent>,
-  notifications: MutableSharedFlow<io.middlepoint.morestuff.shared.ui.model.NotificationState>,
+  notifications: MutableSharedFlow<NotificationState>,
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
   createScopeUseCase: CreateScopeUseCase = koinInject()
@@ -51,7 +51,7 @@ fun homeModel(
                     selectedTasks = listOf()
                     store.dispatch(TaskAction.CompleteTasksAction(completed, true))
 
-                    val notification = io.middlepoint.morestuff.shared.ui.model.NotificationState.Complete {
+                    val notification = NotificationState.Complete {
                         store.dispatch(TaskAction.CompleteTasksAction(completed, false))
                     }
                     launch { notifications.emit(notification) }
@@ -69,7 +69,7 @@ fun homeModel(
                         TaskAction.UpdateTasksToScopeAction(moved, event.scopeId)
                     )
                     val scopeTitle = scopes.firstOrNull { it.id == event.scopeId }?.name ?: ""
-                    val notification = io.middlepoint.morestuff.shared.ui.model.NotificationState.TaskMovedToScope(scopeTitle)
+                    val notification = NotificationState.TaskMovedToScope(scopeTitle)
                     launch { notifications.emit(notification) }
                 }
 
@@ -80,7 +80,7 @@ fun homeModel(
                         store.dispatch(
                             TaskAction.UpdateTasksToScopeAction(selected, scope.id)
                         )
-                        val notification = io.middlepoint.morestuff.shared.ui.model.NotificationState.TaskMovedToScope(scope.name)
+                        val notification = NotificationState.TaskMovedToScope(scope.name)
                         launch { notifications.emit(notification) }
                     }
                 }

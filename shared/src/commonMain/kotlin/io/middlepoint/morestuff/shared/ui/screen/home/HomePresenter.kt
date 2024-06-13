@@ -1,17 +1,15 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.SavedStateHandle
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asSharedFlow
 
 class HomePresenter(
-    private val savedState: SavedStateHandle,
-    private val appPresenter: AppPresenter,
+  private val appPresenter: AppPresenter,
 ) : MoleculeViewModel<HomeEvent, HomeState>() {
 
-    override val initialState: HomeState = savedState["Scopes"] ?: HomeState()
+    override val initialState: HomeState = HomeState()
 
     val notifications = appPresenter.notifications.asSharedFlow()
 
@@ -24,8 +22,5 @@ class HomePresenter(
         )
     }
 
-    override fun onSaveState(model: HomeState) {
-//        savedState["Scopes"] = model
-    }
 }
 

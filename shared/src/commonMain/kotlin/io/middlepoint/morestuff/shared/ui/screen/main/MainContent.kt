@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.main
+package io.middlepoint.morestuff.shared.ui.screen.main
 
-import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -18,14 +17,6 @@ import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.ui.home.HomeScreen
-import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
-import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
-import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
-import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
-import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
-import io.middlepoint.morestuff.android.ui.share.ShareScreen
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
@@ -38,6 +29,14 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
+import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
+import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable

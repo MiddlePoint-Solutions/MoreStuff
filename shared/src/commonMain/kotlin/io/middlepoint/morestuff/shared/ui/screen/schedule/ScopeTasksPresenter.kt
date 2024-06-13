@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.screen.schedule
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel

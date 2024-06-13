@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.share
+package io.middlepoint.morestuff.shared.ui.screen.share
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetActiveTasksFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.android.ui.share.ShareEvent.*
+import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow

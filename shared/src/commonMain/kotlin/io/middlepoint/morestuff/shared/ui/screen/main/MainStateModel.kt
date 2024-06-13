@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.main
+package io.middlepoint.morestuff.shared.ui.screen.main
 
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable

@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.share
+package io.middlepoint.morestuff.shared.ui.screen.share
 
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 

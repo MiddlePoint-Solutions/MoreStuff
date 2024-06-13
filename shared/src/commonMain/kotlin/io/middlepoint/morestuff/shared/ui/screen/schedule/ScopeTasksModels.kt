@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.screen.schedule
 
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 

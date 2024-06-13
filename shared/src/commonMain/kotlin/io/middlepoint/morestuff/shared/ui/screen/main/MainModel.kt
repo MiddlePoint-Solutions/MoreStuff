@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.main
+package io.middlepoint.morestuff.shared.ui.screen.main
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,9 +16,9 @@ import org.koin.compose.koinInject
 
 @Composable
 fun mainModel(
-    initialState: MainState,
-    events: Flow<MainEvent>,
-    store: AppStore = koinInject()
+  initialState: MainState,
+  events: Flow<MainEvent>,
+  store: AppStore = koinInject()
 ): MainState {
 
     var currentState by remember { mutableStateOf(initialState) }

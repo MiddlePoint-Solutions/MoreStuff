@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.share
+package io.middlepoint.morestuff.shared.ui.screen.share
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -47,25 +46,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.home.TaskInputBottomSheet
-import io.middlepoint.morestuff.shared.ui.components.PriorityItem
-import io.middlepoint.morestuff.shared.ui.components.TaskProfile
-import io.middlepoint.morestuff.android.ui.share.ShareEvent.*
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.ui.components.PriorityItem
+import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
+import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
+import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_close_search
+import morestuff.shared.generated.resources.cd_navigate_back
+import morestuff.shared.generated.resources.cd_search_chats
+import morestuff.shared.generated.resources.create_new_chat
+import morestuff.shared.generated.resources.search
+import morestuff.shared.generated.resources.select_chat
+import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,12 +87,12 @@ fun ShareScreen(
         topBar = {
             Surface(shadowElevation = 5.dp) {
                 TopAppBar(
-                    title = { Text(text = stringResource(R.string.select_chat)) },
+                    title = { Text(text = stringResource(Res.string.select_chat)) },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.cd_navigate_back)
+                                contentDescription = stringResource(Res.string.cd_navigate_back)
                             )
                         }
                     },
@@ -99,7 +103,7 @@ fun ShareScreen(
                         IconButton(onClick = { isSearchActive = true }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(R.string.cd_search_chats),
+                                contentDescription = stringResource(Res.string.cd_search_chats),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
@@ -148,7 +152,7 @@ fun ShareScreen(
                 .navigationBarsPadding()
                 .focusRequester(focusRequester),
             active = true,
-            placeholder = { Text(text = stringResource(R.string.search)) },
+            placeholder = { Text(text = stringResource(Res.string.search)) },
             leadingIcon = {
                 IconButton(
                     onClick = {
@@ -157,7 +161,7 @@ fun ShareScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = stringResource(R.string.cd_close_search)
+                        contentDescription = stringResource(Res.string.cd_close_search)
                     )
                 }
             },
@@ -210,11 +214,12 @@ private fun ShareContent(
 
         val chatContext = remember { ChatContext.Share(shareable) }
 
-        BackHandler(onBack = {
-            scope.launch {
-                taskInputBottomSheetState.hide()
-            }
-        })
+        // TODO: Handle back press to close bottom sheet
+//        BackHandler(onBack = {
+//            scope.launch {
+//                taskInputBottomSheetState.hide()
+//            }
+//        })
 
         TaskInputBottomSheet(
             onDismissRequest = { showUserInput = false },
@@ -289,7 +294,7 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
         TaskProfile(title = "+")
 
         Text(
-            text = stringResource(R.string.create_new_chat),
+            text = stringResource(Res.string.create_new_chat),
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .fillMaxWidth()
@@ -298,14 +303,14 @@ private fun CreateNewTaskItem(showUserInput: () -> Unit) {
     }
 }
 
-@Preview
-@Composable
-fun ShareContentPreview() {
-    MoreStuffTheme() {
-        ShareContent(
-            shareable = Shareable.Text(""),
-            tasks = listOf(),
-            shareToTask = {},
-        )
-    }
-}
+//@Preview
+//@Composable
+//fun ShareContentPreview() {
+//    MoreStuffTheme() {
+//        ShareContent(
+//            shareable = Shareable.Text(""),
+//            tasks = listOf(),
+//            shareToTask = {},
+//        )
+//    }
+//}

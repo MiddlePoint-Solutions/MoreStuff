@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.main
+package io.middlepoint.morestuff.shared.ui.screen.main
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel

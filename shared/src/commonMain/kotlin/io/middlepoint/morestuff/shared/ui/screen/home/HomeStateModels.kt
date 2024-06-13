@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.home
+package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
