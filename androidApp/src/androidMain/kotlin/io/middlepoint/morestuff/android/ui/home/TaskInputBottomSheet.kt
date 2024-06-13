@@ -39,7 +39,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.components.ScopeCarousel
+import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.SendIcon

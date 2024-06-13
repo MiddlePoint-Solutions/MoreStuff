@@ -15,6 +15,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.theme.divider

@@ -53,8 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.android.ui.home.TaskInputBottomSheet
-import io.middlepoint.morestuff.android.ui.schedule.PriorityItem
-import io.middlepoint.morestuff.android.ui.schedule.TaskProfile
+import io.middlepoint.morestuff.shared.ui.components.PriorityItem
+import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.android.ui.share.ShareEvent.*
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.ChatContext

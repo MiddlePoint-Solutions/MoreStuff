@@ -1,30 +1,26 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_scheduled_task_icon
+import morestuff.shared.generated.resources.cd_task_message_icon
+import morestuff.shared.generated.resources.cd_task_reminder_icon
+import morestuff.shared.generated.resources.ic_schedule
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun TaskItemBadges(
@@ -38,8 +34,8 @@ fun TaskItemBadges(
     ) {
         if (task.extraDetails) {
             Icon(
-                imageVector = Icons.Default.Notes,
-                contentDescription = stringResource(R.string.cd_task_message_icon),
+                imageVector = Icons.AutoMirrored.Filled.Notes,
+                contentDescription = stringResource(Res.string.cd_task_message_icon),
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -47,8 +43,8 @@ fun TaskItemBadges(
 
         if (task.hasSchedule) {
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-                contentDescription = stringResource(R.string.cd_scheduled_task_icon),
+                imageVector = vectorResource(Res.drawable.ic_schedule),
+                contentDescription = stringResource(Res.string.cd_scheduled_task_icon),
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
@@ -57,7 +53,7 @@ fun TaskItemBadges(
         if (task.hasReminder) {
             Icon(
                 imageVector = Icons.Default.NotificationsActive,
-                contentDescription = stringResource(R.string.cd_task_reminder_icon),
+                contentDescription = stringResource(Res.string.cd_task_reminder_icon),
                 modifier = Modifier.size(16.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )

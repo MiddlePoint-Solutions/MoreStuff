@@ -7,7 +7,7 @@ import io.middlepoint.morestuff.android.ui.home.HomePresenter
 import io.middlepoint.morestuff.android.ui.main.MainViewModel
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksPresenter
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesViewModel
-import io.middlepoint.morestuff.android.ui.search.SearchViewModel
+import io.middlepoint.morestuff.shared.ui.screen.search.SearchViewModel
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
 import io.middlepoint.morestuff.android.ui.share.ShareViewModel
 import io.middlepoint.morestuff.shared.domain.service.Notifier

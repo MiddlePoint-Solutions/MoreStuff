@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.search
+package io.middlepoint.morestuff.shared.ui.screen.search
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,12 +22,12 @@ import org.koin.compose.koinInject
 
 @Composable
 fun searchModel(
-    initialState: SearchState,
-    events: Flow<SearchEvent>,
-    searchTasksUseCase: SearchTasksUseCase = koinInject(),
-    getCompletedTasksUseCase: GetCompletedTasksUseCase = koinInject(),
-    getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase = koinInject(),
-    taskUiMapper: TaskUiMapper = koinInject()
+  initialState: SearchState,
+  events: Flow<SearchEvent>,
+  searchTasksUseCase: SearchTasksUseCase = koinInject(),
+  getCompletedTasksUseCase: GetCompletedTasksUseCase = koinInject(),
+  getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase = koinInject(),
+  taskUiMapper: TaskUiMapper = koinInject()
 ): SearchState {
     val coroutineScope = rememberCoroutineScope()
     var state by remember { mutableStateOf(initialState) }

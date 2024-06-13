@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.search
+package io.middlepoint.morestuff.shared.ui.screen.search
 
-import android.content.res.Configuration
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,21 +18,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.android.R
-import io.middlepoint.morestuff.android.ui.schedule.TaskItemBadges
-import io.middlepoint.morestuff.android.ui.schedule.TaskProfile
+import io.middlepoint.morestuff.shared.ui.components.TaskItemBadges
+import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.completed
+import morestuff.shared.generated.resources.ic_check_circle
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun CompletePriorityItem(
@@ -79,7 +77,7 @@ fun CompletePriorityItem(
                 )
                 if (task.isComplete) {
                     Text(
-                        text = stringResource(R.string.completed) + " ${task.completeTime}",
+                        text = stringResource(Res.string.completed) + " ${task.completeTime}",
                         textAlign = TextAlign.Start,
                         modifier = Modifier.align(Alignment.Start),
                         style = TextStyle(
@@ -90,8 +88,8 @@ fun CompletePriorityItem(
                 }
             }
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
-                contentDescription = stringResource(R.string.completed),
+                imageVector = vectorResource(Res.drawable.ic_check_circle),
+                contentDescription = stringResource(Res.string.completed),
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -106,31 +104,31 @@ fun CompletePriorityItem(
     }
 }
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light"
-)
-@Composable
-fun CompletePriorityItemPreview() {
-    MoreStuffTheme {
-        CompletePriorityItem(
-            task = TaskUiModel(
-                id = 0,
-                title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                createTime = "",
-                completeTime = "",
-                isComplete = true,
-                priorityScore = 100,
-                position = 1,
-                extraDetails = true,
-                hasSchedule = true,
-                hasReminder = true,
-            ),
-            onClick = {}
-        )
-    }
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//fun CompletePriorityItemPreview() {
+//    MoreStuffTheme {
+//        CompletePriorityItem(
+//            task = TaskUiModel(
+//                id = 0,
+//                title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
+//                createTime = "",
+//                completeTime = "",
+//                isComplete = true,
+//                priorityScore = 100,
+//                position = 1,
+//                extraDetails = true,
+//                hasSchedule = true,
+//                hasReminder = true,
+//            ),
+//            onClick = {}
+//        )
+//    }
+//}

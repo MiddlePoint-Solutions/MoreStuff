@@ -1,6 +1,5 @@
-package io.middlepoint.morestuff.android.ui.schedule
+package io.middlepoint.morestuff.shared.ui.components
 
-import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,11 +30,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -117,33 +114,33 @@ fun PriorityItem(
 }
 
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "Dark"
-)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "Light",
-)
-@Composable
-fun PriorityItemPreview() {
-    MoreStuffTheme {
-        PriorityItem(
-            task = TaskUiModel(
-                id = 0,
-                title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-                createTime = "",
-                completeTime = "",
-                isComplete = false,
-                priorityScore = 100,
-                position = 1,
-                extraDetails = true,
-                hasSchedule = true,
-                hasReminder = true,
-            ),
-            selected = true,
-            onClick = {},
-            onLongClick = {}
-        )
-    }
-}
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light",
+//)
+//@Composable
+//fun PriorityItemPreview() {
+//    MoreStuffTheme {
+//        PriorityItem(
+//            task = TaskUiModel(
+//                id = 0,
+//                title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
+//                createTime = "",
+//                completeTime = "",
+//                isComplete = false,
+//                priorityScore = 100,
+//                position = 1,
+//                extraDetails = true,
+//                hasSchedule = true,
+//                hasReminder = true,
+//            ),
+//            selected = true,
+//            onClick = {},
+//            onLongClick = {}
+//        )
+//    }
+//}

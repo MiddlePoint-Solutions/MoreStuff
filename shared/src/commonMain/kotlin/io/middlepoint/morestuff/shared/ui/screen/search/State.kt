@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.search
+package io.middlepoint.morestuff.shared.ui.screen.search
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.FilterType

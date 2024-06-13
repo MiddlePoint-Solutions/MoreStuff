@@ -58,7 +58,7 @@ import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.android.ui.schedule.ScopeContent
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.android.ui.schedule.ScopeTasksPresenter
-import io.middlepoint.morestuff.android.ui.search.SearchBar
+import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import com.arkivanov.decompose.router.stack.pop

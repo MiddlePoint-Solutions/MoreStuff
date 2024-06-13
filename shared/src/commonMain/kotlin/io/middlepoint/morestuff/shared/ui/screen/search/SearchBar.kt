@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.ui.search
+package io.middlepoint.morestuff.shared.ui.screen.search
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
@@ -38,25 +38,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.R
 import io.middlepoint.morestuff.shared.domain.enums.FilterType
-import io.middlepoint.morestuff.android.ui.schedule.PriorityItem
+import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
+import morestuff.shared.generated.resources.Res
+import morestuff.shared.generated.resources.cd_clear_search_query
+import morestuff.shared.generated.resources.cd_filter_completed_tasks
+import morestuff.shared.generated.resources.cd_filter_reminders_tasks
+import morestuff.shared.generated.resources.cd_filter_schedules_tasks
+import morestuff.shared.generated.resources.cd_navigate_back
+import morestuff.shared.generated.resources.filter_done
+import morestuff.shared.generated.resources.filter_reminder
+import morestuff.shared.generated.resources.filter_scheduled
+import morestuff.shared.generated.resources.ic_check_circle
+import morestuff.shared.generated.resources.ic_reminder
+import morestuff.shared.generated.resources.ic_schedule
+import morestuff.shared.generated.resources.no_results_found
+import morestuff.shared.generated.resources.search
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @ExperimentalMaterial3Api
 @Composable
 fun SearchBar(
-    onSearchClose: () -> Unit,
-    showTaskChat: (taskId: Long) -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: SearchViewModel = koinViewModel(),
+  onSearchClose: () -> Unit,
+  showTaskChat: (taskId: Long) -> Unit,
+  modifier: Modifier = Modifier,
+  viewModel: SearchViewModel = koinViewModel(),
 ) {
     val model by viewModel.models.collectAsState()
     var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -96,14 +108,14 @@ fun SearchBar(
                 exitSearch()
             }
         },
-        placeholder = { Text(text = stringResource(R.string.search)) },
+        placeholder = { Text(text = stringResource(Res.string.search)) },
         leadingIcon = {
             IconButton(onClick = {
                 exitSearch()
             }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(id = R.string.cd_navigate_back)
+                    contentDescription = stringResource(Res.string.cd_navigate_back)
                 )
             }
         },
@@ -112,7 +124,7 @@ fun SearchBar(
                 IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cd_clear_search_query)
+                        contentDescription = stringResource(Res.string.cd_clear_search_query)
                     )
                 }
             }
@@ -175,7 +187,7 @@ fun SearchBar(
                 when (it) {
                     true -> {
                         Text(
-                            text = stringResource(R.string.no_results_found),
+                            text = stringResource(Res.string.no_results_found),
                             style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -277,9 +289,9 @@ private fun SearchFilterChip(
 private fun FilterType.Title() {
     val title = when (this) {
         FilterType.None -> ""
-        FilterType.Scheduled -> stringResource(R.string.filter_scheduled)
-        FilterType.Reminder -> stringResource(R.string.filter_reminder)
-        FilterType.Done -> stringResource(R.string.filter_done)
+        FilterType.Scheduled -> stringResource(Res.string.filter_scheduled)
+        FilterType.Reminder -> stringResource(Res.string.filter_reminder)
+        FilterType.Done -> stringResource(Res.string.filter_done)
     }
     Text(text = title)
 }
@@ -293,18 +305,18 @@ private fun FilterType.Icon() {
         )
 
         FilterType.Scheduled -> Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_schedule),
-            contentDescription = stringResource(R.string.cd_filter_schedules_tasks),
+            imageVector = vectorResource(Res.drawable.ic_schedule),
+            contentDescription = stringResource(Res.string.cd_filter_schedules_tasks),
         )
 
         FilterType.Reminder -> Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_reminder),
-            contentDescription = stringResource(R.string.cd_filter_reminders_tasks),
+            imageVector = vectorResource(Res.drawable.ic_reminder),
+            contentDescription = stringResource(Res.string.cd_filter_reminders_tasks),
         )
 
         FilterType.Done -> Icon(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_check_circle),
-            contentDescription = stringResource(R.string.cd_filter_completed_tasks),
+            imageVector = vectorResource(Res.drawable.ic_check_circle),
+            contentDescription = stringResource(Res.string.cd_filter_completed_tasks),
         )
     }
 }
