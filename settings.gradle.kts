@@ -1,4 +1,5 @@
 rootProject.name = "MoreStuff"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
@@ -16,5 +17,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":androidApp")
+include(":composeApp")
 include(":shared")
+//include(":app:android")
+include(":iosApp")
