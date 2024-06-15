@@ -6,8 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextUiEvent.ReportError
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextUiEvent.SetDetectedLanguage
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextUiEvent.StartListening

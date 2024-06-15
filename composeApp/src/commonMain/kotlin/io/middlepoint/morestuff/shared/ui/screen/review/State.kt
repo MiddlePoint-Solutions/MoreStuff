@@ -1,15 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.screen.review
 
-import android.os.Parcelable
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
-sealed class ReviewRound : Parcelable {
+sealed class ReviewRound {
     data class Review(val scopeId: Long) : ReviewRound()
     data object Final : ReviewRound()
 }

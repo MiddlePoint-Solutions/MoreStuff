@@ -22,3 +22,5 @@ interface Notifier {
     }
 
 }
+
+expect class NotifierImpl : Notifier

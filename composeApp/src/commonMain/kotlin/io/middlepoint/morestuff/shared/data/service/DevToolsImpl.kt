@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.service.DataMigrationHelper
+import DataMigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 
 class DevToolsImpl(

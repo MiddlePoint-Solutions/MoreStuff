@@ -1,5 +1,8 @@
 package io.middlepoint.morestuff.shared.di
 
+import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.shared.data.DriverFactory
+import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
@@ -21,6 +24,8 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val dataModule = module {
+
+  single<StuffDb> { createDatabase(get()) }
 
   singleOf(::DevToolsImpl) bind DevTools::class
   singleOf(::DataMappersImpl) bind DataMappers::class

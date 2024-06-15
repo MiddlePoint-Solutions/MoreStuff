@@ -8,14 +8,12 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.model.VoiceToTextParserState
-import io.middlepoint.morestuff.shared.domain.service.VoiceToTextParser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Locale
 
-
-class VoiceToTextParserImpl(
+actual class VoiceToTextParserImpl(
     private val context: Application,
 ) : RecognitionListener, VoiceToTextParser {
     private val _state = MutableStateFlow(VoiceToTextParserState())

@@ -1,32 +1,30 @@
-package io.middlepoint.morestuff.android.ui.utils
+package io.middlepoint.morestuff.shared.ui.utils
 
-import android.os.Build
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
-import java.util.regex.Pattern
 
 const val URL_PATTERN_REGEX =
     "(https?://|www\\.|[a-zA-Z0-9_-]+\\.)?[a-zA-Z0-9_-]+(\\.[a-zA-Z]+)+([\\w.,@?^=%&:/~+#-]*[\\w@?^=%&/~+#-])?"
 
-val urlPattern: Pattern = Pattern.compile(
-    URL_PATTERN_REGEX, Pattern.CASE_INSENSITIVE or Pattern.MULTILINE or Pattern.DOTALL
+val urlPattern: Regex = Regex(
+    URL_PATTERN_REGEX, setOf(RegexOption.IGNORE_CASE, RegexOption.IGNORE_CASE)
 )
 
-fun requiresNotificationsPermission() =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-
-
-fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pattern, urlColor: Color) {
-    val matcher = urlPattern.matcher(content)
+fun AnnotatedString.Builder.appendUrlsWithStyle(
+    content: String,
+    urlPattern: Regex,
+    urlColor: Color
+) {
+    val matcher = urlPattern.findAll(content)
     var lastEnd = 0
 
-    while (matcher.find()) {
-        val start = matcher.start()
-        val end = matcher.end()
+    for (match in matcher) {
+        val start = match.range.first
+        val end = match.range.last + 1
 
         if (start > lastEnd) {
             append(content.substring(lastEnd, start))
@@ -61,12 +59,6 @@ fun AnnotatedString.Builder.appendUrlsWithStyle(content: String, urlPattern: Pat
  * @return True if String contains any Emojis, otherwise false
  */
 fun containsEmoji(str: String): Boolean {
-    val length = str.length
-    for (i in 0 until length) {
-        val type = Character.getType(str[i])
-        if (type == Character.SURROGATE.toInt() || type == Character.OTHER_SYMBOL.toInt()) {
-            return true
-        }
-    }
-    return false
+    val emojiRegex = Regex("[\\p{So}\\p{Cn}]")
+    return emojiRegex.containsMatchIn(str)
 }

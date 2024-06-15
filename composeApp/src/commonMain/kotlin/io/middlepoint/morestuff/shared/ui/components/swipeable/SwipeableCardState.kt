@@ -3,10 +3,10 @@ package io.middlepoint.morestuff.shared.ui.components.swipeable
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 
 enum class SwipeDirection {
-     None , Left, Right, Up, Down
+    None, Left, Right, Up, Down
 }
 
 enum class FlipState {
@@ -23,11 +23,12 @@ enum class FlipState {
 
 @Composable
 fun rememberSwipeableCardState(key: Any = Unit): SwipeableCardState {
+    val screenSize = LocalScreenSize.current
     val screenWidth = with(LocalDensity.current) {
-        LocalConfiguration.current.screenWidthDp.dp.toPx()
+        screenSize.wPX.toFloat()
     }
     val screenHeight = with(LocalDensity.current) {
-        LocalConfiguration.current.screenHeightDp.dp.toPx()
+        screenSize.hPX.toFloat()
     }
 
     return remember(key) {

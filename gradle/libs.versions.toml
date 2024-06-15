@@ -27,14 +27,14 @@ pagingKtx = "3.2.1"
 workKtx = "2.9.0"
 constraintLayout = "2.1.4"
 activityKtx = "1.9.0"
-fragmentKtx = "1.7.1"
+fragmentKtx = "1.8.0"
 #constraintLayoutCompose = "1.0.1"
-lifecycle = "2.7.0"
+lifecycle = "2.8.2"
 preferenceKtx = "1.2.1"
 testCore = "1.5.0"
 extJUnit = "1.1.5"
 espressoCore = "3.5.1"
-firebaseCrashlyticsPlugin = "2.9.9"
+firebaseCrashlyticsPlugin = "3.0.1"
 androidAppStartup = "1.1.1"
 aboutLibrariesVersion = "11.2.1"
 telephotoVersion = "0.5.0"
@@ -42,7 +42,7 @@ lottie = "6.1.0"
 kSoup ="0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.4.1"
+agp = "8.4.2"
 kotlin = "2.0.0"
 
 android_sdk_compile = "34"
@@ -51,18 +51,18 @@ android_sdk_min = "26"
 
 androidx-core = "1.13.1"
 kotlinx-immutable-collections = "0.3.7"
-kotlinx-coroutines = "1.8.0"
+kotlinx-coroutines = "1.9.0-RC"
 kotlinx-serialization = "1.6.3"
-kotlinx-datetime = "0.5.0"
+kotlinx-datetime = "0.6.0"
 kotlinx-atomicfu = "0.23.2"
-compose = "1.6.10"
-compose-compiler = "1.5.10.1"
+compose = "1.6.11"
+compose-compiler = "1.5.14"
 androidx-activity-compose = "1.9.0"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.5.0"
 libres = "1.2.1"
 kermit = "2.0.3"
-ktor = "2.3.9"
+ktor = "2.3.11"
 multiplatform-settings = "1.1.1"
 koin = "3.6.0-Beta4"
 koin-compose = "1.2.0-Beta4"
@@ -99,6 +99,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-immutable-collections = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinx-immutable-collections" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "kotlinx-atomicfu" }
 
@@ -132,6 +133,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 # SqlDelight
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
+sqldelight-driver-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelight-sqlite-dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect", version.ref = "sqldelight" }
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
@@ -203,31 +205,7 @@ koinBom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koinAndroidxCompose = { module = "io.insert-koin:koin-androidx-compose" }
 koinTest = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
 koinTestJunit = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinTest" }
-timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-palette = { module = "androidx.palette:palette", version.ref = "palette" }
-pagingKtx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingKtx" }
 workKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "workKtx" }
-coreKtx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
-activityKtx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
-fragmentKtx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
-#constraintLayoutCompose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintLayoutCompose" }
-runtimeKtx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
-runtimeCompose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
-viewModel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
-viewModelCompose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
-pagingCompose = { module = "androidx.paging:paging-compose", version.ref = "pagingKtx" }
-composeViewBinding = { module = "androidx.compose.ui:ui-viewbinding" }
-composeAnimation = { module = "androidx.compose.animation:animation" }
-composeMaterial3WindowSizeClass = { module = "androidx.compose.material3:material3-window-size-class" }
-composeMaterialIcons = { module = "androidx.compose.material:material-icons-core" }
-composeMaterialIconsExtended = { module = "androidx.compose.material:material-icons-extended" }
-composeTooling = { module = "androidx.compose.ui:ui-tooling" }
-testCore = { module = "androidx.test:core", version.ref = "testCore" }
-testRules = { module = "androidx.test:rules", version.ref = "testCore" }
-androidAppStartup = { module = "androidx.startup:startup-runtime", version.ref = "androidAppStartup" }
-telephoto = { module ="me.saket.telephoto:zoomable-image-coil", version.ref ="telephotoVersion"}
-lottie = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie"}
 kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
 constraintLayout-compose = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintLayout-compose" }
 sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }

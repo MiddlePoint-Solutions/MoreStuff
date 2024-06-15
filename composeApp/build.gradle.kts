@@ -57,6 +57,8 @@ kotlin {
         )
     // spotless:on
 
+    jvm("desktop")
+
     iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
     iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
     iosSimulatorArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
@@ -79,6 +81,8 @@ kotlin {
     }
 
     sourceSets {
+        val desktopMain by getting
+
         commonMain.dependencies {
             implementation(projects.shared)
             implementation(compose.components.resources)
@@ -135,6 +139,8 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.appcompat)
             implementation(libs.androidx.core)
+            implementation(libs.androidx.exifinterface)
+
             api(compose.preview)
             api(compose.uiTooling)
             implementation(libs.androidx.security.crypto)
@@ -143,7 +149,6 @@ kotlin {
             implementation(libs.androidx.test)
             api(libs.koin.android)
             implementation(libs.sqliteAndroid)
-            implementation(libs.androidx.exifinterface)
             implementation(libs.preferenceKtx)
             api(libs.workKtx)
 
@@ -168,6 +173,12 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.sqldelight.driver.native)
             implementation(libs.ktor.client.darwin)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.sqldelight.driver.desktop)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }

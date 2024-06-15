@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.android.ui.utils.appendUrlsWithStyle
-import io.middlepoint.morestuff.android.ui.utils.urlPattern
+import io.middlepoint.morestuff.shared.ui.utils.appendUrlsWithStyle
+import io.middlepoint.morestuff.shared.ui.utils.urlPattern
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import kotlinx.coroutines.launch
 

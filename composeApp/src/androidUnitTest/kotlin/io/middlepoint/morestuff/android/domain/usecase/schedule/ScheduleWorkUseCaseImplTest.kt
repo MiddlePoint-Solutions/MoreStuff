@@ -1,11 +1,9 @@
 package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
-import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class ScheduleWorkUseCaseImplTest {

@@ -13,10 +13,10 @@ import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
-import io.middlepoint.morestuff.shared.domain.service.ClipboardHelper
-import io.middlepoint.morestuff.shared.domain.service.ImageHandler
-import io.middlepoint.morestuff.shared.domain.service.PDFHandler
-import io.middlepoint.morestuff.shared.domain.service.ShareTaskMessage
+import ClipboardHelper
+import ImageHandler
+import PDFHandler
+import ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
@@ -40,21 +40,21 @@ import org.koin.compose.koinInject
 
 @Composable
 fun taskChatModel(
-  taskId: Long,
-  initialState: TaskChatState,
-  events: Flow<TaskChatEvent>,
-  store: AppStore = koinInject(),
-  clipboardHelper: ClipboardHelper = koinInject(),
-  imageHandler: ImageHandler = koinInject(),
-  pdfHandler: PDFHandler = koinInject(),
-  taskUiMapper: TaskUiMapper = koinInject(),
-  shareTaskMessage: ShareTaskMessage = koinInject(),
-  messageUiMapper: MessageUiMapper = koinInject(),
-  getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
-  getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
-  getTaskFlow: GetTaskFlowUseCase = koinInject(),
-  devTools: DevTools = koinInject(),
-  logger: Logger = koinInject()
+    taskId: Long,
+    initialState: TaskChatState,
+    events: Flow<TaskChatEvent>,
+    store: AppStore = koinInject(),
+    clipboardHelper: ClipboardHelper = koinInject(),
+    imageHandler: ImageHandler = koinInject(),
+    pdfHandler: PDFHandler = koinInject(),
+    taskUiMapper: TaskUiMapper = koinInject(),
+    shareHelper: ShareHelper = koinInject(),
+    messageUiMapper: MessageUiMapper = koinInject(),
+    getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
+    getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
+    getTaskFlow: GetTaskFlowUseCase = koinInject(),
+    devTools: DevTools = koinInject(),
+    logger: Logger = koinInject()
 ): TaskChatState {
 
   var task by remember { mutableStateOf(initialState.task) }
@@ -127,7 +127,7 @@ fun taskChatModel(
               MessageDataType.Video -> {}
               MessageDataType.Audio -> {}
               null -> {
-                shareTaskMessage.shareMessage(message.content)
+                shareHelper.shareMessage(message.content)
               }
             }
           }

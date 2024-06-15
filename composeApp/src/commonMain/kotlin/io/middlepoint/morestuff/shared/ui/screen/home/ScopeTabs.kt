@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.compose.CustomScrollableTabRow
 import io.middlepoint.morestuff.shared.ui.compose.TabRowDefaults.tabIndicatorOffset
-import io.middlepoint.morestuff.android.ui.utils.containsEmoji
+import io.middlepoint.morestuff.shared.ui.utils.containsEmoji
 
 @Composable
 fun ScopeTabs(

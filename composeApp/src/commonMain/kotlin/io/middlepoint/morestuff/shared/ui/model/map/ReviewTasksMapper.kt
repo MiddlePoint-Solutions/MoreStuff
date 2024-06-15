@@ -3,12 +3,12 @@ package io.middlepoint.morestuff.shared.ui.model.map
 import io.middlepoint.morestuff.shared.domain.model.ReviewTasks
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import io.middlepoint.morestuff.shared.domain.util.TimeFormatter
+import TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 
 class ReviewTasksMapper(
-  private val timeFormatter: TimeFormatter,
-  private val timeManager: TimeManager,
+    private val timeFormatter: TimeFormatter,
+    private val timeManager: TimeManager,
 ) {
   fun map(input: TaskDomain, position: Int, count: Int): ReviewItemUiModel {
     val inputDateTime = timeManager.nowLocalDateTimeString

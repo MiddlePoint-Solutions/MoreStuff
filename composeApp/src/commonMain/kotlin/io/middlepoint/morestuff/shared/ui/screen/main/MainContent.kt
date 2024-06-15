@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.main
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -28,6 +29,7 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
+import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
@@ -37,6 +39,7 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
+import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
@@ -45,79 +48,83 @@ fun MainContent(
   shareContent: (taskId: Long, content: Shareable) -> Unit,
   onBoardingComplete: () -> Unit,
 ) {
+  CompositionLocalProvider(
+    LocalScreenSize provides getScreenSizeInfo(),
+  ) {
 
-  val router: Router<Screen> = rememberRouter(Screen::class) {
-    when (initialScreen) {
-      OnBoarding -> listOf(OnBoarding)
-      null -> listOf(Home)
-      else -> listOf(Home, initialScreen)
+    val router: Router<Screen> = rememberRouter(Screen::class) {
+      when (initialScreen) {
+        OnBoarding -> listOf(OnBoarding)
+        null -> listOf(Home)
+        else -> listOf(Home, initialScreen)
+      }
     }
-  }
 
-  RoutedContent(
-    router = router,
-    modifier = Modifier.fillMaxSize(),
-    animation = predictiveBackAnimation(
-      fallbackAnimation = stackAnimation(slide() + fade()),
-      onBack = { router.pop() },
-      backHandler = LocalRouterContext.current.backHandler
-    ),
-  ) { screen ->
-    when (screen) {
+    RoutedContent(
+      router = router,
+      modifier = Modifier.fillMaxSize(),
+      animation = predictiveBackAnimation(
+        fallbackAnimation = stackAnimation(slide() + fade()),
+        onBack = { router.pop() },
+        backHandler = LocalRouterContext.current.backHandler
+      ),
+    ) { screen ->
+      when (screen) {
 
-      OnBoarding -> OnBoardingScreen(
-        onBoardingComplete = {
-          onBoardingComplete()
-          router.replaceCurrent(Home)
-        }
-      )
-
-      Home -> HomeScreen()
-
-      is Review -> ReviewScreen(onBack = router::pop, currentScopeId = screen.scopeId)
-
-      Settings -> SettingsScreen(onBack = router::pop)
-
-      Scopes -> ScopesScreen(onBack = router::pop)
-
-      is CreateScope -> CreateScopeScreen(
-        onBack = router::pop,
-        onSaveScope = screen.onSave
-      )
-
-      is TaskChat -> TaskChatScreen(
-        taskId = screen.taskId,
-        onBack = router::pop
-      )
-
-      is ImagePreview -> {
-        ImageImportScreen(
-          imageUri = screen.imageUri,
-          onImport = { message ->
-            val shareableImage = Shareable.Image(screen.imageUri, message)
-            shareContent(screen.taskId, shareableImage)
-            router.replaceAll(Home, TaskChat(screen.taskId))
-          },
-          onBack = router::pop
-
+        OnBoarding -> OnBoardingScreen(
+          onBoardingComplete = {
+            onBoardingComplete()
+            router.replaceCurrent(Home)
+          }
         )
 
-      }
+        Home -> HomeScreen()
 
-      is Share -> {
-        ShareScreen(
+        is Review -> ReviewScreen(onBack = router::pop, currentScopeId = screen.scopeId)
+
+        Settings -> SettingsScreen(onBack = router::pop)
+
+        Scopes -> ScopesScreen(onBack = router::pop)
+
+        is CreateScope -> CreateScopeScreen(
           onBack = router::pop,
-          shareable = screen.shareable,
-        ) { taskId, shareable ->
-          if (shareable is Shareable.Image) {
-            router.push(ImagePreview(shareable.uris, taskId))
-          } else {
-            router.replaceCurrent(
-              TaskChat(taskId),
-              onComplete = {
-                shareContent(taskId, shareable)
-              }
-            )
+          onSaveScope = screen.onSave
+        )
+
+        is TaskChat -> TaskChatScreen(
+          taskId = screen.taskId,
+          onBack = router::pop
+        )
+
+        is ImagePreview -> {
+          ImageImportScreen(
+            imageUri = screen.imageUri,
+            onImport = { message ->
+              val shareableImage = Shareable.Image(screen.imageUri, message)
+              shareContent(screen.taskId, shareableImage)
+              router.replaceAll(Home, TaskChat(screen.taskId))
+            },
+            onBack = router::pop
+
+          )
+
+        }
+
+        is Share -> {
+          ShareScreen(
+            onBack = router::pop,
+            shareable = screen.shareable,
+          ) { taskId, shareable ->
+            if (shareable is Shareable.Image) {
+              router.push(ImagePreview(shareable.uris, taskId))
+            } else {
+              router.replaceCurrent(
+                TaskChat(taskId),
+                onComplete = {
+                  shareContent(taskId, shareable)
+                }
+              )
+            }
           }
         }
       }
