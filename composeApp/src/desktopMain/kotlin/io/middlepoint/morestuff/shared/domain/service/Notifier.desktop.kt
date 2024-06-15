@@ -28,6 +28,6 @@ actual class NotifierImpl : Notifier {
     }
 
     override fun getActiveNotificationScheduleIds(): List<Long> {
-        TODO("Not yet implemented")
+        return listOf()
     }
 }

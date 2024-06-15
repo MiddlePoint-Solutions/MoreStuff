@@ -6,11 +6,11 @@ actual class SchedulerImpl : Scheduler {
     }
 
     override fun schedulePlannedPriorityWorker() {
-        TODO("Not yet implemented")
+        // TODO:
     }
 
     override fun scheduleReviewWorker(hour: Int, minute: Int) {
-        TODO("Not yet implemented")
+        // TODO:
     }
 
     override fun cancelSchedule(scheduleId: Long) {

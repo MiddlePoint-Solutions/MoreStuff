@@ -1,3 +1,5 @@
+import java.util.UUID
+
 actual class File actual constructor(path: String) {
     actual fun exists(): Boolean {
         TODO("Not yet implemented")
@@ -9,11 +11,11 @@ actual class File actual constructor(path: String) {
 }
 
 actual fun generateUUID(): String {
-    TODO("Not yet implemented")
+    return UUID.randomUUID().toString()
 }
 
 actual fun formatString(format: String, vararg args: Any): String {
-    TODO("Not yet implemented")
+    return String.format(format, *args)
 }
 
 actual fun requiresNotificationsPermission(): Boolean {

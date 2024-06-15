@@ -6,6 +6,8 @@ import io.middlepoint.morestuff.db.StuffDb
 
 actual class DriverFactory {
     actual fun createDriver(): SqlDriver {
-        return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        StuffDb.Schema.create(driver)
+        return driver
     }
 }
