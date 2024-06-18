@@ -61,11 +61,6 @@ class MessageMiddleware(
             is CreateScheduleMessageAction -> scope.launch {
                 createScheduleMessageUseCase(action.scheduleId).map { message ->
                     dispatch(ShowReminderNotificationAction(message))
-                    // TODO: show task overload notification?
-//                    val activeMessages = getActiveScheduleMessages()
-//                    if (activeMessages.size > Defaults.REMINDER_GROUP_LIMIT) {
-//                        dispatch(NotificationAction.ShowReminderNotificationsAction(activeMessages))
-//                    }
                 }
             }
 

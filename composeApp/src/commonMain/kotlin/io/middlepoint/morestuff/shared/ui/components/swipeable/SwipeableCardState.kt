@@ -25,10 +25,10 @@ enum class FlipState {
 fun rememberSwipeableCardState(key: Any = Unit): SwipeableCardState {
     val screenSize = LocalScreenSize.current
     val screenWidth = with(LocalDensity.current) {
-        screenSize.wPX.toFloat()
+        screenSize.wDP.toPx()
     }
     val screenHeight = with(LocalDensity.current) {
-        screenSize.hPX.toFloat()
+        screenSize.hDP.toPx()
     }
 
     return remember(key) {

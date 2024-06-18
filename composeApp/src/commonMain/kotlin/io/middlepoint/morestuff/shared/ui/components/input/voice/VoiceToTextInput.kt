@@ -92,8 +92,6 @@ private fun VoiceToTextInputContent(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
-
-
     LaunchedEffect(recordingState.isListening) {
         if (!recordingState.isListening) {
             stopListening()

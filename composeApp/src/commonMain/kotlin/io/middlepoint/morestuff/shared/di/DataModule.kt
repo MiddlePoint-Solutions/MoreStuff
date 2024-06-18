@@ -66,9 +66,5 @@ val dataModule = module {
   }
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
-
-
-  // Platform specific use-cases
-//  factoryOf(::GetPagedMessagesUseCaseImpl) bind GetPagedMessagesUseCase::class
 }
 

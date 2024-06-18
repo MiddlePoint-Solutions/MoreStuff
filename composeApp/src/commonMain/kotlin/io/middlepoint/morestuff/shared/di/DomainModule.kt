@@ -82,8 +82,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateScheduleUse
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveScheduleFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveScheduleFlowUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveSchedulesByPriority
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveSchedulesByPriorityImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveSchedulesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetActiveSchedulesUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetAllActiveSchedulesUseCase
@@ -182,7 +180,7 @@ import org.koin.dsl.module
 val domainModules
     get() = buildList {
         add(storeModule)
-        add(serviceModule) // TODO: is this still being used?
+        add(serviceModule)
         addAll(useCaseModules)
         add(timeManagerModule)
     }
@@ -294,7 +292,6 @@ val scheduleUseCases = module {
     factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
     factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
     factoryOf(::GetAllActiveSchedulesUseCaseImpl) bind GetAllActiveSchedulesUseCase::class
-    factoryOf(::GetActiveSchedulesByPriorityImpl) bind GetActiveSchedulesByPriority::class
     factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
     factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
     factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class

@@ -40,7 +40,6 @@ fun voiceToTextModel(
     merge(
       events,
       voiceToTextParser.state.map { parserState ->
-        // TODO: is this really needed?
         when {
           parserState.isSpeaking && !state.isListening -> StartListening
           !parserState.isSpeaking && state.isListening -> StopListening

@@ -27,12 +27,6 @@ LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE (content_type = 100 OR content_type = 101 OR (content_type = 200 AND reply_content IS NULL))
 ORDER BY datetime(create_time) DESC;
 
--- TODO: Distinct schedule messages? (i.e. remove past reminder message with same schedule id)
-selectActiveReminderMessages:
-SELECT message.*
-FROM message
-WHERE (content_type = 200 AND reply_time IS NULL);
-
 selectMessageById:
 SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
 FROM message

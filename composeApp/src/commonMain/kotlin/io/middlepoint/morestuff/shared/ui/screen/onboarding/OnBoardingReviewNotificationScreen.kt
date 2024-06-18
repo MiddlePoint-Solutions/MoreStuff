@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import formatString
 import io.middlepoint.morestuff.shared.ui.components.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import morestuff.composeapp.generated.resources.Res
@@ -118,13 +120,18 @@ fun OnBoardingReviewNotificationScreen(
                     modifier = Modifier.size(30.dp)
                 )
 
-                // TODO: create format function (or check existing library)
-//                Text(
-//                    text = "${selectedTime.first}:${String.format("%02d", selectedTime.second)}",
-//                    modifier = Modifier.padding(horizontal = 10.dp),
-//                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 30.sp),
-//                    color = MaterialTheme.colorScheme.primary
-//                )
+                val displayTime by remember {
+                    derivedStateOf {
+                        "${selectedTime.first}:${formatString("%02d", selectedTime.second)}"
+                    }
+                }
+
+                Text(
+                    text = displayTime,
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 30.sp),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
         }

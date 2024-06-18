@@ -52,10 +52,4 @@ allprojects {
       endWithNewline()
     }
   }
-
-  // TODO: remove once issue is fixed https://github.com/touchlab/Kermit/issues/383
-  configurations
-    .matching { it.name.endsWith("TestRuntimeClasspath") }
-    .configureEach { exclude(group = "org.jetbrains.kotlin", module = "kotlin-test-junit5") }
 }
-

@@ -149,8 +149,6 @@ fun ReviewContent(
             .systemBarsPadding()
     ) {
 
-
-
         ConstraintLayout(
             modifier
                 .fillMaxSize()

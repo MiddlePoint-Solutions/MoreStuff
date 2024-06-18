@@ -29,6 +29,7 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
@@ -44,7 +45,6 @@ import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun MainContent(
-  initialScreen: Screen?,
   shareContent: (taskId: Long, content: Shareable) -> Unit,
   onBoardingComplete: () -> Unit,
 ) {
@@ -52,13 +52,7 @@ fun MainContent(
     LocalScreenSize provides getScreenSizeInfo(),
   ) {
 
-    val router: Router<Screen> = rememberRouter(Screen::class) {
-      when (initialScreen) {
-        OnBoarding -> listOf(OnBoarding)
-        null -> listOf(Home)
-        else -> listOf(Home, initialScreen)
-      }
-    }
+    val router =  LocalAppRouter.current
 
     RoutedContent(
       router = router,

@@ -9,6 +9,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.unit.Velocity
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -24,17 +25,18 @@ import kotlin.math.abs
  */
 @ExperimentalSwipeableCardApi
 fun Modifier.swipableCard(
-  state: SwipeableCardState,
-  enabled: Boolean = true,
-  onSwiped: (SwipeDirection) -> Unit = {},
-  onDrag: (Boolean) -> Unit = {},
-  onSwipeCancel: () -> Unit = {},
-  blockedDirections: List<SwipeDirection> = listOf(),
+    state: SwipeableCardState,
+    enabled: Boolean = true,
+    onSwiped: (SwipeDirection) -> Unit = {},
+    onDrag: (Boolean) -> Unit = {},
+    onSwipeCancel: () -> Unit = {},
+    blockedDirections: List<SwipeDirection> = listOf(),
 ) = pointerInput(state) {
     coroutineScope {
         val velocityTracker = VelocityTracker()
         detectDragGestures(
             onDragStart = {
+                Logger.d { "$it" }
                 onDrag(true)
             },
             onDragCancel = {
@@ -44,6 +46,7 @@ fun Modifier.swipableCard(
                 }
             },
             onDrag = { change, dragAmount ->
+                Logger.d { "$dragAmount" }
                 if (state.isSwiped || !enabled) {
                     change.consume()
                 } else {
@@ -121,9 +124,9 @@ private fun isVelocitySwipe(velocity: Velocity): Boolean {
 }
 
 private fun Offset.coerceIn(
-  blockedDirections: List<SwipeDirection>,
-  maxHeight: Float,
-  maxWidth: Float,
+    blockedDirections: List<SwipeDirection>,
+    maxHeight: Float,
+    maxWidth: Float,
 ): Offset {
     return copy(
         x = x.coerceIn(
@@ -154,8 +157,8 @@ private fun Offset.coerceIn(
 }
 
 private fun hasNotTravelledEnough(
-  state: SwipeableCardState,
-  offset: Offset,
+    state: SwipeableCardState,
+    offset: Offset,
 ): Boolean {
     return abs(offset.x) < state.maxWidth / 5.5 &&
             abs(offset.y) < state.maxHeight / 6.5

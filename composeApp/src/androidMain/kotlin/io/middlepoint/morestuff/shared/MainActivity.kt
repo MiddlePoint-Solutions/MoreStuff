@@ -11,6 +11,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
@@ -32,6 +35,7 @@ import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.ui.App
 import org.koin.android.ext.android.inject
 import org.koin.compose.KoinContext
 
@@ -42,64 +46,21 @@ class MainActivity : AppCompatActivity() {
 
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    val viewModel: MainViewModel by inject<MainViewModel>()
     val rootRouterContext: RouterContext = defaultRouterContext()
 
     setContent {
-      KoinContext {
+      CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
 
-        val model by viewModel.models.collectAsState()
+        var initialScreen by remember { mutableStateOf<Screen?>(null) }
+        App(initialScreen)
 
-        ProvideAppTheme(model.theme) {
-
-          MoreStuffTheme {
-
-            CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
-
-              val router: Router<Screen> = rememberRouter(Screen::class) { listOf(Screen.Home) }
-
-              ProvideAppRouter(router) {
-
-                Surface(
-                  color = MaterialTheme.colorScheme.surfaceContainer
-                ) {
-                  if (model.ready) {
-                    val initialScreen = if (model.showOnBoarding) {
-                      Screen.OnBoarding
-                    } else {
-                      handleLaunchIntent(intent)
-                    }
-
-                    MainContent(
-                      initialScreen = initialScreen,
-                      shareContent = { taskId, content ->
-                        viewModel.take(
-                          MainEvent.ShareContent(taskId, content)
-                        )
-                      },
-                      onBoardingComplete = {
-                        viewModel.take(MainEvent.OnBoardingComplete)
-                      }
-                    )
-                  }
-                }
-
-                DisposableEffect(Unit) {
-                  val listener = Consumer<Intent> {
-                    val screen = handleLaunchIntent(it)
-                    Logger.d("onNewIntent: $screen")
-                    if (screen != null) {
-                      router.navigate {
-                        listOf(Screen.Home, screen)
-                      }
-                    }
-                  }
-                  addOnNewIntentListener(listener)
-                  onDispose { removeOnNewIntentListener(listener) }
-                }
-              }
-            }
+        DisposableEffect(Unit) {
+          val listener = Consumer<Intent> {
+            initialScreen = handleLaunchIntent(it)
+            Logger.d("onNewIntent: $initialScreen")
           }
+          addOnNewIntentListener(listener)
+          onDispose { removeOnNewIntentListener(listener) }
         }
       }
     }

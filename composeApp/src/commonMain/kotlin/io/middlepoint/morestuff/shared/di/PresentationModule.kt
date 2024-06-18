@@ -32,7 +32,6 @@ val presentationModule = module {
     viewModelOf(::HomePresenter)
     viewModelOf(::ScopeTasksPresenter)
 
-
     viewModelOf(::ShareViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::VoiceToTextViewModel)
