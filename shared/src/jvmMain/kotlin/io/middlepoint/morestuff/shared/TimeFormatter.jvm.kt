@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
 
-actual class TimeFormatterImpl : TimeFormatter {
+class TimeFormatterImpl : TimeFormatter {
 
     override val is24HourFormat: Boolean
         get() = checkIf24HourFormat()

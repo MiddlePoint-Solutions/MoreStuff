@@ -4,7 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 
-actual class ClipboardHelperImpl(
+class ClipboardHelperImpl(
     private val context: Context
 ) : ClipboardHelper {
     override fun copyToClipboard(text: String) {

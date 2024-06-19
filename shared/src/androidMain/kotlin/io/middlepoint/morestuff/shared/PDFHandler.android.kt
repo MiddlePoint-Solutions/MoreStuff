@@ -15,7 +15,7 @@ import java.io.FileOutputStream
 import java.nio.file.Path
 
 
-actual class PDFHandlerImpl(
+class PDFHandlerImpl(
     private val context: Context,
 ) : PDFHandler {
 

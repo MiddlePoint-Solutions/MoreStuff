@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
@@ -41,6 +39,7 @@ kotlin {
       implementation(libs.kotlinx.datetime)
       implementation(libs.kotlinx.coroutines)
       implementation(libs.kermit)
+      implementation(libs.koin.core)
     }
 
     androidMain.dependencies {

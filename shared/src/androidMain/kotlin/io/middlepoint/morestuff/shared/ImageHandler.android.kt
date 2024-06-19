@@ -16,7 +16,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Path
 
-actual class ImageHandlerImpl(
+class ImageHandlerImpl(
     private val context: Context
 ) : ImageHandler {
     override suspend fun saveImages(uris: String, time: LocalDateTime): String? = withContext(Dispatchers.IO) {

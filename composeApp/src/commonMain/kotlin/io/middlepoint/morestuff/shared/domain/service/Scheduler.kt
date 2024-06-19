@@ -8,5 +8,3 @@ interface Scheduler {
     fun cancelPlannedPriorityUpdate()
     fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean)
 }
-
-expect class SchedulerImpl: Scheduler

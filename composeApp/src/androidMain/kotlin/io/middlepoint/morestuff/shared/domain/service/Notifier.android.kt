@@ -40,7 +40,7 @@ import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REVIEW_
 import org.koin.core.component.KoinComponent
 import java.util.Calendar
 
-actual class NotifierImpl(
+class NotifierImpl(
     private val context: Context,
     private val notificationManager: NotificationManagerCompat,
 ) : Notifier, KoinComponent {

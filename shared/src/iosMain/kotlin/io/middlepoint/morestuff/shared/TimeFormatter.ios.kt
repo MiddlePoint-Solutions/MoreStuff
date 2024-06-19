@@ -1,34 +1,35 @@
 package io.middlepoint.morestuff.shared
 
-actual class TimeFormatterImpl : TimeFormatter {
+// TODO: use kotlinx datetime for formatting?
+class TimeFormatterImpl : TimeFormatter {
     override val is24HourFormat: Boolean
-        get() = TODO("Not yet implemented")
+        get() = true // TODO:
 
     override fun formatTime(timeString: String?, pattern: String): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 
     override fun formatTimeDayMonthInDeviceLanguage(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 
     override fun formatTimeOnly(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 
     override fun formatTimeDayAndMonth(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 
     override fun formatTimeDayMonthHour(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 
     override fun formatToDateTime(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "TODO"
     }
 
     override fun formatTimeWithDayMonthYear(timeString: String?): String? {
-        TODO("Not yet implemented")
+        return "" // TODO:
     }
 }

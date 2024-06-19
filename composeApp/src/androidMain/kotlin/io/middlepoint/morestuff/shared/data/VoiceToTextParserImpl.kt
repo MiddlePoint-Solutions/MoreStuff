@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.Locale
 
-actual class VoiceToTextParserImpl(
+class VoiceToTextParserImpl(
     private val context: Application,
 ) : RecognitionListener, VoiceToTextParser {
     private val _state = MutableStateFlow(VoiceToTextParserState())

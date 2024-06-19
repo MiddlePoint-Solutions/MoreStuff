@@ -13,5 +13,3 @@ interface TimeFormatter {
     fun formatTimeWithDayMonthYear(timeString: String?): String?
 
 }
-
-expect class TimeFormatterImpl: TimeFormatter

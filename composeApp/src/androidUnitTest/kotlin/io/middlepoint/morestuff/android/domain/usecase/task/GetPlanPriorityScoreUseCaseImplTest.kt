@@ -43,7 +43,8 @@ class GetPlanPriorityScoreUseCaseImplTest {
         coEvery { getLowestPriorityScoreUseCase() } returns lp
         coEvery { getHighestPriorityScoreUseCase() } returns hp
         coEvery { timeManager.localDateTimeToUtc(scheduleTimeLocal) } returns scheduleTimeUTC
-        coEvery { timeManager.nowUtcInstant } returns Instant.fromEpochSeconds(currentTime.toInstant().epochSeconds)
+        coEvery { timeManager.nowUtcInstant } returns
+                Instant.fromEpochSeconds(Instant.parse(currentTime).epochSeconds)
 
         val actualScore = useCase.invoke(scheduleTimeLocal, taskCreateTimeUtc)
 

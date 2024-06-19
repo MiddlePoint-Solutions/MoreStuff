@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared
 import android.content.Context
 import android.content.Intent
 
-actual class ShareHelperImpl(
+class ShareHelperImpl(
     private val context: Context,
 ) : ShareHelper {
 

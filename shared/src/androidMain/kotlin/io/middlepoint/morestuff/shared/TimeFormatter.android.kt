@@ -8,7 +8,7 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-actual class TimeFormatterImpl(
+class TimeFormatterImpl(
     private val context: Context,
 ) : TimeFormatter {
 

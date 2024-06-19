@@ -100,6 +100,7 @@ class TimeManagerImpl : TimeManager {
             DayOfWeek.FRIDAY -> 1
             DayOfWeek.SATURDAY -> 7
             DayOfWeek.SUNDAY -> 6
+            else -> 0
         }
 
         return (nowLocalDateTime.toInstant(currentTimeZone) + daysUntilWeekend.days).toLocalDateTime(

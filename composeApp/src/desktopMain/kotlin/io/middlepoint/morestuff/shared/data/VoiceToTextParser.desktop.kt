@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-actual class VoiceToTextParserImpl : VoiceToTextParser {
+class VoiceToTextParserImpl : VoiceToTextParser {
 
     private val _state = MutableStateFlow(VoiceToTextParserState())
     override val state = _state.asStateFlow()

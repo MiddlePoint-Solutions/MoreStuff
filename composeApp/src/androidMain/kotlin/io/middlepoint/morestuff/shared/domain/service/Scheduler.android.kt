@@ -21,7 +21,7 @@ import io.middlepoint.morestuff.shared.work.ScheduleWorker
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-actual class SchedulerImpl(
+class SchedulerImpl(
     private val context: Context,
     private val timeManager: TimeManager,
     private val workManager: WorkManager

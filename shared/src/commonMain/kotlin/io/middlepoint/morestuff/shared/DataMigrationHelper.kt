@@ -7,5 +7,3 @@ interface DataMigrationHelper {
     suspend fun importDatabase(uri: String) : Boolean
 
 }
-
-expect class DataMigrationHelperImpl : DataMigrationHelper

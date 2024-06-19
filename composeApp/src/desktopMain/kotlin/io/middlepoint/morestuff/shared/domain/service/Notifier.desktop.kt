@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.service
 
 import io.middlepoint.morestuff.shared.domain.model.Message
 
-actual class NotifierImpl : Notifier {
+class NotifierImpl : Notifier {
     override fun showReminderNotification(message: Message) {
         TODO("Not yet implemented")
     }

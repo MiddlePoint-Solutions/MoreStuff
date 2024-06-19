@@ -231,7 +231,8 @@ private fun HomeContent(
 
                 val scope = model.scopes[page]
 
-                val scopeViewModel = koinViewModel<ScopeTasksPresenter>(
+                val scopeViewModel = koinInjectOnRoute(
+                    type = ScopeTasksPresenter::class,
                     key = "Scope${scope.id}",
                     parameters = { parametersOf(scope.id) }
                 )

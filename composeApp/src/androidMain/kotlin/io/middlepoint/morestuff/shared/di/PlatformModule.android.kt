@@ -37,14 +37,7 @@ actual val platformModule: Module = module {
     factory { Logger.withTag(it.getOrNull() ?: "MoreStuffAndroid") }
     factory<DriverFactory> { DriverFactory(androidApplication()) }
 
-    factoryOf(::TimeFormatterImpl) bind TimeFormatter::class
-    factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
-    factoryOf(::ShareHelperImpl) bind ShareHelper::class
-    factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
-    factoryOf(::ImageHandlerImpl) bind ImageHandler::class
-    factoryOf(::PDFHandlerImpl) bind PDFHandler::class
-
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
 

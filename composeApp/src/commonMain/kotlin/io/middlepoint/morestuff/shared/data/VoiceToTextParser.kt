@@ -10,5 +10,3 @@ interface VoiceToTextParser {
   fun stopListening()
   fun clearSpokenText()
 }
-
-expect class VoiceToTextParserImpl: VoiceToTextParser

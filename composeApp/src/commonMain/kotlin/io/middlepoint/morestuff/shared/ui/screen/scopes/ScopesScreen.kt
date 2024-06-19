@@ -231,9 +231,9 @@ fun ScopesContent(
 private fun OrderedScopesList(
   onEditScope: (ScopeDomain) -> Unit,
   onDeleteScope: (ScopeDomain) -> Unit,
-  viewModel: ScopesViewModel = koinViewModel()
 ) {
 
+  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
   val model by viewModel.models.collectAsState()
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
   val menuVisibility = remember(scopes) {

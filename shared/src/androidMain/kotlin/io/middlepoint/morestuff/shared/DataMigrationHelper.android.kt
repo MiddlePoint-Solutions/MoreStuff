@@ -9,7 +9,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
-actual class DataMigrationHelperImpl(
+class DataMigrationHelperImpl(
     private val context: Context,
     private val logger: Logger,
 ) : DataMigrationHelper {

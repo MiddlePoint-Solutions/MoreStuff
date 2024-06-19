@@ -1,16 +1,16 @@
 package io.middlepoint.morestuff.shared.domain.service
 
-actual class SchedulerImpl : Scheduler {
+class SchedulerImpl : Scheduler {
     override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
         TODO("Not yet implemented")
     }
 
     override fun schedulePlannedPriorityWorker() {
-        TODO("Not yet implemented")
+        // TODO
     }
 
     override fun scheduleReviewWorker(hour: Int, minute: Int) {
-        TODO("Not yet implemented")
+        // TODO:
     }
 
     override fun cancelSchedule(scheduleId: Long) {

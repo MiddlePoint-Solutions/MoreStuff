@@ -5,5 +5,3 @@ interface PDFHandler {
     fun sharePDF(pdfPath: String)
     fun openPDF(pdfPath: String)
 }
-
-expect class PDFHandlerImpl: PDFHandler

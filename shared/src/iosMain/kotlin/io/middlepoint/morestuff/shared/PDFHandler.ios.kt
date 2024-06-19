@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-actual class PDFHandlerImpl : PDFHandler {
+class PDFHandlerImpl : PDFHandler {
     override suspend fun savePDF(uri: String): String? {
         TODO("Not yet implemented")
     }

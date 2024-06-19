@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-actual class TimeFormatterImpl : TimeFormatter {
+class TimeFormatterImpl : TimeFormatter {
     override val is24HourFormat: Boolean
         get() = TODO("Not yet implemented")
 

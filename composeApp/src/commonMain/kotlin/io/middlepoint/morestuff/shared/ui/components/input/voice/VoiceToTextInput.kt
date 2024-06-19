@@ -45,6 +45,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.domain.enums.Language
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.record_audio_permission_description
@@ -59,7 +60,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
 ) {
-    val viewModel: VoiceToTextViewModel = koinViewModel()
+
+    val viewModel = koinInjectOnRoute(VoiceToTextViewModel::class)
     val recordingState by viewModel.models.collectAsState()
     LaunchedEffect(recordingState.spokenText) {
         if (recordingState.spokenText.isNotEmpty()) {

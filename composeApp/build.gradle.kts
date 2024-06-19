@@ -91,8 +91,14 @@ kotlin {
 
         commonMain.dependencies {
             implementation(projects.shared)
+
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
+            implementation(libs.compose.ui.util)
             implementation(compose.components.resources)
-            implementation(libs.bundles.compose)
+            implementation(compose.components.uiToolingPreview)
+
             implementation(compose.materialIconsExtended)
             implementation(libs.bundles.kotlinx)
             implementation(libs.stately.isolate)
@@ -177,6 +183,7 @@ kotlin {
         }
 
         iosMain.dependencies {
+            implementation(compose.foundation)
             implementation(libs.sqldelight.driver.native)
             implementation(libs.ktor.client.darwin)
         }

@@ -2,21 +2,25 @@ package io.middlepoint.morestuff.shared.data
 
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.model.VoiceToTextParserState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
-actual class VoiceToTextParserImpl : VoiceToTextParser {
+class VoiceToTextParserImpl : VoiceToTextParser {
+
+    private val _state = MutableStateFlow(VoiceToTextParserState())
     override val state: StateFlow<VoiceToTextParserState>
-        get() = TODO("Not yet implemented")
+        get() = _state.asStateFlow()
 
     override fun startListening(languageCode: Language) {
-        TODO("Not yet implemented")
+        // TODO:
     }
 
     override fun stopListening() {
-        TODO("Not yet implemented")
+        // TODO:
     }
 
     override fun clearSpokenText() {
-        TODO("Not yet implemented")
+        // TODO:
     }
 }
