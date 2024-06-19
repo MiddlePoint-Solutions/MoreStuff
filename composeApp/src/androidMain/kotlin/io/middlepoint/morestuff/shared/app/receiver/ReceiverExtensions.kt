@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.KEY_REPLY_EXTRA
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import kotlinx.coroutines.CoroutineScope
@@ -81,9 +82,7 @@ fun Intent.setReplayIntentExtras(scheduleId: Long, type: ReplyType) =
   putExtra(KEY_REPLY_EXTRA, ReplyIntentExtras(scheduleId, type))
 
 fun Intent.getReplyIntentExtras(): ReplyIntentExtras? =
-  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-    getParcelableExtra(KEY_REPLY_EXTRA, ReplyIntentExtras::class.java)
-  } else getParcelableExtra(KEY_REPLY_EXTRA)
+  getParcelableExtraCompat(KEY_REPLY_EXTRA, ReplyIntentExtras::class.java)
 
 @Parcelize
 data class ReplyIntentExtras(

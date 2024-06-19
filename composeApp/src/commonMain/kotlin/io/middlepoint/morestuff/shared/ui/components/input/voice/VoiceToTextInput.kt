@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -79,10 +80,10 @@ fun VoiceToTextInput(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun VoiceToTextInputContent(
-  recordingState: VoiceToTextState,
-  startListening: () -> Unit,
-  stopListening: () -> Unit,
-  selectedLanguage: String,
+    recordingState: VoiceToTextState,
+    startListening: () -> Unit,
+    stopListening: () -> Unit,
+    selectedLanguage: String,
 ) {
 
     // TODO: Support Audio recording permission
@@ -151,11 +152,10 @@ private fun VoiceToTextInputContent(
     }
 
     if (showDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showDialog = false
-                stopListening()
-            }
+        BasicAlertDialog(onDismissRequest = {
+            showDialog = false
+            stopListening()
+        }
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.secondaryContainer

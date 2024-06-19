@@ -1,9 +1,0 @@
-interface DataMigrationHelper {
-
-    suspend fun exportDatabase(uri: String) : Boolean
-
-    suspend fun importDatabase(uri: String) : Boolean
-
-}
-
-expect class DataMigrationHelperImpl : DataMigrationHelper

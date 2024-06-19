@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.model.map
 
 import io.middlepoint.morestuff.shared.domain.model.Message
-import TimeFormatter
+import io.middlepoint.morestuff.shared.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 
 class MessageUiMapper(private val timeFormatter: TimeFormatter) {

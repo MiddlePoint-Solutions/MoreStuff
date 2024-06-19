@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
-import ImageHandler
+import io.middlepoint.morestuff.shared.ImageHandler
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 
 interface SaveUserImageUseCase {

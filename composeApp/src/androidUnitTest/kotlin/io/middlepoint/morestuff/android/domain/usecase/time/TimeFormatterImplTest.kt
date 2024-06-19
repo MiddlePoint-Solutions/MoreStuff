@@ -2,13 +2,15 @@ package io.middlepoint.morestuff.android.domain.usecase.time
 
 
 import io.middlepoint.morestuff.android.domain.timeManager
+import io.middlepoint.morestuff.shared.TimeFormatterImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
-import kotlinx.datetime.toInstant
+import kotlinx.datetime.Instant
 import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.datetime.toLocalDateTime
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -30,7 +32,7 @@ internal class TimeFormatterImplTest {
         val dateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
         val outputJavaLocalDateTime = LocalDateTime.parse(formattedString, dateTimeFormatter)
         val outputLocalDateTime = outputJavaLocalDateTime.toKotlinLocalDateTime()
-        val inputInstant = timeString.toInstant()
+        val inputInstant = Instant.parse(timeString)
         val inputLocalDateTime = inputInstant.toLocalDateTime(timeManager.currentTimeZone)
         assertEquals(inputLocalDateTime, outputLocalDateTime)
     }

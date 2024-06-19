@@ -21,7 +21,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlow
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
-import TimeFormatter
+import io.middlepoint.morestuff.shared.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -38,16 +38,16 @@ import org.koin.compose.koinInject
 
 @Composable
 fun userInputModel(
-    initialState: UserInputState,
-    events: Flow<UserInputEvent>,
-    store: AppStore = koinInject(),
-    getLastMessageFlowUseCase: GetLastMessageFlowUseCase = koinInject(),
-    getScopesUseCase: GetScopesUseCase = koinInject(),
-    createTaskUseCase: CreateTaskUseCase = koinInject(),
-    timeManager: TimeManager = koinInject(),
-    timeFormatter: TimeFormatter = koinInject(),
-    messageUiMapper: MessageUiMapper = koinInject(),
-    appMessageProvider: AppMessageProvider = koinInject()
+  initialState: UserInputState,
+  events: Flow<UserInputEvent>,
+  store: AppStore = koinInject(),
+  getLastMessageFlowUseCase: GetLastMessageFlowUseCase = koinInject(),
+  getScopesUseCase: GetScopesUseCase = koinInject(),
+  createTaskUseCase: CreateTaskUseCase = koinInject(),
+  timeManager: TimeManager = koinInject(),
+  timeFormatter: TimeFormatter = koinInject(),
+  messageUiMapper: MessageUiMapper = koinInject(),
+  appMessageProvider: AppMessageProvider = koinInject()
 ): UserInputState {
 
   var context by remember { mutableStateOf<ChatContext?>(null) }
@@ -176,9 +176,9 @@ private fun createAppMessage(
 }
 
 private fun createPlanTime(
-    timeManager: TimeManager,
-    timeFormatter: TimeFormatter,
-    time: LocalDateTime = timeManager.getDefaultPlanTime(),
+  timeManager: TimeManager,
+  timeFormatter: TimeFormatter,
+  time: LocalDateTime = timeManager.getDefaultPlanTime(),
 ) = ScheduleUiModel(
   scheduleLocalDateTime = time,
   displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",

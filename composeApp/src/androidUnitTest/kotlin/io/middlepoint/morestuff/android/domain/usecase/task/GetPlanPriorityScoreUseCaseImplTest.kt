@@ -8,6 +8,7 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -30,8 +31,8 @@ class GetPlanPriorityScoreUseCaseImplTest {
     @Test
     fun `calculate priority for plan task with positive priority`() = runBlocking {
         val taskCreateTimeUtc = "2023-06-19T10:00:00Z"
-        val scheduleTimeUTC = "2023-06-19T20:00:00Z".toInstant()
-        val scheduleTimeLocal = "2023-06-19T20:00:00".toLocalDateTime()
+        val scheduleTimeUTC = Instant.parse("2023-06-19T20:00:00Z")
+        val scheduleTimeLocal = LocalDateTime.parse("2023-06-19T20:00:00")
         val currentTime = "2023-06-19T15:00:00Z"
 
         val lp: Long = 10

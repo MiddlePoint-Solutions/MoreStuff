@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.SavePdfFailure
-import PDFHandler
+import io.middlepoint.morestuff.shared.PDFHandler
 
 /*interface SaveUserPDFUseCase {
     suspend operator fun invoke(uri: String): Either<String, String>

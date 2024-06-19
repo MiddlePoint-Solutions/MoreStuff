@@ -87,6 +87,7 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMe
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -113,12 +114,10 @@ fun TaskChatScreen(
     modifier: Modifier = Modifier,
 ) {
 
-    val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) {
-        listOf(TaskChat)
-    }
+    val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
 
-    val viewModel: TaskChatPresenter = koinViewModel(
-        key = "TaskChat$taskId",
+    val viewModel = koinInjectOnRoute(
+        type = TaskChatPresenter::class,
         parameters = { parametersOf(taskId) }
     )
 

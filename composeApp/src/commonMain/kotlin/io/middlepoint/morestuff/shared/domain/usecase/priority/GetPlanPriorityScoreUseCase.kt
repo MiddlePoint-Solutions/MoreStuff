@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.priority
 
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
 import kotlin.math.max
@@ -23,7 +24,8 @@ class GetPlanPriorityScoreUseCaseImpl(
     ): Long {
 
         val createTime =
-            taskCreateTimeUtc?.toInstant()?.epochSeconds ?: timeManager.nowUtcInstant.epochSeconds
+            taskCreateTimeUtc?.let(Instant.Companion::parse)?.epochSeconds
+                ?: timeManager.nowUtcInstant.epochSeconds
         val scheduleTime = timeManager.localDateTimeToUtc(scheduleTimeLocal).epochSeconds
         val currentTime = timeManager.nowUtcInstant.epochSeconds
 

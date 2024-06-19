@@ -62,6 +62,7 @@ import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksPresenter
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -73,9 +74,9 @@ import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
-    homePresenter: HomePresenter = koinViewModel()
-) {
+fun HomeScreen() {
+
+    val homePresenter = koinInjectOnRoute(HomePresenter::class)
 
     val coroutineScope = rememberCoroutineScope()
     val navigation = LocalAppRouter.current

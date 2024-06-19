@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 
-import File
+import io.middlepoint.morestuff.shared.File
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull

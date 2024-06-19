@@ -23,15 +23,18 @@ kotlin {
     }
   }
 
-  androidTarget {
-
-  }
+  androidTarget()
 
   iosX64()
   iosArm64()
   iosSimulatorArm64()
 
   jvm()
+
+  compilerOptions {
+    // Common compiler options applied to all Kotlin source sets
+    freeCompilerArgs.add("-Xexpect-actual-classes")
+  }
 
   sourceSets {
     commonMain.dependencies {

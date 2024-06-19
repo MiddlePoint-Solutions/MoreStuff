@@ -1,11 +1,11 @@
 package io.middlepoint.morestuff.shared.ui.model.map
 
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
-import TimeFormatter
+import io.middlepoint.morestuff.shared.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 class TaskUiMapper(
-    private val timeFormatter: TimeFormatter,
+  private val timeFormatter: TimeFormatter,
 ) {
   fun map(input: TaskDomain, position: Int = 0): TaskUiModel = TaskUiModel(
     id = input.id,

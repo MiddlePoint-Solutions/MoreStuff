@@ -65,15 +65,21 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
+    compilerOptions {
+        // Common compiler options applied to all Kotlin source sets
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
     cocoapods {
-        summary = "Some description for the Shared Module"
+        summary = "MoreStuff Shared Module"
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
         ios.deploymentTarget = "16.0"
         podfile = project.file("../iosApp/Podfile")
+        name = "ComposeApp"
 
         framework {
-            baseName = "shared"
+            baseName = "ComposeApp"
             isStatic = true
             linkerOpts("-lsqlite3")
             export(libs.decompose.router)

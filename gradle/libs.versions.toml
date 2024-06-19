@@ -42,7 +42,7 @@ lottie = "6.1.0"
 kSoup ="0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.4.2"
+agp = "8.5.0"
 kotlin = "2.0.0"
 
 android_sdk_compile = "34"

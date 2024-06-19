@@ -50,6 +50,7 @@ import io.middlepoint.morestuff.shared.ui.components.priority.PriorityInput
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon
@@ -63,8 +64,9 @@ fun TaskInputBottomSheet(
   sheetState: SheetState,
   context: ChatContext,
   onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
-  viewModel: UserInputViewModel = koinViewModel()
 ) {
+
+  val viewModel = koinInjectOnRoute(UserInputViewModel::class)
 
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }

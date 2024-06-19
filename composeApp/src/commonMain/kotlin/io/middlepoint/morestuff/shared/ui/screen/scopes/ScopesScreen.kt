@@ -64,6 +64,7 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.CreateScop
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.DeleteScope
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.ReorderScopes
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
@@ -88,18 +89,22 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun ScopesScreen(
   onBack: () -> Unit,
   initialScreen: ScopeScreen = Root,
-  viewModel: ScopesViewModel = koinViewModel()
+
 ) {
 
   val router = rememberRouter(ScopeScreen::class) {
     listOf(initialScreen)
   }
 
+
   RoutedContent(
     router = router,
     modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(slide())
   ) { screen ->
+
+    val viewModel = koinInjectOnRoute(ScopesViewModel::class)
+
     when (screen) {
       Root -> ScopesContent(
         onBack = onBack,

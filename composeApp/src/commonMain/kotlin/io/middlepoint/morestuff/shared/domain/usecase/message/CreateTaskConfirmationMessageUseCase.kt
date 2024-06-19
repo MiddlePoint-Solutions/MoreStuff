@@ -1,12 +1,10 @@
 package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
-import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import kotlinx.coroutines.delay
-import java.text.SimpleDateFormat
-import java.util.*
 
 interface CreateTaskConfirmationMessageUseCase {
     suspend operator fun invoke(taskId: Long, priority: Priority): Either<Failure,Boolean>
@@ -15,10 +13,6 @@ interface CreateTaskConfirmationMessageUseCase {
 class CreateTaskConfirmationMessageUseCaseImpl(
     private val createMessageUseCase: CreateMessageUseCase
 ) : CreateTaskConfirmationMessageUseCase {
-
-    private val formatter =
-        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)
-    private val timeFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.US)
 
     override suspend fun invoke(taskId: Long, priority: Priority): Either<Failure,Boolean> {
         delay(1300)

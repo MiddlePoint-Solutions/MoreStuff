@@ -42,15 +42,15 @@ class TimeManagerImpl : TimeManager {
     }
 
     override fun isToday(localTime: String): Boolean {
-        return localTime.toLocalDateTime().date == nowLocalDateTime.date
+        return LocalDateTime.parse(localTime).date == nowLocalDateTime.date
     }
 
     override fun isTomorrow(localTime: String): Boolean {
-        return localTime.toLocalDateTime().date == tomorrowLocalDateTime().date
+        return LocalDateTime.parse(localTime).date == tomorrowLocalDateTime().date
     }
 
     override fun isLater(localTime: String): Boolean {
-        return localTime.toLocalDateTime().date.toEpochDays() > tomorrowLocalDateTime().date.toEpochDays()
+        return LocalDateTime.parse(localTime).date.toEpochDays() > tomorrowLocalDateTime().date.toEpochDays()
     }
 
     override fun todayUtcString(hour: Int, minute: Int): String =

@@ -17,7 +17,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
-import TimeFormatter
+import io.middlepoint.morestuff.shared.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
@@ -155,7 +155,7 @@ private fun createModelForSchedule(
     timeFormatter: TimeFormatter,
 ) =
     scheduleDomain?.scheduleLocalTime?.let {
-        val localTime = it.toLocalDateTime()
+        val localTime = LocalDateTime.parse(it)
         createScheduleModel(localTime, timeManager, timeFormatter)
     }
 

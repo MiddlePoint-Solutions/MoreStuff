@@ -54,6 +54,7 @@ import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
 import kotlinx.coroutines.delay
@@ -69,18 +70,18 @@ import morestuff.composeapp.generated.resources.create_new_chat
 import morestuff.composeapp.generated.resources.search
 import morestuff.composeapp.generated.resources.select_chat
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShareScreen(
     onBack: () -> Unit,
     shareable: Shareable,
-    viewModel: ShareViewModel = koinViewModel(),
     shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
 ) {
+
     var isSearchActive by remember { mutableStateOf(false) }
 
+    val viewModel = koinInjectOnRoute(ShareViewModel::class)
     val state by viewModel.models.collectAsState()
 
     Scaffold(

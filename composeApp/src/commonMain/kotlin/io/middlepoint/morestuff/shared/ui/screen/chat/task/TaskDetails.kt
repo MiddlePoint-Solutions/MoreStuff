@@ -56,6 +56,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.compose.keyboardAsState
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
@@ -72,7 +73,8 @@ fun TaskDetails(
   taskOptions: @Composable ColumnScope.() -> Unit = {},
 ) {
 
-  val viewModel = koinViewModel<TaskDetailsViewModel>(
+  val viewModel = koinInjectOnRoute(
+    type = TaskDetailsViewModel::class,
     key = "TaskChat$taskId",
     parameters = { parametersOf(taskId) }
   )

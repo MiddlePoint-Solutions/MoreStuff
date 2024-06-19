@@ -29,9 +29,10 @@ class CreateMessageUseCaseImpl(
       messageData: MessageData?,
       scheduleId: Long,
     ): Either<Failure, Message> {
-        return messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title).tap {
-            checkForUrlMetadataUseCase(title, it.id)
-        }
+        return messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title)
+            .onRight {
+                checkForUrlMetadataUseCase(title, it.id)
+            }
     }
 }
 

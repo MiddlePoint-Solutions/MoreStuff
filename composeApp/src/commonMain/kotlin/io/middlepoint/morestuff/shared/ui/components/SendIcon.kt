@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui.components
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 
@@ -11,6 +12,6 @@ fun SendIcon(onClick: () -> Unit) {
     IconButton(
         onClick = onClick
     ) {
-        Icon(Icons.Default.Send, contentDescription = null)
+        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null)
     }
 }

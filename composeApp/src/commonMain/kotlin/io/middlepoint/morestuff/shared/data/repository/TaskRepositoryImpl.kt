@@ -7,7 +7,7 @@ import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
-import generateUUID
+import io.middlepoint.morestuff.shared.generateUUID
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.TaskDb
