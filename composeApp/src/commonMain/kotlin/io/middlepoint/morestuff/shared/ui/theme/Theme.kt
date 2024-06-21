@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -9,10 +8,11 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.shared.domain.enums.AppTheme
-import io.middlepoint.morestuff.shared.ui.local.LocalTheme
 
-private val LightColors = lightColorScheme(
+@Composable
+expect fun MoreStuffTheme(content: @Composable () -> Unit)
+
+val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
     primaryContainer = md_theme_light_primaryContainer,
@@ -45,7 +45,7 @@ private val LightColors = lightColorScheme(
 )
 
 
-private val DarkColors = darkColorScheme(
+val DarkColors = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
     primaryContainer = md_theme_dark_primaryContainer,
@@ -77,54 +77,6 @@ private val DarkColors = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-@Composable
-fun MoreStuffTheme(
-    content: @Composable () -> Unit
-) {
-    val darkTheme = isDarkTheme()
-    val colorScheme = when {
-        // TODO: For use when (IF) we support dynamic theme
-        /*Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }*/
-
-        darkTheme -> DarkColors
-        else -> LightColors
-    }
-
-    // TODO: Android specific theming
-//    val view = LocalView.current
-//    if (!view.isInEditMode) {
-//        LaunchedEffect(darkTheme) {
-//            val window = (view.context as Activity).window
-//            window.statusBarColor = Color.Transparent.toArgb()
-//            val elevatedSurfaceColor = colorScheme.surfaceColorAtElevation(2.dp)
-//            window.navigationBarColor = elevatedSurfaceColor.toArgb()
-//            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-//        }
-//    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-    ) {
-        content()
-    }
-}
-
-@Composable
-fun MoreStuffSettingTheme(
-    content: @Composable () -> Unit
-) {
-    val darkTheme = isDarkTheme()
-    val colorScheme =  if (darkTheme) DarkColors else LightColors
-    MaterialTheme(
-        colorScheme = colorScheme.copy(surface = MaterialTheme.colorScheme.surfaceContainer),
-    ) {
-        content()
-    }
-}
-
 val ColorScheme.surfaceContainer: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
@@ -137,12 +89,3 @@ val ColorScheme.divider: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(7.dp)
 
-@Composable
-fun isDarkTheme(): Boolean {
-    val darkTheme = when (LocalTheme.current) {
-        AppTheme.System -> isSystemInDarkTheme()
-        AppTheme.Light -> false
-        AppTheme.Dark -> true
-    }
-    return darkTheme
-}

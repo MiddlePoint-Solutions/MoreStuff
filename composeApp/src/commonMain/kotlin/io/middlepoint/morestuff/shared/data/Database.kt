@@ -2,7 +2,9 @@ package io.middlepoint.morestuff.shared.data
 
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
+import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlSchema
 import io.middlepoint.morestuff.db.Message
 import io.middlepoint.morestuff.db.Schedule
 import io.middlepoint.morestuff.db.Scope

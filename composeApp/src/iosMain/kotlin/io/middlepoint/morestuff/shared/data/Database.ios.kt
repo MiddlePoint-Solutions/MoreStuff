@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.shared.data
 
+import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlSchema
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import io.middlepoint.morestuff.android.data.Constants
 import io.middlepoint.morestuff.db.StuffDb

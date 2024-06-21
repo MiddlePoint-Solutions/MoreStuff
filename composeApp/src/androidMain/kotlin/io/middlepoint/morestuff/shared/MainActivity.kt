@@ -5,11 +5,8 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,27 +14,16 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
-import com.arkivanov.decompose.router.stack.navigate
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.RouterContext
 import io.github.xxfast.decompose.router.defaultRouterContext
-import io.github.xxfast.decompose.router.stack.Router
-import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
-import io.middlepoint.morestuff.shared.ui.local.ProvideAppRouter
-import io.middlepoint.morestuff.shared.ui.local.ProvideAppTheme
-import io.middlepoint.morestuff.shared.ui.screen.main.MainContent
-import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
-import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.App
-import org.koin.android.ext.android.inject
-import org.koin.compose.KoinContext
 
 class MainActivity : AppCompatActivity() {
 

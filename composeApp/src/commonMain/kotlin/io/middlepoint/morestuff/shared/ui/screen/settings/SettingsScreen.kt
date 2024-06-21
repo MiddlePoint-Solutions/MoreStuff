@@ -53,7 +53,6 @@ import com.arkivanov.essenty.instancekeeper.InstanceKeeper
 import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
-import io.middlepoint.morestuff.shared.formatString
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.RouterContext
 import io.github.xxfast.decompose.router.key
@@ -68,11 +67,11 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
+import io.middlepoint.morestuff.shared.formatString
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffSettingTheme
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
@@ -191,79 +190,77 @@ fun SettingsContent(
 
     val scrollState = rememberScrollState()
 
-    MoreStuffSettingTheme {
-        Scaffold(
-            topBar = {
-                SettingsTopBar(
-                    onBack = onBack,
-                    title = stringResource(Res.string.settings)
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.surface
+    Scaffold(
+        topBar = {
+            SettingsTopBar(
+                onBack = onBack,
+                title = stringResource(Res.string.settings)
+            )
+        },
+        containerColor = MaterialTheme.colorScheme.surface
+    ) {
+
+        ConstraintLayout(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+                .verticalScroll(scrollState)
         ) {
 
-            ConstraintLayout(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-                    .verticalScroll(scrollState)
+            val (settings, about) = createRefs()
+
+            Column(
+                modifier = Modifier.constrainAs(settings) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(about.top)
+                    height = Dimension.fillToConstraints
+                }
             ) {
 
-                val (settings, about) = createRefs()
-
-                Column(
-                    modifier = Modifier.constrainAs(settings) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(about.top)
-                        height = Dimension.fillToConstraints
-                    }
-                ) {
-
-                    SelectTheme(
-                        themeSelected = selectAppTheme,
-                        defaultValue = { model.appTheme.ordinal }
-                    )
-
-                    ReviewTimeSelector(
-                        valueChanged = setReviewTime,
-                        defaultValue = model.reviewTime,
-                    )
-                    SelectLanguage(
-                        languageSelected = selectLanguage,
-                        defaultValue = { model.inputVoiceLanguage.ordinal }
-                    )
-
-                    ScopeSettings(onClick = showScopesSettings)
-
-                    if (model.devSettings) {
-                        SettingsMenuLink(
-                            title = {
-                                Text(text = stringResource(Res.string.developer_settings))
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Default.DeveloperBoard,
-                                    contentDescription = ""
-                                )
-                            },
-                            onClick = showDevSettings,
-                        )
-                    }
-                }
-
-                About(
-                    devSettingsEnabled = model.devSettings,
-                    enableDevSettings = enableDevSettings,
-                    showLibraries = showLibraries,
-                    modifier = Modifier.constrainAs(about) {
-                        bottom.linkTo(parent.bottom)
-                    }
+                SelectTheme(
+                    themeSelected = selectAppTheme,
+                    defaultValue = { model.appTheme.ordinal }
                 )
+
+                ReviewTimeSelector(
+                    valueChanged = setReviewTime,
+                    defaultValue = model.reviewTime,
+                )
+                SelectLanguage(
+                    languageSelected = selectLanguage,
+                    defaultValue = { model.inputVoiceLanguage.ordinal }
+                )
+
+                ScopeSettings(onClick = showScopesSettings)
+
+                if (model.devSettings) {
+                    SettingsMenuLink(
+                        title = {
+                            Text(text = stringResource(Res.string.developer_settings))
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.DeveloperBoard,
+                                contentDescription = ""
+                            )
+                        },
+                        onClick = showDevSettings,
+                    )
+                }
             }
 
+            About(
+                devSettingsEnabled = model.devSettings,
+                enableDevSettings = enableDevSettings,
+                showLibraries = showLibraries,
+                modifier = Modifier.constrainAs(about) {
+                    bottom.linkTo(parent.bottom)
+                }
+            )
         }
 
     }
+
 }
 
 @Composable

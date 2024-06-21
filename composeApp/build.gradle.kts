@@ -1,4 +1,6 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -45,6 +47,24 @@ buildConfig {
 
 kotlin {
     jvmToolchain(20)
+
+    // TODO: once we have support for SqlDelight & Arrow
+//    @OptIn(ExperimentalWasmDsl::class)
+//    wasmJs {
+//        moduleName = "composeApp"
+//        browser {
+//            commonWebpackConfig {
+//                outputFileName = "composeApp.js"
+//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+//                    static = (static ?: mutableListOf()).apply {
+//                        // Serve sources to debug inside browser
+//                        add(project.projectDir.path)
+//                    }
+//                }
+//            }
+//        }
+//        binaries.executable()
+//    }
 
     androidTarget()
 
@@ -109,7 +129,6 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.multiplatform.settings)
-            implementation(libs.store5)
             implementation(libs.sqldelight.coroutines.extensions)
             implementation(libs.sqldelight.primitive.adapters)
 
@@ -193,6 +212,10 @@ kotlin {
             implementation(libs.sqldelight.driver.desktop)
             implementation(libs.kotlinx.coroutines.swing)
         }
+
+        // TODO: Enable once we have support from SqlDelight & Arrow
+//        wasmJsMain.dependencies {
+//        }
     }
 }
 
