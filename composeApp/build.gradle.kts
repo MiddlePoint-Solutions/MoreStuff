@@ -287,10 +287,6 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
-    }
-
     testOptions {
         unitTests.all {
             it.useJUnitPlatform()
