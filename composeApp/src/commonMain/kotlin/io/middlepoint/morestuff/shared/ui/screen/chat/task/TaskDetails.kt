@@ -55,8 +55,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.arkivanov.essenty.backhandler.BackCallback
+import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.ui.compose.keyboardAsState
+import io.middlepoint.morestuff.shared.ui.extension.checkRegister
+import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
+import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
@@ -93,11 +98,21 @@ fun TaskDetails(
     }
   }
 
-  // TODO: Handle back press
-//  BackHandler(isEditing) {
-//    focusManager.clearFocus()
-//    isEditing = false
-//  }
+  val backCallback = remember {
+    BackCallback {
+      focusManager.clearFocus()
+      isEditing = false
+    }
+  }
+
+  val backHandler = LocalRouterContext.current.backHandler
+  LaunchedEffect(isEditing) {
+    if (isEditing) {
+      backHandler.checkRegister(backCallback)
+    } else {
+      backHandler.checkUnregister(backCallback)
+    }
+  }
 
   Box(modifier = modifier) {
     Surface(

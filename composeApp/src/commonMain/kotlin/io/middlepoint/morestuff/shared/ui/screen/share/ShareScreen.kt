@@ -216,13 +216,6 @@ private fun ShareContent(
 
         val chatContext = remember { ChatContext.Share(shareable) }
 
-        // TODO: Handle back press to close bottom sheet
-//        BackHandler(onBack = {
-//            scope.launch {
-//                taskInputBottomSheetState.hide()
-//            }
-//        })
-
         TaskInputBottomSheet(
             onDismissRequest = { showUserInput = false },
             sheetState = taskInputBottomSheetState,

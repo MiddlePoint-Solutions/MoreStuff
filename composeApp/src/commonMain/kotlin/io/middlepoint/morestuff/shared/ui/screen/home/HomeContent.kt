@@ -42,11 +42,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.essenty.backhandler.BackCallback
+import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
+import io.middlepoint.morestuff.shared.ui.extension.checkRegister
+import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.show
@@ -76,260 +80,261 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun HomeScreen() {
 
-    val homePresenter = koinInjectOnRoute(HomePresenter::class)
+  val homePresenter = koinInjectOnRoute(HomePresenter::class)
 
-    val coroutineScope = rememberCoroutineScope()
-    val navigation = LocalAppRouter.current
-    val snackbarHostState = remember { SnackbarHostState() }
-    var isSearchActive by rememberSaveable { mutableStateOf(false) }
-    var showScopeSelection by remember { mutableStateOf(false) }
-    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
+  val navigation = LocalAppRouter.current
+  val snackbarHostState = remember { SnackbarHostState() }
+  var isSearchActive by rememberSaveable { mutableStateOf(false) }
+  var showScopeSelection by remember { mutableStateOf(false) }
+  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
-    val model by homePresenter.models.collectAsState()
+  val model by homePresenter.models.collectAsState()
 
-    MoreStuffHomeScaffold(
-        snackbarHostState = snackbarHostState,
-        topBar = {
-            HomeTopBar(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
-                selectedTaskCount = model.selectedTasks.size,
-                reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
-                settingsSelected = { navigation.push(Screen.Settings) },
-                searchAction = { isSearchActive = true },
-                clearTaskSelection = { homePresenter.take(ClearTaskSelection) },
-                completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
-                deleteSelectedTasks = { showDeleteConfirmationDialog = true },
-                selectScope = { showScopeSelection = true },
-            )
-        },
-        content = {
-            if (model.scopes.isNotEmpty()) {
-                HomeContent(
-                    model = model,
-                    onEvent = homePresenter::take,
-                    modifier = Modifier.padding(it),
-                )
-            }
-        },
-    )
+  MoreStuffHomeScaffold(
+    snackbarHostState = snackbarHostState,
+    topBar = {
+      HomeTopBar(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+        selectedTaskCount = model.selectedTasks.size,
+        reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
+        settingsSelected = { navigation.push(Screen.Settings) },
+        searchAction = { isSearchActive = true },
+        clearTaskSelection = { homePresenter.take(ClearTaskSelection) },
+        completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
+        deleteSelectedTasks = { showDeleteConfirmationDialog = true },
+        selectScope = { showScopeSelection = true },
+      )
+    },
+    content = {
+      if (model.scopes.isNotEmpty()) {
+        HomeContent(
+          model = model,
+          onEvent = homePresenter::take,
+          modifier = Modifier.padding(it),
+        )
+      }
+    },
+  )
 
-    LaunchedEffect(Unit) {
-        homePresenter.notifications.collectLatest { notification ->
-            notification.show(snackbarHostState).let { result ->
-                if (result == SnackbarResult.ActionPerformed) {
-                    launch { notification.action() }
-                }
-            }
+  LaunchedEffect(Unit) {
+    homePresenter.notifications.collectLatest { notification ->
+      notification.show(snackbarHostState).let { result ->
+        if (result == SnackbarResult.ActionPerformed) {
+          launch { notification.action() }
         }
+      }
     }
+  }
 
-    if (showDeleteConfirmationDialog) {
-        ConfirmDeleteDialog(
-            onDismiss = { showDeleteConfirmationDialog = false },
-            onConfirm = {
-                homePresenter.take(DeleteSelectedTasks)
-                showDeleteConfirmationDialog = false
-            }
-        )
-    }
+  if (showDeleteConfirmationDialog) {
+    ConfirmDeleteDialog(
+      onDismiss = { showDeleteConfirmationDialog = false },
+      onConfirm = {
+        homePresenter.take(DeleteSelectedTasks)
+        showDeleteConfirmationDialog = false
+      }
+    )
+  }
 
-    AnimatedVisibility(
-        visible = isSearchActive,
-        enter = fadeIn(),
-        exit = fadeOut(),
-    ) {
-        SearchBar(
-            onSearchClose = { isSearchActive = false },
-            showTaskChat = { navigation.push(Screen.TaskChat(it)) },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
+  AnimatedVisibility(
+    visible = isSearchActive,
+    enter = fadeIn(),
+    exit = fadeOut(),
+  ) {
+    SearchBar(
+      onSearchClose = { isSearchActive = false },
+      showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+      modifier = Modifier.fillMaxWidth()
+    )
+  }
 
-    if (showScopeSelection) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        ScopeSelectionBottomSheet(
-            onDismissRequest = {
-                coroutineScope.launch {
-                    sheetState.hide()
-                    showScopeSelection = false
-                }
-            },
-            scopes = model.scopes,
-            sheetState = sheetState,
-            addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
-            createNewScope = {
-                val createScopeScreen = Screen.CreateScope {
-                    homePresenter.take(CreateScopeForSelectedTasks(it))
-                    navigation.pop()
-                }
-                navigation.push(createScopeScreen)
-            }
-        )
-    }
+  if (showScopeSelection) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ScopeSelectionBottomSheet(
+      onDismissRequest = {
+        coroutineScope.launch {
+          sheetState.hide()
+          showScopeSelection = false
+        }
+      },
+      scopes = model.scopes,
+      sheetState = sheetState,
+      addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
+      createNewScope = {
+        val createScopeScreen = Screen.CreateScope {
+          homePresenter.take(CreateScopeForSelectedTasks(it))
+          navigation.pop()
+        }
+        navigation.push(createScopeScreen)
+      }
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun HomeContent(
-    model: HomeState,
-    onEvent: (HomeEvent) -> Unit,
-    modifier: Modifier = Modifier,
+  model: HomeState,
+  onEvent: (HomeEvent) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    var showTaskInput by remember { mutableStateOf(false) }
-    val navigation = LocalAppRouter.current
+  val coroutineScope = rememberCoroutineScope()
+  var showTaskInput by remember { mutableStateOf(false) }
+  val navigation = LocalAppRouter.current
 
-    val selectedTasks = model.selectedTasks
+  val selectedTasks = model.selectedTasks
 
-    val states by rememberUpdatedState(newValue = model.scopes.map { rememberLazyListState() })
-    val pagerState = rememberPagerState(pageCount = { model.scopes.size })
-    var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
-    val scopes by rememberUpdatedState(newValue = model.scopes)
+  val states by rememberUpdatedState(newValue = model.scopes.map { rememberLazyListState() })
+  val pagerState = rememberPagerState(pageCount = { model.scopes.size })
+  var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
+  val scopes by rememberUpdatedState(newValue = model.scopes)
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { pagerState.currentPage }
-            .collect { page ->
-                if (currentScopePage != page) {
-                    launch { states[currentScopePage].animateScrollToItem(0) }
-                    currentScopePage = page
-                }
-                onEvent(ScopeSelected(scopes[page].id))
-            }
+  LaunchedEffect(Unit) {
+    snapshotFlow { pagerState.currentPage }
+      .collect { page ->
+        if (currentScopePage != page) {
+          launch { states[currentScopePage].animateScrollToItem(0) }
+          currentScopePage = page
+        }
+        onEvent(ScopeSelected(scopes[page].id))
+      }
+  }
+
+  val backCallback = remember {
+    BackCallback { onEvent(ClearTaskSelection) }
+  }
+
+  val backHandler = LocalRouterContext.current.backHandler
+  LaunchedEffect(selectedTasks) {
+    if (selectedTasks.isNotEmpty()) {
+      backHandler.checkRegister(backCallback)
+    } else {
+      backHandler.checkUnregister(backCallback)
     }
+  }
 
-    // TODO: handle clear task selection with back handler
-//    BackHandler(selectedTasks.isNotEmpty()) {
-//        onEvent(ClearTaskSelection)
-//    }
+  Box(
+    modifier = modifier.fillMaxSize()
+  ) {
+    Column {
+      Row(
+        modifier = Modifier
+          .shadow(1.dp)
+          .padding(bottom = 0.5.dp)
+      ) {
+        ScopeTabs(
+          currentPage = pagerState.currentPage,
+          scopes = model.scopes,
+          onScopeSelected = { index, _ ->
+            coroutineScope.launch {
+              pagerState.animateScrollToPage(index)
+            }
+          },
+          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+        )
+      }
 
-    Box(
-        modifier = modifier.fillMaxSize()
-    ) {
-        Column {
-            Row(
+      HorizontalPager(
+        state = pagerState,
+        modifier = Modifier.fillMaxSize(),
+        key = { model.scopes[it].id }
+      ) { page ->
+
+        val scope = model.scopes[page]
+
+        val scopeViewModel = koinInjectOnRoute(
+          type = ScopeTasksPresenter::class,
+          key = "Scope${scope.id}",
+          parameters = { parametersOf(scope.id) }
+        )
+
+        val scopeTasks by scopeViewModel.models.collectAsState()
+
+        when (val tasksModel = scopeTasks) {
+          is ScopeTasksModels.Data -> {
+            if (tasksModel.tasks.isEmpty()) {
+              Box(
                 modifier = Modifier
-                    .shadow(1.dp)
-                    .padding(bottom = 0.5.dp)
-            ) {
-                ScopeTabs(
-                    currentPage = pagerState.currentPage,
-                    scopes = model.scopes,
-                    onScopeSelected = { index, _ ->
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
-                )
-            }
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                key = { model.scopes[it].id }
-            ) { page ->
-
-                val scope = model.scopes[page]
-
-                val scopeViewModel = koinInjectOnRoute(
-                    type = ScopeTasksPresenter::class,
-                    key = "Scope${scope.id}",
-                    parameters = { parametersOf(scope.id) }
-                )
-
-                val scopeTasks by scopeViewModel.models.collectAsState()
-
-                when (val tasksModel = scopeTasks) {
-                    is ScopeTasksModels.Data -> {
-                        if (tasksModel.tasks.isEmpty()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(bottom = 180.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                TextButton(onClick = { showTaskInput = true }) {
-                                    Text(
-                                        stringResource(Res.string.cta_lets_go),
-                                        style = MaterialTheme.typography.titleLarge.copy(
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                    )
-                                }
-                            }
-                        } else {
-                            ScopeContent(
-                                tasks = tasksModel.tasks,
-                                selectedTasks = selectedTasks,
-                                onItemClick = { taskId ->
-                                    if (selectedTasks.isNotEmpty()) {
-                                        onEvent(ToggleTaskSelection(taskId))
-                                    } else {
-                                        navigation.push(Screen.TaskChat(taskId))
-                                    }
-                                },
-                                onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
-                                listState = states[page],
-                            )
-                        }
-                    }
-
-                    ScopeTasksModels.Loading -> {
-
-                    }
+                  .fillMaxSize()
+                  .padding(bottom = 180.dp),
+                contentAlignment = Alignment.Center
+              ) {
+                TextButton(onClick = { showTaskInput = true }) {
+                  Text(
+                    stringResource(Res.string.cta_lets_go),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                      color = MaterialTheme.colorScheme.onSurface
+                    )
+                  )
                 }
-            }
-        }
-
-        if (showTaskInput) {
-            val taskInputBottomSheetState = rememberModalBottomSheetState(
-                skipPartiallyExpanded = true
-            )
-
-            val context = remember { ChatContext.Main(model.currentScopeId) }
-
-            // TODO: Handle hiding bottom sheet with back handler
-//            BackHandler(onBack = {
-//                coroutineScope.launch {
-//                    taskInputBottomSheetState.hide()
-//                }
-//            })
-
-            TaskInputBottomSheet(
-                onDismissRequest = { showTaskInput = false },
-                sheetState = taskInputBottomSheetState,
-                context = context,
-                onNewTaskCreated = { _, priority ->
-                    coroutineScope.launch {
-                        when (priority) {
-                            PriorityUiModel.Later -> {
-                                val itemCount =
-                                    states[pagerState.currentPage].layoutInfo.totalItemsCount
-                                states[pagerState.currentPage].scrollToItem(itemCount - 1)
-                            }
-
-                            PriorityUiModel.Now -> {
-                                states[pagerState.currentPage].animateScrollToItem(index = 0)
-                            }
-
-                            is PriorityUiModel.Plan -> {}
-                        }
-                    }
+              }
+            } else {
+              ScopeContent(
+                tasks = tasksModel.tasks,
+                selectedTasks = selectedTasks,
+                onItemClick = { taskId ->
+                  if (selectedTasks.isNotEmpty()) {
+                    onEvent(ToggleTaskSelection(taskId))
+                  } else {
+                    navigation.push(Screen.TaskChat(taskId))
+                  }
                 },
-            )
-        }
+                onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
+                listState = states[page],
+              )
+            }
+          }
 
-        FloatingActionButton(
-            onClick = { showTaskInput = true },
-            modifier = Modifier
-                .padding(20.dp)
-                .align(Alignment.BottomEnd),
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-        ) {
-            Icon(Icons.Default.Add, contentDescription = null)
+          ScopeTasksModels.Loading -> {
+
+          }
         }
+      }
     }
+
+    if (showTaskInput) {
+      val taskInputBottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+      )
+
+      val context = remember { ChatContext.Main(model.currentScopeId) }
+
+      TaskInputBottomSheet(
+        onDismissRequest = { showTaskInput = false },
+        sheetState = taskInputBottomSheetState,
+        context = context,
+        onNewTaskCreated = { _, priority ->
+          coroutineScope.launch {
+            when (priority) {
+              PriorityUiModel.Later -> {
+                val itemCount =
+                  states[pagerState.currentPage].layoutInfo.totalItemsCount
+                states[pagerState.currentPage].scrollToItem(itemCount - 1)
+              }
+
+              PriorityUiModel.Now -> {
+                states[pagerState.currentPage].animateScrollToItem(index = 0)
+              }
+
+              is PriorityUiModel.Plan -> {}
+            }
+          }
+        },
+      )
+    }
+
+    FloatingActionButton(
+      onClick = { showTaskInput = true },
+      modifier = Modifier
+        .padding(20.dp)
+        .align(Alignment.BottomEnd),
+      containerColor = MaterialTheme.colorScheme.primary,
+      contentColor = MaterialTheme.colorScheme.onPrimary,
+    ) {
+      Icon(Icons.Default.Add, contentDescription = null)
+    }
+  }
 }
 
 //@Preview(
