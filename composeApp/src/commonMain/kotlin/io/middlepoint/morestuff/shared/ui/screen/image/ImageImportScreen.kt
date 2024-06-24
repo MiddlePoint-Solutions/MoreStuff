@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.screen.image
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,6 +46,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
+import coil3.compose.LocalPlatformContext
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_send
@@ -55,112 +60,115 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
-    imageUri: String,
-    onImport: (String) -> Unit,
-    onBack: () -> Unit,
+  imageUri: String,
+  onImport: (String) -> Unit,
+  onBack: () -> Unit,
 ) {
-    var messageText by remember { mutableStateOf("") }
+  var messageText by remember { mutableStateOf("") }
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(Res.string.import_image_title)) },
-                navigationIcon = {
-                    NavigateBackIconButton(onBack)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                )
-            )
+  Scaffold(
+    modifier = Modifier
+      .fillMaxSize(),
+    topBar = {
+      TopAppBar(
+        title = { Text(stringResource(Res.string.import_image_title)) },
+        navigationIcon = {
+          NavigateBackIconButton(onBack)
         },
-        containerColor = Color.Transparent
+        colors = TopAppBarDefaults.topAppBarColors(
+          containerColor = Color.Transparent,
+        )
+      )
+    },
+    containerColor = Color.Transparent
+  ) {
+    Column(
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = Modifier
+        .padding(it)
+        .fillMaxSize()
+        .navigationBarsPadding()
+        .imePadding(),
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .navigationBarsPadding()
-                .imePadding(),
-        ) {
 
-//            Image(
-//                painter = rememberAsyncImagePainter(model = imageUri), // TODO: check coil multiplatform
-//                contentDescription = "Selected Image",
-//                modifier = Modifier.weight(1f)
-//            )
+      Image(
+        painter = rememberAsyncImagePainter(
+          model = imageUri,
+          imageLoader = ImageLoader(LocalPlatformContext.current)
+        ),
+        contentDescription = "Selected Image",
+        modifier = Modifier.weight(1f)
+      )
 
-            Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BasicTextField(
-                    value = messageText,
-                    onValueChange = { text -> messageText = text },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 8.dp)
-                        .defaultMinSize(minHeight = 46.dp),
-                    keyboardOptions = KeyboardOptions(
-                        capitalization = KeyboardCapitalization.Sentences,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        if (messageText.isNotBlank()) {
-                            onImport(messageText.trim())
-                        }
-                    }),
-                    maxLines = Int.MAX_VALUE,
-                    textStyle = LocalTextStyle.current.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 18.sp
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (messageText.isEmpty()) {
-                                Text(
-                                    text = stringResource(Res.string.import_image_title_hint),
-                                    style = TextStyle(
-                                        fontSize = 16.sp,
-                                        lineHeight = 20.sp,
-                                        fontWeight = FontWeight(400),
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        letterSpacing = 0.16.sp,
-                                    )
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-                ImportConfirmButton(onClick = { onImport(messageText.trim()) })
+      Row(
+        modifier = Modifier.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        BasicTextField(
+          value = messageText,
+          onValueChange = { text -> messageText = text },
+          modifier = Modifier
+            .weight(1f)
+            .padding(end = 8.dp)
+            .defaultMinSize(minHeight = 46.dp),
+          keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+          ),
+          keyboardActions = KeyboardActions(onDone = {
+            if (messageText.isNotBlank()) {
+              onImport(messageText.trim())
             }
-        }
+          }),
+          maxLines = Int.MAX_VALUE,
+          textStyle = LocalTextStyle.current.copy(
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            fontSize = 18.sp
+          ),
+          cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
+          decorationBox = { innerTextField ->
+            Box {
+              if (messageText.isEmpty()) {
+                Text(
+                  text = stringResource(Res.string.import_image_title_hint),
+                  style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 20.sp,
+                    fontWeight = FontWeight(400),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    letterSpacing = 0.16.sp,
+                  )
+                )
+              }
+              innerTextField()
+            }
+          }
+        )
+        ImportConfirmButton(onClick = { onImport(messageText.trim()) })
+      }
     }
+  }
 }
 
 @Composable
 private fun ImportConfirmButton(onClick: () -> Unit) {
-    IconButton(
-        onClick = onClick,
-        modifier = Modifier
-            .size(55.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.Send,
-            contentDescription = stringResource(Res.string.cd_send),
-            modifier = Modifier
-                .size(36.dp),
-            tint = MaterialTheme.colorScheme.onPrimary
-        )
-    }
+  IconButton(
+    onClick = onClick,
+    modifier = Modifier
+      .size(55.dp)
+      .clip(CircleShape)
+      .background(MaterialTheme.colorScheme.primary)
+  ) {
+    Icon(
+      imageVector = Icons.AutoMirrored.Filled.Send,
+      contentDescription = stringResource(Res.string.cd_send),
+      modifier = Modifier
+        .size(36.dp),
+      tint = MaterialTheme.colorScheme.onPrimary
+    )
+  }
 }

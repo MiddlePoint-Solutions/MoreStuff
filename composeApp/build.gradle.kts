@@ -153,6 +153,8 @@ kotlin {
             implementation(libs.sonner)
 
             implementation(libs.reorderable)
+            implementation(libs.coil.compose)
+            implementation(libs.zoomable)
 
             // About
             implementation(libs.aboutLibrariesCore)

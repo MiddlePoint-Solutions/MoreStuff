@@ -7,7 +7,7 @@ settingsUiM3 = "0.22.0"
 settingsStoragePreferences = "1.0.2"
 turbine = "1.0.0"
 multiplatformSettingsNoArg = "1.0.0"
-coilCompose = "2.5.0"
+coilCompose = "3.0.0-alpha06"
 extensionsComposeJetpack = "3.0.0"
 parcelable = "1.3.0"
 androidGradlePlugin = "8.3.0"
@@ -88,6 +88,7 @@ constraintLayout-compose = "0.4.0"
 compose-settings = "2.4.0"
 sonner = "0.3.6"
 reorderable = "2.1.1"
+zoomable = "1.6.1"
 
 
 [libraries]
@@ -161,7 +162,8 @@ composeSettings-ui-extended = { group = "com.github.alorma.compose-settings", na
 settingsStoragePreferences = { group = "com.github.alorma.compose-settings", name = "storage-base", version.ref = "compose-settings" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
-
+coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilCompose" }
+zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 
 # Testing
 mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockk-common" }
@@ -182,7 +184,6 @@ preferenceKtx = { module = "androidx.preference:preference-ktx", version.ref = "
 uiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview" }
 uiTooling = { module = "androidx.compose.ui:ui-tooling" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformSettingsNoArg" }
-coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 uiTestManifest = { module = "androidx.compose.ui:ui-test-manifest" }
 extensionsComposeJetpack = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "extensionsComposeJetpack" }
 parcelable = { module = "com.arkivanov.essenty:parcelable", version.ref = "parcelable" }

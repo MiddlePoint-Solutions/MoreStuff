@@ -1,10 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.items
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,7 +18,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.compose.LocalPlatformContext
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.size.Scale
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 
@@ -45,28 +57,28 @@ fun ImageMessage(
                 derivedStateOf { message.messageData?.filePath }
             }
 
-            // TODO: Coil multiplatform
-//            Image(
-//                painter = rememberAsyncImagePainter(
-//                    model = ImageRequest.Builder(LocalContext.current)
-//                        .data(data = uri)
-//                        .crossfade(true)
-//                        .scale(Scale.FIT)
-//                        .memoryCacheKey(message.messageData?.filePath)
-//                        .build(),
-//                    imageLoader = LocalContext.current.imageLoader
-//                ),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
-//                    .combinedClickable(
-//                        onClick = { actions.onImageSelected(message) },
-//                        onLongClick = showMenu
-//                    )
-//                    .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
-//                    .clip(RoundedCornerShape(8.dp)),
-//                contentScale = ContentScale.Inside
-//            )
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                        .data(data = uri)
+                        .crossfade(true)
+                        .scale(Scale.FIT)
+                        .memoryCacheKey(message.messageData?.filePath)
+                        .build(),
+                    imageLoader = ImageLoader(LocalPlatformContext.current)
+                ),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 10.dp)
+                    .combinedClickable(
+                        onClick = { actions.onImageSelected(message) },
+                        onLongClick = showMenu
+                    )
+                    .sizeIn(minHeight = 200.dp, maxHeight = 400.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Inside
+            )
+
             if (message.content.isNotEmpty()) {
                 Text(
                     modifier = Modifier
