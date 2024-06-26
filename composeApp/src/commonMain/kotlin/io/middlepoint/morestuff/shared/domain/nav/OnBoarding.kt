@@ -9,10 +9,10 @@ sealed class OnBoarding() {
   data object Welcome : OnBoarding()
 
   @Serializable
-  //    data object NotificationPermission : OnBoarding()
+  data object NotificationPermission : OnBoarding()
   data object Ready : OnBoarding()
 
-//    data object ChatWithYourTasks : OnBoarding()
+  data object ChatWithYourTasks : OnBoarding()
 
   //    data object ReviewReminder : OnBoarding()
   @Serializable

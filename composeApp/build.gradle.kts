@@ -98,11 +98,17 @@ kotlin {
         podfile = project.file("../iosApp/Podfile")
         name = "ComposeApp"
 
+        pod("lottie-ios") {
+            version = "4.4.0"
+            linkOnly = true
+        }
+
         framework {
             baseName = "ComposeApp"
             isStatic = true
-            linkerOpts("-lsqlite3")
             export(libs.decompose.router)
+            export(libs.kottie)
+            linkerOpts("-lsqlite3")
         }
     }
 
@@ -155,6 +161,8 @@ kotlin {
             implementation(libs.reorderable)
             implementation(libs.coil.compose)
             implementation(libs.zoomable)
+            implementation(libs.kottie)
+            implementation(libs.calf.permissions)
 
             // About
             implementation(libs.aboutLibrariesCore)

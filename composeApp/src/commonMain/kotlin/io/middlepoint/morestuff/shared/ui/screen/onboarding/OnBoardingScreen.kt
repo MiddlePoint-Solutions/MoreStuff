@@ -11,9 +11,7 @@ import com.arkivanov.decompose.router.pages.selectNext
 import io.github.xxfast.decompose.router.pages.RoutedContent
 import io.github.xxfast.decompose.router.pages.rememberRouter
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Ready
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Review
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Welcome
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.*
 
 
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalFoundationApi::class)
@@ -27,7 +25,7 @@ fun OnBoardingScreen(
     Pages(
       items = buildList {
         add(Welcome)
-//            add(ChatWithYourTasks)
+        add(ChatWithYourTasks)
         add(Review)
 //            if (requiresNotificationsPermission()) {
 //                add(NotificationPermission)
@@ -54,7 +52,7 @@ fun OnBoardingScreen(
   ) { screen ->
     when (screen) {
       Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
-//            NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
+      NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
 //            ReviewReminder -> {
 //                val reviewTime by viewModel.models.collectAsState()
 //                OnBoardingReviewNotificationScreen(
@@ -63,7 +61,7 @@ fun OnBoardingScreen(
 //                    onReviewTimeChange = { viewModel.take(SettingsEvent.SetReviewTime(it.first, it.second)) }
 //                )
 //            }
-//            ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
+      ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
       Review -> OnBoardingReviewScreen(onNext = navigation::selectNext)
       Ready -> OnBoardingCompleteScreen(onFinish = onBoardingComplete)
     }

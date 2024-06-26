@@ -36,6 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_enable
@@ -62,7 +65,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
   val scope = rememberCoroutineScope()
   // TODO: Use multiplatform permissions
 //    val permissionState = if (requiresNotificationsPermission()) {
-//        rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) { granted ->
+//        rememberPermissionState(Permission.RemoteNotification) { granted ->
 //            if (granted) {
 //                onNext()
 //            }
