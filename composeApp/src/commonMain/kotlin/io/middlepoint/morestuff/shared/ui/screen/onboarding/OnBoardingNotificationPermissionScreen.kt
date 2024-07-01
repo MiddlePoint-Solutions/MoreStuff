@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,8 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
 import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import com.mohamedrejeb.calf.permissions.shouldShowRationale
 import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -54,7 +57,7 @@ import org.jetbrains.compose.resources.stringResource
 
 @OptIn(
   ExperimentalMaterial3Api::class,
-  ExperimentalResourceApi::class
+  ExperimentalPermissionsApi::class
 )
 @Composable
 fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
@@ -63,21 +66,19 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
   var showRationaleDialog by remember { mutableStateOf(false) }
 
   val scope = rememberCoroutineScope()
-  // TODO: Use multiplatform permissions
-//    val permissionState = if (requiresNotificationsPermission()) {
-//        rememberPermissionState(Permission.RemoteNotification) { granted ->
-//            if (granted) {
-//                onNext()
-//            }
-//        }
-//    } else {
-//        error("VERSION.SDK_INT < TIRAMISU")
-//    }
-//
-//    if (permissionState.status.shouldShowRationale && !rationaleDisplayed) {
-//        showRationaleDialog = true
-//        rationaleDisplayed = true
-//    }
+  val permissionState = rememberPermissionState(Permission.Notification) { granted ->
+    if (granted) {
+      onNext()
+    }
+  }
+
+  LaunchedEffect(permissionState.status) {
+    if (permissionState.status.shouldShowRationale && !rationaleDisplayed) {
+      showRationaleDialog = true
+      rationaleDisplayed = true
+    }
+  }
+
 
   if (showRationaleDialog) {
     BasicAlertDialog(
@@ -97,7 +98,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
           horizontalArrangement = Arrangement.End
         ) {
           TextButton(onClick = {
-//            scope.launch { permissionState.launchPermissionRequest() }
+            scope.launch { permissionState.launchPermissionRequest() }
             showRationaleDialog = false
           }) {
             Text(text = stringResource(Res.string.button_enable))
@@ -162,7 +163,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
     ) {
       OnboardingButton(
         onClick = {
-//          permissionState.launchPermissionRequest()
+          permissionState.launchPermissionRequest()
         },
         title = stringResource(Res.string.button_enable)
       )

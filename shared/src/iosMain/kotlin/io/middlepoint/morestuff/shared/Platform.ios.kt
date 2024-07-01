@@ -47,9 +47,7 @@ private fun stringWithFormat(format: String, args: Array<out Any>): String {
     }
 }
 
-actual fun requiresNotificationsPermission(): Boolean {
-    TODO("Not yet implemented")
-}
+actual fun requiresNotificationsPermission(): Boolean = true
 
 actual val sharedModule: Module
     get() = module {

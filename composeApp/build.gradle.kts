@@ -1,6 +1,4 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -107,7 +105,6 @@ kotlin {
             baseName = "ComposeApp"
             isStatic = true
             export(libs.decompose.router)
-            export(libs.kottie)
             linkerOpts("-lsqlite3")
         }
     }

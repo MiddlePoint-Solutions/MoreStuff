@@ -12,6 +12,7 @@ import io.github.xxfast.decompose.router.pages.RoutedContent
 import io.github.xxfast.decompose.router.pages.rememberRouter
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.*
+import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 
 
 @OptIn(ExperimentalDecomposeApi::class, ExperimentalFoundationApi::class)
@@ -27,9 +28,9 @@ fun OnBoardingScreen(
         add(Welcome)
         add(ChatWithYourTasks)
         add(Review)
-//            if (requiresNotificationsPermission()) {
-//                add(NotificationPermission)
-//            }
+        if (requiresNotificationsPermission()) {
+          add(NotificationPermission)
+        }
 //            add(ReviewReminder)
         add(Ready)
       },
