@@ -44,6 +44,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.PermissionStatus
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
@@ -79,7 +83,7 @@ fun VoiceToTextInput(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 private fun VoiceToTextInputContent(
     recordingState: VoiceToTextState,
@@ -88,10 +92,8 @@ private fun VoiceToTextInputContent(
     selectedLanguage: String,
 ) {
 
-    // TODO: Support Audio recording permission
-
     var canRecord by remember { mutableStateOf(false) }
-//    val recordAudioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
+    val recordAudioPermissionState = rememberPermissionState(Permission.RecordAudio)
     var showPermissionDialog by remember { mutableStateOf(false) }
     var showDialog by remember { mutableStateOf(false) }
 
@@ -118,23 +120,22 @@ private fun VoiceToTextInputContent(
 
     var dismissDialog by remember { mutableStateOf(false) }
 
-    // TODO: Audio recording permission
-//    if (recordAudioPermissionState.status is PermissionStatus.Denied && !dismissDialog && showPermissionDialog) {
-//        MicrophonePermissionDialog(
-//            onConfirm = {
-//                recordAudioPermissionState.launchPermissionRequest()
-//                dismissDialog = true
-//
-//            },
-//            onCancel = { dismissDialog = true }
-//        )
-//    }
-//
-//    LaunchedEffect(recordAudioPermissionState.status) {
-//        if (recordAudioPermissionState.status == PermissionStatus.Granted) {
-//            canRecord = true
-//        }
-//    }
+    if (recordAudioPermissionState.status is PermissionStatus.Denied && !dismissDialog && showPermissionDialog) {
+        MicrophonePermissionDialog(
+            onConfirm = {
+                recordAudioPermissionState.launchPermissionRequest()
+                dismissDialog = true
+
+            },
+            onCancel = { dismissDialog = true }
+        )
+    }
+
+    LaunchedEffect(recordAudioPermissionState.status) {
+        if (recordAudioPermissionState.status == PermissionStatus.Granted) {
+            canRecord = true
+        }
+    }
 
     Box(
         modifier = Modifier.height(IntrinsicSize.Min)

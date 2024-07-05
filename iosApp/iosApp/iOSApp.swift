@@ -1,4 +1,5 @@
 import SwiftUI
+import Lottie
 import ComposeApp
 
 @main
@@ -41,6 +42,12 @@ class DefaultRouterHolder : ObservableObject {
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     let holder: DefaultRouterHolder = DefaultRouterHolder()
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        LottieConfiguration.shared.renderingEngine = .mainThread
+        return true
+    }
+    
 }
 
 

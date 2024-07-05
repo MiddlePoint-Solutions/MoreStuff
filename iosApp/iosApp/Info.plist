@@ -4,6 +4,10 @@
 <dict>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Request permission to post notifications</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+    <string>We need access to speech recognition to convert your speech to text.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to the microphone to capture your voice for speech recognition.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>

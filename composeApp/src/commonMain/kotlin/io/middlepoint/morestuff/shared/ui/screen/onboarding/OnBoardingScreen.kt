@@ -22,7 +22,10 @@ fun OnBoardingScreen(
 //    viewModel: SettingsViewModel = koinViewModel()
 ) {
 
-  val navigation = rememberRouter(OnBoarding::class) {
+  val navigation = rememberRouter(
+    type = OnBoarding::class,
+    serializer = null
+  ) {
     Pages(
       items = buildList {
         add(Welcome)

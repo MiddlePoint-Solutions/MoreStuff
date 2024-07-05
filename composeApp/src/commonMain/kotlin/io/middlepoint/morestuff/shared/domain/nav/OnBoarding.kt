@@ -12,6 +12,7 @@ sealed class OnBoarding() {
   data object NotificationPermission : OnBoarding()
   data object Ready : OnBoarding()
 
+  @Serializable
   data object ChatWithYourTasks : OnBoarding()
 
   //    data object ReviewReminder : OnBoarding()

@@ -12,8 +12,8 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         google()
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         maven("https://jitpack.io")
     }
 }

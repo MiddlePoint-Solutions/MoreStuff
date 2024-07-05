@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,11 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
+import co.touchlab.kermit.Logger
 import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
 import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
-import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_enable
@@ -51,7 +51,6 @@ import morestuff.composeapp.generated.resources.notification_permission
 import morestuff.composeapp.generated.resources.notification_permission_rationale
 import morestuff.composeapp.generated.resources.onboarding_notification_permission_subtitle
 import morestuff.composeapp.generated.resources.onboarding_notification_permission_title
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -60,25 +59,29 @@ import org.jetbrains.compose.resources.stringResource
   ExperimentalPermissionsApi::class
 )
 @Composable
-fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
+fun OnBoardingNotificationPermissionScreen(
+  onNext: () -> Unit
+) {
 
-  var rationaleDisplayed by remember { mutableStateOf(false) }
   var showRationaleDialog by remember { mutableStateOf(false) }
+  var checkPermission by remember { mutableStateOf(false) }
 
   val scope = rememberCoroutineScope()
-  val permissionState = rememberPermissionState(Permission.Notification) { granted ->
-    if (granted) {
-      onNext()
+  val permissionState = rememberPermissionState(Permission.Notification)
+
+  LaunchedEffect(permissionState.status, checkPermission) {
+    if (checkPermission) {
+      Logger.d { "Permission status: ${permissionState.status}$" }
+      when {
+        permissionState.status.isGranted -> onNext()
+        permissionState.status.shouldShowRationale -> {
+          showRationaleDialog = true
+          checkPermission = false
+        }
+        else -> permissionState.openAppSettings()
+      }
     }
   }
-
-  LaunchedEffect(permissionState.status) {
-    if (permissionState.status.shouldShowRationale && !rationaleDisplayed) {
-      showRationaleDialog = true
-      rationaleDisplayed = true
-    }
-  }
-
 
   if (showRationaleDialog) {
     BasicAlertDialog(
@@ -100,6 +103,7 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
           TextButton(onClick = {
             scope.launch { permissionState.launchPermissionRequest() }
             showRationaleDialog = false
+            checkPermission = true
           }) {
             Text(text = stringResource(Res.string.button_enable))
           }
@@ -163,7 +167,8 @@ fun OnBoardingNotificationPermissionScreen(onNext: () -> Unit) {
     ) {
       OnboardingButton(
         onClick = {
-          permissionState.launchPermissionRequest()
+          scope.launch { permissionState.launchPermissionRequest() }
+          checkPermission = true
         },
         title = stringResource(Res.string.button_enable)
       )
