@@ -35,7 +35,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +53,10 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import com.dokar.sonner.rememberToasterState
+import com.mohamedrejeb.calf.io.getPath
+import com.mohamedrejeb.calf.picker.FilePickerFileType
+import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -103,408 +105,403 @@ import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.random.Random
 
 @Composable
 fun TaskChatScreen(
-    taskId: Long,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
+  taskId: Long,
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
 
-    val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
+  val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
 
-    val viewModel = koinInjectOnRoute(
-        type = TaskChatPresenter::class,
-        parameters = { parametersOf(taskId) }
-    )
+  val viewModel = koinInjectOnRoute(
+    type = TaskChatPresenter::class,
+    parameters = { parametersOf(taskId) }
+  )
 
-    RoutedContent(
-        router = router,
-        modifier = Modifier.background(Color.Transparent),
-        animation = stackAnimation(scale() + fade()),
-    ) { screen ->
+  RoutedContent(
+    router = router,
+    modifier = Modifier.background(Color.Transparent),
+    animation = stackAnimation(scale() + fade()),
+  ) { screen ->
 
-        when (screen) {
-            is TaskChat -> {
+    when (screen) {
+      is TaskChat -> {
 
-                val model by viewModel.models.collectAsState()
+        val model by viewModel.models.collectAsState()
 
-                val chatActions = remember {
-                    ChatActions(
-                        scheduleAction = { scheduleId, replyType ->
-                            viewModel.take(ScheduleResponse(scheduleId, replyType))
-                        },
-                        copyMessage = { viewModel.take(CopyText(it.content)) },
-                        deleteMessage = { viewModel.take(DeleteMessage(it)) },
-                        onImageSelected = {
-                            val path = it.messageData?.filePath ?: ""
-                            val title = it.content
-                            router.push(ImagePreview(path, title))
-                        },
-                        onPdfSelected = {
-                            val path = it.messageData?.filePath ?: ""
-                            viewModel.take(OpenDocument(path))
-                        },
-                        shareImage = { viewModel.take(ShareImage(it)) },
-                        sharePdf = { viewModel.take(ShareDocument(it)) },
-                        shareMessage = { viewModel.take(ShareMessage(it)) }
-                    )
-                }
-
-                TaskChatContent(
-                    model = model,
-                    onEvent = viewModel::take,
-                    chatActions = chatActions,
-                    modifier = modifier,
-                    onBack = onBack,
-                    sendTaskMessage = { viewModel.take(InputText(it)) },
-                    imagePicked = { router.push(ImageImport(it.toString())) },
-                    pdfPicked = { uri ->
-                        viewModel.take(InputDocument(uri.toString(), title = ""))
-                    }
-                )
-            }
-
-            is ImageImport -> {
-                ImageImportScreen(
-                    imageUri = screen.uri,
-                    onImport = { title ->
-                        viewModel.take(InputImage(screen.uri, title))
-                        router.pop()
-                    },
-                    onBack = router::pop
-                )
-            }
-
-            is ImagePreview -> {
-                ImagePreviewScreen(
-                    imagePath = screen.imagePath,
-                    onBack = router::pop,
-                    onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-                    title = screen.title,
-                )
-            }
+        val chatActions = remember {
+          ChatActions(
+            scheduleAction = { scheduleId, replyType ->
+              viewModel.take(ScheduleResponse(scheduleId, replyType))
+            },
+            copyMessage = { viewModel.take(CopyText(it.content)) },
+            deleteMessage = { viewModel.take(DeleteMessage(it)) },
+            onImageSelected = {
+              val path = it.messageData?.filePath ?: ""
+              val title = it.content
+              router.push(ImagePreview(path, title))
+            },
+            onPdfSelected = {
+              val path = it.messageData?.filePath ?: ""
+              viewModel.take(OpenDocument(path))
+            },
+            shareImage = { viewModel.take(ShareImage(it)) },
+            sharePdf = { viewModel.take(ShareDocument(it)) },
+            shareMessage = { viewModel.take(ShareMessage(it)) }
+          )
         }
+
+        TaskChatContent(
+          model = model,
+          onEvent = viewModel::take,
+          chatActions = chatActions,
+          modifier = modifier,
+          onBack = onBack,
+          sendTaskMessage = { viewModel.take(InputText(it)) },
+          imagePicked = { router.push(ImageImport(it)) },
+          pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
+        )
+      }
+
+      is ImageImport -> {
+        ImageImportScreen(
+          imageUri = screen.uri,
+          onImport = { title ->
+            viewModel.take(InputImage(screen.uri, title))
+            router.pop()
+          },
+          onBack = router::pop
+        )
+      }
+
+      is ImagePreview -> {
+        ImagePreviewScreen(
+          imagePath = screen.imagePath,
+          onBack = router::pop,
+          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+          title = screen.title,
+        )
+      }
     }
+  }
 }
 
 @Composable
 private fun TaskChatContent(
-    model: TaskChatState,
-    chatActions: ChatActions,
-    onEvent: (TaskChatEvent) -> Unit,
-    modifier: Modifier = Modifier,
-    onBack: () -> Unit = {},
-    sendTaskMessage: (String) -> Unit = {},
-    imagePicked: (String) -> Unit = {},
-    pdfPicked: (String) -> Unit = {},
+  model: TaskChatState,
+  chatActions: ChatActions,
+  onEvent: (TaskChatEvent) -> Unit,
+  modifier: Modifier = Modifier,
+  onBack: () -> Unit = {},
+  sendTaskMessage: (String) -> Unit = {},
+  imagePicked: (String) -> Unit = {},
+  pdfPicked: (String) -> Unit = {},
 ) {
-    val scope = rememberCoroutineScope()
-    val scrollState = rememberLazyListState()
+  val scope = rememberCoroutineScope()
+  val scrollState = rememberLazyListState()
 
-    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
-    val task = model.task
-    val messages = model.messages
+  val task = model.task
+  val messages = model.messages
+  val platformContext = com.mohamedrejeb.calf.core.LocalPlatformContext.current
 
-    // TODO: Image picker
-//    val pickImage = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
-//        if (uri != null) {
-//            imagePicked(uri)
-//        } else {
-//            Logger.d("Image picker uri is NULL!")
-//        }
-//    }
-//    // TODO: PDF picker
-//    val pickPdf = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-//        if (uri != null) {
-//            pdfPicked(uri)
-//        } else {
-//            Logger.d("Pdf picker uri is NULL!")
-//        }
-//    }
-
-    Scaffold(
-        topBar = {
-            TaskTopAppBar(
-                isComplete = task.isComplete,
-                onBack = onBack,
-                onDelete = { showDeleteConfirmationDialog = true },
-                onToggleComplete = { onEvent(ToggleTaskComplete) }
-            )
-        },
-        modifier = modifier.navigationBarsPadding(),
-        containerColor = Color.Transparent,
-    ) { scaffoldPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = scaffoldPadding.calculateTopPadding())
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-
-                Messages(
-                    messages = messages,
-                    actions = chatActions,
-                    modifier = modifier.weight(1f),
-                    scrollState = scrollState,
-                    contentPadding = PaddingValues(top = 40.dp, bottom = 20.dp)
-                )
-
-                AnimatedVisibility(
-                    visible = task.isComplete,
-                    modifier = Modifier.background(Color.Transparent)
-                ) {
-                    AppChatItem(
-                        message = MessageUiModel(
-                            id = Random.nextLong(),
-                            taskId = task.id,
-                            scheduleId = 0L,
-                            contentType = ContentType.APP_TASK_MESSAGE,
-                            createTime = "",
-                            content = stringResource(
-                                Res.string.task_chat_complete_message_with_date,
-                                task.completeTime
-                            ),
-                            formattedTime = "",
-                            formattedTimeOnly = ""
-                        ),
-                        chatActions
-                    )
-                    Spacer(modifier = Modifier.padding(bottom = 80.dp))
-                }
-
-                AnimatedVisibility(
-                    visible = !task.isComplete,
-                    modifier = Modifier.background(Color.Transparent)
-                ) {
-                    TaskChatInput(
-                        sendTaskMessage = {
-                            sendTaskMessage(it)
-                            scope.launch {
-                                delay(200)
-                                scrollState.animateScrollToItem(index = 0)
-                            }
-                        },
-                        pickImage = {
-//                            pickImage.launch(
-//                                PickVisualMediaRequest(
-//                                    PickVisualMedia.ImageOnly
-//                                )
-//                            )
-                        },
-                        pickPdf = {
-//                            pickPdf.launch("application/pdf")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color.Transparent),
-                    )
-                }
-            }
-
-            TaskDetails(
-                taskId = task.id,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+  val singleImagePickerLauncher =
+    rememberFilePickerLauncher(
+      type = FilePickerFileType.Image,
+      selectionMode = FilePickerSelectionMode.Single,
+      onResult = { files ->
+        files.firstOrNull()?.getPath(platformContext)?.let {
+          imagePicked(it)
         }
-    }
+      }
+    )
 
-    if (showDeleteConfirmationDialog) {
-        ConfirmDeleteDialog(
-            onDismiss = { showDeleteConfirmationDialog = false },
-            onConfirm = {
-                onEvent(DeleteTask)
-                onBack()
-                showDeleteConfirmationDialog = false
-            }
+  val singleFilePickerLauncher =
+    rememberFilePickerLauncher(
+      type = FilePickerFileType.Pdf,
+      selectionMode = FilePickerSelectionMode.Single,
+      onResult = { files ->
+        files.firstOrNull()?.getPath(platformContext)?.let {
+          pdfPicked(it)
+        }
+      }
+    )
+
+  Scaffold(
+    topBar = {
+      TaskTopAppBar(
+        isComplete = task.isComplete,
+        onBack = onBack,
+        onDelete = { showDeleteConfirmationDialog = true },
+        onToggleComplete = { onEvent(ToggleTaskComplete) }
+      )
+    },
+    modifier = modifier.navigationBarsPadding(),
+    containerColor = Color.Transparent,
+  ) { scaffoldPadding ->
+    Box(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(top = scaffoldPadding.calculateTopPadding())
+    ) {
+      Column(
+        modifier = Modifier.fillMaxSize()
+      ) {
+
+        Messages(
+          messages = messages,
+          actions = chatActions,
+          modifier = modifier.weight(1f),
+          scrollState = scrollState,
+          contentPadding = PaddingValues(top = 40.dp, bottom = 20.dp)
         )
+
+        AnimatedVisibility(
+          visible = task.isComplete,
+          modifier = Modifier.background(Color.Transparent)
+        ) {
+          AppChatItem(
+            message = MessageUiModel(
+              id = Random.nextLong(),
+              taskId = task.id,
+              scheduleId = 0L,
+              contentType = ContentType.APP_TASK_MESSAGE,
+              createTime = "",
+              content = stringResource(
+                Res.string.task_chat_complete_message_with_date,
+                task.completeTime
+              ),
+              formattedTime = "",
+              formattedTimeOnly = ""
+            ),
+            chatActions
+          )
+          Spacer(modifier = Modifier.padding(bottom = 80.dp))
+        }
+
+        AnimatedVisibility(
+          visible = !task.isComplete,
+          modifier = Modifier.background(Color.Transparent)
+        ) {
+          TaskChatInput(
+            sendTaskMessage = {
+              sendTaskMessage(it)
+              scope.launch {
+                delay(200)
+                scrollState.animateScrollToItem(index = 0)
+              }
+            },
+            pickImage = { singleImagePickerLauncher.launch() },
+            pickPdf = { singleFilePickerLauncher.launch() },
+            modifier = Modifier
+              .fillMaxWidth()
+              .background(Color.Transparent),
+          )
+        }
+      }
+
+      TaskDetails(
+        taskId = task.id,
+        modifier = Modifier.align(Alignment.TopCenter)
+      )
     }
+  }
+
+  if (showDeleteConfirmationDialog) {
+    ConfirmDeleteDialog(
+      onDismiss = { showDeleteConfirmationDialog = false },
+      onConfirm = {
+        onEvent(DeleteTask)
+        onBack()
+        showDeleteConfirmationDialog = false
+      }
+    )
+  }
 }
 
 
 @Composable
 private fun TaskChatInput(
-    sendTaskMessage: (String) -> Unit,
-    pickImage: () -> Unit,
-    pickPdf: () -> Unit,
-    modifier: Modifier = Modifier,
+  sendTaskMessage: (String) -> Unit,
+  pickImage: () -> Unit,
+  pickPdf: () -> Unit,
+  modifier: Modifier = Modifier,
 ) {
-    val isTextEmpty = remember { mutableStateOf(true) }
+  val isTextEmpty = remember { mutableStateOf(true) }
 
-    var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue())
-    }
-    var showMenu by remember { mutableStateOf(false) }
+  var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+    mutableStateOf(TextFieldValue())
+  }
+  var showMenu by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier
-    ) {
-        UserInput(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            textContent = {
-                val weight = if (isTextEmpty.value) 0.30f else 0.12f
-                CompositionLocalProvider(LocalBoxWeight provides weight) {
-                    UserTextInput(
-                        value = userInputValue,
-                        onValueChange = {
-                            userInputValue = it
-                            isTextEmpty.value = it.text.isBlank()
-                        },
-                        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                        actionsContent = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                if (isTextEmpty.value) {
-                                    IconButton(
-                                        onClick = { showMenu = true },
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Icon(
-                                            Icons.Filled.AttachFile,
-                                            contentDescription = stringResource(Res.string.cd_select_images)
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = showMenu,
-                                        onDismissRequest = { showMenu = false }
-                                    ) {
-                                        DropdownMenuItem(onClick = {
-                                            pickImage()
-                                            showMenu = false
-                                        },
-                                            text = {
-                                                Text(
-                                                    text = stringResource(Res.string.select_image)
-                                                )
-                                            })
-                                        DropdownMenuItem(onClick = {
-                                            pickPdf()
-                                            showMenu = false
-                                        },
-                                            text = {
-                                                Text(
-                                                    text = stringResource(Res.string.select_pdf)
-                                                )
-                                            })
-
-                                    }
-                                    VoiceToTextInput(
-                                        onUpdateValue = {
-                                            userInputValue = userInputValue.copy(text = it)
-                                            isTextEmpty.value = it.isBlank()
-                                        }
-                                    )
-                                } else {
-                                    AnimatedVisibility(
-                                        visible = !isTextEmpty.value,
-                                        enter = fadeIn(),
-                                        exit = fadeOut()
-                                    ) {
-                                        SendIcon(onClick = {
-                                            sendTaskMessage(userInputValue.text)
-                                            userInputValue = userInputValue.copy(text = "")
-                                            isTextEmpty.value = true
-                                        })
-                                    }
-                                }
-                            }
-                        },
-                    )
-                }
+  Box(
+    modifier = modifier
+  ) {
+    UserInput(
+      modifier = Modifier.align(Alignment.BottomCenter),
+      textContent = {
+        val weight = if (isTextEmpty.value) 0.30f else 0.12f
+        CompositionLocalProvider(LocalBoxWeight provides weight) {
+          UserTextInput(
+            value = userInputValue,
+            onValueChange = {
+              userInputValue = it
+              isTextEmpty.value = it.text.isBlank()
             },
-        )
-    }
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            actionsContent = {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth()
+              ) {
+                if (isTextEmpty.value) {
+                  IconButton(
+                    onClick = { showMenu = true },
+                    modifier = Modifier.weight(1f)
+                  ) {
+                    Icon(
+                      Icons.Filled.AttachFile,
+                      contentDescription = stringResource(Res.string.cd_select_images)
+                    )
+                  }
+                  DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                  ) {
+                    DropdownMenuItem(onClick = {
+                      pickImage()
+                      showMenu = false
+                    },
+                      text = {
+                        Text(
+                          text = stringResource(Res.string.select_image)
+                        )
+                      })
+                    DropdownMenuItem(onClick = {
+                      pickPdf()
+                      showMenu = false
+                    },
+                      text = {
+                        Text(
+                          text = stringResource(Res.string.select_pdf)
+                        )
+                      })
+
+                  }
+                  VoiceToTextInput(
+                    onUpdateValue = {
+                      userInputValue = userInputValue.copy(text = it)
+                      isTextEmpty.value = it.isBlank()
+                    }
+                  )
+                } else {
+                  AnimatedVisibility(
+                    visible = !isTextEmpty.value,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                  ) {
+                    SendIcon(onClick = {
+                      sendTaskMessage(userInputValue.text)
+                      userInputValue = userInputValue.copy(text = "")
+                      isTextEmpty.value = true
+                    })
+                  }
+                }
+              }
+            },
+          )
+        }
+      },
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskTopAppBar(
-    isComplete: Boolean,
-    onBack: () -> Unit,
-    onDelete: () -> Unit,
-    onToggleComplete: () -> Unit,
+  isComplete: Boolean,
+  onBack: () -> Unit,
+  onDelete: () -> Unit,
+  onToggleComplete: () -> Unit,
 ) {
-    Surface {
-        TopAppBar(
-            title = { },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(Res.string.cd_navigate_back)
-                    )
-                }
-            },
-            actions = {
+  Surface {
+    TopAppBar(
+      title = { },
+      navigationIcon = {
+        IconButton(onClick = onBack) {
+          Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(Res.string.cd_navigate_back)
+          )
+        }
+      },
+      actions = {
 
-                var showMenu by remember { mutableStateOf(false) }
+        var showMenu by remember { mutableStateOf(false) }
 
-                IconButton(onClick = { showMenu = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = stringResource(Res.string.cd_more_options)
-                    )
-                }
+        IconButton(onClick = { showMenu = true }) {
+          Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = stringResource(Res.string.cd_more_options)
+          )
+        }
 
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
+        DropdownMenu(
+          expanded = showMenu,
+          onDismissRequest = { showMenu = false }
+        ) {
 
-                    DropdownMenuItem(
-                        text = {
-                            if (isComplete) {
-                                Text(stringResource(Res.string.restore))
-                            } else {
-                                Text(stringResource(Res.string.complete))
-                            }
-
-                        },
-                        onClick = {
-                            onToggleComplete()
-                            showMenu = false
-                        },
-                        leadingIcon = {
-                            if (isComplete) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.Undo,
-                                    contentDescription = stringResource(Res.string.cd_undo)
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Filled.Done,
-                                    contentDescription = stringResource(Res.string.cd_task_done_icon)
-                                )
-                            }
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(Res.string.delete)) },
-                        onClick = {
-                            onDelete()
-                            showMenu = false
-                        },
-                        leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) }
-                    )
-                }
-
+          DropdownMenuItem(
+            text = {
+              if (isComplete) {
+                Text(stringResource(Res.string.restore))
+              } else {
+                Text(stringResource(Res.string.complete))
+              }
 
             },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        )
-    }
+            onClick = {
+              onToggleComplete()
+              showMenu = false
+            },
+            leadingIcon = {
+              if (isComplete) {
+                Icon(
+                  Icons.AutoMirrored.Filled.Undo,
+                  contentDescription = stringResource(Res.string.cd_undo)
+                )
+              } else {
+                Icon(
+                  Icons.Filled.Done,
+                  contentDescription = stringResource(Res.string.cd_task_done_icon)
+                )
+              }
+            }
+          )
+
+          DropdownMenuItem(
+            text = { Text(stringResource(Res.string.delete)) },
+            onClick = {
+              onDelete()
+              showMenu = false
+            },
+            leadingIcon = { Icon(Icons.Filled.Delete, contentDescription = null) }
+          )
+        }
+
+
+      },
+      colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.primaryContainer
+      )
+    )
+  }
 }
 
 //@Preview(

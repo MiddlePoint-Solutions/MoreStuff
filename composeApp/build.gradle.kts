@@ -160,6 +160,7 @@ kotlin {
             implementation(libs.zoomable)
             implementation(libs.kottie)
             implementation(libs.calf.permissions)
+            implementation(libs.calf.filepicker)
 
             // About
             implementation(libs.aboutLibrariesCore)

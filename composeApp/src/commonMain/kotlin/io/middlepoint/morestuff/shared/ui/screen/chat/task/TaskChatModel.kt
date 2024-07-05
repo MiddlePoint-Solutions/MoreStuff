@@ -79,9 +79,7 @@ fun taskChatModel(
   }
 
   LaunchedEffect(Unit) {
-    logger.d { "Inside LaunchedEffect" }
     events.collect { event ->
-      logger.d { "Inside Collect: $event" }
       with(event) {
         when (this) {
           is CopyText -> {
