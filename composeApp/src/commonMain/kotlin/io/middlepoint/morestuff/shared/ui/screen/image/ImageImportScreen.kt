@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
@@ -56,6 +57,8 @@ import morestuff.composeapp.generated.resources.cd_send
 import morestuff.composeapp.generated.resources.import_image_title
 import morestuff.composeapp.generated.resources.import_image_title_hint
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +66,7 @@ fun ImageImportScreen(
   imageUri: String,
   onImport: (String) -> Unit,
   onBack: () -> Unit,
+  logger: Logger = koinInject { parametersOf("ImageImportScreen") }
 ) {
   var messageText by remember { mutableStateOf("") }
 
@@ -95,6 +99,7 @@ fun ImageImportScreen(
       Image(
         painter = rememberAsyncImagePainter(
           model = imageUri,
+          onState = { logger.d { "$it" } },
           imageLoader = ImageLoader(LocalPlatformContext.current)
         ),
         contentDescription = "Selected Image",

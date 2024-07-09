@@ -29,7 +29,7 @@ class PDFHandlerImpl(
                     inputStream.copyTo(outputStream)
                 }
             }
-            pdfFile.toUri().path
+            pdfFile.path
         } catch (e: Exception) {
             Logger.e("Error handling PDF: $e")
             null
@@ -110,6 +110,5 @@ class PDFHandlerImpl(
             Toast.makeText(context, "PDF file not found", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 }
