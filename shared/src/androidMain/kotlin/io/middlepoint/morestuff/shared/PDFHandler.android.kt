@@ -29,7 +29,7 @@ class PDFHandlerImpl(
                     inputStream.copyTo(outputStream)
                 }
             }
-            pdfFile.absolutePath
+            pdfFile.toUri().path
         } catch (e: Exception) {
             Logger.e("Error handling PDF: $e")
             null
