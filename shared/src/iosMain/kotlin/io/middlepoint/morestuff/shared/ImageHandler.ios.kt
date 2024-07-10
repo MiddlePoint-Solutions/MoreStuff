@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import platform.Foundation.NSData
@@ -15,13 +16,10 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 
-class ImageHandlerImpl(
-  private val logger: Logger
-) : ImageHandler {
+class ImageHandlerImpl: ImageHandler {
 
-  override suspend fun saveImages(uris: String, time: LocalDateTime): String? =
-    withContext(Dispatchers.Main) {
-      logger.d { "uris: $uris" }
+  override suspend fun saveImages(uris: String, time: LocalDateTime): String =
+    withContext(Dispatchers.IO) {
       val savedImagePath = try {
         val url = NSURL.URLWithString(uris)
         val data = url?.let { NSData.dataWithContentsOfURL(it) }
@@ -43,7 +41,7 @@ class ImageHandlerImpl(
       savedImagePath
     }
 
-  private fun createImageFile(time: kotlinx.datetime.LocalDateTime): String {
+  private fun createImageFile(time: LocalDateTime): String {
     val timeStamp =
       "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
     val imageFileName = "JPEG_$timeStamp.jpg"
@@ -56,9 +54,10 @@ class ImageHandlerImpl(
     val activityViewController =
       UIActivityViewController(activityItems = listOf(fileUrl), applicationActivities = null)
 
-    val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-    if (rootViewController != null) {
-      rootViewController.presentViewController(activityViewController, true, null)
-    }
+    UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
+      activityViewController,
+      true,
+      null
+    )
   }
 }
