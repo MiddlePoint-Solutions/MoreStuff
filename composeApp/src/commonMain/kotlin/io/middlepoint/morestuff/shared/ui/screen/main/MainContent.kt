@@ -14,12 +14,10 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import com.mohamedrejeb.calf.io.KmpFile
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.Router
-import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen.ImagePreview
@@ -52,7 +50,7 @@ fun MainContent(
     LocalScreenSize provides getScreenSizeInfo(),
   ) {
 
-    val router =  LocalAppRouter.current
+    val router = LocalAppRouter.current
 
     RoutedContent(
       router = router,
@@ -91,15 +89,15 @@ fun MainContent(
         )
 
         is ImagePreview -> {
+          val imageFile = KmpFile.createKmpFile(screen.imageUri)
           ImageImportScreen(
-            imageUri = screen.imageUri,
+            image = imageFile,
             onImport = { message ->
               val shareableImage = Shareable.Image(screen.imageUri, message)
               shareContent(screen.taskId, shareableImage)
               router.replaceAll(Home, TaskChat(screen.taskId))
             },
             onBack = router::pop
-
           )
 
         }

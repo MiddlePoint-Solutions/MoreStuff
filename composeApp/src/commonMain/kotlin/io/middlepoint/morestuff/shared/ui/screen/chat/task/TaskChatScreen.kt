@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,27 +44,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import coil3.BitmapImage
 import coil3.annotation.ExperimentalCoilApi
+import coil3.compose.LocalPlatformContext
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.io.getPath
-import com.mohamedrejeb.calf.io.readByteArray
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
+import com.mohamedrejeb.calf.picker.coil.toCalfPlatformContext
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
-import com.mohamedrejeb.calf.picker.toImageBitmap
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -127,6 +123,7 @@ fun TaskChatScreen(
 
   val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
+  val platformContext = LocalPlatformContext.current.toCalfPlatformContext()
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
@@ -180,9 +177,14 @@ fun TaskChatScreen(
 
       is ImageImport -> {
         ImageImportScreen(
-          imageUri = screen.uri,
+          image = screen.imageFile,
           onImport = { title ->
-            viewModel.take(InputImage(screen.uri, title))
+            viewModel.take(
+              InputImage(
+                screen.imageFile.getPath(platformContext) ?: "",
+                title
+              )
+            )
             router.pop()
           },
           onBack = router::pop
@@ -210,7 +212,7 @@ private fun TaskChatContent(
   modifier: Modifier = Modifier,
   onBack: () -> Unit = {},
   sendTaskMessage: (String) -> Unit = {},
-  imagePicked: (String) -> Unit = {},
+  imagePicked: (KmpFile) -> Unit = {},
   pdfPicked: (String) -> Unit = {},
   logger: Logger = koinInject()
 ) {
@@ -223,31 +225,14 @@ private fun TaskChatContent(
   val messages = model.messages
   val platformContext = com.mohamedrejeb.calf.core.LocalPlatformContext.current
 
-  var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-
   val singleImagePickerLauncher =
     rememberFilePickerLauncher(
       type = FilePickerFileType.Image,
       selectionMode = FilePickerSelectionMode.Single,
       onResult = { files ->
-        scope.launch {
-
-          files.firstOrNull()?.let {
-            logger.d { "File path: $it" }
-            bitmap = try {
-              it.readByteArray(platformContext).toImageBitmap()
-            } catch (e: Exception) {
-              e.printStackTrace()
-              null
-            }
-          }
-
-//          files.firstOrNull()?.getPath(platformContext)?.let {
-//            logger.d { "File path: $it" }
-//            imagePicked(it)
-//          }
-
-
+        files.firstOrNull()?.let {
+          logger.d { "File path: $it" }
+          imagePicked(it)
         }
       }
     )
@@ -340,19 +325,6 @@ private fun TaskChatContent(
         taskId = task.id,
         modifier = Modifier.align(Alignment.TopCenter)
       )
-
-      bitmap?.let {
-        Image(
-          bitmap = it,
-          contentDescription = "Image",
-          contentScale = ContentScale.FillWidth,
-          modifier =
-          Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clip(MaterialTheme.shapes.medium),
-        )
-      }
     }
   }
 

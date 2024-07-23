@@ -1,8 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import platform.Foundation.NSData
@@ -19,7 +17,7 @@ import platform.UIKit.UIImageJPEGRepresentation
 class ImageHandlerImpl: ImageHandler {
 
   override suspend fun saveImages(uris: String, time: LocalDateTime): String =
-    withContext(Dispatchers.IO) {
+    withContext(Dispatchers.Main) {
       val savedImagePath = try {
         val url = NSURL.URLWithString(uris)
         val data = url?.let { NSData.dataWithContentsOfURL(it) }
