@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared
 
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -17,6 +18,7 @@ actual fun formatString(format: String, vararg args: Any): String {
   return String.format(Locale.US, format, *args)
 }
 
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
 actual fun requiresNotificationsPermission(): Boolean =
   Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 
@@ -29,3 +31,5 @@ actual val sharedModule: Module
     factoryOf(::ImageHandlerImpl) bind ImageHandler::class
     factoryOf(::PDFHandlerImpl) bind PDFHandler::class
   }
+actual val platform: Platform
+  get() = Platform.Android

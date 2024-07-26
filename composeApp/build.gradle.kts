@@ -161,6 +161,7 @@ kotlin {
             implementation(libs.kottie)
             implementation(libs.calf.permissions)
             implementation(libs.calf.filepicker)
+            implementation(libs.calf.filepicker.coil)
 
             // About
             implementation(libs.aboutLibrariesCore)

@@ -33,11 +33,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,8 +52,14 @@ import co.touchlab.kermit.Logger
 import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
+import com.mohamedrejeb.calf.io.KmpFile
+import com.mohamedrejeb.calf.io.readByteArray
+import com.mohamedrejeb.calf.picker.coil.KmpFileFetcher
+import com.mohamedrejeb.calf.picker.toImageBitmap
+import io.middlepoint.morestuff.shared.Platform
+import io.middlepoint.morestuff.shared.platform
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
+import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_send
 import morestuff.composeapp.generated.resources.import_image_title
@@ -63,10 +71,9 @@ import org.koin.core.parameter.parametersOf
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
-  imageUri: String,
+  image: KmpFile,
   onImport: (String) -> Unit,
   onBack: () -> Unit,
-  logger: Logger = koinInject { parametersOf("ImageImportScreen") }
 ) {
   var messageText by remember { mutableStateOf("") }
 
@@ -96,11 +103,18 @@ fun ImageImportScreen(
         .imePadding(),
     ) {
 
+      val platformContext = LocalPlatformContext.current
+      val imageLoader = remember {
+        ImageLoader(platformContext).newBuilder()
+          .components {
+            add(KmpFileFetcher.Factory())
+          }.build()
+      }
+
       Image(
         painter = rememberAsyncImagePainter(
-          model = imageUri,
-          onState = { logger.d { "$it" } },
-          imageLoader = ImageLoader(LocalPlatformContext.current)
+          model = image,
+          imageLoader = imageLoader
         ),
         contentDescription = "Selected Image",
         modifier = Modifier.weight(1f)
@@ -157,6 +171,29 @@ fun ImageImportScreen(
       }
     }
   }
+}
+
+@Composable
+private fun PreviewImage(
+  imageUri: KmpFile,
+  modifier: Modifier = Modifier,
+  logger: Logger = koinInject { parametersOf("PreviewImage") }
+) {
+
+  val uri = remember { imageUri }
+
+  Image(
+    painter = rememberAsyncImagePainter(
+      model = uri,
+      onState = { logger.d { "$it" } },
+      imageLoader = ImageLoader(LocalPlatformContext.current)
+        .newBuilder()
+        .components { add(KmpFileFetcher.Factory()) }
+        .build()
+    ),
+    contentDescription = "Selected Image",
+    modifier = modifier
+  )
 }
 
 @Composable

@@ -37,3 +37,5 @@ actual val sharedModule: Module
         factoryOf(::ImageHandlerImpl) bind ImageHandler::class
         factoryOf(::PDFHandlerImpl) bind PDFHandler::class
     }
+actual val platform: Platform
+  get() = TODO("Not yet implemented")
