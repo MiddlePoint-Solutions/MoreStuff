@@ -26,8 +26,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.ClearActivePending
 import io.middlepoint.morestuff.shared.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CountActiveReminderMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CountActiveReminderMessagesUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.message.CreateImageMessageUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.message.CreateImageMessageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMediaMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMediaMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreatePDFMessageUseCase
@@ -50,8 +50,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessage
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserImageUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserImageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.message.SaveMediaUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.SaveMediaUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCase
@@ -312,10 +312,10 @@ val messageUseCases = module {
     factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
     factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
     factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
-    factoryOf(::SaveUserImageUseCaseImpl) bind SaveUserImageUseCase::class
+    factoryOf(::SaveMediaUseCaseImpl) bind SaveMediaUseCase::class
     factoryOf(::SaveUserPDFUseCaseImpl) bind SaveUserPDFUseCase::class
     factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
-    factoryOf(::CreateImageMessageUseCaseImpl) bind CreateImageMessageUseCase::class
+    factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
     factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
     factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
 }

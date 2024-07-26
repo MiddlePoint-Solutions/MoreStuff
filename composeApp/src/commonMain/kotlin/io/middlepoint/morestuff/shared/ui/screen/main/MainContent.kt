@@ -108,7 +108,7 @@ fun MainContent(
             shareable = screen.shareable,
           ) { taskId, shareable ->
             if (shareable is Shareable.Image) {
-              router.push(ImagePreview(shareable.uris, taskId))
+              router.push(ImagePreview(shareable.uri, taskId))
             } else {
               router.replaceCurrent(
                 TaskChat(taskId),

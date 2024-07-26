@@ -1,16 +1,17 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
+import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.displayTitle
 import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
-import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
+import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
+import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
-import io.middlepoint.morestuff.shared.domain.usecase.message.CreateImageMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMediaMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreatePDFMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateScheduleMessageUseCase
@@ -25,9 +26,9 @@ sealed class MessageAction : Action.FeatureAction() {
     data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
 
-    data class CreateImageMessageAction(
+    data class CreateFileMessageAction(
         val taskId: Long,
-        val filePath: String,
+        val file: KmpFile,
         val message: String
     ) : MessageAction()
 
@@ -45,7 +46,7 @@ class MessageMiddleware(
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
     private val createMessageUseCase: CreateMessageUseCase,
     private val setScheduleResponseMessage: SetScheduleMessageResponseUseCase,
-    private val createImageMessageUseCase: CreateImageMessageUseCase,
+    private val createMediaMessageUseCase: CreateMediaMessageUseCase,
     private val createPDFMessageUseCase: CreatePDFMessageUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
 ) : Middleware<AppState> {
@@ -73,12 +74,12 @@ class MessageMiddleware(
                 )
             }
 
-            is MessageAction.CreateImageMessageAction -> scope.launch {
-                createImageMessageUseCase(
+            is MessageAction.CreateFileMessageAction -> scope.launch {
+                createMediaMessageUseCase(
                     action.taskId,
                     scheduleId = 0,
                     contentType = ContentType.TASK_MESSAGE,
-                    filePath = action.filePath,
+                    mediaFile = action.file,
                     action.message
                 )
             }

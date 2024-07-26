@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class Shareable {
   data class Text(val message: String) : Shareable()
 
-  data class Image(val uris: String, val message: String) : Shareable()
+  data class Image(val uri: String, val message: String) : Shareable()
 
-  data class Pdf(val uris: String, val message: String) : Shareable()
+  data class Pdf(val uri: String, val message: String) : Shareable()
 }

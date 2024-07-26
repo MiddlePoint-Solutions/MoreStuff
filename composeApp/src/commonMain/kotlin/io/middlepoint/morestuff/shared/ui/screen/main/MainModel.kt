@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
@@ -45,9 +46,9 @@ fun mainModel(
                     when (this) {
                         is Shareable.Image -> {
                             store.dispatch(
-                                MessageAction.CreateImageMessageAction(
+                                MessageAction.CreateFileMessageAction(
                                     event.taskId,
-                                    uris,
+                                    KmpFile.createKmpFile(uri),
                                     message
                                 )
                             )
@@ -57,7 +58,7 @@ fun mainModel(
                             store.dispatch(
                                 MessageAction.CreatePDFMessageAction(
                                     event.taskId,
-                                    uris,
+                                    uri,
                                     message
                                 )
                             )

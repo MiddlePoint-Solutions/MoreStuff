@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.runtime.Immutable
+import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
@@ -14,7 +15,7 @@ data class TaskChatState(
 @Immutable
 sealed class TaskChatEvent {
     data class InputText(val content: String) : TaskChatEvent()
-    data class InputImage(val path: String, val title: String) : TaskChatEvent()
+    data class InputUserMedia(val imageFile: KmpFile, val title: String) : TaskChatEvent()
     data class InputDocument(val path: String, val title: String) : TaskChatEvent()
     data class CopyText(val content: String) : TaskChatEvent()
     data class DeleteMessage(val message: MessageUiModel) : TaskChatEvent()

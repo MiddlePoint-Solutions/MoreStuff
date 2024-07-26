@@ -26,7 +26,6 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyTex
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
@@ -96,9 +95,9 @@ fun taskChatModel(
             )
           }
 
-          is InputImage -> {
+          is TaskChatEvent.InputUserMedia -> {
             store.dispatch(
-              MessageAction.CreateImageMessageAction(taskId, path, title.trim())
+              MessageAction.CreateFileMessageAction(taskId, imageFile, title.trim())
             )
           }
 

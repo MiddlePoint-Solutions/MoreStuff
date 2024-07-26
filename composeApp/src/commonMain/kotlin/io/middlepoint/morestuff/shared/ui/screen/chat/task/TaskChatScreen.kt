@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.LocalPlatformContext
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
@@ -84,7 +83,6 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyTex
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
@@ -179,12 +177,7 @@ fun TaskChatScreen(
         ImageImportScreen(
           image = screen.imageFile,
           onImport = { title ->
-            viewModel.take(
-              InputImage(
-                screen.imageFile.getPath(platformContext) ?: "",
-                title
-              )
-            )
+            viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
             router.pop()
           },
           onBack = router::pop
@@ -203,7 +196,6 @@ fun TaskChatScreen(
   }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun TaskChatContent(
   model: TaskChatState,
