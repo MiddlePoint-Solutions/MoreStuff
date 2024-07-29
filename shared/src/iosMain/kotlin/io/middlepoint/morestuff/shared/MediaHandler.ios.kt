@@ -27,9 +27,9 @@ import platform.posix.malloc
 import platform.posix.memcpy
 import platform.posix.size_t
 
-class ImageHandlerImpl(
+class MediaHandlerImpl(
   private val logger: Logger
-) : ImageHandler {
+) : MediaHandler {
 
   override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String =
     withContext(Dispatchers.Main) {
@@ -47,7 +47,7 @@ class ImageHandlerImpl(
   ): String {
     val extension = url.substringAfterLast('.', "")
     val fileName = "$title.$extension"
-    val folderName = "files"
+    val folderName = "images"
     val documentsDirectory = NSSearchPathForDirectoriesInDomains(
       NSDocumentDirectory,
       NSUserDomainMask,

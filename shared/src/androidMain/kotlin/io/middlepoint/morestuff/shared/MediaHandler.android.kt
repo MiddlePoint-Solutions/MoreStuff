@@ -5,14 +5,10 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import android.net.Uri
 import androidx.core.content.FileProvider
-import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import co.touchlab.kermit.Logger
-import com.mohamedrejeb.calf.core.PlatformContext
 import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
@@ -20,9 +16,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Path
 
-class ImageHandlerImpl(
+class MediaHandlerImpl(
   private val context: Context
-) : ImageHandler {
+) : MediaHandler {
 
   override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String? =
     withContext(Dispatchers.IO) {
@@ -42,12 +38,9 @@ class ImageHandlerImpl(
         ) ?: ExifInterface.ORIENTATION_NORMAL
 
 
-        val bitmap = uri.let { uri ->
-          contentResolver.openInputStream(uri)?.use { inputStream ->
-            BitmapFactory.decodeStream(inputStream)
-          }
+        val bitmap = contentResolver.openInputStream(uri)?.use { inputStream ->
+          BitmapFactory.decodeStream(inputStream)
         }
-
 
         val rotatedBitmap = bitmap?.let {
           when (orientation) {
@@ -59,11 +52,7 @@ class ImageHandlerImpl(
         }
 
         val imageFile = createImageFile(time).toFile()
-
-        outputStream = withContext(Dispatchers.IO) {
-          FileOutputStream(imageFile)
-        }
-
+        outputStream = FileOutputStream(imageFile)
         rotatedBitmap?.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
         outputStream.close()
         imageFile.absolutePath

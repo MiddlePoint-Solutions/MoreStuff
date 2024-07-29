@@ -4,7 +4,6 @@ import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import platform.Foundation.NSNumber
 import platform.Foundation.NSString
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
@@ -55,7 +54,7 @@ actual val sharedModule: Module
         factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
         factoryOf(::ShareHelperImpl) bind ShareHelper::class
         factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
-        factoryOf(::ImageHandlerImpl) bind ImageHandler::class
+        factoryOf(::MediaHandlerImpl) bind MediaHandler::class
         factoryOf(::PDFHandlerImpl) bind PDFHandler::class
     }
 actual val platform: Platform

@@ -14,7 +14,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.ImageHandler
+import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.PDFHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
@@ -44,7 +44,7 @@ fun taskChatModel(
   events: Flow<TaskChatEvent>,
   store: AppStore = koinInject(),
   clipboardHelper: ClipboardHelper = koinInject(),
-  imageHandler: ImageHandler = koinInject(),
+  mediaHandler: MediaHandler = koinInject(),
   pdfHandler: PDFHandler = koinInject(),
   taskUiMapper: TaskUiMapper = koinInject(),
   shareHelper: ShareHelper = koinInject(),
@@ -114,7 +114,7 @@ fun taskChatModel(
           is ShareMessage -> {
             when (message.messageData?.messageType) {
               MessageDataType.Image -> {
-                imageHandler.shareImage(message.messageData.filePath)
+                mediaHandler.shareImage(message.messageData.filePath)
               }
 
               MessageDataType.Pdf -> {
@@ -130,7 +130,7 @@ fun taskChatModel(
           }
 
           is ShareImage -> {
-            imageHandler.shareImage(path)
+            mediaHandler.shareImage(path)
           }
 
           is ScheduleResponse -> {
