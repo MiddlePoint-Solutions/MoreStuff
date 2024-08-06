@@ -58,7 +58,7 @@ fun mainModel(
                             store.dispatch(
                                 MessageAction.CreatePDFMessageAction(
                                     event.taskId,
-                                    uri,
+                                    KmpFile.createKmpFile(uri),
                                     message
                                 )
                             )

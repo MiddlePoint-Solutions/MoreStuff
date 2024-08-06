@@ -15,7 +15,6 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.ClipboardHelper
 import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.PDFHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
@@ -45,7 +44,6 @@ fun taskChatModel(
   store: AppStore = koinInject(),
   clipboardHelper: ClipboardHelper = koinInject(),
   mediaHandler: MediaHandler = koinInject(),
-  pdfHandler: PDFHandler = koinInject(),
   taskUiMapper: TaskUiMapper = koinInject(),
   shareHelper: ShareHelper = koinInject(),
   messageUiMapper: MessageUiMapper = koinInject(),
@@ -91,7 +89,7 @@ fun taskChatModel(
 
           is InputDocument -> {
             store.dispatch(
-              MessageAction.CreatePDFMessageAction(taskId, path, title.trim())
+              MessageAction.CreatePDFMessageAction(taskId, pdfFile, title.trim())
             )
           }
 
@@ -108,7 +106,7 @@ fun taskChatModel(
           }
 
           is OpenDocument -> {
-            pdfHandler.openPDF(path)
+            mediaHandler.openPDF(path)
           }
 
           is ShareMessage -> {
@@ -118,7 +116,7 @@ fun taskChatModel(
               }
 
               MessageDataType.Pdf -> {
-                pdfHandler.sharePDF(message.messageData.filePath)
+                mediaHandler.sharePDF(message.messageData.filePath)
               }
 
               MessageDataType.Video -> {}
@@ -138,7 +136,7 @@ fun taskChatModel(
           }
 
           is ShareDocument -> {
-            pdfHandler.sharePDF(path)
+            mediaHandler.sharePDF(path)
           }
 
           is DeleteTask -> {

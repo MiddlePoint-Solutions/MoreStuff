@@ -34,7 +34,7 @@ sealed class MessageAction : Action.FeatureAction() {
 
     data class CreatePDFMessageAction(
         val taskId: Long,
-        val filePath: String,
+        val file: KmpFile,
         val message: String
     ) : MessageAction()
 
@@ -89,7 +89,7 @@ class MessageMiddleware(
                     taskId = action.taskId,
                     scheduleId = 0,
                     contentType = ContentType.TASK_MESSAGE,
-                    filePath = action.filePath,
+                    pdfFile = action.file,
                     message = action.message
                 )
             }

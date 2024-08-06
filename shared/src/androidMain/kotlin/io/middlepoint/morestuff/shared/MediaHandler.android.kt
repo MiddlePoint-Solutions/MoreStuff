@@ -5,10 +5,15 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.net.Uri
+import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import co.touchlab.kermit.Logger
 import com.mohamedrejeb.calf.io.KmpFile
+import com.mohamedrejeb.calf.io.getName
+import com.mohamedrejeb.calf.io.readByteArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
@@ -17,7 +22,8 @@ import java.io.FileOutputStream
 import java.nio.file.Path
 
 class MediaHandlerImpl(
-  private val context: Context
+  private val context: Context,
+  private val logger: Logger
 ) : MediaHandler {
 
   override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String? =
@@ -57,7 +63,7 @@ class MediaHandlerImpl(
         outputStream.close()
         imageFile.absolutePath
       } catch (e: Exception) {
-        Logger.e("Error handling image: $e")
+        logger.e("Error handling image: $e")
         ""
       }
 
@@ -96,5 +102,81 @@ class MediaHandlerImpl(
     context.startActivity(chooserIntent)
   }
 
+  override suspend fun savePDF(media: KmpFile): String? = withContext(Dispatchers.IO) {
+    try {
+      val originalFileName = media.getName(context) ?: "PDF_Default.pdf"
+      val pdfFile = createPDFFile(originalFileName).toFile()
 
+      media.readByteArray(context).inputStream().use { inputStream ->
+        FileOutputStream(pdfFile).use { outputStream ->
+          inputStream.copyTo(outputStream)
+        }
+      }
+
+      pdfFile.toUri().toString()
+    } catch (e: Exception) {
+      logger.e("Error saving PDF: $e")
+      null
+    }
+  }
+
+  private fun createPDFFile(originalFileName: String): Path {
+    val pdfFileName =
+      if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
+    return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
+  }
+
+  override fun sharePDF(pdfPath: String) {
+    val packageName = context.packageName
+    val file = File(pdfPath)
+    val contentUri = FileProvider.getUriForFile(context, "$packageName.fileprovider", file)
+
+    val intent = Intent().apply {
+      action = Intent.ACTION_SEND
+      putExtra(Intent.EXTRA_STREAM, contentUri)
+      type = "application/pdf"
+      flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    val chooserIntent = Intent.createChooser(intent, null).apply {
+      flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
+    context.startActivity(chooserIntent)
+  }
+
+  override fun openPDF(pdfPath: String) {
+
+    logger.d("openPdf - File path: $pdfPath")
+
+    val pdfFile = if (pdfPath.startsWith("/")) {
+      File(pdfPath)
+    } else {
+      File(context.cacheDir, pdfPath.toUri().lastPathSegment ?: "")
+    }
+
+    if (pdfFile.exists()) {
+      try {
+
+        val pdfUri: Uri = FileProvider.getUriForFile(
+          context,
+          "${context.packageName}.fileprovider",
+          pdfFile
+        )
+
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+          data = pdfUri
+          flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        context.startActivity(intent)
+      } catch (e: Exception) {
+        logger.e("Error while opening ${pdfFile.name}",e)
+        Toast.makeText(context, "Error while opening ${pdfFile.name}", Toast.LENGTH_SHORT)
+          .show()
+      }
+
+    } else {
+      Toast.makeText(context, "PDF file not found", Toast.LENGTH_SHORT).show()
+    }
+  }
 }

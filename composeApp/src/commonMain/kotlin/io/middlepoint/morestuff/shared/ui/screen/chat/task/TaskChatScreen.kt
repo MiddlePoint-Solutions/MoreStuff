@@ -205,7 +205,7 @@ private fun TaskChatContent(
   onBack: () -> Unit = {},
   sendTaskMessage: (String) -> Unit = {},
   imagePicked: (KmpFile) -> Unit = {},
-  pdfPicked: (String) -> Unit = {},
+  pdfPicked: (KmpFile) -> Unit = {},
   logger: Logger = koinInject()
 ) {
   val scope = rememberCoroutineScope()
@@ -223,7 +223,7 @@ private fun TaskChatContent(
       selectionMode = FilePickerSelectionMode.Single,
       onResult = { files ->
         files.firstOrNull()?.let {
-          logger.d { "File path: $it" }
+          logger.d { "Image path: $it" }
           imagePicked(it)
         }
       }
@@ -234,7 +234,8 @@ private fun TaskChatContent(
       type = FilePickerFileType.Pdf,
       selectionMode = FilePickerSelectionMode.Single,
       onResult = { files ->
-        files.firstOrNull()?.getPath(platformContext)?.let {
+        files.firstOrNull()?.let {
+          logger.d { "PDF path: $it" }
           pdfPicked(it)
         }
       }

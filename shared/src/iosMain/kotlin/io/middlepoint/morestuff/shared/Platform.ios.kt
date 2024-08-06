@@ -55,7 +55,6 @@ actual val sharedModule: Module
         factoryOf(::ShareHelperImpl) bind ShareHelper::class
         factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
         factoryOf(::MediaHandlerImpl) bind MediaHandler::class
-        factoryOf(::PDFHandlerImpl) bind PDFHandler::class
     }
 actual val platform: Platform
   get() = Platform.iOS

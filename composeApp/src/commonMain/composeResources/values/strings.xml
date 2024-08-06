@@ -262,5 +262,6 @@
     <string name="delete_scope">Delete Scope?</string>
     <string name="title_edit_scope">Edit Scope</string>
 
+    <string name="error">Error</string>
 
 </resources>

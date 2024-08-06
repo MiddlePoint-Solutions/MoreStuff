@@ -12,17 +12,23 @@ import kotlinx.cinterop.toCValues
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
+import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSLog
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.create
+import platform.Foundation.dataWithContentsOfURL
+import platform.Foundation.lastPathComponent
 import platform.Foundation.writeToURL
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
+import platform.UIKit.UIDocumentInteractionController
 import platform.posix.malloc
 import platform.posix.memcpy
 import platform.posix.size_t
@@ -35,7 +41,7 @@ class MediaHandlerImpl(
     withContext(Dispatchers.Main) {
       media.readByteArray(PlatformContext.INSTANCE).let {
         val path = media.getPath(PlatformContext.INSTANCE) ?: ""
-        writeToFile(it, path, createImageFile(time))
+        writeToFile(it, path, "images", createImageFile(time))
       }
     }
 
@@ -43,11 +49,11 @@ class MediaHandlerImpl(
   private fun writeToFile(
     byteArray: ByteArray,
     url: String,
+    folderName: String,
     title: String,
   ): String {
     val extension = url.substringAfterLast('.', "")
     val fileName = "$title.$extension"
-    val folderName = "images"
     val documentsDirectory = NSSearchPathForDirectoriesInDomains(
       NSDocumentDirectory,
       NSUserDomainMask,
@@ -103,4 +109,43 @@ class MediaHandlerImpl(
     memcpy(data, this.toCValues(), this.size.convert<size_t>())
     return NSData.create(bytes = data, length = this.size.toULong())
   }
+
+  override suspend fun savePDF(media: KmpFile): String = withContext(Dispatchers.Main) {
+    media.readByteArray(PlatformContext.INSTANCE).let {
+      val path = media.getPath(PlatformContext.INSTANCE) ?: ""
+      writeToFile(it, path, "files", getOriginalFileName(path) ?: "PDF_Default.pdf")
+    }
+  }
+
+  @OptIn(ExperimentalForeignApi::class)
+  override fun sharePDF(pdfPath: String) {
+    val fileURL = NSURL.fileURLWithPath(pdfPath)
+    val documentController = UIDocumentInteractionController.interactionControllerWithURL(fileURL)
+    documentController.UTI = "com.adobe.pdf"
+
+    val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+    if (rootViewController != null) {
+      val rect = CGRectMake(0.0, 0.0, 0.0, 0.0)
+      documentController.presentOptionsMenuFromRect(rect, rootViewController.view, true)
+    }
+  }
+
+  private fun getOriginalFileName(uri: String): String? {
+    val url = NSURL.URLWithString(uri)
+    return url?.lastPathComponent
+  }
+
+  override fun openPDF(pdfPath: String) {
+    val pdfFile = NSURL.fileURLWithPath(pdfPath)
+    val documentController = UIDocumentInteractionController.interactionControllerWithURL(pdfFile)
+    documentController.UTI = "com.adobe.pdf"
+
+    val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+    if (rootViewController != null) {
+      documentController.presentPreviewAnimated(true)
+    } else {
+      NSLog("PDF file not found or cannot be opened")
+    }
+  }
+
 }

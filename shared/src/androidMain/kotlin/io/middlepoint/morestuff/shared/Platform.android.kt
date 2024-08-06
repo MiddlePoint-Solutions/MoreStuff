@@ -8,9 +8,6 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import java.util.Locale
 
-
-actual typealias File = java.io.File
-
 actual fun generateUUID(): String = java.util.UUID.randomUUID().toString()
 
 actual fun formatString(format: String, vararg args: Any): String {
@@ -28,7 +25,6 @@ actual val sharedModule: Module
     factoryOf(::ShareHelperImpl) bind ShareHelper::class
     factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
     factoryOf(::MediaHandlerImpl) bind MediaHandler::class
-    factoryOf(::PDFHandlerImpl) bind PDFHandler::class
   }
 actual val platform: Platform
   get() = Platform.Android

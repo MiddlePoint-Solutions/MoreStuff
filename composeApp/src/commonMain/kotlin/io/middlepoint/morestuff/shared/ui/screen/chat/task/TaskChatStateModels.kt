@@ -16,7 +16,7 @@ data class TaskChatState(
 sealed class TaskChatEvent {
     data class InputText(val content: String) : TaskChatEvent()
     data class InputUserMedia(val imageFile: KmpFile, val title: String) : TaskChatEvent()
-    data class InputDocument(val path: String, val title: String) : TaskChatEvent()
+    data class InputDocument(val pdfFile: KmpFile, val title: String) : TaskChatEvent()
     data class CopyText(val content: String) : TaskChatEvent()
     data class DeleteMessage(val message: MessageUiModel) : TaskChatEvent()
     data class ShareMessage(val message: MessageUiModel) : TaskChatEvent()

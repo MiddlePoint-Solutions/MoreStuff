@@ -12,4 +12,16 @@ class MediaHandlerImpl : MediaHandler {
     override fun shareImage(imagePath: String) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun savePDF(media: KmpFile): String? {
+        TODO("Not yet implemented")
+    }
+
+    override fun sharePDF(pdfPath: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun openPDF(pdfPath: String) {
+        TODO("Not yet implemented")
+    }
 }
