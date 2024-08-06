@@ -127,9 +127,17 @@ class MediaHandlerImpl(
   }
 
   override fun sharePDF(pdfPath: String) {
-    val packageName = context.packageName
-    val file = File(pdfPath)
-    val contentUri = FileProvider.getUriForFile(context, "$packageName.fileprovider", file)
+    logger.d("sharePDF - File path: $pdfPath")
+
+    val pdfFile = if (pdfPath.startsWith("/")) {
+      File(pdfPath)
+    } else {
+      File(context.cacheDir, pdfPath.toUri().lastPathSegment ?: "")
+    }
+
+    val contentUri = FileProvider.getUriForFile(
+      context, "${context.packageName}.fileprovider", pdfFile
+    )
 
     val intent = Intent().apply {
       action = Intent.ACTION_SEND
@@ -170,7 +178,7 @@ class MediaHandlerImpl(
 
         context.startActivity(intent)
       } catch (e: Exception) {
-        logger.e("Error while opening ${pdfFile.name}",e)
+        logger.e("Error while opening ${pdfFile.name}", e)
         Toast.makeText(context, "Error while opening ${pdfFile.name}", Toast.LENGTH_SHORT)
           .show()
       }
