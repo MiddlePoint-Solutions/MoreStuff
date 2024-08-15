@@ -8,16 +8,6 @@ import platform.Foundation.NSString
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
 
-actual class File actual constructor(path: String) {
-    actual fun exists(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    actual fun delete(): Boolean {
-        TODO("Not yet implemented")
-    }
-}
-
 actual fun generateUUID(): String {
     return NSUUID().UUIDString
 }
