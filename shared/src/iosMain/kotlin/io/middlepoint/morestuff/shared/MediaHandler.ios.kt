@@ -18,12 +18,10 @@ import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSLog
 import platform.Foundation.NSSearchPathForDirectoriesInDomains
-import platform.Foundation.NSTemporaryDirectory
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.create
-import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.lastPathComponent
 import platform.Foundation.writeToURL
 import platform.UIKit.UIActivityViewController
@@ -33,119 +31,121 @@ import platform.posix.malloc
 import platform.posix.memcpy
 import platform.posix.size_t
 
+
 class MediaHandlerImpl(
-  private val logger: Logger
+    private val logger: Logger
 ) : MediaHandler {
 
-  override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String =
-    withContext(Dispatchers.Main) {
-      media.readByteArray(PlatformContext.INSTANCE).let {
-        val path = media.getPath(PlatformContext.INSTANCE) ?: ""
-        writeToFile(it, path, "images", createImageFile(time))
-      }
+    override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String =
+        withContext(Dispatchers.Main) {
+            media.readByteArray(PlatformContext.INSTANCE).let {
+                val path = media.getPath(PlatformContext.INSTANCE) ?: ""
+                writeToFile(it, path, "images", createImageFile(time))
+            }
+        }
+
+    @OptIn(ExperimentalForeignApi::class)
+    private fun writeToFile(
+        byteArray: ByteArray,
+        url: String,
+        folderName: String,
+        title: String,
+    ): String {
+        val extension = url.substringAfterLast('.', "")
+        val fileName = "$title.$extension"
+        val documentsDirectory = NSSearchPathForDirectoriesInDomains(
+            NSDocumentDirectory,
+            NSUserDomainMask,
+            true
+        ).firstOrNull()
+        logger.d { "Documents directory: $documentsDirectory" }
+        if (documentsDirectory != null) {
+            val customFolderPath = "$documentsDirectory/$folderName"
+            val customFolderURL = NSURL.fileURLWithPath(customFolderPath)
+
+            if (!NSFileManager.defaultManager.fileExistsAtPath(customFolderPath)) {
+                logger.d { "creating directory: $customFolderPath" }
+                NSFileManager.defaultManager.createDirectoryAtPath(
+                    customFolderPath,
+                    true,
+                    null,
+                    null
+                )
+            }
+
+            val fileURL = customFolderURL.URLByAppendingPathComponent(fileName)
+
+            if (fileURL != null) {
+                byteArray.toNSData().writeToURL(fileURL, true)
+                return fileURL.path ?: ""
+            }
+        }
+        logger.e { "creating directory: $documentsDirectory" }
+        return ""
     }
 
-  @OptIn(ExperimentalForeignApi::class)
-  private fun writeToFile(
-    byteArray: ByteArray,
-    url: String,
-    folderName: String,
-    title: String,
-  ): String {
-    val extension = url.substringAfterLast('.', "")
-    val fileName = "$title.$extension"
-    val documentsDirectory = NSSearchPathForDirectoriesInDomains(
-      NSDocumentDirectory,
-      NSUserDomainMask,
-      true
-    ).firstOrNull()
-    logger.d { "Documents directory: $documentsDirectory" }
-    if (documentsDirectory != null) {
-      val customFolderPath = "$documentsDirectory/$folderName"
-      val customFolderURL = NSURL.fileURLWithPath(customFolderPath)
+    private fun createImageFile(time: LocalDateTime): String {
+        val timeStamp =
+            "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
+        return "img_$timeStamp"
+    }
 
-      if (!NSFileManager.defaultManager.fileExistsAtPath(customFolderPath)) {
-        logger.d { "creating directory: $customFolderPath" }
-        NSFileManager.defaultManager.createDirectoryAtPath(
-          customFolderPath,
-          true,
-          null,
-          null
+    override fun shareImage(imagePath: String) {
+        val fileUrl = NSURL.fileURLWithPath(imagePath)
+        val activityViewController =
+            UIActivityViewController(activityItems = listOf(fileUrl), applicationActivities = null)
+
+        UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
+            activityViewController,
+            true,
+            null
         )
-      }
-
-      val fileURL = customFolderURL.URLByAppendingPathComponent(fileName)
-
-      if (fileURL != null) {
-        byteArray.toNSData().writeToURL(fileURL, true)
-        return fileURL.path ?: ""
-      }
     }
-    logger.e { "creating directory: $documentsDirectory" }
-    return ""
-  }
 
-  private fun createImageFile(time: LocalDateTime): String {
-    val timeStamp =
-      "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
-    return "img_$timeStamp"
-  }
-
-  override fun shareImage(imagePath: String) {
-    val fileUrl = NSURL.fileURLWithPath(imagePath)
-    val activityViewController =
-      UIActivityViewController(activityItems = listOf(fileUrl), applicationActivities = null)
-
-    UIApplication.sharedApplication.keyWindow?.rootViewController?.presentViewController(
-      activityViewController,
-      true,
-      null
-    )
-  }
-
-  @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-  private fun ByteArray.toNSData(): NSData {
-    val data = malloc(this.size.convert<size_t>())
-    memcpy(data, this.toCValues(), this.size.convert<size_t>())
-    return NSData.create(bytes = data, length = this.size.toULong())
-  }
-
-  override suspend fun savePDF(media: KmpFile): String = withContext(Dispatchers.Main) {
-    media.readByteArray(PlatformContext.INSTANCE).let {
-      val path = media.getPath(PlatformContext.INSTANCE) ?: ""
-      writeToFile(it, path, "files", getOriginalFileName(path) ?: "PDF_Default.pdf")
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    private fun ByteArray.toNSData(): NSData {
+        val data = malloc(this.size.convert<size_t>())
+        memcpy(data, this.toCValues(), this.size.convert<size_t>())
+        return NSData.create(bytes = data, length = this.size.toULong())
     }
-  }
 
-  @OptIn(ExperimentalForeignApi::class)
-  override fun sharePDF(pdfPath: String) {
-    val fileURL = NSURL.fileURLWithPath(pdfPath)
-    val documentController = UIDocumentInteractionController.interactionControllerWithURL(fileURL)
-    documentController.UTI = "com.adobe.pdf"
-
-    val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-    if (rootViewController != null) {
-      val rect = CGRectMake(0.0, 0.0, 0.0, 0.0)
-      documentController.presentOptionsMenuFromRect(rect, rootViewController.view, true)
+    override suspend fun savePDF(media: KmpFile): String = withContext(Dispatchers.Main) {
+        media.readByteArray(PlatformContext.INSTANCE).let {
+            val path = media.getPath(PlatformContext.INSTANCE) ?: ""
+            writeToFile(it, path, "files", getOriginalFileName(path) ?: "PDF_Default.pdf")
+        }
     }
-  }
 
-  private fun getOriginalFileName(uri: String): String? {
-    val url = NSURL.URLWithString(uri)
-    return url?.lastPathComponent
-  }
+    @OptIn(ExperimentalForeignApi::class)
+    override fun sharePDF(path: String) {
+        val fileURL = NSURL.fileURLWithPath(path)
+        val documentController =
+            UIDocumentInteractionController.interactionControllerWithURL(fileURL)
+        documentController.UTI = "com.adobe.pdf"
 
-  override fun openPDF(pdfPath: String) {
-    val pdfFile = NSURL.fileURLWithPath(pdfPath)
-    val documentController = UIDocumentInteractionController.interactionControllerWithURL(pdfFile)
-    documentController.UTI = "com.adobe.pdf"
-
-    val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
-    if (rootViewController != null) {
-      documentController.presentPreviewAnimated(true)
-    } else {
-      NSLog("PDF file not found or cannot be opened")
+        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+        if (rootViewController != null) {
+            val rect = CGRectMake(0.0, 0.0, 0.0, 0.0)
+            documentController.presentOptionsMenuFromRect(rect, rootViewController.view, true)
+        }
     }
-  }
+
+    private fun getOriginalFileName(uri: String): String? {
+        val url = NSURL.URLWithString(uri)
+        return url?.lastPathComponent
+    }
+
+    override fun openPDF(path: String) {
+        val pdfFile = NSURL.fileURLWithPath(path)
+        val documentController = UIDocumentInteractionController.interactionControllerWithURL(pdfFile)
+        documentController.UTI = "com.adobe.pdf"
+
+        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+        if (rootViewController != null) {
+            documentController.presentPreviewAnimated(true)
+        } else {
+            NSLog("PDF file not found or cannot be opened")
+        }
+    }
 
 }

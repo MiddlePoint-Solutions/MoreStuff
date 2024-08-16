@@ -126,13 +126,13 @@ class MediaHandlerImpl(
     return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
   }
 
-  override fun sharePDF(pdfPath: String) {
-    logger.d("sharePDF - File path: $pdfPath")
+  override fun sharePDF(path: String) {
+    logger.d("sharePDF - File path: $path")
 
-    val pdfFile = if (pdfPath.startsWith("/")) {
-      File(pdfPath)
+    val pdfFile = if (path.startsWith("/")) {
+      File(path)
     } else {
-      File(context.cacheDir, pdfPath.toUri().lastPathSegment ?: "")
+      File(context.cacheDir, path.toUri().lastPathSegment ?: "")
     }
 
     val contentUri = FileProvider.getUriForFile(
@@ -152,14 +152,14 @@ class MediaHandlerImpl(
     context.startActivity(chooserIntent)
   }
 
-  override fun openPDF(pdfPath: String) {
+  override fun openPDF(path: String) {
 
-    logger.d("openPdf - File path: $pdfPath")
+    logger.d("openPdf - File path: $path")
 
-    val pdfFile = if (pdfPath.startsWith("/")) {
-      File(pdfPath)
+    val pdfFile = if (path.startsWith("/")) {
+      File(path)
     } else {
-      File(context.cacheDir, pdfPath.toUri().lastPathSegment ?: "")
+      File(context.cacheDir, path.toUri().lastPathSegment ?: "")
     }
 
     if (pdfFile.exists()) {

@@ -17,11 +17,11 @@ class MediaHandlerImpl : MediaHandler {
         TODO("Not yet implemented")
     }
 
-    override fun sharePDF(pdfPath: String) {
+    override fun sharePDF(path: String) {
         TODO("Not yet implemented")
     }
 
-    override fun openPDF(pdfPath: String) {
+    override fun openPDF(path: String) {
         TODO("Not yet implemented")
     }
 }

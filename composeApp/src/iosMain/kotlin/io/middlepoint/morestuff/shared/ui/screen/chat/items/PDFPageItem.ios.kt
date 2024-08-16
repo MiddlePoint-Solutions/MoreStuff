@@ -8,34 +8,44 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
-import co.touchlab.kermit.Logger
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.io.getPath
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.refTo
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.skia.Image
-import platform.CoreGraphics.CGContextRestoreGState
-import platform.CoreGraphics.CGContextSaveGState
+import platform.CoreFoundation.CFStringCreateWithCString
+import platform.CoreFoundation.CFURLCreateWithFileSystemPath
+import platform.CoreFoundation.kCFAllocatorDefault
+import platform.CoreFoundation.kCFStringEncodingUTF8
+import platform.CoreFoundation.kCFURLPOSIXPathStyle
+import platform.CoreGraphics.CGBitmapContextCreate
+import platform.CoreGraphics.CGBitmapContextCreateImage
+import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
+import platform.CoreGraphics.CGColorSpaceRelease
+import platform.CoreGraphics.CGContextDrawPDFPage
+import platform.CoreGraphics.CGContextFillRect
+import platform.CoreGraphics.CGContextRelease
 import platform.CoreGraphics.CGContextScaleCTM
+import platform.CoreGraphics.CGContextSetFillColorWithColor
 import platform.CoreGraphics.CGContextTranslateCTM
-import platform.CoreGraphics.CGRect
+import platform.CoreGraphics.CGImageAlphaInfo
+import platform.CoreGraphics.CGImageRelease
+import platform.CoreGraphics.CGPDFDocumentCreateWithURL
+import platform.CoreGraphics.CGPDFDocumentGetPage
+import platform.CoreGraphics.CGPDFDocumentIsUnlocked
+import platform.CoreGraphics.CGPDFDocumentRelease
+import platform.CoreGraphics.CGPDFPageGetBoxRect
 import platform.CoreGraphics.CGRectMake
-import platform.CoreGraphics.CGSizeMake
+import platform.CoreGraphics.kCGPDFMediaBox
 import platform.Foundation.NSData
-import platform.Foundation.NSURL
-import platform.PDFKit.PDFDisplayBox
-import platform.PDFKit.PDFDocument
-import platform.PDFKit.kPDFDisplayBoxCropBox
-import platform.UIKit.UIGraphicsBeginImageContextWithOptions
-import platform.UIKit.UIGraphicsEndImageContext
-import platform.UIKit.UIGraphicsGetCurrentContext
-import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
-import platform.UIKit.UIImageJPEGRepresentation
-import platform.darwin.NSUInteger
+import platform.UIKit.UIColor
+import platform.UIKit.UIImage
+import platform.UIKit.UIImagePNGRepresentation
 import platform.posix.memcpy
 
 @Composable
@@ -62,44 +72,59 @@ actual fun PDFPagePreview(
 @OptIn(ExperimentalForeignApi::class)
 private suspend fun renderPage(url: String, width: Int, height: Int, scale: Float): ByteArray? {
     return withContext(Dispatchers.Default) {
-        Logger.d { "Url: $url" }
-        val nsUrl = NSURL.fileURLWithPath(url)
-        val document = PDFDocument(nsUrl)
+        val cfpath = CFStringCreateWithCString(kCFAllocatorDefault, url, kCFStringEncodingUTF8)
+        val cfurl = CFURLCreateWithFileSystemPath(kCFAllocatorDefault, cfpath, kCFURLPOSIXPathStyle, false)
 
-        Logger.d { "Document: ${document.pageCount}" }
+        val document = CGPDFDocumentCreateWithURL(cfurl)?.takeIf { CGPDFDocumentIsUnlocked(it) }
+            ?: return@withContext null
 
-        val page = document.pageAtIndex(0u) ?: return@withContext null
-        val pdfScale = scale * platform.UIKit.UIScreen.mainScreen.scale
-        Logger.d { "pdfScale: $pdfScale" }
-//        val pdfSize = CGSizeMake(width.toDouble() * pdfScale, height.toDouble() * pdfScale)
-        val pdfSize = CGSizeMake(70.0, 130.0)
-        val image = page.thumbnailOfSize(pdfSize, kPDFDisplayBoxCropBox)
+        val pageRef = CGPDFDocumentGetPage(document, 1u) ?: run {
+            CGPDFDocumentRelease(document)
+            return@run null
+        }
 
-        // Begin image context
-//        UIGraphicsBeginImageContextWithOptions(pdfSize, true, 1.0)
-//        val context = UIGraphicsGetCurrentContext() ?: return@withContext null
-//
-//        // Save the graphics state
-//        CGContextSaveGState(context)
-//
-//        // Transformations
-//        CGContextScaleCTM(context, pdfScale, pdfScale)
-//        CGContextTranslateCTM(context, 0.0, height.toDouble())
-//        CGContextScaleCTM(context, 1.0, -1.0)
-//
-//        // Get the CGRect for the page and draw it in the context
-//        val displayBoxMediaBox = 0L
-//        page.drawWithBox(displayBoxMediaBox, context)
-//
-//        // Restore the graphics state
-//        CGContextRestoreGState(context)
-//
-//        // Get the image from the current context
-//        val image = UIGraphicsGetImageFromCurrentImageContext()
-//        UIGraphicsEndImageContext()
+        val pageRect = CGPDFPageGetBoxRect(pageRef, kCGPDFMediaBox)
+        val scale = width.toDouble() / pageRect.size
+        val height = (pageRect.size * scale).toInt()
 
-        val imageData = UIImageJPEGRepresentation(image, 1.0) as NSData
-        return@withContext imageData.toByteArray()
+        val colorSpace = CGColorSpaceCreateDeviceRGB()
+        val context = CGBitmapContextCreate(
+            null,
+            width.toULong(),
+            height.toULong(),
+            8u,
+            4u * width.toULong(),
+            colorSpace,
+            CGImageAlphaInfo.kCGImageAlphaPremultipliedLast.value
+        )
+
+        CGContextSetFillColorWithColor(context, UIColor.whiteColor.CGColor)
+        CGContextFillRect(context, CGRectMake(0.0, 0.0, width.toDouble(), height.toDouble()))
+
+        CGContextTranslateCTM(context, 0.0, height.toDouble())
+        CGContextScaleCTM(context, scale, -scale)
+
+        CGContextDrawPDFPage(context, pageRef)
+
+        val image = CGBitmapContextCreateImage(context)
+        val uiImage = UIImage.imageWithCGImage(image)
+
+        val thumbnailData = UIImagePNGRepresentation(uiImage)
+        val byteArray = thumbnailData?.let { data ->
+            ByteArray(data.length.toInt()).apply {
+                usePinned { pinned ->
+                    memcpy(pinned.addressOf(0), data.bytes, data.length)
+                }
+            }
+        }
+
+        // Clean up
+        CGColorSpaceRelease(colorSpace)
+        CGContextRelease(context)
+        CGImageRelease(image)
+        CGPDFDocumentRelease(document)
+
+        return@withContext byteArray
     }
 }
 

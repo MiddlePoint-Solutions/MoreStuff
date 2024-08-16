@@ -8,6 +8,6 @@ interface MediaHandler {
     fun shareImage(imagePath: String)
 
     suspend fun savePDF(media: KmpFile): String?
-    fun sharePDF(pdfPath: String)
-    fun openPDF(pdfPath: String)
+    fun sharePDF(path: String)
+    fun openPDF(path: String)
 }

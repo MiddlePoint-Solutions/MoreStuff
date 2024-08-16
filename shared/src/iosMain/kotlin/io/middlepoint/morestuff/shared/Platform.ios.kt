@@ -1,9 +1,5 @@
 package io.middlepoint.morestuff.shared
 
-import org.koin.core.module.Module
-import org.koin.core.module.dsl.factoryOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
 import platform.Foundation.NSString
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
@@ -38,13 +34,5 @@ private fun stringWithFormat(format: String, args: Array<out Any>): String {
 
 actual fun requiresNotificationsPermission(): Boolean = true
 
-actual val sharedModule: Module
-    get() = module {
-        factoryOf(::TimeFormatterImpl) bind TimeFormatter::class
-        factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
-        factoryOf(::ShareHelperImpl) bind ShareHelper::class
-        factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
-        factoryOf(::MediaHandlerImpl) bind MediaHandler::class
-    }
 actual val platform: Platform
   get() = Platform.iOS
