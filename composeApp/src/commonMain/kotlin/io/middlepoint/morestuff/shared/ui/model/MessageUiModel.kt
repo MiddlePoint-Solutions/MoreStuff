@@ -21,7 +21,8 @@ data class MessageUiModel(
   val messageData: MessageData? = null,
   val formattedTime: String,
   val formattedTimeOnly: String
-) {
-  val isDataMessage: Boolean get() = messageData != null
-  val isPdfMessage: Boolean get() = messageData?.messageType == MessageDataType.Pdf
-}
+)
+
+val MessageUiModel.isDataMessage: Boolean get() = messageData != null
+val MessageUiModel.isPdfMessage: Boolean get() = messageData?.messageType == MessageDataType.Pdf
+

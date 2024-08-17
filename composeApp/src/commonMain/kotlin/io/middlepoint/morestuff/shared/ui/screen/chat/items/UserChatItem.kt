@@ -36,6 +36,8 @@ import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.ui.extension.getFileName
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.isDataMessage
+import io.middlepoint.morestuff.shared.ui.model.isPdfMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData.messageUiModel
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme

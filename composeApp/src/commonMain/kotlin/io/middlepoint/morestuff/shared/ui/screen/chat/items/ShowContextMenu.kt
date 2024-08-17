@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.isPdfMessage
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.copy_message
 import morestuff.composeapp.generated.resources.delete

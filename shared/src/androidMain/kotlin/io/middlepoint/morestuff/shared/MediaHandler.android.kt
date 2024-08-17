@@ -20,6 +20,7 @@ import kotlinx.datetime.LocalDateTime
 import java.io.File
 import java.io.FileOutputStream
 import java.nio.file.Path
+import kotlin.io.path.createTempFile
 
 class MediaHandlerImpl(
   private val context: Context,
@@ -42,7 +43,6 @@ class MediaHandlerImpl(
           ExifInterface.TAG_ORIENTATION,
           ExifInterface.ORIENTATION_NORMAL
         ) ?: ExifInterface.ORIENTATION_NORMAL
-
 
         val bitmap = contentResolver.openInputStream(uri)?.use { inputStream ->
           BitmapFactory.decodeStream(inputStream)
@@ -81,7 +81,7 @@ class MediaHandlerImpl(
     val timeStamp =
       "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
     val imageFileName = "JPEG_" + timeStamp + "_"
-    return kotlin.io.path.createTempFile(prefix = imageFileName, suffix = ".jpg")
+    return createTempFile(prefix = imageFileName, suffix = ".jpg")
   }
 
   override fun shareImage(imagePath: String) {
@@ -123,7 +123,7 @@ class MediaHandlerImpl(
   private fun createPDFFile(originalFileName: String): Path {
     val pdfFileName =
       if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
-    return kotlin.io.path.createTempFile(prefix = "", suffix = pdfFileName)
+    return createTempFile(prefix = "", suffix = pdfFileName)
   }
 
   override fun sharePDF(path: String) {
