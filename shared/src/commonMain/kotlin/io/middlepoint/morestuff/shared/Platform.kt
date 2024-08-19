@@ -7,6 +7,11 @@ enum class Platform {
   Web
 }
 
+enum class MediaFolder(val folderName: String) {
+  Files("files"),
+  Images("images")
+}
+
 expect fun generateUUID(): String
 
 expect fun formatString(format: String, vararg args: Any): String

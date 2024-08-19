@@ -5,6 +5,7 @@ import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
+import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScheduleRepositoryImpl
@@ -29,6 +30,7 @@ val dataModule = module {
 
   singleOf(::DevToolsImpl) bind DevTools::class
   singleOf(::DataMappersImpl) bind DataMappers::class
+  singleOf(::MessageDataMap)
 
   // Repositories
   single<TaskRepository> {

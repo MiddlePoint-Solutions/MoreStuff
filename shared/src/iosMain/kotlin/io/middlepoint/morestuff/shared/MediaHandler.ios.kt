@@ -5,6 +5,8 @@ import com.mohamedrejeb.calf.core.PlatformContext
 import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.io.getPath
 import com.mohamedrejeb.calf.io.readByteArray
+import io.middlepoint.morestuff.shared.MediaFolder.Files
+import io.middlepoint.morestuff.shared.MediaFolder.Images
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.convert
@@ -38,19 +40,20 @@ class MediaHandlerImpl(
     withContext(Dispatchers.Main) {
       media.readByteArray(PlatformContext.INSTANCE).let {
         val path = media.getPath(PlatformContext.INSTANCE) ?: ""
-        writeToFile(it, path, "images", generateFileName(time))
+        writeToFile(it, path, Images, generateFileName(time))
       }
     }
 
   override suspend fun savePDF(media: KmpFile): String = withContext(Dispatchers.Main) {
     media.readByteArray(PlatformContext.INSTANCE).let {
       val path = media.getPath(PlatformContext.INSTANCE) ?: ""
-      writeToFile(it, path, "files", getFileName(path))
+      writeToFile(it, path, Files, getFileName(path))
     }
   }
 
+  // TODO: paths should already contain proper path (sandboxed)
   override fun shareImage(imagePath: String) {
-    val fileUrl = getLocalFileSandboxUrl(imagePath, "images")
+    val fileUrl = getLocalFileSandboxUrl(imagePath, Images)
 
     val activityViewController =
       UIActivityViewController(activityItems = listOf(fileUrl), applicationActivities = null)
@@ -62,19 +65,19 @@ class MediaHandlerImpl(
     )
   }
 
-  private fun getLocalFileSandboxUrl(path: String, folderName: String): NSURL {
+  private fun getLocalFileSandboxUrl(path: String, folder: MediaFolder): NSURL {
     val filename = getFileName(path, true)
     val directory = NSSearchPathForDirectoriesInDomains(
       NSDocumentDirectory,
       NSUserDomainMask,
       true
     ).first() as String
-    return NSURL.fileURLWithPath("$directory/$folderName/$filename")
+    return NSURL.fileURLWithPath("$directory/${folder.folderName}/$filename")
   }
 
   @OptIn(ExperimentalForeignApi::class)
   override fun sharePDF(path: String) {
-    val fileUrl = getLocalFileSandboxUrl(path, "files")
+    val fileUrl = getLocalFileSandboxUrl(path, Files)
     val documentController =
       UIDocumentInteractionController.interactionControllerWithURL(fileUrl)
     documentController.UTI = "com.adobe.pdf"
@@ -87,7 +90,7 @@ class MediaHandlerImpl(
   }
 
   override fun openPDF(path: String) {
-    val pdfFile = getLocalFileSandboxUrl(path, "files")
+    val pdfFile = getLocalFileSandboxUrl(path, Files)
     val documentController = UIDocumentInteractionController.interactionControllerWithURL(pdfFile)
     documentController.UTI = "com.adobe.pdf"
 
@@ -102,7 +105,7 @@ class MediaHandlerImpl(
   private fun writeToFile(
     byteArray: ByteArray,
     url: String,
-    folderName: String,
+    folder: MediaFolder,
     title: String,
   ): String {
     val extension = url.substringAfterLast('.', "")
@@ -110,7 +113,7 @@ class MediaHandlerImpl(
     val documentsDirectory = getDocumentsDirectory()
     logger.d { "Documents directory: $documentsDirectory" }
     if (documentsDirectory != null) {
-      val customFolderPath = createDirectoryIfNeeded(documentsDirectory, folderName)
+      val customFolderPath = createDirectoryIfNeeded(documentsDirectory, folder)
       val customFolderURL = NSURL.fileURLWithPath(customFolderPath)
       val fileURL = customFolderURL.URLByAppendingPathComponent(fileName)
       if (fileURL != null) {
@@ -134,9 +137,9 @@ class MediaHandlerImpl(
   @OptIn(ExperimentalForeignApi::class)
   private fun createDirectoryIfNeeded(
     documentsDirectory: NSURL,
-    folderName: String
+    folder: MediaFolder
   ): String {
-    val customFolderPath = "${documentsDirectory.path}/$folderName"
+    val customFolderPath = "${documentsDirectory.path}/${folder.folderName}"
     if (!NSFileManager.defaultManager.fileExistsAtPath(customFolderPath)) {
       logger.d { "creating directory: $customFolderPath" }
       NSFileManager.defaultManager.createDirectoryAtPath(

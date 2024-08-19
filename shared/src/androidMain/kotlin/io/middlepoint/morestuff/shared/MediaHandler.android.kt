@@ -81,6 +81,7 @@ class MediaHandlerImpl(
     val timeStamp =
       "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
     val imageFileName = "JPEG_" + timeStamp + "_"
+    // TODO: change files location according to: https://developer.android.com/training/data-storage
     return createTempFile(prefix = imageFileName, suffix = ".jpg")
   }
 

@@ -4,13 +4,9 @@ import platform.Foundation.NSString
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
 
-actual fun generateUUID(): String {
-    return NSUUID().UUIDString
-}
+actual fun generateUUID(): String = NSUUID().UUIDString
 
-actual fun formatString(format: String, vararg args: Any): String {
-    return stringWithFormat(format, args)
-}
+actual fun formatString(format: String, vararg args: Any): String = stringWithFormat(format, args)
 
 private fun stringWithFormat(format: String, args: Array<out Any>): String {
     // NSString format works with NSObjects via %@, we should change standard format to %@
