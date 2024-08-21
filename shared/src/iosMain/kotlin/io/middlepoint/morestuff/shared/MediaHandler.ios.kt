@@ -19,7 +19,6 @@ import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSLog
-import platform.Foundation.NSSearchPathForDirectoriesInDomains
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.URLByAppendingPathComponent
@@ -51,10 +50,8 @@ class MediaHandlerImpl(
     }
   }
 
-  // TODO: paths should already contain proper path (sandboxed)
   override fun shareImage(imagePath: String) {
-    val fileUrl = getLocalFileSandboxUrl(imagePath, Images)
-
+    val fileUrl = NSURL.fileURLWithPath(imagePath)
     val activityViewController =
       UIActivityViewController(activityItems = listOf(fileUrl), applicationActivities = null)
 
@@ -65,19 +62,9 @@ class MediaHandlerImpl(
     )
   }
 
-  private fun getLocalFileSandboxUrl(path: String, folder: MediaFolder): NSURL {
-    val filename = getFileName(path, true)
-    val directory = NSSearchPathForDirectoriesInDomains(
-      NSDocumentDirectory,
-      NSUserDomainMask,
-      true
-    ).first() as String
-    return NSURL.fileURLWithPath("$directory/${folder.folderName}/$filename")
-  }
-
   @OptIn(ExperimentalForeignApi::class)
   override fun sharePDF(path: String) {
-    val fileUrl = getLocalFileSandboxUrl(path, Files)
+    val fileUrl = NSURL.fileURLWithPath(path)
     val documentController =
       UIDocumentInteractionController.interactionControllerWithURL(fileUrl)
     documentController.UTI = "com.adobe.pdf"
@@ -90,7 +77,7 @@ class MediaHandlerImpl(
   }
 
   override fun openPDF(path: String) {
-    val pdfFile = getLocalFileSandboxUrl(path, Files)
+    val pdfFile = NSURL.fileURLWithPath(path)
     val documentController = UIDocumentInteractionController.interactionControllerWithURL(pdfFile)
     documentController.UTI = "com.adobe.pdf"
 
