@@ -2,7 +2,7 @@
 coreKtx = "1.12.0"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
-composeBom = "2024.02.02"
+composeBom = "2024.09.01"
 drawerlayout = "1.2.0"
 reorderable = "0.9.6"
 settingsUiM3 = "0.22.0"
