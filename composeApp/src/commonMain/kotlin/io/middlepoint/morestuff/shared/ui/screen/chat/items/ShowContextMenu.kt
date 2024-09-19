@@ -10,8 +10,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.isPdfMessage
+import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.copy_message
 import morestuff.composeapp.generated.resources.delete
@@ -19,19 +22,20 @@ import morestuff.composeapp.generated.resources.share
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun ShowContextMenu(
+fun UserMessageContextMenu(
     message: MessageUiModel,
+    onDismissRequest: () -> Unit,
     showMenu: Boolean,
+    actions: ChatActions,
     modifier: Modifier = Modifier,
-    actions: io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions,
-    close: () -> Unit,
 ) {
     DropdownMenu(
         expanded = showMenu,
-        onDismissRequest = close,
+        onDismissRequest = onDismissRequest,
         modifier = modifier,
+        offset = DpOffset((-16).dp, 0.dp)
     ) {
-        val contextMenuItems = getContextMenuItems(message, actions, close)
+        val contextMenuItems = getContextMenuItems(message, actions, onDismissRequest)
 
         contextMenuItems.forEach { item ->
             DropdownMenuItem(
@@ -46,7 +50,7 @@ fun ShowContextMenu(
 @Composable
 private fun getContextMenuItems(
   message: MessageUiModel,
-  actions: io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions,
+  actions: ChatActions,
   close: () -> Unit,
 ): List<ContextMenuItem> {
     val deleteAction = {

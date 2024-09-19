@@ -121,7 +121,6 @@ fun TaskChatScreen(
 
   val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
-  val platformContext = LocalPlatformContext.current.toCalfPlatformContext()
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
@@ -130,7 +129,6 @@ fun TaskChatScreen(
 
   RoutedContent(
     router = router,
-    modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(scale() + fade()),
   ) { screen ->
 
