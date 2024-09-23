@@ -149,7 +149,6 @@ fun SettingsScreen(
 
   RoutedContent(
     router = router,
-    modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(slide()),
   ) { screen ->
 
