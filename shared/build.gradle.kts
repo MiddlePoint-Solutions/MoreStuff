@@ -9,6 +9,9 @@ plugins {
 }
 
 kotlin {
+
+  jvmToolchain(20)
+
   @OptIn(ExperimentalWasmDsl::class)
   wasmJs {
     browser {
@@ -56,9 +59,10 @@ kotlin {
 android {
   namespace = "io.middlepoint.morestuff.shared"
   compileSdk = libs.versions.android.sdk.compile.get().toInt()
+
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
   }
 
   defaultConfig {
