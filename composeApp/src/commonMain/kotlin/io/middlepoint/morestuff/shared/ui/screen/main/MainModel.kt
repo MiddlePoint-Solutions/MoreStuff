@@ -48,7 +48,8 @@ fun mainModel(
                             store.dispatch(
                                 MessageAction.CreateFileMessageAction(
                                     event.taskId,
-                                    KmpFile.createKmpFile(uri),
+//                                    KmpFile.createKmpFile(uri),
+                                    file,
                                     message
                                 )
                             )

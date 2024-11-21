@@ -89,9 +89,10 @@ fun MainContent(
         )
 
         is ImagePreview -> {
-          val imageFile = KmpFile.createKmpFile(screen.imageUri)
+//          val imageFile = KmpFile.createKmpFile(screen.imageUri)
           ImageImportScreen(
-            image = imageFile,
+//            image = screen,
+            image = screen.imageUri,
             onImport = { message ->
               val shareableImage = Shareable.Image(screen.imageUri, message)
               shareContent(screen.taskId, shareableImage)
@@ -99,7 +100,6 @@ fun MainContent(
             },
             onBack = router::pop
           )
-
         }
 
         is Share -> {
@@ -108,7 +108,7 @@ fun MainContent(
             shareable = screen.shareable,
           ) { taskId, shareable ->
             if (shareable is Shareable.Image) {
-              router.push(ImagePreview(shareable.uri, taskId))
+              router.push(ImagePreview(shareable.file, taskId))
             } else {
               router.replaceCurrent(
                 TaskChat(taskId),

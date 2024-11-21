@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
+import com.mohamedrejeb.calf.io.KmpFile
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.RouterContext
 import io.github.xxfast.decompose.router.defaultRouterContext
@@ -66,7 +67,8 @@ class MainActivity : AppCompatActivity() {
 
           intent.type?.startsWith("image/") == true -> {
             intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
+//              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
+              Screen.Share(Shareable.Image(KmpFile(it), ""), it.toString())
             }
           }
 
