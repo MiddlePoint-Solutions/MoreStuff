@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import coil3.compose.LocalPlatformContext
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.scale
@@ -56,10 +55,8 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
-import com.mohamedrejeb.calf.picker.coil.toCalfPlatformContext
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
@@ -121,7 +118,6 @@ fun TaskChatScreen(
 
   val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
-  val platformContext = LocalPlatformContext.current.toCalfPlatformContext()
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
@@ -130,7 +126,6 @@ fun TaskChatScreen(
 
   RoutedContent(
     router = router,
-    modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(scale() + fade()),
   ) { screen ->
 
@@ -175,7 +170,7 @@ fun TaskChatScreen(
 
       is ImageImport -> {
         ImageImportScreen(
-          image = screen.imageFile,
+          imagePath = screen.imageFile,
           onImport = { title ->
             viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
             router.pop()
@@ -205,7 +200,7 @@ private fun TaskChatContent(
   onBack: () -> Unit = {},
   sendTaskMessage: (String) -> Unit = {},
   imagePicked: (KmpFile) -> Unit = {},
-  pdfPicked: (String) -> Unit = {},
+  pdfPicked: (KmpFile) -> Unit = {},
   logger: Logger = koinInject()
 ) {
   val scope = rememberCoroutineScope()
@@ -223,7 +218,7 @@ private fun TaskChatContent(
       selectionMode = FilePickerSelectionMode.Single,
       onResult = { files ->
         files.firstOrNull()?.let {
-          logger.d { "File path: $it" }
+          logger.d { "Image path: $it" }
           imagePicked(it)
         }
       }
@@ -234,7 +229,8 @@ private fun TaskChatContent(
       type = FilePickerFileType.Pdf,
       selectionMode = FilePickerSelectionMode.Single,
       onResult = { files ->
-        files.firstOrNull()?.getPath(platformContext)?.let {
+        files.firstOrNull()?.let {
+          logger.d { "PDF path: $it" }
           pdfPicked(it)
         }
       }

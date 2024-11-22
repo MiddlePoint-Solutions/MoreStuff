@@ -14,8 +14,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.ImageHandler
-import io.middlepoint.morestuff.shared.PDFHandler
+import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
@@ -44,8 +43,7 @@ fun taskChatModel(
   events: Flow<TaskChatEvent>,
   store: AppStore = koinInject(),
   clipboardHelper: ClipboardHelper = koinInject(),
-  imageHandler: ImageHandler = koinInject(),
-  pdfHandler: PDFHandler = koinInject(),
+  mediaHandler: MediaHandler = koinInject(),
   taskUiMapper: TaskUiMapper = koinInject(),
   shareHelper: ShareHelper = koinInject(),
   messageUiMapper: MessageUiMapper = koinInject(),
@@ -91,7 +89,7 @@ fun taskChatModel(
 
           is InputDocument -> {
             store.dispatch(
-              MessageAction.CreatePDFMessageAction(taskId, path, title.trim())
+              MessageAction.CreatePDFMessageAction(taskId, pdfFile, title.trim())
             )
           }
 
@@ -108,17 +106,17 @@ fun taskChatModel(
           }
 
           is OpenDocument -> {
-            pdfHandler.openPDF(path)
+            mediaHandler.openPDF(path)
           }
 
           is ShareMessage -> {
             when (message.messageData?.messageType) {
               MessageDataType.Image -> {
-                imageHandler.shareImage(message.messageData.filePath)
+                mediaHandler.shareImage(message.messageData.filePath)
               }
 
               MessageDataType.Pdf -> {
-                pdfHandler.sharePDF(message.messageData.filePath)
+                mediaHandler.sharePDF(message.messageData.filePath)
               }
 
               MessageDataType.Video -> {}
@@ -130,7 +128,7 @@ fun taskChatModel(
           }
 
           is ShareImage -> {
-            imageHandler.shareImage(path)
+            mediaHandler.shareImage(path)
           }
 
           is ScheduleResponse -> {
@@ -138,7 +136,7 @@ fun taskChatModel(
           }
 
           is ShareDocument -> {
-            pdfHandler.sharePDF(path)
+            mediaHandler.sharePDF(path)
           }
 
           is DeleteTask -> {

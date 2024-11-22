@@ -2,18 +2,6 @@ package io.middlepoint.morestuff.shared.di
 
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.DriverFactory
-import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.ClipboardHelperImpl
-import io.middlepoint.morestuff.shared.DataMigrationHelper
-import io.middlepoint.morestuff.shared.DataMigrationHelperImpl
-import io.middlepoint.morestuff.shared.ImageHandler
-import io.middlepoint.morestuff.shared.ImageHandlerImpl
-import io.middlepoint.morestuff.shared.PDFHandler
-import io.middlepoint.morestuff.shared.PDFHandlerImpl
-import io.middlepoint.morestuff.shared.ShareHelper
-import io.middlepoint.morestuff.shared.ShareHelperImpl
-import io.middlepoint.morestuff.shared.TimeFormatter
-import io.middlepoint.morestuff.shared.TimeFormatterImpl
 import com.russhwolf.settings.PreferencesSettings
 import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser

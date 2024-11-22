@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -49,13 +50,13 @@ import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInpu
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityInput
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +68,6 @@ fun TaskInputBottomSheet(
 ) {
 
   val viewModel = koinInjectOnRoute(UserInputViewModel::class)
-
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()
@@ -78,7 +78,7 @@ fun TaskInputBottomSheet(
   }
 
   val chatActions = remember {
-    io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions(
+    ChatActions(
       taskChatAction = {
         navigation.push(Screen.TaskChat(it))
         coroutineScope.launch {
@@ -90,6 +90,7 @@ fun TaskInputBottomSheet(
 
   ModalBottomSheet(
     onDismissRequest = onDismissRequest,
+    modifier = Modifier.imePadding(),
     sheetState = sheetState,
     shape = RectangleShape,
     dragHandle = null,

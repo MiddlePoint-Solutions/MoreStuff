@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
+import io.middlepoint.morestuff.shared.StorageManager
+
 
 interface DataMappers {
     val messageDataMapper: MessageDataMapper
@@ -10,12 +12,13 @@ interface DataMappers {
     val scopeDbMapper: ScopeDataMapper
 }
 
-
-
-class DataMappersImpl() : DataMappers {
+class DataMappersImpl(
+    private val storageManager: StorageManager,
+    private val messageDataMap: MessageDataMap
+) : DataMappers {
 
     override val messageDataMapper: MessageDataMapper
-        get() = makeMessageWithDataMapper()
+        get() = messageDataMap
 
     override val messageDbMapper: MessageDbMapper
         get() = makeMessageDbMapper()

@@ -1,7 +1,7 @@
 name: Test
 on:
   pull_request:
-    branches: [ "morestuff-mvp", "master" ]
+    types: [opened, synchronize]
 
 jobs:
   test:
@@ -12,7 +12,7 @@ jobs:
       - name: JDK setup
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 20
           distribution: corretto
           cache: gradle
 

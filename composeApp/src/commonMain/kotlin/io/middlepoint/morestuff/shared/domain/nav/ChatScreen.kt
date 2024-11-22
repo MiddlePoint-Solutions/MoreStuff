@@ -9,8 +9,7 @@ sealed class ChatScreen {
   @Serializable
   data object TaskChat : ChatScreen()
 
-  @Serializable
-  data class ImageImport(@Contextual val imageFile: KmpFile) : ChatScreen()
+  data class ImageImport(val imageFile: KmpFile) : ChatScreen()
 
   @Serializable
   data class ImagePreview(val imagePath: String, val title: String) : ChatScreen()

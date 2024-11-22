@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.main
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -17,6 +18,7 @@ import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.mohamedrejeb.calf.io.KmpFile
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
+import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
@@ -89,9 +91,9 @@ fun MainContent(
         )
 
         is ImagePreview -> {
-          val imageFile = KmpFile.createKmpFile(screen.imageUri)
+          val imageFile = remember { createKmpFile(screen.imageUri) }
           ImageImportScreen(
-            image = imageFile,
+            imagePath = imageFile,
             onImport = { message ->
               val shareableImage = Shareable.Image(screen.imageUri, message)
               shareContent(screen.taskId, shareableImage)
@@ -99,7 +101,6 @@ fun MainContent(
             },
             onBack = router::pop
           )
-
         }
 
         is Share -> {

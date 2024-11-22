@@ -34,7 +34,7 @@ fun AnnotatedString.Builder.appendUrlsWithStyle(
         if (!processedUrl.startsWith("http://") && !processedUrl.startsWith("https://")) {
             processedUrl = "https://$processedUrl"
         }
-        pushStringAnnotation("URL", processedUrl)
+        pushStringAnnotation("url", processedUrl)
         withStyle(
             style = SpanStyle(
                 textDecoration = TextDecoration.Underline,

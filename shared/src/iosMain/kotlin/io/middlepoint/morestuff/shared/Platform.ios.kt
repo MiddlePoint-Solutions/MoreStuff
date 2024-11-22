@@ -1,31 +1,14 @@
 package io.middlepoint.morestuff.shared
 
-import org.koin.core.module.Module
-import org.koin.core.module.dsl.factoryOf
-import org.koin.dsl.bind
-import org.koin.dsl.module
-import platform.Foundation.NSNumber
+import com.mohamedrejeb.calf.io.KmpFile
 import platform.Foundation.NSString
+import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
 
-actual class File actual constructor(path: String) {
-    actual fun exists(): Boolean {
-        TODO("Not yet implemented")
-    }
+actual fun generateUUID(): String = NSUUID().UUIDString
 
-    actual fun delete(): Boolean {
-        TODO("Not yet implemented")
-    }
-}
-
-actual fun generateUUID(): String {
-    return NSUUID().UUIDString
-}
-
-actual fun formatString(format: String, vararg args: Any): String {
-    return stringWithFormat(format, args)
-}
+actual fun formatString(format: String, vararg args: Any): String = stringWithFormat(format, args)
 
 private fun stringWithFormat(format: String, args: Array<out Any>): String {
     // NSString format works with NSObjects via %@, we should change standard format to %@
@@ -49,14 +32,7 @@ private fun stringWithFormat(format: String, args: Array<out Any>): String {
 
 actual fun requiresNotificationsPermission(): Boolean = true
 
-actual val sharedModule: Module
-    get() = module {
-        factoryOf(::TimeFormatterImpl) bind TimeFormatter::class
-        factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
-        factoryOf(::ShareHelperImpl) bind ShareHelper::class
-        factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
-        factoryOf(::ImageHandlerImpl) bind ImageHandler::class
-        factoryOf(::PDFHandlerImpl) bind PDFHandler::class
-    }
 actual val platform: Platform
   get() = Platform.iOS
+
+actual fun createKmpFile(path: String): KmpFile = KmpFile(NSURL(fileURLWithPath = path))

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -14,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
+import com.mohamedrejeb.calf.io.KmpFile
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.RouterContext
 import io.github.xxfast.decompose.router.defaultRouterContext
@@ -30,8 +32,8 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-
+//    WindowCompat.setDecorFitsSystemWindows(window, false)
+    enableEdgeToEdge()
     val rootRouterContext: RouterContext = defaultRouterContext()
 
     setContent {

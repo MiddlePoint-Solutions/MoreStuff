@@ -14,7 +14,6 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
 
 group = "io.middlepoint.morestuff"
-version = "0.1.0-SNAPSHOT"
 
 plugins {
   alias(libs.plugins.kotlin.multiplatform).apply(false)

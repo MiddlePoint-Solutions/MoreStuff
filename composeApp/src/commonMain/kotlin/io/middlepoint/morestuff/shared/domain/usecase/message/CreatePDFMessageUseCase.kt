@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
+import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.model.Failure
@@ -14,7 +15,7 @@ interface CreatePDFMessageUseCase {
         taskId: Long,
         scheduleId: Long = 0,
         contentType: ContentType,
-        filePath: String,
+        pdfFile: KmpFile,
         message: String,
     ): Either<Failure, Message>
 }
@@ -28,11 +29,11 @@ class CreatePDFMessageUseCaseImpl(
         taskId: Long,
         scheduleId: Long,
         contentType: ContentType,
-        filePath: String,
+        pdfFile: KmpFile,
         message: String,
     ): Either<Failure, Message> {
 
-        return when (val pdfResult = saveUserPdfUseCase(filePath)) {
+        return when (val pdfResult = saveUserPdfUseCase(pdfFile)) {
             is Either.Left -> Either.Left(SavePdfFailure(pdfResult.toString()))
             is Either.Right -> {
                 val pdfPath = pdfResult.value

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-import org.koin.core.module.Module
+import com.mohamedrejeb.calf.io.KmpFile
 
 enum class Platform {
   Android,
@@ -9,9 +9,9 @@ enum class Platform {
   Web
 }
 
-expect class File(path: String) {
-  fun exists(): Boolean
-  fun delete(): Boolean
+enum class MediaFolder(val folderName: String) {
+  Files("files"),
+  Images("images")
 }
 
 expect fun generateUUID(): String
@@ -20,6 +20,6 @@ expect fun formatString(format: String, vararg args: Any): String
 
 expect fun requiresNotificationsPermission(): Boolean
 
-expect val sharedModule: Module
-
 expect val platform: Platform
+
+expect fun createKmpFile(path: String) : KmpFile

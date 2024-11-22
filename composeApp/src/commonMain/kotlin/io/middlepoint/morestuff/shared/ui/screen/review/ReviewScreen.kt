@@ -152,7 +152,7 @@ fun ReviewContent(
         ConstraintLayout(
             modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
+//                .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
 
             val (topBar, cards, controls) = createRefs()

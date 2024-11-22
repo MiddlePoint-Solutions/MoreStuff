@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 
-import io.middlepoint.morestuff.shared.File
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
@@ -166,10 +165,11 @@ class MessageRepositoryImpl(
 
         val imagePath = message?.messageData?.filePath
         imagePath?.let {
-            val file = File(it)
-            if (file.exists()) {
-                file.delete()
-            }
+            // TODO
+//            val file = File(it)
+//            if (file.exists()) {
+//                file.delete()
+//            }
         }
         messageQueries.deleteMessage(messageId)
     }

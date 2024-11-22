@@ -18,6 +18,7 @@ struct SwiftUIApp: App {
   var body: some Scene {
     WindowGroup {
       HomeView(routerContext: defaultRouterContext)
+            .ignoresSafeArea(edges: .all)
             .ignoresSafeArea(.keyboard)
     }
     .onChange(of: scenePhase) { newPhase in
