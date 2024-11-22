@@ -67,8 +67,7 @@ class MainActivity : AppCompatActivity() {
 
           intent.type?.startsWith("image/") == true -> {
             intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-//              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
-              Screen.Share(Shareable.Image(KmpFile(it), ""), it.toString())
+              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
             }
           }
 

@@ -24,8 +24,8 @@ sealed class Screen {
   @Serializable
   data class Share(val shareable: Shareable, val content: String) : Screen()
 
-//  data class ImagePreview(val imageUri: String, val taskId: Long) : Screen()
-  data class ImagePreview(val imageUri: KmpFile, val taskId: Long) : Screen()
+  @Serializable
+  data class ImagePreview(val imageUri: String, val taskId: Long) : Screen()
 
   @Serializable
   data object Scopes : Screen()

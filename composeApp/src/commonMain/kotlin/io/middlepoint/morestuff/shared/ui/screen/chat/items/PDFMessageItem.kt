@@ -18,6 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import com.mohamedrejeb.calf.io.KmpFile
+import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.ui.extension.getFileName
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import morestuff.composeapp.generated.resources.Res
@@ -30,7 +31,7 @@ fun PDFMessageItem(
   pdfPath: String,
   message: MessageUiModel,
 ) {
-  val pdfFile = remember(pdfPath) { KmpFile.createKmpFile(pdfPath) }
+  val pdfFile = remember(pdfPath) { createKmpFile(pdfPath) }
   val platformContext = LocalPlatformContext.current
 
     Box {

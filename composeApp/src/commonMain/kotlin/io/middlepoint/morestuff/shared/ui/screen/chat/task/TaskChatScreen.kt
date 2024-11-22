@@ -48,7 +48,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import coil3.compose.LocalPlatformContext
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.scale
@@ -56,10 +55,8 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
 import com.mohamedrejeb.calf.picker.FilePickerFileType
 import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
-import com.mohamedrejeb.calf.picker.coil.toCalfPlatformContext
 import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
@@ -173,7 +170,7 @@ fun TaskChatScreen(
 
       is ImageImport -> {
         ImageImportScreen(
-          image = screen.imageFile,
+          imagePath = screen.imageFile,
           onImport = { title ->
             viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
             router.pop()

@@ -1,14 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-actual class File actual constructor(path: String) {
-    actual fun exists(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    actual fun delete(): Boolean {
-        TODO("Not yet implemented")
-    }
-}
+import com.mohamedrejeb.calf.io.KmpFile
 
 actual fun generateUUID(): String {
     TODO("Not yet implemented")
@@ -24,3 +16,7 @@ actual fun requiresNotificationsPermission(): Boolean {
 
 actual val platform: Platform
   get() = Platform.Web
+
+actual fun createKmpFile(path: String): KmpFile {
+  TODO("Not yet implemented")
+}
