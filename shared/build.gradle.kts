@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -34,6 +35,7 @@ kotlin {
 
   jvm()
 
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions {
     // Common compiler options applied to all Kotlin source sets
     freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -45,8 +47,10 @@ kotlin {
       implementation(libs.kotlinx.datetime)
       implementation(libs.kotlinx.coroutines)
       implementation(libs.kermit)
-      implementation(libs.koin.core)
       implementation(libs.calf.io)
+
+      implementation(project.dependencies.platform(libs.koin.bom))
+      implementation(libs.koin.core)
     }
 
     androidMain.dependencies {

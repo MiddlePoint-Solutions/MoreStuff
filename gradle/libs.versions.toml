@@ -3,50 +3,45 @@ coreKtx = "1.13.1"
 drawerlayout = "1.2.0"
 turbine = "1.0.0"
 multiplatformSettingsNoArg = "1.0.0"
-coilCompose = "3.0.0-alpha08"
+coilCompose = "3.0.1"
 extensionsComposeJetpack = "3.0.0"
 parcelable = "1.3.0"
 accompanist = "0.32.0"
 coroutines = "1.9.0-RC"
 okhttp = "4.12.0"
-firebaseBom = "33.1.2"
+firebaseBom = "33.6.0"
 googleServices = "4.4.2"
-koinBom = "3.5.6"
 koinTest = "3.5.6"
-workKtx = "2.9.0"
+workKtx = "2.10.0"
 preferenceKtx = "1.2.1"
 firebaseCrashlyticsPlugin = "3.0.2"
 aboutLibrariesVersion = "11.2.1"
-kSoup ="0.3.0"
+kSoup = "0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.5.1"
-kotlin = "2.0.0"
+agp = "8.7.2"
+kotlin = "2.0.21"
 
-android_sdk_compile = "34"
+android_sdk_compile = "35"
 android_sdk_target = "34"
 android_sdk_min = "26"
 
-androidx-core = "1.13.1"
+androidx-core = "1.15.0"
 kotlinx-immutable-collections = "0.3.7"
-kotlinx-coroutines = "1.9.0-RC"
-kotlinx-serialization = "1.7.1"
+kotlinx-coroutines = "1.9.0"
+kotlinx-serialization = "1.7.3"
 kotlinx-datetime = "0.6.0"
-kotlinx-atomicfu = "0.25.0"
-compose = "1.6.11"
-compose-compiler = "1.5.14"
-androidx-activity-compose = "1.9.1"
+kotlinx-atomicfu = "0.26.0"
+compose = "1.7.1"
+androidx-activity-compose = "1.9.3"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
-libres = "1.2.1"
 kermit = "2.0.3"
-ktor = "2.3.11"
+ktor = "2.3.12"
 multiplatform-settings = "1.1.1"
-koin = "3.6.0-Beta4"
-koin-compose = "1.2.0-Beta4"
+koin-bom = "4.1.0-Beta1"
 sqldelight = "2.0.2"
-arrow = "1.2.1"
-sentry = "0.5.0"
+arrow = "1.2.4"
 buildConfig = "5.3.5"
 spotless = "6.23.3"
 ktfmt = "0.44"
@@ -68,7 +63,7 @@ sonner = "0.3.6"
 reorderable = "2.1.1"
 zoomable = "1.6.1"
 kottie = "1.9.6-alpha02"
-calf = "0.5.3"
+calf = "0.6.1"
 
 
 [libraries]
@@ -86,7 +81,6 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "k
 
 # Compose
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
-compose-compiler = { module = "org.jetbrains.compose.compiler:compiler", version.ref = "compose-compiler" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
@@ -119,13 +113,17 @@ sqldelight-sqlite-dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect"
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
 
+# Koin
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
+koin-compose = { module = "io.insert-koin:koin-compose" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
+koin-core = { module = "io.insert-koin:koin-core" }
+koin-android = { module = "io.insert-koin:koin-android" }
+
 # Misc
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
-koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
-koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin-compose" }
-koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 stately-isolate = { module = "co.touchlab:stately-isolate", version.ref = "stately" }
@@ -167,7 +165,7 @@ googleServices = { module = "com.google.gms:google-services", version.ref = "goo
 koinTest = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
 koinTestJunit = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinTest" }
 workKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "workKtx" }
-kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup"}
+kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup" }
 constraintLayout-compose = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintLayout-compose" }
 sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterfaceVersion" }

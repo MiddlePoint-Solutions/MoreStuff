@@ -1,4 +1,5 @@
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -83,6 +84,7 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         // Common compiler options applied to all Kotlin source sets
         freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -137,9 +139,11 @@ kotlin {
 
             api(libs.arrow.core)
             api(libs.kermit)
-            api(libs.koin.core)
-            api(libs.koin.compose)
-            api(libs.koin.compose.viewmodel)
+
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
             api(libs.decompose.router)
 
             // You will probably need to also bring in decompose and essenty
@@ -230,17 +234,15 @@ kotlin {
 
 android {
     namespace = "io.middlepoint.morestuff.android"
-    compileSdk = libs.versions.android.sdk.compile.get().toInt()
-
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         applicationId = "io.middlepoint.morestuff"
-        compileSdk = 34
-        minSdk = 26
-        targetSdk = 34
+        compileSdk = libs.versions.android.sdk.compile.get().toInt()
+        minSdk = libs.versions.android.sdk.min.get().toInt()
+        targetSdk = libs.versions.android.sdk.target.get().toInt()
         versionCode = 32
         versionName = "0.6.2"
         vectorDrawables {
