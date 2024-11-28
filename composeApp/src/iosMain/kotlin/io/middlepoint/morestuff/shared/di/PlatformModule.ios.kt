@@ -17,6 +17,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 import platform.Foundation.NSUserDefaults
 
+
 actual val platformModule: Module = module {
     factory { Logger.withTag(it.getOrNull() ?: "MoreStuff-iOS") }
     factoryOf(::DriverFactory)
