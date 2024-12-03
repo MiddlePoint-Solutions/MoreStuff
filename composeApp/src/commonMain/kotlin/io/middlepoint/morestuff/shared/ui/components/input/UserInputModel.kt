@@ -21,7 +21,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlow
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
-import io.middlepoint.morestuff.shared.TimeFormatter
+import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel

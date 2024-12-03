@@ -15,13 +15,14 @@ import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
-import io.middlepoint.morestuff.shared.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
 import org.koin.compose.koinInject
 
 @Composable
@@ -164,10 +165,11 @@ private fun createScheduleModel(
     timeManager: TimeManager,
     timeFormatter: TimeFormatter
 ): ScheduleUiModel {
+    val timeString = time.toInstant(TimeZone.UTC).toString()
     return ScheduleUiModel(
         scheduleLocalDateTime = time,
-        displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "Error",
+        displayDate = timeFormatter.formatTimeDayAndMonth(timeString) ?: "Error",
+        displayTime = timeFormatter.formatTimeOnly(timeString) ?: "Error",
         scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
         dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
         currentUtcTimeMillis = timeManager.nowUtcMillis
