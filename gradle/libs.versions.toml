@@ -19,7 +19,7 @@ aboutLibrariesVersion = "11.2.1"
 kSoup = "0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.7.2"
+agp = "8.7.3"
 kotlin = "2.0.21"
 
 android_sdk_compile = "35"
