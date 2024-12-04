@@ -165,7 +165,7 @@ private fun createScheduleModel(
     timeManager: TimeManager,
     timeFormatter: TimeFormatter
 ): ScheduleUiModel {
-    val timeString = time.toInstant(TimeZone.UTC).toString()
+    val timeString = time.toInstant(TimeZone.currentSystemDefault()).toString()
     return ScheduleUiModel(
         scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatTimeDayAndMonth(timeString) ?: "Error",

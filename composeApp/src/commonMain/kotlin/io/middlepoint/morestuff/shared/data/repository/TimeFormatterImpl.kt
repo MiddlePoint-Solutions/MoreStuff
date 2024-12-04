@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -7,7 +8,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class TimeFormatterImpl : TimeFormatter {
-
+    val loggerTime = Logger.withTag("TimeFormatterImpl")
     override val is24HourFormat: Boolean
         get() = true
 
@@ -15,6 +16,7 @@ class TimeFormatterImpl : TimeFormatter {
         return timeString?.let {
             try {
                 val localDateTime = try {
+                    loggerTime.i("Original time: $it")
                     Instant.parse(it).toLocalDateTime(TimeZone.currentSystemDefault())
                 } catch (e: Exception) {
                     LocalDateTime.parse(it)
@@ -43,8 +45,20 @@ class TimeFormatterImpl : TimeFormatter {
         return formatTime(timeString, "HH:mm${addAmPm()}")
     }
 
-    override fun formatTimeDayAndMonth(timeString: String?): String? {
+    /*override fun formatTimeDayAndMonth(timeString: String?): String? {
         return formatTime(timeString, "EEEE, MM, d")
+    }*/
+
+    override fun formatTimeDayAndMonth(timeString: String?): String? {
+        return timeString?.let {
+            try {
+                val instant = Instant.parse(it)
+                val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+                "${localDateTime.dayOfWeek.name.lowercase()}, ${localDateTime.month.name.lowercase()}, ${localDateTime.dayOfMonth}"
+            } catch (e: Exception) {
+                null
+            }
+        }
     }
 
     override fun formatTimeDayMonthHour(timeString: String?): String? {
@@ -112,22 +126,22 @@ class TimeFormatterImpl : TimeFormatter {
     }
 
 
- /*   private fun Month.getFullMonthName(): String {
-        return when (this) {
-            Month.JANUARY -> stringResource(Res.string.month_january)
-            Month.FEBRUARY -> stringResource(Res.string.month_february)
-            Month.MARCH -> stringResource(Res.string.month_march)
-            Month.APRIL -> stringResource(Res.string.month_april)
-            Month.MAY -> stringResource(Res.string.month_may)
-            Month.JUNE -> stringResource(Res.string.month_june)
-            Month.JULY -> stringResource(Res.string.month_july)
-            Month.AUGUST -> stringResource(Res.string.month_august)
-            Month.SEPTEMBER -> stringResource(Res.string.month_september)
-            Month.OCTOBER -> stringResource(Res.string.month_october)
-            Month.NOVEMBER -> stringResource(Res.string.month_november)
-            Month.DECEMBER -> stringResource(Res.string.month_december)
-        }
-    }*/
+    /*   private fun Month.getFullMonthName(): String {
+           return when (this) {
+               Month.JANUARY -> stringResource(Res.string.month_january)
+               Month.FEBRUARY -> stringResource(Res.string.month_february)
+               Month.MARCH -> stringResource(Res.string.month_march)
+               Month.APRIL -> stringResource(Res.string.month_april)
+               Month.MAY -> stringResource(Res.string.month_may)
+               Month.JUNE -> stringResource(Res.string.month_june)
+               Month.JULY -> stringResource(Res.string.month_july)
+               Month.AUGUST -> stringResource(Res.string.month_august)
+               Month.SEPTEMBER -> stringResource(Res.string.month_september)
+               Month.OCTOBER -> stringResource(Res.string.month_october)
+               Month.NOVEMBER -> stringResource(Res.string.month_november)
+               Month.DECEMBER -> stringResource(Res.string.month_december)
+           }
+       }*/
 
 }
 
