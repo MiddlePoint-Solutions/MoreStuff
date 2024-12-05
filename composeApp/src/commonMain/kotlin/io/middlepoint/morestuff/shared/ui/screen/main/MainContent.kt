@@ -42,7 +42,6 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
-@OptIn(ExperimentalDecomposeApi::class)
 @Composable
 fun MainContent(
   shareContent: (taskId: Long, content: Shareable) -> Unit,
@@ -58,11 +57,6 @@ fun MainContent(
       router = router,
       modifier = Modifier.fillMaxSize(),
       animation = stackAnimation(slide() + fade())
-//      animation = predictiveBackAnimation(
-//        fallbackAnimation = stackAnimation(slide() + fade()),
-//        onBack = { router.pop() },
-//        backHandler = LocalRouterContext.current.backHandler
-//      ),
     ) { screen ->
       when (screen) {
 

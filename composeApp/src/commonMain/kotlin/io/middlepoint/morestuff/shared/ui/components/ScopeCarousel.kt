@@ -34,98 +34,100 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, FlowPreview::class)
+@OptIn(FlowPreview::class)
 @Composable
 fun ScopeCarousel(
-    scopes: List<ScopeDomain>,
-    currentScopeId: Long,
-    onScopeSelected: (Long) -> Unit,
-    modifier: Modifier = Modifier,
+  scopes: List<ScopeDomain>,
+  currentScopeId: Long,
+  onScopeSelected: (Long) -> Unit,
+  modifier: Modifier = Modifier,
 ) {
 
-    if (scopes.isEmpty()) {
-        return
-    }
+  if (scopes.isEmpty()) {
+    return
+  }
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
-    BoxWithConstraints {
-        val screenWidth = maxWidth
-        val itemWidth = (screenWidth.value / 3.5).dp
-        val halfItemWidth = itemWidth / 2
-        val centerPadding = ((screenWidth / 2) - halfItemWidth) + 20.dp
+  BoxWithConstraints {
+    val screenWidth = maxWidth
+    val itemWidth = (screenWidth.value / 3.5).dp
+    val halfItemWidth = itemWidth / 2
+    val centerPadding = ((screenWidth / 2) - halfItemWidth) + 20.dp
 
-        val pagerState = rememberPagerState(
-            initialPage = scopes.indexOfFirst { it.id == currentScopeId },
-            pageCount = { scopes.size }
-        )
+    val pagerState = rememberPagerState(
+      initialPage = scopes.indexOfFirst { it.id == currentScopeId },
+      pageCount = { scopes.size }
+    )
 
-        LaunchedEffect(Unit) {
-            snapshotFlow { pagerState.currentPage }
-                .debounce(300)
-                .collect { onScopeSelected(scopes[it].id) }
-        }
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = modifier,
-            contentPadding = PaddingValues(start = centerPadding, end = centerPadding)
-        ) { page ->
-            val scope = scopes[page]
-            ScopeCarouselItem(
-                scope = scope,
-                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(page) } },
-                isSelected = page == pagerState.currentPage,
-                modifier = Modifier
-                    .padding(2.dp)
-                    .widthIn(min = itemWidth, max = itemWidth + 50.dp),
-            )
+    LaunchedEffect(Unit) {
+      snapshotFlow { pagerState.currentPage }
+        .debounce(500)
+        .collect {
+          onScopeSelected(scopes[it].id)
         }
     }
+
+    HorizontalPager(
+      state = pagerState,
+      modifier = modifier,
+      contentPadding = PaddingValues(start = centerPadding, end = centerPadding)
+    ) { page ->
+      val scope = scopes[page]
+      ScopeCarouselItem(
+        scope = scope,
+        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(page) } },
+        isSelected = page == pagerState.currentPage,
+        modifier = Modifier
+          .padding(2.dp)
+          .widthIn(min = itemWidth, max = itemWidth + 50.dp),
+      )
+    }
+  }
 }
 
 @Composable
 private fun ScopeCarouselItem(
-    scope: ScopeDomain,
-    onClick: () -> Unit,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
+  scope: ScopeDomain,
+  onClick: () -> Unit,
+  isSelected: Boolean,
+  modifier: Modifier = Modifier,
 ) {
 
-    val currentState by remember(isSelected) { mutableStateOf(isSelected) }
-    val transition = updateTransition(currentState, label = "scope item state")
+  val currentState by remember(isSelected) { mutableStateOf(isSelected) }
+  val transition = updateTransition(currentState, label = "scope item state")
 
-    val alphaState by transition.animateFloat(label = "text alpha") { state ->
-        when (state) {
-            true -> 1f
-            false -> 0.2f
-        }
+  val alphaState by transition.animateFloat(label = "text alpha") { state ->
+    when (state) {
+      true -> 1f
+      false -> 0.2f
     }
+  }
 
-    val fontState by transition.animateInt(label = "text font") { state ->
-        when (state) {
-            false -> 15
-            true -> 20
-        }
+  val fontState by transition.animateInt(label = "text font") { state ->
+    when (state) {
+      false -> 15
+      true -> 20
     }
+  }
 
-    Column(
-        modifier = modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-            onClick = onClick
-        ),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = scope.name,
-            modifier = Modifier.graphicsLayer { alpha = alphaState },
-            style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp),
-            fontSize = fontState.sp,
-            color = MaterialTheme.colorScheme.secondary,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-    }
+  Column(
+    modifier = modifier.clickable(
+      interactionSource = remember { MutableInteractionSource() },
+      indication = null,
+      onClick = onClick
+    ),
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+    Text(
+      text = scope.name,
+      modifier = Modifier.graphicsLayer { alpha = alphaState },
+      style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp),
+      fontSize = fontState.sp,
+      color = MaterialTheme.colorScheme.secondary,
+      maxLines = 2,
+      overflow = TextOverflow.Ellipsis,
+    )
+  }
 }

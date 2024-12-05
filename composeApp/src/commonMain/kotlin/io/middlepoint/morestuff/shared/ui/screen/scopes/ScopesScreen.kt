@@ -96,10 +96,9 @@ fun ScopesScreen(
     listOf(initialScreen)
   }
 
-
   RoutedContent(
     router = router,
-    modifier = Modifier.background(Color.Transparent),
+//    modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(slide())
   ) { screen ->
 
