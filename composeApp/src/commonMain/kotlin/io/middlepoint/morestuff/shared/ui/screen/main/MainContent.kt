@@ -57,11 +57,12 @@ fun MainContent(
     RoutedContent(
       router = router,
       modifier = Modifier.fillMaxSize(),
-      animation = predictiveBackAnimation(
-        fallbackAnimation = stackAnimation(slide() + fade()),
-        onBack = { router.pop() },
-        backHandler = LocalRouterContext.current.backHandler
-      ),
+      animation = stackAnimation(slide() + fade())
+//      animation = predictiveBackAnimation(
+//        fallbackAnimation = stackAnimation(slide() + fade()),
+//        onBack = { router.pop() },
+//        backHandler = LocalRouterContext.current.backHandler
+//      ),
     ) { screen ->
       when (screen) {
 
