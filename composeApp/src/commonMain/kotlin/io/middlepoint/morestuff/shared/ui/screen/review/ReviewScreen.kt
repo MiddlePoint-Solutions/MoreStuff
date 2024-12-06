@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.ui.screen.review
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -46,6 +45,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -78,6 +78,7 @@ import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeable
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -108,6 +109,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.compose.LocalKoinScope
 
+@NonRestartableComposable
 @Composable
 fun ReviewScreen(
   onBack: () -> Unit,
@@ -129,18 +131,13 @@ fun ReviewContent(
   currentScopeId: Long,
 ) {
 
-  val koin = LocalKoinScope.current
-  val viewModel = rememberOnRoute(ReviewViewModel::class) {
-    koin.get()
-  }
+  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
+  val model by viewModel.models.collectAsState()
 
   val scope = rememberCoroutineScope()
   var showReviewHelpScreen by remember { mutableStateOf(false) }
   val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
   var showReviewDragHints by remember { mutableStateOf(false) }
-  val model by viewModel.models.collectAsState()
-
 
   Box(
     modifier = Modifier
@@ -289,10 +286,7 @@ private fun PriorityReviewTopBar(
   currentScopeId: Long,
 ) {
 
-  val koin = LocalKoinScope.current
-  val viewModel = rememberOnRoute(ReviewViewModel::class) {
-    koin.get()
-  }
+  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
 
   val coroutineScope = rememberCoroutineScope()
   var showMenu by remember { mutableStateOf(false) }

@@ -5,15 +5,15 @@ import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow
 
 
-class ReviewViewModel(
-) : MoleculeViewModel<ReviewViewEvent, ReviewState>() {
+class ReviewViewModel : MoleculeViewModel<ReviewViewEvent, ReviewState>() {
 
-    override val initialState: ReviewState = ReviewState()
-    @Composable
-    override fun models(events: SharedFlow<ReviewViewEvent>): ReviewState {
-        return reviewModel(
-            initialState = initialState,
-            events = events,
-        )
-    }
+  override val initialState: ReviewState = ReviewState()
+
+  @Composable
+  override fun models(events: SharedFlow<ReviewViewEvent>): ReviewState {
+    return reviewModel(
+      initialState = initialState,
+      events = events,
+    )
+  }
 }

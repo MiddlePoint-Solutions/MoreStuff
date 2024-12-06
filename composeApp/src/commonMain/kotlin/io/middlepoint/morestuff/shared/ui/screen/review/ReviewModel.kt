@@ -16,6 +16,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetReviewTasksUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.ReviewTasksMapper
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -30,6 +31,7 @@ fun reviewModel(
   getScopesUseCase: GetScopesUseCase = koinInject(),
   reviewTasksMapper: ReviewTasksMapper = koinInject()
 ): ReviewState {
+
   var round by remember { mutableStateOf(initialState.round) }
   var currentScope by remember { mutableStateOf(initialState.currentScope) }
   var items by remember { mutableStateOf(initialState.items) }
@@ -44,7 +46,7 @@ fun reviewModel(
   LaunchedEffect(Unit) {
     events.collect { event ->
       when (event) {
-        is ReviewViewEvent.ItemSwipe -> {
+        is ItemSwipe -> {
           val actionType = when (event.direction) {
             SwipeDirection.Left -> PriorityActionType.Less
             SwipeDirection.Right -> PriorityActionType.More
@@ -61,7 +63,7 @@ fun reviewModel(
           }
         }
 
-        is ReviewViewEvent.CompleteTask -> {
+        is CompleteTask -> {
           store.dispatch(TaskAction.CompleteTasksAction(listOf(event.item.id), true))
           actions = actions + (event.item to PriorityActionType.Done)
           if (items.indexOf(event.item) == 0) {
@@ -69,7 +71,7 @@ fun reviewModel(
           }
         }
 
-        is ReviewViewEvent.Undo -> {
+        is Undo -> {
           val action = actions.firstOrNull { it.first.id == event.item.id }
           action?.let {
             when (it.second) {
@@ -91,12 +93,12 @@ fun reviewModel(
           actions = actions.filterNot { it.first.id == event.item.id }
         }
 
-        is ReviewViewEvent.ToggleReviewHint -> {
+        is ToggleReviewHint -> {
           reviewHintEnabled = !reviewHintEnabled
           store.dispatch(SettingAction.EnableReviewHint(reviewHintEnabled))
         }
 
-        is ReviewViewEvent.LoadScope -> {
+        is LoadScope -> {
           val taskResult = getReviewTasksUseCase(event.scopeId)
           if (taskResult is Either.Right) {
             val tasks = taskResult.value
