@@ -68,7 +68,7 @@ fun TaskInputBottomSheet(
   onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
 ) {
 
-  val viewModel = koinInjectOnRoute(UserInputViewModel::class)
+  val viewModel: UserInputViewModel = koinInjectOnRoute()
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()

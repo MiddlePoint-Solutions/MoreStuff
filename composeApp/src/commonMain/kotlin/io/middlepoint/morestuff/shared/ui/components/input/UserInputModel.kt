@@ -50,6 +50,7 @@ fun userInputModel(
   appMessageProvider: AppMessageProvider = koinInject()
 ): UserInputState {
 
+  // TODO: use UserInputState as the current state and use .copy to update state instead of updating these individually.
   var context by remember { mutableStateOf<ChatContext?>(null) }
   var messages by remember { mutableStateOf(listOf<MessageUiModel>()) }
   var scopes by remember { mutableStateOf((listOf<ScopeDomain>())) }
@@ -100,8 +101,8 @@ fun userInputModel(
         UserInputEvent.SetNowPriority -> priority = PriorityUiModel.Now
         UserInputEvent.SetPlanPriority -> {
           val time = createPlanTime(timeManager, timeFormatter)
+//          priority = PriorityUiModel.Plan(time.scheduleLocalDateTime)
           planTime = time
-          priority = PriorityUiModel.Plan(time.scheduleLocalDateTime)
         }
 
         is UserInputEvent.UpdatePlanDate -> {
