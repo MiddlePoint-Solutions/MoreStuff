@@ -6,45 +6,51 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.*
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import org.koin.compose.koinInject
 
 @Composable
 fun scopesModel(
   initialState: ScopesState,
-  events: Flow<ScopesUiEvent>,
+  events: SharedFlow<ScopesUiEvent>,
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject()
 ): ScopesState {
-    var scopesState by remember { mutableStateOf(initialState.scopes) }
+  var scopesState by remember { mutableStateOf(initialState.scopes) }
 
-    LaunchedEffect(Unit) {
-        getScopesFlowUseCase().collect { newScopes ->
-            scopesState = newScopes
-        }
+  LaunchedEffect(Unit) {
+    getScopesFlowUseCase().collect { newScopes ->
+      scopesState = newScopes
     }
+  }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            when (event) {
-                is ScopesUiEvent.CreateScope -> {
-                    store.dispatch(ScopeAction.CreateScopeAction(event.name))
-                }
-                is ScopesUiEvent.DeleteScope -> {
-                    store.dispatch(ScopeAction.DeleteScopeAction(event.scopeId))
-                }
-                is ScopesUiEvent.UpdateScopeName -> {
-                    store.dispatch(ScopeAction.UpdateScopeNameAction(event.scopeId, event.newName))
-                }
-                is ScopesUiEvent.ReorderScopes -> {
-                    store.dispatch(ScopeAction.UpdateScopeOrderAction(event.scopes))
-                }
-            }
+  LaunchedEffect(Unit) {
+    events.collect { event ->
+      when (event) {
+        is ScopesUiEvent.CreateScope -> {
+          store.dispatch(CreateScopeAction(event.name))
         }
-    }
 
-    return ScopesState(scopes = scopesState)
+        is ScopesUiEvent.DeleteScope -> {
+          store.dispatch(DeleteScopeAction(event.scopeId))
+        }
+
+        is ScopesUiEvent.UpdateScopeName -> {
+          store.dispatch(UpdateScopeNameAction(event.scopeId, event.newName))
+        }
+
+        is ScopesUiEvent.ReorderScopes -> {
+          store.dispatch(UpdateScopeOrderAction(event.scopes))
+        }
+      }
+    }
+  }
+
+  return ScopesState(scopes = scopesState)
 }

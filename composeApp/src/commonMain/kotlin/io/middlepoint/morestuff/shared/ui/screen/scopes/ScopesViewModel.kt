@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 
 class ScopesViewModel: MoleculeViewModel<ScopesUiEvent, ScopesState>() {
@@ -10,7 +10,7 @@ class ScopesViewModel: MoleculeViewModel<ScopesUiEvent, ScopesState>() {
   override val initialState: ScopesState = ScopesState()
 
   @Composable
-  override fun models(events: Flow<ScopesUiEvent>): ScopesState {
+  override fun models(events: SharedFlow<ScopesUiEvent>): ScopesState {
     return scopesModel(
       initialState = initialState,
       events = events,

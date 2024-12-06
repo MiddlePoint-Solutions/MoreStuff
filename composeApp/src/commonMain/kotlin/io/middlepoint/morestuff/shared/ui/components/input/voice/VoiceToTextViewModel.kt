@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.ui.components.input.voice
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 
 class VoiceToTextViewModel(
@@ -13,7 +13,7 @@ class VoiceToTextViewModel(
   override val initialState: VoiceToTextState = VoiceToTextState()
 
   @Composable
-  override fun models(events: Flow<VoiceToTextUiEvent>): VoiceToTextState {
+  override fun models(events: SharedFlow<VoiceToTextUiEvent>): VoiceToTextState {
     return voiceToTextModel(
       initialState = initialState,
       events = events,

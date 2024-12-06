@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 import com.russhwolf.settings.Settings
-import io.middlepoint.morestuff.android.data.key
+import io.middlepoint.morestuff.shared.data.settingKey
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.*
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
@@ -29,16 +29,16 @@ class UserRepositoryImpl(
 
     override suspend fun <T> saveAppSetting(setting: AppSetting<T>, settingValue: T) {
         when (setting) {
-            FirstTime -> settings.putBoolean(setting.key, settingValue as Boolean)
-            Theme -> settings.putString(setting.key, settingValue as String)
-            SnoozeLimit -> settings.putInt(setting.key, settingValue as Int)
-            DevSettings -> settings.putBoolean(setting.key, settingValue as Boolean)
+            FirstTime -> settings.putBoolean(setting.settingKey, settingValue as Boolean)
+            Theme -> settings.putString(setting.settingKey, settingValue as String)
+            SnoozeLimit -> settings.putInt(setting.settingKey, settingValue as Int)
+            DevSettings -> settings.putBoolean(setting.settingKey, settingValue as Boolean)
             ReviewTime -> settings.putString(
-                setting.key,
+                setting.settingKey,
                 (settingValue as Pair<Int, Int>).let { "${it.first};${it.second}" }
             )
-            ShowHintArrowPriority -> settings.putBoolean(setting.key, settingValue as Boolean)
-            is VoiceInputLanguage -> settings.putString(setting.key, settingValue as String)
+            ShowHintArrowPriority -> settings.putBoolean(setting.settingKey, settingValue as Boolean)
+            is VoiceInputLanguage -> settings.putString(setting.settingKey, settingValue as String)
         }
     }
 
@@ -51,7 +51,7 @@ class UserRepositoryImpl(
             DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
             ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
-            VoiceInputLanguage -> Language.valueOf(settings.getString(setting.key, (setting.defaultValue as Language).name))
+            VoiceInputLanguage -> Language.valueOf(settings.getString(setting.settingKey, (setting.defaultValue as Language).name))
         } as R
 
     override fun getAppTheme(): AppTheme =
@@ -59,17 +59,17 @@ class UserRepositoryImpl(
 
     private inline fun <reified T> getSetting(setting: AppSetting<*>, defaultValue: T): T =
         when (setting) {
-            FirstTime -> settings.getBoolean(setting.key, defaultValue as Boolean)
-            Theme -> settings.getString(setting.key, defaultValue as String)
-            SnoozeLimit -> settings.getInt(setting.key, defaultValue as Int)
-            DevSettings -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            FirstTime -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
+            Theme -> settings.getString(setting.settingKey, defaultValue as String)
+            SnoozeLimit -> settings.getInt(setting.settingKey, defaultValue as Int)
+            DevSettings -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
             is ReviewTime -> {
-                val timeStr = settings.getString(setting.key, setting.defaultValue.toString())
+                val timeStr = settings.getString(setting.settingKey, setting.defaultValue.toString())
                 timeStr.toPairInt() ?: setting.defaultValue
             }
-            ShowHintArrowPriority -> settings.getBoolean(setting.key, defaultValue as Boolean)
+            ShowHintArrowPriority -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
             VoiceInputLanguage -> {
-                val languageName = settings.getString(setting.key, (defaultValue as Language).name)
+                val languageName = settings.getString(setting.settingKey, (defaultValue as Language).name)
                 Language.valueOf(languageName)
             }
         } as T

@@ -7,8 +7,8 @@ import app.cash.molecule.RecompositionMode.Immediate
 import app.cash.molecule.moleculeFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
@@ -24,6 +24,7 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
   // small enough to surface issues if they get backed up for some reason.
   private val events = MutableSharedFlow<Event>(extraBufferCapacity = 20)
 
+  // TODO: the model is only active when state is collected. This also means that events will not be collected either.
   val models: StateFlow<Model> by lazy {
     moleculeFlow(mode = Immediate) {
       models(events)
@@ -38,7 +39,7 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
   }
 
   @Composable
-  protected abstract fun models(events: Flow<Event>): Model
+  protected abstract fun models(events: SharedFlow<Event>): Model
 
   protected open fun onSaveState(model: Model) {}
 

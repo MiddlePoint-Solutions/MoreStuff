@@ -12,6 +12,8 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.RadioButton
@@ -59,6 +61,9 @@ fun SettingsList(
     subtitle = subtitle,
     action = action,
     onClick = { showDialog = true },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+    )
   )
 
   if (showDialog) {
@@ -88,15 +93,13 @@ fun SettingsList(
           verticalArrangement = Arrangement.Center
         ) {
 
-          ProvideTextStyle(MaterialTheme.typography.titleLarge) {
-            Row(
-              modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 16.dp),
-              horizontalArrangement = Arrangement.Center
-            ) {
-              title()
-            }
+          Row(
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(top = 16.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.Center
+          ) {
+            title()
           }
 
           items.forEachIndexed { index, item ->
@@ -120,7 +123,9 @@ fun SettingsList(
               )
               Text(
                 text = item,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                  color = MaterialTheme.colorScheme.onSurface
+                ),
               )
             }
           }

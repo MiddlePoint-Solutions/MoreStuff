@@ -48,10 +48,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
+import io.github.xxfast.decompose.router.rememberOnRoute
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
@@ -89,27 +91,23 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 fun ScopesScreen(
   onBack: () -> Unit,
   initialScreen: ScopeScreen = Root,
-
 ) {
 
-  val router = rememberRouter(ScopeScreen::class) {
-    listOf(initialScreen)
-  }
+  val router = rememberRouter { listOf(initialScreen) }
+  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
+  val model by viewModel.models.collectAsState()
 
   RoutedContent(
     router = router,
-//    modifier = Modifier.background(Color.Transparent),
     animation = stackAnimation(slide())
   ) { screen ->
-
-    val viewModel = koinInjectOnRoute(ScopesViewModel::class)
-
     when (screen) {
       Root -> ScopesContent(
+        model = model,
         onBack = onBack,
         onCreateScope = { router.push(Create) },
         onEditScope = { scope -> router.push(Edit(scope)) },
-        onEvent = { scopeId -> viewModel.take(DeleteScope(scopeId)) }
+        onEvent = viewModel::take
       )
 
       Create -> CreateScopeScreen(
@@ -135,10 +133,11 @@ fun ScopesScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScopesContent(
+  model: ScopesState,
   onBack: () -> Unit,
   onCreateScope: () -> Unit,
   onEditScope: (ScopeDomain) -> Unit,
-  onEvent: (Long) -> Unit,
+  onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
   var isDeleteDialogOpen by remember { mutableStateOf(false) }
@@ -169,7 +168,7 @@ fun ScopesContent(
         )
       )
     },
-    containerColor = MaterialTheme.colorScheme.surfaceContainer
+    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
   ) {
     Column(
       modifier = Modifier
@@ -201,11 +200,13 @@ fun ScopesContent(
       )
 
       OrderedScopesList(
+        model = model,
         onEditScope = onEditScope,
         onDeleteScope = { scopeId ->
           selectedScope = scopeId
           isDeleteDialogOpen = true
-        }
+        },
+        onEvent = onEvent
       )
     }
   }
@@ -216,8 +217,7 @@ fun ScopesContent(
       onDismissRequest = { isDeleteDialogOpen = false },
       scopeName = scope.name,
       onConfirm = {
-
-        onEvent(scope.id)
+        onEvent(DeleteScope(scope.id))
         isDeleteDialogOpen = false
       },
     )
@@ -228,16 +228,17 @@ fun ScopesContent(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun OrderedScopesList(
+  model: ScopesState,
   onEditScope: (ScopeDomain) -> Unit,
   onDeleteScope: (ScopeDomain) -> Unit,
+  onEvent: (ScopesUiEvent) -> Unit
 ) {
-
-  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
-  val model by viewModel.models.collectAsState()
+//  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
+//  val model by viewModel.models.collectAsState()
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
   val menuVisibility = remember(scopes) {
     mutableStateMapOf<Long, Boolean>().apply {
-      model.scopes.forEach { scope ->
+      scopes.forEach { scope ->
         put(scope.id, false)
       }
     }
@@ -294,7 +295,7 @@ private fun OrderedScopesList(
                   imageVector = Icons.Default.DragHandle,
                   modifier = Modifier.draggableHandle(
                     onDragStopped = {
-                      viewModel.take(ReorderScopes(scopes))
+                      onEvent(ReorderScopes(scopes))
                     }
                   ),
                   contentDescription = stringResource(Res.string.cd_move_icon),

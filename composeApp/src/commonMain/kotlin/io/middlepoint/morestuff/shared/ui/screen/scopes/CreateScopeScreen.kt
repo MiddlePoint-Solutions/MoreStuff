@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -52,117 +53,118 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateScopeScreen(
-    onBack: () -> Unit,
-    onSaveScope: (String) -> Unit,
+  onBack: () -> Unit,
+  onSaveScope: (String) -> Unit,
 ) {
+  var scopeTitle by remember { mutableStateOf("") }
+  val focusRequester = remember { FocusRequester() }
 
-    var scopeTitle by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
+  var showSaveAction by remember { mutableStateOf(false) }
 
-    var showSaveAction by remember { mutableStateOf(false) }
+  LaunchedEffect(Unit) {
+    delay(300)
+    focusRequester.requestFocus()
 
-    LaunchedEffect(Unit) {
-        delay(300)
-        focusRequester.requestFocus()
+    snapshotFlow { scopeTitle }
+      .distinctUntilChanged()
+      .collectLatest { title -> showSaveAction = title.isNotBlank() }
+  }
 
-        snapshotFlow { scopeTitle }
-            .distinctUntilChanged()
-            .collectLatest { title -> showSaveAction = title.isNotBlank() }
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = (stringResource(Res.string.add_scope))) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.cd_navigate_back)
-                        )
-                    }
-                },
-                actions = {
-                    if (showSaveAction) {
-                        TextButton(
-                            onClick = { onSaveScope(scopeTitle.trim()) },
-                            contentPadding = PaddingValues()
-                        ) {
-                            Text(
-                                text = stringResource(Res.string.save).uppercase(),
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
-                )
+  Scaffold(
+    topBar = {
+      TopAppBar(
+        title = { Text(text = (stringResource(Res.string.add_scope))) },
+        navigationIcon = {
+          IconButton(onClick = onBack) {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(Res.string.cd_navigate_back)
             )
+          }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
+        actions = {
+          if (showSaveAction) {
+            TextButton(
+              onClick = {
+                onSaveScope(scopeTitle.trim())
+              },
+              contentPadding = PaddingValues()
+            ) {
+              Text(
+                text = stringResource(Res.string.save).uppercase(),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                  fontWeight = FontWeight.SemiBold
+                )
+              )
+            }
+          }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+        )
+      )
+    },
+    containerColor = MaterialTheme.colorScheme.surfaceContainer
+  ) {
+
+    ConstraintLayout(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(it),
     ) {
 
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
-        ) {
+      val (content, action) = createRefs()
 
-            val (content, action) = createRefs()
+      Column(
+        modifier = Modifier.constrainAs(content) {
+          top.linkTo(parent.top)
+          bottom.linkTo(action.top)
+          height = Dimension.fillToConstraints
+          width = Dimension.matchParent
+        },
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
 
-            Column(
-                modifier = Modifier.constrainAs(content) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(action.top)
-                    height = Dimension.fillToConstraints
-                    width = Dimension.matchParent
-                },
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+        Icon(
+          painter = painterResource(Res.drawable.ic_scope_add),
+          contentDescription = stringResource(Res.string.cd_scopes_icon),
+          modifier = Modifier
+            .padding(top = 20.dp)
+            .size(60.dp),
+          tint = MaterialTheme.colorScheme.onSurface
+        )
 
-                Icon(
-                    painter = painterResource(Res.drawable.ic_scope_add),
-                    contentDescription = stringResource(Res.string.cd_scopes_icon),
-                    modifier = Modifier
-                        .padding(top = 20.dp)
-                        .size(60.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
+        Spacer(
+          modifier = Modifier.height(16.dp)
+        )
 
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
+        Text(
+          text = stringResource(Res.string.description_create_scope),
+          color = MaterialTheme.colorScheme.onSurface,
+          style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+        )
 
-                Text(
-                    text = stringResource(Res.string.description_create_scope),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
-                )
+        Spacer(
+          modifier = Modifier.height(16.dp)
+        )
+      }
 
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .constrainAs(action) {
-                        centerVerticallyTo(parent, bias = 0.4f)
-                        width = Dimension.matchParent
-                        height = Dimension.wrapContent
-                    }
-            ) {
-                ScopeTitleEditor(
-                    title = scopeTitle,
-                    onTitleChange = { title -> scopeTitle = title.trim() },
-                    modifier = Modifier.focusRequester(focusRequester)
-                )
-            }
-        }
+      Box(
+        modifier = Modifier
+          .constrainAs(action) {
+            centerVerticallyTo(parent, bias = 0.4f)
+            width = Dimension.matchParent
+            height = Dimension.wrapContent
+          }
+      ) {
+        ScopeTitleEditor(
+          title = scopeTitle,
+          onTitleChange = { title -> scopeTitle = title.trim() },
+          modifier = Modifier.focusRequester(focusRequester)
+        )
+      }
     }
+  }
 }
 
 //@Preview(

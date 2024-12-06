@@ -2,14 +2,14 @@ package io.middlepoint.morestuff.shared.ui.components.input
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 class UserInputViewModel : MoleculeViewModel<UserInputEvent, UserInputState>() {
 
   override val initialState: UserInputState = UserInputState()
 
   @Composable
-  override fun models(events: Flow<UserInputEvent>): UserInputState {
+  override fun models(events: SharedFlow<UserInputEvent>): UserInputState {
     return userInputModel(initialState, events)
   }
 }

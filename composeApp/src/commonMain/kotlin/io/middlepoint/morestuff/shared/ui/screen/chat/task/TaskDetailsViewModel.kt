@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 
 class TaskDetailsViewModel(
@@ -12,7 +12,7 @@ class TaskDetailsViewModel(
     override val initialState: TaskDetailsState = TaskDetailsState()
 
     @Composable
-    override fun models(events: Flow<TaskDetailsEvent>): TaskDetailsState {
+    override fun models(events: SharedFlow<TaskDetailsEvent>): TaskDetailsState {
         return taskDetailsModel(
             taskId = taskId,
             initialState = initialState,

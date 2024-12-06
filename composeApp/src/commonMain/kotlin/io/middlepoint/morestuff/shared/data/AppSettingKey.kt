@@ -1,5 +1,6 @@
-package io.middlepoint.morestuff.android.data
+package io.middlepoint.morestuff.shared.data
 
+import io.middlepoint.morestuff.android.data.Constants
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.DevSettings
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.FirstTime
@@ -7,7 +8,7 @@ import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ReviewTime
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.SnoozeLimit
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.Theme
 
-val AppSetting<*>.key: String
+val AppSetting<*>.settingKey: String
     get() = when (this) {
         FirstTime -> Constants.KEY_FIRST_TIME
         Theme -> Constants.KEY_APP_THEME

@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_navigate_back
 import org.jetbrains.compose.resources.stringResource
@@ -33,7 +34,7 @@ fun SettingsTopBar(onBack: () -> Unit, title: String) {
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
         )
     )
 }
