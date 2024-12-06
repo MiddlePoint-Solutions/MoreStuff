@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared
+package io.middlepoint.morestuff.shared.domain.repository
 
 interface TimeFormatter {
 

@@ -9,7 +9,7 @@ import org.koin.dsl.module
 actual val sharedModule: Module
   get() = module {
     singleOf(::StorageManagerImpl) bind StorageManager::class
-    factoryOf(::TimeFormatterImpl) bind TimeFormatter::class
+
     factoryOf(::ClipboardHelperImpl) bind ClipboardHelper::class
     factoryOf(::ShareHelperImpl) bind ShareHelper::class
     factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class

@@ -153,4 +153,9 @@ class TimeManagerImpl : TimeManager {
             hour,
             minute
         )
+
+    override fun todayLocalDateTime(hour: Int, minute: Int): LocalDateTime {
+        return localDateTime(nowLocalDateTime, hour, minute)
+    }
+
 }

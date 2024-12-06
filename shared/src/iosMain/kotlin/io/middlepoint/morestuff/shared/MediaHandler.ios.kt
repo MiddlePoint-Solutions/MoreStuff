@@ -21,12 +21,14 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSLog
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
-import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.create
 import platform.Foundation.writeToURL
 import platform.UIKit.UIActivityViewController
 import platform.UIKit.UIApplication
 import platform.UIKit.UIDocumentInteractionController
+import platform.UIKit.UIDocumentInteractionControllerDelegateProtocol
+import platform.UIKit.UIViewController
+import platform.darwin.NSObject
 import platform.posix.malloc
 import platform.posix.memcpy
 import platform.posix.size_t
@@ -83,9 +85,18 @@ class MediaHandlerImpl(
 
     val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
     if (rootViewController != null) {
-      documentController.presentPreviewAnimated(true)
+      val delegate = DocumentInteractionControllerDelegate(rootViewController)
+      documentController.delegate = delegate
+
+      val success = documentController.presentPreviewAnimated(true)
+      if (!success) {
+        logger.e { "Failed to present PDF preview. Path: $path" }
+      } else {
+        logger.d { "PDF preview presented successfully. Path: $path" }
+      }
     } else {
-      NSLog("PDF file not found or cannot be opened")
+      logger.e { "Root view controller not found. Unable to open PDF. Path: $path" }
+      NSLog("PDF file not found or cannot be opened. Path: $path")
     }
   }
 
@@ -98,7 +109,6 @@ class MediaHandlerImpl(
     val extension = url.substringAfterLast('.', "")
     val fileName = "$title.$extension"
     val documentsDirectory = getDocumentsDirectory()
-    logger.d { "Documents directory: $documentsDirectory" }
     if (documentsDirectory != null) {
       val customFolderPath = createDirectoryIfNeeded(documentsDirectory, folder)
       val customFolderURL = NSURL.fileURLWithPath(customFolderPath)
@@ -108,7 +118,6 @@ class MediaHandlerImpl(
         return fileURL.path ?: ""
       }
     }
-    logger.e { "creating directory: $documentsDirectory" }
     return ""
   }
 
@@ -128,7 +137,6 @@ class MediaHandlerImpl(
   ): String {
     val customFolderPath = "${documentsDirectory.path}/${folder.folderName}"
     if (!NSFileManager.defaultManager.fileExistsAtPath(customFolderPath)) {
-      logger.d { "creating directory: $customFolderPath" }
       NSFileManager.defaultManager.createDirectoryAtPath(
         customFolderPath,
         true,
@@ -157,4 +165,16 @@ class MediaHandlerImpl(
         }
       }
 
+}
+
+
+
+
+class DocumentInteractionControllerDelegate(
+  private val viewController: UIViewController
+) : NSObject(), UIDocumentInteractionControllerDelegateProtocol {
+
+  override fun documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController): UIViewController {
+    return viewController
+  }
 }

@@ -4,23 +4,28 @@ import ComposeApp
 
 @main
 struct SwiftUIApp: App {
-  @UIApplicationDelegateAdaptor var delegate: AppDelegate
-  @Environment(\.scenePhase)  var scenePhase: ScenePhase
+    @UIApplicationDelegateAdaptor var delegate: AppDelegate
+    @Environment(\.scenePhase)  var scenePhase: ScenePhase
     
     init() {
-        PlatformModuleKt.doInitKoin { Koin_coreKoinApplication in
-            
+        StartSdkKt.startSdk(navigationHelper: navigationHelper)
+        
+    }
+    
+    var defaultRouterContext: RouterContext { delegate.holder.defaultRouterContext }
+    var navigationHelper: NavigationHelper { delegate.navigationHelper }
+    
+    var body: some Scene {
+        WindowGroup {
+            HomeView(routerContext: defaultRouterContext)
+                .ignoresSafeArea(edges: .all)
+                .ignoresSafeArea(.keyboard)
+                .onOpenURL { url in
+                    
+                    handleFileURL(url, navigationHelper: navigationHelper)
+                }
         }
-    }
-
-  var defaultRouterContext: RouterContext { delegate.holder.defaultRouterContext }
-
-  var body: some Scene {
-    WindowGroup {
-      HomeView(routerContext: defaultRouterContext)
-            .ignoresSafeArea(edges: .all)
-            .ignoresSafeArea(.keyboard)
-    }
+    
     .onChange(of: scenePhase) { newPhase in
         switch newPhase {
         case .background: defaultRouterContext.stop()
@@ -31,6 +36,44 @@ struct SwiftUIApp: App {
     } // Compose has own keyboard handler
   }
 }
+
+private func handleFileURL(_ url: URL, navigationHelper: NavigationHelper) {
+    let filePath: String?
+    
+    if url.scheme?.localizedCaseInsensitiveCompare("morestuff") == .orderedSame {
+        if #available(iOS 16.0, *) {
+            filePath = url.query(percentEncoded: false)
+        } else {
+            filePath = url.query?.removingPercentEncoding
+        }
+    } else if url.scheme?.localizedCaseInsensitiveCompare("file") == .orderedSame {
+        filePath = url.path
+    } else {
+        return
+    }
+
+    guard let filePath = filePath else {
+        return
+    }
+    
+    let fileExtension = (filePath as NSString).pathExtension.lowercased()
+
+    switch fileExtension {
+    case "jpg", "jpeg", "png":
+        navigationHelper.shareImage(uri: filePath)
+    case "pdf":
+        navigationHelper.sharePdf(uri: filePath)
+    case "txt", "md", "rtf":
+        if let content = try? String(contentsOfFile: filePath) {
+            navigationHelper.shareText(message: content)
+        } else {
+            print("Failed to read text file content.")
+        }
+    default:
+        print("Unsupported file type: \(fileExtension)")
+    }
+}
+
 
 class DefaultRouterHolder : ObservableObject {
   let defaultRouterContext: RouterContext = DefaultRouterContextKt.defaultRouterContext()
@@ -43,6 +86,7 @@ class DefaultRouterHolder : ObservableObject {
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     let holder: DefaultRouterHolder = DefaultRouterHolder()
+    let navigationHelper: NavigationHelper = NavigationHelper()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         LottieConfiguration.shared.renderingEngine = .mainThread

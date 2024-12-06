@@ -136,4 +136,7 @@ interface TimeManager {
     fun getRelativeDate(timeString: String): RelativeDateDisplay
 
     fun utcMillisToLocalDateTime(utcMillis: Long, hour: Int = 0, minute: Int = 0): LocalDateTime
+
+    fun todayLocalDateTime(hour: Int, minute: Int): LocalDateTime
+
 }
