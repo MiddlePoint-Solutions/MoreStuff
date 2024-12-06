@@ -441,6 +441,7 @@ private fun ReviewTimeSelector(
   )
 
   if (showTimePickerDialog) {
+
     PriorityTimePicker(
       dismissTimePicker = { showTimePickerDialog = false },
       onTimeChange = {
@@ -450,6 +451,7 @@ private fun ReviewTimeSelector(
       state = timePickerState
     )
   }
+
   SettingsMenuLink(
     title = {
       Column {
