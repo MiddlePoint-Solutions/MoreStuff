@@ -21,8 +21,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
 import org.koin.compose.koinInject
 
 @Composable
@@ -165,11 +163,10 @@ private fun createScheduleModel(
     timeManager: TimeManager,
     timeFormatter: TimeFormatter
 ): ScheduleUiModel {
-    val timeString = time.toInstant(TimeZone.currentSystemDefault()).toString()
     return ScheduleUiModel(
         scheduleLocalDateTime = time,
-        displayDate = timeFormatter.formatTimeDayAndMonth(timeString) ?: "Error",
-        displayTime = timeFormatter.formatTimeOnly(timeString) ?: "Error",
+        displayDate = timeFormatter.formatDisplayDate(time.date),
+        displayTime = timeFormatter.formatDisplayTime(time.time) ?: "Error",
         scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
         dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
         currentUtcTimeMillis = timeManager.nowUtcMillis

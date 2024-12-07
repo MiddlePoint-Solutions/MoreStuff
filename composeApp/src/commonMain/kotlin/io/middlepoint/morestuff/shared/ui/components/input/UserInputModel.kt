@@ -12,7 +12,6 @@ import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
@@ -208,8 +207,8 @@ private fun createPlanTime(
   time: LocalDateTime = timeManager.getDefaultPlanTime(),
 ) = ScheduleUiModel(
   scheduleLocalDateTime = time,
-  displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-  displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
+  displayDate = timeFormatter.formatDisplayDate(time.date),
+  displayTime = timeFormatter.formatDisplayTime(time.time) ?: "--:--",
   scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
   dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
   currentUtcTimeMillis = timeManager.nowUtcMillis

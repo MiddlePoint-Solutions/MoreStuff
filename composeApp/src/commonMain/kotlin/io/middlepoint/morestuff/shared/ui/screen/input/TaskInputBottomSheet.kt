@@ -18,14 +18,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ModeStandby
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,8 +39,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -58,7 +54,6 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon

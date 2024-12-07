@@ -19,7 +19,7 @@ class MessageUiMapper(private val timeFormatter: TimeFormatter) {
       replyContent = input.replyContent,
       formattedTime = timeFormatter.formatTimeDayMonthInDeviceLanguage(input.createTime)
         ?: "",
-      formattedTimeOnly = timeFormatter.formatTimeOnly(input.createTime) ?: "",
+      formattedTimeOnly = timeFormatter.formatDisplayTime(input.createTime) ?: "",
       openGraphResult = input.openGraphResult
     )
 
