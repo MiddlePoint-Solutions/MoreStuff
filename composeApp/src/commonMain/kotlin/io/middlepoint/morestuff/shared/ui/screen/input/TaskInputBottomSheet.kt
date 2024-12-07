@@ -3,8 +3,11 @@ package io.middlepoint.morestuff.shared.ui.screen.input
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -15,12 +18,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ModeStandby
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -146,28 +151,20 @@ fun TaskInputBottomSheet(
         }
       }
 
-      ConstraintLayout {
-
-        val (chat, input) = createRefs()
+      BoxWithConstraints {
 
         Messages(
           messages = messages,
           actions = chatActions,
-          modifier = Modifier
-            .fillMaxWidth()
-            .constrainAs(chat) {
-              top.linkTo(parent.top)
-              bottom.linkTo(input.top)
-              height = Dimension.preferredWrapContent
-            },
+          modifier = Modifier.fillMaxSize(),
           scrollState = scrollState,
-          contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
+          contentPadding = PaddingValues(top = 10.dp, bottom = 130.dp)
         )
 
         Surface(
-          modifier = Modifier.constrainAs(input) {
-            bottom.linkTo(parent.bottom, margin = 6.dp)
-          }
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter),
         ) {
           var userInputValue by rememberSaveable(
             stateSaver = TextFieldValue.Saver,
@@ -186,7 +183,9 @@ fun TaskInputBottomSheet(
                 priority = priority,
                 schedule = schedule,
                 onEvent = viewModel::take,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                  .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
+                  .fillMaxWidth()
               )
             },
             textContent = {
