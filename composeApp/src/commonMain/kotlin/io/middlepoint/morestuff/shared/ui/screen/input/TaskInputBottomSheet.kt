@@ -58,6 +58,8 @@ import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,15 +70,11 @@ fun TaskInputBottomSheet(
   onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
 ) {
 
-  val viewModel: UserInputViewModel = koinInjectOnRoute()
+  val viewModel: UserInputViewModel = koinInject { parametersOf(context) }
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()
   val navigation = LocalAppRouter.current
-
-  LaunchedEffect(context) {
-    viewModel.take(UserInputEvent.LoadContext(context))
-  }
 
   val chatActions = remember {
     ChatActions(
@@ -117,7 +115,6 @@ fun TaskInputBottomSheet(
       Box(
         modifier = Modifier.fillMaxWidth()
       ) {
-
         Surface(
           modifier = Modifier.fillMaxWidth(),
           tonalElevation = 8.dp,

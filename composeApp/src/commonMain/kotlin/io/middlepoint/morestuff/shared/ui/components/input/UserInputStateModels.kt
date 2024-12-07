@@ -15,7 +15,6 @@ data class UserInputState(
 )
 
 sealed class UserInputEvent {
-  data class LoadContext(val context: ChatContext) : UserInputEvent()
   data object SetNowPriority : UserInputEvent()
   data object SetLaterPriority : UserInputEvent()
   data object SetPlanPriority : UserInputEvent()

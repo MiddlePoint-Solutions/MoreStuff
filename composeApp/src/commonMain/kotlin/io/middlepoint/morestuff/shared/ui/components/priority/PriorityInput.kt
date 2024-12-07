@@ -37,28 +37,15 @@ fun PriorityInput(
 
     val showPlanInput = remember(priority) { priority is PriorityUiModel.Plan }
 
-    LaunchedEffect(schedule) {
-      Logger.d { "Yoooo: $schedule" }
-    }
-
     AnimatedVisibility(
       showPlanInput,
       enter = slideInVertically { it * 2 },
       exit = slideOutVertically { (it * 1.5).toInt() }
     ) {
-
-      LaunchedEffect(Unit) {
-        Logger.d { "Yoooo1111: $schedule" }
-      }
-
       Box(
-        modifier = Modifier.size(200.dp).background(color = MaterialTheme.colorScheme.error),
         contentAlignment = Alignment.Center
       ) {
-        if (schedule != null) { // TODO: why is this null?
-          LaunchedEffect(Unit) {
-            Logger.d { "Yoooo2222: $schedule" }
-          }
+        if (schedule != null) {
           PlanPrioritySelector(
             scheduleModel = schedule,
             modifier = Modifier.fillMaxWidth(),
