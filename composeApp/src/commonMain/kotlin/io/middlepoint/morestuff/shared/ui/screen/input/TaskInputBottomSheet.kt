@@ -4,6 +4,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,6 +23,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ModeStandby
@@ -33,15 +44,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
@@ -54,6 +72,7 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon
@@ -97,6 +116,15 @@ fun TaskInputBottomSheet(
 
       val state by viewModel.models.collectAsState()
 
+      if (state.scopes.isEmpty()) {
+        return@ModalBottomSheet
+      }
+
+      val pagerState = rememberPagerState(
+        initialPage = state.scopes.indexOfFirst { it.id == context.scopeId },
+        pageCount = { state.scopes.size }
+      )
+
       val messages = state.messages
       val priority = state.priority
       val schedule = state.planTime
@@ -126,7 +154,8 @@ fun TaskInputBottomSheet(
             onScopeSelected = { viewModel.take(UserInputEvent.SetCurrentScope(it)) },
             modifier = Modifier
               .height(60.dp)
-              .fillMaxWidth()
+              .fillMaxWidth(),
+            pagerState = pagerState,
           )
         }
 
@@ -146,12 +175,22 @@ fun TaskInputBottomSheet(
         }
       }
 
-      BoxWithConstraints {
+      Box {
 
         Messages(
           messages = messages,
           actions = chatActions,
-          modifier = Modifier.fillMaxSize(),
+          modifier = Modifier
+            .fillMaxSize()
+            .draggable(
+              orientation = Orientation.Horizontal,
+              reverseDirection = true,
+              state = rememberDraggableState { delta ->
+                coroutineScope.launch {
+                  pagerState.scrollBy(delta)
+                }
+              }
+            ),
           scrollState = scrollState,
           contentPadding = PaddingValues(top = 10.dp, bottom = 130.dp)
         )
