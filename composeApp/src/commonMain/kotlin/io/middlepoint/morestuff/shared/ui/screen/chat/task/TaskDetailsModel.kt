@@ -150,8 +150,8 @@ fun taskDetailsModel(
 }
 
 private fun createModelForSchedule(
-    scheduleDomain: ScheduleDomain?, timeManager: TimeManager,
-    timeFormatter: TimeFormatter,
+  scheduleDomain: ScheduleDomain?, timeManager: TimeManager,
+  timeFormatter: TimeFormatter,
 ) =
     scheduleDomain?.scheduleLocalTime?.let {
         val localTime = LocalDateTime.parse(it)

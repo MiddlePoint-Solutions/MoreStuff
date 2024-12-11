@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.di
 
 import io.middlepoint.morestuff.db.StuffDb
-import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl

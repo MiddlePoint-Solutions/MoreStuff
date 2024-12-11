@@ -11,10 +11,8 @@ interface TimeFormatter {
   fun formatTimeDayMonthInDeviceLanguage(timeString: String?): String?
   fun formatDisplayTime(timeString: String): String?
   fun formatDisplayTime(time: LocalTime): String?
-  fun formatDisplayDate(timeString: String?): String?
   fun formatDisplayDate(time: LocalDate): String
-  fun formatTimeDayMonthHour(timeString: String?): String?
-  fun formatToDateTime(timeString: String?): String?
-  fun formatTimeWithDayMonthYear(timeString: String?): String?
+  fun formatToDateTime(timeString: String): String?
+  fun formatDisplayCompleteTime(timeString: String): String
 
 }

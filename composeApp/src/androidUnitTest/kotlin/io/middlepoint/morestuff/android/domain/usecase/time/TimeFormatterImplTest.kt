@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.domain.usecase.time
 
 
 import io.middlepoint.morestuff.android.domain.timeManager
-import io.middlepoint.morestuff.shared.TimeFormatterImpl
+import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk

@@ -12,7 +12,8 @@ import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
 
 class TimeFormatterImpl : TimeFormatter {
-  val loggerTime = Logger.withTag("TimeFormatterImpl")
+
+  private val loggerTime = Logger.withTag("TimeFormatterImpl")
   override val is24HourFormat: Boolean
     get() = true
 
@@ -54,39 +55,22 @@ class TimeFormatterImpl : TimeFormatter {
     return "${displayTimeFormat.format(time)}${addAmPm()}"
   }
 
-  override fun formatDisplayDate(timeString: String?): String? {
-//        return formatTime(timeString, "EEEE, MM, d")
-    return formatTime(timeString, "dd/MM/yyyy")
-  }
-
   override fun formatDisplayDate(time: LocalDate): String {
     return time.format(LocalDate.Formats.ISO)
   }
 
-  override fun formatTimeDayMonthHour(timeString: String?): String? {
-    return formatTime(timeString, "EEEE d MMMM, HH:mm")
+  override fun formatToDateTime(timeString: String): String? {
+//    return formatTime(timeString, "dd/MM/yyyy HH:mm${addAmPm()}")
+    return Instant.parse(timeString).toLocalDateTime(TimeZone.currentSystemDefault()).toString()
   }
 
-  override fun formatToDateTime(timeString: String?): String? {
-    return formatTime(timeString, "dd/MM/yyyy HH:mm${addAmPm()}")
+  override fun formatDisplayCompleteTime(timeString: String): String {
+    return LocalDateTime.parse(timeString).toString()
   }
 
   private fun addAmPm(): String {
     return if (is24HourFormat) "" else " a"
   }
-
-  override fun formatTimeWithDayMonthYear(timeString: String?): String? {
-    return timeString?.let {
-      try {
-        val instant = Instant.parse(it)
-        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-        customFormatWithOrdinal(localDateTime)
-      } catch (e: Exception) {
-        null
-      }
-    }
-  }
-
 
   private fun customFormatLocalDateTime(localDateTime: LocalDateTime, pattern: String): String {
     val components = mapOf(
@@ -106,24 +90,4 @@ class TimeFormatterImpl : TimeFormatter {
     return formattedString
   }
 
-  private fun customFormatWithOrdinal(dateTime: LocalDateTime): String {
-    val dayOfMonth = dateTime.dayOfMonth
-    val month = dateTime.month.name.lowercase()
-      .replaceFirstChar { it.titlecase() }
-    val year = dateTime.year
-
-    return "$dayOfMonth${getDayOfMonthSuffix(dayOfMonth)} $month, $year"
-  }
-
-  private fun getDayOfMonthSuffix(n: Int): String {
-    if (n in 11..13) {
-      return "th"
-    }
-    return when (n % 10) {
-      1 -> "st"
-      2 -> "nd"
-      3 -> "rd"
-      else -> "th"
-    }
-  }
 }
