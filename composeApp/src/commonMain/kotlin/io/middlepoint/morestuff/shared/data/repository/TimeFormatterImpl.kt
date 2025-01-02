@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.data.repository
 
-import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
+import io.middlepoint.morestuff.shared.domain.repository.is24HourFormat
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -13,17 +13,12 @@ import kotlinx.datetime.toLocalDateTime
 
 class TimeFormatterImpl : TimeFormatter {
 
-  private val loggerTime = Logger.withTag("TimeFormatterImpl")
-  override val is24HourFormat: Boolean
-    get() = true
-
   private val displayTimeFormat = LocalTime.Format { hour(); char(':'); minute(); }
 
   override fun formatTime(timeString: String?, pattern: String): String? {
     return timeString?.let {
       try {
         val localDateTime = try {
-          loggerTime.i("Original time: $it")
           Instant.parse(it).toLocalDateTime(TimeZone.currentSystemDefault())
         } catch (e: Exception) {
           LocalDateTime.parse(it)
@@ -51,7 +46,7 @@ class TimeFormatterImpl : TimeFormatter {
     return formatTime(timeString, "HH:mm${addAmPm()}")
   }
 
-  override fun formatDisplayTime(time: LocalTime): String? {
+  override fun formatDisplayTime(time: LocalTime): String {
     return "${displayTimeFormat.format(time)}${addAmPm()}"
   }
 
@@ -59,8 +54,7 @@ class TimeFormatterImpl : TimeFormatter {
     return time.format(LocalDate.Formats.ISO)
   }
 
-  override fun formatToDateTime(timeString: String): String? {
-//    return formatTime(timeString, "dd/MM/yyyy HH:mm${addAmPm()}")
+  override fun formatToDateTime(timeString: String): String {
     return Instant.parse(timeString).toLocalDateTime(TimeZone.currentSystemDefault()).toString()
   }
 
@@ -69,7 +63,7 @@ class TimeFormatterImpl : TimeFormatter {
   }
 
   private fun addAmPm(): String {
-    return if (is24HourFormat) "" else " a"
+    return if (is24HourFormat()) "" else " a"
   }
 
   private fun customFormatLocalDateTime(localDateTime: LocalDateTime, pattern: String): String {

@@ -45,16 +45,17 @@ fun ScopeCarousel(
   scopes: List<ScopeDomain>,
   currentScopeId: Long,
   onScopeSelected: (Long) -> Unit,
-  modifier: Modifier = Modifier,
-  pagerState: PagerState = rememberPagerState(
-    initialPage = scopes.indexOfFirst { it.id == currentScopeId },
-    pageCount = { scopes.size }
-  )
+  modifier: Modifier = Modifier
 ) {
 
   if (scopes.isEmpty()) {
     return
   }
+
+  val  pagerState: PagerState = rememberPagerState(
+    initialPage = scopes.indexOfFirst { it.id == currentScopeId },
+    pageCount = { scopes.size }
+  )
 
   val coroutineScope = rememberCoroutineScope()
 

@@ -52,7 +52,7 @@ fun reviewModel(
             SwipeDirection.Right -> PriorityActionType.More
             SwipeDirection.Up -> PriorityActionType.Now
             SwipeDirection.Down -> PriorityActionType.Later
-            else -> null
+            SwipeDirection.None -> null
           }
           actionType?.let {
             store.dispatch(PriorityAction.TaskPriorityUpdateAction(event.item.id, it))
