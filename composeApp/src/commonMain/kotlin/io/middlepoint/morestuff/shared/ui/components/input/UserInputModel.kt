@@ -177,13 +177,6 @@ fun userInputModel(
     }
   }
 
-//  return UserInputState(
-//    messages = messages,
-//    scopes = scopes,
-//    priority = priority,
-//    planTime = planTime,
-//    lastCreatedTaskId = lastCreatedTaskId
-//  )
   return state
 }
 

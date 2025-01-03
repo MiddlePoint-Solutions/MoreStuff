@@ -166,7 +166,7 @@ private fun createScheduleModel(
     return ScheduleUiModel(
         scheduleLocalDateTime = time,
         displayDate = timeFormatter.formatDisplayDate(time.date),
-        displayTime = timeFormatter.formatDisplayTime(time.time) ?: "Error",
+        displayTime = timeFormatter.formatDisplayTime(time.time),
         scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
         dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
         currentUtcTimeMillis = timeManager.nowUtcMillis

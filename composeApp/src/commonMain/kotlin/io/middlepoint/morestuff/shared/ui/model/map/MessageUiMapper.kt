@@ -12,14 +12,13 @@ class MessageUiMapper(private val timeFormatter: TimeFormatter) {
       taskId = input.taskId,
       scheduleId = input.scheduleId,
       contentType = input.contentType,
-      createTime = timeFormatter.formatToDateTime(input.createTime) ?: "",
+      createTime = timeFormatter.formatToDateTime(input.createTime),
       content = input.content,
       messageData = input.messageData,
       replyType = input.replyType,
       replyContent = input.replyContent,
-      formattedTime = timeFormatter.formatTimeDayMonthInDeviceLanguage(input.createTime)
-        ?: "",
-      formattedTimeOnly = timeFormatter.formatDisplayTime(input.createTime) ?: "",
+      formattedTime = timeFormatter.formatDisplayDayMonth(input.createTime),
+      formattedTimeOnly = timeFormatter.formatDisplayTime(input.createTime),
       openGraphResult = input.openGraphResult
     )
 
