@@ -49,7 +49,7 @@
 		5D7E06EA2CF7633000479A35 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		5D7E06FC2CF765A000479A35 /* MoreStuffShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MoreStuffShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D7E07112CF76BE300479A35 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
-		7555FF7B242A565900829871 /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7555FF7B242A565900829871 /* MoreStuff.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoreStuff.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FC07B7A87184B758B31D2F56 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -118,7 +118,7 @@
 		7555FF7C242A565900829871 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7555FF7B242A565900829871 /* iosApp.app */,
+				7555FF7B242A565900829871 /* MoreStuff.app */,
 				5D7E06FC2CF765A000479A35 /* MoreStuffShare.appex */,
 			);
 			name = Products;
@@ -172,9 +172,9 @@
 			productReference = 5D7E06FC2CF765A000479A35 /* MoreStuffShare.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		7555FF7A242A565900829871 /* iosApp */ = {
+		7555FF7A242A565900829871 /* MoreStuff */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "iosApp" */;
+			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "MoreStuff" */;
 			buildPhases = (
 				76302727FC4B31D9D2B01B71 /* [CP] Check Pods Manifest.lock */,
 				7555FF77242A565900829871 /* Sources */,
@@ -189,9 +189,9 @@
 			dependencies = (
 				5D7E07052CF765A000479A35 /* PBXTargetDependency */,
 			);
-			name = iosApp;
+			name = MoreStuff;
 			productName = iosApp;
-			productReference = 7555FF7B242A565900829871 /* iosApp.app */;
+			productReference = 7555FF7B242A565900829871 /* MoreStuff.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -225,7 +225,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7555FF7A242A565900829871 /* iosApp */,
+				7555FF7A242A565900829871 /* MoreStuff */,
 				5D7E06FB2CF765A000479A35 /* MoreStuffShare */,
 			);
 		};
@@ -599,7 +599,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "iosApp" */ = {
+		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "MoreStuff" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7555FFA6242A565B00829871 /* Debug */,
