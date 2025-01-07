@@ -17,15 +17,15 @@ class TimeFormatterImpl(
   private val timeUtils: TimeUtils
 ) : TimeFormatter {
 
-  internal val displayTimeFormat = LocalTime.Format {
+  private val displayTimeFormat = LocalTime.Format {
     amPmHour(Padding.NONE); char(':'); minute(); char(' '); amPmMarker("AM", "PM")
   }
 
-  internal val displayTimeFormat24Hours = LocalTime.Format {
+  private val displayTimeFormat24Hours = LocalTime.Format {
     hour(); char(':'); minute()
   }
 
-  internal val displayDayMonth = LocalDateTime.Format {
+  private val displayDayMonth = LocalDateTime.Format {
     monthName(ENGLISH_FULL); char(' '); dayOfMonth(Padding.NONE)
   }
 
@@ -52,8 +52,11 @@ class TimeFormatterImpl(
   override fun formatToDateTime(timeString: String, timeZone: TimeZone): String =
     Instant.parse(timeString).toLocalDateTime(timeZone).toString()
 
-  // TODO: the timeString used here is LocalDateTime instead of Instant
-  override fun formatDisplayCompleteTime(timeString: String): String =
-    LocalDateTime.parse(timeString).toString()
+  override fun formatDisplayCompleteTime(timeString: String, timeZone: TimeZone): String =
+    if (timeString.endsWith('z', ignoreCase = true)) {
+      Instant.parse(timeString).toLocalDateTime(timeZone).toString()
+    } else {
+      LocalDateTime.parse(timeString).toString()
+    }
 
 }

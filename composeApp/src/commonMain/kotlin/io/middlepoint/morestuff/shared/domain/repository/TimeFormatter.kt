@@ -27,5 +27,8 @@ interface TimeFormatter {
     timeZone: TimeZone = TimeZone.currentSystemDefault()
   ): String
 
-  fun formatDisplayCompleteTime(timeString: String): String
+  fun formatDisplayCompleteTime(
+    timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
 }
