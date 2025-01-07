@@ -26,7 +26,7 @@ class TimeFormatterImpl(
     }
   }
 
-  private val displayTimeFormat = LocalTime.Format { displayTime }
+  private val displayTimeFormat = LocalTime.Format { displayTime() }
 
   private val displayDayMonth = LocalDateTime.Format {
     monthName(ENGLISH_FULL); char(' '); dayOfMonth(Padding.NONE)
