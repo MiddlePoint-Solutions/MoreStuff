@@ -197,6 +197,8 @@
     <string name="developer_settings_enabled">¡Ajustes de desarrollador activados!</string>
     <string name="click_s_to_enable_developer_settings">Pincha %1$s veces para activar los ajustes de desarrollador</string>
     <string name="version">Versión</string>
+    <string name="notification_permission_already_granted">Permiso de notificaciones ya concedido</string>
+
 
     <string name="onboarding_schedule_review_title">Programar Revisión</string>
     <string name="onboarding_schedule_review_subtitle">Adquiera el hábito de las revisiones diarias estableciendo su horario preferido</string>
