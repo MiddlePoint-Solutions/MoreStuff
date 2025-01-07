@@ -1,75 +1,42 @@
 package io.middlepoint.morestuff.android.domain.usecase.time
 
 
-import io.middlepoint.morestuff.android.domain.timeManager
-import io.middlepoint.morestuff.shared.TimeFormatterImpl
+import io.middlepoint.morestuff.shared.TimeUtils
+import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.spyk
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toKotlinLocalDateTime
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.TimeZone
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 internal class TimeFormatterImplTest {
 
-    private val timeFormatter = spyk(TimeFormatterImpl(mockk())) {
-        every { is24HourFormat } returns true
-    }
+  private fun provideTimeUtils(use24Hours: Boolean) = mockk<TimeUtils> {
+    every { is24HourFormat() } returns use24Hours
+  }
 
-    @Test
-    fun `formatTime should format input time string using the provided pattern`() {
-        val timeString = "2023-03-27T12:00:00.000Z"
-        val pattern = "yyyy-MM-dd HH:mm:ss"
-        val formattedString = timeFormatter.formatTime(timeString, pattern)
-        assertNotNull(formattedString)
-        val dateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
-        val outputJavaLocalDateTime = LocalDateTime.parse(formattedString, dateTimeFormatter)
-        val outputLocalDateTime = outputJavaLocalDateTime.toKotlinLocalDateTime()
-        val inputInstant = Instant.parse(timeString)
-        val inputLocalDateTime = inputInstant.toLocalDateTime(timeManager.currentTimeZone)
-        assertEquals(inputLocalDateTime, outputLocalDateTime)
-    }
+  private val timeFormatter24Hours = TimeFormatterImpl(provideTimeUtils(true))
+  private val timeFormatter = TimeFormatterImpl(provideTimeUtils(false))
 
-    @Test
-    fun `formatTimeOnly should format input time string to HH mm format`() {
-        val timeString = "2023-03-27T12:00:00.000Z"
-        val expectedFormattedString = ZonedDateTime.parse(timeString)
-            .withZoneSameInstant(ZoneId.systemDefault())
-            .toLocalTime()
-            .format(DateTimeFormatter.ofPattern("HH:mm"))
+  @Test
+  fun `format display time should return time string only`() {
+    val timeString = "2023-03-27T12:00:00.000Z"
+    val formattedString = timeFormatter.formatDisplayTime(timeString, TimeZone.UTC)
+    assertEquals("12:00 PM", formattedString)
+  }
 
-        val formattedString = timeFormatter.formatTimeOnly(timeString)
-        assertEquals(expectedFormattedString, formattedString)
-    }
+  @Test
+  fun `format display 24 hours time should return time string only`() {
+    val timeString = "2023-03-27T12:00:00.000Z"
+    val formattedString = timeFormatter24Hours.formatDisplayTime(timeString, TimeZone.UTC)
+    assertEquals("12:00", formattedString)
+  }
 
-    @Test
-    fun `formatTimeDayAndMonth should format input time string to EEEE, MMMM d format`() {
-        val timeString = "2023-03-27T12:00:00.000Z"
-        val expectedFormattedString = ZonedDateTime.parse(timeString)
-            .withZoneSameInstant(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("EEEE, MMMM d"))
-
-        val formattedString = timeFormatter.formatTimeDayAndMonth(timeString)
-        assertEquals(expectedFormattedString, formattedString)
-    }
-
-    @Test
-    fun `formatToDateTime should format input time string to ddMMyyyyHHmm format`() {
-        val timeString = "2023-03-27T12:00:00.000Z"
-        val expectedFormattedString = ZonedDateTime.parse(timeString)
-            .withZoneSameInstant(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
-
-        val formattedString = timeFormatter.formatToDateTime(timeString)
-        assertEquals(expectedFormattedString, formattedString)
-    }
-
+  @Test
+  fun `format month and day should return correct format`() {
+    val timeString = "2023-03-27T12:00:00.000Z"
+    val formattedString = timeFormatter.formatDisplayDayMonth(timeString, TimeZone.UTC)
+    assertEquals("March 27", formattedString)
+  }
 
 }

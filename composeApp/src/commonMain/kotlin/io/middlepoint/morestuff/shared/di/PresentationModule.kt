@@ -11,7 +11,7 @@ import io.middlepoint.morestuff.shared.ui.screen.home.AppPresenter
 import io.middlepoint.morestuff.shared.ui.screen.home.HomePresenter
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewModel
-import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksPresenter
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchViewModel
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
@@ -30,7 +30,7 @@ val presentationModule = module {
     viewModelOf(::MainViewModel)
     viewModelOf(::ReviewViewModel)
     viewModelOf(::HomePresenter)
-    viewModelOf(::ScopeTasksPresenter)
+    viewModelOf(::ScopeTasksViewModel)
 
     viewModelOf(::ShareViewModel)
     viewModelOf(::SearchViewModel)

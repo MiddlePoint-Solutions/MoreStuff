@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.ui.screen.home
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,7 +63,7 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelect
 import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
-import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksPresenter
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
@@ -73,7 +72,6 @@ import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cta_lets_go
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -244,7 +242,7 @@ private fun HomeContent(
         val scope = model.scopes[page]
 
         val scopeViewModel = koinInjectOnRoute(
-          type = ScopeTasksPresenter::class,
+          type = ScopeTasksViewModel::class,
           key = "Scope${scope.id}",
           parameters = { parametersOf(scope.id) }
         )

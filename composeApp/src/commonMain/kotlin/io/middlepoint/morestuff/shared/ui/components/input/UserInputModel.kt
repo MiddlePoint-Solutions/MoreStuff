@@ -6,22 +6,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
-import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -39,6 +39,7 @@ import org.koin.compose.koinInject
 @Composable
 fun userInputModel(
   initialState: UserInputState,
+  context: ChatContext,
   events: Flow<UserInputEvent>,
   store: AppStore = koinInject(),
   getLastMessageFlowUseCase: GetLastMessageFlowUseCase = koinInject(),
@@ -50,28 +51,30 @@ fun userInputModel(
   appMessageProvider: AppMessageProvider = koinInject()
 ): UserInputState {
 
-  var context by remember { mutableStateOf<ChatContext?>(null) }
-  var messages by remember { mutableStateOf(listOf<MessageUiModel>()) }
-  var scopes by remember { mutableStateOf((listOf<ScopeDomain>())) }
+  // TODO: use UserInputState as the current state and use .copy to update state instead of updating these individually.
+  var state by remember(initialState) { mutableStateOf(initialState) }
   var currentScope by remember { mutableStateOf(defaultScope) }
-  var priority by remember { mutableStateOf<PriorityUiModel>(PriorityUiModel.Now) }
-  var planTime by remember(priority) { mutableStateOf<ScheduleUiModel?>(null) }
-  var lastCreatedTaskId by remember { mutableStateOf<Long?>(null) }
-
-  LaunchedEffect(Unit) {
-    getScopesUseCase().onRight { scopesList ->
-      scopes = scopesList
-      currentScope = scopesList.firstOrNull { it.id == context?.scopeId } ?: defaultScope
-    }
-  }
 
   LaunchedEffect(context) {
+    Logger.d { "context: $context" }
+    getScopesUseCase()
+      .onRight { scopesList ->
+        state = state.copy(
+          scopes = scopesList
+        )
+        currentScope = scopesList.firstOrNull { it.id == context.scopeId } ?: defaultScope
+      }
+
     val intro = createAppMessage(
       appMessageProvider.getWhatCanIDoForYouMessage(),
       timeManager,
       messageUiMapper
     )
-    messages = mutableListOf<MessageUiModel>().apply { add(0, intro) }
+
+    state = state.copy(
+      messages = mutableListOf<MessageUiModel>().apply { add(0, intro) },
+      priority = PriorityUiModel.Now
+    )
 
     getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
       .drop(1)
@@ -79,7 +82,9 @@ fun userInputModel(
       .map { message -> message?.let(messageUiMapper::map) }
       .collect { message ->
         message?.let {
-          messages = messages.toMutableList().apply { add(0, it) }
+          state = state.copy(
+            messages = state.messages.toMutableList().apply { add(0, it) }
+          )
           delay(1500)
 
           val appMessage =
@@ -88,7 +93,10 @@ fun userInputModel(
               timeManager,
               messageUiMapper
             )
-          messages = messages.toMutableList().apply { add(0, appMessage) }
+
+          state = state.copy(
+            messages = state.messages.toMutableList().apply { add(0, appMessage) }
+          )
         }
       }
   }
@@ -96,69 +104,80 @@ fun userInputModel(
   LaunchedEffect(Unit) {
     events.collect { event ->
       when (event) {
-        UserInputEvent.SetLaterPriority -> priority = PriorityUiModel.Later
-        UserInputEvent.SetNowPriority -> priority = PriorityUiModel.Now
+        UserInputEvent.SetLaterPriority -> {
+          state = state.copy(
+            priority = PriorityUiModel.Later
+          )
+        }
+
+        UserInputEvent.SetNowPriority -> {
+          state = state.copy(
+            priority = PriorityUiModel.Now
+          )
+        }
+
         UserInputEvent.SetPlanPriority -> {
           val time = createPlanTime(timeManager, timeFormatter)
-          planTime = time
-          priority = PriorityUiModel.Plan(time.scheduleLocalDateTime)
+          state = state.copy(
+            priority = PriorityUiModel.Plan(time.scheduleLocalDateTime),
+            planTime = time
+          )
         }
 
         is UserInputEvent.UpdatePlanDate -> {
-          planTime = planTime?.let {
-            val updatedTime = timeManager.utcMillisToLocalDateTime(
-              event.utcTimeMillis,
-              it.hour,
-              it.minute
-            )
-            createPlanTime(timeManager, timeFormatter, updatedTime)
-          }
+          state = state.copy(
+            planTime = state.planTime?.let {
+              val updatedTime = timeManager.utcMillisToLocalDateTime(
+                event.utcTimeMillis,
+                it.hour,
+                it.minute
+              )
+              createPlanTime(timeManager, timeFormatter, updatedTime)
+            }
+          )
         }
 
         is UserInputEvent.UpdatePlanTime -> {
-          planTime = planTime?.let {
-            val updatedTime = timeManager.localDateTime(
-              it.scheduleLocalDateTime,
-              event.hour,
-              event.minute
-            )
-            createPlanTime(timeManager, timeFormatter, updatedTime)
-          }
+          state = state.copy(
+            planTime = state.planTime?.let {
+              val updatedTime = timeManager.localDateTime(
+                it.scheduleLocalDateTime,
+                event.hour,
+                event.minute
+              )
+              createPlanTime(timeManager, timeFormatter, updatedTime)
+            }
+          )
         }
 
         is UserInputEvent.SetCurrentScope -> {
-          currentScope = scopes.first { it.id == event.scopeId }
+          currentScope = state.scopes.first { it.id == event.scopeId }
         }
 
         is UserInputEvent.CreateNewTask -> {
-          val domainPriority = priority.mapToDomain()
+          val domainPriority = state.priority.mapToDomain()
           val trimmedTitle = event.title.trim()
           val params = TaskParams(trimmedTitle, domainPriority, TaskType.User, currentScope.id)
           val task = createTaskUseCase(params)
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
-          lastCreatedTaskId = task.id
+          state = state.copy(
+            lastCreatedTaskId = task.id
+          )
           launch {
             // Hack for not using the same taskId in share screen.
             // This will be solved when adding new navigation with decompose router
             delay(300)
-            lastCreatedTaskId = null
+            state = state.copy(
+              lastCreatedTaskId = null
+            )
           }
         }
 
-        is UserInputEvent.LoadContext -> {
-          context = event.context
-        }
       }
     }
   }
 
-  return UserInputState(
-    messages = messages,
-    scopes = scopes,
-    priority = priority,
-    planTime = planTime,
-    lastCreatedTaskId = lastCreatedTaskId
-  )
+  return state
 }
 
 private fun createAppMessage(
@@ -181,8 +200,8 @@ private fun createPlanTime(
   time: LocalDateTime = timeManager.getDefaultPlanTime(),
 ) = ScheduleUiModel(
   scheduleLocalDateTime = time,
-  displayDate = timeFormatter.formatTimeDayAndMonth(time.toString()) ?: "Error",
-  displayTime = timeFormatter.formatTimeOnly(time.toString()) ?: "--:--",
+  displayDate = timeFormatter.formatDisplayDate(time.date),
+  displayTime = timeFormatter.formatDisplayTime(time.time) ?: "--:--",
   scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
   dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
   currentUtcTimeMillis = timeManager.nowUtcMillis

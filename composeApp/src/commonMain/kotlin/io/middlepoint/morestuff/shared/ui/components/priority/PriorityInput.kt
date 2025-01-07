@@ -3,19 +3,23 @@ package io.middlepoint.morestuff.shared.ui.components.priority
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.ui.components.input.UserInputEvent
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -31,16 +35,13 @@ fun PriorityInput(
     modifier = modifier
   ) {
 
-    val showPlanInput by remember(priority) {
-      derivedStateOf { priority is PriorityUiModel.Plan }
-    }
+    val showPlanInput = remember(priority) { priority is PriorityUiModel.Plan }
 
     AnimatedVisibility(
       showPlanInput,
       enter = slideInVertically { it * 2 },
       exit = slideOutVertically { (it * 1.5).toInt() }
     ) {
-
       Box(
         contentAlignment = Alignment.Center
       ) {

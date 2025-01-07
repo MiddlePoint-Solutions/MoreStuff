@@ -8,6 +8,7 @@ import com.arkivanov.essenty.instancekeeper.getOrCreate
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.RouterContext
 import io.github.xxfast.decompose.router.key
+import io.github.xxfast.decompose.router.rememberOnRoute
 import org.koin.compose.LocalKoinApplication
 import org.koin.core.Koin
 import org.koin.core.parameter.ParametersDefinition
@@ -32,5 +33,16 @@ fun <T : Any> koinInjectOnRoute(
       )
     }
   }
+  rememberOnRoute { }
   return routeInstance.instance
+}
+
+@Suppress("DEPRECATION")
+@Composable
+inline fun <reified T : Any> koinInjectOnRoute(
+  key: Any = T::class,
+  noinline parameters: ParametersDefinition? = null,
+): T {
+  val koin: Koin = LocalKoinApplication.current
+  return rememberOnRoute(T::class, key) { koin.get(clazz = T::class, parameters = parameters) }
 }

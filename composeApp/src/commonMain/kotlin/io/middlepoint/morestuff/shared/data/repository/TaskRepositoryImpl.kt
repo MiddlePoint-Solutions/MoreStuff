@@ -129,7 +129,7 @@ class TaskRepositoryImpl(
         complete: Boolean,
     ): Either<Failure, Boolean> {
         val time = when (complete) {
-            true -> timeManager.nowLocalDateTimeString
+            true -> timeManager.nowUtcInstantString
             false -> null
         }
 
