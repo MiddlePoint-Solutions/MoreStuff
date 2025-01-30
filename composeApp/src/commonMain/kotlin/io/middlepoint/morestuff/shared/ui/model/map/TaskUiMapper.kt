@@ -18,6 +18,7 @@ class TaskUiMapper(
     extraDetails = input.extraDetails,
     hasSchedule = input.hasSchedule,
     hasReminder = input.hasReminder,
+    scheduleTime = input.getScheduleOrNull()?.scheduleUtcTime?:""
   )
 
   fun map(input: List<TaskDomain>): List<TaskUiModel> =

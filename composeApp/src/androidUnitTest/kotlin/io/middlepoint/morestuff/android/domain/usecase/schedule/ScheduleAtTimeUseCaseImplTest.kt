@@ -14,9 +14,9 @@ class ScheduleAtTimeUseCaseImplTest {
 
     @Test
     fun `schedule at Time use case`() = runBlocking {
-        coEvery { scheduler.scheduleAtExact(scheduleId, time) } just Runs
-        scheduleAtTimeUseCaseImpl.invoke(scheduleId, time)
-        coVerify { scheduler.scheduleAtExact(scheduleId, time) }
+        coEvery { scheduler.scheduleAtExact(scheduleId, time,"") } just Runs
+        scheduleAtTimeUseCaseImpl.invoke(scheduleId, time,"")
+        coVerify { scheduler.scheduleAtExact(scheduleId, time,"") }
     }
 
 }

@@ -7,29 +7,38 @@ import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 
 interface CancelActiveScheduleUseCase {
-    suspend operator fun invoke(
-        taskIds: List<Long>,
-        scheduleType: List<ScheduleType> = listOf()
-    ): Either<Failure, List<ScheduleDomain>>
+  suspend operator fun invoke(
+    taskIds: List<Long>,
+    scheduleType: List<ScheduleType> = listOf()
+  ): Either<Failure, List<ScheduleDomain>>
 }
 
 class CancelActiveScheduleUseCaseImpl(
-    private val scheduler: Scheduler,
-    private val getActiveSchedule: GetActiveSchedulesUseCase,
-    private val setScheduleFulfilled: SetScheduleFulfilledUseCase
+  private val scheduler: Scheduler,
+  private val getActiveSchedule: GetActiveSchedulesUseCase,
+  private val setScheduleFulfilled: SetScheduleFulfilledUseCase
 ) : CancelActiveScheduleUseCase {
 
-    override suspend fun invoke(
-        taskIds: List<Long>,
-        scheduleType: List<ScheduleType>
-    ): Either<Failure, List<ScheduleDomain>> {
-        return getActiveSchedule(taskIds, scheduleType).onRight { schedules ->
-            schedules.forEach {
-                setScheduleFulfilled(it.id)
-                scheduler.cancelSchedule(it.id)
-            }
-        }
+  override suspend fun invoke(
+    taskIds: List<Long>,
+    scheduleType: List<ScheduleType>
+  ): Either<Failure, List<ScheduleDomain>> {
+    if (taskIds.isEmpty()) {
+      return Either.Right(emptyList())
     }
+
+    val adjustedScheduleType = scheduleType.ifEmpty {
+      listOf(ScheduleType.OneTime, ScheduleType.Reminder)
+    }
+
+    return getActiveSchedule(taskIds, adjustedScheduleType)
+      .onRight { schedules ->
+        schedules.forEach { schedule ->
+          setScheduleFulfilled(schedule.id)
+          scheduler.cancelSchedule(schedule.id)
+        }
+      }
+  }
 }
 
 

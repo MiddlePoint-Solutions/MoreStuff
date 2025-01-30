@@ -8,6 +8,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
 import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
@@ -28,6 +29,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCas
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleWorkUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfilledUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
@@ -48,7 +50,7 @@ sealed class ScheduleAction : Action.FeatureAction() {
         val scheduleType: List<ScheduleType> = ScheduleType.entries.toList()
     ) : ScheduleAction()
 
-    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain) : ScheduleAction()
+    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain, val task: TaskDomain) : ScheduleAction()
 
     internal data class ScheduleReplyAction(
       val schedule: ScheduleDomain,
@@ -67,6 +69,7 @@ class ScheduleMiddleware(
     private val toggleQuickReminderUseCase: ToggleQuickReminderUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
+    private val getTaskUseCase: GetTaskUseCase
 ) : Middleware<AppState> {
 
     val timeManager: TimeManager = TimeManagerImpl()
@@ -87,7 +90,7 @@ class ScheduleMiddleware(
             is TaskAction.TaskCreatedAction -> scope.launch {
                 with(action) {
                     createOneTimeScheduleUseCase(task.id, priority).map {
-                        dispatch(ScheduleCreatedAction(it))
+                        dispatch(ScheduleCreatedAction(it, task))
                     }
                 }
             }
@@ -100,8 +103,10 @@ class ScheduleMiddleware(
 
             is RescheduleTaskAction -> scope.launch {
                 with(action) {
-                    createScheduleUseCase(taskId, scheduleType, localDateTime).map {
-                        dispatch(ScheduleCreatedAction(it))
+                    getTaskUseCase(taskId).map { task ->
+                        createScheduleUseCase(taskId, scheduleType, localDateTime).map { schedule ->
+                            dispatch(ScheduleCreatedAction(schedule, task))
+                        }
                     }
                 }
             }
@@ -148,7 +153,7 @@ class ScheduleMiddleware(
             is ScheduleCreatedAction -> {
                 scope.launch {
                     action.schedule.scheduleLocalTime?.let { time ->
-                        scheduleAtTimeUseCase(action.schedule.id, time)
+                        scheduleAtTimeUseCase(action.schedule.id, time, action.task.title)
                     }
                 }
             }
@@ -163,15 +168,15 @@ class ScheduleMiddleware(
             }
 
             is ToggleReminderScheduleAction -> scope.launch {
-                toggleQuickReminderUseCase(action.taskId).map {
+               /* toggleQuickReminderUseCase(action.taskId).map { //TODO: fix this later
                     dispatch(ScheduleCreatedAction(it))
-                }
+                }*/
             }
 
             is CreateReminderScheduleAction -> scope.launch {
-                createReminderUseCase(action.taskId).map {
+               /* createReminderUseCase(action.taskId).map { //TODO: fix this later
                     dispatch(ScheduleCreatedAction(it))
-                }
+                }*/
             }
 
             is CancelScheduleAction -> scope.launch {
