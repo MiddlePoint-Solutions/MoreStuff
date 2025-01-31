@@ -34,7 +34,7 @@ fun scopeTasksModel(
       }
   }
 
-  LaunchedEffect(tasks) {
+/*  LaunchedEffect(tasks) {
     val expiredTaskIds = mutableListOf<Long>()
 
     tasks?.forEach { task ->
@@ -59,7 +59,7 @@ fun scopeTasksModel(
     if (expiredTaskIds.isNotEmpty()) {
       cancelActiveScheduleUseCase(expiredTaskIds)
     }
-  }
+  }*/
 
   return tasks?.let { Data(it) } ?: Loading
 }

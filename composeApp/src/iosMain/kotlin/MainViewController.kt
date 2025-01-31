@@ -39,6 +39,11 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
                 }
             }
         }
+        LaunchedEffect(Unit) {
+            navigationHelper.navigation.collect { screen ->
+                initialScreen.value = screen
+            }
+        }
         App(screen = initialScreen.value)
     }
 }

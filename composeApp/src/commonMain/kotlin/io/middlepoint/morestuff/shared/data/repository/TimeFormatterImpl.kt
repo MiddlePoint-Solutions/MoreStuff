@@ -8,7 +8,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 class TimeFormatterImpl : TimeFormatter {
-    val loggerTime = Logger.withTag("TimeFormatterImpl")
     override val is24HourFormat: Boolean
         get() = true
 
@@ -16,7 +15,6 @@ class TimeFormatterImpl : TimeFormatter {
         return timeString?.let {
             try {
                 val localDateTime = try {
-                    loggerTime.i("Original time: $it")
                     Instant.parse(it).toLocalDateTime(TimeZone.currentSystemDefault())
                 } catch (e: Exception) {
                     LocalDateTime.parse(it)

@@ -4,15 +4,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableSharedFlow
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 val logger = Logger.withTag("NavigationHelper")
 
-class NavigationHelper : ViewModel() {
+class NavigationHelper: ViewModel(), KoinComponent {
 
     val shareable = MutableSharedFlow<Shareable>()
+    val navigation = MutableSharedFlow<Screen>()
+    private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
+
 
     fun shareText(message: String) {
         viewModelScope.launch {
@@ -34,20 +41,29 @@ class NavigationHelper : ViewModel() {
             shareable.emit(Shareable.Pdf(uri, ""))
         }
     }
-}
 
-
-
-
-
-/*class NavigationHelper : ViewModel()  {
-
-    val shareable = MutableSharedFlow<String>()
-
-    fun share(path: String) {
+    fun navigateToTaskChat(taskId: Long) {
         viewModelScope.launch {
-            logger.d { "Emitting path to shareable: $path" }
-            shareable.emit(path) }
+            logger.d { "Emitting Screen to navigate to: $taskId" }
+            navigation.emit(Screen.TaskChat(taskId))
+            cancelActiveScheduleUseCase(listOf(taskId))
+        }
     }
 
-}*/
+    fun cancelTaskSchedule(taskId: Long) {
+        viewModelScope.launch {
+            logger.d { "Cancelling active schedule for taskId: $taskId" }
+
+            val result = cancelActiveScheduleUseCase.invoke(listOf(taskId))
+
+            result.onRight { schedules ->
+                logger.d { "Cancelled schedules: ${schedules.map { it.id }}" }
+            }.onLeft { failure ->
+                logger.e { "Failed to cancel schedule: $failure" }
+            }
+        }
+    }
+
+
+}
+

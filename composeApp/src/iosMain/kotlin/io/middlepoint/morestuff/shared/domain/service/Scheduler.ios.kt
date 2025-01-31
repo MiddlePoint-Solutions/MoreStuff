@@ -2,25 +2,36 @@ package io.middlepoint.morestuff.shared.domain.service
 
 
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.ui.utils.NotificationState
 import kotlinx.datetime.LocalDateTime
-import org.koin.core.component.KoinComponent
+import org.koin.compose.koinInject
+import org.koin.core.component.inject
 import platform.Foundation.NSDateComponents
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 import kotlin.time.Duration.Companion.days
-
+import platform.UserNotifications.*
+import platform.darwin.NSObject
+import org.koin.core.component.inject
 
 class SchedulerImpl(
-    private val timeManager: TimeManager,
-) : Scheduler, KoinComponent {
+  private val timeManager: TimeManager,
+) : Scheduler {
    private val logger = Logger.withTag("SchedulerImpl")
     private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
 
-    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String) {
+    init {
+        notificationCenter.delegate()
+    }
+
+    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String, taskId: Long) {
         logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
 
         val localDateTime = LocalDateTime.parse(scheduleTime)
@@ -36,7 +47,7 @@ class SchedulerImpl(
         val content = UNMutableNotificationContent().apply {
             setTitle("Reminder")
             setBody(taskTitle)
-            setUserInfo(mapOf("scheduleId" to scheduleId))
+            setUserInfo(mapOf("scheduleId" to scheduleId.toString(), "taskId" to taskId.toString()))
         }
 
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
@@ -52,11 +63,13 @@ class SchedulerImpl(
 
         notificationCenter.addNotificationRequest(request) { error ->
             if (error == null) {
+
                 logger.i { "Successfully scheduled notification for scheduleId=$scheduleId" }
             } else {
                 logger.e { "Error scheduling notification: ${'$'}{error.localizedDescription}" }
             }
         }
+
     }
 
 
@@ -135,18 +148,21 @@ class SchedulerImpl(
         scheduleReviewWorker(hour, minute)
     }
 
-    /*override fun cancelSchedule(scheduleId: Long) {
+    override fun cancelSchedule(scheduleId: Long) {
         UNUserNotificationCenter.currentNotificationCenter()
             .removePendingNotificationRequestsWithIdentifiers(
                 listOf(getScheduleWorkTag(scheduleId))
             )
-    }*/
+    }
 
-    override fun cancelSchedule(scheduleId: Long) {
-        notificationCenter.removePendingNotificationRequestsWithIdentifiers(
+   /* override fun cancelSchedule(scheduleId: Long) {
+      val notificationCenter =  notificationCenter.removePendingNotificationRequestsWithIdentifiers(
             listOf(getScheduleWorkTag(scheduleId))
         )
-    }
+        logger.i { "Notification for scheduleId=$scheduleId cancelled" }
+        logger.i { "Notification for notificationCenter=$notificationCenter cancelled" }
+        return notificationCenter
+    }*/
 
     override fun cancelPlannedPriorityUpdate() {
         UNUserNotificationCenter.currentNotificationCenter()
@@ -155,10 +171,11 @@ class SchedulerImpl(
             )
     }
 
-    private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
+  private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
     companion object {
         private const val PLANNED_PRIORITY_WORK = "SmartReminder"
         private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }
+
