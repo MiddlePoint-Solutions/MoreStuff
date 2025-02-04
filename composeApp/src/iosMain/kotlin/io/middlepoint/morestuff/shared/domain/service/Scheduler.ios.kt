@@ -2,23 +2,14 @@ package io.middlepoint.morestuff.shared.domain.service
 
 
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.ui.utils.NotificationState
 import kotlinx.datetime.LocalDateTime
-import org.koin.compose.koinInject
-import org.koin.core.component.inject
 import platform.Foundation.NSDateComponents
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
-import platform.darwin.dispatch_async
-import platform.darwin.dispatch_get_main_queue
 import kotlin.time.Duration.Companion.days
-import platform.UserNotifications.*
-import platform.darwin.NSObject
-import org.koin.core.component.inject
 
 class SchedulerImpl(
   private val timeManager: TimeManager,
@@ -154,15 +145,6 @@ class SchedulerImpl(
                 listOf(getScheduleWorkTag(scheduleId))
             )
     }
-
-   /* override fun cancelSchedule(scheduleId: Long) {
-      val notificationCenter =  notificationCenter.removePendingNotificationRequestsWithIdentifiers(
-            listOf(getScheduleWorkTag(scheduleId))
-        )
-        logger.i { "Notification for scheduleId=$scheduleId cancelled" }
-        logger.i { "Notification for notificationCenter=$notificationCenter cancelled" }
-        return notificationCenter
-    }*/
 
     override fun cancelPlannedPriorityUpdate() {
         UNUserNotificationCenter.currentNotificationCenter()

@@ -107,50 +107,32 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
 
-       /// Manejar notificaciones cuando el usuario las toca
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        print("🔔 didReceiveNotificationResponse ejecutado con userInfo: \(userInfo)")
 
         if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
-            print("✅ Notification tapped, navegando a TaskChat(taskId=\(taskId))")
             navigateToTaskChat(taskId: taskId)
             //cancelSchedule(taskId: taskId)
-        } else {
-            print("⚠️ No taskId encontrado en userInfo")
         }
         if let scheduleId = userInfo["scheduleId"] as? String {
-            print("📩 Cancelando scheduleId=\(scheduleId) porque la notificación ha sido recibida")
             center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
-        } else {
-            print("⚠️ No scheduleId encontrado en userInfo")
         }
-        
 
         completionHandler()
     }
     
-    /// Manejar notificaciones cuando se reciben (incluso en primer plano)
        func userNotificationCenter(_ center: UNUserNotificationCenter,
                                    willPresent notification: UNNotification,
                                    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
            let userInfo = notification.request.content.userInfo
-           print("📩 Notificación recibida en primer plano con userInfo: \(userInfo)")
 
            if let scheduleId = userInfo["scheduleId"] as? String {
-               print("📩 Cancelando scheduleId=\(scheduleId) porque la notificación ha sido recibida")
                center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
-           } else {
-               print("⚠️ No scheduleId encontrado en userInfo")
            }
            if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
-               print("✅ Notification tapped, cancelando a TaskChat(taskId=\(taskId))")
-        
                cancelSchedule(taskId: taskId)
-           } else {
-               print("⚠️ No taskId encontrado en userInfo")
            }
 
            completionHandler([.banner, .sound])

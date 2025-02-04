@@ -16,8 +16,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.MainActivity
 import io.middlepoint.morestuff.android.R
+import io.middlepoint.morestuff.shared.MainActivity
 import io.middlepoint.morestuff.shared.app.extensions.isAtLeastVersion
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
@@ -37,7 +37,6 @@ import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.GROUP_K
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REMINDERS_CHANNEL_ID
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REVIEW_CHANNEL_ID
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REVIEW_NOTIFICATION_ID
-import io.middlepoint.morestuff.shared.ui.utils.NotificationState
 import org.koin.core.component.KoinComponent
 import java.util.Calendar
 
@@ -72,7 +71,7 @@ class NotifierImpl(
             notifyUser(message.scheduleId.toInt(), createReminderNotification(message))
             notifyUser(SUMMARY_ID, summaryNotification)
         }
-        NotificationState.pendingTaskId.value = message.taskId
+        //NotificationNavigation.pendingTaskIds.value += (message.scheduleId to message.taskId)
     }
 
     override fun showReminderNotifications(messages: List<Message>) {

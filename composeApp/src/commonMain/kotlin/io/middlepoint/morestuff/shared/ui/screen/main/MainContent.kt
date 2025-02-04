@@ -44,7 +44,7 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
-import io.middlepoint.morestuff.shared.ui.utils.NotificationState
+import io.middlepoint.morestuff.shared.ui.utils.NotificationNavigation
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
 @OptIn(DelicateDecomposeApi::class)
@@ -58,16 +58,20 @@ fun MainContent(
   ) {
 
     val router = LocalAppRouter.current
-    val currentPendingTaskId by NotificationState.pendingTaskId
     val logger = Logger.withTag("MainContent")
+    val pendingTaskIds by NotificationNavigation.pendingTaskIds
 
-    LaunchedEffect(currentPendingTaskId) {
-      currentPendingTaskId?.let { taskId ->
-        logger.d("task id: $taskId")
-        router.replaceCurrent(TaskChat(taskId))
-        NotificationState.pendingTaskId.value = null
+   /* LaunchedEffect(pendingTaskIds) {
+      if (pendingTaskIds.isNotEmpty()) {
+        pendingTaskIds.forEach { (scheduleId, taskId) ->
+          logger.d("🔔 Notificación recibida. Navegando a TaskChat con taskId: $taskId")
+          router.push(TaskChat(taskId))
+        }
+
+        NotificationNavigation.pendingTaskIds.value = emptyMap()
       }
-    }
+    }*/
+
 
     RoutedContent(
       router = router,
