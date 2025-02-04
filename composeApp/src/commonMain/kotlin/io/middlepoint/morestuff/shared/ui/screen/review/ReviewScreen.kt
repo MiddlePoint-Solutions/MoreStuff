@@ -26,10 +26,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -65,19 +65,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import io.github.xxfast.decompose.router.rememberOnRoute
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.launch
@@ -95,8 +96,6 @@ import morestuff.composeapp.generated.resources.ic_arrow_high
 import morestuff.composeapp.generated.resources.ic_arrow_low
 import morestuff.composeapp.generated.resources.ic_arrow_lowest
 import morestuff.composeapp.generated.resources.ic_arrow_up
-import morestuff.composeapp.generated.resources.ic_review_later_24px
-import morestuff.composeapp.generated.resources.ic_review_now_24px
 import morestuff.composeapp.generated.resources.ic_review_undo_24px
 import morestuff.composeapp.generated.resources.onboarding_review_all_done
 import morestuff.composeapp.generated.resources.priority_review
@@ -107,7 +106,6 @@ import morestuff.composeapp.generated.resources.review_hint_lowest_priority
 import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.LocalKoinScope
 
 @NonRestartableComposable
 @Composable
@@ -157,7 +155,7 @@ fun ReviewContent(
           PriorityReviewTopBar(
             scopes = model.scopes,
             navigateUp = onBack,
-            toggleReviewHint = { viewModel.take(ReviewViewEvent.ToggleReviewHint) },
+            toggleReviewHint = { viewModel.take(ToggleReviewHint) },
             showReviewHelpScreen = { showReviewHelpScreen = true },
             isReviewHintActive = model.reviewHintEnabled,
             modifier = Modifier.constrainAs(topBar) {
@@ -188,8 +186,8 @@ fun ReviewContent(
           ) {
             ReviewSwipeControls(
               lastItemSwiped = { states.lastSwipedItem() },
-              firstVisibleState = { states.firstVisibleStateOrNull() },
-              undoAction = { viewModel.take(ReviewViewEvent.Undo(it)) },
+              firstVisibleItem = { states.firstVisibleOrNull() },
+              modelAction = viewModel::take
             )
           }
 
@@ -209,7 +207,7 @@ fun ReviewContent(
                   modifier = modifier.fillMaxSize(),
                   states = states,
                   onSwiped = { schedule, direction ->
-                    viewModel.take(ReviewViewEvent.ItemSwipe(schedule, direction))
+                    viewModel.take(ItemSwipe(schedule, direction))
                   },
                   onDrag = { isDragging ->
                     showReviewDragHints = isDragging
@@ -217,7 +215,7 @@ fun ReviewContent(
                   onComplete = {
                     scope.launch {
                       states.firstVisibleStateOrNull()?.onComplete()
-                      viewModel.take(ReviewViewEvent.CompleteTask(it))
+                      viewModel.take(CompleteTask(it))
                     }
                   },
                   showTaskChat = { taskId ->
@@ -348,7 +346,7 @@ private fun PriorityReviewTopBar(
     ScopeCarousel(
       scopes = scopes,
       currentScopeId = currentScopeId,
-      onScopeSelected = { viewModel.take(ReviewViewEvent.LoadScope(it)) },
+      onScopeSelected = { viewModel.take(LoadScope(it)) },
       modifier = Modifier
         .height(75.dp)
         .padding(bottom = 30.dp)
@@ -361,31 +359,12 @@ private fun PriorityReviewTopBar(
 @Composable
 private fun ReviewSwipeControls(
   lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
-  firstVisibleState: () -> SwipeableCardState?,
-  undoAction: (ReviewItemUiModel) -> Unit,
+  firstVisibleItem: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+  modelAction: (ReviewViewEvent) -> Unit,
   modifier: Modifier = Modifier,
 ) {
 
   val scope = rememberCoroutineScope()
-
-  val undoLastAction: () -> Unit = {
-    scope.launch {
-      lastItemSwiped()?.let { lastItem ->
-        lastItem.second.undo()
-        undoAction(lastItem.first)
-      }
-    }
-  }
-  val buttonAction: (SwipeDirection) -> Unit = { direction ->
-    scope.launch {
-      firstVisibleState()?.swipe(direction)
-    }
-  }
-
-  val lowAction: () -> Unit = { buttonAction(SwipeDirection.Left) }
-  val highAction: () -> Unit = { buttonAction(SwipeDirection.Right) }
-  val doneAction: () -> Unit = { buttonAction(SwipeDirection.Up) }
-  val laterAction: () -> Unit = { buttonAction(SwipeDirection.Down) }
 
   Column(
     modifier = modifier,
@@ -394,39 +373,39 @@ private fun ReviewSwipeControls(
   ) {
 
     Row(
-      horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
+      horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)
     ) {
       MainReviewButton(
-        onClick = lowAction,
-        icon = Icons.Rounded.Remove
-
+        onClick = {  },
+        icon = Icons.Filled.Delete
       )
       MainReviewButton(
-        onClick = highAction,
-        icon = Icons.Rounded.Add
+        onClick = {
+          firstVisibleItem()?.let { item ->
+            scope.launch {
+              item.second.onComplete()
+              modelAction(CompleteTask(item.first))
+            }
+          }
+        },
+        icon = Icons.Filled.Done
       )
     }
 
     Row(
       horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
     ) {
-
       SecondaryReviewButton(
-        onClick = laterAction,
-        icon = vectorResource(Res.drawable.ic_review_later_24px)
-      )
-
-      SecondaryReviewButton(
-        onClick = undoLastAction,
+        onClick = {
+          lastItemSwiped()?.let { item ->
+            scope.launch {
+              item.second.undo()
+              modelAction(Undo(item.first))
+            }
+          }
+        },
         icon = vectorResource(Res.drawable.ic_review_undo_24px)
       )
-
-      SecondaryReviewButton(
-        onClick = doneAction,
-        icon = vectorResource(Res.drawable.ic_review_now_24px)
-      )
-
-
     }
   }
 }
@@ -603,7 +582,7 @@ private fun MainReviewButton(
 ) {
   Button(
     modifier = Modifier
-      .size(width = 140.dp, height = 56.dp)
+      .size(width = 130.dp, height = 56.dp)
       .clip(CircleShape),
     colors = ButtonDefaults.buttonColors(
       containerColor = MaterialTheme.colorScheme.secondaryContainer
