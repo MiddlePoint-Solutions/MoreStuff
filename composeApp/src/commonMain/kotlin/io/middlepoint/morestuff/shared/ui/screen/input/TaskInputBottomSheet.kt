@@ -3,8 +3,14 @@ package io.middlepoint.morestuff.shared.ui.screen.input
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -12,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ModeStandby
@@ -36,8 +43,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.arkivanov.decompose.router.stack.push
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -53,11 +58,12 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_scopes_icon
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,15 +74,11 @@ fun TaskInputBottomSheet(
   onNewTaskCreated: (taskId: Long, priority: PriorityUiModel) -> Unit,
 ) {
 
-  val viewModel = koinInjectOnRoute(UserInputViewModel::class)
+  val viewModel: UserInputViewModel = koinInject { parametersOf(context) }
   val coroutineScope = rememberCoroutineScope()
   val focusRequester = remember { FocusRequester() }
   val scrollState = rememberLazyListState()
   val navigation = LocalAppRouter.current
-
-  LaunchedEffect(context) {
-    viewModel.take(UserInputEvent.LoadContext(context))
-  }
 
   val chatActions = remember {
     ChatActions(
@@ -99,6 +101,10 @@ fun TaskInputBottomSheet(
 
       val state by viewModel.models.collectAsState()
 
+      if (state.scopes.isEmpty()) {
+        return@ModalBottomSheet
+      }
+
       val messages = state.messages
       val priority = state.priority
       val schedule = state.planTime
@@ -117,7 +123,6 @@ fun TaskInputBottomSheet(
       Box(
         modifier = Modifier.fillMaxWidth()
       ) {
-
         Surface(
           modifier = Modifier.fillMaxWidth(),
           tonalElevation = 8.dp,
@@ -129,7 +134,7 @@ fun TaskInputBottomSheet(
             onScopeSelected = { viewModel.take(UserInputEvent.SetCurrentScope(it)) },
             modifier = Modifier
               .height(60.dp)
-              .fillMaxWidth()
+              .fillMaxWidth(),
           )
         }
 
@@ -149,28 +154,20 @@ fun TaskInputBottomSheet(
         }
       }
 
-      ConstraintLayout {
-
-        val (chat, input) = createRefs()
+      Box {
 
         Messages(
           messages = messages,
           actions = chatActions,
-          modifier = Modifier
-            .fillMaxWidth()
-            .constrainAs(chat) {
-              top.linkTo(parent.top)
-              bottom.linkTo(input.top)
-              height = Dimension.preferredWrapContent
-            },
+          modifier = Modifier.fillMaxSize(),
           scrollState = scrollState,
-          contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp)
+          contentPadding = PaddingValues(top = 10.dp, bottom = 130.dp)
         )
 
         Surface(
-          modifier = Modifier.constrainAs(input) {
-            bottom.linkTo(parent.bottom, margin = 6.dp)
-          }
+          modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter),
         ) {
           var userInputValue by rememberSaveable(
             stateSaver = TextFieldValue.Saver,
@@ -189,7 +186,9 @@ fun TaskInputBottomSheet(
                 priority = priority,
                 schedule = schedule,
                 onEvent = viewModel::take,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                  .background(color = MaterialTheme.colorScheme.surfaceContainerLow)
+                  .fillMaxWidth()
               )
             },
             textContent = {

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow
 
-class ScopeTasksPresenter(
+class ScopeTasksViewModel(
     private val scopeId: Long,
 ) : MoleculeViewModel<Nothing, ScopeTasksModels>() {
 

@@ -1,15 +1,34 @@
 package io.middlepoint.morestuff.shared.domain.repository
 
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+
 interface TimeFormatter {
 
-    val is24HourFormat: Boolean
+  fun formatDisplayDayMonth(
+    timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
 
-    fun formatTime(timeString: String?, pattern: String): String?
-    fun formatTimeDayMonthInDeviceLanguage(timeString: String?): String?
-    fun formatTimeOnly(timeString: String?): String?
-    fun formatTimeDayAndMonth(timeString: String?): String?
-    fun formatTimeDayMonthHour(timeString: String?): String?
-    fun formatToDateTime(timeString: String?): String?
-    fun formatTimeWithDayMonthYear(timeString: String?): String?
+  fun formatDisplayTime(
+    timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
 
+  fun formatDisplayTime(
+    time: LocalTime,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
+
+  fun formatDisplayDate(time: LocalDate): String
+  fun formatToDateTime(
+    timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
+
+  fun formatDisplayCompleteTime(
+    timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
 }

@@ -27,6 +27,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DefaultApp"
+        android:name="io.middlepoint.morestuff.shared.MoreStuffApp"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name="io.middlepoint.morestuff.shared.MainActivity"
