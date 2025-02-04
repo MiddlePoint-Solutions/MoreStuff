@@ -164,6 +164,15 @@ class SwipeableCardState(
         }
     }
 
+    suspend fun onDelete() = coroutineScope {
+        isSwiped = true
+        launch {
+            scale.animateTo(offset(1f, -0f), tween(300))
+        }.invokeOnCompletion {
+            swipedDirection = SwipeDirection.None
+        }
+    }
+
     private fun offset(x: Float = offset.value.x, y: Float = offset.value.y): Offset {
         return Offset(x, y)
     }

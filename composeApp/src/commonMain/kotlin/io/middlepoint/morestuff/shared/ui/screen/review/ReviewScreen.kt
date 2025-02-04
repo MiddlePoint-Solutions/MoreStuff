@@ -158,9 +158,7 @@ fun ReviewContent(
             toggleReviewHint = { viewModel.take(ToggleReviewHint) },
             showReviewHelpScreen = { showReviewHelpScreen = true },
             isReviewHintActive = model.reviewHintEnabled,
-            modifier = Modifier.constrainAs(topBar) {
-              top.linkTo(parent.top)
-            },
+            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
             currentScopeId = currentScopeId,
           )
           val states = model.items.map { it to rememberSwipeableCardState(round) }
@@ -376,9 +374,17 @@ private fun ReviewSwipeControls(
       horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)
     ) {
       MainReviewButton(
-        onClick = {  },
+        onClick = {
+          firstVisibleItem()?.let { item ->
+            scope.launch {
+              item.second.onDelete()
+              modelAction(DeleteTask(item.first))
+            }
+          }
+        },
         icon = Icons.Filled.Delete
       )
+
       MainReviewButton(
         onClick = {
           firstVisibleItem()?.let { item ->

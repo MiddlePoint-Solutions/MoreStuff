@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
-import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
+import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
@@ -22,7 +22,7 @@ sealed class PriorityAction : Action.FeatureAction() {
 
     data class TaskPriorityUpdateAction(
         val task: Long,
-        val actionType: PriorityActionType,
+        val actionType: ReviewActionType,
     ) : PriorityAction()
 
     data object UpdatePlannedPriorityAction : PriorityAction()
