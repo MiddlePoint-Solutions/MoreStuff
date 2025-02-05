@@ -67,6 +67,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
@@ -77,10 +78,12 @@ import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_close
@@ -185,7 +188,7 @@ fun ReviewContent(
             ReviewSwipeControls(
               lastItemSwiped = { states.lastSwipedItem() },
               firstVisibleItem = { states.firstVisibleOrNull() },
-              modelAction = viewModel::take
+              modelAction = viewModel::take,
             )
           }
 
@@ -363,6 +366,23 @@ private fun ReviewSwipeControls(
 ) {
 
   val scope = rememberCoroutineScope()
+  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+
+  if (showDeleteConfirmationDialog) {
+    ConfirmDeleteDialog(
+      onDismiss = { showDeleteConfirmationDialog = false },
+      onConfirm = {
+        firstVisibleItem()?.let { item ->
+          scope.launch {
+            delay(300)
+            item.second.onDelete()
+            modelAction(DeleteTask(item.first))
+          }
+        }
+        showDeleteConfirmationDialog = false
+      }
+    )
+  }
 
   Column(
     modifier = modifier,
@@ -374,14 +394,7 @@ private fun ReviewSwipeControls(
       horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)
     ) {
       MainReviewButton(
-        onClick = {
-          firstVisibleItem()?.let { item ->
-            scope.launch {
-              item.second.onDelete()
-              modelAction(DeleteTask(item.first))
-            }
-          }
-        },
+        onClick = { showDeleteConfirmationDialog = true },
         icon = Icons.Filled.Delete
       )
 
