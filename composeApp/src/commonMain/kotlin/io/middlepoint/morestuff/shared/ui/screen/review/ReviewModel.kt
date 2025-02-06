@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.review
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +39,7 @@ fun reviewModel(
   var actions by remember { mutableStateOf(initialState.actions) }
   var scopes by remember { mutableStateOf(initialState.scopes) }
   var reviewHintEnabled by remember { mutableStateOf(initialState.reviewHintEnabled) }
+  var itemsForReview by remember { mutableIntStateOf(0) }
 
   LaunchedEffect(currentScope) {
     getScopesUseCase().onRight { scopes = it }
@@ -46,6 +48,8 @@ fun reviewModel(
   fun checkUpdateRound(item: ReviewItemUiModel) {
     if (items.indexOf(item) == 0) {
       round = ReviewRound.Final
+    } else {
+      itemsForReview -= 1
     }
   }
 
@@ -80,8 +84,7 @@ fun reviewModel(
         }
 
         is Undo -> {
-          val action = actions.firstOrNull { it.first.id == event.item.id }
-          action?.let {
+          actions.firstOrNull { it.first.id == event.item.id }?.let {
             when (it.second) {
               ReviewActionType.Done -> store.dispatch(
                 TaskAction.CompleteTasksAction(
@@ -97,6 +100,7 @@ fun reviewModel(
                 )
               )
             }
+            itemsForReview += 1
           }
           actions = actions.filterNot { it.first.id == event.item.id }
         }
@@ -115,12 +119,21 @@ fun reviewModel(
             }.shuffled()
             currentScope = scopes.firstOrNull { it.id == event.scopeId } ?: currentScope
             round = ReviewRound.Review(event.scopeId)
+            itemsForReview = items.size
           }
         }
       }
     }
   }
 
-  return ReviewState(round, currentScope, items, actions, scopes, reviewHintEnabled)
+  return ReviewState(
+    round,
+    currentScope,
+    items,
+    itemsForReview,
+    actions,
+    scopes,
+    reviewHintEnabled
+  )
 }
 

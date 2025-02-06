@@ -138,25 +138,6 @@ fun TaskCard(
                         )
                     }
                 }
-
-                Surface(
-                    modifier = Modifier.size(width = 50.dp, height = 30.dp),
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(33.dp),
-                    shadowElevation = 2.dp
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = item.position,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                textAlign = TextAlign.Center
-                            ),
-                        )
-                    }
-                }
             }
         }
 

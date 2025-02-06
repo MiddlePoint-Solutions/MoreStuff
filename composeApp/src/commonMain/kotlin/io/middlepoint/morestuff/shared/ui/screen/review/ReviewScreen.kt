@@ -149,7 +149,7 @@ fun ReviewContent(
       modifier = modifier.fillMaxSize()
     ) {
 
-      val (topBar, cards, controls) = createRefs()
+      val (topBar, cards, controls, count) = createRefs()
 
       when (val round = model.round) {
 
@@ -164,6 +164,7 @@ fun ReviewContent(
             modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
             currentScopeId = currentScopeId,
           )
+
           val states = model.items.map { it to rememberSwipeableCardState(round) }
 
           val hintVisibilityState = remember { MutableTransitionState(false) }
@@ -192,42 +193,56 @@ fun ReviewContent(
             )
           }
 
+          Row(
+            modifier = modifier
+              .fillMaxWidth()
+              .constrainAs(count) {
+                bottom.linkTo(cards.top)
+                verticalBias = 1f
+              },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+          ) {
+            if(model.itemsForReview> 0) {
+              Text(
+                "${model.itemsForReview}",
+                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                color = MaterialTheme.colorScheme.secondary,
+              )
+            }
+          }
+
           Box(
             modifier = modifier
-              .fillMaxHeight(0.7f)
+              .fillMaxHeight(0.67f)
               .constrainAs(cards) {
-                centerVerticallyTo(parent, bias = 0.4f)
-              }
+                centerVerticallyTo(parent, bias = 0.44f)
+              },
+            contentAlignment = Alignment.Center
           ) {
             if (states.isNotEmpty()) {
-              AnimatedContent(
-                targetState = roundAnimationState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() }
-              ) {
-                TaskPrioritySwipe(
-                  modifier = modifier.fillMaxSize(),
-                  states = states,
-                  onSwiped = { schedule, direction ->
-                    viewModel.take(ItemSwipe(schedule, direction))
-                  },
-                  onDrag = { isDragging ->
-                    showReviewDragHints = isDragging
-                  },
-                  onComplete = {
-                    scope.launch {
-                      states.firstVisibleStateOrNull()?.onComplete()
-                      viewModel.take(CompleteTask(it))
-                    }
-                  },
-                  showTaskChat = { taskId ->
-                    /*currentTaskId = taskId
-                    scope.launch {
-                        showTaskChat.targetState = true
-                    }*/
+              TaskPrioritySwipe(
+                modifier = modifier.fillMaxSize().align(Alignment.Center),
+                states = states,
+                onSwiped = { schedule, direction ->
+                  viewModel.take(ItemSwipe(schedule, direction))
+                },
+                onDrag = { isDragging ->
+                  showReviewDragHints = isDragging
+                },
+                onComplete = {
+                  scope.launch {
+                    states.firstVisibleStateOrNull()?.onComplete()
+                    viewModel.take(CompleteTask(it))
                   }
-                )
-
-              }
+                },
+                showTaskChat = { taskId ->
+                  /*currentTaskId = taskId
+                  scope.launch {
+                      showTaskChat.targetState = true
+                  }*/
+                }
+              )
             }
           }
 
@@ -441,8 +456,8 @@ private fun TaskPrioritySwipe(
 ) {
   val itemClick by rememberUpdatedState(showTaskChat)
   Box(
-    modifier = modifier
-      .padding(20.dp)
+    modifier = modifier.padding(20.dp),
+    contentAlignment = Alignment.Center
   ) {
     AllDoneMessage()
 

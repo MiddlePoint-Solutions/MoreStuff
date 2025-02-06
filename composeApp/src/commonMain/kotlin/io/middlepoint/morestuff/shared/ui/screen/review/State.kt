@@ -15,6 +15,7 @@ data class ReviewState(
   val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
   val currentScope: ScopeDomain = defaultScope,
   val items: List<ReviewItemUiModel> = listOf(),
+  val itemsForReview: Int = 0,
   val actions: List<Pair<ReviewItemUiModel, ReviewActionType>> = listOf(),
   val scopes: List<ScopeDomain> = listOf(),
   val reviewHintEnabled: Boolean = false
