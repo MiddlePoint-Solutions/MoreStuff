@@ -3,24 +3,17 @@ package io.middlepoint.morestuff.shared.ui.screen.main
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.DelicateDecomposeApi
-import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import com.mohamedrejeb.calf.io.KmpFile
-import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
@@ -44,7 +37,6 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
-import io.middlepoint.morestuff.shared.ui.utils.NotificationNavigation
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
 @OptIn(DelicateDecomposeApi::class)
@@ -58,20 +50,6 @@ fun MainContent(
   ) {
 
     val router = LocalAppRouter.current
-    val logger = Logger.withTag("MainContent")
-    val pendingTaskIds by NotificationNavigation.pendingTaskIds
-
-   /* LaunchedEffect(pendingTaskIds) {
-      if (pendingTaskIds.isNotEmpty()) {
-        pendingTaskIds.forEach { (scheduleId, taskId) ->
-          logger.d("🔔 Notificación recibida. Navegando a TaskChat con taskId: $taskId")
-          router.push(TaskChat(taskId))
-        }
-
-        NotificationNavigation.pendingTaskIds.value = emptyMap()
-      }
-    }*/
-
 
     RoutedContent(
       router = router,
