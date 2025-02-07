@@ -1,10 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.screen.review
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -168,6 +171,7 @@ fun ReviewContent(
           val states = model.items.map { it to rememberSwipeableCardState(round) }
 
           val hintVisibilityState = remember { MutableTransitionState(false) }
+          val scopeVisibilityState = remember { MutableTransitionState(false) }
           val roundAnimationState = remember(round) { mutableLongStateOf(round.scopeId) }
 
           LaunchedEffect(showReviewDragHints) {
@@ -198,17 +202,29 @@ fun ReviewContent(
               .fillMaxWidth()
               .constrainAs(count) {
                 bottom.linkTo(cards.top)
-                verticalBias = 1f
               },
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
           ) {
-            if(model.itemsForReview> 0) {
-              Text(
-                "${model.itemsForReview}",
-                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
-                color = MaterialTheme.colorScheme.secondary,
-              )
+            if (model.itemsForReview > 0) {
+              AnimatedContent(
+                targetState = model.itemsForReview,
+                transitionSpec = {
+                  slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Up
+                  ).togetherWith(
+                    slideOutOfContainer(
+                      AnimatedContentTransitionScope.SlideDirection.Down
+                    )
+                  )
+                }
+              ) {
+                Text(
+                  "$it",
+                  style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                  color = MaterialTheme.colorScheme.secondary,
+                )
+              }
             }
           }
 
