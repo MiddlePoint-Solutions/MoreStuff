@@ -34,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -45,6 +46,7 @@ fun ScopeCarousel(
   scopes: List<ScopeDomain>,
   currentScopeId: Long,
   onScopeSelected: (Long) -> Unit,
+  onScroll: (Boolean) -> Unit = {},
   modifier: Modifier = Modifier
 ) {
 
@@ -52,7 +54,7 @@ fun ScopeCarousel(
     return
   }
 
-  val  pagerState: PagerState = rememberPagerState(
+  val pagerState: PagerState = rememberPagerState(
     initialPage = scopes.indexOfFirst { it.id == currentScopeId },
     pageCount = { scopes.size }
   )
@@ -66,10 +68,13 @@ fun ScopeCarousel(
     val centerPadding = ((screenWidth / 2) - halfItemWidth) + 20.dp
 
     LaunchedEffect(Unit) {
-      snapshotFlow { pagerState.currentPage }
-        .debounce(500)
-        .collect {
-          onScopeSelected(scopes[it].id)
+      snapshotFlow { pagerState.isScrollInProgress }
+        .debounce(300)
+        .collect { isScrolling ->
+          if (!isScrolling) {
+            onScopeSelected(scopes[pagerState.currentPage].id)
+          }
+          onScroll(isScrolling)
         }
     }
 

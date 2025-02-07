@@ -1,9 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,13 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,27 +39,18 @@ import io.middlepoint.morestuff.shared.ui.TaskColors
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_extra_details
-import morestuff.composeapp.generated.resources.cd_task_complete
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun TaskCard(
     modifier: Modifier = Modifier,
     item: ReviewItemUiModel,
-    onComplete: (ReviewItemUiModel) -> Unit,
     isClickable: Boolean = true,
-    showTaskChat: (taskId: Long) -> Unit,
 ) {
     val selectedState = remember { MutableTransitionState(false) }
 
     val backgroundColors by remember {
         derivedStateOf { TaskColors.getProfileColorsForTask(item.title) }
-    }
-
-    val extraDetails by remember(item.extraDetails) {
-        derivedStateOf { item.extraDetails }
     }
 
     Card(
@@ -112,7 +96,9 @@ fun TaskCard(
                     .padding(top = 15.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush = Brush.verticalGradient(backgroundColors))
-            )
+            ) {
+
+            }
 
             Row(
                 modifier = Modifier
@@ -124,89 +110,10 @@ fun TaskCard(
                 )
             ) {
 
-                if (extraDetails) {
-                    Surface(
-                        modifier = Modifier.size(width = 42.dp, height = 30.dp),
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = RoundedCornerShape(33.dp),
-                        shadowElevation = 2.dp
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Notes,
-                            contentDescription = stringResource(Res.string.cd_extra_details),
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
             }
         }
-
-        AnimatedVisibility(
-            visibleState = selectedState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 20.dp, end = 20.dp),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Row(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    // TODO: uncomment when ready to show task chat from review
-                    /*TaskCardIconButton(
-                        onClick = { showTaskChat(item.id) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                        )
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
-                            contentDescription = stringResource(R.string.cd_show_task_chat),
-                            tint = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    }*/
-
-                    TaskCardIconButton(
-                        onClick = { onComplete(item) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(Res.string.cd_task_complete),
-                        )
-                    }
-                }
-            }
-        }
-
     }
 }
-
-@Composable
-private fun TaskCardIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
-    content: @Composable () -> Unit
-) {
-    FilledIconButton(
-        onClick = onClick,
-        modifier = modifier.size(55.dp),
-        colors = colors,
-        shape = RoundedCornerShape(12.dp),
-        content = content
-    )
-}
-
 
 @NonRestartableComposable
 @Composable

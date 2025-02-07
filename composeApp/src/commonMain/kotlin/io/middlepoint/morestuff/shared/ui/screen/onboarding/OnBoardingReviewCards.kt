@@ -100,9 +100,7 @@ private fun OnBoardingTaskPrioritySwipe(
             enabled = false
           ),
         item = task,
-        onComplete = {},
         isClickable = false,
-        showTaskChat = {}
       )
 
       if (index == cardAnimated && state.swipedDirection == null) {

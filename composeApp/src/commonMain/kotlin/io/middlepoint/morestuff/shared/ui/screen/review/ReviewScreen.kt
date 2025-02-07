@@ -158,21 +158,28 @@ fun ReviewContent(
 
         is ReviewRound.Review -> {
 
-          PriorityReviewTopBar(
-            scopes = model.scopes,
-            navigateUp = onBack,
-            toggleReviewHint = { viewModel.take(ToggleReviewHint) },
-            showReviewHelpScreen = { showReviewHelpScreen = true },
-            isReviewHintActive = model.reviewHintEnabled,
-            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
-            currentScopeId = currentScopeId,
-          )
-
           val states = model.items.map { it to rememberSwipeableCardState(round) }
 
           val hintVisibilityState = remember { MutableTransitionState(false) }
           val scopeVisibilityState = remember { MutableTransitionState(false) }
-          val roundAnimationState = remember(round) { mutableLongStateOf(round.scopeId) }
+
+          PriorityReviewTopBar(
+            navigateUp = onBack,
+            showReviewHelpScreen = { showReviewHelpScreen = true },
+            isReviewHintActive = model.reviewHintEnabled,
+            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
+          ) {
+            ScopeCarousel(
+              scopes = model.scopes,
+              currentScopeId = currentScopeId,
+              onScopeSelected = { viewModel.take(LoadScope(it)) },
+              onScroll = { scopeVisibilityState.targetState = !it },
+              modifier = Modifier
+                .height(75.dp)
+                .padding(bottom = 30.dp)
+                .fillMaxWidth()
+            )
+          }
 
           LaunchedEffect(showReviewDragHints) {
             hintVisibilityState.targetState = !showReviewDragHints
@@ -197,36 +204,46 @@ fun ReviewContent(
             )
           }
 
-          Row(
+          AnimatedVisibility(
+            visibleState = scopeVisibilityState,
+            enter = fadeIn(),
+            exit = fadeOut(),
             modifier = modifier
               .fillMaxWidth()
               .constrainAs(count) {
                 bottom.linkTo(cards.top)
+                verticalBias = 0.6f
+                height = Dimension.preferredWrapContent
               },
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
           ) {
-            if (model.itemsForReview > 0) {
-              AnimatedContent(
-                targetState = model.itemsForReview,
-                transitionSpec = {
-                  slideIntoContainer(
-                    AnimatedContentTransitionScope.SlideDirection.Up
-                  ).togetherWith(
-                    slideOutOfContainer(
-                      AnimatedContentTransitionScope.SlideDirection.Down
+            Row(
+              modifier = modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              if (model.itemsForReview > 0) {
+                AnimatedContent(
+                  targetState = model.itemsForReview,
+                  transitionSpec = {
+                    slideIntoContainer(
+                      AnimatedContentTransitionScope.SlideDirection.Up
+                    ).togetherWith(
+                      slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down
+                      )
                     )
+                  }
+                ) {
+                  Text(
+                    "$it",
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                    color = MaterialTheme.colorScheme.secondary,
                   )
                 }
-              ) {
-                Text(
-                  "$it",
-                  style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
-                  color = MaterialTheme.colorScheme.secondary,
-                )
               }
             }
           }
+
 
           Box(
             modifier = modifier
@@ -236,29 +253,24 @@ fun ReviewContent(
               },
             contentAlignment = Alignment.Center
           ) {
-            if (states.isNotEmpty()) {
-              TaskPrioritySwipe(
-                modifier = modifier.fillMaxSize().align(Alignment.Center),
-                states = states,
-                onSwiped = { schedule, direction ->
-                  viewModel.take(ItemSwipe(schedule, direction))
-                },
-                onDrag = { isDragging ->
-                  showReviewDragHints = isDragging
-                },
-                onComplete = {
-                  scope.launch {
-                    states.firstVisibleStateOrNull()?.onComplete()
-                    viewModel.take(CompleteTask(it))
-                  }
-                },
-                showTaskChat = { taskId ->
-                  /*currentTaskId = taskId
-                  scope.launch {
-                      showTaskChat.targetState = true
-                  }*/
-                }
-              )
+            AnimatedVisibility(
+              visibleState = scopeVisibilityState,
+              enter = fadeIn(),
+              exit = fadeOut(),
+              modifier = modifier.fillMaxWidth(),
+            ) {
+              if (states.isNotEmpty()) {
+                TaskPrioritySwipe(
+                  modifier = modifier.fillMaxSize().align(Alignment.Center),
+                  states = states,
+                  onSwiped = { schedule, direction ->
+                    viewModel.take(ItemSwipe(schedule, direction))
+                  },
+                  onDrag = { isDragging ->
+                    showReviewDragHints = isDragging
+                  },
+                )
+              }
             }
           }
 
@@ -272,6 +284,7 @@ fun ReviewContent(
 
           LaunchedEffect(model.round) {
             hintVisibilityState.targetState = true
+            scopeVisibilityState.targetState = true
           }
         }
 
@@ -307,13 +320,11 @@ fun ReviewContent(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-  scopes: List<ScopeDomain>,
-  toggleReviewHint: () -> Unit,
   showReviewHelpScreen: () -> Unit,
   isReviewHintActive: Boolean,
   modifier: Modifier = Modifier,
   navigateUp: () -> Unit = {},
-  currentScopeId: Long,
+  scopeSelectorContent: @Composable () -> Unit
 ) {
 
   val viewModel = koinInjectOnRoute(ReviewViewModel::class)
@@ -356,7 +367,7 @@ private fun PriorityReviewTopBar(
         ) {
           DropdownMenuItem(onClick = {
             coroutineScope.launch {
-              toggleReviewHint()
+              viewModel.take(ToggleReviewHint)
               showMenu = false
             }
           },
@@ -375,15 +386,7 @@ private fun PriorityReviewTopBar(
       colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 
-    ScopeCarousel(
-      scopes = scopes,
-      currentScopeId = currentScopeId,
-      onScopeSelected = { viewModel.take(LoadScope(it)) },
-      modifier = Modifier
-        .height(75.dp)
-        .padding(bottom = 30.dp)
-        .fillMaxWidth()
-    )
+    scopeSelectorContent()
   }
 }
 
@@ -467,10 +470,7 @@ private fun TaskPrioritySwipe(
   states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
   onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
   onDrag: (Boolean) -> Unit,
-  onComplete: (ReviewItemUiModel) -> Unit,
-  showTaskChat: (taskId: Long) -> Unit,
 ) {
-  val itemClick by rememberUpdatedState(showTaskChat)
   Box(
     modifier = modifier.padding(20.dp),
     contentAlignment = Alignment.Center
@@ -487,8 +487,6 @@ private fun TaskPrioritySwipe(
               onDrag = onDrag,
             ),
           item = task,
-          onComplete = onComplete,
-          showTaskChat = itemClick
         )
       }
       LaunchedEffect(task, state.swipedDirection) {
