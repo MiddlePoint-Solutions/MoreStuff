@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +36,20 @@ class MainActivity : AppCompatActivity() {
 //    WindowCompat.setDecorFitsSystemWindows(window, false)
     enableEdgeToEdge()
     val rootRouterContext: RouterContext = defaultRouterContext()
+    val launchScreen = handleLaunchIntent(intent)
 
     setContent {
       CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
 
         var initialScreen by remember { mutableStateOf<Screen?>(null) }
         App(initialScreen)
+
+        LaunchedEffect(Unit) {
+          if (initialScreen == null && launchScreen != null) {
+            initialScreen = launchScreen
+            Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
+          }
+        }
 
         DisposableEffect(Unit) {
           val listener = Consumer<Intent> {
@@ -53,6 +62,7 @@ class MainActivity : AppCompatActivity() {
       }
     }
   }
+
 
   private fun handleLaunchIntent(intent: Intent) =
     when (intent.action) {
