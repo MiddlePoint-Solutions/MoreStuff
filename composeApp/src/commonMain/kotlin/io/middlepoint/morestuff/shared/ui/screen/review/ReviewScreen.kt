@@ -80,7 +80,10 @@ import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
+import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData.messageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
@@ -253,13 +256,13 @@ fun ReviewContent(
               },
             contentAlignment = Alignment.Center
           ) {
-            AnimatedVisibility(
-              visibleState = scopeVisibilityState,
-              enter = fadeIn(),
-              exit = fadeOut(),
-              modifier = modifier.fillMaxWidth(),
-            ) {
-              if (states.isNotEmpty()) {
+            if (states.isNotEmpty()) {
+              AnimatedVisibility(
+                visibleState = scopeVisibilityState,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = modifier.fillMaxWidth(),
+              ) {
                 TaskPrioritySwipe(
                   modifier = modifier.fillMaxSize().align(Alignment.Center),
                   states = states,
@@ -487,6 +490,7 @@ private fun TaskPrioritySwipe(
               onDrag = onDrag,
             ),
           item = task,
+          messages = MockData.createMessages(3)
         )
       }
       LaunchedEffect(task, state.swipedDirection) {

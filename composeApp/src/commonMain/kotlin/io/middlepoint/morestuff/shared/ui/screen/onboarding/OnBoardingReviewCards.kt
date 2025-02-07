@@ -38,7 +38,6 @@ import morestuff.composeapp.generated.resources.onboarding_review_all_done
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun OnBoardingReviewCards(
   tasks: List<ReviewItemUiModel>,
@@ -100,7 +99,6 @@ private fun OnBoardingTaskPrioritySwipe(
             enabled = false
           ),
         item = task,
-        isClickable = false,
       )
 
       if (index == cardAnimated && state.swipedDirection == null) {

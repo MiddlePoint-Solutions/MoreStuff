@@ -62,7 +62,7 @@ private fun isAutoScrollingEnabled(
 fun Messages(
     messages: List<MessageUiModel>,
     scrollState: LazyListState,
-    actions: ChatActions,
+    actions: ChatActions = ChatActions(),
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
