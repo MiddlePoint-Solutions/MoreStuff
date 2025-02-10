@@ -1,7 +1,8 @@
-package io.middlepoint.morestuff.shared.domain.usecase.message
+package io.middlepoint.morestuff.android.domain.usecase.message
 
 import io.middlepoint.morestuff.android.domain.createMessageForTest
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
+import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flow
@@ -30,8 +31,7 @@ class GetTaskChatMessagesUseCaseImplTest {
 
         val getTaskChatMessagesImpl = GetTaskChatMessagesUseCaseImpl(messageRepository)
 
-        val messagesFlow = getTaskChatMessagesImpl.invoke(taskId)
-        val messages = messagesFlow.toList().flatten()
+        val messages = getTaskChatMessagesImpl(taskId).asFlow().toList().flatten()
         assertEquals(listOf(message1, message2), messages)
     }
 }
