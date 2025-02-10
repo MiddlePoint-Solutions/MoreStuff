@@ -15,19 +15,19 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 
 @Composable
 fun searchModel(
-  initialState: SearchState,
-  events: Flow<SearchEvent>,
-  searchTasksUseCase: SearchTasksUseCase = koinInject(),
-  getCompletedTasksUseCase: GetCompletedTasksUseCase = koinInject(),
-  getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase = koinInject(),
-  taskUiMapper: TaskUiMapper = koinInject()
+    initialState: SearchState,
+    events: Flow<SearchEvent>,
+    searchTasksUseCase: SearchTasksUseCase = koinInject(),
+    getCompletedTasksUseCase: GetCompletedTasksUseCase = koinInject(),
+    getActiveTasksWithScheduleUseCase: GetActiveTasksWithScheduleUseCase = koinInject(),
+    taskUiMapper: TaskUiMapper = koinInject()
 ): SearchState {
     val coroutineScope = rememberCoroutineScope()
     var state by remember { mutableStateOf(initialState) }
@@ -38,9 +38,11 @@ fun searchModel(
         searchJob = coroutineScope.launch {
             when (state.filter) {
                 FilterType.Done -> {
-                    val tasks = getCompletedTasksUseCase().first()
-                    val mappedTasks = taskUiMapper.map(tasks.filter { it.title.contains(state.query, ignoreCase = true) })
-                    state = state.copy(searchResults = mappedTasks)
+                    getCompletedTasksUseCase()
+                        .collectLatest { tasks ->
+                            val mappedTasks = taskUiMapper.map(tasks.filter { it.title.contains(state.query, ignoreCase = true) })
+                            state = state.copy(searchResults = mappedTasks)
+                        }
                 }
                 FilterType.Reminder, FilterType.Scheduled -> {
                     val scheduleTypes = if (state.filter == FilterType.Scheduled) listOf(ScheduleType.OneTime) else listOf(ScheduleType.Reminder)
@@ -50,9 +52,11 @@ fun searchModel(
                     }
                 }
                 FilterType.None -> {
-                    val tasks = searchTasksUseCase(state.query, false).first()
-                    val mappedTasks = taskUiMapper.map(tasks.filter { it.title.contains(state.query, ignoreCase = true) })
-                    state = state.copy(searchResults = mappedTasks)
+                    searchTasksUseCase(state.query, false)
+                        .collectLatest { tasks ->
+                            val mappedTasks = taskUiMapper.map(tasks.filter { it.title.contains(state.query, ignoreCase = true) })
+                            state = state.copy(searchResults = mappedTasks)
+                        }
                 }
             }
         }

@@ -16,4 +16,5 @@ data class TaskUiModel(
     val extraDetails: Boolean = false,
     val hasSchedule: Boolean = false,
     val hasReminder: Boolean = false,
+    val scheduleTime: String = ""
 )

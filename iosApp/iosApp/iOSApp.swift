@@ -84,15 +84,75 @@ class DefaultRouterHolder : ObservableObject {
   }
 }
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     let holder: DefaultRouterHolder = DefaultRouterHolder()
     let navigationHelper: NavigationHelper = NavigationHelper()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         LottieConfiguration.shared.renderingEngine = .mainThread
+        
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+            if let error = error {
+                print("Error al solicitar permisos de notificación: \(error.localizedDescription)")
+            } else if granted {
+                print("Permisos de notificación concedidos.")
+            } else {
+                print("Permisos de notificación denegados.")
+            }
+        }
+        
         return true
     }
+
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+
+        if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
+            navigateToTaskChat(taskId: taskId)
+            //cancelSchedule(taskId: taskId)
+        }
+        if let scheduleId = userInfo["scheduleId"] as? String {
+            center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
+        }
+
+        completionHandler()
+    }
     
+       func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                   willPresent notification: UNNotification,
+                                   withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+           let userInfo = notification.request.content.userInfo
+
+           if let scheduleId = userInfo["scheduleId"] as? String {
+               center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
+           }
+           if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
+               cancelSchedule(taskId: taskId)
+           }
+
+           completionHandler([.banner, .sound])
+       }
+    
+    private func navigateToTaskChat(taskId: Int) {
+            DispatchQueue.main.async {
+                self.navigationHelper.navigateToTaskChat(taskId: Int64(taskId))
+            }
+        }
+    
+    private func cancelSchedule(taskId: Int){
+        DispatchQueue.main.async {
+            self.navigationHelper.cancelTaskSchedule(taskId: Int64(taskId))
+        }
+    }
+
+    
+   
+
 }
 
 

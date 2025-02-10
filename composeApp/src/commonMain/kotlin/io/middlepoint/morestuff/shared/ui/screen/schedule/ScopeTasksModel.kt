@@ -6,27 +6,60 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetScopeActiveTasksFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.*
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Clock
 import org.koin.compose.koinInject
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Instant
 
 @Composable
 fun scopeTasksModel(
-    scopeId: Long,
-    getScopeActiveTasksFlowUseCase: GetScopeActiveTasksFlowUseCase = koinInject(),
-    taskMapper: TaskUiMapper = koinInject()
+  scopeId: Long,
+  getScopeActiveTasksFlowUseCase: GetScopeActiveTasksFlowUseCase = koinInject(),
+  cancelActiveScheduleUseCase: CancelActiveScheduleUseCase = koinInject(),
+  taskMapper: TaskUiMapper = koinInject()
 ): ScopeTasksModels {
+  var tasks: List<TaskUiModel>? by remember { mutableStateOf(null) }
 
-    var tasks: List<TaskUiModel>? by remember { mutableStateOf(null) }
+  LaunchedEffect(Unit) {
+    getScopeActiveTasksFlowUseCase(scopeId)
+      .map(taskMapper::map)
+      .collect { taskList ->
+        tasks = taskList
+      }
+  }
 
-    LaunchedEffect(Unit) {
-        getScopeActiveTasksFlowUseCase(scopeId)
-            .map(taskMapper::map)
-            .collect { tasks = it }
+/*  LaunchedEffect(tasks) {
+    val expiredTaskIds = mutableListOf<Long>()
+
+    tasks?.forEach { task ->
+      val currentTime = Clock.System.now().epochSeconds
+      val scheduleTime = runCatching { Instant.parse(task.scheduleTime).epochSeconds }.getOrNull()
+
+      if (scheduleTime != null) {
+        if (scheduleTime > currentTime) {
+          val delayTime = scheduleTime - currentTime
+          delay(delayTime * 1000)
+
+          val newCurrentTime = Clock.System.now().epochSeconds
+          if (newCurrentTime >= scheduleTime) {
+            expiredTaskIds.add(task.id)
+          }
+        } else {
+          expiredTaskIds.add(task.id)
+        }
+      }
     }
 
-    return tasks?.let { Data(it) } ?: Loading
+    if (expiredTaskIds.isNotEmpty()) {
+      cancelActiveScheduleUseCase(expiredTaskIds)
+    }
+  }*/
+
+  return tasks?.let { Data(it) } ?: Loading
 }

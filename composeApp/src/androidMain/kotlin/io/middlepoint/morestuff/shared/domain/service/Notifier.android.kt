@@ -16,8 +16,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.Person
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.MainActivity
 import io.middlepoint.morestuff.android.R
+import io.middlepoint.morestuff.shared.MainActivity
 import io.middlepoint.morestuff.shared.app.extensions.isAtLeastVersion
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
@@ -71,6 +71,7 @@ class NotifierImpl(
             notifyUser(message.scheduleId.toInt(), createReminderNotification(message))
             notifyUser(SUMMARY_ID, summaryNotification)
         }
+        //NotificationNavigation.pendingTaskIds.value += (message.scheduleId to message.taskId)
     }
 
     override fun showReminderNotifications(messages: List<Message>) {

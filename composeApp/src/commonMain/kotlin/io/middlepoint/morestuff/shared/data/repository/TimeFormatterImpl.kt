@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import androidx.compose.ui.text.intl.Locale
 import io.middlepoint.morestuff.shared.TimeUtils
+import io.middlepoint.morestuff.shared.domain.enums.MonthNamesLocalized
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -9,10 +11,11 @@ import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeFormatBuilder
-import kotlinx.datetime.format.MonthNames.Companion.ENGLISH_FULL
+import kotlinx.datetime.format.MonthNames
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.format.char
 import kotlinx.datetime.toLocalDateTime
+
 
 class TimeFormatterImpl(
   private val timeUtils: TimeUtils
@@ -23,23 +26,31 @@ class TimeFormatterImpl(
       hour(); char(':'); minute()
     } else {
       amPmHour(Padding.NONE); char(':'); minute(); char(' '); amPmMarker("AM", "PM")
+
     }
   }
 
   private val displayTimeFormat = LocalTime.Format { displayTime() }
+  private val getUserLocale = Locale.current.language
+  private val monthNames: MonthNames = MonthNamesLocalized.fromLanguageCode(getUserLocale)
+
 
   private val displayDayMonth = LocalDateTime.Format {
-    monthName(ENGLISH_FULL); char(' '); dayOfMonth(Padding.NONE)
+    monthName(monthNames)
+    char(' ')
+    dayOfMonth(Padding.NONE)
   }
 
+
+
   private val displayCompleteTimeFormat = LocalDateTime.Format {
-    displayTime()
-    char(' ')
-    monthName(ENGLISH_FULL);
-    char(' ');
     dayOfMonth(Padding.NONE);
     char(' ');
+    monthName(monthNames);
+    char(' ');
     year(padding = Padding.NONE)
+    char(' ')
+    displayTime()
   }
 
   override fun formatDisplayDayMonth(timeString: String, timeZone: TimeZone): String =
@@ -71,3 +82,5 @@ class TimeFormatterImpl(
     }.format(displayCompleteTimeFormat)
 
 }
+
+

@@ -38,7 +38,7 @@ class BootCompleteSchedulerUseCaseImpl(
 
         futureSchedules.forEach { schedule ->
             schedule.scheduleLocalTime?.let { time ->
-                scheduler.scheduleAtExact(schedule.id, time)
+                scheduler.scheduleAtExact(schedule.id, time, "", 0)
             }
         }
     }

@@ -27,7 +27,12 @@ class SchedulerImpl(
     private val workManager: WorkManager
 ) : Scheduler {
 
-    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
+    override fun scheduleAtExact(
+        scheduleId: Long,
+        scheduleTime: String,
+        taskTitle: String,
+        taskId: Long,
+    ) {
         val data = ScheduleWorker.createWorkerData(scheduleId)
 
         val delayTimeMillis =

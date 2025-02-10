@@ -376,7 +376,7 @@ private fun DeleteScopeDialog(
     title = { Text(stringResource(Res.string.delete_scope)) },
     text = {
       Text(
-        text = stringResource(Res.string.sure_delete_scope, scopeName),
+        text = stringResource(Res.string.sure_delete_scope).replace("%s", scopeName),
         textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyLarge
       )

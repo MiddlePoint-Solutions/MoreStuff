@@ -5,18 +5,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.predictiveBackAnimation
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import com.mohamedrejeb.calf.io.KmpFile
-import io.github.xxfast.decompose.router.LocalRouterContext
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
@@ -42,6 +39,7 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
+@OptIn(DelicateDecomposeApi::class)
 @Composable
 fun MainContent(
   shareContent: (taskId: Long, content: Shareable) -> Unit,

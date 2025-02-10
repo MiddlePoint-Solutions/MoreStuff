@@ -276,10 +276,7 @@ private fun TaskChatContent(
               scheduleId = 0L,
               contentType = ContentType.APP_TASK_MESSAGE,
               createTime = "",
-              content = stringResource(
-                Res.string.task_chat_complete_message_with_date,
-                task.completeTime
-              ),
+              content = stringResource(Res.string.task_chat_complete_message_with_date).replace("%s", task.completeTime),
               formattedTime = "",
               formattedTimeOnly = ""
             ),

@@ -3,54 +3,30 @@ package io.middlepoint.morestuff.shared.domain.service
 
 import co.touchlab.kermit.Logger
 import kotlinx.datetime.LocalDateTime
-import platform.Foundation.*
-import platform.UserNotifications.*
-import kotlin.time.Duration.Companion.minutes
+import platform.Foundation.NSDateComponents
+import platform.UserNotifications.UNCalendarNotificationTrigger
+import platform.UserNotifications.UNMutableNotificationContent
+import platform.UserNotifications.UNNotificationRequest
+import platform.UserNotifications.UNTimeIntervalNotificationTrigger
+import platform.UserNotifications.UNUserNotificationCenter
+import kotlin.time.Duration.Companion.days
 
 class SchedulerImpl(
-    private val timeManager: TimeManager
+  private val timeManager: TimeManager,
 ) : Scheduler {
    private val logger = Logger.withTag("SchedulerImpl")
+    private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
 
- /*   override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
+
+    init {
+        notificationCenter.delegate()
+    }
+
+    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String, taskId: Long) {
+        logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
+
+        val localDateTime = LocalDateTime.parse(scheduleTime)
         val triggerDate = NSDateComponents().apply {
-            val localDateTime = LocalDateTime.parse(scheduleTime)
-            year = localDateTime.year.toLong()
-            month = localDateTime.monthNumber.toLong()
-            day = localDateTime.dayOfMonth.toLong()
-            hour = localDateTime.hour.toLong()
-            minute = localDateTime.minute.toLong()
-            second = localDateTime.second.toLong()
-        }
-
-        val content = UNMutableNotificationContent()
-        content.setTitle("Scheduled Task")
-        content.setBody("Task with ID $scheduleId is scheduled.")
-
-
-        val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
-            dateComponents = triggerDate,
-            repeats = false
-        )
-        val request = UNNotificationRequest.requestWithIdentifier(
-            identifier = getScheduleWorkTag(scheduleId),
-            content = content,
-            trigger = trigger
-        )
-
-        UNUserNotificationCenter.currentNotificationCenter()
-            .addNotificationRequest(request) { error ->
-                error?.let {
-                    println("Error scheduling notification: ${it.localizedDescription}")
-                }
-            }
-    }*/
-
-    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String) {
-        logger.i { "Scheduling task with scheduleId=$scheduleId at $scheduleTime" }
-
-        val triggerDate = NSDateComponents().apply {
-            val localDateTime = LocalDateTime.parse(scheduleTime)
             setYear(localDateTime.year.toLong())
             setMonth(localDateTime.monthNumber.toLong())
             setDay(localDateTime.dayOfMonth.toLong())
@@ -59,12 +35,11 @@ class SchedulerImpl(
             setSecond(localDateTime.second.toLong())
         }
 
-        val content = UNMutableNotificationContent()
-        content.setTitle("Scheduled Task")
-        content.setBody("Task with ID $scheduleId is scheduled.")
-        content.setUserInfo(mapOf("scheduleId" to scheduleId))
-
-        logger.i { "Created notification content for scheduleId=$scheduleId" }
+        val content = UNMutableNotificationContent().apply {
+            setTitle("Reminder")
+            setBody(taskTitle)
+            setUserInfo(mapOf("scheduleId" to scheduleId.toString(), "taskId" to taskId.toString()))
+        }
 
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
             dateComponents = triggerDate,
@@ -77,14 +52,15 @@ class SchedulerImpl(
             trigger = trigger
         )
 
-        UNUserNotificationCenter.currentNotificationCenter()
-            .addNotificationRequest(request) { error ->
-                if (error == null) {
-                    logger.i { "Successfully scheduled task with scheduleId=$scheduleId" }
-                } else {
-                    logger.e { "Error scheduling task: ${error.localizedDescription}" }
-                }
+        notificationCenter.addNotificationRequest(request) { error ->
+            if (error == null) {
+
+                logger.i { "Successfully scheduled notification for scheduleId=$scheduleId" }
+            } else {
+                logger.e { "Error scheduling notification: ${'$'}{error.localizedDescription}" }
             }
+        }
+
     }
 
 
@@ -95,7 +71,7 @@ class SchedulerImpl(
 
 
         val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(
-            timeInterval = 20.minutes.inWholeSeconds.toDouble(), // Asegúrate de usar Double
+            timeInterval = 1.days.inWholeSeconds.toDouble(),
             repeats = true
         )
         val request = UNNotificationRequest.requestWithIdentifier(
@@ -177,10 +153,11 @@ class SchedulerImpl(
             )
     }
 
-    private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
+  private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
 
     companion object {
         private const val PLANNED_PRIORITY_WORK = "SmartReminder"
         private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }
+

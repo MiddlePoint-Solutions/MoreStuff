@@ -13,6 +13,7 @@
     <string name="text_created_time_placeholder">Creado: %s</string>
     <string name="text_completed_time_placeholder">Completedo: %s</string>
     <string name="text_scheduled_time_placeholder">Programado para: %s</string>
+    <string name="task_chat_complete_message_with_date">Completada el %s</string>
 
     <!--  Menu options  -->
     <string name="menu_title_settings">Ajustes</string>
