@@ -1,31 +1,20 @@
 package io.middlepoint.morestuff.shared.ui.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Notes
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
@@ -43,206 +32,103 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.TaskColors
+import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.cd_extra_details
-import morestuff.composeapp.generated.resources.cd_task_complete
-import org.jetbrains.compose.resources.ExperimentalResourceApi
+import morestuff.composeapp.generated.resources.text_created_time_placeholder
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun TaskCard(
-    modifier: Modifier = Modifier,
-    item: ReviewItemUiModel,
-    onComplete: (ReviewItemUiModel) -> Unit,
-    isClickable: Boolean = true,
-    showTaskChat: (taskId: Long) -> Unit,
+  item: ReviewItemUiModel,
+  modifier: Modifier = Modifier,
+  messages: List<MessageUiModel> = listOf()
 ) {
-    val selectedState = remember { MutableTransitionState(false) }
 
-    val backgroundColors by remember {
-        derivedStateOf { TaskColors.getProfileColorsForTask(item.title) }
-    }
+  val backgroundColors by remember {
+    derivedStateOf { TaskColors.getProfileColorsForTask(item.title) }
+  }
 
-    val extraDetails by remember(item.extraDetails) {
-        derivedStateOf { item.extraDetails }
-    }
-
-    Card(
-        modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .clickable(isClickable) {
-                selectedState.targetState = !selectedState.currentState
-            }
-            .aspectRatio(0.7f),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+  Card(
+    modifier = modifier
+      .clip(RoundedCornerShape(10.dp))
+      .aspectRatio(0.7f),
+    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    border = BorderStroke(0.3.dp, color = Color.Black.copy(alpha = 0.18f))
+  ) {
+    Column(
+      modifier = Modifier.padding(start = 20.dp, end = 20.dp)
     ) {
-        Text(
-            text = item.title,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            textAlign = TextAlign.Start,
-            style = MaterialTheme.typography.displaySmall.copy(
-                fontWeight = FontWeight(400),
-                fontSize = 25.sp,
-                lineHeight = 28.sp
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-            maxLines = 2,
-            minLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
+      Text(
+        text = item.title,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        textAlign = TextAlign.Start,
+        style = MaterialTheme.typography.displaySmall.copy(
+          fontWeight = FontWeight(400),
+          fontSize = 25.sp,
+          lineHeight = 28.sp
+        ),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 20.dp),
+        maxLines = 2,
+        minLines = 2,
+        overflow = TextOverflow.Ellipsis
+      )
+
+      Box(
+        modifier = Modifier
+          .aspectRatio(1f)
+          .padding(top = 6.dp),
+      ) {
 
         Box(
-            modifier = Modifier
-                .aspectRatio(1f)
-                .padding(start = 20.dp, end = 20.dp, top = 6.dp),
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 15.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(brush = Brush.verticalGradient(backgroundColors))
         ) {
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 15.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(brush = Brush.verticalGradient(backgroundColors))
-            )
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(
-                    space = 10.dp,
-                    alignment = Alignment.End
-                )
-            ) {
-
-                if (extraDetails) {
-                    Surface(
-                        modifier = Modifier.size(width = 42.dp, height = 30.dp),
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = RoundedCornerShape(33.dp),
-                        shadowElevation = 2.dp
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Notes,
-                            contentDescription = stringResource(Res.string.cd_extra_details),
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
-
-                Surface(
-                    modifier = Modifier.size(width = 50.dp, height = 30.dp),
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(33.dp),
-                    shadowElevation = 2.dp
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = item.position,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                textAlign = TextAlign.Center
-                            ),
-                        )
-                    }
-                }
-            }
+          Messages(
+            messages = messages,
+            userInteractionEnabled = false,
+            contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp, end = 10.dp),
+          )
         }
+      }
 
-        AnimatedVisibility(
-            visibleState = selectedState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 20.dp, end = 20.dp),
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Row(
-                    modifier = Modifier.align(Alignment.CenterEnd),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    // TODO: uncomment when ready to show task chat from review
-                    /*TaskCardIconButton(
-                        onClick = { showTaskChat(item.id) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                        )
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.chat_bubble_24px),
-                            contentDescription = stringResource(R.string.cd_show_task_chat),
-                            tint = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    }*/
-
-                    TaskCardIconButton(
-                        onClick = { onComplete(item) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = stringResource(Res.string.cd_task_complete),
-                        )
-                    }
-                }
-            }
-        }
-
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 10.dp)
+      ) {
+        Text(
+          text = stringResource(Res.string.text_created_time_placeholder, item.createTime),
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+      }
     }
+  }
 }
-
-@Composable
-private fun TaskCardIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
-    content: @Composable () -> Unit
-) {
-    FilledIconButton(
-        onClick = onClick,
-        modifier = modifier.size(55.dp),
-        colors = colors,
-        shape = RoundedCornerShape(12.dp),
-        content = content
-    )
-}
-
 
 @NonRestartableComposable
 @Composable
 private fun topScrimBrush() = Brush.verticalGradient(
-    listOf(
-        Color.White.copy(alpha = 0.5f),
-        Color.White.copy(alpha = 0f)
-    )
+  listOf(
+    Color.White.copy(alpha = 0.1f),
+    Color.White.copy(alpha = 0f)
+  )
 )
 
 @NonRestartableComposable
 @Composable
 private fun bottomScrimBrush() = Brush.verticalGradient(
-    listOf(
-        Color.White.copy(alpha = 0f),
-        Color.White.copy(alpha = 0.5f)
-    )
+  listOf(
+    Color.White.copy(alpha = 0f),
+    Color.White.copy(alpha = 0.5f)
+  )
 )
 
 //@Preview(

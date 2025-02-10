@@ -10,6 +10,27 @@ object MockData {
   val chatActions =
     ChatActions(scheduleAction = { _, _ -> })
 
+  fun createMessages(count: Int) = buildList<MessageUiModel> {
+    repeat(count) {
+      add(
+        MessageUiModel(
+          id = it.toLong(),
+          taskId = userNewTask.taskId,
+          scheduleId = userNewTask.scheduleId,
+          contentType = userNewTask.contentType,
+          createTime = userNewTask.createTime,
+          content = userNewTask.content,
+          replyType = userNewTask.replyType,
+          replyContent = userNewTask.replyContent,
+          openGraphResult = userNewTask.openGraphResult,
+          messageData = userNewTask.messageData,
+          formattedTime = "",
+          formattedTimeOnly = "10:00"
+        )
+      )
+    }
+  }
+
   val messageUiModel: MessageUiModel
     get() {
       val userNewTaskMessage = userNewTask

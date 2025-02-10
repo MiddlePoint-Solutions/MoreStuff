@@ -36,7 +36,6 @@ fun Modifier.swipableCard(
         val velocityTracker = VelocityTracker()
         detectDragGestures(
             onDragStart = {
-                Logger.d { "$it" }
                 onDrag(true)
             },
             onDragCancel = {
@@ -46,7 +45,6 @@ fun Modifier.swipableCard(
                 }
             },
             onDrag = { change, dragAmount ->
-                Logger.d { "$dragAmount" }
                 if (state.isSwiped || !enabled) {
                     change.consume()
                 } else {

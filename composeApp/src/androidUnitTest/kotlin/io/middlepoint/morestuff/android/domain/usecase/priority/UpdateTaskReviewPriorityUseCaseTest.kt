@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.priority
 
 import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createTaskForTest
-import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
+import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
@@ -36,7 +36,7 @@ class UpdateTaskReviewPriorityUseCaseTest {
             val priority = Priority.Now()
 
             coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
-            useCase(taskId, PriorityActionType.Now)
+            useCase(taskId, ReviewActionType.Now)
             coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
@@ -50,7 +50,7 @@ class UpdateTaskReviewPriorityUseCaseTest {
             val priority = Priority.Later()
 
             coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
-            useCase(taskId, PriorityActionType.Later)
+            useCase(taskId, ReviewActionType.Later)
             coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
@@ -74,7 +74,7 @@ class UpdateTaskReviewPriorityUseCaseTest {
 
             coEvery { getTaskUseCase(taskId) } returns currentTask.right()
             coEvery { getTaskAbovePriorityScoreUseCase(taskPriorityScore) } returns nextPriorityTask.right()
-            useCase(taskId, PriorityActionType.More)
+            useCase(taskId, ReviewActionType.More)
             coVerify { getTaskUseCase(taskId) }
             coVerify { getTaskAbovePriorityScoreUseCase(taskPriorityScore) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, expectedPriorityScore) }
@@ -99,7 +99,7 @@ class UpdateTaskReviewPriorityUseCaseTest {
 
             coEvery { getTaskUseCase(taskId) } returns currentTask.right()
             coEvery { getTaskBelowPriorityScoreUseCase(taskPriorityScore) } returns nextPriorityTask.right()
-            useCase(taskId, PriorityActionType.Less)
+            useCase(taskId, ReviewActionType.Less)
             coVerify { getTaskUseCase(taskId) }
             coVerify { getTaskBelowPriorityScoreUseCase(taskPriorityScore) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, expectedPriorityScore) }

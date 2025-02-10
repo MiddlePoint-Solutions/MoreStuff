@@ -5,13 +5,23 @@ import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import kotlinx.coroutines.flow.Flow
 
 interface GetTaskChatMessagesUseCase {
-    operator fun invoke(taskId: Long): Flow<List<Message>>
+  operator fun invoke(taskId: Long): GetTaskChatMessagesUseCase
+  fun asList(): List<Message>
+  fun asFlow(): Flow<List<Message>>
 }
 
 class GetTaskChatMessagesUseCaseImpl(
-    private val messageRepository: MessageRepository,
+  private val messageRepository: MessageRepository,
 ) : GetTaskChatMessagesUseCase {
-    override fun invoke(taskId: Long): Flow<List<Message>> {
-        return messageRepository.getTaskChatMessagesFlow(taskId)
-    }
+
+  private var taskId: Long = 0
+
+  override fun invoke(taskId: Long): GetTaskChatMessagesUseCase {
+    this.taskId = taskId
+    return this
+  }
+
+  override fun asList(): List<Message> = messageRepository.getTaskChatMessages(taskId)
+
+  override fun asFlow(): Flow<List<Message>> = messageRepository.getTaskChatMessagesFlow(taskId)
 }

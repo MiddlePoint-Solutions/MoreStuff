@@ -230,10 +230,10 @@
     <string name="cd_lowest_priority_hint_icon">Icono prioridad más baja</string>
     <string name="cd_low_priority_hint_icon">Icono prioridad baja</string>
     <string name="cd_high_priority_hint_icon">Icono prioridad alta</string>
-    <string name="review_hint_high_priority">Prioridad Alta</string>
-    <string name="review_hint_low_priority">Prioridad Baja</string>
-    <string name="review_hint_highest_priority">Prioridad más alta</string>
-    <string name="review_hint_lowest_priority">Prioridad más baja</string>
+    <string name="review_hint_high_priority">Prioridad\nAlta</string>
+    <string name="review_hint_low_priority">Prioridad\nBaja</string>
+    <string name="review_hint_highest_priority">Prioridad\nmás alta</string>
+    <string name="review_hint_lowest_priority">Prioridad\nmás baja</string>
     <string name="cd_app_logo">app logo</string>
     <string name="cd_notifications_permission_image">Imagen notificación de permiso</string>
     <string name="notification_permission_rationale">MoreStuff necesita el permiso de notificación para habilitar la configuración de horarios y recordatorios de las cosas que no quieres olvidar...\nTambién puedes habilitar el permiso mientras usas la aplicación.</string>

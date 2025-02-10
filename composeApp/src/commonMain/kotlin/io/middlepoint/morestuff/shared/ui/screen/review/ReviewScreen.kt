@@ -1,10 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.screen.review
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +29,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -65,21 +68,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import io.github.xxfast.decompose.router.rememberOnRoute
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
+import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData.messageUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_close
@@ -95,8 +105,6 @@ import morestuff.composeapp.generated.resources.ic_arrow_high
 import morestuff.composeapp.generated.resources.ic_arrow_low
 import morestuff.composeapp.generated.resources.ic_arrow_lowest
 import morestuff.composeapp.generated.resources.ic_arrow_up
-import morestuff.composeapp.generated.resources.ic_review_later_24px
-import morestuff.composeapp.generated.resources.ic_review_now_24px
 import morestuff.composeapp.generated.resources.ic_review_undo_24px
 import morestuff.composeapp.generated.resources.onboarding_review_all_done
 import morestuff.composeapp.generated.resources.priority_review
@@ -107,7 +115,6 @@ import morestuff.composeapp.generated.resources.review_hint_lowest_priority
 import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.LocalKoinScope
 
 @NonRestartableComposable
 @Composable
@@ -148,27 +155,34 @@ fun ReviewContent(
       modifier = modifier.fillMaxSize()
     ) {
 
-      val (topBar, cards, controls) = createRefs()
+      val (topBar, cards, controls, count) = createRefs()
 
       when (val round = model.round) {
 
         is ReviewRound.Review -> {
 
-          PriorityReviewTopBar(
-            scopes = model.scopes,
-            navigateUp = onBack,
-            toggleReviewHint = { viewModel.take(ReviewViewEvent.ToggleReviewHint) },
-            showReviewHelpScreen = { showReviewHelpScreen = true },
-            isReviewHintActive = model.reviewHintEnabled,
-            modifier = Modifier.constrainAs(topBar) {
-              top.linkTo(parent.top)
-            },
-            currentScopeId = currentScopeId,
-          )
           val states = model.items.map { it to rememberSwipeableCardState(round) }
 
           val hintVisibilityState = remember { MutableTransitionState(false) }
-          val roundAnimationState = remember(round) { mutableLongStateOf(round.scopeId) }
+          val scopeVisibilityState = remember { MutableTransitionState(false) }
+
+          PriorityReviewTopBar(
+            navigateUp = onBack,
+            showReviewHelpScreen = { showReviewHelpScreen = true },
+            isReviewHintActive = model.reviewHintEnabled,
+            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
+          ) {
+            ScopeCarousel(
+              scopes = model.scopes,
+              currentScopeId = currentScopeId,
+              onScopeSelected = { viewModel.take(LoadScope(it)) },
+              onScroll = { scopeVisibilityState.targetState = !it },
+              modifier = Modifier
+                .height(75.dp)
+                .padding(bottom = 30.dp)
+                .fillMaxWidth()
+            )
+          }
 
           LaunchedEffect(showReviewDragHints) {
             hintVisibilityState.targetState = !showReviewDragHints
@@ -188,46 +202,76 @@ fun ReviewContent(
           ) {
             ReviewSwipeControls(
               lastItemSwiped = { states.lastSwipedItem() },
-              firstVisibleState = { states.firstVisibleStateOrNull() },
-              undoAction = { viewModel.take(ReviewViewEvent.Undo(it)) },
+              firstVisibleItem = { states.firstVisibleOrNull() },
+              modelAction = viewModel::take,
             )
+          }
+
+          AnimatedVisibility(
+            visibleState = scopeVisibilityState,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = modifier
+              .fillMaxWidth()
+              .constrainAs(count) {
+                bottom.linkTo(cards.top)
+                verticalBias = 0.6f
+                height = Dimension.preferredWrapContent
+              },
+          ) {
+            Row(
+              modifier = modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              if (model.itemsForReview > 0) {
+                AnimatedContent(
+                  targetState = model.itemsForReview,
+                  transitionSpec = {
+                    slideIntoContainer(
+                      AnimatedContentTransitionScope.SlideDirection.Up
+                    ).togetherWith(
+                      slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down
+                      )
+                    )
+                  }
+                ) {
+                  Text(
+                    "$it",
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                    color = MaterialTheme.colorScheme.secondary,
+                  )
+                }
+              }
+            }
           }
 
           Box(
             modifier = modifier
-              .fillMaxHeight(0.7f)
+              .fillMaxHeight(0.67f)
               .constrainAs(cards) {
-                centerVerticallyTo(parent, bias = 0.4f)
-              }
+                centerVerticallyTo(parent, bias = 0.44f)
+              },
+            contentAlignment = Alignment.Center
           ) {
             if (states.isNotEmpty()) {
-              AnimatedContent(
-                targetState = roundAnimationState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() }
+              AnimatedVisibility(
+                visibleState = scopeVisibilityState,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = modifier.fillMaxWidth(),
               ) {
                 TaskPrioritySwipe(
-                  modifier = modifier.fillMaxSize(),
+                  modifier = modifier.fillMaxSize().align(Alignment.Center),
                   states = states,
                   onSwiped = { schedule, direction ->
-                    viewModel.take(ReviewViewEvent.ItemSwipe(schedule, direction))
+                    viewModel.take(ItemSwipe(schedule, direction))
                   },
                   onDrag = { isDragging ->
                     showReviewDragHints = isDragging
                   },
-                  onComplete = {
-                    scope.launch {
-                      states.firstVisibleStateOrNull()?.onComplete()
-                      viewModel.take(ReviewViewEvent.CompleteTask(it))
-                    }
-                  },
-                  showTaskChat = { taskId ->
-                    /*currentTaskId = taskId
-                    scope.launch {
-                        showTaskChat.targetState = true
-                    }*/
-                  }
                 )
-
               }
             }
           }
@@ -242,11 +286,13 @@ fun ReviewContent(
 
           LaunchedEffect(model.round) {
             hintVisibilityState.targetState = true
+            scopeVisibilityState.targetState = true
           }
         }
 
         ReviewRound.Final -> {
           LaunchedEffect(Unit) {
+            delay(2000)
             onBack()
           }
         }
@@ -273,17 +319,14 @@ fun ReviewContent(
   }
 }
 
-
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 private fun PriorityReviewTopBar(
-  scopes: List<ScopeDomain>,
-  toggleReviewHint: () -> Unit,
   showReviewHelpScreen: () -> Unit,
   isReviewHintActive: Boolean,
   modifier: Modifier = Modifier,
   navigateUp: () -> Unit = {},
-  currentScopeId: Long,
+  scopeSelectorContent: @Composable () -> Unit
 ) {
 
   val viewModel = koinInjectOnRoute(ReviewViewModel::class)
@@ -326,7 +369,7 @@ private fun PriorityReviewTopBar(
         ) {
           DropdownMenuItem(onClick = {
             coroutineScope.launch {
-              toggleReviewHint()
+              viewModel.take(ToggleReviewHint)
               showMenu = false
             }
           },
@@ -345,15 +388,7 @@ private fun PriorityReviewTopBar(
       colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
     )
 
-    ScopeCarousel(
-      scopes = scopes,
-      currentScopeId = currentScopeId,
-      onScopeSelected = { viewModel.take(ReviewViewEvent.LoadScope(it)) },
-      modifier = Modifier
-        .height(75.dp)
-        .padding(bottom = 30.dp)
-        .fillMaxWidth()
-    )
+    scopeSelectorContent()
   }
 }
 
@@ -361,31 +396,29 @@ private fun PriorityReviewTopBar(
 @Composable
 private fun ReviewSwipeControls(
   lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
-  firstVisibleState: () -> SwipeableCardState?,
-  undoAction: (ReviewItemUiModel) -> Unit,
+  firstVisibleItem: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+  modelAction: (ReviewViewEvent) -> Unit,
   modifier: Modifier = Modifier,
 ) {
 
   val scope = rememberCoroutineScope()
+  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
-  val undoLastAction: () -> Unit = {
-    scope.launch {
-      lastItemSwiped()?.let { lastItem ->
-        lastItem.second.undo()
-        undoAction(lastItem.first)
+  if (showDeleteConfirmationDialog) {
+    ConfirmDeleteDialog(
+      onDismiss = { showDeleteConfirmationDialog = false },
+      onConfirm = {
+        firstVisibleItem()?.let { item ->
+          scope.launch {
+            delay(300)
+            item.second.onDelete()
+            modelAction(DeleteTask(item.first))
+          }
+        }
+        showDeleteConfirmationDialog = false
       }
-    }
+    )
   }
-  val buttonAction: (SwipeDirection) -> Unit = { direction ->
-    scope.launch {
-      firstVisibleState()?.swipe(direction)
-    }
-  }
-
-  val lowAction: () -> Unit = { buttonAction(SwipeDirection.Left) }
-  val highAction: () -> Unit = { buttonAction(SwipeDirection.Right) }
-  val doneAction: () -> Unit = { buttonAction(SwipeDirection.Up) }
-  val laterAction: () -> Unit = { buttonAction(SwipeDirection.Down) }
 
   Column(
     modifier = modifier,
@@ -394,39 +427,40 @@ private fun ReviewSwipeControls(
   ) {
 
     Row(
-      horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
+      horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)
     ) {
       MainReviewButton(
-        onClick = lowAction,
-        icon = Icons.Rounded.Remove
-
+        onClick = { showDeleteConfirmationDialog = true },
+        icon = Icons.Filled.Delete
       )
+
       MainReviewButton(
-        onClick = highAction,
-        icon = Icons.Rounded.Add
+        onClick = {
+          firstVisibleItem()?.let { item ->
+            scope.launch {
+              item.second.onComplete()
+              modelAction(CompleteTask(item.first))
+            }
+          }
+        },
+        icon = Icons.Filled.Done
       )
     }
 
     Row(
       horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
     ) {
-
       SecondaryReviewButton(
-        onClick = laterAction,
-        icon = vectorResource(Res.drawable.ic_review_later_24px)
-      )
-
-      SecondaryReviewButton(
-        onClick = undoLastAction,
+        onClick = {
+          lastItemSwiped()?.let { item ->
+            scope.launch {
+              item.second.undo()
+              modelAction(Undo(item.first))
+            }
+          }
+        },
         icon = vectorResource(Res.drawable.ic_review_undo_24px)
       )
-
-      SecondaryReviewButton(
-        onClick = doneAction,
-        icon = vectorResource(Res.drawable.ic_review_now_24px)
-      )
-
-
     }
   }
 }
@@ -438,33 +472,29 @@ private fun TaskPrioritySwipe(
   states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
   onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
   onDrag: (Boolean) -> Unit,
-  onComplete: (ReviewItemUiModel) -> Unit,
-  showTaskChat: (taskId: Long) -> Unit,
 ) {
-  val itemClick by rememberUpdatedState(showTaskChat)
   Box(
-    modifier = modifier
-      .padding(20.dp)
+    modifier = modifier.padding(20.dp),
+    contentAlignment = Alignment.Center
   ) {
     AllDoneMessage()
 
-    states.forEach { (task, state) ->
+    states.forEach { (item, state) ->
       if (state.swipedDirection == null) {
         TaskCard(
           modifier = Modifier
-            .layoutId(task.id)
+            .layoutId(item.id)
             .swipableCard(
               state = state,
               onDrag = onDrag,
             ),
-          item = task,
-          onComplete = onComplete,
-          showTaskChat = itemClick
+          item = item,
+          messages = item.messages
         )
       }
-      LaunchedEffect(task, state.swipedDirection) {
+      LaunchedEffect(item, state.swipedDirection) {
         state.swipedDirection?.let { direction ->
-          onSwiped(task, direction)
+          onSwiped(item, direction)
         }
       }
     }
@@ -490,11 +520,10 @@ private fun AllDoneMessage() {
 
     Text(
       text = stringResource(Res.string.onboarding_review_all_done),
-      style = MaterialTheme.typography.headlineMedium.copy(
-        fontSize = 38.sp
-      ),
+      style = MaterialTheme.typography.headlineMedium.copy(fontSize = 38.sp),
       color = MaterialTheme.colorScheme.secondary
     )
+
   }
 }
 
@@ -603,7 +632,7 @@ private fun MainReviewButton(
 ) {
   Button(
     modifier = Modifier
-      .size(width = 140.dp, height = 56.dp)
+      .size(width = 130.dp, height = 56.dp)
       .clip(CircleShape),
     colors = ButtonDefaults.buttonColors(
       containerColor = MaterialTheme.colorScheme.secondaryContainer

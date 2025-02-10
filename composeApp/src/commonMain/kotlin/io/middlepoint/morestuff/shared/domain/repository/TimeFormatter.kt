@@ -22,12 +22,13 @@ interface TimeFormatter {
   ): String
 
   fun formatDisplayDate(time: LocalDate): String
+
   fun formatToDateTime(
     timeString: String,
     timeZone: TimeZone = TimeZone.currentSystemDefault()
   ): String
 
-  fun formatDisplayCompleteTime(
+  fun formatDisplayFullTimeAndDate(
     timeString: String,
     timeZone: TimeZone = TimeZone.currentSystemDefault()
   ): String

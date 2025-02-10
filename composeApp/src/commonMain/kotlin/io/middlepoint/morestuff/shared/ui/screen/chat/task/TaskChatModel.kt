@@ -68,7 +68,7 @@ fun taskChatModel(
   LaunchedEffect(Unit) {
     val messagesFlow = when {
       devTools.showDebugMessages -> getTaskMessagesFlowUseCase(taskId = taskId)
-      else -> getTaskChatMessagesUseCase(taskId = taskId)
+      else -> getTaskChatMessagesUseCase(taskId = taskId).asFlow()
     }
     messagesFlow
       .map(messageUiMapper::map)

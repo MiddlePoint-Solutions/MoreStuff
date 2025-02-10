@@ -9,10 +9,10 @@
     <string name="chat_action_today">Today</string>
 
     <!-- Placeholders -->
-    <string name="text_created_time_placeholder">Created: %s</string>
-    <string name="text_completed_time_placeholder">Completed: %s</string>
-    <string name="text_scheduled_time_placeholder">Scheduled for: %s</string>
-    <string name="task_chat_complete_message_with_date">Completed on %s</string>
+    <string name="text_created_time_placeholder">Created: %1$s</string>
+    <string name="text_completed_time_placeholder">Completed: %1$s</string>
+    <string name="text_scheduled_time_placeholder">Scheduled for: %1$s</string>
+    <string name="task_chat_complete_message_with_date">Completed on %1$s</string>
 
     <!--  Menu options  -->
     <string name="menu_title_settings">Settings</string>

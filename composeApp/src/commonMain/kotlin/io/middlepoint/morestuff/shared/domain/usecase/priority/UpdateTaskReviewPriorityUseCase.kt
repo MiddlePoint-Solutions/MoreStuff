@@ -2,14 +2,14 @@ package io.middlepoint.morestuff.shared.domain.usecase.priority
 
 import arrow.core.Either
 import arrow.core.flatMap
-import io.middlepoint.morestuff.shared.domain.enums.PriorityActionType
+import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 
 interface UpdateTaskReviewPriorityUseCase {
-    suspend operator fun invoke(taskId: Long, actionType: PriorityActionType): Either<Failure, Long>
+    suspend operator fun invoke(taskId: Long, actionType: ReviewActionType): Either<Failure, Long>
 }
 
 class UpdateTaskReviewPriorityUseCaseImpl(
@@ -22,30 +22,30 @@ class UpdateTaskReviewPriorityUseCaseImpl(
 
     override suspend fun invoke(
         taskId: Long,
-        actionType: PriorityActionType,
+        actionType: ReviewActionType,
     ): Either<Failure, Long> = when (actionType) {
-        PriorityActionType.Now -> {
+        ReviewActionType.Now -> {
             val score = getDefaultPriorityScoreUseCase(Priority.Now())
             updateTaskPriorityScoreUseCase(taskId, score)
         }
 
-        PriorityActionType.Later -> {
+        ReviewActionType.Later -> {
             val score = getDefaultPriorityScoreUseCase(Priority.Later())
             updateTaskPriorityScoreUseCase(taskId, score)
         }
 
-        PriorityActionType.More -> getTaskUseCase(taskId).flatMap { task ->
+        ReviewActionType.More -> getTaskUseCase(taskId).flatMap { task ->
             getTaskAbovePriorityScoreUseCase(task.priorityScore).flatMap { taskAbove ->
                 updateTaskPriorityScoreUseCase(taskId, taskAbove.priorityScore + 1)
             }
         }
 
-        PriorityActionType.Less -> getTaskUseCase(taskId).flatMap { task ->
+        ReviewActionType.Less -> getTaskUseCase(taskId).flatMap { task ->
             getTaskBelowPriorityScoreUseCase(task.priorityScore).flatMap { taskBelow ->
                 updateTaskPriorityScoreUseCase(taskId, taskBelow.priorityScore - 1)
             }
         }
 
-        PriorityActionType.Done -> getTaskUseCase(taskId).map { it.priorityScore }
+        ReviewActionType.Done -> getTaskUseCase(taskId).map { it.priorityScore }
     }
 }

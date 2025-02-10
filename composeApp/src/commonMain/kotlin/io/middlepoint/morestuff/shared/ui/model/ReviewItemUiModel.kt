@@ -11,4 +11,5 @@ data class ReviewItemUiModel(
     val priorityScore: Long,
     var isCompleted: Boolean,
     val extraDetails: Boolean,
+    val messages: List<MessageUiModel>
 )
