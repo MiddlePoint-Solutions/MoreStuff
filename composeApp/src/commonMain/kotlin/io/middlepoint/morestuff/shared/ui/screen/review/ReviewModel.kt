@@ -41,8 +41,9 @@ fun reviewModel(
   var reviewHintEnabled by remember { mutableStateOf(initialState.reviewHintEnabled) }
   var itemsForReview by remember { mutableIntStateOf(0) }
 
-  LaunchedEffect(currentScope) {
+  LaunchedEffect(Unit) {
     getScopesUseCase().onRight { scopes = it }
+    reviewHintEnabled = store.currentState.settings.enableReviewHint
   }
 
   fun checkUpdateRound(item: ReviewItemUiModel) {
