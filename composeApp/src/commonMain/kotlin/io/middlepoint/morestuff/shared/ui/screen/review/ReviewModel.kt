@@ -111,16 +111,12 @@ fun reviewModel(
         }
 
         is LoadScope -> {
-          val taskResult = getReviewTasksUseCase(event.scopeId)
-          if (taskResult is Either.Right) {
-            val tasks = taskResult.value
-            items = tasks.tasks.mapIndexed { index, task ->
-              reviewTasksMapper.map(task, index + 1, tasks.tasks.size)
-            }.shuffled()
-            currentScope = scopes.firstOrNull { it.id == event.scopeId } ?: currentScope
-            round = ReviewRound.Review(event.scopeId)
-            itemsForReview = items.size
+          getReviewTasksUseCase(event.scopeId).map {
+            items = reviewTasksMapper.map(it.tasks, it.taskMessages)
           }
+          currentScope = scopes.firstOrNull { it.id == event.scopeId } ?: currentScope
+          round = ReviewRound.Review(event.scopeId)
+          itemsForReview = items.size
         }
       }
     }

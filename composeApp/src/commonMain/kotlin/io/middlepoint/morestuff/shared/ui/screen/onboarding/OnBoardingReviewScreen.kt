@@ -49,112 +49,113 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun OnBoardingReviewScreen(
-    nextButtonText: String = stringResource(Res.string.button_next),
-    onNext: () -> Unit,
+  nextButtonText: String = stringResource(Res.string.button_next),
+  onNext: () -> Unit,
 ) {
 
-    var tasks = remember { listOf<ReviewItemUiModel>() }
-    var showExample by remember { mutableStateOf(false) }
+  var tasks = remember { listOf<ReviewItemUiModel>() }
+  var showExample by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        val ids = listOf(
-            Res.string.onboarding_review_task1,
-            Res.string.onboarding_review_task2,
-            Res.string.onboarding_review_task3,
-            Res.string.onboarding_review_task4,
-            Res.string.onboarding_review_task5,
-            Res.string.onboarding_review_task6,
-            Res.string.onboarding_review_task7,
-            Res.string.onboarding_review_task8,
-            Res.string.onboarding_review_task9,
-            Res.string.onboarding_review_task10,
-        )
+  LaunchedEffect(Unit) {
+    val ids = listOf(
+      Res.string.onboarding_review_task1,
+      Res.string.onboarding_review_task2,
+      Res.string.onboarding_review_task3,
+      Res.string.onboarding_review_task4,
+      Res.string.onboarding_review_task5,
+      Res.string.onboarding_review_task6,
+      Res.string.onboarding_review_task7,
+      Res.string.onboarding_review_task8,
+      Res.string.onboarding_review_task9,
+      Res.string.onboarding_review_task10,
+    )
 
-        tasks = List(ids.size) { index ->
-            ReviewItemUiModel(
-                id = index.toLong(),
-                createTime = "",
-                position = "${index + 1}/${ids.size}",
-                title = getString(ids[index]),
-                priorityScore = 5,
-                isCompleted = false,
-                extraDetails = false
-            )
-        }
+    tasks = List(ids.size) { index ->
+      ReviewItemUiModel(
+        id = index.toLong(),
+        createTime = "",
+        title = getString(ids[index]),
+        position = "${index + 1}/${ids.size}",
+        priorityScore = 5,
+        isCompleted = false,
+        extraDetails = false,
+        messages = listOf()
+      )
     }
+  }
 
-    LaunchedEffect(Unit) {
-        delay(500)
-        showExample = true
-    }
+  LaunchedEffect(Unit) {
+    delay(500)
+    showExample = true
+  }
 
-    Box(
-        modifier = Modifier
-            .windowInsetsPadding(WindowInsets.safeContent)
-            .fillMaxSize(),
+  Box(
+    modifier = Modifier
+      .windowInsetsPadding(WindowInsets.safeContent)
+      .fillMaxSize(),
+  ) {
+
+    ConstraintLayout(
+      modifier = Modifier.fillMaxSize(),
     ) {
 
-        ConstraintLayout(
-            modifier = Modifier.fillMaxSize(),
-        ) {
+      val (image, title, subtitle) = createRefs()
 
-            val (image, title, subtitle) = createRefs()
+      Text(
+        text = stringResource(Res.string.onboarding_review_title),
+        modifier = Modifier
+          .fillMaxWidth()
+          .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
+        style = MaterialTheme.typography.headlineMedium.copy(
+          fontSize = 40.sp,
+          lineHeight = 44.sp,
+          fontWeight = FontWeight.Black,
+          textAlign = TextAlign.Center
+        ),
+        color = MaterialTheme.colorScheme.primary,
+      )
 
-            Text(
-                text = stringResource(Res.string.onboarding_review_title),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
-                style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 40.sp,
-                    lineHeight = 44.sp,
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center
-                ),
-                color = MaterialTheme.colorScheme.primary,
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(Res.string.onboarding_review_subtitle),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-                Text(
-                    text = "High ⬆\uFE0F Low ⬇\uFE0F More ➡\uFE0F Less ⬅\uFE0F",
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
-
-            AnimatedVisibility(
-                visible = showExample,
-                modifier = Modifier
-                    .constrainAs(image) { centerTo(parent) }
-                    .zIndex(1f),
-                enter = fadeIn()
-            ) {
-                OnBoardingReviewCards(
-                    tasks = tasks,
-                )
-            }
-        }
-
-        OnboardingButton(
-            onClick = onNext,
-            title = nextButtonText,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 100.dp)
+      Column(
+        modifier = Modifier
+          .fillMaxWidth()
+          .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
+        Text(
+          text = stringResource(Res.string.onboarding_review_subtitle),
+          style = MaterialTheme.typography.headlineSmall,
+          textAlign = TextAlign.Center,
+          color = MaterialTheme.colorScheme.secondary,
         )
+        Text(
+          text = "High ⬆\uFE0F Low ⬇\uFE0F More ➡\uFE0F Less ⬅\uFE0F",
+          style = MaterialTheme.typography.titleMedium,
+          textAlign = TextAlign.Center,
+          color = MaterialTheme.colorScheme.secondary,
+        )
+      }
+
+      AnimatedVisibility(
+        visible = showExample,
+        modifier = Modifier
+          .constrainAs(image) { centerTo(parent) }
+          .zIndex(1f),
+        enter = fadeIn()
+      ) {
+        OnBoardingReviewCards(
+          tasks = tasks,
+        )
+      }
     }
+
+    OnboardingButton(
+      onClick = onNext,
+      title = nextButtonText,
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .padding(bottom = 100.dp)
+    )
+  }
 }
 
 //@Preview(

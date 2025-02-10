@@ -1,9 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.components
 
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,16 +10,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
@@ -42,9 +34,6 @@ import io.middlepoint.morestuff.shared.ui.TaskColors
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.cd_extra_details
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TaskCard(
@@ -61,12 +50,8 @@ fun TaskCard(
     modifier = modifier
       .clip(RoundedCornerShape(10.dp))
       .aspectRatio(0.7f),
-    elevation = CardDefaults.cardElevation(
-      defaultElevation = 8.dp
-    ),
-    colors = CardDefaults.cardColors(
-      containerColor = MaterialTheme.colorScheme.surfaceVariant
-    ),
+    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     border = BorderStroke(0.3.dp, color = Color.Black.copy(alpha = 0.18f))
   ) {
     Text(
@@ -101,8 +86,8 @@ fun TaskCard(
       ) {
         Messages(
           messages = messages,
-          scrollState = rememberLazyListState().apply {  },
-          contentPadding = PaddingValues(top = 40.dp, bottom = 20.dp, end = 10.dp),
+          userInteractionEnabled = false,
+          contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp, end = 10.dp),
         )
       }
 

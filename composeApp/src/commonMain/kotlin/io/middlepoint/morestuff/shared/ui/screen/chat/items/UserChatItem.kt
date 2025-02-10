@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageType
+import io.middlepoint.morestuff.shared.ui.local.LocalUserInteractionEnabled
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.isDataMessage
 import io.middlepoint.morestuff.shared.ui.model.isPdfMessage
@@ -79,6 +80,7 @@ fun UserChatItem(
       color = MaterialTheme.colorScheme.primary,
       modifier = Modifier
         .combinedClickable(
+          enabled = LocalUserInteractionEnabled.current,
           onClick = {
             when (messageType) {
               MessageType.Text -> showMenu = true

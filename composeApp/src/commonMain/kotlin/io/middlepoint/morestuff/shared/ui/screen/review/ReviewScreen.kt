@@ -247,7 +247,6 @@ fun ReviewContent(
             }
           }
 
-
           Box(
             modifier = modifier
               .fillMaxHeight(0.67f)
@@ -293,6 +292,7 @@ fun ReviewContent(
 
         ReviewRound.Final -> {
           LaunchedEffect(Unit) {
+            delay(2000)
             onBack()
           }
         }
@@ -318,7 +318,6 @@ fun ReviewContent(
     }
   }
 }
-
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -480,22 +479,22 @@ private fun TaskPrioritySwipe(
   ) {
     AllDoneMessage()
 
-    states.forEach { (task, state) ->
+    states.forEach { (item, state) ->
       if (state.swipedDirection == null) {
         TaskCard(
           modifier = Modifier
-            .layoutId(task.id)
+            .layoutId(item.id)
             .swipableCard(
               state = state,
               onDrag = onDrag,
             ),
-          item = task,
-          messages = MockData.createMessages(3)
+          item = item,
+          messages = item.messages
         )
       }
-      LaunchedEffect(task, state.swipedDirection) {
+      LaunchedEffect(item, state.swipedDirection) {
         state.swipedDirection?.let { direction ->
-          onSwiped(task, direction)
+          onSwiped(item, direction)
         }
       }
     }
@@ -521,11 +520,10 @@ private fun AllDoneMessage() {
 
     Text(
       text = stringResource(Res.string.onboarding_review_all_done),
-      style = MaterialTheme.typography.headlineMedium.copy(
-        fontSize = 38.sp
-      ),
+      style = MaterialTheme.typography.headlineMedium.copy(fontSize = 38.sp),
       color = MaterialTheme.colorScheme.secondary
     )
+
   }
 }
 
