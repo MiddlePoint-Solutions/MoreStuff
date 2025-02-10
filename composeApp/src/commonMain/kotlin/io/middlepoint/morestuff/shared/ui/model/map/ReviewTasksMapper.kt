@@ -13,7 +13,7 @@ class ReviewTasksMapper(
   fun map(input: TaskDomain, messages: List<Message>, position: Int): ReviewItemUiModel =
     ReviewItemUiModel(
       id = input.id,
-      createTime = timeFormatter.formatToDateTime(input.createTime),
+      createTime = timeFormatter.formatDisplayFullTimeAndDate(input.createTime),
       title = input.title,
       position = "$position",
       priorityScore = input.priorityScore,

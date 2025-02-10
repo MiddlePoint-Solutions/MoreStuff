@@ -72,7 +72,7 @@ class TimeFormatterImpl(
   override fun formatToDateTime(timeString: String, timeZone: TimeZone): String =
     Instant.parse(timeString).toLocalDateTime(timeZone).toString()
 
-  override fun formatDisplayCompleteTime(timeString: String, timeZone: TimeZone): String =
+  override fun formatDisplayFullTimeAndDate(timeString: String, timeZone: TimeZone): String =
     timeString.let { time ->
       if (time.endsWith('z', ignoreCase = true)) {
         Instant.parse(time).toLocalDateTime(timeZone)

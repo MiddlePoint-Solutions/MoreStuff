@@ -10,7 +10,7 @@ class TaskUiMapper(
   fun map(input: TaskDomain, position: Int = 0): TaskUiModel = TaskUiModel(
     id = input.id,
     createTime = timeFormatter.formatToDateTime(input.createTime),
-    completeTime = input.completeTime?.let(timeFormatter::formatDisplayCompleteTime) ?: "",
+    completeTime = input.completeTime?.let(timeFormatter::formatDisplayFullTimeAndDate) ?: "",
     title = input.title,
     priorityScore = input.priorityScore,
     position = position,

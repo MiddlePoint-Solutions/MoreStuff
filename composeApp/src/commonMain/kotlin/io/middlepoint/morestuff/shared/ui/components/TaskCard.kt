@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -34,6 +35,9 @@ import io.middlepoint.morestuff.shared.ui.TaskColors
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
+import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.text_created_time_placeholder
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TaskCard(
@@ -54,53 +58,56 @@ fun TaskCard(
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     border = BorderStroke(0.3.dp, color = Color.Black.copy(alpha = 0.18f))
   ) {
-    Text(
-      text = item.title,
-      color = MaterialTheme.colorScheme.onSecondaryContainer,
-      textAlign = TextAlign.Start,
-      style = MaterialTheme.typography.displaySmall.copy(
-        fontWeight = FontWeight(400),
-        fontSize = 25.sp,
-        lineHeight = 28.sp
-      ),
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(top = 20.dp, start = 20.dp, end = 20.dp),
-      maxLines = 2,
-      minLines = 2,
-      overflow = TextOverflow.Ellipsis
-    )
-
-    Box(
-      modifier = Modifier
-        .aspectRatio(1f)
-        .padding(start = 20.dp, end = 20.dp, top = 6.dp),
+    Column(
+      modifier = Modifier.padding(start = 20.dp, end = 20.dp)
     ) {
+      Text(
+        text = item.title,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        textAlign = TextAlign.Start,
+        style = MaterialTheme.typography.displaySmall.copy(
+          fontWeight = FontWeight(400),
+          fontSize = 25.sp,
+          lineHeight = 28.sp
+        ),
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 20.dp),
+        maxLines = 2,
+        minLines = 2,
+        overflow = TextOverflow.Ellipsis
+      )
 
       Box(
         modifier = Modifier
-          .fillMaxSize()
-          .padding(top = 15.dp)
-          .clip(RoundedCornerShape(8.dp))
-          .background(brush = Brush.verticalGradient(backgroundColors))
+          .aspectRatio(1f)
+          .padding(top = 6.dp),
       ) {
-        Messages(
-          messages = messages,
-          userInteractionEnabled = false,
-          contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp, end = 10.dp),
-        )
+
+        Box(
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 15.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(brush = Brush.verticalGradient(backgroundColors))
+        ) {
+          Messages(
+            messages = messages,
+            userInteractionEnabled = false,
+            contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp, end = 10.dp),
+          )
+        }
       }
 
-      Row(
+      Column(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(horizontal = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(
-          space = 10.dp,
-          alignment = Alignment.End
-        )
+          .padding(top = 10.dp)
       ) {
-
+        Text(
+          text = stringResource(Res.string.text_created_time_placeholder, item.createTime),
+          color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
       }
     }
   }
