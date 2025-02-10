@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,7 +19,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.ModeStandby
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.intl.Locale
@@ -45,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.alorma.compose.settings.ui.SettingsMenuLink
@@ -54,6 +61,11 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.isGranted
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import com.mohamedrejeb.calf.permissions.shouldShowRationale
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
@@ -74,6 +86,8 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.button_enable
+import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.cd_select_theme
 import morestuff.composeapp.generated.resources.click_s_to_enable_developer_settings
@@ -90,6 +104,10 @@ import morestuff.composeapp.generated.resources.language_english
 import morestuff.composeapp.generated.resources.language_hebrew
 import morestuff.composeapp.generated.resources.language_russian
 import morestuff.composeapp.generated.resources.language_spanish
+import morestuff.composeapp.generated.resources.notification_permission_already_granted
+import morestuff.composeapp.generated.resources.notification_permission_rationale
+import morestuff.composeapp.generated.resources.ok
+import morestuff.composeapp.generated.resources.onboarding_notification_permission_title
 import morestuff.composeapp.generated.resources.open_source_libraries
 import morestuff.composeapp.generated.resources.privacy_policy
 import morestuff.composeapp.generated.resources.select_language
@@ -206,6 +224,8 @@ fun SettingsContent(
           languageSelected = selectLanguage,
           defaultValue = { model.inputVoiceLanguage.ordinal }
         )
+
+        NotificationPermissionButton()
 
         ScopeSettings(onClick = showScopesSettings)
 
@@ -555,6 +575,118 @@ private fun ScopeSettings(onClick: () -> Unit) {
     )
   )
 }
+
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+fun NotificationPermissionButton() {
+  var showExplanationDialog by remember { mutableStateOf(false) }
+  var showRationaleDialog by remember { mutableStateOf(false) }
+  var showAlreadyGrantedDialog by remember { mutableStateOf(false) }
+  var checkPermission by remember { mutableStateOf(false) }
+  val scope = rememberCoroutineScope()
+  val permissionState = rememberPermissionState(Permission.Notification)
+
+  LaunchedEffect(permissionState.status, checkPermission) {
+    if (checkPermission) {
+      when {
+        permissionState.status.isGranted -> {
+          checkPermission = false
+        }
+
+        permissionState.status.shouldShowRationale -> {
+          showRationaleDialog = true
+          checkPermission = false
+        }
+
+        else -> {
+          permissionState.openAppSettings()
+          checkPermission = false
+        }
+      }
+    }
+  }
+
+  if (showAlreadyGrantedDialog) {
+    BasicAlertDialog(
+      onDismissRequest = { showAlreadyGrantedDialog = false },
+      properties = DialogProperties(
+        dismissOnBackPress = true,
+        dismissOnClickOutside = true
+      )
+    ) {
+      Card {
+        Column(modifier = Modifier.padding(16.dp)) {
+          Text(
+            text = stringResource(Res.string.notification_permission_already_granted),
+            style = MaterialTheme.typography.bodyLarge
+          )
+          Spacer(modifier = Modifier.height(16.dp))
+          TextButton(
+            onClick = { showAlreadyGrantedDialog = false },
+            modifier = Modifier.align(Alignment.End)
+          ) {
+            Text(text = stringResource(Res.string.ok))
+          }
+        }
+      }
+    }
+  }
+
+  if (showExplanationDialog) {
+    BasicAlertDialog(
+      onDismissRequest = { showExplanationDialog = false },
+      properties = DialogProperties(
+        dismissOnBackPress = false,
+        dismissOnClickOutside = false
+      )
+    ) {
+      Card {
+        Text(
+          text = stringResource(Res.string.notification_permission_rationale),
+          modifier = Modifier.padding(10.dp)
+        )
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.End
+        ) {
+          TextButton(onClick = {
+            showExplanationDialog = false
+            scope.launch { permissionState.launchPermissionRequest() }
+            checkPermission = true
+          }) {
+            Text(text = stringResource(Res.string.button_enable))
+          }
+          TextButton(onClick = {
+            showExplanationDialog = false
+          }) {
+            Text(text = stringResource(Res.string.button_skip))
+          }
+        }
+      }
+    }
+  }
+  SettingsMenuLink(
+    title = { Text(text = stringResource(Res.string.onboarding_notification_permission_title)) },
+    onClick = {
+      if (permissionState.status.isGranted) {
+        showAlreadyGrantedDialog = true
+      } else {
+        showExplanationDialog = true
+      }
+    },
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Notifications,
+        contentDescription = "Notifications"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+    )
+  )
+}
+
 
 //@Preview(
 //  uiMode = Configuration.UI_MODE_NIGHT_YES,
