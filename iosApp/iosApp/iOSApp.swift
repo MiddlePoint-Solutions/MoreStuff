@@ -1,5 +1,4 @@
 import SwiftUI
-import Lottie
 import ComposeApp
 
 @main

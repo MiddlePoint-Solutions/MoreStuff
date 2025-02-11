@@ -97,13 +97,8 @@ kotlin {
     homepage = "Link to the Shared Module homepage"
     version = "1.0"
     ios.deploymentTarget = "16.0"
-    podfile = project.file("../iosApp/Podfile")
+//    podfile = project.file("../iosApp/Podfile")
     name = "ComposeApp"
-
-    pod("lottie-ios") {
-      version = "4.4.0"
-      linkOnly = true
-    }
 
     framework {
       baseName = "ComposeApp"
