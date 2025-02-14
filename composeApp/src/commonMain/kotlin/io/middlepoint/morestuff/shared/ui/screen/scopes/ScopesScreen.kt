@@ -44,16 +44,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import io.github.xxfast.decompose.router.rememberOnRoute
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
@@ -83,7 +80,6 @@ import morestuff.composeapp.generated.resources.edit_scope
 import morestuff.composeapp.generated.resources.sure_delete_scope
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -192,7 +188,8 @@ fun ScopesContent(
 
       Text(
         text = stringResource(Res.string.description_scopes),
-        color = MaterialTheme.colorScheme.onSurface
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.align(Alignment.CenterHorizontally).padding(horizontal = 16.dp),
       )
 
       Spacer(
