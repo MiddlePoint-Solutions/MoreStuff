@@ -1,8 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,35 +43,36 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
-import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
+import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
-import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearTaskSelection
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
-import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -170,7 +176,6 @@ fun HomeScreen() {
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeContent(
   model: HomeState,
@@ -200,7 +205,9 @@ private fun HomeContent(
   }
 
   val backCallback = remember {
-    BackCallback { onEvent(ClearTaskSelection) }
+    BackCallback {
+      onEvent(ClearTaskSelection)
+    }
   }
 
   val backHandler = LocalRouterContext.current.backHandler
@@ -233,9 +240,29 @@ private fun HomeContent(
         )
       }
 
+      AnimatedVisibility(
+        visible = showTaskInput,
+        enter = expandVertically(),
+        exit = shrinkVertically(),
+      ) {
+        InputItem(
+          onDone = {
+            coroutineScope.launch {
+              onEvent(CreateTask(it))
+              delay(100)
+              states[pagerState.currentPage].animateScrollToItem(index = 0)
+              showTaskInput = false
+            }
+          }
+        )
+      }
+
       HorizontalPager(
         state = pagerState,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+          .graphicsLayer {
+            alpha = if (showTaskInput) 0.5f else 1f
+          },
         key = { model.scopes[it].id }
       ) { page ->
 
@@ -252,21 +279,7 @@ private fun HomeContent(
         when (val tasksModel = scopeTasks) {
           is ScopeTasksModels.Data -> {
             if (tasksModel.tasks.isEmpty()) {
-              Box(
-                modifier = Modifier
-                  .fillMaxSize()
-                  .padding(bottom = 180.dp),
-                contentAlignment = Alignment.Center
-              ) {
-                TextButton(onClick = { showTaskInput = true }) {
-                  Text(
-                    stringResource(Res.string.cta_lets_go),
-                    style = MaterialTheme.typography.titleLarge.copy(
-                      color = MaterialTheme.colorScheme.onSurface
-                    )
-                  )
-                }
-              }
+              EmptyScopeContent { showTaskInput = true }
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
@@ -291,46 +304,72 @@ private fun HomeContent(
       }
     }
 
-    if (showTaskInput) {
-      val taskInputBottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-      )
+//    if (showTaskInput) {
+//      val taskInputBottomSheetState = rememberModalBottomSheetState(
+//        skipPartiallyExpanded = true
+//      )
+//
+//      val context = remember { ChatContext.Main(model.currentScopeId) }
+//
+//      TaskInputBottomSheet(
+//        onDismissRequest = { showTaskInput = false },
+//        sheetState = taskInputBottomSheetState,
+//        context = context,
+//        onNewTaskCreated = { _, priority ->
+//          coroutineScope.launch {
+//            when (priority) {
+//              PriorityUiModel.Later -> {
+//                val itemCount =
+//                  states[pagerState.currentPage].layoutInfo.totalItemsCount
+//                states[pagerState.currentPage].scrollToItem(itemCount - 1)
+//              }
+//
+//              PriorityUiModel.Now -> {
+//                states[pagerState.currentPage].animateScrollToItem(index = 0)
+//              }
+//
+//              is PriorityUiModel.Plan -> {}
+//            }
+//          }
+//        },
+//      )
+//    }
 
-      val context = remember { ChatContext.Main(model.currentScopeId) }
-
-      TaskInputBottomSheet(
-        onDismissRequest = { showTaskInput = false },
-        sheetState = taskInputBottomSheetState,
-        context = context,
-        onNewTaskCreated = { _, priority ->
-          coroutineScope.launch {
-            when (priority) {
-              PriorityUiModel.Later -> {
-                val itemCount =
-                  states[pagerState.currentPage].layoutInfo.totalItemsCount
-                states[pagerState.currentPage].scrollToItem(itemCount - 1)
-              }
-
-              PriorityUiModel.Now -> {
-                states[pagerState.currentPage].animateScrollToItem(index = 0)
-              }
-
-              is PriorityUiModel.Plan -> {}
-            }
-          }
-        },
-      )
-    }
-
-    FloatingActionButton(
-      onClick = { showTaskInput = true },
+    AnimatedVisibility(
+      visible = !showTaskInput,
       modifier = Modifier
         .padding(20.dp)
         .align(Alignment.BottomEnd),
-      containerColor = MaterialTheme.colorScheme.primary,
-      contentColor = MaterialTheme.colorScheme.onPrimary,
+      enter = scaleIn() + fadeIn(),
+      exit = scaleOut() + fadeOut()
     ) {
-      Icon(Icons.Default.Add, contentDescription = null)
+      FloatingActionButton(
+        onClick = { showTaskInput = true },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+      ) {
+        Icon(Icons.Default.Add, contentDescription = null)
+      }
+    }
+
+  }
+}
+
+@Composable
+private fun EmptyScopeContent(showTaskInput: () -> Unit) {
+  Box(
+    modifier = Modifier
+      .fillMaxSize()
+      .padding(bottom = 180.dp),
+    contentAlignment = Alignment.Center
+  ) {
+    TextButton(onClick = showTaskInput) {
+      Text(
+        stringResource(Res.string.cta_lets_go),
+        style = MaterialTheme.typography.titleLarge.copy(
+          color = MaterialTheme.colorScheme.onSurface
+        )
+      )
     }
   }
 }

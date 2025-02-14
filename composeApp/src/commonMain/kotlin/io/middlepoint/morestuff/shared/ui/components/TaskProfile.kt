@@ -23,31 +23,31 @@ import io.middlepoint.morestuff.shared.ui.theme.TaskColors
 @Composable
 fun TaskProfile(title: String) {
 
-    val profileColor by remember {
-        derivedStateOf { TaskColors.getProfileColorsForTask(title) }
-    }
+  val profileColor by remember {
+    derivedStateOf { TaskColors.getProfileColorsForTask(title) }
+  }
 
-    val profileTitle by remember {
-        derivedStateOf { title[0].uppercase() }
-    }
+  val profileTitle by remember {
+    derivedStateOf { title.getOrNull(0)?.uppercase() ?: "" }
+  }
 
-    Box(
-        modifier = Modifier
-            .clip(CircleShape)
-            .size(50.dp)
-            .background(
-                brush = Brush.Companion.verticalGradient(profileColor)
-            )
-    ) {
-        BasicText(
-            text = profileTitle,
-            modifier = Modifier.align(Alignment.Center),
-            style = TextStyle(
-                fontSize = 24.sp,
-                lineHeight = 23.8.sp,
-                fontWeight = FontWeight(400),
-                color = Color.White,
-            )
-        )
-    }
+  Box(
+    modifier = Modifier
+      .clip(CircleShape)
+      .size(50.dp)
+      .background(
+        brush = Brush.Companion.verticalGradient(profileColor)
+      )
+  ) {
+    BasicText(
+      text = profileTitle,
+      modifier = Modifier.align(Alignment.Center),
+      style = TextStyle(
+        fontSize = 24.sp,
+        lineHeight = 23.8.sp,
+        fontWeight = FontWeight(400),
+        color = Color.White,
+      )
+    )
+  }
 }

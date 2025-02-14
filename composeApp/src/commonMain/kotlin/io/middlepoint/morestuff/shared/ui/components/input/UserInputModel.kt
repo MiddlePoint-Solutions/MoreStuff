@@ -159,6 +159,7 @@ fun userInputModel(
           val trimmedTitle = event.title.trim()
           val params = TaskParams(trimmedTitle, domainPriority, TaskType.User, currentScope.id)
           val task = createTaskUseCase(params)
+
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
           state = state.copy(
             lastCreatedTaskId = task.id

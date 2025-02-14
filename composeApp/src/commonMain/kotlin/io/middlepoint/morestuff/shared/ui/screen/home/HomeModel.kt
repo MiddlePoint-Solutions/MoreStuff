@@ -7,9 +7,11 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
@@ -29,77 +31,86 @@ fun homeModel(
   createScopeUseCase: CreateScopeUseCase = koinInject()
 ): HomeState {
 
-    var scopes: List<ScopeDomain> by remember { mutableStateOf(initialState.scopes) }
-    var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
-    var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
+  var scopes: List<ScopeDomain> by remember { mutableStateOf(initialState.scopes) }
+  var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
+  var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
 
-    LaunchedEffect(Unit) {
-        getScopesFlowUseCase().collect {
-            scopes = it
-        }
+  fun dispatch(action: Action) = store.dispatch(action)
+
+  LaunchedEffect(Unit) {
+    getScopesFlowUseCase().collect {
+      scopes = it
     }
+  }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            when (event) {
-                ClearTaskSelection -> {
-                    selectedTasks = listOf()
-                }
+  LaunchedEffect(Unit) {
+    events.collect { event ->
+      when (event) {
 
-                CompleteSelectedTasks -> {
-                    val completed = selectedTasks.toList()
-                    selectedTasks = listOf()
-                    store.dispatch(TaskAction.CompleteTasksAction(completed, true))
-
-                    val notification = NotificationState.Complete {
-                        store.dispatch(TaskAction.CompleteTasksAction(completed, false))
-                    }
-                    launch { notifications.emit(notification) }
-                }
-
-                DeleteSelectedTasks -> {
-                    store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
-                    selectedTasks = listOf()
-                }
-
-                is MoveSelectedTasksToScope -> {
-                    val moved = selectedTasks.toList()
-                    selectedTasks = listOf()
-                    store.dispatch(
-                        TaskAction.UpdateTasksToScopeAction(moved, event.scopeId)
-                    )
-                    val scopeTitle = scopes.firstOrNull { it.id == event.scopeId }?.name ?: ""
-                    val notification = NotificationState.TaskMovedToScope(scopeTitle)
-                    launch { notifications.emit(notification) }
-                }
-
-                is CreateScopeForSelectedTasks -> {
-                    val selected = selectedTasks.toList()
-                    selectedTasks = listOf()
-                    createScopeUseCase(event.title).onRight { scope ->
-                        store.dispatch(
-                            TaskAction.UpdateTasksToScopeAction(selected, scope.id)
-                        )
-                        val notification = NotificationState.TaskMovedToScope(scope.name)
-                        launch { notifications.emit(notification) }
-                    }
-                }
-
-                is ScopeSelected -> currentScopeId = event.scopeId
-                is ToggleTaskSelection -> {
-                    selectedTasks = if (event.taskId in selectedTasks) {
-                        selectedTasks - event.taskId
-                    } else {
-                        selectedTasks + event.taskId
-                    }
-                }
-            }
+        is CreateTask -> {
+          if (event.title.isNotBlank()) {
+            dispatch(TaskAction.CreateUserTaskAction(event.title, Priority.Now(), currentScopeId))
+          }
         }
-    }
 
-    return HomeState(
-        currentScopeId = currentScopeId,
-        selectedTasks = selectedTasks,
-        scopes = scopes
-    )
+        ClearTaskSelection -> {
+          selectedTasks = listOf()
+        }
+
+        CompleteSelectedTasks -> {
+          val completed = selectedTasks.toList()
+          selectedTasks = listOf()
+          store.dispatch(TaskAction.CompleteTasksAction(completed, true))
+
+          val notification = NotificationState.Complete {
+            store.dispatch(TaskAction.CompleteTasksAction(completed, false))
+          }
+          launch { notifications.emit(notification) }
+        }
+
+        DeleteSelectedTasks -> {
+          store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
+          selectedTasks = listOf()
+        }
+
+        is MoveSelectedTasksToScope -> {
+          val moved = selectedTasks.toList()
+          selectedTasks = listOf()
+          store.dispatch(
+            TaskAction.UpdateTasksToScopeAction(moved, event.scopeId)
+          )
+          val scopeTitle = scopes.firstOrNull { it.id == event.scopeId }?.name ?: ""
+          val notification = NotificationState.TaskMovedToScope(scopeTitle)
+          launch { notifications.emit(notification) }
+        }
+
+        is CreateScopeForSelectedTasks -> {
+          val selected = selectedTasks.toList()
+          selectedTasks = listOf()
+          createScopeUseCase(event.title).onRight { scope ->
+            store.dispatch(
+              TaskAction.UpdateTasksToScopeAction(selected, scope.id)
+            )
+            val notification = NotificationState.TaskMovedToScope(scope.name)
+            launch { notifications.emit(notification) }
+          }
+        }
+
+        is ScopeSelected -> currentScopeId = event.scopeId
+        is ToggleTaskSelection -> {
+          selectedTasks = if (event.taskId in selectedTasks) {
+            selectedTasks - event.taskId
+          } else {
+            selectedTasks + event.taskId
+          }
+        }
+      }
+    }
+  }
+
+  return HomeState(
+    currentScopeId = currentScopeId,
+    selectedTasks = selectedTasks,
+    scopes = scopes
+  )
 }

@@ -16,6 +16,7 @@ sealed class HomeEvent {
   data object ClearTaskSelection : HomeEvent()
   data object CompleteSelectedTasks : HomeEvent()
   data object DeleteSelectedTasks : HomeEvent()
+  data class CreateTask(val title: String): HomeEvent()
   data class ToggleTaskSelection(val taskId: Long) : HomeEvent()
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()
