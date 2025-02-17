@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.main_input_hint
+import morestuff.composeapp.generated.resources.task_chat_input_hint
 import morestuff.composeapp.generated.resources.textfield_desc
 import org.jetbrains.compose.resources.stringResource
 
@@ -50,7 +51,8 @@ fun UserTextInput(
     actionsContent: @Composable BoxScope.() -> Unit = {},
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = remember { FocusRequester() },
-    startWithFocus: Boolean = false
+    startWithFocus: Boolean = false,
+    inputHint: String = stringResource(Res.string.task_chat_input_hint)
 ) {
 
     val a11ylabel = stringResource(Res.string.textfield_desc)
@@ -102,7 +104,7 @@ fun UserTextInput(
                     ) {
                         if (value.text.isEmpty()) {
                             Text(
-                                text = stringResource(Res.string.main_input_hint),
+                                text = inputHint,
                                 modifier = Modifier.align(Alignment.CenterStart),
                                 style = LocalTextStyle.current.copy(
                                     color = LocalContentColor.current.copy(alpha = 0.6f),
