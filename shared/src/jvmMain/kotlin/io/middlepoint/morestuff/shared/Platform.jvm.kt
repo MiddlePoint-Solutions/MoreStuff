@@ -4,10 +4,6 @@ import com.mohamedrejeb.calf.io.KmpFile
 import java.io.File
 import java.util.UUID
 
-actual fun generateUUID(): String {
-  return UUID.randomUUID().toString()
-}
-
 actual fun formatString(format: String, vararg args: Any): String {
   return String.format(format, *args)
 }

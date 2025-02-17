@@ -6,8 +6,6 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
 
-actual fun generateUUID(): String = NSUUID().UUIDString
-
 actual fun formatString(format: String, vararg args: Any): String = stringWithFormat(format, args)
 
 private fun stringWithFormat(format: String, args: Array<out Any>): String {

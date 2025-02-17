@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.shared
 
 import com.mohamedrejeb.calf.io.KmpFile
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 enum class Platform {
   Android,
@@ -14,7 +16,8 @@ enum class MediaFolder(val folderName: String) {
   Images("images")
 }
 
-expect fun generateUUID(): String
+@OptIn(ExperimentalUuidApi::class)
+fun generateUUID(): String = Uuid.random().toString()
 
 expect fun formatString(format: String, vararg args: Any): String
 

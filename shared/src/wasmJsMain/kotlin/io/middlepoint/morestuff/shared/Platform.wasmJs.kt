@@ -2,10 +2,6 @@ package io.middlepoint.morestuff.shared
 
 import com.mohamedrejeb.calf.io.KmpFile
 
-actual fun generateUUID(): String {
-    TODO("Not yet implemented")
-}
-
 actual fun formatString(format: String, vararg args: Any): String {
     TODO("Not yet implemented")
 }
