@@ -37,80 +37,81 @@ import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PriorityItem(
-    task: TaskUiModel,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    selected: Boolean = false,
+  task: TaskUiModel,
+  onClick: () -> Unit,
+  onLongClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  selected: Boolean = false,
+  enabled: Boolean = true
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(80.dp)
+      .background(color = MaterialTheme.colorScheme.surfaceContainer)
+      .combinedClickable(enabled = enabled, onClick = onClick, onLongClick = onLongClick)
+  ) {
+    Row(
+      modifier = modifier
+        .fillMaxSize()
+        .padding(start = 14.dp),
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(start = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
 
-            Box(modifier = Modifier) {
-                TaskProfile(task.title)
+      Box(modifier = Modifier) {
+        TaskProfile(task.title)
 
-                if (selected) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(start = 30.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = CircleShape
-                            )
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.surfaceContainer,
-                                shape = CircleShape
-                            )
-                            .size(20.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            val title by remember {
-                derivedStateOf { task.title }
-            }
-
-            Text(
-                text = title,
-                modifier = Modifier
-                    .fillMaxWidth(0.90f)
-                    .padding(12.dp),
-                maxLines = 2,
-                color = MaterialTheme.colorScheme.onSurface,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0xFFFFFFFF),
-                    textAlign = TextAlign.Start,
-                )
-            )
+        if (selected) {
+          Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+              .align(Alignment.BottomEnd)
+              .padding(start = 30.dp)
+              .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+              )
+              .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = CircleShape
+              )
+              .size(20.dp)
+          )
         }
+      }
 
-        TaskItemBadges(
-            task = task,
-            modifier = Modifier.align(Alignment.BottomEnd)
+      Spacer(modifier = Modifier.width(8.dp))
+
+      val title by remember {
+        derivedStateOf { task.title }
+      }
+
+      Text(
+        text = title,
+        modifier = Modifier
+          .fillMaxWidth(0.90f)
+          .padding(12.dp),
+        maxLines = 2,
+        color = MaterialTheme.colorScheme.onSurface,
+        overflow = TextOverflow.Ellipsis,
+        style = TextStyle(
+          fontSize = 16.sp,
+          lineHeight = 18.sp,
+          fontWeight = FontWeight(700),
+          color = Color(0xFFFFFFFF),
+          textAlign = TextAlign.Start,
         )
+      )
     }
+
+    TaskItemBadges(
+      task = task,
+      modifier = Modifier.align(Alignment.BottomEnd)
+    )
+  }
 }
 
 

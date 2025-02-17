@@ -27,6 +27,7 @@ fun ScopeContent(
     onItemClick: (taskId: Long) -> Unit,
     onItemLongClick: (taskId: Long) -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     listState: LazyListState = rememberLazyListState(),
 ) {
     LazyColumn(
@@ -34,6 +35,7 @@ fun ScopeContent(
             .fillMaxSize()
             .simpleVerticalScrollbar(listState),
         state = listState,
+        userScrollEnabled = enabled
     ) {
         itemsIndexed(
             items = tasks,
@@ -52,7 +54,8 @@ fun ScopeContent(
                 task = item,
                 selected = selected,
                 onClick = { onItemClick(item.id) },
-                onLongClick = { onItemLongClick(item.id) }
+                onLongClick = { onItemLongClick(item.id) },
+                enabled = enabled
             )
 
             Row(

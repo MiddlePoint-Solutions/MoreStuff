@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -58,7 +57,7 @@ import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.show
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
@@ -104,7 +103,7 @@ fun HomeScreen() {
         reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
         settingsSelected = { navigation.push(Screen.Settings) },
         searchAction = { isSearchActive = true },
-        clearTaskSelection = { homePresenter.take(ClearTaskSelection) },
+        clearTaskSelection = { homePresenter.take(ResetHomeState) },
         completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteConfirmationDialog = true },
         selectScope = { showScopeSelection = true },
@@ -183,10 +182,10 @@ private fun HomeContent(
   modifier: Modifier = Modifier,
 ) {
   val coroutineScope = rememberCoroutineScope()
-  var showTaskInput by remember { mutableStateOf(false) }
   val navigation = LocalAppRouter.current
 
   val selectedTasks = model.selectedTasks
+  val taskInputActive = model.taskInputActive
 
   val states by rememberUpdatedState(newValue = model.scopes.map { rememberLazyListState() })
   val pagerState = rememberPagerState(pageCount = { model.scopes.size })
@@ -206,13 +205,13 @@ private fun HomeContent(
 
   val backCallback = remember {
     BackCallback {
-      onEvent(ClearTaskSelection)
+      onEvent(ResetHomeState)
     }
   }
 
   val backHandler = LocalRouterContext.current.backHandler
-  LaunchedEffect(selectedTasks) {
-    if (selectedTasks.isNotEmpty()) {
+  LaunchedEffect(model) {
+    if (selectedTasks.isNotEmpty() || taskInputActive) {
       backHandler.checkRegister(backCallback)
     } else {
       backHandler.checkUnregister(backCallback)
@@ -241,7 +240,7 @@ private fun HomeContent(
       }
 
       AnimatedVisibility(
-        visible = showTaskInput,
+        visible = taskInputActive,
         enter = expandVertically(),
         exit = shrinkVertically(),
       ) {
@@ -251,7 +250,6 @@ private fun HomeContent(
               onEvent(CreateTask(it))
               delay(100)
               states[pagerState.currentPage].animateScrollToItem(index = 0)
-              showTaskInput = false
             }
           }
         )
@@ -261,7 +259,7 @@ private fun HomeContent(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
-            alpha = if (showTaskInput) 0.5f else 1f
+            alpha = if (taskInputActive) 0.5f else 1f
           },
         key = { model.scopes[it].id }
       ) { page ->
@@ -279,7 +277,7 @@ private fun HomeContent(
         when (val tasksModel = scopeTasks) {
           is ScopeTasksModels.Data -> {
             if (tasksModel.tasks.isEmpty()) {
-              EmptyScopeContent { showTaskInput = true }
+              EmptyScopeContent { onEvent(HomeEvent.ShowTaskInput) }
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
@@ -293,6 +291,7 @@ private fun HomeContent(
                 },
                 onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
                 listState = states[page],
+                enabled = !taskInputActive
               )
             }
           }
@@ -304,39 +303,8 @@ private fun HomeContent(
       }
     }
 
-//    if (showTaskInput) {
-//      val taskInputBottomSheetState = rememberModalBottomSheetState(
-//        skipPartiallyExpanded = true
-//      )
-//
-//      val context = remember { ChatContext.Main(model.currentScopeId) }
-//
-//      TaskInputBottomSheet(
-//        onDismissRequest = { showTaskInput = false },
-//        sheetState = taskInputBottomSheetState,
-//        context = context,
-//        onNewTaskCreated = { _, priority ->
-//          coroutineScope.launch {
-//            when (priority) {
-//              PriorityUiModel.Later -> {
-//                val itemCount =
-//                  states[pagerState.currentPage].layoutInfo.totalItemsCount
-//                states[pagerState.currentPage].scrollToItem(itemCount - 1)
-//              }
-//
-//              PriorityUiModel.Now -> {
-//                states[pagerState.currentPage].animateScrollToItem(index = 0)
-//              }
-//
-//              is PriorityUiModel.Plan -> {}
-//            }
-//          }
-//        },
-//      )
-//    }
-
     AnimatedVisibility(
-      visible = !showTaskInput,
+      visible = !taskInputActive,
       modifier = Modifier
         .padding(20.dp)
         .align(Alignment.BottomEnd),
@@ -344,7 +312,7 @@ private fun HomeContent(
       exit = scaleOut() + fadeOut()
     ) {
       FloatingActionButton(
-        onClick = { showTaskInput = true },
+        onClick = { onEvent(HomeEvent.ShowTaskInput) },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {

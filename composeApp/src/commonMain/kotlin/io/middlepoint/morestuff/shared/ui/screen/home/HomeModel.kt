@@ -34,6 +34,7 @@ fun homeModel(
   var scopes: List<ScopeDomain> by remember { mutableStateOf(initialState.scopes) }
   var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
   var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
+  var taskInputActive: Boolean by remember { mutableStateOf(initialState.taskInputActive) }
 
   fun dispatch(action: Action) = store.dispatch(action)
 
@@ -51,10 +52,14 @@ fun homeModel(
           if (event.title.isNotBlank()) {
             dispatch(TaskAction.CreateUserTaskAction(event.title, Priority.Now(), currentScopeId))
           }
+          taskInputActive = false
         }
 
-        ClearTaskSelection -> {
+        ShowTaskInput -> { taskInputActive = true }
+
+        ResetHomeState -> {
           selectedTasks = listOf()
+          taskInputActive = false
         }
 
         CompleteSelectedTasks -> {
@@ -104,6 +109,7 @@ fun homeModel(
             selectedTasks + event.taskId
           }
         }
+
       }
     }
   }
@@ -111,6 +117,7 @@ fun homeModel(
   return HomeState(
     currentScopeId = currentScopeId,
     selectedTasks = selectedTasks,
-    scopes = scopes
+    scopes = scopes,
+    taskInputActive = taskInputActive
   )
 }

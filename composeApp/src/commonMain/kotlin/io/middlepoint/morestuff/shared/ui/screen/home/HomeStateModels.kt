@@ -9,11 +9,13 @@ data class HomeState(
   val currentScopeId: Long = defaultScope.id,
   val scopes: List<ScopeDomain> = listOf(),
   val selectedTasks: List<Long> = listOf(),
+  val taskInputActive: Boolean = false
 )
 
 @Immutable
 sealed class HomeEvent {
-  data object ClearTaskSelection : HomeEvent()
+  data object ResetHomeState : HomeEvent()
+  data object ShowTaskInput: HomeEvent()
   data object CompleteSelectedTasks : HomeEvent()
   data object DeleteSelectedTasks : HomeEvent()
   data class CreateTask(val title: String): HomeEvent()
