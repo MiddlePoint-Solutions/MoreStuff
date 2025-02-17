@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.components
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -7,15 +8,18 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,7 +46,14 @@ fun PriorityItem(
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     selected: Boolean = false,
+    isDragging: Boolean = false,
+    handleModifier: Modifier = Modifier,
 ) {
+    val offsetX by animateDpAsState(
+        targetValue = if (selected) 32.dp else 0.dp,
+        label = "PriorityItemOffset"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,91 +67,82 @@ fun PriorityItem(
                 .padding(start = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
-            Box(modifier = Modifier) {
-                TaskProfile(task.title)
-
-                if (selected) {
+            Box(
+                modifier = handleModifier
+                    .padding(end = 8.dp)
+                    .size(24.dp)
+            ) {
+                if (selected && !isDragging) {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(start = 30.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surface,
-                                shape = CircleShape
-                            )
-                            .border(
-                                width = 2.dp,
-                                color = MaterialTheme.colorScheme.surfaceContainer,
-                                shape = CircleShape
-                            )
-                            .size(20.dp)
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Reorder",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            val title by remember {
-                derivedStateOf { task.title }
-            }
-
-            Text(
-                text = title,
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth(0.90f)
-                    .padding(12.dp),
-                maxLines = 2,
-                color = MaterialTheme.colorScheme.onSurface,
-                overflow = TextOverflow.Ellipsis,
-                style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 18.sp,
-                    fontWeight = FontWeight(700),
-                    color = Color(0xFFFFFFFF),
-                    textAlign = TextAlign.Start,
-                )
-            )
-        }
+                    .offset(x = offsetX)
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box {
+                    TaskProfile(task.title)
 
-        TaskItemBadges(
-            task = task,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        )
+                    if (selected) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .padding(start = 30.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface,
+                                    shape = CircleShape
+                                )
+                                .border(
+                                    width = 2.dp,
+                                    color = MaterialTheme.colorScheme.surfaceContainer,
+                                    shape = CircleShape
+                                )
+                                .size(20.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                val title by remember { derivedStateOf { task.title } }
+
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(12.dp),
+                    maxLines = 2,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    overflow = TextOverflow.Ellipsis,
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 18.sp,
+                        fontWeight = FontWeight(700),
+                        color = Color(0xFFFFFFFF),
+                        textAlign = TextAlign.Start,
+                    )
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(end = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TaskItemBadges(task = task)
+                }
+            }
+        }
     }
 }
-
-
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_YES,
-//    name = "Dark"
-//)
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_NO,
-//    name = "Light",
-//)
-//@Composable
-//fun PriorityItemPreview() {
-//    MoreStuffTheme {
-//        PriorityItem(
-//            task = TaskUiModel(
-//                id = 0,
-//                title = "Buy milk & bread & cheese & wine & chocolate & ice-cream & something mmm",
-//                createTime = "",
-//                completeTime = "",
-//                isComplete = false,
-//                priorityScore = 100,
-//                position = 1,
-//                extraDetails = true,
-//                hasSchedule = true,
-//                hasReminder = true,
-//            ),
-//            selected = true,
-//            onClick = {},
-//            onLongClick = {}
-//        )
-//    }
-//}
