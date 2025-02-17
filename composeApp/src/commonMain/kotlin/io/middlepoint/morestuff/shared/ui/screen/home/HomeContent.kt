@@ -247,7 +247,8 @@ private fun HomeContent(
               delay(100)
               states[pagerState.currentPage].animateScrollToItem(index = 0)
             }
-          }
+          },
+          onCancel = { onEvent(ResetHomeState) }
         )
       }
 
@@ -255,7 +256,7 @@ private fun HomeContent(
         state = pagerState,
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
-            alpha = if (taskInputActive) 0.5f else 1f
+            alpha = if (taskInputActive) 0.4f else 1f
           },
         key = { model.scopes[it].id }
       ) { page ->

@@ -1,7 +1,9 @@
 package io.middlepoint.morestuff.shared.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -9,6 +11,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.sharp.Close
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.main_input_hint
 import org.jetbrains.compose.resources.stringResource
 
@@ -41,6 +48,7 @@ import org.jetbrains.compose.resources.stringResource
 fun InputItem(
   modifier: Modifier = Modifier,
   onDone: (String) -> Unit = {},
+  onCancel: () -> Unit = {}
 ) {
 
   var inputValue by rememberSaveable(
@@ -56,17 +64,20 @@ fun InputItem(
     focusRequester.requestFocus()
   }
 
-  Box(
+  Row(
     modifier = modifier
       .fillMaxWidth()
-      .height(80.dp)
+      .height(100.dp)
       .padding(start = 24.dp, end = 12.dp),
-    contentAlignment = Alignment.CenterStart
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.Start
   ) {
+
     BasicTextField(
       value = inputValue,
       onValueChange = { inputValue = it },
       modifier = Modifier
+        .weight(0.95f)
         .width(IntrinsicSize.Max)
         .clearFocusOnKeyboardDismiss()
         .focusRequester(focusRequester),
@@ -104,6 +115,16 @@ fun InputItem(
           innerTextField()
         }
       })
+
+    IconButton(
+      onClick = onCancel,
+    ) {
+      Icon(
+        Icons.Sharp.Close,
+        contentDescription = stringResource(Res.string.cd_cancel_schedule),
+        tint = MaterialTheme.colorScheme.secondary
+      )
+    }
   }
 }
 

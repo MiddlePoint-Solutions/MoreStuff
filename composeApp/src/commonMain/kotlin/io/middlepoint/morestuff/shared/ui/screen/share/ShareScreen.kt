@@ -4,16 +4,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,8 +34,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -71,10 +67,7 @@ import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeTabs
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
@@ -83,7 +76,6 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -178,7 +170,7 @@ fun ShareScreen(
         isSearchActive = false
       }
     }
-    val colors1 = SearchBarDefaults.colors(
+    val colors = SearchBarDefaults.colors(
       containerColor = MaterialTheme.colorScheme.surfaceContainer,
     )
     SearchBar(
@@ -202,7 +194,7 @@ fun ShareScreen(
               )
             }
           },
-          colors = colors1.inputFieldColors,
+          colors = TextFieldDefaults.colors(),
         )
       },
       expanded = true,
@@ -210,7 +202,7 @@ fun ShareScreen(
       modifier = Modifier
         .navigationBarsPadding()
         .focusRequester(focusRequester),
-      colors = colors1,
+      colors = colors,
       content = {
         Crossfade(
           targetState = state.searchResults,
@@ -234,7 +226,6 @@ private fun ShareContent(
   onEvent: (ShareEvent) -> Unit,
   shareToTask: (taskId: Long) -> Unit,
   modifier: Modifier = Modifier,
-  searchBarActive: Boolean = false,
 ) {
 
   val coroutineScope = rememberCoroutineScope()
@@ -299,7 +290,8 @@ private fun ShareContent(
         InputItem(
           onDone = { title ->
             onEvent(ShareEvent.CreateNewTask(title))
-          }
+          },
+          onCancel = { onEvent(ShareEvent.ResetShareState) }
         )
       } else {
         CreateNewTaskItem { onEvent(ShareEvent.ShowTaskInput) }
