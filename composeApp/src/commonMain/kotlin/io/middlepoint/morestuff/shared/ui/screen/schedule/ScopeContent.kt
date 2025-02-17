@@ -22,53 +22,53 @@ import io.middlepoint.morestuff.shared.ui.theme.divider
 
 @Composable
 fun ScopeContent(
-    tasks: List<TaskUiModel>,
-    selectedTasks: List<Long>,
-    onItemClick: (taskId: Long) -> Unit,
-    onItemLongClick: (taskId: Long) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    listState: LazyListState = rememberLazyListState(),
+  tasks: List<TaskUiModel>,
+  modifier: Modifier = Modifier,
+  listState: LazyListState = rememberLazyListState(),
+  selectedTasks: List<Long> = listOf(),
+  onItemClick: (taskId: Long) -> Unit = {},
+  onItemLongClick: (taskId: Long) -> Unit = {},
+  enabled: Boolean = true,
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .simpleVerticalScrollbar(listState),
-        state = listState,
-        userScrollEnabled = enabled
-    ) {
-        itemsIndexed(
-            items = tasks,
-            key = { _, task -> task.id }
-        ) { index, item ->
+  LazyColumn(
+    modifier = modifier
+      .fillMaxSize()
+      .simpleVerticalScrollbar(listState),
+    state = listState,
+    userScrollEnabled = enabled
+  ) {
+    itemsIndexed(
+      items = tasks,
+      key = { _, task -> task.id }
+    ) { index, item ->
 
-            val isLast by remember(index) {
-                derivedStateOf { index == tasks.lastIndex }
-            }
+      val isLast by remember(index) {
+        derivedStateOf { index == tasks.lastIndex }
+      }
 
-            val selected by remember(selectedTasks) {
-                derivedStateOf { selectedTasks.contains(item.id) }
-            }
+      val selected by remember(selectedTasks) {
+        derivedStateOf { selectedTasks.contains(item.id) }
+      }
 
-            PriorityItem(
-                task = item,
-                selected = selected,
-                onClick = { onItemClick(item.id) },
-                onLongClick = { onItemLongClick(item.id) },
-                enabled = enabled
-            )
+      PriorityItem(
+        task = item,
+        selected = selected,
+        onClick = { onItemClick(item.id) },
+        onLongClick = { onItemLongClick(item.id) },
+        enabled = enabled
+      )
 
-            Row(
-                modifier = Modifier.fillParentMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                if (!isLast) {
-                    HorizontalDivider(
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        color = MaterialTheme.colorScheme.divider
-                    )
-                }
-            }
+      Row(
+        modifier = Modifier.fillParentMaxWidth(),
+        horizontalArrangement = Arrangement.End
+      ) {
+        if (!isLast) {
+          HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(0.8f),
+            color = MaterialTheme.colorScheme.divider
+          )
         }
+      }
     }
+  }
 }

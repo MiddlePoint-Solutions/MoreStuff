@@ -61,7 +61,6 @@ import morestuff.composeapp.generated.resources.no_results_found
 import morestuff.composeapp.generated.resources.search
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.viewmodel.koinViewModel
 
 @ExperimentalMaterial3Api
 @Composable
@@ -100,131 +99,139 @@ fun SearchBar(
     }
 
 
+    val onActiveChange: (Boolean) -> Unit = { isActive ->
+        if (!isActive) {
+            exitSearch()
+        }
+    }
+    val colors = SearchBarDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    )
     SearchBar(
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = searchQuery,
+                onQueryChange = { newQuery -> searchQuery = newQuery },
+                onSearch = { },
+                expanded = isSearchActive,
+                onExpandedChange = onActiveChange,
+                placeholder = { Text(text = stringResource(Res.string.search)) },
+                leadingIcon = {
+                    IconButton(onClick = {
+                        exitSearch()
+                    }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.cd_navigate_back)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (model.query.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = stringResource(Res.string.cd_clear_search_query)
+                            )
+                        }
+                    }
+                },
+                colors = colors.inputFieldColors,
+            )
+        },
+        expanded = isSearchActive,
+        onExpandedChange = onActiveChange,
         modifier = Modifier.focusRequester(focusRequester),
-        query = searchQuery,
-        onQueryChange = { newQuery -> searchQuery = newQuery },
-        onSearch = { },
-        active = isSearchActive,
-        onActiveChange = { isActive ->
-            if (!isActive) {
-                exitSearch()
-            }
-        },
-        placeholder = { Text(text = stringResource(Res.string.search)) },
-        leadingIcon = {
-            IconButton(onClick = {
-                exitSearch()
-            }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(Res.string.cd_navigate_back)
-                )
-            }
-        },
-        trailingIcon = {
-            if (model.query.isNotEmpty()) {
-                IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
-                    Icon(
-                        Icons.Default.Close,
-                        contentDescription = stringResource(Res.string.cd_clear_search_query)
+        colors = colors,
+        content = {
+            Column {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 16.dp, start = 4.dp, end = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+
+                    SearchFilterChip(
+                        filter = FilterType.Scheduled,
+                        selectedFilter = model.filter,
+                        onFilterSelected = { selectedFilter ->
+                            viewModel.take(
+                                SearchEvent.SetSearchFilter(
+                                    selectedFilter
+                                )
+                            )
+                        }
+                    )
+
+                    SearchFilterChip(
+                        filter = FilterType.Reminder,
+                        selectedFilter = model.filter,
+                        onFilterSelected = { selectedFilter ->
+                            viewModel.take(
+                                SearchEvent.SetSearchFilter(
+                                    selectedFilter
+                                )
+                            )
+                        }
+                    )
+
+                    SearchFilterChip(
+                        filter = FilterType.Done,
+                        selectedFilter = model.filter,
+                        onFilterSelected = { selectedFilter ->
+                            viewModel.take(
+                                SearchEvent.SetSearchFilter(
+                                    selectedFilter
+                                )
+                            )
+                        }
                     )
                 }
-            }
-        },
-        colors = SearchBarDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        ),
-    ) {
 
-
-        Column {
-            Row(
-                modifier = Modifier
-                    .padding(top = 16.dp, start = 4.dp, end = 4.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-
-                SearchFilterChip(
-                    filter = FilterType.Scheduled,
-                    selectedFilter = model.filter,
-                    onFilterSelected = { selectedFilter ->
-                        viewModel.take(
-                            SearchEvent.SetSearchFilter(
-                                selectedFilter
+                Crossfade(
+                    targetState = model.searchResults.isEmpty() && model.query.isNotEmpty(),
+                    label = "Search results fade animation"
+                ) {
+                    when (it) {
+                        true -> {
+                            Text(
+                                text = stringResource(Res.string.no_results_found),
+                                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 30.dp),
                             )
-                        )
-                    }
-                )
+                        }
 
-                SearchFilterChip(
-                    filter = FilterType.Reminder,
-                    selectedFilter = model.filter,
-                    onFilterSelected = { selectedFilter ->
-                        viewModel.take(
-                            SearchEvent.SetSearchFilter(
-                                selectedFilter
-                            )
-                        )
-                    }
-                )
-
-                SearchFilterChip(
-                    filter = FilterType.Done,
-                    selectedFilter = model.filter,
-                    onFilterSelected = { selectedFilter ->
-                        viewModel.take(
-                            SearchEvent.SetSearchFilter(
-                                selectedFilter
-                            )
-                        )
-                    }
-                )
-            }
-
-            Crossfade(
-                targetState = model.searchResults.isEmpty() && model.query.isNotEmpty(),
-                label = "Search results fade animation"
-            ) {
-                when (it) {
-                    true -> {
-                        Text(
-                            text = stringResource(Res.string.no_results_found),
-                            style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 30.dp),
-                        )
-                    }
-
-                    false -> {
-                        Crossfade(
-                            targetState = model.searchResults,
-                            label = "Search results fade"
-                        ) { result ->
-                            LazyColumn {
-                                items(
-                                    items = result,
-                                    key = { item -> item.id },
-                                    contentType = { item ->
-                                        when (item.isComplete) {
-                                            true -> SearchContentType.Complete
-                                            false -> SearchContentType.Priority
+                        false -> {
+                            Crossfade(
+                                targetState = model.searchResults,
+                                label = "Search results fade"
+                            ) { result ->
+                                LazyColumn {
+                                    items(
+                                        items = result,
+                                        key = { item -> item.id },
+                                        contentType = { item ->
+                                            when (item.isComplete) {
+                                                true -> SearchContentType.Complete
+                                                false -> SearchContentType.Priority
+                                            }
                                         }
-                                    }
-                                ) { task ->
-                                    when {
-                                        task.isComplete -> CompletePriorityItem(
-                                            task = task,
-                                            onClick = { showTaskChat(task.id) }
-                                        )
+                                    ) { task ->
+                                        when {
+                                            task.isComplete -> CompletePriorityItem(
+                                                task = task,
+                                                onClick = { showTaskChat(task.id) }
+                                            )
 
-                                        else -> PriorityItem(
-                                            task = task,
-                                            onClick = { showTaskChat(task.id) },
-                                            onLongClick = {},
-                                        )
+                                            else -> PriorityItem(
+                                                task = task,
+                                                onClick = { showTaskChat(task.id) },
+                                                onLongClick = {},
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -232,8 +239,8 @@ fun SearchBar(
                     }
                 }
             }
-        }
-    }
+        },
+    )
 }
 
 enum class SearchContentType {

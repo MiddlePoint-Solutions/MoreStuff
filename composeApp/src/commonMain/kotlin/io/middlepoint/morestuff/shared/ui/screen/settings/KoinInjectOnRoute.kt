@@ -22,7 +22,6 @@ fun <T : Any> koinInjectOnRoute(
   block: @DisallowComposableCalls ((koin: Koin) -> T)? = null
 ): T {
   class RouteInstance(val instance: T) : InstanceKeeper.Instance
-
   val routerContext: RouterContext = LocalRouterContext.current
   val koin: Koin = LocalKoinApplication.current
   val instanceKeeper: InstanceKeeper = routerContext.instanceKeeper
@@ -33,7 +32,6 @@ fun <T : Any> koinInjectOnRoute(
       )
     }
   }
-  rememberOnRoute { }
   return routeInstance.instance
 }
 

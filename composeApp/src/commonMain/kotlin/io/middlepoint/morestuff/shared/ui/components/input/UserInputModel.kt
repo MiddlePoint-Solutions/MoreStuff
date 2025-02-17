@@ -161,9 +161,7 @@ fun userInputModel(
           val task = createTaskUseCase(params)
 
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
-          state = state.copy(
-            lastCreatedTaskId = task.id
-          )
+          state = state.copy(lastCreatedTaskId = task.id)
           launch {
             // Hack for not using the same taskId in share screen.
             // This will be solved when adding new navigation with decompose router
@@ -173,7 +171,6 @@ fun userInputModel(
             )
           }
         }
-
       }
     }
   }

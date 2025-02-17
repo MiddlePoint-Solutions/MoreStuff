@@ -106,9 +106,7 @@ fun MainContent(
             } else {
               router.replaceCurrent(
                 TaskChat(taskId),
-                onComplete = {
-                  shareContent(taskId, shareable)
-                }
+                onComplete = { shareContent(taskId, shareable) }
               )
             }
           }

@@ -24,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +48,7 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
+import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
@@ -74,9 +73,6 @@ import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.cta_lets_go
-import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -320,25 +316,6 @@ private fun HomeContent(
       }
     }
 
-  }
-}
-
-@Composable
-private fun EmptyScopeContent(showTaskInput: () -> Unit) {
-  Box(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(bottom = 180.dp),
-    contentAlignment = Alignment.Center
-  ) {
-    TextButton(onClick = showTaskInput) {
-      Text(
-        stringResource(Res.string.cta_lets_go),
-        style = MaterialTheme.typography.titleLarge.copy(
-          color = MaterialTheme.colorScheme.onSurface
-        )
-      )
-    }
   }
 }
 
