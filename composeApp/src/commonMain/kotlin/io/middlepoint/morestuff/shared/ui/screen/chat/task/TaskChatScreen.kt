@@ -116,7 +116,7 @@ fun TaskChatScreen(
   modifier: Modifier = Modifier,
 ) {
 
-  val router: Router<ChatScreen> = rememberRouter(ChatScreen::class) { listOf(TaskChat) }
+  val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
 
   val viewModel = koinInjectOnRoute(

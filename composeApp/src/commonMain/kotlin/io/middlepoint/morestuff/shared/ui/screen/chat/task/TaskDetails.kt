@@ -224,7 +224,7 @@ fun TaskDetails(
               enabled = !task.isComplete,
               keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 imeAction = ImeAction.Done
               ),
               keyboardActions = KeyboardActions {

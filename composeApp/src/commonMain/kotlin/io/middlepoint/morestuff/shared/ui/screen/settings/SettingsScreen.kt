@@ -125,10 +125,7 @@ fun SettingsScreen(
   onBack: () -> Unit,
 ) {
 
-  val router = rememberRouter(SettingScreen::class) {
-    listOf(Root)
-  }
-
+  val router = rememberRouter<SettingScreen> { listOf(Root) }
   val viewModel = koinInjectOnRoute(SettingsViewModel::class)
 
   val model by viewModel.models.collectAsState()

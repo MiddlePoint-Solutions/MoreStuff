@@ -188,6 +188,7 @@ kotlin {
       implementation(libs.sqldelight.driver.android)
       implementation(libs.ktor.client.okhttp)
       implementation(libs.androidx.test)
+      implementation(libs.androidx.lifecycle.viewmodel)
       api(libs.koin.android)
       implementation(libs.sqliteAndroid)
       implementation(libs.preferenceKtx)

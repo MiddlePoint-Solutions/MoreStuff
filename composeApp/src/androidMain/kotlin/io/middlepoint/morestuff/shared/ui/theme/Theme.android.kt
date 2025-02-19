@@ -24,33 +24,33 @@ import io.middlepoint.morestuff.shared.ui.local.LocalTheme
 @Composable
 actual fun MoreStuffTheme(content: @Composable () -> Unit) {
 
-    val isDarkTheme = when (LocalTheme.current) {
-        AppTheme.System -> isSystemInDarkTheme()
-        AppTheme.Light -> false
-        AppTheme.Dark -> true
+  val isDarkTheme = when (LocalTheme.current) {
+    AppTheme.System -> isSystemInDarkTheme()
+    AppTheme.Light -> false
+    AppTheme.Dark -> true
+  }
+
+  val colorScheme = when {
+    isDarkTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicDarkColorScheme(
+      LocalContext.current
+    )
+
+    isDarkTheme -> DarkColors
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(LocalContext.current)
+    else -> LightColors
+  }
+
+  MaterialTheme(
+    colorScheme = colorScheme
+  ) {
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+      LaunchedEffect(isDarkTheme) {
+        val window = (view.context as Activity).window
+        WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme
+      }
     }
 
-    val colorScheme = when {
-        isDarkTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicDarkColorScheme(LocalContext.current)
-        isDarkTheme -> DarkColors
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(LocalContext.current)
-        else -> LightColors
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme
-    ) {
-        val view = LocalView.current
-        if (!view.isInEditMode) {
-            LaunchedEffect(isDarkTheme) {
-                val window = (view.context as Activity).window
-                window.statusBarColor = Color.Transparent.toArgb()
-                val elevatedSurfaceColor = colorScheme.surfaceColorAtElevation(2.dp)
-                window.navigationBarColor = elevatedSurfaceColor.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme
-            }
-        }
-
-        content()
-    }
+    content()
+  }
 }

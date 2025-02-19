@@ -43,7 +43,7 @@ fun ScopeTitleEditor(
             modifier = modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
-                autoCorrect = false,
+                autoCorrectEnabled = false,
                 imeAction = ImeAction.Done
             ),
             textStyle = LocalTextStyle.current,

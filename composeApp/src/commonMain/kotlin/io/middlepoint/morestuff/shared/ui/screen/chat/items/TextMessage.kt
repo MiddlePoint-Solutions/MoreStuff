@@ -1,17 +1,32 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.items
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.utils.appendUrlsWithStyle
@@ -33,22 +48,48 @@ fun TextMessageItem(
   modifier: Modifier = Modifier,
 ) {
   val content = handleUrlText(message.content)
-  val scope = rememberCoroutineScope()
   val uriHandler = LocalUriHandler.current
 
   Column(modifier) {
-    ClickableText(
-      text = content,
-      modifier = Modifier.padding(
-        start = 14.dp,
-        end = 15.dp,
-        top = 8.dp,
-        bottom = 3.dp
-      ),
+
+    val annotatedContent = buildAnnotatedString {
+      append(content)
+      content.getStringAnnotations("url", 0, content.length).forEach { annotation ->
+        addStyle(
+          style = SpanStyle(
+            color = Color.Blue,
+            textDecoration = TextDecoration.Underline
+          ),
+          start = annotation.start,
+          end = annotation.end
+        )
+        addLink(LinkAnnotation.Url(annotation.item), annotation.start, annotation.end)
+      }
+    }
+
+    // Hold on to the latest TextLayoutResult so we can convert tap coordinates to an offset.
+    var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
+    BasicText(
+      text = annotatedContent,
+      modifier = Modifier
+        .padding(start = 14.dp, end = 15.dp, top = 8.dp, bottom = 3.dp)
+        .pointerInput(Unit) {
+          detectTapGestures { tapOffset: Offset ->
+            layoutResult?.let { result ->
+              // Map the tap position to a character offset.
+              val position = result.getOffsetForPosition(tapOffset)
+              // Check if the tap position is inside a link annotation.
+              annotatedContent.getLinkAnnotations(position, position).firstOrNull()
+                ?.let { link ->
+                  uriHandler.openUri(link.item.toString())
+                }
+            }
+          }
+        },
       style = MaterialTheme.typography.bodyLarge,
-      onClick = { offset ->
-        content.getStringAnnotations(tag = "url", start = offset, end = offset).firstOrNull()
-          ?.let { scope.launch { uriHandler.openUri(it.item) } }
+      onTextLayout = { result ->
+        layoutResult = result
       }
     )
 

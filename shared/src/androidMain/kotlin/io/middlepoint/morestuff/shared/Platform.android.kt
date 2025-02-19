@@ -6,8 +6,6 @@ import androidx.core.net.toUri
 import com.mohamedrejeb.calf.io.KmpFile
 import java.util.Locale
 
-actual fun generateUUID(): String = java.util.UUID.randomUUID().toString()
-
 actual fun formatString(format: String, vararg args: Any): String {
   return String.format(Locale.US, format, *args)
 }

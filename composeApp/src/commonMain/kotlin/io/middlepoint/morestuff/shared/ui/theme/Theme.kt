@@ -77,10 +77,6 @@ val DarkColors = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-val ColorScheme.surfaceContainer: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
-
 val ColorScheme.surfaceContainerElevation: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(7.dp)
