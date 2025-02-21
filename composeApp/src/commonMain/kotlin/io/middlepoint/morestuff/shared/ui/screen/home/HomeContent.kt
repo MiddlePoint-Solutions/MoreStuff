@@ -47,6 +47,7 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
@@ -65,6 +66,7 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
@@ -288,7 +290,11 @@ private fun HomeContent(
                 },
                 onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
                 listState = states[page],
-                enabled = !taskInputActive
+                enabled = !taskInputActive,
+                onReorder = { updatedTasks ->
+                  logger.d { "Reordering tasks..." }
+                  scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
+                },
               )
             }
           }

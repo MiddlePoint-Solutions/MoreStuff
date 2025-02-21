@@ -88,19 +88,6 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     let navigationHelper: NavigationHelper = NavigationHelper()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        LottieConfiguration.shared.renderingEngine = .mainThread
-        
-        let center = UNUserNotificationCenter.current()
-        center.delegate = self
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Error al solicitar permisos de notificación: \(error.localizedDescription)")
-            } else if granted {
-                print("Permisos de notificación concedidos.")
-            } else {
-                print("Permisos de notificación denegados.")
-            }
-        }
         
         return true
     }

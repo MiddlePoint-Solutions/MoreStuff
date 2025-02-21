@@ -159,6 +159,8 @@
     <string name="set_review_time">Programar hora de la revisión</string>
     <string name="select_image">Seleccionar Imagen</string>
     <string name="select_pdf">Seleccionar PDF</string>
+    <string name="restore">Restaurar</string>
+
 
 
     <string name="sure_delete_scope">Estás seguro que quieres eliminar\n%s scope?</string>
@@ -262,5 +264,9 @@
     <string name="month_october">Octubre</string>
     <string name="month_november">Noviembre</string>
     <string name="month_december">Diciembre</string>
+
+
+    <string name="description_scopes">Usa scopes para separar lógicamente tus cosas.</string>
+    <string name="description_create_scope">Mantenlo corto y simple</string>
 
 </resources>

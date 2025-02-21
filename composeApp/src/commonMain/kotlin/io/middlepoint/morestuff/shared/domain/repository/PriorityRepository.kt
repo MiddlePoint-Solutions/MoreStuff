@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.domain.repository
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 interface PriorityRepository {
 
@@ -21,5 +22,8 @@ interface PriorityRepository {
     ): Either<Failure, Long>
 
     suspend fun updateTaskPriority(taskId: Long, priorityScore: Long): Either<Failure, Long>
+
+    suspend fun updateTasksPriorities(tasks: List<TaskUiModel>): Either<Failure, Unit>
+
 
 }

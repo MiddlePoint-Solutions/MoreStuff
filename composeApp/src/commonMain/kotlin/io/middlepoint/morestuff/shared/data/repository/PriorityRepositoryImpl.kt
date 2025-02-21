@@ -5,6 +5,8 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
+import io.middlepoint.morestuff.shared.domain.service.logger
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 class PriorityRepositoryImpl(
     database: StuffDb,
@@ -72,6 +74,16 @@ class PriorityRepositoryImpl(
     ): Either<Failure, Long> {
         taskQueries.updateTaskPriorityScore(priorityScore, taskId)
         return Either.Right(priorityScore)
+    }
+
+    override suspend fun updateTasksPriorities(tasks: List<TaskUiModel>): Either<Failure, Unit> {
+        return taskQueries.transactionWithResult {
+            tasks.forEach { task ->
+                taskQueries.updateTaskPriorityScore(task.priorityScore, task.id)
+                logger.d { "Updated task ${task.id} - ${task.title} to priority ${task.priorityScore}" }
+            }
+            Either.Right(Unit)
+        }
     }
 
 }

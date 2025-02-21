@@ -2,11 +2,9 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +19,6 @@ import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -105,7 +102,7 @@ fun TaskCard(
           .padding(top = 10.dp)
       ) {
         Text(
-          text = stringResource(Res.string.text_created_time_placeholder, item.createTime),
+          text = stringResource(Res.string.text_created_time_placeholder).replace("%s", item.createTime),
           color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
       }
