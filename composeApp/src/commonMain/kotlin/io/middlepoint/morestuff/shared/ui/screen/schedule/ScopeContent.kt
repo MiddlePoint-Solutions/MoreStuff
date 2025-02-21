@@ -25,9 +25,11 @@ import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.theme.divider
+import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
+import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -45,6 +47,8 @@ fun ScopeContent(
 ) {
 
   var reorderList by remember(tasks) { mutableStateOf(tasks) }
+  val sharedFunctionsHandler: SharedFunctionsHandler = koinInject()
+  val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
 
   val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
     val newList = reorderList.toMutableList().apply {
@@ -59,7 +63,7 @@ fun ScopeContent(
 
   LaunchedEffect(Unit) {
     snapshotFlow { reorderList }
-      .debounce(300)
+      .debounce(200)
       .collectLatest { updatedList ->
         if (updatedList != tasks) {
           logger.d("Final reordering triggered")
@@ -98,7 +102,7 @@ fun ScopeContent(
           onLongClick = { onItemLongClick(item.id) },
           enabled = enabled,
           isDragging = isDragging,
-          handleModifier = if (selected) Modifier.draggableHandle(true) else Modifier
+          handleModifier = if (selected) Modifier.draggableHandle(true) else Modifier,
         )
       }
 

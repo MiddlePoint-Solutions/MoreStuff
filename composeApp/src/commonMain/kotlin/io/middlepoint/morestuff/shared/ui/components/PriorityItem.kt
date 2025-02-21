@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.utils.ReorderHapticFeedbackType
+import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -35,10 +38,14 @@ fun PriorityItem(
   selected: Boolean = false,
   enabled: Boolean = true,
   isDragging: Boolean = false,
-  handleModifier: Modifier = Modifier
+  handleModifier: Modifier = Modifier,
 ) {
+
+  val sharedFunctionsHandler: SharedFunctionsHandler = koinInject()
+  val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
+
   val offsetX by animateDpAsState(
-    targetValue = if (selected) 32.dp else 0.dp,
+    targetValue = if (selected) 4.dp else 0.dp,
     label = "PriorityItemOffset"
   )
 
@@ -47,7 +54,13 @@ fun PriorityItem(
       .fillMaxWidth()
       .height(80.dp)
       .background(color = MaterialTheme.colorScheme.surfaceContainer)
-      .combinedClickable(enabled = enabled, onClick = onClick, onLongClick = onLongClick)
+      .combinedClickable(
+        enabled = enabled,
+        onClick = onClick,
+        onLongClick = {
+          haptic.performHapticFeedback(ReorderHapticFeedbackType.START)
+          onLongClick()
+        })
   ) {
     Row(
       modifier = modifier
@@ -55,19 +68,21 @@ fun PriorityItem(
         .padding(start = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      // Ícono de menú para arrastrar
-      Box(
-        modifier = handleModifier
-          .padding(end = 8.dp)
-          .size(24.dp)
-      ) {
-        if (selected && !isDragging) {
-          Icon(
-            imageVector = Icons.Default.Menu,
-            contentDescription = "Reorder",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.fillMaxSize()
-          )
+      if (selected) {
+        Box(
+          modifier = handleModifier
+            .padding(end = 8.dp)
+            .size(24.dp)
+        ) {
+          if (selected && !isDragging) {
+            Icon(
+              imageVector = Icons.Default.Menu,
+              contentDescription = "Reorder",
+              tint = MaterialTheme.colorScheme.onSurfaceVariant,
+              modifier = Modifier.fillMaxSize()
+            )
+          }
+
         }
       }
 
