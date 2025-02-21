@@ -62,8 +62,10 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
 import io.middlepoint.morestuff.shared.ui.screen.input.TaskInputBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
+import io.middlepoint.morestuff.shared.ui.screen.schedule.logger
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
@@ -280,6 +282,10 @@ private fun HomeContent(
                 },
                 onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
                 listState = states[page],
+                onReorder = { updatedTasks ->
+                  logger.d { "Reordering tasks..." }
+                  scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
+                },
               )
             }
           }

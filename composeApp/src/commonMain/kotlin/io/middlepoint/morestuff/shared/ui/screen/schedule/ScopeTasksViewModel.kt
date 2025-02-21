@@ -6,12 +6,12 @@ import kotlinx.coroutines.flow.SharedFlow
 
 class ScopeTasksViewModel(
     private val scopeId: Long,
-) : MoleculeViewModel<Nothing, ScopeTasksModels>() {
+    ) : MoleculeViewModel<ScopeTasksEvent, ScopeTasksModels>() {
 
     override val initialState: ScopeTasksModels = ScopeTasksModels.Loading
 
     @Composable
-    override fun models(events: SharedFlow<Nothing>): ScopeTasksModels {
-        return scopeTasksModel(scopeId)
+    override fun models(events: SharedFlow<ScopeTasksEvent>): ScopeTasksModels {
+        return scopeTasksModel( scopeId = scopeId, events = events)
     }
 }
