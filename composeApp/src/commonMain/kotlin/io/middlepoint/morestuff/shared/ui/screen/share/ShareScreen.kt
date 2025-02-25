@@ -326,7 +326,11 @@ private fun ShareContent(
               onItemClick = { taskId -> shareToTask(taskId) },
               listState = states[page],
               enabled = !taskInputActive,
-              onReorder = {}
+              onReorder = {},
+              onTaskComplete = {},
+              isReordering = false,
+              onToggleReordering = {},
+
             )
           }
         }
@@ -371,6 +375,7 @@ private fun ShareTasksList(
           task = task,
           onClick = { shareToTask(task.id) },
           onLongClick = {},
+          onTaskComplete = {}
         )
 
         HorizontalDivider(

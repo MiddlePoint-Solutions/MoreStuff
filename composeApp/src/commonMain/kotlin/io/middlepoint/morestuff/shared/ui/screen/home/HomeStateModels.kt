@@ -9,7 +9,8 @@ data class HomeState(
   val currentScopeId: Long = defaultScope.id,
   val scopes: List<ScopeDomain> = listOf(),
   val selectedTasks: List<Long> = listOf(),
-  val taskInputActive: Boolean = false
+  val taskInputActive: Boolean = false,
+  val reorderingScopes: Map<Long, Boolean> = emptyMap()
 )
 
 @Immutable
@@ -23,4 +24,7 @@ sealed class HomeEvent {
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()
   data class CreateScopeForSelectedTasks(val title: String) : HomeEvent()
+  data class CompleteTask(val taskId: Long) : HomeEvent()
+  data class ToggleScopeReordering(val scopeId: Long, val isReordering: Boolean) : HomeEvent()
+
 }

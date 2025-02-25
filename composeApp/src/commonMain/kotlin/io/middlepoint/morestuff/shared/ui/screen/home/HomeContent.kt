@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -57,14 +58,7 @@ import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.show
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
@@ -72,6 +66,7 @@ import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -91,6 +86,8 @@ fun HomeScreen() {
   var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
   val model by homePresenter.models.collectAsState()
+  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
+
 
   MoreStuffHomeScaffold(
     snackbarHostState = snackbarHostState,
@@ -113,6 +110,19 @@ fun HomeScreen() {
           model = model,
           onEvent = homePresenter::take,
           modifier = Modifier.padding(it),
+          onTaskComplete = { taskId ->
+            if (pendingCompletionTasks.contains(taskId)) {
+              pendingCompletionTasks[taskId]?.cancel()
+              pendingCompletionTasks.remove(taskId)
+            } else {
+              val job = coroutineScope.launch {
+                delay(1000)
+                homePresenter.take(CompleteTask(taskId))
+                pendingCompletionTasks.remove(taskId)
+              }
+              pendingCompletionTasks[taskId] = job
+            }
+          }
         )
       }
     },
@@ -177,6 +187,7 @@ fun HomeScreen() {
 private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
+  onTaskComplete: (Long) -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val coroutineScope = rememberCoroutineScope()
@@ -276,7 +287,7 @@ private fun HomeContent(
         when (val tasksModel = scopeTasks) {
           is ScopeTasksModels.Data -> {
             if (tasksModel.tasks.isEmpty()) {
-              EmptyScopeContent { onEvent(HomeEvent.ShowTaskInput) }
+              EmptyScopeContent { onEvent(ShowTaskInput) }
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
@@ -295,6 +306,13 @@ private fun HomeContent(
                   logger.d { "Reordering tasks..." }
                   scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
                 },
+                onTaskComplete = { taskId ->
+                  onTaskComplete(taskId)
+                },
+                isReordering = model.reorderingScopes[scope.id] ?: false,
+                onToggleReordering = { newValue ->
+                  onEvent(ToggleScopeReordering(scope.id, newValue))
+                }
               )
             }
           }
@@ -315,7 +333,7 @@ private fun HomeContent(
       exit = scaleOut() + fadeOut()
     ) {
       FloatingActionButton(
-        onClick = { onEvent(HomeEvent.ShowTaskInput) },
+        onClick = { onEvent(ShowTaskInput) },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {

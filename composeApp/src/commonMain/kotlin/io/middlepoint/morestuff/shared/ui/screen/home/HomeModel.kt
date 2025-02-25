@@ -35,6 +35,8 @@ fun homeModel(
   var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
   var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
   var taskInputActive: Boolean by remember { mutableStateOf(initialState.taskInputActive) }
+  var reorderingScopes: Map<Long, Boolean> by remember { mutableStateOf(initialState.reorderingScopes) }
+
 
   fun dispatch(action: Action) = store.dispatch(action)
 
@@ -60,18 +62,21 @@ fun homeModel(
         ResetHomeState -> {
           selectedTasks = listOf()
           taskInputActive = false
+          reorderingScopes = emptyMap()
         }
 
-        CompleteSelectedTasks -> {
+        is CompleteSelectedTasks -> {
           val completed = selectedTasks.toList()
           selectedTasks = listOf()
           store.dispatch(TaskAction.CompleteTasksAction(completed, true))
-
-          val notification = NotificationState.Complete {
-            store.dispatch(TaskAction.CompleteTasksAction(completed, false))
+          if (completed.isNotEmpty()) {
+            val notification = NotificationState.Complete {
+              store.dispatch(TaskAction.CompleteTasksAction(completed, false))
+            }
+            launch { notifications.emit(notification) }
           }
-          launch { notifications.emit(notification) }
         }
+
 
         DeleteSelectedTasks -> {
           store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
@@ -110,6 +115,21 @@ fun homeModel(
           }
         }
 
+        is CompleteTask -> {
+          store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
+          val notification = NotificationState.Complete {
+            store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+          }
+          launch { notifications.emit(notification) }
+        }
+
+        is ToggleScopeReordering -> {
+          // Actualiza el estado de reordenación para el scope indicado
+          reorderingScopes = reorderingScopes.toMutableMap().also {
+            it[event.scopeId] = event.isReordering
+          }
+        }
+
       }
     }
   }
@@ -118,6 +138,7 @@ fun homeModel(
     currentScopeId = currentScopeId,
     selectedTasks = selectedTasks,
     scopes = scopes,
-    taskInputActive = taskInputActive
+    taskInputActive = taskInputActive,
+    reorderingScopes = reorderingScopes
   )
 }

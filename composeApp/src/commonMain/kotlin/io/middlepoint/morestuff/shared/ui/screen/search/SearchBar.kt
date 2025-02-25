@@ -231,6 +231,7 @@ fun SearchBar(
                                                 task = task,
                                                 onClick = { showTaskChat(task.id) },
                                                 onLongClick = {},
+                                                onTaskComplete = {}//TODO
                                             )
                                         }
                                     }

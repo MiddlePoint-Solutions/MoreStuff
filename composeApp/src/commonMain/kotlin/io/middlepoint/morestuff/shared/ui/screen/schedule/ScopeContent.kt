@@ -18,20 +18,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.theme.divider
-import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+
 
 @OptIn(ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
@@ -44,36 +39,27 @@ fun ScopeContent(
   onItemLongClick: (taskId: Long) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
+  onTaskComplete: (taskId: Long) -> Unit = {},
+  isReordering: Boolean,
+  onToggleReordering: (Boolean) -> Unit,
 ) {
 
   var reorderList by remember(tasks) { mutableStateOf(tasks) }
-  val sharedFunctionsHandler: SharedFunctionsHandler = koinInject()
-  val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
 
   val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
     val newList = reorderList.toMutableList().apply {
       val movedTask = removeAt(from.index)
       add(to.index, movedTask)
     }
-
-    logger.d("Moving task: ${reorderList[from.index].title} from position ${from.index} to ${to.index}")
-
     reorderList = newList
+    onReorder(newList)
   }
 
-  LaunchedEffect(Unit) {
-    snapshotFlow { reorderList }
-      .debounce(200)
-      .collectLatest { updatedList ->
-        if (updatedList != tasks) {
-          logger.d("Final reordering triggered")
-          onReorder(updatedList)
-        }
-      }
+  LaunchedEffect(reorderList) {
+    if (reorderList != tasks) {
+      onReorder(reorderList)
+    }
   }
-
-
-
 
   LazyColumn(
     modifier = modifier
@@ -94,18 +80,31 @@ fun ScopeContent(
       val selected by remember(selectedTasks) {
         derivedStateOf { selectedTasks.contains(item.id) }
       }
+
+      val selectedToComplete by remember { derivedStateOf { item.isComplete } }
+
       ReorderableItem(reorderableState, key = item.id) { isDragging ->
         PriorityItem(
           task = item,
           selected = selected,
-          onClick = { onItemClick(item.id) },
-          onLongClick = { onItemLongClick(item.id) },
+          selectedToComplete = selectedToComplete,
+          hasSelection = isReordering,
+          onClick = {
+            if (isReordering) {
+              onToggleReordering(false)
+            }
+            onItemClick(item.id)
+          },
+          onLongClick = {
+            onToggleReordering(!isReordering)
+            onItemLongClick(item.id)
+          },
           enabled = enabled,
           isDragging = isDragging,
-          handleModifier = if (selected) Modifier.draggableHandle(true) else Modifier,
+          handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
+          onTaskComplete = { onTaskComplete(item.id) },
         )
       }
-
 
       Row(
         modifier = Modifier.fillParentMaxWidth(),
@@ -120,4 +119,6 @@ fun ScopeContent(
       }
     }
   }
+
 }
+
