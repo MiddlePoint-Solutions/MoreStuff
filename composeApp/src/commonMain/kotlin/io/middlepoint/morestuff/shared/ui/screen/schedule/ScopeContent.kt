@@ -61,6 +61,12 @@ fun ScopeContent(
     }
   }
 
+  LaunchedEffect(selectedTasks) {
+    if (selectedTasks.isEmpty()) {
+      onToggleReordering(false)
+    }
+  }
+
   LazyColumn(
     modifier = modifier
       .fillMaxSize()
@@ -91,10 +97,20 @@ fun ScopeContent(
           hasSelection = isReordering,
           onClick = {
             if (isReordering) {
-              onToggleReordering(false)
+              // Alterna la selección de la tarea sin salir del modo reordenar
+              onItemLongClick(item.id)
+            } else {
+              onItemClick(item.id)
             }
-            onItemClick(item.id)
           },
+
+
+              /*onClick = {
+                if (isReordering) {
+                  onToggleReordering(false)
+                }
+                onItemClick(item.id)
+              },*/
           onLongClick = {
             onToggleReordering(!isReordering)
             onItemLongClick(item.id)

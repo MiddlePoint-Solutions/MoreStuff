@@ -124,7 +124,6 @@ fun homeModel(
         }
 
         is ToggleScopeReordering -> {
-          // Actualiza el estado de reordenación para el scope indicado
           reorderingScopes = reorderingScopes.toMutableMap().also {
             it[event.scopeId] = event.isReordering
           }
