@@ -1,7 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.components
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,7 +25,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,16 +39,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.shared.ui.TaskColors
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.utils.ReorderHapticFeedbackType
 import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
@@ -70,19 +75,12 @@ fun PriorityItem(
     label = "PriorityItemOffset"
   )
 
-  val backgroundColor by animateColorAsState(
-    targetValue = if (selected)
-      MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-    else
-      MaterialTheme.colorScheme.surfaceContainer,
-    label = "PriorityItemBackgroundColor"
-  )
 
   Box(
     modifier = Modifier
       .fillMaxWidth()
       .height(80.dp)
-      .background(backgroundColor/*color = MaterialTheme.colorScheme.surfaceContainer*/)
+      .background(color = MaterialTheme.colorScheme.surfaceContainer)
       .combinedClickable(
         enabled = enabled,
         onClick = onClick,
@@ -127,7 +125,6 @@ fun PriorityItem(
             selectedToComplete = selectedToComplete,
             onClick = onTaskComplete,
             enabled = enabled,
-            taskTitle = task.title
           )
         }
 
@@ -151,25 +148,32 @@ fun PriorityItem(
             textAlign = TextAlign.Start,
           )
         )
-        /*if (selected) {
-          Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-              .padding(start = 30.dp)
-              .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = CircleShape
-              )
-              .border(
-                width = 2.dp,
-                color = MaterialTheme.colorScheme.surfaceContainer,
-                shape = CircleShape
-              )
-              .size(20.dp)
-          )
-        }*/
+        if (selected) {
+          AnimatedVisibility(
+            visible = selected,
+            enter = scaleIn() + fadeIn(),
+            exit = scaleOut() + fadeOut()
+          ) {
+            Icon(
+              imageVector = Icons.Default.CheckCircle,
+              contentDescription = null,
+              tint = MaterialTheme.colorScheme.primary,
+              modifier = Modifier
+                .padding(start = 30.dp, end = 16.dp)
+                .background(
+                  color = MaterialTheme.colorScheme.surface,
+                  shape = CircleShape
+                )
+                .border(
+                  width = 2.dp,
+                  color = MaterialTheme.colorScheme.surfaceContainer,
+                  shape = CircleShape
+                )
+                .size(20.dp)
+            )
+          }
+        }
+
       }
     }
 
@@ -186,44 +190,46 @@ fun ToggleTaskAsDone(
   selectedToComplete: Boolean,
   onClick: () -> Unit,
   enabled: Boolean = true,
-  taskTitle: String,
 ) {
   var isCompleted by remember { mutableStateOf(selectedToComplete) }
-
-  val profileColors by remember {
-    derivedStateOf { TaskColors.getProfileColorsForTask(taskTitle) }
-  }
-
-  val gradientBrush = remember(profileColors) {
-    Brush.verticalGradient(profileColors)
-  }
 
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
-      .size(24.dp)
-      .border(
-        width = 1.dp,
-        color = if (isCompleted)
-          profileColors.first()
-        else
-          MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-        shape = CircleShape
-      )
-      .padding(2.dp)
-      .background(
-        brush = if (isCompleted)
-          gradientBrush
-        else
-          SolidColor(Color.Transparent),
-        shape = CircleShape
-      )
+      .size(30.dp)
       .clickable(enabled = enabled) {
         isCompleted = !isCompleted
         onClick()
       }
-  ) {}
+  ) {
+    AnimatedContent(
+      targetState = isCompleted,
+      label = "Toggle task completion animation",
+      transitionSpec = { scaleIn() togetherWith fadeOut() },
+      modifier = Modifier.align(Alignment.Center)
+    ) { completed ->
+      when (completed) {
+        true -> {
+          Icon(
+            imageVector = Icons.Filled.CheckCircle,
+            contentDescription = "Completed Task",
+            modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.onSurface
+          )
+        }
+        false -> {
+          Icon(
+            imageVector = Icons.Outlined.Circle,
+            contentDescription = "Incomplete Task",
+            modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.onSurface
+          )
+        }
+      }
+    }
+  }
 }
+
 
 
 
