@@ -3,9 +3,13 @@ package io.middlepoint.morestuff.shared.ui.screen.search
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -39,6 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -79,7 +85,8 @@ fun SearchBar(
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
   val focusRequester = remember { FocusRequester() }
   var searchQuery by remember { mutableStateOf(model.query) }
-
+  val keyboardController = LocalSoftwareKeyboardController.current
+  val focusManager = LocalFocusManager.current
 
   LaunchedEffect(Unit) {
     isSearchActive = true
@@ -110,132 +117,151 @@ fun SearchBar(
   val colors = SearchBarDefaults.colors(
     containerColor = MaterialTheme.colorScheme.surfaceContainer,
   )
-  SearchBar(
-    inputField = {
-      SearchBarDefaults.InputField(
-        query = searchQuery,
-        onQueryChange = { newQuery -> searchQuery = newQuery },
-        onSearch = { },
-        expanded = isSearchActive,
-        onExpandedChange = onActiveChange,
-        placeholder = { Text(text = stringResource(Res.string.search)) },
-        leadingIcon = {
-          IconButton(onClick = {
-            exitSearch()
-          }) {
-            Icon(
-              Icons.AutoMirrored.Filled.ArrowBack,
-              contentDescription = stringResource(Res.string.cd_navigate_back)
+
+  Box(
+    modifier = Modifier
+      .fillMaxSize()
+      .clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null
+      ) {
+        focusManager.clearFocus()
+        keyboardController?.hide()
+      }
+  ){
+    SearchBar(
+      inputField = {
+        SearchBarDefaults.InputField(
+          query = searchQuery,
+          onQueryChange = { newQuery -> searchQuery = newQuery },
+          onSearch = { },
+          expanded = isSearchActive,
+          onExpandedChange = onActiveChange,
+          placeholder = { Text(text = stringResource(Res.string.search)) },
+          leadingIcon = {
+            IconButton(onClick = {
+              exitSearch()
+            }) {
+              Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(Res.string.cd_navigate_back)
+              )
+            }
+          },
+          trailingIcon = {
+            if (model.query.isNotEmpty()) {
+              IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
+                Icon(
+                  Icons.Default.Close,
+                  contentDescription = stringResource(Res.string.cd_clear_search_query)
+                )
+              }
+            }
+          },
+          colors = TextFieldDefaults.colors(),
+        )
+      },
+      expanded = isSearchActive,
+      onExpandedChange = onActiveChange,
+      modifier = Modifier.focusRequester(focusRequester),
+      colors = colors,
+      content = {
+        Column {
+          Row(
+            modifier = Modifier
+              .padding(top = 16.dp, start = 4.dp, end = 4.dp)
+              .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+          ) {
+
+            SearchFilterChip(
+              filter = FilterType.Scheduled,
+              selectedFilter = model.filter,
+              onFilterSelected = { selectedFilter ->
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                viewModel.take(
+                  SearchEvent.SetSearchFilter(
+                    selectedFilter
+                  )
+                )
+              }
+            )
+
+            SearchFilterChip(
+              filter = FilterType.Reminder,
+              selectedFilter = model.filter,
+              onFilterSelected = { selectedFilter ->
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                viewModel.take(
+                  SearchEvent.SetSearchFilter(
+                    selectedFilter
+                  )
+                )
+              }
+            )
+
+            SearchFilterChip(
+              filter = FilterType.Done,
+              selectedFilter = model.filter,
+              onFilterSelected = { selectedFilter ->
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                viewModel.take(
+                  SearchEvent.SetSearchFilter(
+                    selectedFilter
+                  )
+                )
+              }
             )
           }
-        },
-        trailingIcon = {
-          if (model.query.isNotEmpty()) {
-            IconButton(onClick = { viewModel.take(SearchEvent.ClearSearchQuery) }) {
-              Icon(
-                Icons.Default.Close,
-                contentDescription = stringResource(Res.string.cd_clear_search_query)
-              )
-            }
-          }
-        },
-        colors = TextFieldDefaults.colors(),
-      )
-    },
-    expanded = isSearchActive,
-    onExpandedChange = onActiveChange,
-    modifier = Modifier.focusRequester(focusRequester),
-    colors = colors,
-    content = {
-      Column {
-        Row(
-          modifier = Modifier
-            .padding(top = 16.dp, start = 4.dp, end = 4.dp)
-            .fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
 
-          SearchFilterChip(
-            filter = FilterType.Scheduled,
-            selectedFilter = model.filter,
-            onFilterSelected = { selectedFilter ->
-              viewModel.take(
-                SearchEvent.SetSearchFilter(
-                  selectedFilter
+          Crossfade(
+            targetState = model.searchResults.isEmpty() && model.query.isNotEmpty(),
+            label = "Search results fade animation"
+          ) {
+            when (it) {
+              true -> {
+                Text(
+                  text = stringResource(Res.string.no_results_found),
+                  style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 30.dp),
                 )
-              )
-            }
-          )
+              }
 
-          SearchFilterChip(
-            filter = FilterType.Reminder,
-            selectedFilter = model.filter,
-            onFilterSelected = { selectedFilter ->
-              viewModel.take(
-                SearchEvent.SetSearchFilter(
-                  selectedFilter
-                )
-              )
-            }
-          )
-
-          SearchFilterChip(
-            filter = FilterType.Done,
-            selectedFilter = model.filter,
-            onFilterSelected = { selectedFilter ->
-              viewModel.take(
-                SearchEvent.SetSearchFilter(
-                  selectedFilter
-                )
-              )
-            }
-          )
-        }
-
-        Crossfade(
-          targetState = model.searchResults.isEmpty() && model.query.isNotEmpty(),
-          label = "Search results fade animation"
-        ) {
-          when (it) {
-            true -> {
-              Text(
-                text = stringResource(Res.string.no_results_found),
-                style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center),
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .padding(vertical = 30.dp),
-              )
-            }
-
-            false -> {
-              Crossfade(
-                targetState = model.searchResults,
-                label = "Search results fade"
-              ) { result ->
-                LazyColumn {
-                  items(
-                    items = result,
-                    key = { item -> item.id },
-                    contentType = { item ->
-                      when (item.isComplete) {
-                        true -> SearchContentType.Complete
-                        false -> SearchContentType.Priority
+              false -> {
+                Crossfade(
+                  targetState = model.searchResults,
+                  label = "Search results fade"
+                ) { result ->
+                  LazyColumn {
+                    items(
+                      items = result,
+                      key = { item -> item.id },
+                      contentType = { item ->
+                        when (item.isComplete) {
+                          true -> SearchContentType.Complete
+                          false -> SearchContentType.Priority
+                        }
                       }
-                    }
-                  ) { task ->
-                    when {
-                      task.isComplete -> CompletePriorityItem(
-                        task = task,
-                        onClick = { showTaskChat(task.id) }
-                      )
+                    ) { task ->
+                      when {
+                        task.isComplete -> CompletePriorityItem(
+                          task = task,
+                          onClick = { showTaskChat(task.id) }
+                        )
 
-                      else -> PriorityItem(
-                        task = task,
-                        onClick = { showTaskChat(task.id) },
-                        onLongClick = {},
-                        onTaskComplete = {},
-                        enabled = false
-                      )
+                        else -> PriorityItem(
+                          task = task,
+                          onClick = { showTaskChat(task.id) },
+                          onLongClick = {},
+                          onTaskComplete = {},
+                          enabled = false
+                        )
+                      }
                     }
                   }
                 }
@@ -243,9 +269,10 @@ fun SearchBar(
             }
           }
         }
-      }
-    },
-  )
+      },
+    )
+  }
+
 }
 
 enum class SearchContentType {
