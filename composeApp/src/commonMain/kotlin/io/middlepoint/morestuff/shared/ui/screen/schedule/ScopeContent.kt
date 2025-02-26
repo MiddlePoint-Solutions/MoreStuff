@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -107,6 +109,11 @@ fun ScopeContent(
           enabled = enabled,
           handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
           onTaskComplete = { onTaskComplete(item.id) },
+          modifier = Modifier.animateItem(
+            fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
+            fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
+            placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
+          )
         )
       }
 
