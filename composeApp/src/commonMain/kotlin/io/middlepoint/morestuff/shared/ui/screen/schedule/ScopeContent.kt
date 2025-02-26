@@ -87,36 +87,24 @@ fun ScopeContent(
         derivedStateOf { selectedTasks.contains(item.id) }
       }
 
-      val selectedToComplete by remember { derivedStateOf { item.isComplete } }
 
-      ReorderableItem(reorderableState, key = item.id) { isDragging ->
+      ReorderableItem(reorderableState, key = item.id) {
         PriorityItem(
           task = item,
           selected = selected,
-          selectedToComplete = selectedToComplete,
           hasSelection = isReordering,
           onClick = {
             if (isReordering) {
-              // Alterna la selección de la tarea sin salir del modo reordenar
               onItemLongClick(item.id)
             } else {
               onItemClick(item.id)
             }
           },
-
-
-              /*onClick = {
-                if (isReordering) {
-                  onToggleReordering(false)
-                }
-                onItemClick(item.id)
-              },*/
           onLongClick = {
             onToggleReordering(!isReordering)
             onItemLongClick(item.id)
           },
           enabled = enabled,
-          isDragging = isDragging,
           handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
           onTaskComplete = { onTaskComplete(item.id) },
         )

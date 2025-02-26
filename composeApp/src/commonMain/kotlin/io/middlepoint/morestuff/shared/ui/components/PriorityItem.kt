@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,24 +56,24 @@ import org.koin.compose.koinInject
 fun PriorityItem(
   task: TaskUiModel,
   onClick: () -> Unit,
-  onTaskComplete: () -> Unit,
+  onTaskComplete: (Boolean) -> Unit,
   onLongClick: () -> Unit,
   modifier: Modifier = Modifier,
   selected: Boolean = false,
-  selectedToComplete: Boolean = false,
   hasSelection: Boolean = false,
   enabled: Boolean = true,
-  isDragging: Boolean = false,
   handleModifier: Modifier = Modifier,
 ) {
 
   val sharedFunctionsHandler: SharedFunctionsHandler = koinInject()
   val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
 
-  val offsetX by animateDpAsState(
+  /*val offsetX by animateDpAsState(
     targetValue = if (hasSelection) 4.dp else 0.dp,
     label = "PriorityItemOffset"
-  )
+  )*/
+
+  var isCompleted by remember { mutableStateOf(task.isComplete) }
 
 
   Box(
@@ -82,7 +82,6 @@ fun PriorityItem(
       .height(80.dp)
       .background(color = MaterialTheme.colorScheme.surfaceContainer)
       .combinedClickable(
-        enabled = enabled,
         onClick = onClick,
         onLongClick = {
           haptic.performHapticFeedback(ReorderHapticFeedbackType.START)
@@ -95,86 +94,78 @@ fun PriorityItem(
         .padding(start = 14.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      if (hasSelection) {
-        Box(
-          modifier = handleModifier
-            .padding(end = 8.dp)
-            .size(24.dp)
-        ) {
-          if (!isDragging) {
-            Icon(
-              imageVector = Icons.Default.DragHandle,
-              contentDescription = "Reorder",
-              tint = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.fillMaxSize()
-            )
-          }
-
-        }
-      }
-
-      Row(
-        modifier = Modifier
-          .offset(x = offsetX)
-          .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Box {
-          //TaskProfile(task.title)
+      Crossfade(
+        targetState = hasSelection,
+        label = "ToggleTaskAsDone or DragHandle transition"
+      ) { showDragHandle ->
+        if (showDragHandle) {
+          Icon(
+            imageVector = Icons.Default.DragHandle,
+            contentDescription = "Reorder",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = handleModifier
+              .size(30.dp)
+          )
+        } else {
           ToggleTaskAsDone(
-            selectedToComplete = selectedToComplete,
-            onClick = onTaskComplete,
+            selectedToComplete = isCompleted,
+            onClick = {
+              isCompleted = !isCompleted
+              onTaskComplete(isCompleted)
+            },
             enabled = enabled,
           )
         }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        val title by remember { derivedStateOf { task.title } }
-
-        Text(
-          text = title,
-          modifier = Modifier
-            .weight(1f)
-            .padding(12.dp),
-          maxLines = 2,
-          color = MaterialTheme.colorScheme.onSurface,
-          overflow = TextOverflow.Ellipsis,
-          style = TextStyle(
-            fontSize = 16.sp,
-            lineHeight = 18.sp,
-            fontWeight = FontWeight(700),
-            color = Color(0xFFFFFFFF),
-            textAlign = TextAlign.Start,
-          )
-        )
-        if (selected) {
-          AnimatedVisibility(
-            visible = selected,
-            enter = scaleIn() + fadeIn(),
-            exit = scaleOut() + fadeOut()
-          ) {
-            Icon(
-              imageVector = Icons.Default.CheckCircle,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.primary,
-              modifier = Modifier
-                .padding(start = 30.dp, end = 16.dp)
-                .background(
-                  color = MaterialTheme.colorScheme.surface,
-                  shape = CircleShape
-                )
-                .border(
-                  width = 2.dp,
-                  color = MaterialTheme.colorScheme.surfaceContainer,
-                  shape = CircleShape
-                )
-                .size(20.dp)
-            )
-          }
-        }
-
       }
+
+      Spacer(modifier = Modifier.width(8.dp))
+
+      val title by remember { derivedStateOf { task.title } }
+
+      Text(
+        text = title,
+        modifier = Modifier
+          .weight(1f)
+          .padding(12.dp),
+        maxLines = 2,
+        color = MaterialTheme.colorScheme.onSurface,
+        overflow = TextOverflow.Ellipsis,
+        style = TextStyle(
+          fontSize = 16.sp,
+          lineHeight = 18.sp,
+          fontWeight = FontWeight(700),
+          color = Color(0xFFFFFFFF),
+          textAlign = TextAlign.Start,
+          textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+        )
+      )
+      if (selected) {
+        AnimatedVisibility(
+          visible = selected,
+          enter = scaleIn() + fadeIn(),
+          exit = scaleOut() + fadeOut()
+        ) {
+          Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+              .padding(start = 30.dp, end = 16.dp)
+              .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+              )
+              .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = CircleShape
+              )
+              .size(20.dp)
+          )
+        }
+      }
+
+
     }
 
     TaskItemBadges(
@@ -191,19 +182,16 @@ fun ToggleTaskAsDone(
   onClick: () -> Unit,
   enabled: Boolean = true,
 ) {
-  var isCompleted by remember { mutableStateOf(selectedToComplete) }
-
   Box(
     contentAlignment = Alignment.Center,
     modifier = Modifier
       .size(30.dp)
       .clickable(enabled = enabled) {
-        isCompleted = !isCompleted
-        onClick()
+        onClick() // Llamamos a onClick sin mantener un estado interno
       }
   ) {
     AnimatedContent(
-      targetState = isCompleted,
+      targetState = selectedToComplete, // Ahora depende completamente del estado externo
       label = "Toggle task completion animation",
       transitionSpec = { scaleIn() togetherWith fadeOut() },
       modifier = Modifier.align(Alignment.Center)
@@ -217,6 +205,7 @@ fun ToggleTaskAsDone(
             tint = MaterialTheme.colorScheme.onSurface
           )
         }
+
         false -> {
           Icon(
             imageVector = Icons.Outlined.Circle,
@@ -229,9 +218,6 @@ fun ToggleTaskAsDone(
     }
   }
 }
-
-
-
 
 
 

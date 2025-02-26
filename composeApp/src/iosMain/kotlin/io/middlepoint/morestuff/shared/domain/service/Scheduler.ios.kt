@@ -65,7 +65,7 @@ class SchedulerImpl(
 
 
     override fun schedulePlannedPriorityWorker() {
-        val content = UNMutableNotificationContent()
+    /*    val content = UNMutableNotificationContent()
         content.setTitle("Planned Priority Update")
         content.setBody("Executing planned priority update.")
 
@@ -85,7 +85,7 @@ class SchedulerImpl(
                 error?.let {
                     println("Error scheduling planned priority worker: ${it.localizedDescription}")
                 }
-            }
+            }*/
     }
 
     override fun scheduleReviewWorker(hour: Int, minute: Int) {
