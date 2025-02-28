@@ -3,7 +3,13 @@ package io.middlepoint.morestuff.shared.ui.screen.home
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -28,6 +34,8 @@ fun ScopeTabs(
     scopes: List<ScopeDomain>,
     onScopeSelected: (index: Int, scope: ScopeDomain) -> Unit,
     containerColor: Color,
+    createNewScope: () -> Unit,
+    isCreateScopeVisible: Boolean = true
 ) {
     val selectedTabColor = MaterialTheme.colorScheme.primary
     val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
@@ -80,6 +88,20 @@ fun ScopeTabs(
                 }
             )
         }
+        if(isCreateScopeVisible){
+            IconButton(
+                onClick = { createNewScope() },
+                modifier = Modifier.padding(start = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Scope",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+
     }
 }
 

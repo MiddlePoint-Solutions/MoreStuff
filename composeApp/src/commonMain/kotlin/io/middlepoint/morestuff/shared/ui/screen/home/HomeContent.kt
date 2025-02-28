@@ -122,6 +122,14 @@ fun HomeScreen() {
               }
               pendingCompletionTasks[taskId] = job
             }
+          },
+          createNewScope = {
+            val createScopeScreen = Screen.CreateScope {
+              homePresenter.take(CreateScope(it))
+              navigation.pop()
+            }
+            navigation.push(createScopeScreen)
+
           }
         )
       }
@@ -188,6 +196,7 @@ private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
   onTaskComplete: (Long) -> Unit,
+  createNewScope: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
   val coroutineScope = rememberCoroutineScope()
@@ -200,6 +209,8 @@ private fun HomeContent(
   val pagerState = rememberPagerState(pageCount = { model.scopes.size })
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
+  val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
+
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -211,6 +222,16 @@ private fun HomeContent(
         onEvent(ScopeSelected(scopes[page].id))
       }
   }
+
+  LaunchedEffect(model.scopes.size) {
+    val newSize = model.scopes.size
+    if (newSize > previousScopesSize.value) {
+      pagerState.animateScrollToPage(newSize - 1)
+    }
+    previousScopesSize.value = newSize
+  }
+
+
 
   val backCallback = remember {
     BackCallback {
@@ -244,7 +265,8 @@ private fun HomeContent(
               pagerState.animateScrollToPage(index)
             }
           },
-          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+          createNewScope = createNewScope
         )
       }
 

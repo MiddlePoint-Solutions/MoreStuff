@@ -57,7 +57,9 @@ fun homeModel(
           taskInputActive = false
         }
 
-        ShowTaskInput -> { taskInputActive = true }
+        ShowTaskInput -> {
+          taskInputActive = true
+        }
 
         ResetHomeState -> {
           selectedTasks = listOf()
@@ -104,6 +106,10 @@ fun homeModel(
             val notification = NotificationState.TaskMovedToScope(scope.name)
             launch { notifications.emit(notification) }
           }
+        }
+
+        is CreateScope -> {
+          createScopeUseCase(event.title)
         }
 
         is ScopeSelected -> currentScopeId = event.scopeId

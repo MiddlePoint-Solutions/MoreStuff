@@ -277,7 +277,9 @@ private fun ShareContent(
             pagerState.animateScrollToPage(index)
           }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+        createNewScope = {},
+        isCreateScopeVisible = false
       )
     }
 
