@@ -1,31 +1,26 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
-import arrow.core.right
+import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
-import io.middlepoint.morestuff.shared.domain.usecase.task.NA
-import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import io.mockk.unmockkAll
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlinx.coroutines.runBlocking
 
 class ReorderTaskUseCaseImplTest {
 
     private val priorityRepository: PriorityRepository = mockk()
-    private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase = mockk()
-
     private lateinit var reorderTaskUseCase: ReorderTaskUseCaseImpl
 
     @BeforeEach
     fun setup() {
-        reorderTaskUseCase = ReorderTaskUseCaseImpl(priorityRepository, updateTaskPriorityScoreUseCase)
+        reorderTaskUseCase = ReorderTaskUseCaseImpl(priorityRepository)
     }
 
     @AfterEach
@@ -34,63 +29,25 @@ class ReorderTaskUseCaseImplTest {
     }
 
     @Test
-    fun `when no above or below score, should return failure`() = runBlocking {
-        val result = reorderTaskUseCase.invoke(1)
-        assertTrue(result.isLeft())
+    fun `when task list is empty, should return success`() = runBlocking {
+        val result = reorderTaskUseCase.invoke(emptyList())
+        assertTrue(result.isRight())
     }
 
     @Test
-    fun `when only below score, should update task with below score + 1`() = runBlocking {
-        coEvery { updateTaskPriorityScoreUseCase(1, 6) } returns 6L.right()
+    fun `when task list is not empty, should reorder tasks based on highest priority`() = runBlocking {
+        val task1 = TaskUiModel(id = 1, title = "Task 1", priorityScore = 10)
+        val task2 = TaskUiModel(id = 2, title = "Task 2", priorityScore = 8)
+        val task3 = TaskUiModel(id = 3, title = "Task 3", priorityScore = 5)
+        val updatedTasks = listOf(task1, task2, task3)
 
-        val result = reorderTaskUseCase.invoke(1, NA, 5)
+        coEvery { priorityRepository.getHighestPriorityScore() } returns 100L
+        coEvery { priorityRepository.updateTasksPriorities(any()) } returns Either.Right(Unit)
+
+        val result = reorderTaskUseCase.invoke(updatedTasks)
         assertTrue(result.isRight())
-        assertEquals(6, result.getOrNull())
 
-        coVerify(exactly = 1) { updateTaskPriorityScoreUseCase(1, 6) }
-    }
-
-    @Test
-    fun `when only above score, should update task with above score - 1`() = runBlocking {
-        coEvery { updateTaskPriorityScoreUseCase(1, 4) } returns 4L.right()
-
-        val result = reorderTaskUseCase.invoke(1, 5, NA)
-        assertTrue(result.isRight())
-        assertEquals(4, result.getOrNull())
-
-        coVerify(exactly = 1) { updateTaskPriorityScoreUseCase(1, 4) }
-    }
-
-    @Test
-    fun `when both scores and above equals average, should reorder by adding`() = runBlocking {
-        coEvery { priorityRepository.updateTasksPriorityScoreByAdding(1, 5) } returns 5L.right()
-
-        val result = reorderTaskUseCase.invoke(1, 5, 5)
-        assertTrue(result.isRight())
-        assertEquals(5, result.getOrNull())
-
-        coVerify(exactly = 1) { priorityRepository.updateTasksPriorityScoreByAdding(1, 5) }
-    }
-
-    @Test
-    fun `when both scores and below equals average, should reorder by subtracting`() = runBlocking {
-        coEvery { priorityRepository.updateTasksPriorityScoreBySubtracting(1, 5) } returns 5L.right()
-
-        val result = reorderTaskUseCase.invoke(1, 6, 5)
-        assertTrue(result.isRight())
-        assertEquals(5, result.getOrNull())
-
-        coVerify(exactly = 1) { priorityRepository.updateTasksPriorityScoreBySubtracting(1, 5) }
-    }
-
-    @Test
-    fun `when both scores are different, should update task with average score`() = runBlocking {
-        coEvery { updateTaskPriorityScoreUseCase(1, 5) } returns 5L.right()
-
-        val result = reorderTaskUseCase.invoke(1, 6, 4)
-        assertTrue(result.isRight())
-        assertEquals(5, result.getOrNull())
-
-        coVerify(exactly = 1) { updateTaskPriorityScoreUseCase(1, 5) }
+        coVerify(exactly = 1) { priorityRepository.getHighestPriorityScore() }
+        coVerify(exactly = 1) { priorityRepository.updateTasksPriorities(any()) }
     }
 }
