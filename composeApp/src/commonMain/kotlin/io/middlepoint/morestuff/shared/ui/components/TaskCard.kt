@@ -89,7 +89,7 @@ fun TaskCard(
             .background(brush = Brush.verticalGradient(backgroundColors))
         ) {
           Messages(
-            messages = messages,
+            messages = messages.take(4),
             userInteractionEnabled = false,
             contentPadding = PaddingValues(top = 10.dp, bottom = 20.dp, end = 10.dp),
           )
