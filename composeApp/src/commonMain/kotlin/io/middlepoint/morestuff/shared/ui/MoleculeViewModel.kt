@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 
@@ -33,10 +34,17 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
   }
 
   fun take(event: Event) {
-    if (!events.tryEmit(event)) {
-      error("Event buffer overflow.")
+    viewModelScope.launch {
+      events.emit(event)
     }
   }
+
+
+  /*  fun take(event: Event) {
+      if (!events.tryEmit(event)) {
+        error("Event buffer overflow.")
+      }
+    }*/
 
   @Composable
   protected abstract fun models(events: SharedFlow<Event>): Model

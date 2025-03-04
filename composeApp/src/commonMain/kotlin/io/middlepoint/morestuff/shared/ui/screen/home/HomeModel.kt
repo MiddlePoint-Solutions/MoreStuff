@@ -121,14 +121,6 @@ fun homeModel(
           }
         }
 
-        is CompleteTask -> {
-          store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
-          val notification = NotificationState.Complete {
-            store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
-          }
-          launch { notifications.emit(notification) }
-        }
-
         is ToggleScopeReordering -> {
           reorderingScopes = reorderingScopes.toMutableMap().also {
             it[event.scopeId] = event.isReordering

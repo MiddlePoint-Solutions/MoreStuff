@@ -41,7 +41,6 @@ fun ScopeContent(
   onItemLongClick: (taskId: Long) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
-  onTaskComplete: (taskId: Long) -> Unit = {},
   isReordering: Boolean,
   onToggleReordering: (Boolean) -> Unit,
 ) {
@@ -106,9 +105,7 @@ fun ScopeContent(
             onToggleReordering(!isReordering)
             onItemLongClick(item.id)
           },
-          enabled = enabled,
           handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-          onTaskComplete = { onTaskComplete(item.id) },
           modifier = Modifier.animateItem(
             fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
             fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
