@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -44,16 +45,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import io.github.xxfast.decompose.router.rememberOnRoute
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
@@ -69,6 +67,7 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScop
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.channels.Channel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_add_new_scope
@@ -83,7 +82,6 @@ import morestuff.composeapp.generated.resources.edit_scope
 import morestuff.composeapp.generated.resources.sure_delete_scope
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -235,7 +233,7 @@ private fun OrderedScopesList(
 ) {
 //  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
 //  val model by viewModel.models.collectAsState()
-  var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
+/*  var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
   val menuVisibility = remember(scopes) {
     mutableStateMapOf<Long, Boolean>().apply {
       scopes.forEach { scope ->
@@ -252,7 +250,40 @@ private fun OrderedScopesList(
         add(to.index, removeAt(from.index))
       }
     }
+  )*/
+
+  var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
+
+  val menuVisibility = remember(scopes) {
+    mutableStateMapOf<Long, Boolean>().apply {
+      scopes.forEach { scope ->
+        put(scope.id, false)
+      }
+    }
+  }
+
+  val listState = rememberLazyListState()
+
+  val listUpdatedChannel = remember { Channel<Unit>(Channel.CONFLATED) }
+  fun updateList(from: Int, to: Int) {
+    val newList = scopes.toMutableList().apply {
+      val movedScope = removeAt(from)
+      add(to, movedScope)
+    }
+    scopes = newList
+  }
+
+  val reorderState = rememberReorderableLazyListState(
+    lazyListState = listState,
+    onMove = { from, to ->
+      listUpdatedChannel.tryReceive()
+      updateList(from.index, to.index)
+      listUpdatedChannel.receive()
+    }
   )
+  LaunchedEffect(scopes) {
+    listUpdatedChannel.trySend(Unit)
+  }
 
   Column(
     modifier = Modifier.padding(top = 20.dp)

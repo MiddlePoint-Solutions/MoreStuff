@@ -26,6 +26,7 @@ import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.theme.divider
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
@@ -47,14 +48,26 @@ fun ScopeContent(
 
   var reorderList by remember(tasks) { mutableStateOf(tasks) }
 
-  val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
+  fun updateList(from: Int, to: Int) {
     val newList = reorderList.toMutableList().apply {
-      val movedTask = removeAt(from.index)
-      add(to.index, movedTask)
+      val movedTask = removeAt(from)
+      add(to, movedTask)
     }
     reorderList = newList
     onReorder(newList)
   }
+
+  val listUpdatedChannel = remember { Channel<Unit>(Channel.CONFLATED) }
+  val reorderableState = rememberReorderableLazyListState(listState) { from, to ->
+    listUpdatedChannel.tryReceive()
+    updateList(from.index, to.index)
+    listUpdatedChannel.receive()
+  }
+
+  LaunchedEffect(reorderList) {
+    listUpdatedChannel.trySend(Unit)
+  }
+
 
   LaunchedEffect(reorderList) {
     if (reorderList != tasks) {
