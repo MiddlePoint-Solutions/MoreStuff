@@ -243,7 +243,6 @@ fun ToggleTaskAsDone(
   enabled: Boolean = true,
   modifier: Modifier = Modifier
 ) {
-  // Aquí se aplica la traslación solo al contenedor externo
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
@@ -254,7 +253,6 @@ fun ToggleTaskAsDone(
       targetState = selectedToComplete,
       label = "Toggle task completion animation",
       transitionSpec = { scaleIn() togetherWith fadeOut() },
-      // Usamos un modificador "limpio" para el contenido interno
       modifier = Modifier.align(Alignment.Center)
     ) { completed ->
       when (completed) {
