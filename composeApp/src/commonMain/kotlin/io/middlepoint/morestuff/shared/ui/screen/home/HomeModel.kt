@@ -127,6 +127,13 @@ fun homeModel(
           }
         }
 
+        is CompleteTask -> {
+          store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
+          val notification = NotificationState.Complete {
+            store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+          }
+          launch { notifications.emit(notification) }
+        }
       }
     }
   }

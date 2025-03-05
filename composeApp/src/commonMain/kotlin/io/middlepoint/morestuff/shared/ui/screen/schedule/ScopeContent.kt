@@ -40,10 +40,12 @@ fun ScopeContent(
   selectedTasks: List<Long> = listOf(),
   onItemClick: (taskId: Long) -> Unit = {},
   onItemLongClick: (taskId: Long) -> Unit = {},
+  onTaskComplete: (taskId: Long) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
   isReordering: Boolean,
   onToggleReordering: (Boolean) -> Unit,
+  onClearSelection: () -> Unit = {},
 ) {
 
   var reorderList by remember(tasks) { mutableStateOf(tasks) }
@@ -75,9 +77,9 @@ fun ScopeContent(
     }
   }
 
-  LaunchedEffect(selectedTasks) {
-    if (selectedTasks.isEmpty()) {
-      onToggleReordering(false)
+  LaunchedEffect(isReordering) {
+    if (!isReordering) {
+      onClearSelection()
     }
   }
 
@@ -105,25 +107,31 @@ fun ScopeContent(
       ReorderableItem(reorderableState, key = item.id) {
         PriorityItem(
           task = item,
-          selected = selected,
-          hasSelection = isReordering,
-          onClick = {
+          isSelected = selected,
+          isReorderModeActive = isReordering,
+          onTaskClick = {
             if (isReordering) {
               onItemLongClick(item.id)
             } else {
               onItemClick(item.id)
             }
           },
-          onLongClick = {
-            onToggleReordering(!isReordering)
-            onItemLongClick(item.id)
+
+          onTaskLongPress = {
+            if (!isReordering) {
+              onToggleReordering(true)
+            } else {
+              onToggleReordering(false)
+            }
           },
           handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
           modifier = Modifier.animateItem(
             fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
             fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
             placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
-          )
+          ),
+          onTaskComplete = { onTaskComplete(item.id) },
+          enabled = enabled,
         )
       }
 

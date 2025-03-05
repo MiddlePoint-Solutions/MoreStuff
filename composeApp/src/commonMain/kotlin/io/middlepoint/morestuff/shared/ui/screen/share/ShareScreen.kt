@@ -374,8 +374,9 @@ private fun ShareTasksList(
       ) { task ->
         PriorityItem(
           task = task,
-          onClick = { shareToTask(task.id) },
-          onLongClick = {},
+          onTaskClick = { shareToTask(task.id) },
+          onTaskLongPress = {},
+          onTaskComplete = {}
         )
 
         HorizontalDivider(

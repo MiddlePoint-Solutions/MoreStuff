@@ -60,9 +60,10 @@ fun HomeTopBar(
     completeSelectedTasks: () -> Unit,
     deleteSelectedTasks: () -> Unit,
     selectScope: () -> Unit,
+    isReorderingActive: Boolean,
 ) {
 
-    val taskSelectionActive = remember(selectedTaskCount) { selectedTaskCount > 0 }
+    val taskSelectionActive = remember(selectedTaskCount, isReorderingActive) { selectedTaskCount > 0 || isReorderingActive }
     val transition = updateTransition(taskSelectionActive, label = "Selection state")
     var showMenu by remember { mutableStateOf(false) }
 

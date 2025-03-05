@@ -7,7 +7,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,11 +58,13 @@ import org.koin.compose.koinInject
 @Composable
 fun PriorityItem(
   task: TaskUiModel,
-  onClick: () -> Unit,
-  onLongClick: () -> Unit,
+  onTaskClick: () -> Unit,
+  onTaskComplete: (Boolean) -> Unit,
+  enabled: Boolean = true,
+  onTaskLongPress: () -> Unit,
   modifier: Modifier = Modifier,
-  selected: Boolean = false,
-  hasSelection: Boolean = false,
+  isSelected: Boolean = false,
+  isReorderModeActive: Boolean = false,
   handleModifier: Modifier = Modifier,
 ) {
 
@@ -68,7 +72,7 @@ fun PriorityItem(
   val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
 
   val offsetX by animateDpAsState(
-    targetValue = if (hasSelection) 4.dp else 0.dp,
+    targetValue = if (isReorderModeActive) 4.dp else 0.dp,
     label = "PriorityItemOffset"
   )
 
@@ -81,10 +85,10 @@ fun PriorityItem(
       .height(80.dp)
       .background(color = MaterialTheme.colorScheme.surfaceContainer)
       .combinedClickable(
-        onClick = onClick,
+        onClick = onTaskClick,
         onLongClick = {
           haptic.performHapticFeedback(ReorderHapticFeedbackType.START)
-          onLongClick()
+          onTaskLongPress()
         })
   ) {
     Row(
@@ -94,11 +98,15 @@ fun PriorityItem(
       verticalAlignment = Alignment.CenterVertically,
     ) {
 
-      if (selected || hasSelection) {
+      if (isReorderModeActive) {
         AnimatedVisibility(
-          visible = selected || hasSelection,
-          enter = scaleIn(initialScale = 0.3f) + fadeIn(animationSpec = tween(500)),
-          exit = scaleOut(targetScale = 1.5f) + fadeOut(animationSpec = tween(500))
+          visible = isReorderModeActive,
+          enter = slideInHorizontally(
+            initialOffsetX = { -40 }
+          ) + fadeIn(animationSpec = tween(1000)),
+          exit = slideOutHorizontally(
+            targetOffsetX = { 40 }
+          ) + fadeOut(animationSpec = tween(1000))
         ) {
           Box(
             modifier = handleModifier
@@ -122,8 +130,12 @@ fun PriorityItem(
       ) {
         Box {
           TaskProfile(task.title)
-
-          if (selected) {
+          androidx.compose.animation.AnimatedVisibility(
+            visible = isSelected,
+            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
+            exit = fadeOut(animationSpec = tween(durationMillis = 300)),
+            modifier = Modifier.align(Alignment.BottomEnd)
+          ) {
             Icon(
               imageVector = Icons.Default.CheckCircle,
               contentDescription = null,
@@ -164,12 +176,62 @@ fun PriorityItem(
           )
         )
 
+
       }
+
     }
+    if (isSelected || isReorderModeActive) {
+      ToggleTaskAsDone(
+        modifier = Modifier
+          .align(Alignment.Center)
+          .graphicsLayer { translationX = 116.dp.toPx() },
+        selectedToComplete = isCompleted,
+        onClick = {
+          isCompleted = !isCompleted
+          onTaskComplete(isCompleted)
+        },
+        enabled = enabled,
+
+        )
+    }
+
     TaskItemBadges(
       task = task,
-      modifier = Modifier.align(Alignment.BottomEnd)
+      modifier = Modifier
+        .align(Alignment.BottomEnd)
+        .padding(end = 8.dp, bottom = 4.dp)
     )
+    /*    Row(
+          modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(end = 8.dp, bottom = 8.dp),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+          if (isSelected || isReorderModeActive) {
+            ToggleTaskAsDone(
+              selectedToComplete = isCompleted,
+              onClick = {
+                isCompleted = !isCompleted
+                onTaskComplete(isCompleted)
+              },
+              enabled = enabled,
+              modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
+            )
+          }
+
+          Box(
+            modifier = Modifier.widthIn(min = 48.dp),
+            contentAlignment = Alignment.BottomEnd
+          ) {
+            TaskItemBadges(
+              task = task,
+              modifier = Modifier.align(Alignment.BottomEnd)
+            )
+          }
+
+        }*/
+
   }
 }
 
@@ -179,19 +241,20 @@ fun ToggleTaskAsDone(
   selectedToComplete: Boolean,
   onClick: () -> Unit,
   enabled: Boolean = true,
+  modifier: Modifier = Modifier
 ) {
+  // Aquí se aplica la traslación solo al contenedor externo
   Box(
     contentAlignment = Alignment.Center,
-    modifier = Modifier
+    modifier = modifier
       .size(30.dp)
-      .clickable(enabled = enabled) {
-        onClick() // Llamamos a onClick sin mantener un estado interno
-      }
+      .clickable(enabled = enabled) { onClick() }
   ) {
     AnimatedContent(
-      targetState = selectedToComplete, // Ahora depende completamente del estado externo
+      targetState = selectedToComplete,
       label = "Toggle task completion animation",
       transitionSpec = { scaleIn() togetherWith fadeOut() },
+      // Usamos un modificador "limpio" para el contenido interno
       modifier = Modifier.align(Alignment.Center)
     ) { completed ->
       when (completed) {
@@ -216,3 +279,4 @@ fun ToggleTaskAsDone(
     }
   }
 }
+

@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -75,6 +76,7 @@ import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -94,6 +96,8 @@ fun HomeScreen() {
   var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
   val model by homePresenter.models.collectAsState()
+  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
+  var isReorderingActive = remember { mutableStateOf(false) }
 
 
   MoreStuffHomeScaffold(
@@ -105,10 +109,14 @@ fun HomeScreen() {
         reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
         settingsSelected = { navigation.push(Screen.Settings) },
         searchAction = { isSearchActive = true },
-        clearTaskSelection = { homePresenter.take(ResetHomeState) },
+        clearTaskSelection = {
+          homePresenter.take(ResetHomeState)
+          isReorderingActive.value = false
+        },
         completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteConfirmationDialog = true },
         selectScope = { showScopeSelection = true },
+        isReorderingActive = isReorderingActive.value
       )
     },
     content = {
@@ -123,8 +131,21 @@ fun HomeScreen() {
               navigation.pop()
             }
             navigation.push(createScopeScreen)
-
-          }
+          },
+          onTaskComplete = { taskId ->
+            if (pendingCompletionTasks.contains(taskId)) {
+              pendingCompletionTasks[taskId]?.cancel()
+              pendingCompletionTasks.remove(taskId)
+            } else {
+              val job = coroutineScope.launch {
+                delay(1000)
+                homePresenter.take(HomeEvent.CompleteTask(taskId))
+                pendingCompletionTasks.remove(taskId)
+              }
+              pendingCompletionTasks[taskId] = job
+            }
+          },
+          onReorderingChanged = { isReordering -> isReorderingActive.value = isReordering }
         )
       }
     },
@@ -190,7 +211,9 @@ private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
   createNewScope: () -> Unit,
+  onTaskComplete: (Long) -> Unit,
   modifier: Modifier = Modifier,
+  onReorderingChanged: (Boolean) -> Unit,
 ) {
   val coroutineScope = rememberCoroutineScope()
   val navigation = LocalAppRouter.current
@@ -325,17 +348,19 @@ private fun HomeContent(
                   model.scopes.forEach { scope ->
                     onEvent(ToggleScopeReordering(scope.id, newValue))
                   }
-                }
 
-                /*onToggleReordering = { newValue ->
-                  onEvent(ToggleScopeReordering(scope.id, newValue))
-                }*/
+                  onReorderingChanged(newValue)
+
+                },
+                onTaskComplete = { taskId ->
+                  onTaskComplete(taskId)
+                },
+                onClearSelection = { onEvent(ResetHomeState) }
               )
             }
           }
 
           ScopeTasksModels.Loading -> {
-
           }
         }
       }
