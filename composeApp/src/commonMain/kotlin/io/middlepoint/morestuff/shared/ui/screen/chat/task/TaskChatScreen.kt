@@ -215,6 +215,8 @@ private fun TaskChatContent(
   val messages = model.messages
   val platformContext = com.mohamedrejeb.calf.core.LocalPlatformContext.current
   val focusManager = LocalFocusManager.current
+  var titleLineCount by remember { mutableStateOf(0) }
+
 
   val singleImagePickerLauncher =
     rememberFilePickerLauncher(
@@ -264,13 +266,17 @@ private fun TaskChatContent(
       Column(
         modifier = Modifier.fillMaxSize()
       ) {
+        val contentPadding = if (titleLineCount > 1)
+          PaddingValues(top = 74.dp, bottom = 20.dp)
+        else
+          PaddingValues(top = 40.dp, bottom = 20.dp)
 
         Messages(
           messages = messages,
           actions = chatActions,
           modifier = modifier.weight(1f),
           scrollState = scrollState,
-          contentPadding = PaddingValues(top = 40.dp, bottom = 20.dp)
+          contentPadding = contentPadding
         )
 
         AnimatedVisibility(
@@ -315,9 +321,12 @@ private fun TaskChatContent(
         }
       }
 
-      TaskDetails(
+      TaskDetails(//TODO
         taskId = task.id,
-        modifier = Modifier.align(Alignment.TopCenter)
+        modifier = Modifier.align(Alignment.TopCenter),
+        onTitleLineCount = { count ->
+          titleLineCount = count
+        }
       )
     }
   }

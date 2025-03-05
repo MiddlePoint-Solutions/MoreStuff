@@ -15,7 +15,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -161,7 +164,7 @@ fun PriorityItem(
         Text(
           text = title,
           modifier = Modifier
-            .weight(1f)
+            .fillMaxWidth(0.85f)
             .padding(12.dp),
           maxLines = 2,
           color = MaterialTheme.colorScheme.onSurface,
@@ -180,27 +183,47 @@ fun PriorityItem(
       }
 
     }
-    if (isSelected || isReorderModeActive) {
-      ToggleTaskAsDone(
-        modifier = Modifier
-          .align(Alignment.Center)
-          .graphicsLayer { translationX = 116.dp.toPx() },
-        selectedToComplete = isCompleted,
-        onClick = {
-          isCompleted = !isCompleted
-          onTaskComplete(isCompleted)
-        },
-        enabled = enabled,
+    Column(
+      modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp).width(48.dp),
+      verticalArrangement = Arrangement.spacedBy(4.dp),
+      horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+      if (isSelected || isReorderModeActive) {
+        ToggleTaskAsDone(
 
+          selectedToComplete = isCompleted,
+          onClick = {
+            isCompleted = !isCompleted
+            onTaskComplete(isCompleted)
+          },
+          enabled = enabled,
         )
+      }
+      TaskItemBadges(
+        task = task,
+      )
     }
 
-    TaskItemBadges(
-      task = task,
-      modifier = Modifier
-        .align(Alignment.BottomEnd)
-        .padding(end = 8.dp, bottom = 4.dp)
-    )
+    /*    if (isSelected || isReorderModeActive) {
+          ToggleTaskAsDone(
+            modifier = Modifier
+              .align(Alignment.Center)
+              .graphicsLayer { translationX = 130.dp.toPx() },
+            selectedToComplete = isCompleted,
+            onClick = {
+              isCompleted = !isCompleted
+              onTaskComplete(isCompleted)
+            },
+            enabled = enabled,
+
+            )
+        }
+
+        TaskItemBadges(
+          task = task,
+          modifier = Modifier
+            .align(Alignment.BottomEnd)
+        )*/
     /*    Row(
           modifier = Modifier
             .align(Alignment.CenterEnd)

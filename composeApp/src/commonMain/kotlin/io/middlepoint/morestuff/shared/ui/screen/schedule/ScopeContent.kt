@@ -83,6 +83,12 @@ fun ScopeContent(
     }
   }
 
+  LaunchedEffect(selectedTasks) {
+    if (selectedTasks.isEmpty()) {
+      onToggleReordering(false)
+    }
+  }
+
   LazyColumn(
     modifier = modifier
       .fillMaxSize()
@@ -120,6 +126,7 @@ fun ScopeContent(
           onTaskLongPress = {
             if (!isReordering) {
               onToggleReordering(true)
+              onItemLongClick(item.id)
             } else {
               onToggleReordering(false)
             }

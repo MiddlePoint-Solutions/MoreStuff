@@ -76,6 +76,7 @@ fun TaskDetails(
   taskId: Long,
   modifier: Modifier = Modifier,
   taskOptions: @Composable ColumnScope.() -> Unit = {},
+  onTitleLineCount: (Int) -> Unit
 ) {
 
   val viewModel = koinInjectOnRoute(
@@ -240,6 +241,8 @@ fun TaskDetails(
                     it.getLineEnd(0, visibleEnd = true)
                   }
                 }
+                onTitleLineCount(it.lineCount)
+
               },
               maxLines = if (isEditing || showSchedule) 4 else 2,
               textStyle = MaterialTheme.typography.headlineSmall.copy(
