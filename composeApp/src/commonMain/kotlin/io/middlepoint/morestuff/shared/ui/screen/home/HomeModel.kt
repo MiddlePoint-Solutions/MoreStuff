@@ -129,8 +129,10 @@ fun homeModel(
 
         is CompleteTask -> {
           store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
+          selectedTasks = selectedTasks - event.taskId
           val notification = NotificationState.Complete {
             store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+            selectedTasks = selectedTasks + event.taskId
           }
           launch { notifications.emit(notification) }
         }

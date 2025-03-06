@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.components.TaskItemBadges
+import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.completed
@@ -56,20 +57,8 @@ fun CompletePriorityItem(
       verticalAlignment = Alignment.CenterVertically,
     ) {
 
-      //TaskProfile(task.title)
-      Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-          .size(30.dp)
+      TaskProfile(task.title)
 
-      ) {
-        Icon(
-          imageVector = Icons.Filled.CheckCircle,
-          contentDescription = "Completed Task",
-          modifier = Modifier.fillMaxSize(),
-          tint = MaterialTheme.colorScheme.onSurface
-        )
-      }
 
       Column(
         modifier = Modifier.padding(12.dp),
@@ -100,6 +89,19 @@ fun CompletePriorityItem(
             )
           )
         }
+      }
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .size(18.dp)
+
+      ) {
+        Icon(
+          imageVector = Icons.Filled.CheckCircle,
+          contentDescription = "Completed Task",
+          modifier = Modifier.fillMaxSize() .padding(end = 18.dp),
+          tint = MaterialTheme.colorScheme.onSurface
+        )
       }
       /*Icon(
         imageVector = vectorResource(Res.drawable.ic_check_circle),
