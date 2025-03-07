@@ -2,13 +2,16 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -43,7 +46,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -184,77 +186,34 @@ fun PriorityItem(
 
     }
     Column(
-      modifier = Modifier.align(Alignment.BottomEnd).padding(end = 8.dp).width(48.dp),
+      modifier = Modifier
+        .align(if (isSelected || isReorderModeActive) Alignment.CenterEnd else Alignment.BottomEnd)
+        .padding(end = 8.dp)
+        .width(48.dp),
       verticalArrangement = Arrangement.spacedBy(4.dp),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      if (isSelected || isReorderModeActive) {
-        ToggleTaskAsDone(
-
-          selectedToComplete = isCompleted,
-          onClick = {
-            isCompleted = !isCompleted
-            onTaskComplete(isCompleted)
-          },
-          enabled = enabled,
-        )
-      }
-      TaskItemBadges(
-        task = task,
-      )
-    }
-
-    /*    if (isSelected || isReorderModeActive) {
+      AnimatedContent(
+        targetState = isSelected || isReorderModeActive,
+        transitionSpec = {
+          (fadeIn() + slideInVertically()).togetherWith(fadeOut() + slideOutVertically())
+        },
+        label = "Task Toggle Transition"
+      ) { showToggleTaskAsDone ->
+        if (showToggleTaskAsDone) {
           ToggleTaskAsDone(
-            modifier = Modifier
-              .align(Alignment.Center)
-              .graphicsLayer { translationX = 130.dp.toPx() },
             selectedToComplete = isCompleted,
             onClick = {
               isCompleted = !isCompleted
               onTaskComplete(isCompleted)
             },
             enabled = enabled,
-
-            )
+          )
+        } else {
+          TaskItemBadges(task = task)
         }
-
-        TaskItemBadges(
-          task = task,
-          modifier = Modifier
-            .align(Alignment.BottomEnd)
-        )*/
-    /*    Row(
-          modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .padding(end = 8.dp, bottom = 8.dp),
-          verticalAlignment = Alignment.CenterVertically,
-          horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-          if (isSelected || isReorderModeActive) {
-            ToggleTaskAsDone(
-              selectedToComplete = isCompleted,
-              onClick = {
-                isCompleted = !isCompleted
-                onTaskComplete(isCompleted)
-              },
-              enabled = enabled,
-              modifier = Modifier.align(Alignment.CenterVertically).weight(1f)
-            )
-          }
-
-          Box(
-            modifier = Modifier.widthIn(min = 48.dp),
-            contentAlignment = Alignment.BottomEnd
-          ) {
-            TaskItemBadges(
-              task = task,
-              modifier = Modifier.align(Alignment.BottomEnd)
-            )
-          }
-
-        }*/
-
+      }
+    }
   }
 }
 
