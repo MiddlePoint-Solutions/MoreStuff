@@ -2,16 +2,13 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -193,15 +190,14 @@ fun PriorityItem(
       verticalArrangement = Arrangement.spacedBy(4.dp),
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      AnimatedContent(
-        targetState = isSelected || isReorderModeActive,
-        transitionSpec = {
-          (fadeIn() + slideInVertically()).togetherWith(fadeOut() + slideOutVertically())
-        },
-        label = "Task Toggle Transition"
-      ) { showToggleTaskAsDone ->
-        if (showToggleTaskAsDone) {
+      Box(modifier = Modifier.height(48.dp).width(48.dp), contentAlignment = Alignment.Center) {
+        androidx.compose.animation.AnimatedVisibility(
+          visible = isSelected || isReorderModeActive,
+          enter = fadeIn(),
+          exit = fadeOut()
+        ) {
           ToggleTaskAsDone(
+            modifier = Modifier.fillMaxSize(),
             selectedToComplete = isCompleted,
             onClick = {
               isCompleted = !isCompleted
@@ -209,8 +205,17 @@ fun PriorityItem(
             },
             enabled = enabled,
           )
-        } else {
-          TaskItemBadges(task = task)
+        }
+
+        androidx.compose.animation.AnimatedVisibility(
+          visible = !(isSelected || isReorderModeActive),
+          enter = fadeIn(),
+          exit = fadeOut()
+        ) {
+          TaskItemBadges(
+            modifier = Modifier.fillMaxSize(),
+            task = task
+          )
         }
       }
     }
@@ -242,7 +247,7 @@ fun ToggleTaskAsDone(
           Icon(
             imageVector = Icons.Filled.CheckCircle,
             contentDescription = "Completed Task",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.size(30.dp),
             tint = MaterialTheme.colorScheme.onSurface
           )
         }
@@ -251,7 +256,7 @@ fun ToggleTaskAsDone(
           Icon(
             imageVector = Icons.Outlined.Circle,
             contentDescription = "Incomplete Task",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.size(30.dp),
             tint = MaterialTheme.colorScheme.onSurface
           )
         }
