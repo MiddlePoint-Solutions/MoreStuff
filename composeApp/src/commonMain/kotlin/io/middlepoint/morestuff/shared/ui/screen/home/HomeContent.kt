@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -47,6 +48,7 @@ import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
@@ -56,20 +58,25 @@ import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.show
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
+import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -89,6 +96,9 @@ fun HomeScreen() {
   var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
   val model by homePresenter.models.collectAsState()
+  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
+  var isReorderingActive = remember { mutableStateOf(false) }
+
 
   MoreStuffHomeScaffold(
     snackbarHostState = snackbarHostState,
@@ -99,10 +109,14 @@ fun HomeScreen() {
         reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
         settingsSelected = { navigation.push(Screen.Settings) },
         searchAction = { isSearchActive = true },
-        clearTaskSelection = { homePresenter.take(ResetHomeState) },
+        clearTaskSelection = {
+          homePresenter.take(ResetHomeState)
+          isReorderingActive.value = false
+        },
         completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteConfirmationDialog = true },
         selectScope = { showScopeSelection = true },
+        isReorderingActive = isReorderingActive.value
       )
     },
     content = {
@@ -111,6 +125,27 @@ fun HomeScreen() {
           model = model,
           onEvent = homePresenter::take,
           modifier = Modifier.padding(it),
+          createNewScope = {
+            val createScopeScreen = Screen.CreateScope {
+              homePresenter.take(CreateScope(it))
+              navigation.pop()
+            }
+            navigation.push(createScopeScreen)
+          },
+          onTaskComplete = { taskId ->
+            if (pendingCompletionTasks.contains(taskId)) {
+              pendingCompletionTasks[taskId]?.cancel()
+              pendingCompletionTasks.remove(taskId)
+            } else {
+              val job = coroutineScope.launch {
+                delay(1000)
+                homePresenter.take(HomeEvent.CompleteTask(taskId))
+                pendingCompletionTasks.remove(taskId)
+              }
+              pendingCompletionTasks[taskId] = job
+            }
+          },
+          onReorderingChanged = { isReordering -> isReorderingActive.value = isReordering }
         )
       }
     },
@@ -175,7 +210,10 @@ fun HomeScreen() {
 private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
+  createNewScope: () -> Unit,
+  onTaskComplete: (Long) -> Unit,
   modifier: Modifier = Modifier,
+  onReorderingChanged: (Boolean) -> Unit,
 ) {
   val coroutineScope = rememberCoroutineScope()
   val navigation = LocalAppRouter.current
@@ -187,6 +225,8 @@ private fun HomeContent(
   val pagerState = rememberPagerState(pageCount = { model.scopes.size })
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
+  val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
+
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -198,6 +238,15 @@ private fun HomeContent(
         onEvent(ScopeSelected(scopes[page].id))
       }
   }
+
+  LaunchedEffect(model.scopes.size) {
+    val newSize = model.scopes.size
+    if (newSize > previousScopesSize.value) {
+      pagerState.animateScrollToPage(newSize - 1)
+    }
+    previousScopesSize.value = newSize
+  }
+
 
   val backCallback = remember {
     BackCallback {
@@ -231,7 +280,8 @@ private fun HomeContent(
               pagerState.animateScrollToPage(index)
             }
           },
-          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+          createNewScope = createNewScope
         )
       }
 
@@ -274,7 +324,7 @@ private fun HomeContent(
         when (val tasksModel = scopeTasks) {
           is ScopeTasksModels.Data -> {
             if (tasksModel.tasks.isEmpty()) {
-              EmptyScopeContent { onEvent(HomeEvent.ShowTaskInput) }
+              EmptyScopeContent { onEvent(ShowTaskInput) }
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
@@ -288,13 +338,29 @@ private fun HomeContent(
                 },
                 onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
                 listState = states[page],
-                enabled = !taskInputActive
+                enabled = !taskInputActive,
+                onReorder = { updatedTasks ->
+                  logger.d { "Reordering tasks..." }
+                  scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
+                },
+                isReordering = model.reorderingScopes[scope.id] ?: false,
+                onToggleReordering = { newValue ->
+                  model.scopes.forEach { scope ->
+                    onEvent(ToggleScopeReordering(scope.id, newValue))
+                  }
+
+                  onReorderingChanged(newValue)
+
+                },
+                onTaskComplete = { taskId ->
+                  onTaskComplete(taskId)
+                },
+                onClearSelection = { onEvent(ResetHomeState) }
               )
             }
           }
 
           ScopeTasksModels.Loading -> {
-
           }
         }
       }
@@ -309,7 +375,7 @@ private fun HomeContent(
       exit = scaleOut() + fadeOut()
     ) {
       FloatingActionButton(
-        onClick = { onEvent(HomeEvent.ShowTaskInput) },
+        onClick = { onEvent(ShowTaskInput) },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {

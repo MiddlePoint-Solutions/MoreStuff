@@ -1,11 +1,42 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import arrow.core.Either
-import arrow.core.left
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.TaskReorderFailure
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
+import io.middlepoint.morestuff.shared.domain.service.logger
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
+
+interface ReorderTaskUseCase {
+    suspend operator fun invoke(updatedTasks: List<TaskUiModel>): Either<Failure, Unit>
+}
+
+class ReorderTaskUseCaseImpl(
+    private val priorityRepository: PriorityRepository
+) : ReorderTaskUseCase {
+    override suspend operator fun invoke(updatedTasks: List<TaskUiModel>): Either<Failure, Unit> {
+        if (updatedTasks.isEmpty()) return Either.Right(Unit)
+
+        val highestPriority = priorityRepository.getHighestPriorityScore()
+
+        val updatedPriorities = updatedTasks.mapIndexed { index, task ->
+            val newPriority = highestPriority - index
+            logger.d { "Updating ${task.title} (ID: ${task.id}) from ${task.priorityScore} to $newPriority" }
+            task.copy(priorityScore = newPriority)
+        }
+
+        return priorityRepository.updateTasksPriorities(updatedPriorities)
+    }
+}
+
+
+
+
+
+
+
+
+/*
 val NA: Nothing? = null
 
 
@@ -49,4 +80,4 @@ class ReorderTaskUseCaseImpl(
             }
         }
     }
-}
+}*/

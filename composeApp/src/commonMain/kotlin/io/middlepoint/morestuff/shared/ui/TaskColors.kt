@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.Color
 object TaskColors {
 
     fun getProfileColorsForTask(title: String) = profileColors[taskTitleToNumber(title)]
+    fun getPrimaryColorForTask(title: String): Color =
+        getProfileColorsForTask(title).first()
 
     private val profileColors = listOf(
         listOf(

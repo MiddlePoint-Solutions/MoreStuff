@@ -28,7 +28,7 @@ fun TaskItemBadges(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(12.dp),
+        modifier = modifier.padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(5.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -36,7 +36,7 @@ fun TaskItemBadges(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Notes,
                 contentDescription = stringResource(Res.string.cd_task_message_icon),
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -45,7 +45,7 @@ fun TaskItemBadges(
             Icon(
                 imageVector = vectorResource(Res.drawable.ic_schedule),
                 contentDescription = stringResource(Res.string.cd_scheduled_task_icon),
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -54,7 +54,7 @@ fun TaskItemBadges(
             Icon(
                 imageVector = Icons.Default.NotificationsActive,
                 contentDescription = stringResource(Res.string.cd_task_reminder_icon),
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }

@@ -13,6 +13,7 @@ import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
+import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
@@ -28,6 +29,7 @@ actual val platformModule: Module = module {
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
+    singleOf(::SharedFunctionsHandler)
 
     single { WorkManager.getInstance(androidApplication()) }
     single { NotificationManagerCompat.from(androidApplication()) }

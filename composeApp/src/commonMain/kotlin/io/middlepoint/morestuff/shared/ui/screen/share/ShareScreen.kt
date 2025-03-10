@@ -60,14 +60,13 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.ui.components.PriorityItem
-import io.middlepoint.morestuff.shared.ui.components.TaskProfile
-import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.InputItem
+import io.middlepoint.morestuff.shared.ui.components.PriorityItem
+import io.middlepoint.morestuff.shared.ui.components.TaskProfile
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeTabs
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
@@ -278,7 +277,9 @@ private fun ShareContent(
             pagerState.animateScrollToPage(index)
           }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+        createNewScope = {},
+        isCreateScopeVisible = false
       )
     }
 
@@ -326,7 +327,11 @@ private fun ShareContent(
               tasks = tasksModel.tasks,
               onItemClick = { taskId -> shareToTask(taskId) },
               listState = states[page],
-              enabled = !taskInputActive
+              enabled = !taskInputActive,
+              onReorder = {},
+              isReordering = false,
+              onToggleReordering = {},
+
             )
           }
         }
@@ -369,8 +374,9 @@ private fun ShareTasksList(
       ) { task ->
         PriorityItem(
           task = task,
-          onClick = { shareToTask(task.id) },
-          onLongClick = {},
+          onTaskClick = { shareToTask(task.id) },
+          onTaskLongPress = {},
+          onTaskComplete = {}
         )
 
         HorizontalDivider(
