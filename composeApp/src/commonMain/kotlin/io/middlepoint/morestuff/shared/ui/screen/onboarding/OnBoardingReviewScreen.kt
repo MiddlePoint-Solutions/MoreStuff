@@ -70,10 +70,26 @@ fun OnBoardingReviewScreen(
       Res.string.onboarding_review_task10,
     )
 
+    val createDates = listOf(
+      "2025-03-10",
+      "2025-03-11",
+      "2025-03-12",
+      "2025-03-13",
+      "2025-03-14",
+      "2025-03-15",
+      "2025-03-16",
+      "2025-03-17",
+      "2025-03-18",
+      "2025-03-19"
+    )
+
+
+
+
     tasks = List(ids.size) { index ->
       ReviewItemUiModel(
         id = index.toLong(),
-        createTime = "",
+        createTime = createDates[index],
         title = getString(ids[index]),
         position = "${index + 1}/${ids.size}",
         priorityScore = 5,
