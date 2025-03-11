@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -68,8 +69,17 @@ fun InputItem(
   var showSchedulePickers by remember { mutableStateOf(false) }
 
   val focusRequester = remember { FocusRequester() }
+  val keyboardController = LocalSoftwareKeyboardController.current
+
 
   LaunchedEffect(Unit) { focusRequester.requestFocus() }
+
+  LaunchedEffect(showSchedulePickers) {
+    if (!showSchedulePickers) {
+      focusRequester.requestFocus()
+      keyboardController?.show()
+    }
+  }
 
   Column {
     Row(
@@ -150,8 +160,18 @@ fun InputItem(
         PlanPrioritySelector(
           scheduleModel = schedule,
           modifier = Modifier.fillMaxWidth(),
-          onDateChange = onDateChange,
-          onTimeChange = onTimeChange
+          onDateChange = { newDate ->
+            onDateChange(newDate)
+            focusRequester.requestFocus()
+            keyboardController?.show()
+          },
+          onTimeChange = { hour, minute ->
+            onTimeChange(hour, minute)
+            focusRequester.requestFocus()
+            keyboardController?.show()
+          }
+         /* onDateChange = onDateChange,
+          onTimeChange = onTimeChange*/
         )
       }
     }
