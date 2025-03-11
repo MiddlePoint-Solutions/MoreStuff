@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,93 +39,124 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.middlepoint.morestuff.shared.ui.components.priority.PlanPrioritySelector
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
+import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
+import morestuff.composeapp.generated.resources.ic_schedule
 import morestuff.composeapp.generated.resources.main_input_hint
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+
 
 @Composable
 fun InputItem(
   modifier: Modifier = Modifier,
   onDone: (String) -> Unit = {},
-  onCancel: () -> Unit = {}
+  onCancel: () -> Unit = {},
+  onTimeChange: (Int, Int) -> Unit,
+  onDateChange: (Long) -> Unit,
+  onSetPriority: () -> Unit,
+  schedule: ScheduleUiModel?,
 ) {
-
   var inputValue by rememberSaveable(
     stateSaver = TextFieldValue.Saver,
     key = "inputValue"
-  ) {
-    mutableStateOf(TextFieldValue(text = ""))
-  }
+  ) { mutableStateOf(TextFieldValue(text = "")) }
+
+  var showSchedulePickers by remember { mutableStateOf(false) }
 
   val focusRequester = remember { FocusRequester() }
 
-  LaunchedEffect(Unit) {
-    focusRequester.requestFocus()
-  }
+  LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
-  Row(
-    modifier = modifier
-      .fillMaxWidth()
-      .height(100.dp)
-      .padding(start = 24.dp, end = 12.dp),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.Start
-  ) {
-
-    BasicTextField(
-      value = inputValue,
-      onValueChange = { inputValue = it },
-      modifier = Modifier
-        .weight(0.95f)
-        .width(IntrinsicSize.Max)
-        .clearFocusOnKeyboardDismiss()
-        .focusRequester(focusRequester),
-      keyboardOptions = KeyboardOptions(
-        capitalization = KeyboardCapitalization.Sentences,
-        keyboardType = KeyboardType.Text,
-        imeAction = ImeAction.Done
-      ),
-      keyboardActions = KeyboardActions(
-        onDone = {
-          onDone(inputValue.text)
-        }
-      ),
-      maxLines = 2,
-      cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-      textStyle = LocalTextStyle.current.copy(
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 16.sp,
-        textDirection = TextDirection.Content,
-        textAlign = TextAlign.Start
-      ),
-      decorationBox = { innerTextField ->
-        Box(
-          modifier = Modifier.padding(bottom = 6.dp, top = 6.dp),
-        ) {
-          if (inputValue.text.isEmpty()) {
-            Text(
-              text = stringResource(Res.string.main_input_hint),
-              style = LocalTextStyle.current.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                fontSize = 16.sp
-              )
-            )
-          }
-          innerTextField()
-        }
-      })
-
-    IconButton(
-      onClick = onCancel,
+  Column {
+    Row(
+      modifier = modifier
+        .fillMaxWidth()
+        .height(78.dp)
+        .padding(start = 24.dp, end = 12.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.Start
     ) {
-      Icon(
-        Icons.Sharp.Close,
-        contentDescription = stringResource(Res.string.cd_cancel_schedule),
-        tint = MaterialTheme.colorScheme.secondary
-      )
+
+      BasicTextField(
+        value = inputValue,
+        onValueChange = { inputValue = it },
+        modifier = Modifier
+          .weight(0.95f)
+          .width(IntrinsicSize.Max)
+          .clearFocusOnKeyboardDismiss()
+          .focusRequester(focusRequester),
+        keyboardOptions = KeyboardOptions(
+          capitalization = KeyboardCapitalization.Sentences,
+          keyboardType = KeyboardType.Text,
+          imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+          onDone = {
+            onDone(inputValue.text)
+          }
+        ),
+        maxLines = 2,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+        textStyle = LocalTextStyle.current.copy(
+          color = MaterialTheme.colorScheme.onSurface,
+          fontSize = 16.sp,
+          textDirection = TextDirection.Content,
+          textAlign = TextAlign.Start
+        ),
+        decorationBox = { innerTextField ->
+          Box(
+            modifier = Modifier.padding(bottom = 6.dp, top = 6.dp),
+          ) {
+            if (inputValue.text.isEmpty()) {
+              Text(
+                text = stringResource(Res.string.main_input_hint),
+                style = LocalTextStyle.current.copy(
+                  color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                  fontSize = 16.sp
+                )
+              )
+            }
+            innerTextField()
+          }
+        })
+
+      IconButton(
+        onClick = onCancel,
+      ) {
+        Icon(
+          Icons.Sharp.Close,
+          contentDescription = stringResource(Res.string.cd_cancel_schedule),
+          tint = MaterialTheme.colorScheme.secondary
+        )
+      }
+
+      IconButton(onClick = {
+        onSetPriority()
+        showSchedulePickers = !showSchedulePickers }) {
+        Icon(
+          imageVector = vectorResource(Res.drawable.ic_schedule),
+          contentDescription = stringResource(Res.string.cd_cancel_schedule),
+          tint = MaterialTheme.colorScheme.secondary
+        )
+      }
     }
+
+    if (showSchedulePickers) {
+      if (schedule != null){
+        PlanPrioritySelector(
+          scheduleModel = schedule,
+          modifier = Modifier.fillMaxWidth(),
+          onDateChange = onDateChange,
+          onTimeChange = onTimeChange
+        )
+      }
+    }
+
   }
 }
+
 

@@ -7,18 +7,38 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
+import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
+import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
 
 @Composable
@@ -28,7 +48,9 @@ fun homeModel(
   notifications: MutableSharedFlow<NotificationState>,
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
-  createScopeUseCase: CreateScopeUseCase = koinInject()
+  createScopeUseCase: CreateScopeUseCase = koinInject(),
+  timeManager: TimeManager = koinInject(),
+  timeFormatter: TimeFormatter = koinInject(),
 ): HomeState {
 
   var scopes: List<ScopeDomain> by remember { mutableStateOf(initialState.scopes) }
@@ -36,12 +58,18 @@ fun homeModel(
   var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
   var taskInputActive: Boolean by remember { mutableStateOf(initialState.taskInputActive) }
   var reorderingScopes: Map<Long, Boolean> by remember { mutableStateOf(initialState.reorderingScopes) }
+  var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
+  var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
+  var planTime by remember { mutableStateOf(initialState.planTime) }
 
-
-  fun dispatch(action: Action) = store.dispatch(action)
+  fun dispatch(action: Action) {
+    Logger.i { "Dispatching action: ${action::class.simpleName}" }
+    store.dispatch(action)
+  }
 
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
+      Logger.i { "Scopes updated: ${it.size} scopes received" }
       scopes = it
     }
   }
@@ -49,10 +77,39 @@ fun homeModel(
   LaunchedEffect(Unit) {
     events.collect { event ->
       when (event) {
-
         is CreateTask -> {
           if (event.title.isNotBlank()) {
             dispatch(TaskAction.CreateUserTaskAction(event.title, Priority.Now(), currentScopeId))
+          }
+          taskInputActive = false
+        }
+
+        is HomeEvent.SetPlanPriority -> {
+          planTime = createPlanTime(timeManager, timeFormatter)
+        }
+
+        is CreateTaskWithSchedule -> {
+          if (event.title.isNotBlank()) {
+            dispatch(
+              TaskAction.CreateUserTaskAction(
+                event.title,
+                Priority.Now(),
+                currentScopeId,
+                onTaskCreated = { createdTask ->
+                  lastCreatedTaskId = createdTask.id
+                  planTime?.let { schedule ->
+                    scheduleModel = schedule
+                    store.dispatch(
+                      ScheduleAction.RescheduleTaskAction(
+                        createdTask.id,
+                        ScheduleType.OneTime,
+                        schedule.scheduleLocalDateTime
+                      )
+                    )
+                  }
+                }
+              )
+            )
           }
           taskInputActive = false
         }
@@ -79,6 +136,41 @@ fun homeModel(
           }
         }
 
+        DeleteSelectedTasks -> {
+          store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
+          selectedTasks = listOf()
+        }
+
+        is HomeEvent.UpdatePlanDate -> {
+          planTime = planTime?.let {
+            val updatedTime = timeManager.utcMillisToLocalDateTime(
+              event.dateMillis,
+              it.hour,
+              it.minute
+            )
+            createPlanTime(
+              timeManager,
+              timeFormatter,
+              updatedTime
+            )
+          }
+
+        }
+
+        is HomeEvent.UpdatePlanTime -> {
+          planTime = planTime?.let {
+            val updatedTime = timeManager.localDateTime(
+              it.scheduleLocalDateTime,
+              event.hour,
+              event.minute
+            )
+            createPlanTime(
+              timeManager,
+              timeFormatter,
+              updatedTime
+            )
+          }
+        }
 
         DeleteSelectedTasks -> {
           store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
@@ -145,6 +237,20 @@ fun homeModel(
     selectedTasks = selectedTasks,
     scopes = scopes,
     taskInputActive = taskInputActive,
-    reorderingScopes = reorderingScopes
+    reorderingScopes = reorderingScopes,
+    planTime = planTime
   )
 }
+
+private fun createPlanTime(
+  timeManager: TimeManager,
+  timeFormatter: TimeFormatter,
+  time: LocalDateTime = timeManager.getDefaultPlanTime(),
+) = ScheduleUiModel(
+  scheduleLocalDateTime = time,
+  displayDate = timeFormatter.formatDisplayDate(time.date),
+  displayTime = timeFormatter.formatDisplayTime(time.time) ?: "--:--",
+  scheduleUtcTimeMillis = timeManager.localDateTimeToUtc(time).toEpochMilliseconds(),
+  dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
+  currentUtcTimeMillis = timeManager.nowUtcMillis
+)

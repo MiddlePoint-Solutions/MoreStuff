@@ -30,6 +30,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityButton
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
@@ -53,6 +54,7 @@ fun TaskSchedule(
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
 
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,10 +63,12 @@ fun TaskSchedule(
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()
+        Logger.i { "TaskSchedule recomposed - Model: $model" }
 
         Spacer(modifier = Modifier.width(13.dp))
         when (model) {
             null -> {
+                Logger.i { "TaskSchedule: Showing PriorityButton (schedule not initialized yet)" }
                 PriorityButton(
                     onClick = createSchedule,
                     text = actionText,
@@ -73,6 +77,7 @@ fun TaskSchedule(
             }
 
             else -> {
+                Logger.i { "TaskSchedule: Showing date and time pickers" }
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
                         initialSelectedDateMillis = model.scheduleUtcTimeMillis
