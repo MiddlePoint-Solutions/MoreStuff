@@ -78,7 +78,7 @@ fun OnBoardingNotificationPermissionScreen(
           showRationaleDialog = true
           checkPermission = false
         }
-        else -> permissionState.openAppSettings()
+        //else -> permissionState.openAppSettings()
       }
     }
   }
@@ -167,7 +167,8 @@ fun OnBoardingNotificationPermissionScreen(
     ) {
       OnboardingButton(
         onClick = {
-          scope.launch { permissionState.launchPermissionRequest() }
+          showRationaleDialog = true
+          //scope.launch { permissionState.launchPermissionRequest() }
           checkPermission = true
         },
         title = stringResource(Res.string.button_enable)
