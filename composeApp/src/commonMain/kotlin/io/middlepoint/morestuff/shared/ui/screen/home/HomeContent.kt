@@ -248,12 +248,6 @@ private fun HomeContent(
     previousScopesSize.value = newSize
   }
 
-  LaunchedEffect(taskInputActive) {
-    if (!taskInputActive) {
-      states[scopes[pagerState.currentPage].id.toInt()].animateScrollToItem(index = 0)
-    }
-  }
-
 
   val backCallback = remember {
     BackCallback {
@@ -313,6 +307,7 @@ private fun HomeContent(
           onDateChange = { onEvent(HomeEvent.UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(HomeEvent.UpdatePlanTime(h, m)) },
           onSetPriority = { onEvent(HomeEvent.SetPlanPriority) },
+          onClearSetPriority = { onEvent(HomeEvent.ClearPlanPriority) },
           schedule = schedule,
         )
       }

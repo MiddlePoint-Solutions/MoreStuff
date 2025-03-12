@@ -29,6 +29,7 @@ sealed class HomeEvent {
   data class UpdatePlanTime(val hour: Int, val minute: Int) : HomeEvent()
   data class UpdatePlanDate(val dateMillis: Long) : HomeEvent()
   data object SetPlanPriority : HomeEvent()
+  data object ClearPlanPriority : HomeEvent()
   data class ToggleTaskSelection(val taskId: Long) : HomeEvent()
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()

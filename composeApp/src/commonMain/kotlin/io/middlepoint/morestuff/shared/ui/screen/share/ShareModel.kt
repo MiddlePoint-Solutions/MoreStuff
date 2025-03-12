@@ -89,7 +89,7 @@ fun shareModel(
         }
 
         ShowTaskInput -> {
-          state = state.copy(taskInputActive = true)
+          state = state.copy(taskInputActive = true, planTime = null)
         }
 
         is CreateNewTask -> {
@@ -135,10 +135,15 @@ fun shareModel(
         }
 
 
-
         is SetPlanPriority -> {
           state = state.copy(
             planTime = createPlanTime(timeManager, timeFormatter)
+          )
+        }
+
+        is ShareEvent.ClearPlanPriority -> {
+          state = state.copy(
+            planTime = null
           )
         }
 

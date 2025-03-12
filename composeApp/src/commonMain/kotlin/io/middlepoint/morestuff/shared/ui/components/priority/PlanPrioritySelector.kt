@@ -3,8 +3,6 @@ package io.middlepoint.morestuff.shared.ui.components.priority
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -78,7 +76,7 @@ fun PlanPrioritySelector(
   }
 
   Row(
-    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+    //modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
     horizontalArrangement = Arrangement.Start,
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -88,16 +86,6 @@ fun PlanPrioritySelector(
       tint = MaterialTheme.colorScheme.secondary
     )
     Spacer(modifier = Modifier.width(12.dp))
-    SetSchedulePriorityButton(
-      onClick = { showDatePickerDialog = true },
-    ) {
-      Text(
-        text = scheduleModel.displayDate,
-        style = MaterialTheme.typography.bodyMedium
-      )
-    }
-
-    Spacer(modifier = Modifier.width(18.dp))
 
     SetSchedulePriorityButton(
       onClick = { showTimePickerDialog = true },
@@ -112,9 +100,17 @@ fun PlanPrioritySelector(
         style = MaterialTheme.typography.bodyMedium
       )
     }
+    Spacer(modifier = Modifier.width(18.dp))
 
+    SetSchedulePriorityButton(
+      onClick = { showDatePickerDialog = true },
+    ) {
+      Text(
+        text = scheduleModel.displayDate,
+        style = MaterialTheme.typography.bodyMedium
+      )
+    }
   }
-
 }
 
 

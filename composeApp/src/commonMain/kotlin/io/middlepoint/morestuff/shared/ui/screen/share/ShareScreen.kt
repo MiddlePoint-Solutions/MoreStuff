@@ -303,6 +303,7 @@ private fun ShareContent(
           onDateChange = { onEvent(ShareEvent.UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(ShareEvent.UpdatePlanTime(h, m)) },
           onSetPriority = {onEvent(ShareEvent.SetPlanPriority)},
+          onClearSetPriority = {onEvent(ShareEvent.ClearPlanPriority)},
           schedule = schedule,
         )
       } else {

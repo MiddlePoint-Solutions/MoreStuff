@@ -29,4 +29,5 @@ sealed class ShareEvent {
     data class UpdatePlanTime(val hour: Int, val minute: Int) : ShareEvent()
     data class UpdatePlanDate(val dateMillis: Long) : ShareEvent()
     data object SetPlanPriority : ShareEvent()
+    data object ClearPlanPriority : ShareEvent()
 }

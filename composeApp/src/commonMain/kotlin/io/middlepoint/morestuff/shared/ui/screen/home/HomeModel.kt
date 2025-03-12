@@ -88,6 +88,10 @@ fun homeModel(
           planTime = createPlanTime(timeManager, timeFormatter)
         }
 
+        is HomeEvent.ClearPlanPriority -> {
+          planTime = null
+        }
+
         is CreateTaskWithSchedule -> {
           if (event.title.isNotBlank()) {
             dispatch(
@@ -116,6 +120,7 @@ fun homeModel(
 
         ShowTaskInput -> {
           taskInputActive = true
+          planTime = null
         }
 
         ResetHomeState -> {
