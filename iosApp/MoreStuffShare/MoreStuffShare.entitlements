@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.io.middlepoint.morestuff.share</string>
+		<string>group.io.middlepoint.morestuff</string>
 	</array>
 </dict>
 </plist>

@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.home
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 
 @Immutable
 data class HomeState(
@@ -10,8 +11,12 @@ data class HomeState(
   val scopes: List<ScopeDomain> = listOf(),
   val selectedTasks: List<Long> = listOf(),
   val taskInputActive: Boolean = false,
-  val reorderingScopes: Map<Long, Boolean> = emptyMap()
-)
+  val reorderingScopes: Map<Long, Boolean> = emptyMap(),
+  val scheduleModel: ScheduleUiModel? = null,
+  val lastCreatedTaskId: Long? = null,
+  val planTime: ScheduleUiModel? = null,
+
+  )
 
 @Immutable
 sealed class HomeEvent {
@@ -20,6 +25,11 @@ sealed class HomeEvent {
   data object CompleteSelectedTasks : HomeEvent()
   data object DeleteSelectedTasks : HomeEvent()
   data class CreateTask(val title: String): HomeEvent()
+  data class CreateTaskWithSchedule(val title: String) : HomeEvent()
+  data class UpdatePlanTime(val hour: Int, val minute: Int) : HomeEvent()
+  data class UpdatePlanDate(val dateMillis: Long) : HomeEvent()
+  data object SetPlanPriority : HomeEvent()
+  data object ClearPlanPriority : HomeEvent()
   data class ToggleTaskSelection(val taskId: Long) : HomeEvent()
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()
@@ -27,4 +37,5 @@ sealed class HomeEvent {
   data class ToggleScopeReordering(val scopeId: Long, val isReordering: Boolean) : HomeEvent()
   data class CreateScope(val title: String) : HomeEvent()
   data class CompleteTask(val taskId: Long) : HomeEvent()
+
 }

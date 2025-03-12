@@ -234,6 +234,7 @@ private fun ShareContent(
   val pagerState = rememberPagerState(pageCount = { model.scopes.size })
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
+  val schedule = model.planTime
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -289,10 +290,21 @@ private fun ShareContent(
     ) { active ->
       if (active) {
         InputItem(
-          onDone = { title ->
-            onEvent(ShareEvent.CreateNewTask(title))
+          onDone = { text ->
+            coroutineScope.launch {
+              if (model.planTime != null) {
+                onEvent(ShareEvent.CreateTaskWithSchedule(text))
+              } else {
+                onEvent(ShareEvent.CreateNewTask(text))
+              }
+            }
           },
-          onCancel = { onEvent(ShareEvent.ResetShareState) }
+          onCancel = { onEvent(ShareEvent.ResetShareState) },
+          onDateChange = { onEvent(ShareEvent.UpdatePlanDate(it)) },
+          onTimeChange = { h, m -> onEvent(ShareEvent.UpdatePlanTime(h, m)) },
+          onSetPriority = {onEvent(ShareEvent.SetPlanPriority)},
+          onClearSetPriority = {onEvent(ShareEvent.ClearPlanPriority)},
+          schedule = schedule,
         )
       } else {
         CreateNewTaskItem { onEvent(ShareEvent.ShowTaskInput) }

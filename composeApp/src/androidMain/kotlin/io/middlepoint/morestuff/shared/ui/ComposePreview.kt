@@ -6,6 +6,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 
+/*
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "Dark"
@@ -19,4 +20,4 @@ fun PriorityItemPreview() {
     MoreStuffTheme {
        InputItem()
     }
-}
+}*/

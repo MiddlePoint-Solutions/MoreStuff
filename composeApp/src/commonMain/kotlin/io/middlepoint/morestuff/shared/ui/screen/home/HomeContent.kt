@@ -226,6 +226,7 @@ private fun HomeContent(
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
+  val schedule = model.planTime
 
 
   LaunchedEffect(Unit) {
@@ -291,18 +292,28 @@ private fun HomeContent(
         exit = shrinkVertically(),
       ) {
         InputItem(
-          onDone = {
+          onDone = { text ->
             coroutineScope.launch {
-              onEvent(CreateTask(it))
-              delay(100)
+              if (model.planTime != null) {
+                onEvent(HomeEvent.CreateTaskWithSchedule(text))
+              } else {
+                onEvent(CreateTask(text))
+              }
+              delay(200)
               states[pagerState.currentPage].animateScrollToItem(index = 0)
             }
           },
-          onCancel = { onEvent(ResetHomeState) }
+          onCancel = { onEvent(ResetHomeState) },
+          onDateChange = { onEvent(HomeEvent.UpdatePlanDate(it)) },
+          onTimeChange = { h, m -> onEvent(HomeEvent.UpdatePlanTime(h, m)) },
+          onSetPriority = { onEvent(HomeEvent.SetPlanPriority) },
+          onClearSetPriority = { onEvent(HomeEvent.ClearPlanPriority) },
+          schedule = schedule,
         )
       }
 
       HorizontalPager(
+
         state = pagerState,
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
