@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key.Companion.R
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -60,6 +61,7 @@ import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
 import morestuff.composeapp.generated.resources.main_input_hint
+import morestuff.composeapp.generated.resources.task_chat_schedule_action
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -212,7 +214,7 @@ fun ScheduleSelectorRow(
           )
         ) {
           Text(
-            text = "Schedule",
+            text = stringResource(Res.string.task_chat_schedule_action),
             style = TextStyle(
               fontSize = 14.sp,
               lineHeight = 28.sp,
