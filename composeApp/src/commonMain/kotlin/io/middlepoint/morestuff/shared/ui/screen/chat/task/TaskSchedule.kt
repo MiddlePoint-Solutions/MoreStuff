@@ -71,7 +71,7 @@ fun TaskSchedule(
 
     LaunchedEffect(permissionState.status) {
         if (permissionState.status.isGranted) {
-            createSchedule()
+
         } else if (permissionState.status is PermissionStatus.Denied) {
             hasBeenDeniedBefore = true
         }
@@ -205,6 +205,10 @@ fun TaskSchedule(
                     permissionState.openAppSettings()
                 } else {
                     permissionState.launchPermissionRequest()
+                    if (permissionState.status.isGranted){
+                        createSchedule()
+                    }
+
                 }
             }
         },
