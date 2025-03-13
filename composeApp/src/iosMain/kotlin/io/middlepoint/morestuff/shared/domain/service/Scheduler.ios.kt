@@ -144,6 +144,8 @@ class SchedulerImpl(
             .removePendingNotificationRequestsWithIdentifiers(
                 listOf(getScheduleWorkTag(scheduleId))
             )
+        logger.i { "Cancelled notification with scheduleId= $scheduleId" }
+
     }
 
     override fun cancelPlannedPriorityUpdate() {
