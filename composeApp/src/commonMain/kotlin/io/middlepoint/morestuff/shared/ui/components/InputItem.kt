@@ -55,6 +55,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.PermissionStatus
+import com.mohamedrejeb.calf.permissions.isGranted
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import com.mohamedrejeb.calf.permissions.shouldShowRationale
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -171,8 +177,7 @@ fun InputItem(
   }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScheduleSelectorRow(
   schedule: ScheduleUiModel?,
@@ -187,6 +192,11 @@ fun ScheduleSelectorRow(
   var displaySchedule by remember { mutableStateOf(schedule) }
   val coroutineScope = rememberCoroutineScope()
 
+  val permissionState = rememberPermissionState(Permission.Notification)
+  var showRationaleDialog by remember { mutableStateOf(false) }
+  var hasBeenDeniedBefore by remember { mutableStateOf(false) }
+
+
   LaunchedEffect(schedule) {
     if (schedule != null) {
       displaySchedule = schedule
@@ -198,6 +208,12 @@ fun ScheduleSelectorRow(
     }
   }
 
+  LaunchedEffect(permissionState.status) {
+    if (permissionState.status is PermissionStatus.Denied) {
+      hasBeenDeniedBefore = true
+    }
+  }
+
   Row(
     modifier = Modifier
       .fillMaxWidth()
@@ -206,17 +222,22 @@ fun ScheduleSelectorRow(
   ) {
     IconButton(
       onClick = {
-        if (isVisible) {
-          isVisible = false
-          coroutineScope.launch {
-            delay(400)
-            onClearSetPriority()
+        if (permissionState.status.isGranted) {
+          if (isVisible) {
+            isVisible = false
+            coroutineScope.launch {
+              delay(400)
+              onClearSetPriority()
+            }
+          } else {
+            onSetPriority()
+            isVisible = true
           }
         } else {
-          onSetPriority()
-          isVisible = true
+          showRationaleDialog = true
         }
       },
+
       modifier = Modifier.size(52.dp)
     ) {
       Icon(
@@ -325,6 +346,33 @@ fun ScheduleSelectorRow(
       )
     }
   }
-}
 
+  NotificationPermissionDialog(
+    showDialog = showRationaleDialog,
+    onDismiss = {
+      showRationaleDialog = false
+    },
+    onGrantPermission = {
+      showRationaleDialog = false
+
+      coroutineScope.launch {
+        if (hasBeenDeniedBefore && !permissionState.status.shouldShowRationale) {
+          permissionState.openAppSettings()
+        } else {
+          permissionState.launchPermissionRequest()
+
+          delay(500)
+          if (permissionState.status.isGranted && !isVisible) {
+            onSetPriority()
+            isVisible = true
+          }
+        }
+      }
+    },
+    onSkip = {
+      showRationaleDialog = false
+    }
+  )
+
+}
 

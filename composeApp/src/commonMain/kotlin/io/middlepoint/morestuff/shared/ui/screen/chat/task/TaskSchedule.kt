@@ -20,9 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,16 +32,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.touchlab.kermit.Logger
+import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
+import com.mohamedrejeb.calf.permissions.Permission
+import com.mohamedrejeb.calf.permissions.PermissionStatus
+import com.mohamedrejeb.calf.permissions.isGranted
+import com.mohamedrejeb.calf.permissions.rememberPermissionState
+import com.mohamedrejeb.calf.permissions.shouldShowRationale
+import io.middlepoint.morestuff.shared.ui.components.NotificationPermissionDialog
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityButton
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
+import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun TaskSchedule(
     model: ScheduleUiModel?,
@@ -50,10 +60,22 @@ fun TaskSchedule(
     cancelSchedule: () -> Unit,
     icon: @Composable () -> Unit = {},
 ) {
-
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
+    var showRationaleDialog by remember { mutableStateOf(false) }
 
+    val permissionState = rememberPermissionState(Permission.Notification)
+    val coroutineScope = rememberCoroutineScope()
+    var hasBeenDeniedBefore by remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(permissionState.status) {
+        if (permissionState.status.isGranted) {
+            createSchedule()
+        } else if (permissionState.status is PermissionStatus.Denied) {
+            hasBeenDeniedBefore = true
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -63,21 +85,27 @@ fun TaskSchedule(
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()
-        Logger.i { "TaskSchedule recomposed - Model: $model" }
 
         Spacer(modifier = Modifier.width(13.dp))
+
         when (model) {
             null -> {
-                Logger.i { "TaskSchedule: Showing PriorityButton (schedule not initialized yet)" }
                 PriorityButton(
-                    onClick = createSchedule,
+                    onClick = {
+                        when {
+                            permissionState.status.isGranted -> {
+                                createSchedule()
+                            }
+                            else -> {
+                                showRationaleDialog = true
+                            }
+                        }
+                    },
                     text = actionText,
                     shape = RoundedCornerShape(percent = 50),
                 )
             }
-
             else -> {
-                Logger.i { "TaskSchedule: Showing date and time pickers" }
                 if (showDatePickerDialog) {
                     val datePickerState = rememberDatePickerState(
                         initialSelectedDateMillis = model.scheduleUtcTimeMillis
@@ -86,9 +114,7 @@ fun TaskSchedule(
                     PriorityDatePicker(
                         dismissDialog = { showDatePickerDialog = false },
                         onDateChange = {
-                            datePickerState.selectedDateMillis?.let {
-                                onDateChange(it)
-                            }
+                            datePickerState.selectedDateMillis?.let { onDateChange(it) }
                             showDatePickerDialog = false
                         },
                         state = datePickerState,
@@ -103,10 +129,7 @@ fun TaskSchedule(
                     PriorityTimePicker(
                         dismissTimePicker = { showTimePickerDialog = false },
                         onTimeChange = {
-                            onTimeChange(
-                                timePickerState.hour,
-                                timePickerState.minute
-                            )
+                            onTimeChange(timePickerState.hour, timePickerState.minute)
                             showTimePickerDialog = false
                         },
                         state = timePickerState
@@ -168,7 +191,31 @@ fun TaskSchedule(
             }
         }
     }
+
+    NotificationPermissionDialog(
+        showDialog = showRationaleDialog,
+        onDismiss = {
+            showRationaleDialog = false
+        },
+        onGrantPermission = {
+            showRationaleDialog = false
+
+            coroutineScope.launch {
+                if (hasBeenDeniedBefore && !permissionState.status.shouldShowRationale) {
+                    permissionState.openAppSettings()
+                } else {
+                    permissionState.launchPermissionRequest()
+                }
+            }
+        },
+        onSkip = {
+            showRationaleDialog = false
+        }
+    )
 }
+
+
+
 
 //@Preview(
 //    uiMode = Configuration.UI_MODE_NIGHT_YES,

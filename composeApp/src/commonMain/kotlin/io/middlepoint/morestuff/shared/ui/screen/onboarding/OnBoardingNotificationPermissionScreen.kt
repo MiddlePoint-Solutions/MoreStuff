@@ -82,41 +82,41 @@ fun OnBoardingNotificationPermissionScreen(
       }
     }
   }
-
-  if (showRationaleDialog) {
-    BasicAlertDialog(
-      onDismissRequest = { showRationaleDialog = false },
-      properties = DialogProperties(
-        dismissOnBackPress = false,
-        dismissOnClickOutside = false
-      )
-    ) {
-      Card {
-        Text(
-          text = stringResource(Res.string.notification_permission_rationale),
-          modifier = Modifier.padding(10.dp)
+    if (showRationaleDialog) {
+      BasicAlertDialog(
+        onDismissRequest = { showRationaleDialog = false },
+        properties = DialogProperties(
+          dismissOnBackPress = false,
+          dismissOnClickOutside = false
         )
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.End
-        ) {
-          TextButton(onClick = {
-            scope.launch { permissionState.launchPermissionRequest() }
-            showRationaleDialog = false
-            checkPermission = true
-          }) {
-            Text(text = stringResource(Res.string.button_enable))
-          }
-          TextButton(onClick = {
-            scope.launch { onNext() }
-            showRationaleDialog = false
-          }) {
-            Text(text = stringResource(Res.string.button_skip))
+      ) {
+        Card {
+          Text(
+            text = stringResource(Res.string.notification_permission_rationale),
+            modifier = Modifier.padding(10.dp)
+          )
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+          ) {
+            TextButton(onClick = {
+              scope.launch { permissionState.launchPermissionRequest() }
+              showRationaleDialog = false
+              checkPermission = true
+
+            }) {
+              Text(text = stringResource(Res.string.button_enable))
+            }
+            TextButton(onClick = {
+              scope.launch { onNext() }
+              showRationaleDialog = false
+            }) {
+              Text(text = stringResource(Res.string.button_skip))
+            }
           }
         }
       }
     }
-  }
 
   Box(
     modifier = Modifier
