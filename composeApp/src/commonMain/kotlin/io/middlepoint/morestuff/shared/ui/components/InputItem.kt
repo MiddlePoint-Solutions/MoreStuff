@@ -1,20 +1,19 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -202,19 +201,22 @@ fun ScheduleSelectorRow(
   var showRationaleDialog by remember { mutableStateOf(false) }
   var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
+
   val buttonExpanded = isVisible
   val buttonSizeAnimation by animateDpAsState(
-    targetValue = if (buttonExpanded) 28.dp else 18.dp,
+    targetValue = if (buttonExpanded) 24.dp else 18.dp,
     animationSpec = tween(400)
   )
 
   val buttonBackgroundAnimation by animateDpAsState(
-    targetValue = if (buttonExpanded) 48.dp else 24.dp,
+    targetValue = if (buttonExpanded) 40.dp else 40.dp,
     animationSpec = tween(400)
   )
-  val backgroundWidthAnimation by animateFloatAsState(
-    targetValue = if (buttonExpanded) 1f else 0f,
-    animationSpec = tween(400)
+
+
+  val expandedWidth by animateDpAsState(
+    targetValue = if (isVisible) 230.dp else 48.dp,
+    animationSpec = tween(400, easing = FastOutSlowInEasing)
   )
 
   LaunchedEffect(schedule) {
@@ -237,25 +239,31 @@ fun ScheduleSelectorRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(end = 12.dp).padding(vertical = 8.dp),
+      .padding(horizontal = 12.dp, vertical = 8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
+    // Contenedor principal que maneja el fondo y todos los elementos
     Box(
-      contentAlignment = Alignment.CenterStart,
-      modifier = Modifier.padding(start = 8.dp)
+      contentAlignment = Alignment.CenterStart
     ) {
+      // expandible Background
       Box(
         modifier = Modifier
-          .fillMaxWidth(backgroundWidthAnimation)
-          .height(56.dp)
+          .width(expandedWidth)
+          .height(48.dp)
           .background(
             color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-            shape = RoundedCornerShape(26.dp)
+            shape = if (isVisible) RoundedCornerShape(24.dp) else CircleShape
           )
       )
-      Row(verticalAlignment = Alignment.CenterVertically) {
+
+      // Content ( schedule button + date/time selector)
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(42.dp)
+      ) {
         Box(
-          modifier = Modifier.size(52.dp),
+          modifier = Modifier.size(48.dp),
           contentAlignment = Alignment.Center
         ) {
           IconButton(
@@ -277,10 +285,6 @@ fun ScheduleSelectorRow(
             },
             modifier = Modifier
               .size(buttonBackgroundAnimation)
-              .background(
-                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-                shape = CircleShape
-              )
           ) {
             Icon(
               imageVector = vectorResource(Res.drawable.ic_schedule),
@@ -291,19 +295,28 @@ fun ScheduleSelectorRow(
           }
         }
 
-        Spacer(modifier = Modifier.width(10.dp))
-
+        // Time/date animated buttons
         AnimatedVisibility(
           visible = isVisible,
-          enter = slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400)) +
-              fadeIn(animationSpec = tween(300)),
-          exit = slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400)) +
-              fadeOut(animationSpec = tween(300))
+          enter = fadeIn(animationSpec = tween(300)) +
+              expandHorizontally(
+                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                expandFrom = Alignment.Start
+              ),
+          exit = fadeOut(animationSpec = tween(300)) +
+              shrinkHorizontally(
+                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                shrinkTowards = Alignment.Start
+              ),
+          modifier = Modifier.padding(end = 6.dp)
         ) {
-          Row(verticalAlignment = Alignment.CenterVertically) {
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+          ) {
             Button(
               onClick = { showDatePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
               colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
                 contentColor = MaterialTheme.colorScheme.secondary,
@@ -312,19 +325,17 @@ fun ScheduleSelectorRow(
               Text(
                 text = displaySchedule?.displayDate ?: "Select Date",
                 style = TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 28.sp,
+                  fontSize = 12.sp,
+                  lineHeight = 22.sp,
                   fontWeight = FontWeight(400),
                   color = MaterialTheme.colorScheme.secondary,
                 )
               )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
-
             Button(
               onClick = { showTimePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
               colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
                 contentColor = MaterialTheme.colorScheme.secondary,
@@ -333,8 +344,8 @@ fun ScheduleSelectorRow(
               Text(
                 text = displaySchedule?.displayTime ?: "Select Time",
                 style = TextStyle(
-                  fontSize = 14.sp,
-                  lineHeight = 28.sp,
+                  fontSize = 12.sp,
+                  lineHeight = 22.sp,
                   fontWeight = FontWeight(400),
                   color = MaterialTheme.colorScheme.secondary,
                 )
@@ -344,36 +355,37 @@ fun ScheduleSelectorRow(
         }
       }
     }
+  }
 
-    if (showDatePickerDialog && displaySchedule != null) {
-      val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = displaySchedule?.scheduleUtcTimeMillis ?: 0L
-      )
 
-      PriorityDatePicker(
-        dismissDialog = { showDatePickerDialog = false },
-        onDateChange = {
-          datePickerState.selectedDateMillis?.let { onDateChange(it) }
-          showDatePickerDialog = false
-        },
-        state = datePickerState,
-      )
-    }
+  if (showDatePickerDialog && displaySchedule != null) {
+    val datePickerState = rememberDatePickerState(
+      initialSelectedDateMillis = displaySchedule?.scheduleUtcTimeMillis ?: 0L
+    )
 
-    if (showTimePickerDialog && displaySchedule != null) {
-      val timePickerState = rememberTimePickerState(
-        initialHour = displaySchedule?.hour ?: 0,
-        initialMinute = displaySchedule?.minute ?: 0
-      )
-      PriorityTimePicker(
-        dismissTimePicker = { showTimePickerDialog = false },
-        onTimeChange = {
-          onTimeChange(timePickerState.hour, timePickerState.minute)
-          showTimePickerDialog = false
-        },
-        state = timePickerState
-      )
-    }
+    PriorityDatePicker(
+      dismissDialog = { showDatePickerDialog = false },
+      onDateChange = {
+        datePickerState.selectedDateMillis?.let { onDateChange(it) }
+        showDatePickerDialog = false
+      },
+      state = datePickerState,
+    )
+  }
+
+  if (showTimePickerDialog && displaySchedule != null) {
+    val timePickerState = rememberTimePickerState(
+      initialHour = displaySchedule?.hour ?: 0,
+      initialMinute = displaySchedule?.minute ?: 0
+    )
+    PriorityTimePicker(
+      dismissTimePicker = { showTimePickerDialog = false },
+      onTimeChange = {
+        onTimeChange(timePickerState.hour, timePickerState.minute)
+        showTimePickerDialog = false
+      },
+      state = timePickerState
+    )
   }
 
   NotificationPermissionDialog(
