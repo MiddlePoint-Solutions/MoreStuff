@@ -204,7 +204,7 @@ fun ScheduleSelectorRow(
 
   val buttonExpanded = isVisible
   val buttonSizeAnimation by animateDpAsState(
-    targetValue = if (buttonExpanded) 24.dp else 18.dp,
+    targetValue = if (buttonExpanded) 22.dp else 16.dp,
     animationSpec = tween(400)
   )
 
@@ -215,7 +215,7 @@ fun ScheduleSelectorRow(
 
 
   val expandedWidth by animateDpAsState(
-    targetValue = if (isVisible) 230.dp else 48.dp,
+    targetValue = if (isVisible) 220.dp else 48.dp,
     animationSpec = tween(400, easing = FastOutSlowInEasing)
   )
 
@@ -260,7 +260,7 @@ fun ScheduleSelectorRow(
       // Content ( schedule button + date/time selector)
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.height(42.dp)
+        modifier = Modifier.height(40.dp)
       ) {
         Box(
           modifier = Modifier.size(48.dp),
@@ -316,7 +316,7 @@ fun ScheduleSelectorRow(
           ) {
             Button(
               onClick = { showDatePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
               colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
                 contentColor = MaterialTheme.colorScheme.secondary,
@@ -326,7 +326,7 @@ fun ScheduleSelectorRow(
                 text = displaySchedule?.displayDate ?: "Select Date",
                 style = TextStyle(
                   fontSize = 12.sp,
-                  lineHeight = 22.sp,
+                  lineHeight = 20.sp,
                   fontWeight = FontWeight(400),
                   color = MaterialTheme.colorScheme.secondary,
                 )
@@ -335,7 +335,7 @@ fun ScheduleSelectorRow(
 
             Button(
               onClick = { showTimePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
               colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
                 contentColor = MaterialTheme.colorScheme.secondary,
@@ -345,7 +345,7 @@ fun ScheduleSelectorRow(
                 text = displaySchedule?.displayTime ?: "Select Time",
                 style = TextStyle(
                   fontSize = 12.sp,
-                  lineHeight = 22.sp,
+                  lineHeight = 20.sp,
                   fontWeight = FontWeight(400),
                   color = MaterialTheme.colorScheme.secondary,
                 )
