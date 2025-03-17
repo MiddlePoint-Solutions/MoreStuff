@@ -1,11 +1,14 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -177,6 +182,7 @@ fun InputItem(
   }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScheduleSelectorRow(
@@ -196,6 +202,20 @@ fun ScheduleSelectorRow(
   var showRationaleDialog by remember { mutableStateOf(false) }
   var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
+  val buttonExpanded = isVisible
+  val buttonSizeAnimation by animateDpAsState(
+    targetValue = if (buttonExpanded) 30.dp else 18.dp,
+    animationSpec = tween(400)
+  )
+
+  val buttonBackgroundAnimation by animateDpAsState(
+    targetValue = if (buttonExpanded) 48.dp else 24.dp,
+    animationSpec = tween(400)
+  )
+  val backgroundWidthAnimation by animateFloatAsState(
+    targetValue = if (buttonExpanded) 1f else 0f,
+    animationSpec = tween(400)
+  )
 
   LaunchedEffect(schedule) {
     if (schedule != null) {
@@ -217,101 +237,110 @@ fun ScheduleSelectorRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(start = 12.dp, end = 12.dp).padding(vertical = 8.dp),
+      .padding(start = 10.dp, end = 12.dp).padding(vertical = 8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    IconButton(
-      onClick = {
-        if (permissionState.status.isGranted) {
-          if (isVisible) {
-            isVisible = false
-            coroutineScope.launch {
-              delay(400)
-              onClearSetPriority()
-            }
-          } else {
-            onSetPriority()
-            isVisible = true
-          }
-        } else {
-          showRationaleDialog = true
-        }
-      },
-
-      modifier = Modifier.size(52.dp)
+    Box(
+      contentAlignment = Alignment.CenterStart,
+      modifier = Modifier.padding(start = 12.dp)
     ) {
-      Icon(
-        imageVector = vectorResource(Res.drawable.ic_schedule),
-        contentDescription = stringResource(Res.string.cd_schedule_icon),
-        tint = MaterialTheme.colorScheme.inverseSurface,
+      Box(
+        modifier = Modifier
+          .fillMaxWidth(backgroundWidthAnimation)
+          .height(56.dp)
+          .background(
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+            shape = RoundedCornerShape(26.dp)
+          )
       )
-    }
-    Spacer(modifier = Modifier.width(10.dp))
-
-    AnimatedVisibility(
-      visible = isVisible,
-      enter = slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400)) +
-          fadeIn(animationSpec = tween(300)),
-      exit = slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400)) +
-          fadeOut(animationSpec = tween(300))
-    ) {
       Row(verticalAlignment = Alignment.CenterVertically) {
-        Button(
-          onClick = { showDatePickerDialog = true },
-          contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-            contentColor = MaterialTheme.colorScheme.secondary,
-          )
+        Box(
+          modifier = Modifier.size(52.dp),
+          contentAlignment = Alignment.Center
         ) {
-          Text(
-            text = displaySchedule?.displayDate ?: "Select Date",
-            style = TextStyle(
-              fontSize = 14.sp,
-              lineHeight = 28.sp,
-              fontWeight = FontWeight(400),
-              color = MaterialTheme.colorScheme.secondary,
+          IconButton(
+            onClick = {
+              if (permissionState.status.isGranted) {
+                if (isVisible) {
+                  isVisible = false
+                  coroutineScope.launch {
+                    delay(400)
+                    onClearSetPriority()
+                  }
+                } else {
+                  onSetPriority()
+                  isVisible = true
+                }
+              } else {
+                showRationaleDialog = true
+              }
+            },
+            modifier = Modifier
+              .size(buttonBackgroundAnimation)
+              .background(
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                shape = CircleShape
+              )
+          ) {
+            Icon(
+              imageVector = vectorResource(Res.drawable.ic_schedule),
+              contentDescription = stringResource(Res.string.cd_schedule_icon),
+              modifier = Modifier.size(buttonSizeAnimation),
+              tint = MaterialTheme.colorScheme.inverseSurface,
             )
-          )
+          }
         }
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        Button(
-          onClick = { showTimePickerDialog = true },
-          contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-            contentColor = MaterialTheme.colorScheme.secondary,
-          )
+        AnimatedVisibility(
+          visible = isVisible,
+          enter = slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400)) +
+              fadeIn(animationSpec = tween(300)),
+          exit = slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400)) +
+              fadeOut(animationSpec = tween(300))
         ) {
-          Text(
-            text = displaySchedule?.displayTime ?: "Select Time",
-            style = TextStyle(
-              fontSize = 14.sp,
-              lineHeight = 28.sp,
-              fontWeight = FontWeight(400),
-              color = MaterialTheme.colorScheme.secondary,
-            )
-          )
-        }
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(
+              onClick = { showDatePickerDialog = true },
+              contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+              colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                contentColor = MaterialTheme.colorScheme.secondary,
+              )
+            ) {
+              Text(
+                text = displaySchedule?.displayDate ?: "Select Date",
+                style = TextStyle(
+                  fontSize = 14.sp,
+                  lineHeight = 28.sp,
+                  fontWeight = FontWeight(400),
+                  color = MaterialTheme.colorScheme.secondary,
+                )
+              )
+            }
 
-        Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
-        IconButton(
-          onClick = {
-            isVisible = false
-            coroutineScope.launch {
-              delay(400)
-              onClearSetPriority()
+            Button(
+              onClick = { showTimePickerDialog = true },
+              contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+              colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                contentColor = MaterialTheme.colorScheme.secondary,
+              )
+            ) {
+              Text(
+                text = displaySchedule?.displayTime ?: "Select Time",
+                style = TextStyle(
+                  fontSize = 14.sp,
+                  lineHeight = 28.sp,
+                  fontWeight = FontWeight(400),
+                  color = MaterialTheme.colorScheme.secondary,
+                )
+              )
             }
           }
-        ) {
-          Icon(
-            Icons.Sharp.Close,
-            contentDescription = stringResource(Res.string.cd_cancel_schedule),
-            tint = MaterialTheme.colorScheme.secondary
-          )
         }
       }
     }
@@ -373,6 +402,4 @@ fun ScheduleSelectorRow(
       showRationaleDialog = false
     }
   )
-
 }
-
