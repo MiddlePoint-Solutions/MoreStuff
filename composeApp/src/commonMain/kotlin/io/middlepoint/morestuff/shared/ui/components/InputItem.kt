@@ -204,7 +204,7 @@ fun ScheduleSelectorRow(
 
   val buttonExpanded = isVisible
   val buttonSizeAnimation by animateDpAsState(
-    targetValue = if (buttonExpanded) 30.dp else 18.dp,
+    targetValue = if (buttonExpanded) 28.dp else 18.dp,
     animationSpec = tween(400)
   )
 
@@ -237,12 +237,12 @@ fun ScheduleSelectorRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(start = 10.dp, end = 12.dp).padding(vertical = 8.dp),
+      .padding(end = 12.dp).padding(vertical = 8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
     Box(
       contentAlignment = Alignment.CenterStart,
-      modifier = Modifier.padding(start = 12.dp)
+      modifier = Modifier.padding(start = 8.dp)
     ) {
       Box(
         modifier = Modifier

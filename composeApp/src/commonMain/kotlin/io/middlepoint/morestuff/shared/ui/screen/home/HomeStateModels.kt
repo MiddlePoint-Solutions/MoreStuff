@@ -21,6 +21,7 @@ data class HomeState(
 @Immutable
 sealed class HomeEvent {
   data object ResetHomeState : HomeEvent()
+  data object HideTaskInput : HomeEvent()
   data object ShowTaskInput: HomeEvent()
   data object CompleteSelectedTasks : HomeEvent()
   data object DeleteSelectedTasks : HomeEvent()

@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -252,6 +254,7 @@ private fun HomeContent(
   val backCallback = remember {
     BackCallback {
       onEvent(ResetHomeState)
+      onEvent(HomeEvent.HideTaskInput)
     }
   }
 
@@ -266,6 +269,18 @@ private fun HomeContent(
 
   Box(
     modifier = modifier.fillMaxSize()
+      .then(
+        if (taskInputActive) {
+          Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null,
+          ) {
+            onEvent(HomeEvent.HideTaskInput)
+          }
+        } else {
+          Modifier
+        }
+      )
   ) {
     Column {
       Row(
@@ -303,7 +318,10 @@ private fun HomeContent(
               states[pagerState.currentPage].animateScrollToItem(index = 0)
             }
           },
-          onCancel = { onEvent(ResetHomeState) },
+          onCancel = {
+            onEvent(ResetHomeState)
+            onEvent(HomeEvent.HideTaskInput)
+          },
           onDateChange = { onEvent(HomeEvent.UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(HomeEvent.UpdatePlanTime(h, m)) },
           onSetPriority = { onEvent(HomeEvent.SetPlanPriority) },
@@ -313,7 +331,6 @@ private fun HomeContent(
       }
 
       HorizontalPager(
-
         state = pagerState,
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
@@ -341,7 +358,9 @@ private fun HomeContent(
                 tasks = tasksModel.tasks,
                 selectedTasks = selectedTasks,
                 onItemClick = { taskId ->
-                  if (selectedTasks.isNotEmpty()) {
+                  if (taskInputActive) {
+                    onEvent(HomeEvent.HideTaskInput)
+                  } else if (selectedTasks.isNotEmpty()) {
                     onEvent(ToggleTaskSelection(taskId))
                   } else {
                     navigation.push(Screen.TaskChat(taskId))
@@ -366,7 +385,9 @@ private fun HomeContent(
                 onTaskComplete = { taskId ->
                   onTaskComplete(taskId)
                 },
-                onClearSelection = { onEvent(ResetHomeState) }
+                onClearSelection = {
+                  onEvent(ResetHomeState)
+                }
               )
             }
           }
@@ -393,7 +414,6 @@ private fun HomeContent(
         Icon(Icons.Default.Add, contentDescription = null)
       }
     }
-
   }
 }
 
