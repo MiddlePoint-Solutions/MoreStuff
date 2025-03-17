@@ -49,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -71,6 +73,7 @@ import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.at
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
@@ -201,6 +204,9 @@ fun ScheduleSelectorRow(
   var showRationaleDialog by remember { mutableStateOf(false) }
   var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
+  // Tamaño para guardar el ancho del contenido
+  var contentWidth by remember { mutableStateOf(0.dp) }
+  var rowRef = remember { mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
 
   val buttonExpanded = isVisible
   val buttonSizeAnimation by animateDpAsState(
@@ -213,9 +219,9 @@ fun ScheduleSelectorRow(
     animationSpec = tween(400)
   )
 
-
+  // Animación que usa el contentWidth medido, con un mínimo para cuando no está expandido
   val expandedWidth by animateDpAsState(
-    targetValue = if (isVisible) 220.dp else 48.dp,
+    targetValue = if (isVisible) (contentWidth + 60.dp).coerceAtLeast(220.dp) else 48.dp,
     animationSpec = tween(400, easing = FastOutSlowInEasing)
   )
 
@@ -290,7 +296,7 @@ fun ScheduleSelectorRow(
               imageVector = vectorResource(Res.drawable.ic_schedule),
               contentDescription = stringResource(Res.string.cd_schedule_icon),
               modifier = Modifier.size(buttonSizeAnimation),
-              tint = MaterialTheme.colorScheme.inverseSurface,
+              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseSurface,
             )
           }
         }
@@ -310,53 +316,71 @@ fun ScheduleSelectorRow(
               ),
           modifier = Modifier.padding(end = 6.dp)
         ) {
-          Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-          ) {
-            Button(
-              onClick = { showDatePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
-              colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-                contentColor = MaterialTheme.colorScheme.secondary,
-              )
-            ) {
-              Text(
-                text = displaySchedule?.displayDate ?: "Select Date",
-                style = TextStyle(
-                  fontSize = 12.sp,
-                  lineHeight = 20.sp,
-                  fontWeight = FontWeight(400),
-                  color = MaterialTheme.colorScheme.secondary,
+          // Usamos SubcomposeLayout para medir el tamaño del contenido
+          SubcomposeLayout { constraints ->
+            val placeable = subcompose("content") {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.onGloballyPositioned { coordinates ->
+                  // Actualizar el ancho del contenido cuando cambie
+                  contentWidth = coordinates.size.width.toDp()
+                }
+              ) {
+                Button(
+                  onClick = { showDatePickerDialog = true },
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                  )
+                ) {
+                  Text(
+                    text = displaySchedule?.displayDate ?: "Select Date",
+                    style = TextStyle(
+                      fontSize = 12.sp,
+                      lineHeight = 20.sp,
+                      fontWeight = FontWeight(400),
+                      color = MaterialTheme.colorScheme.secondary,
+                    )
+                  )
+                }
+                Text(
+                  text = stringResource(Res.string.at),
+                  style = TextStyle(
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                  )
                 )
-              )
-            }
+                Button(
+                  onClick = { showTimePickerDialog = true },
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                  )
+                ) {
+                  Text(
+                    text = displaySchedule?.displayTime ?: "Select Time",
+                    style = TextStyle(
+                      fontSize = 12.sp,
+                      lineHeight = 20.sp,
+                      fontWeight = FontWeight(400),
+                      color = MaterialTheme.colorScheme.secondary,
+                    )
+                  )
+                }
+              }
+            }.map { it.measure(constraints) }
 
-            Button(
-              onClick = { showTimePickerDialog = true },
-              contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
-              colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-                contentColor = MaterialTheme.colorScheme.secondary,
-              )
-            ) {
-              Text(
-                text = displaySchedule?.displayTime ?: "Select Time",
-                style = TextStyle(
-                  fontSize = 12.sp,
-                  lineHeight = 20.sp,
-                  fontWeight = FontWeight(400),
-                  color = MaterialTheme.colorScheme.secondary,
-                )
-              )
+            layout(placeable[0].width, placeable[0].height) {
+              placeable[0].place(0, 0)
             }
           }
         }
       }
     }
   }
-
 
   if (showDatePickerDialog && displaySchedule != null) {
     val datePickerState = rememberDatePickerState(

@@ -33,6 +33,7 @@
     <string name="schedule_set_time">Selecciona hora</string>
 
     <string name="option_complete">Completo</string>
+    <string name="at">a las</string>
 
     <!--  Schedule Reply  -->
     <string name="schedule_reply_tomorrow">Mañana</string>

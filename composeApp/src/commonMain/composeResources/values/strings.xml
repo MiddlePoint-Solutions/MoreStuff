@@ -32,6 +32,7 @@
     <string name="schedule_set_time">Set Time</string>
 
     <string name="option_complete">Complete</string>
+    <string name="at">at</string>
 
     <!--  Schedule Reply  -->
     <string name="schedule_reply_tomorrow">Tomorrow</string>
