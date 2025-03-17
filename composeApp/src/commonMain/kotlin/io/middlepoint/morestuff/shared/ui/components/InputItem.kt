@@ -204,7 +204,6 @@ fun ScheduleSelectorRow(
   var showRationaleDialog by remember { mutableStateOf(false) }
   var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
-  // Tamaño para guardar el ancho del contenido
   var contentWidth by remember { mutableStateOf(0.dp) }
   var rowRef = remember { mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
 
@@ -219,7 +218,6 @@ fun ScheduleSelectorRow(
     animationSpec = tween(400)
   )
 
-  // Animación que usa el contentWidth medido, con un mínimo para cuando no está expandido
   val expandedWidth by animateDpAsState(
     targetValue = if (isVisible) (contentWidth + 60.dp).coerceAtLeast(220.dp) else 48.dp,
     animationSpec = tween(400, easing = FastOutSlowInEasing)
@@ -248,7 +246,6 @@ fun ScheduleSelectorRow(
       .padding(horizontal = 12.dp, vertical = 8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    // Contenedor principal que maneja el fondo y todos los elementos
     Box(
       contentAlignment = Alignment.CenterStart
     ) {
@@ -296,7 +293,7 @@ fun ScheduleSelectorRow(
               imageVector = vectorResource(Res.drawable.ic_schedule),
               contentDescription = stringResource(Res.string.cd_schedule_icon),
               modifier = Modifier.size(buttonSizeAnimation),
-              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inverseSurface,
+              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             )
           }
         }
@@ -316,14 +313,12 @@ fun ScheduleSelectorRow(
               ),
           modifier = Modifier.padding(end = 6.dp)
         ) {
-          // Usamos SubcomposeLayout para medir el tamaño del contenido
           SubcomposeLayout { constraints ->
             val placeable = subcompose("content") {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.onGloballyPositioned { coordinates ->
-                  // Actualizar el ancho del contenido cuando cambie
                   contentWidth = coordinates.size.width.toDp()
                 }
               ) {
@@ -345,13 +340,13 @@ fun ScheduleSelectorRow(
                     )
                   )
                 }
-                Text(
+              /*  Text(
                   text = stringResource(Res.string.at),
                   style = TextStyle(
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.secondary,
                   )
-                )
+                )*/
                 Button(
                   onClick = { showTimePickerDialog = true },
                   contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
