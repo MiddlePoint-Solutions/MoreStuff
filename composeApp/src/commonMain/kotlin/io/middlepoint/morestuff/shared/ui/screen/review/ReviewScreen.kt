@@ -1,0 +1,688 @@
+package io.middlepoint.morestuff.shared.ui.screen.review
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
+import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
+import io.middlepoint.morestuff.shared.ui.components.TaskCard
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleOrNull
+import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
+import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
+import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
+import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
+import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData.messageUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
+import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
+import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.button_close
+import morestuff.composeapp.generated.resources.cd_high_priority_hint_icon
+import morestuff.composeapp.generated.resources.cd_highest_priority_hint_icon
+import morestuff.composeapp.generated.resources.cd_low_priority_hint_icon
+import morestuff.composeapp.generated.resources.cd_lowest_priority_hint_icon
+import morestuff.composeapp.generated.resources.cd_navigate_back
+import morestuff.composeapp.generated.resources.disable_hint_arrow
+import morestuff.composeapp.generated.resources.enable_hint_arrow
+import morestuff.composeapp.generated.resources.help
+import morestuff.composeapp.generated.resources.ic_arrow_high
+import morestuff.composeapp.generated.resources.ic_arrow_low
+import morestuff.composeapp.generated.resources.ic_arrow_lowest
+import morestuff.composeapp.generated.resources.ic_arrow_up
+import morestuff.composeapp.generated.resources.ic_review_undo_24px
+import morestuff.composeapp.generated.resources.onboarding_review_all_done
+import morestuff.composeapp.generated.resources.priority_review
+import morestuff.composeapp.generated.resources.review_hint_high_priority
+import morestuff.composeapp.generated.resources.review_hint_highest_priority
+import morestuff.composeapp.generated.resources.review_hint_low_priority
+import morestuff.composeapp.generated.resources.review_hint_lowest_priority
+import morestuff.composeapp.generated.resources.show_hint_arrow_priority
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
+
+@NonRestartableComposable
+@Composable
+fun ReviewScreen(
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
+  currentScopeId: Long,
+) {
+  ReviewContent(
+    onBack = onBack,
+    modifier = modifier,
+    currentScopeId = currentScopeId
+  )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReviewContent(
+  onBack: () -> Unit,
+  modifier: Modifier = Modifier,
+  currentScopeId: Long,
+) {
+
+  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
+  val model by viewModel.models.collectAsState()
+
+  val scope = rememberCoroutineScope()
+  var showReviewHelpScreen by remember { mutableStateOf(false) }
+  val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  var showReviewDragHints by remember { mutableStateOf(false) }
+
+  Box(
+    modifier = Modifier
+      .fillMaxSize()
+      .systemBarsPadding()
+  ) {
+    ConstraintLayout(
+      modifier = modifier.fillMaxSize()
+    ) {
+
+      val (topBar, cards, controls, count) = createRefs()
+
+      when (val round = model.round) {
+
+        is ReviewRound.Review -> {
+
+          val states = model.items.map { it to rememberSwipeableCardState(round) }
+
+          val hintVisibilityState = remember { MutableTransitionState(false) }
+          val scopeVisibilityState = remember { MutableTransitionState(false) }
+
+          PriorityReviewTopBar(
+            navigateUp = onBack,
+            showReviewHelpScreen = { showReviewHelpScreen = true },
+            isReviewHintActive = model.reviewHintEnabled,
+            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
+          ) {
+            ScopeCarousel(
+              scopes = model.scopes,
+              currentScopeId = currentScopeId,
+              onScopeSelected = { viewModel.take(LoadScope(it)) },
+              onScroll = { scopeVisibilityState.targetState = !it },
+              modifier = Modifier
+                .height(75.dp)
+                .padding(bottom = 30.dp)
+                .fillMaxWidth()
+            )
+          }
+
+          LaunchedEffect(showReviewDragHints) {
+            hintVisibilityState.targetState = !showReviewDragHints
+          }
+
+          AnimatedVisibility(
+            visibleState = hintVisibilityState,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = modifier
+              .navigationBarsPadding()
+              .fillMaxWidth()
+              .constrainAs(controls) {
+                top.linkTo(cards.bottom)
+                height = Dimension.preferredWrapContent
+              },
+          ) {
+            ReviewSwipeControls(
+              lastItemSwiped = { states.lastSwipedItem() },
+              firstVisibleItem = { states.firstVisibleOrNull() },
+              modelAction = viewModel::take,
+            )
+          }
+
+          AnimatedVisibility(
+            visibleState = scopeVisibilityState,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = modifier
+              .fillMaxWidth()
+              .constrainAs(count) {
+                bottom.linkTo(cards.top)
+                verticalBias = 0.6f
+                height = Dimension.preferredWrapContent
+              },
+          ) {
+            Row(
+              modifier = modifier.fillMaxWidth(),
+              horizontalArrangement = Arrangement.Center,
+              verticalAlignment = Alignment.CenterVertically,
+            ) {
+              if (model.itemsForReview > 0) {
+                AnimatedContent(
+                  targetState = model.itemsForReview,
+                  transitionSpec = {
+                    slideIntoContainer(
+                      AnimatedContentTransitionScope.SlideDirection.Up
+                    ).togetherWith(
+                      slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Down
+                      )
+                    )
+                  }
+                ) {
+                  Text(
+                    "$it",
+                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp),
+                    color = MaterialTheme.colorScheme.secondary,
+                  )
+                }
+              }
+            }
+          }
+
+          Box(
+            modifier = modifier
+              .fillMaxHeight(0.67f)
+              .constrainAs(cards) {
+                centerVerticallyTo(parent, bias = 0.44f)
+              },
+            contentAlignment = Alignment.Center
+          ) {
+            if (states.isNotEmpty()) {
+              AnimatedVisibility(
+                visibleState = scopeVisibilityState,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = modifier.fillMaxWidth(),
+              ) {
+                TaskPrioritySwipe(
+                  modifier = modifier.fillMaxSize().align(Alignment.Center),
+                  states = states,
+                  onSwiped = { schedule, direction ->
+                    viewModel.take(ItemSwipe(schedule, direction))
+                  },
+                  onDrag = { isDragging ->
+                    showReviewDragHints = isDragging
+                  },
+                )
+              }
+            }
+          }
+
+          AnimatedVisibility(
+            visible = showReviewDragHints && model.reviewHintEnabled,
+            enter = fadeIn(),
+            exit = fadeOut()
+          ) {
+            ReviewDragHint()
+          }
+
+          LaunchedEffect(model.round) {
+            hintVisibilityState.targetState = true
+            scopeVisibilityState.targetState = true
+          }
+        }
+
+        ReviewRound.Final -> {
+          LaunchedEffect(Unit) {
+            delay(980)
+            onBack()
+          }
+        }
+      }
+    }
+
+    if (showReviewHelpScreen) {
+      ModalBottomSheet(
+        onDismissRequest = { showReviewHelpScreen = false },
+        sheetState = bottomSheetState,
+        content = {
+          OnBoardingReviewScreen(
+            nextButtonText = stringResource(Res.string.button_close),
+            onNext = {
+              scope.launch {
+                bottomSheetState.hide()
+                showReviewHelpScreen = false
+              }
+            }
+          )
+        }
+      )
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PriorityReviewTopBar(
+  showReviewHelpScreen: () -> Unit,
+  isReviewHintActive: Boolean,
+  modifier: Modifier = Modifier,
+  navigateUp: () -> Unit = {},
+  scopeSelectorContent: @Composable () -> Unit
+) {
+
+  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
+
+  val coroutineScope = rememberCoroutineScope()
+  var showMenu by remember { mutableStateOf(false) }
+
+  Column(modifier = modifier) {
+    TopAppBar(
+      title = {
+        Text(
+          text = stringResource(Res.string.priority_review),
+        )
+      },
+      navigationIcon = {
+        IconButton(onClick = navigateUp) {
+          Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(Res.string.cd_navigate_back)
+          )
+        }
+      },
+      actions = {
+        IconButton(onClick = showReviewHelpScreen) {
+          Icon(
+            imageVector = Icons.AutoMirrored.Filled.Help,
+            contentDescription = stringResource(Res.string.help)
+          )
+        }
+        IconButton(onClick = { showMenu = true }) {
+          Icon(
+            imageVector = Icons.Default.MoreVert,
+            contentDescription = stringResource(Res.string.show_hint_arrow_priority)
+          )
+        }
+
+        DropdownMenu(
+          expanded = showMenu,
+          onDismissRequest = { showMenu = false }
+        ) {
+          DropdownMenuItem(onClick = {
+            coroutineScope.launch {
+              viewModel.take(ToggleReviewHint)
+              showMenu = false
+            }
+          },
+            text = {
+              Text(
+                text = if (isReviewHintActive) {
+                  stringResource(Res.string.disable_hint_arrow)
+                } else {
+                  stringResource(Res.string.enable_hint_arrow)
+                }
+              )
+            })
+
+        }
+      },
+      colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+    )
+
+    scopeSelectorContent()
+  }
+}
+
+
+@Composable
+private fun ReviewSwipeControls(
+  lastItemSwiped: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+  firstVisibleItem: () -> Pair<ReviewItemUiModel, SwipeableCardState>?,
+  modelAction: (ReviewViewEvent) -> Unit,
+  modifier: Modifier = Modifier,
+) {
+
+  val scope = rememberCoroutineScope()
+  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+
+  if (showDeleteConfirmationDialog) {
+    ConfirmDeleteDialog(
+      onDismiss = { showDeleteConfirmationDialog = false },
+      onConfirm = {
+        firstVisibleItem()?.let { item ->
+          scope.launch {
+            delay(300)
+            item.second.onDelete()
+            modelAction(DeleteTask(item.first))
+          }
+        }
+        showDeleteConfirmationDialog = false
+      }
+    )
+  }
+
+  Column(
+    modifier = modifier,
+    verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
+    horizontalAlignment = Alignment.CenterHorizontally,
+  ) {
+
+    Row(
+      horizontalArrangement = Arrangement.spacedBy(30.dp, Alignment.CenterHorizontally)
+    ) {
+      MainReviewButton(
+        onClick = { showDeleteConfirmationDialog = true },
+        icon = Icons.Filled.Delete
+      )
+
+      MainReviewButton(
+        onClick = {
+          firstVisibleItem()?.let { item ->
+            scope.launch {
+              item.second.onComplete()
+              modelAction(CompleteTask(item.first))
+            }
+          }
+        },
+        icon = Icons.Filled.Done
+      )
+    }
+
+    Row(
+      horizontalArrangement = Arrangement.spacedBy(11.dp, Alignment.CenterHorizontally)
+    ) {
+      SecondaryReviewButton(
+        onClick = {
+          lastItemSwiped()?.let { item ->
+            scope.launch {
+              item.second.undo()
+              modelAction(Undo(item.first))
+            }
+          }
+        },
+        icon = vectorResource(Res.drawable.ic_review_undo_24px)
+      )
+    }
+  }
+}
+
+@Composable
+@OptIn(ExperimentalSwipeableCardApi::class)
+private fun TaskPrioritySwipe(
+  modifier: Modifier = Modifier,
+  states: List<Pair<ReviewItemUiModel, SwipeableCardState>>,
+  onSwiped: (schedule: ReviewItemUiModel, direction: SwipeDirection) -> Unit,
+  onDrag: (Boolean) -> Unit,
+) {
+  Box(
+    modifier = modifier.padding(20.dp),
+    contentAlignment = Alignment.Center
+  ) {
+    AllDoneMessage()
+
+    states.forEach { (item, state) ->
+      if (state.swipedDirection == null) {
+        TaskCard(
+          modifier = Modifier
+            .layoutId(item.id)
+            .swipableCard(
+              state = state,
+              onDrag = onDrag,
+            ),
+          item = item,
+          messages = item.messages
+        )
+      }
+      LaunchedEffect(item, state.swipedDirection) {
+        state.swipedDirection?.let { direction ->
+          onSwiped(item, direction)
+        }
+      }
+    }
+
+  }
+}
+
+@Composable
+private fun AllDoneMessage() {
+  Column(
+    modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center
+  ) {
+    Icon(
+      imageVector = Icons.Default.DoneAll,
+      contentDescription = "",
+      modifier = Modifier.size(40.dp),
+      tint = MaterialTheme.colorScheme.secondary
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Text(
+      text = stringResource(Res.string.onboarding_review_all_done),
+      style = MaterialTheme.typography.headlineMedium.copy(fontSize = 38.sp),
+      color = MaterialTheme.colorScheme.secondary
+    )
+
+  }
+}
+
+@Composable
+private fun ReviewDragHint() {
+  Box(Modifier.fillMaxSize()) {
+    Column(
+      modifier = Modifier
+        .align(Alignment.TopCenter)
+        .background(
+          color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+          shape = RoundedCornerShape(15)
+        )
+        .padding(10.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+      Icon(
+        imageVector = vectorResource(Res.drawable.ic_arrow_up),
+        contentDescription = stringResource(Res.string.cd_highest_priority_hint_icon),
+        modifier = Modifier.size(40.dp),
+        tint = MaterialTheme.colorScheme.onBackground,
+      )
+      Spacer(modifier = Modifier.width(8.dp))
+      ReviewHintTitle(text = stringResource(Res.string.review_hint_highest_priority))
+    }
+    Column(
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .background(
+          color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+          shape = RoundedCornerShape(15)
+        )
+        .padding(10.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+      ReviewHintTitle(text = stringResource(Res.string.review_hint_lowest_priority))
+      Spacer(modifier = Modifier.width(8.dp))
+      Icon(
+        imageVector = vectorResource(Res.drawable.ic_arrow_lowest),
+        contentDescription = stringResource(Res.string.cd_lowest_priority_hint_icon),
+        modifier = Modifier.size(40.dp),
+        tint = MaterialTheme.colorScheme.onBackground,
+      )
+    }
+    Column(
+      modifier = Modifier
+        .align(Alignment.CenterEnd)
+        .background(
+          color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+          shape = RoundedCornerShape(15)
+        )
+        .padding(10.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+      Icon(
+        imageVector = vectorResource(Res.drawable.ic_arrow_high),
+        contentDescription = stringResource(Res.string.cd_high_priority_hint_icon),
+        modifier = Modifier.size(40.dp),
+        tint = MaterialTheme.colorScheme.onBackground,
+      )
+      Spacer(modifier = Modifier.width(8.dp))
+      ReviewHintTitle(text = stringResource(Res.string.review_hint_high_priority))
+    }
+
+    Column(
+      modifier = Modifier
+        .align(Alignment.CenterStart)
+        .background(
+          color = MaterialTheme.colorScheme.background.copy(alpha = 0.4f),
+          shape = RoundedCornerShape(15)
+        )
+        .padding(10.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
+      Icon(
+        imageVector = vectorResource(Res.drawable.ic_arrow_low),
+        contentDescription = stringResource(Res.string.cd_low_priority_hint_icon),
+        modifier = Modifier.size(40.dp),
+        tint = MaterialTheme.colorScheme.onBackground,
+      )
+      Spacer(modifier = Modifier.width(8.dp))
+      ReviewHintTitle(text = stringResource(Res.string.review_hint_low_priority))
+    }
+  }
+}
+
+@Composable
+private fun ReviewHintTitle(text: String) {
+  Text(
+    text = text,
+    style = MaterialTheme.typography.headlineSmall.copy(
+      color = MaterialTheme.colorScheme.onBackground,
+      textAlign = TextAlign.Center,
+    )
+  )
+}
+
+@Composable
+private fun MainReviewButton(
+  onClick: () -> Unit,
+  icon: ImageVector,
+) {
+  Button(
+    modifier = Modifier
+      .size(width = 130.dp, height = 56.dp)
+      .clip(CircleShape),
+    colors = ButtonDefaults.buttonColors(
+      containerColor = MaterialTheme.colorScheme.secondaryContainer
+    ),
+    onClick = onClick
+  ) {
+    Icon(
+      icon,
+      null,
+      modifier = Modifier.size(32.dp),
+      tint = reviewIconTint
+    )
+  }
+}
+
+@Composable
+private fun SecondaryReviewButton(
+  onClick: () -> Unit,
+  icon: ImageVector,
+) {
+
+  Button(
+    modifier = Modifier
+      .size(width = 90.dp, height = 48.dp)
+      .clip(CircleShape),
+    colors = ButtonDefaults.buttonColors(
+      containerColor = MaterialTheme.colorScheme.secondaryContainer
+    ),
+    onClick = onClick
+  ) {
+    Icon(
+      icon,
+      null,
+      modifier = Modifier.size(24.dp),
+      tint = reviewIconTint
+    )
+  }
+}
+
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_YES,
+//    name = "Dark"
+//)
+//@Preview(
+//    uiMode = Configuration.UI_MODE_NIGHT_NO,
+//    name = "Light"
+//)
+//@Composable
+//fun ReviewSwipeControlsPreview() {
+//    MoreStuffTheme {
+//        ReviewSwipeControls({ null }, { null }, {})
+//    }
+//}

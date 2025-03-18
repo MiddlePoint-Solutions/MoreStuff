@@ -1,64 +1,76 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
-    kotlin("plugin.serialization")
-    id("kotlin-parcelize")
+  alias(libs.plugins.kotlin.multiplatform)
+  alias(libs.plugins.android.library)
+  alias(libs.plugins.compose)
+  alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
 
-    applyDefaultHierarchyTemplate()
+  jvmToolchain(20)
 
-    androidTarget()
-
-    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true)
-            ::iosArm64
-        else
-            ::iosX64
-
-    iosTarget("ios") {
-
-    }
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                //Logger
-                implementation("io.github.aakira:napier:1.5.0")
-                //Key-Value storage
-                //implementation("com.russhwolf:multiplatform-settings:1.0.0")
-                implementation(libs.multiplatformSettingsNoArg)
-
-                val decompose = "2.1.0-compose-experimental-alpha-02"
-
-                // Decompose-router
-//                implementation("io.github.xxfast:decompose-router:0.2.1")
-//                implementation("com.arkivanov.decompose:decompose:$decompose")
-//                implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decompose")
-//                implementation("com.arkivanov.essenty:parcelable:1.1.0")
-            }
+  @OptIn(ExperimentalWasmDsl::class)
+  wasmJs {
+    browser {
+      commonWebpackConfig {
+        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+          static = (static ?: mutableListOf()).apply {
+            // Serve sources to debug inside browser
+            add(project.projectDir.path)
+          }
         }
-
-        val androidMain by getting
-        val iosMain by getting
+      }
     }
+  }
+
+  androidTarget()
+
+  iosX64()
+  iosArm64()
+  iosSimulatorArm64()
+
+  jvm()
+
+  @OptIn(ExperimentalKotlinGradlePluginApi::class)
+  compilerOptions {
+    // Common compiler options applied to all Kotlin source sets
+    freeCompilerArgs.add("-Xexpect-actual-classes")
+  }
+
+  sourceSets {
+    commonMain.dependencies {
+      implementation(compose.runtime)
+      implementation(libs.kotlinx.datetime)
+      implementation(libs.kotlinx.coroutines)
+      implementation(libs.kermit)
+      implementation(libs.calf.io)
+
+      implementation(project.dependencies.platform(libs.koin.bom))
+      implementation(libs.koin.core)
+    }
+
+    androidMain.dependencies {
+      implementation(libs.androidx.core)
+      implementation(libs.androidx.exifinterface)
+    }
+  }
 }
 
 android {
-    compileSdk = 34
+  namespace = "io.middlepoint.morestuff.shared"
+  compileSdk = libs.versions.android.sdk.compile.get().toInt()
 
-    defaultConfig {
-        minSdk = 26
-        targetSdk = 34
-    }
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "co.softov.morestuff.shared.android"
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_20
+    targetCompatibility = JavaVersion.VERSION_20
+  }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
+  defaultConfig {
+    minSdk = libs.versions.android.sdk.min.get().toInt()
+  }
+
 }

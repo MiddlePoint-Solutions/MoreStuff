@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">MoreStuff</string>
+
+    <!--  Chat  -->
+    <string name="chat_input_task_hint">Añade un título para tu tarea...</string>
+    <string name="chat_action_later">Más tarde</string>
+    <string name="chat_action_tomorrow">Mañana</string>
+    <string name="chat_action_today">Hoy</string>
+
+    <!-- Placeholders -->
+    <string name="text_created_time_placeholder">Creado: %s</string>
+    <string name="text_completed_time_placeholder">Completedo: %s</string>
+    <string name="text_scheduled_time_placeholder">Programado para: %s</string>
+    <string name="task_chat_complete_message_with_date">Completada el %s</string>
+
+    <!--  Menu options  -->
+    <string name="menu_title_settings">Ajustes</string>
+
+    <!-- Time options -->
+    <string name="time_option_1_hour">1 Hora</string>
+    <string name="time_option_morning">Mañana</string>
+    <string name="time_option_noon">Mediodía</string>
+    <string name="time_option_after_noon">Media tarde</string>
+    <string name="time_option_evening">Tarde</string>
+    <string name="time_option_night">Noche</string>
+    <string name="time_option_custom">Personalizado</string>
+    <string name="time_option_later">Más tarde</string>
+    <string name="time_option_tomorrow">Mañana %s</string>
+    <string name="time_option_today">Hoy %s</string>
+    <string name="schedule_set_day">Selecciona día</string>
+    <string name="schedule_set_time">Selecciona hora</string>
+
+    <string name="option_complete">Completo</string>
+    <string name="at">a las</string>
+
+    <!--  Schedule Reply  -->
+    <string name="schedule_reply_tomorrow">Mañana</string>
+    <string name="schedule_reply_snooze">Posponer</string>
+    <string name="schedule_reply_later">Más tarde</string>
+    <string name="schedule_reply_done">Hecho</string>
+
+    <!--  Settings keys  -->
+    <string name="pref_key_app_theme" translatable="false">app_theme</string>
+    <string name="pref_key_snooze_limit" translatable="false">snooze_limit</string>
+
+    <!--  Debug Keys  -->
+    <string name="pref_key_debug_reminder" translatable="false">debug_reminder</string>
+    <string name="pref_key_debug_reminder_today_offset" translatable="false">debug_reminder_today_offset</string>
+    <string name="pref_key_debug_keep_screen_on" translatable="false">debug_keep_screen_on</string>
+    <string name="pref_key_smart_reminder_enabled" translatable="false">smart_reminder_enabled</string>
+
+    <!--  Content Description  -->
+    <string name="cd_settings_show_task_lists" translatable="false">Show Task Lists</string>
+    <string name="cd_application_settings">Ajustes de la aplicación</string>
+    <string name="cd_send">Enviar</string>
+    <string name="review_item_title_text_color">#000000</string>
+
+    <string name="settings_snooze_limit_title">Límite posponer</string>
+    <string name="settings_snooze_limit_desc">¿Cuántas veces se debe posponer una tarea antes de pasarla al día siguiente (0 sin límite)?</string>
+    <string name="chat_item_invalid">Inválido</string>
+    <string name="page_title_active">Activo</string>
+    <string name="page_title_complete">Completo</string>
+    <string name="page_title_schedule">Programado</string>
+    <string name="page_title_now">Ahora</string>
+    <string name="page_title_tomorrow">Mañana</string>
+    <string name="page_title_later">Más tarde</string>
+    <string name="textfield_desc">Entrada de texto</string>
+    <string name="priority_now">Ahora</string>
+    <string name="priority_plan">Plan</string>
+    <string name="priority_later">Tarde</string>
+    <string name="done">Hecho</string>
+    <string name="new_messages">Inicio</string>
+    <string name="cd_navigate_back">Navegar hacia atrás</string>
+    <string name="help">Ayuda</string>
+    <string name="show_hint_arrow_priority">Mostrar flechas de prioridad</string>
+    <string name="disable_hint_arrow">Desactivar sugerencias</string>
+    <string name="enable_hint_arrow">Activar sugerencias</string>
+    <string name="cd_schedule_icon">Icono de horario</string>
+    <string name="cd_task_complete">Tarea Completa</string>
+    <string name="task_chat_schedule_action">Establecer Horario</string>
+    <string name="settings">Ajustes</string>
+    <string name="priority_review">Revisión</string>
+    <string name="finish">Finalizar</string>
+    <string name="cd_priority_review">Abrir revisión de prioridad</string>
+    <string name="cd_settings">Mostrar Ajustes</string>
+    <string name="start">Inicio</string>
+    <string name="cancel">Cancelar</string>
+    <string name="ok">OK</string>
+    <string name="relative_today">Hoy</string>
+    <string name="relative_tomorrow">Mañana</string>
+    <string name="cd_plan_scheduling_requires_your_permission">Establecer horarios requiere su permiso</string>
+    <string name="mr_stuff_image">MR.Stuff imagen</string>
+    <string name="snack_task_archived">Tarea archivada</string>
+    <string name="undo">Deshacer</string>
+    <string name="snack_task_completed">Tarea Completada</string>
+    <string name="snack_task_moved_to_new_scope">Tarea movida a un nuevo scope</string>
+    <string name="title_activity_share">Compartir Actividad</string>
+    <string name="select_chat">Seleccionar Chat</string>
+    <string name="cd_search_chats">Buscar Chats</string>
+    <string name="cd_scheduled_task_icon">Icono tarea programada</string>
+    <string name="cd_task_reminder_icon">Icono recordatorio tarea</string>
+    <string name="cd_task_done_icon">Icono tarea completada</string>
+    <string name="cd_task_message_icon">Icono mensaje tarea</string>
+    <string name="create_new_chat">Crear nuevo chat</string>
+    <string name="main_input_hint">Crear nueva tarea</string>
+    <string name="task_chat_input_hint">Mensaje</string>
+    <string name="cd_complete_task">Completar tarea</string>
+    <string name="complete">Terminar</string>
+    <string name="completed">Terminada</string>
+    <string name="move_to_top">Mover al principio</string>
+    <string name="cd_move_to_top">Mover tarea al principio</string>
+    <string name="move_to_bottom">Mover al final</string>
+    <string name="cd_move_task_to_bottom">Mover tarea al final</string>
+    <string name="select_theme">Seleccionar Tema</string>
+    <string name="cd_select_theme">Seleccionar Tema</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="enable_confetti">Activar Confetti</string>
+    <string name="delete">Borrar</string>
+    <string name="copy_message">Copiar</string>
+    <string name="search">Buscar…</string>
+    <string name="share">Compartir</string>
+    <string name="filter_scheduled">Programado</string>
+    <string name="filter_reminder">Recordatorio</string>
+    <string name="filter_done">Hecho</string>
+    <string name="cd_filter_schedules_tasks">Filtrar tareas programadas</string>
+    <string name="cd_filter_reminders_tasks">Filtrar tareas con recordatorio</string>
+    <string name="cd_filter_completed_tasks">Filtrar tareas completadas</string>
+    <string name="cd_cancel_schedule">Cancelar horario</string>
+    <string name="cd_select_images">seleccionar imágenes</string>
+    <string name="open_source_libraries">Abrir Bilbioteca fuente</string>
+    <string name="about_morestuff">Sobre MoreStuff</string>
+    <string name="privacy_policy">Política de Privacidad</string>
+    <string name="no_results_found">No se han encontrado resultados</string>
+    <string name="cd_clear_search_query">Limpiar consulta de búsqueda</string>
+    <string name="cd_reminder_icon">Icono de recordatorio</string>
+    <string name="task_chat_reminder_action">Recordatorio</string>
+    <string name="cd_show_task_chat">Mostrar chat de tarea</string>
+    <string name="select_language">Seleccionar idioma de entrada de voz</string>
+    <string name="language_english">Inglés</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_hebrew">Hebreo</string>
+    <string name="language_russian">Ruso</string>
+    <string name="language_catalan">Catalán</string>
+    <string name="language_device_default">Dispositivo</string>
+    <string name="confirm_delete">Confirmar eliminación</string>
+    <string name="sure_delete_task">Estás seguro que deseas eliminar \nla siguiente tarea?</string>
+    <string name="can_i_do_for_you_today">¿Qué puedo hacer hoy por ti?</string>
+    <string name="added_new_task">¡Nueva tarea añadida!</string>
+    <string name="developer_settings">Ajustes de Desarrollador</string>
+    <string name="test_onboarding">Probar Introducción </string>
+    <string name="test_review_notifications">Probar las notificaciones de revisión</string>
+    <string name="export_database">Exportar Base de Datos</string>
+    <string name="import_database">Importar Base de Datos</string>
+    <string name="debug_messages">Mensajes de depuración</string>
+    <string name="join_community">Únete a nuestra comunidad y ayuda a dar forma a MoreStuff!</string>
+    <string name="set_review_time">Programar hora de la revisión</string>
+    <string name="select_image">Seleccionar Imagen</string>
+    <string name="select_pdf">Seleccionar PDF</string>
+    <string name="restore">Restaurar</string>
+
+
+
+    <string name="sure_delete_scope">Estás seguro que quieres eliminar\n%s scope?</string>
+    <string name="add_scope">Crear nuevo Scope</string>
+    <string name="save">Confirmar</string>
+    <string name="edit_scope">Editar nombre del Scope </string>
+    <string name="task_scopes">Task Scopes</string>
+    <string name="title_scopes">Crear Scope</string>
+    <string name="choose_scope">Añadir al Scope</string>
+    <string name="manage_scopes">Configurar Scopes</string>
+    <string name="remove_from_scope">Eliminar del Scope actual</string>
+
+    <!--  onBoarding  -->
+    <string name="onboarding_welcome_title">"Nuestro objetivo"</string>
+    <string name="onboarding_welcome_subtitle1">ayudarte</string>
+    <string name="onboarding_welcome_subtitle2">a organizar y priorizar</string>
+    <string name="onboarding_welcome_subtitle3">tus cosas</string>
+    <string name="onboarding_notification_permission_title">Permitir Notificaciones</string>
+    <string name="onboarding_notification_permission_subtitle">Para programar las cosas importantes\nMoreStuff necesita tu permiso</string>
+    <string name="button_enable">Activar</string>
+    <string name="button_skip">Saltar</string>
+    <string name="button_next">Siguiente</string>
+    <string name="button_ready">Listo</string>
+    <string name="button_close">Cerrar</string>
+    <string name="onboarding_complete_title">Tu espacio de trabajo\nestá listo </string>
+    <string name="onboarding_chat_task_title">Habla con tus tareas</string>
+    <string name="onboarding_chat_task_subtitle">Tal como lo harías con tus contactos en una aplicación de mensajería.</string>
+    <string name="import_image_title">Importar Imagen</string>
+    <string name="import_image_title_hint">Añade un mensaje…</string>
+    <string name="cd_share">Compartir</string>
+    <string name="request_permission">Solicitar permiso</string>
+    <string name="record_audio_permission_title">Permiso para grabar audio</string>
+    <string name="record_audio_permission_description">Grabar audio es necesario para que esta funcionalidad esté disponible\nPor favor concede el permiso</string>
+    <string name="voice_to_text_listening">Escuchando</string>
+    <string name="cta_lets_go">¡Vamos! :)</string>
+    <string name="cd_share_to_new_task">Compartir a una nueva tarea</string>
+    <string name="dev_settings_already_enabled">¡Ya has activado los ajustes de desarrollador!</string>
+    <string name="developer_settings_enabled">¡Ajustes de desarrollador activados!</string>
+    <string name="click_s_to_enable_developer_settings">Pincha %1$s veces para activar los ajustes de desarrollador</string>
+    <string name="version">Versión</string>
+    <string name="notification_permission_already_granted">Permiso de notificaciones ya concedido</string>
+
+
+    <string name="onboarding_schedule_review_title">Programar Revisión</string>
+    <string name="onboarding_schedule_review_subtitle">Adquiera el hábito de las revisiones diarias estableciendo su horario preferido</string>
+    <string name="add_reminder">Añadir Recordatorio</string>
+    <string name="onboarding_review_title">Revisa</string>
+    <string name="onboarding_review_subtitle">Desliza para fijar la prioridad</string>
+
+    <!--  OnBoarding review tasks  -->
+    <string name="onboarding_review_task1">Planear viaje a Venecia</string>
+    <string name="onboarding_review_task2">Llamar a los padres</string>
+    <string name="onboarding_review_task3">Ideas para el logo</string>
+    <string name="onboarding_review_task4">Búsqueda de contenido para la web</string>
+    <string name="onboarding_review_task5">Imprimir documentos importantes</string>
+    <string name="onboarding_review_task6">Programar reunión con el diseñador</string>
+    <string name="onboarding_review_task7">Crear plan de negocio para el cliente</string>
+    <string name="onboarding_review_task8">Escribir ideas</string>
+    <string name="onboarding_review_task9">Pagar el tiquet del párquing</string>
+    <string name="onboarding_review_task10">Escuchar el último podcast</string>
+
+    <!-- Hint tasks and messages  -->
+    <string name="hint_task_1">Bienvenido a  MoreStuff 🤗</string>
+    <string name="hint_task_1_message_1">Aquí puedes hablar con tus tareas</string>
+    <string name="hint_task_1_message_2">Añadir notas, links, fotos y pdf 🖼️</string>
+    <string name="hint_task_1_message_3">Crea un recordatorio así\n no te olvidas</string>
+    <string name="hint_task_1_message_4">¡Estate atento! Van a venir más funciones 🥳</string>
+
+    <string name="cd_highest_priority_hint_icon">Icono prioridad más alta</string>
+    <string name="cd_lowest_priority_hint_icon">Icono prioridad más baja</string>
+    <string name="cd_low_priority_hint_icon">Icono prioridad baja</string>
+    <string name="cd_high_priority_hint_icon">Icono prioridad alta</string>
+    <string name="review_hint_high_priority">Prioridad\nAlta</string>
+    <string name="review_hint_low_priority">Prioridad\nBaja</string>
+    <string name="review_hint_highest_priority">Prioridad\nmás alta</string>
+    <string name="review_hint_lowest_priority">Prioridad\nmás baja</string>
+    <string name="cd_app_logo">app logo</string>
+    <string name="cd_notifications_permission_image">Imagen notificación de permiso</string>
+    <string name="notification_permission_rationale">MoreStuff necesita el permiso de notificación para habilitar la configuración de horarios y recordatorios de las cosas que no quieres olvidar...\nTambién puedes habilitar el permiso mientras usas la aplicación.</string>
+    <string name="onboarding_review_all_done">Todo Hecho</string>
+    <string name="cd_extra_details">Notas</string>
+    <string name="cd_close_search">Cerrar búsqueda</string>
+
+    <string name="date_connector">de</string>
+    <string name="cd_delete_tasks">Eliminar tareas</string>
+    <string name="cd_complete_tasks">Completar tareas</string>
+    <string name="cd_more_options">Más opciones</string>
+    <string name="cd_open_settings">Abrir ajustes</string>
+    <string name="cd_search_tasks">Buscar tareas</string>
+
+    <!-- Month names  -->
+    <string name="month_january">Enero</string>
+    <string name="month_february">Febrero</string>
+    <string name="month_march">Marzo</string>
+    <string name="month_april">Abril</string>
+    <string name="month_may">Mayo</string>
+    <string name="month_june">Junio</string>
+    <string name="month_july">Julio</string>
+    <string name="month_august">Agosto</string>
+    <string name="month_september">Septiembre</string>
+    <string name="month_october">Octubre</string>
+    <string name="month_november">Noviembre</string>
+    <string name="month_december">Diciembre</string>
+
+
+    <string name="description_scopes">Usa scopes para separar lógicamente tus cosas.</string>
+    <string name="description_create_scope">Mantenlo corto y simple</string>
+
+</resources>
