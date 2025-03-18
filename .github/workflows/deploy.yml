@@ -50,7 +50,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: io.middlepoint.morestuff
-          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
+          releaseFiles: composeApp/build/outputs/bundle/release/androidApp-release.aab
           track: internal
           status: draft
-          mappingFile: androidApp/build/outputs/mapping/release/mapping.txt
+          mappingFile: composeApp/build/outputs/mapping/release/mapping.txt
