@@ -22,19 +22,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -84,11 +72,11 @@ fun homeModel(
           taskInputActive = false
         }
 
-        is HomeEvent.SetPlanPriority -> {
+        is SetPlanPriority -> {
           planTime = createPlanTime(timeManager, timeFormatter)
         }
 
-        is HomeEvent.ClearPlanPriority -> {
+        is ClearPlanPriority -> {
           planTime = null
         }
 
@@ -125,8 +113,11 @@ fun homeModel(
 
         ResetHomeState -> {
           selectedTasks = listOf()
-          taskInputActive = false
           reorderingScopes = emptyMap()
+        }
+
+        HideTaskInput -> {
+          taskInputActive = false
         }
 
         is CompleteSelectedTasks -> {
@@ -146,7 +137,7 @@ fun homeModel(
           selectedTasks = listOf()
         }
 
-        is HomeEvent.UpdatePlanDate -> {
+        is UpdatePlanDate -> {
           planTime = planTime?.let {
             val updatedTime = timeManager.utcMillisToLocalDateTime(
               event.dateMillis,
@@ -162,7 +153,7 @@ fun homeModel(
 
         }
 
-        is HomeEvent.UpdatePlanTime -> {
+        is UpdatePlanTime -> {
           planTime = planTime?.let {
             val updatedTime = timeManager.localDateTime(
               it.scheduleLocalDateTime,
@@ -209,7 +200,9 @@ fun homeModel(
           createScopeUseCase(event.title)
         }
 
-        is ScopeSelected -> currentScopeId = event.scopeId
+        is ScopeSelected -> {
+          currentScopeId = event.scopeId
+        }
         is ToggleTaskSelection -> {
           selectedTasks = if (event.taskId in selectedTasks) {
             selectedTasks - event.taskId

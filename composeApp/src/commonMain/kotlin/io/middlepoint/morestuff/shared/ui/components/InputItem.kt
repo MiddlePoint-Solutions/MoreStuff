@@ -1,22 +1,26 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -45,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +73,7 @@ import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.at
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
@@ -177,6 +184,7 @@ fun InputItem(
   }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScheduleSelectorRow(
@@ -196,6 +204,24 @@ fun ScheduleSelectorRow(
   var showRationaleDialog by remember { mutableStateOf(false) }
   var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
+  var contentWidth by remember { mutableStateOf(0.dp) }
+  var rowRef = remember { mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
+
+  val buttonExpanded = isVisible
+  val buttonSizeAnimation by animateDpAsState(
+    targetValue = if (buttonExpanded) 22.dp else 16.dp,
+    animationSpec = tween(400)
+  )
+
+  val buttonBackgroundAnimation by animateDpAsState(
+    targetValue = if (buttonExpanded) 40.dp else 40.dp,
+    animationSpec = tween(400)
+  )
+
+  val expandedWidth by animateDpAsState(
+    targetValue = if (isVisible) (contentWidth + 60.dp).coerceAtLeast(220.dp) else 48.dp,
+    animationSpec = tween(400, easing = FastOutSlowInEasing)
+  )
 
   LaunchedEffect(schedule) {
     if (schedule != null) {
@@ -217,134 +243,168 @@ fun ScheduleSelectorRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(start = 12.dp, end = 12.dp).padding(vertical = 8.dp),
+      .padding(horizontal = 12.dp, vertical = 8.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    IconButton(
-      onClick = {
-        if (permissionState.status.isGranted) {
-          if (isVisible) {
-            isVisible = false
-            coroutineScope.launch {
-              delay(400)
-              onClearSetPriority()
-            }
-          } else {
-            onSetPriority()
-            isVisible = true
-          }
-        } else {
-          showRationaleDialog = true
-        }
-      },
-
-      modifier = Modifier.size(52.dp)
+    Box(
+      contentAlignment = Alignment.CenterStart
     ) {
-      Icon(
-        imageVector = vectorResource(Res.drawable.ic_schedule),
-        contentDescription = stringResource(Res.string.cd_schedule_icon),
-        tint = MaterialTheme.colorScheme.inverseSurface,
+      // expandible Background
+      Box(
+        modifier = Modifier
+          .width(expandedWidth)
+          .height(48.dp)
+          .background(
+            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+            shape = if (isVisible) RoundedCornerShape(24.dp) else CircleShape
+          )
       )
-    }
-    Spacer(modifier = Modifier.width(10.dp))
 
-    AnimatedVisibility(
-      visible = isVisible,
-      enter = slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(400)) +
-          fadeIn(animationSpec = tween(300)),
-      exit = slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(400)) +
-          fadeOut(animationSpec = tween(300))
-    ) {
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        Button(
-          onClick = { showDatePickerDialog = true },
-          contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-            contentColor = MaterialTheme.colorScheme.secondary,
-          )
+      // Content ( schedule button + date/time selector)
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.height(40.dp)
+      ) {
+        Box(
+          modifier = Modifier.size(48.dp),
+          contentAlignment = Alignment.Center
         ) {
-          Text(
-            text = displaySchedule?.displayDate ?: "Select Date",
-            style = TextStyle(
-              fontSize = 14.sp,
-              lineHeight = 28.sp,
-              fontWeight = FontWeight(400),
-              color = MaterialTheme.colorScheme.secondary,
+          IconButton(
+            onClick = {
+              if (permissionState.status.isGranted) {
+                if (isVisible) {
+                  isVisible = false
+                  coroutineScope.launch {
+                    delay(400)
+                    onClearSetPriority()
+                  }
+                } else {
+                  onSetPriority()
+                  isVisible = true
+                }
+              } else {
+                showRationaleDialog = true
+              }
+            },
+            modifier = Modifier
+              .size(buttonBackgroundAnimation)
+          ) {
+            Icon(
+              imageVector = vectorResource(Res.drawable.ic_schedule),
+              contentDescription = stringResource(Res.string.cd_schedule_icon),
+              modifier = Modifier.size(buttonSizeAnimation),
+              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             )
-          )
+          }
         }
 
-        Spacer(modifier = Modifier.width(10.dp))
-
-        Button(
-          onClick = { showTimePickerDialog = true },
-          contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-            contentColor = MaterialTheme.colorScheme.secondary,
-          )
+        // Time/date animated buttons
+        AnimatedVisibility(
+          visible = isVisible,
+          enter = fadeIn(animationSpec = tween(300)) +
+              expandHorizontally(
+                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                expandFrom = Alignment.Start
+              ),
+          exit = fadeOut(animationSpec = tween(300)) +
+              shrinkHorizontally(
+                animationSpec = tween(400, easing = FastOutSlowInEasing),
+                shrinkTowards = Alignment.Start
+              ),
+          modifier = Modifier.padding(end = 6.dp)
         ) {
-          Text(
-            text = displaySchedule?.displayTime ?: "Select Time",
-            style = TextStyle(
-              fontSize = 14.sp,
-              lineHeight = 28.sp,
-              fontWeight = FontWeight(400),
-              color = MaterialTheme.colorScheme.secondary,
-            )
-          )
-        }
+          SubcomposeLayout { constraints ->
+            val placeable = subcompose("content") {
+              Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.onGloballyPositioned { coordinates ->
+                  contentWidth = coordinates.size.width.toDp()
+                }
+              ) {
+                Button(
+                  onClick = { showDatePickerDialog = true },
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                  )
+                ) {
+                  Text(
+                    text = displaySchedule?.displayDate ?: "Select Date",
+                    style = TextStyle(
+                      fontSize = 12.sp,
+                      lineHeight = 20.sp,
+                      fontWeight = FontWeight(400),
+                      color = MaterialTheme.colorScheme.secondary,
+                    )
+                  )
+                }
+              /*  Text(
+                  text = stringResource(Res.string.at),
+                  style = TextStyle(
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.secondary,
+                  )
+                )*/
+                Button(
+                  onClick = { showTimePickerDialog = true },
+                  contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
+                  colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                  )
+                ) {
+                  Text(
+                    text = displaySchedule?.displayTime ?: "Select Time",
+                    style = TextStyle(
+                      fontSize = 12.sp,
+                      lineHeight = 20.sp,
+                      fontWeight = FontWeight(400),
+                      color = MaterialTheme.colorScheme.secondary,
+                    )
+                  )
+                }
+              }
+            }.map { it.measure(constraints) }
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        IconButton(
-          onClick = {
-            isVisible = false
-            coroutineScope.launch {
-              delay(400)
-              onClearSetPriority()
+            layout(placeable[0].width, placeable[0].height) {
+              placeable[0].place(0, 0)
             }
           }
-        ) {
-          Icon(
-            Icons.Sharp.Close,
-            contentDescription = stringResource(Res.string.cd_cancel_schedule),
-            tint = MaterialTheme.colorScheme.secondary
-          )
         }
       }
     }
+  }
 
-    if (showDatePickerDialog && displaySchedule != null) {
-      val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = displaySchedule?.scheduleUtcTimeMillis ?: 0L
-      )
+  if (showDatePickerDialog && displaySchedule != null) {
+    val datePickerState = rememberDatePickerState(
+      initialSelectedDateMillis = displaySchedule?.scheduleUtcTimeMillis ?: 0L
+    )
 
-      PriorityDatePicker(
-        dismissDialog = { showDatePickerDialog = false },
-        onDateChange = {
-          datePickerState.selectedDateMillis?.let { onDateChange(it) }
-          showDatePickerDialog = false
-        },
-        state = datePickerState,
-      )
-    }
+    PriorityDatePicker(
+      dismissDialog = { showDatePickerDialog = false },
+      onDateChange = {
+        datePickerState.selectedDateMillis?.let { onDateChange(it) }
+        showDatePickerDialog = false
+      },
+      state = datePickerState,
+    )
+  }
 
-    if (showTimePickerDialog && displaySchedule != null) {
-      val timePickerState = rememberTimePickerState(
-        initialHour = displaySchedule?.hour ?: 0,
-        initialMinute = displaySchedule?.minute ?: 0
-      )
-      PriorityTimePicker(
-        dismissTimePicker = { showTimePickerDialog = false },
-        onTimeChange = {
-          onTimeChange(timePickerState.hour, timePickerState.minute)
-          showTimePickerDialog = false
-        },
-        state = timePickerState
-      )
-    }
+  if (showTimePickerDialog && displaySchedule != null) {
+    val timePickerState = rememberTimePickerState(
+      initialHour = displaySchedule?.hour ?: 0,
+      initialMinute = displaySchedule?.minute ?: 0
+    )
+    PriorityTimePicker(
+      dismissTimePicker = { showTimePickerDialog = false },
+      onTimeChange = {
+        onTimeChange(timePickerState.hour, timePickerState.minute)
+        showTimePickerDialog = false
+      },
+      state = timePickerState
+    )
   }
 
   NotificationPermissionDialog(
@@ -373,6 +433,4 @@ fun ScheduleSelectorRow(
       showRationaleDialog = false
     }
   )
-
 }
-

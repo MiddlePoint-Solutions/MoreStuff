@@ -88,8 +88,10 @@ fun PriorityItem(
       .combinedClickable(
         onClick = onTaskClick,
         onLongClick = {
-          haptic.performHapticFeedback(ReorderHapticFeedbackType.START)
-          onTaskLongPress()
+          if (enabled) {
+            haptic.performHapticFeedback(ReorderHapticFeedbackType.START)
+            onTaskLongPress()
+          }
         }
       )
   ) {
@@ -193,10 +195,14 @@ fun PriorityItem(
         androidx.compose.animation.AnimatedContent(
           targetState = isSelected || isReorderModeActive,
           transitionSpec = {
-            fadeIn(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)) togetherWith
+            fadeIn(
+              animationSpec = tween(
+                durationMillis = 500,
+                easing = LinearOutSlowInEasing
+              )
+            ) togetherWith
                 fadeOut(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing))
-          }
-          ,
+          },
           label = "TaskToggleAnimation"
         ) { state ->
           if (state) {

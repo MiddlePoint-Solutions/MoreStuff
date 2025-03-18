@@ -292,7 +292,7 @@ fun ReviewContent(
 
         ReviewRound.Final -> {
           LaunchedEffect(Unit) {
-            delay(2000)
+            delay(980)
             onBack()
           }
         }
