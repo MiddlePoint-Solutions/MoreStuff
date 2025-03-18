@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MoreStuff</string>
+    <!--  Schedule Reply  -->
+    <string name="schedule_reply_tomorrow">Tomorrow</string>
+    <string name="schedule_reply_snooze">Snooze</string>
+    <string name="schedule_reply_later">Later</string>
+    <string name="schedule_reply_done">Done</string>
+</resources>

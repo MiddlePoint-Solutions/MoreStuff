@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -16,29 +18,72 @@
 	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>io.middlepoint.morestuff</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>morestuff</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to the microphone to capture your voice for speech recognition.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Just for tests</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>We need access to speech recognition to convert your speech to text.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Request permission to post notifications</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
 		<false/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UIWindowSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>Default Configuration</string>
-					<key>UISceneDelegateClassName</key>
-					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
 	</dict>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+    
+    <key>NSMicrophoneUsageDescription</key>
+      <string>We need access to the microphone to capture your voice for speech recognition.</string>
+
+      <key>NSPhotoLibraryUsageDescription</key>
+      <string>Just for tests</string>
+
+      <key>NSSpeechRecognitionUsageDescription</key>
+      <string>We need access to speech recognition to convert your speech to text.</string>
+
+      <key>NSUserNotificationsUsageDescription</key>
+      <string>Request permission to post notifications</string>
+
+      <key>NSContactsUsageDescription</key>
+      <string>We need access to contacts to enhance the user experience and enable personalized interactions.</string>
+
+      <key>NSLocationWhenInUseUsageDescription</key>
+      <string>This app requires access to your location to display relevant information based on your location.</string>
+
+      <key>NSBluetoothAlwaysUsageDescription</key>
+      <string>Access to Bluetooth is required to connect with compatible devices and improve app functionality.</string>
+
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+    <string>io.middlepoint.morestuff.backgroundTask</string>
+</array>
+
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>audio</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict/>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

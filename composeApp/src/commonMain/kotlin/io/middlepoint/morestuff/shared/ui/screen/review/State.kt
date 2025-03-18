@@ -1,0 +1,37 @@
+package io.middlepoint.morestuff.shared.ui.screen.review
+
+import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
+import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
+import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
+import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.defaultScope
+
+sealed class ReviewRound {
+  data class Review(val scopeId: Long) : ReviewRound()
+  data object Final : ReviewRound()
+}
+
+data class ReviewState(
+  val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
+  val currentScope: ScopeDomain = defaultScope,
+  val items: List<ReviewItemUiModel> = listOf(),
+  val itemsForReview: Int = 0,
+  val actions: List<Pair<ReviewItemUiModel, ReviewActionType>> = listOf(),
+  val scopes: List<ScopeDomain> = listOf(),
+  val reviewHintEnabled: Boolean = false
+)
+
+sealed class ReviewViewEvent {
+  data class Undo(val item: ReviewItemUiModel) : ReviewViewEvent()
+
+  data class ItemSwipe(
+    val item: ReviewItemUiModel,
+    val direction: SwipeDirection
+  ) : ReviewViewEvent()
+
+  data class CompleteTask(val item: ReviewItemUiModel) : ReviewViewEvent()
+  data class DeleteTask(val item: ReviewItemUiModel) : ReviewViewEvent()
+  data class LoadScope(val scopeId: Long) : ReviewViewEvent()
+  data object ToggleReviewHint : ReviewViewEvent()
+}
+
