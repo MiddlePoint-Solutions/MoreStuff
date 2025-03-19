@@ -96,8 +96,8 @@ fun ScopeTabs(
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add Scope",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(24.dp)
+                    tint = unselectedTabColor,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
