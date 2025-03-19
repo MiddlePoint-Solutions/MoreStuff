@@ -29,7 +29,7 @@ class ShareViewController: UIViewController {
             return
         }
         
-        guard let containerURL = FileManager().containerURL(forSecurityApplicationGroupIdentifier: "group.io.middlepoint.morestuff.share") else {
+        guard let containerURL = FileManager().containerURL(forSecurityApplicationGroupIdentifier: "group.io.middlepoint.morestuff") else {
             print("Failed to access App Group container.")
             close()
             return
