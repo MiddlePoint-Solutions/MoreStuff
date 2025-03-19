@@ -5,15 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.utils.appendUrlsWithStyle
 import io.middlepoint.morestuff.shared.ui.utils.urlPattern
-import kotlinx.coroutines.launch
 
 @Composable
 private fun OpenGraphContent(message: MessageUiModel) {
@@ -46,6 +41,7 @@ private fun OpenGraphContent(message: MessageUiModel) {
 fun TextMessageItem(
   message: MessageUiModel,
   modifier: Modifier = Modifier,
+  onNonLinkClick: () -> Unit = {},
 ) {
   val content = handleUrlText(message.content)
   val uriHandler = LocalUriHandler.current
@@ -79,12 +75,15 @@ fun TextMessageItem(
             layoutResult?.let { result ->
               // Map the tap position to a character offset.
               val position = result.getOffsetForPosition(tapOffset)
+              val linkAnnotation =
+                annotatedContent.getLinkAnnotations(position, position).firstOrNull()
               // Check if the tap position is inside a link annotation.
-              annotatedContent.getLinkAnnotations(position, position).firstOrNull()
-                ?.let { link ->
-                  uriHandler.openUri(link.item.toString())
-                }
-            }
+              if (linkAnnotation != null) {
+                uriHandler.openUri(linkAnnotation.item.toString())
+              } else {
+                onNonLinkClick()
+              }
+            } ?: onNonLinkClick()
           }
         },
       style = MaterialTheme.typography.bodyLarge,

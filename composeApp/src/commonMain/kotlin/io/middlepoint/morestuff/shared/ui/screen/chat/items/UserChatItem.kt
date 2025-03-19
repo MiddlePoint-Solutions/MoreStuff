@@ -114,7 +114,7 @@ fun UserChatItem(
         }
 
         else -> {
-          TextMessageItem(message = message)
+          TextMessageItem(message = message, onNonLinkClick = { showMenu = true })
         }
       }
     }
