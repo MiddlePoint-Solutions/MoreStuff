@@ -69,7 +69,7 @@ fun TextMessageItem(
     BasicText(
       text = annotatedContent,
       modifier = Modifier
-        .padding(start = 14.dp, end = 15.dp, top = 8.dp, bottom = 3.dp)
+        .padding(start = 14.dp, end = 15.dp, top = 6.dp)
         .pointerInput(Unit) {
           detectTapGestures { tapOffset: Offset ->
             layoutResult?.let { result ->
