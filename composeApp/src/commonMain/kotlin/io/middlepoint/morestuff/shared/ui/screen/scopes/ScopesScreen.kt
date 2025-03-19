@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -231,26 +231,6 @@ private fun OrderedScopesList(
   onDeleteScope: (ScopeDomain) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit
 ) {
-//  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
-//  val model by viewModel.models.collectAsState()
-/*  var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
-  val menuVisibility = remember(scopes) {
-    mutableStateMapOf<Long, Boolean>().apply {
-      scopes.forEach { scope ->
-        put(scope.id, false)
-      }
-    }
-  }
-
-  val listState = rememberLazyListState()
-  val reorderState = rememberReorderableLazyListState(
-    lazyListState = listState,
-    onMove = { from, to ->
-      scopes = scopes.toMutableList().apply {
-        add(to.index, removeAt(from.index))
-      }
-    }
-  )*/
 
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
 
@@ -264,7 +244,6 @@ private fun OrderedScopesList(
 
   val listState = rememberLazyListState()
 
-  val listUpdatedChannel = remember { Channel<Unit>(Channel.CONFLATED) }
   fun updateList(from: Int, to: Int) {
     val newList = scopes.toMutableList().apply {
       val movedScope = removeAt(from)
@@ -273,22 +252,27 @@ private fun OrderedScopesList(
     scopes = newList
   }
 
-  val reorderState = rememberReorderableLazyListState(
-    lazyListState = listState,
-    onMove = { from, to ->
-      listUpdatedChannel.tryReceive()
-      updateList(from.index, to.index)
-      listUpdatedChannel.receive()
-    }
-  )
+  val listUpdatedChannel = remember { Channel<Unit>(Channel.CONFLATED) }
+
+  val reorderState = rememberReorderableLazyListState(listState) { from, to ->
+    listUpdatedChannel.tryReceive()
+    updateList(from.index, to.index)
+    listUpdatedChannel.receive()
+  }
+
   LaunchedEffect(scopes) {
     listUpdatedChannel.trySend(Unit)
+  }
+
+  LaunchedEffect(scopes) {
+    if (scopes != model.scopes) {
+      onEvent(ReorderScopes(scopes))
+    }
   }
 
   Column(
     modifier = Modifier.padding(top = 20.dp)
   ) {
-
     Text(
       text = stringResource(Res.string.title_scopes),
       modifier = Modifier.padding(start = 16.dp),
@@ -304,16 +288,11 @@ private fun OrderedScopesList(
       state = listState,
       modifier = Modifier.fillMaxSize()
     ) {
-      items(
+      itemsIndexed(
         items = scopes,
-        key = { scope -> scope.id }
-      ) { scope ->
-
-        ReorderableItem(
-          state = reorderState,
-          key = scope.id
-        ) {
-
+        key = { _, scope -> scope.id }
+      ) { _, scope ->
+        ReorderableItem(reorderState, key = scope.id) {
           Column(
             modifier = Modifier.background(
               color = MaterialTheme.colorScheme.surfaceContainerElevation
@@ -324,11 +303,7 @@ private fun OrderedScopesList(
               leadingContent = {
                 Icon(
                   imageVector = Icons.Default.DragHandle,
-                  modifier = Modifier.draggableHandle(
-                    onDragStopped = {
-                      onEvent(ReorderScopes(scopes))
-                    }
-                  ),
+                  modifier = Modifier.draggableHandle(),
                   contentDescription = stringResource(Res.string.cd_move_icon),
                   tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -377,7 +352,6 @@ private fun OrderedScopesList(
                       )
                     }
                   )
-
                 }
               },
               colors = ListItemDefaults.colors(
