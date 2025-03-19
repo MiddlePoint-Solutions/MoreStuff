@@ -222,6 +222,17 @@ kotlin {
       implementation(compose.desktop.currentOs)
       implementation(libs.sqldelight.driver.desktop)
       implementation(libs.kotlinx.coroutines.swing)
+      implementation(libs.sqlite.jdbc)
+      implementation(libs.androidx.collection)
+      implementation(libs.slf4j.simple)
+      implementation(libs.skiko.awt.runtime.macos.arm64)
+
+      implementation(libs.compose.desktop)
+      implementation(libs.compose.runtime.desktop)
+      implementation(libs.androidx.lifecycle.runtime.compose.desktop)
+      implementation(libs.androidx.lifecycle.runtime.compose)
+      implementation(libs.sqldelight.async.extensions)
+      implementation(libs.sqldelight.coroutines.extensions.jvm)
     }
 
     // TODO: Enable once we have support from SqlDelight & Arrow

@@ -58,6 +58,14 @@ zoomable = "1.6.1"
 kottie = "1.9.6-alpha02"
 calf = "0.6.1"
 
+sqlite-jdbc = "3.49.1.0"
+slf4j = "2.0.11"
+skiko = "0.8.18"
+androidx-collection = "1.4.0"
+compose-desktop = "1.7.3"
+compose-runtime-desktop = "1.7.3"
+androidx-lifecycle-runtime-compose = "2.8.0"
+
 
 [libraries]
 # Kotlin
@@ -156,6 +164,18 @@ kSoup = { module = "com.mohamedrejeb.ksoup:ksoup-html", version.ref = "kSoup" }
 constraintLayout-compose = { module = "tech.annexflow.compose:constraintlayout-compose-multiplatform", version.ref = "constraintLayout-compose" }
 sqliteAndroid = { module = "com.github.requery:sqlite-android", version.ref = "sqliteAndroid" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterfaceVersion" }
+
+# Desktop
+sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite-jdbc" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+skiko-awt-runtime-macos-arm64 = { module = "org.jetbrains.skiko:skiko-awt-runtime-macos-arm64", version.ref = "skiko" }
+androidx-collection = { module = "androidx.collection:collection", version.ref = "androidx-collection" }
+sqldelight-async-extensions = { module = "app.cash.sqldelight:async-extensions-jvm", version.ref = "sqldelight" }
+sqldelight-coroutines-extensions-jvm = { module = "app.cash.sqldelight:coroutines-extensions-jvm", version.ref = "sqldelight" }
+compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose-desktop" }
+compose-runtime-desktop = { module = "org.jetbrains.compose.runtime:runtime-desktop", version.ref = "compose-runtime-desktop" }
+androidx-lifecycle-runtime-compose-desktop = { module = "androidx.lifecycle:lifecycle-runtime-compose-desktop", version.ref = "androidx-lifecycle-runtime-compose" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle-runtime-compose" }
 
 # END OLD
 

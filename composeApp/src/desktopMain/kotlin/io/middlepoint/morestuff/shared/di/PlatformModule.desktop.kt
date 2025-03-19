@@ -10,6 +10,7 @@ import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.service.SchedulerImpl
+import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -24,6 +25,7 @@ actual val platformModule: Module = module {
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
+    singleOf(::SharedFunctionsHandler)
 
     single<Settings> {
         val preferences = Preferences.userRoot()

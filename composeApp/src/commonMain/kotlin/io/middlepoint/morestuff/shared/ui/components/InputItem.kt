@@ -9,6 +9,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +52,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -67,6 +78,7 @@ import com.mohamedrejeb.calf.permissions.PermissionStatus
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
+import io.middlepoint.morestuff.shared.Platform
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -101,12 +113,44 @@ fun InputItem(
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
 
-  LaunchedEffect(Unit) { focusRequester.requestFocus() }
+  fun getCurrentPlatform(): Platform {
+    return Platform.Desktop
+  }
+
+  LaunchedEffect(Unit) {
+    if (Platform.Desktop == getCurrentPlatform()) {
+
+      delay(200)
+      try {
+        focusRequester.requestFocus()
+      } catch (e: IllegalArgumentException) {
+        println("Desktop focus request failed: ${e.message}")
+        delay(500)
+        try {
+          focusRequester.requestFocus()
+        } catch (e: IllegalArgumentException) {
+          println("Second desktop focus request also failed: ${e.message}")
+        }
+      }
+    } else {
+      focusRequester.requestFocus()
+    }
+  }
 
   LaunchedEffect(inputValue) {
     if (inputValue.text.isEmpty()) {
-      focusRequester.requestFocus()
-      keyboardController?.show()
+      if (Platform.Desktop == getCurrentPlatform()) {
+        delay(200)
+        try {
+          focusRequester.requestFocus()
+          keyboardController?.show()
+        } catch (e: IllegalArgumentException) {
+          println("Desktop focus request in inputValue observer failed: ${e.message}")
+        }
+      } else {
+        focusRequester.requestFocus()
+        keyboardController?.show()
+      }
     }
   }
 
@@ -293,7 +337,9 @@ fun ScheduleSelectorRow(
               imageVector = vectorResource(Res.drawable.ic_schedule),
               contentDescription = stringResource(Res.string.cd_schedule_icon),
               modifier = Modifier.size(buttonSizeAnimation),
-              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                alpha = 0.6f
+              ),
             )
           }
         }
@@ -340,13 +386,13 @@ fun ScheduleSelectorRow(
                     )
                   )
                 }
-              /*  Text(
-                  text = stringResource(Res.string.at),
-                  style = TextStyle(
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                  )
-                )*/
+                /*  Text(
+                    text = stringResource(Res.string.at),
+                    style = TextStyle(
+                      fontSize = 12.sp,
+                      color = MaterialTheme.colorScheme.secondary,
+                    )
+                  )*/
                 Button(
                   onClick = { showTimePickerDialog = true },
                   contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),

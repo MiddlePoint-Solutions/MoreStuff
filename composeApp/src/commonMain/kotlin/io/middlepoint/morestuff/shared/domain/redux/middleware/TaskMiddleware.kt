@@ -76,6 +76,7 @@ class TaskMiddleware(
         with(action) {
           val params = TaskParams(title, priority, TaskType.User, scopeId)
           val task = createTaskUseCase(params)
+          println("Create task: ${task.title}")
           onTaskCreated?.invoke(task)
           dispatch(TaskCreatedAction(task, priority))
         }

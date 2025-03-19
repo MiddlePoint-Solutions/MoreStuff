@@ -26,8 +26,4 @@ class SchedulerImpl : Scheduler {
     override fun cancelPlannedPriorityUpdate() {
         TODO("Not yet implemented")
     }
-
-    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
-        TODO("Not yet implemented")
-    }
 }

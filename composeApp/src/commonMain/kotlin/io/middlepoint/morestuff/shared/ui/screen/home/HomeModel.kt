@@ -52,12 +52,15 @@ fun homeModel(
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
+    println("Dispatching action: ${action::class.simpleName}")
     store.dispatch(action)
   }
 
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
       Logger.i { "Scopes updated: ${it.size} scopes received" }
+      println("Scopes updated: ${it.size} scopes received")
+
       scopes = it
     }
   }
