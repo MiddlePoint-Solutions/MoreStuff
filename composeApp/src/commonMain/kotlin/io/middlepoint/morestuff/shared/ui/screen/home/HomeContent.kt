@@ -59,6 +59,7 @@ import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
@@ -161,7 +162,12 @@ fun HomeScreen() {
     homePresenter.notifications.collectLatest { notification ->
       notification.show(snackbarHostState).let { result ->
         if (result == SnackbarResult.ActionPerformed) {
-          launch { notification.action() }
+          launch {
+            notification.action()
+            if (notification is NotificationState.Complete) {
+              homePresenter.take(ResetHomeState)
+            }
+          }
         }
       }
     }
