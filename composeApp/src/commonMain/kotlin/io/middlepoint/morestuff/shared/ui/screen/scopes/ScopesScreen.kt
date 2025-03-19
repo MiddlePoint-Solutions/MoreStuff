@@ -299,11 +299,10 @@ private fun OrderedScopesList(
             )
           ) {
             ListItem(
-              modifier = Modifier.fillMaxWidth(),
+              modifier = Modifier.fillMaxWidth().draggableHandle(),
               leadingContent = {
                 Icon(
                   imageVector = Icons.Default.DragHandle,
-                  modifier = Modifier.draggableHandle(),
                   contentDescription = stringResource(Res.string.cd_move_icon),
                   tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
