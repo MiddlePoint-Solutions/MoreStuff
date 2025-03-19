@@ -82,6 +82,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.confirm_delete
+import morestuff.composeapp.generated.resources.sure_delete_tasks
+import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -165,6 +169,8 @@ fun HomeScreen() {
 
   if (showDeleteConfirmationDialog) {
     ConfirmDeleteDialog(
+      title = stringResource(Res.string.confirm_delete),
+      text = stringResource(Res.string.sure_delete_tasks),
       onDismiss = { showDeleteConfirmationDialog = false },
       onConfirm = {
         homePresenter.take(DeleteSelectedTasks)
