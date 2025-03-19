@@ -151,7 +151,8 @@
     <string name="language_catalan">Catalan</string>
     <string name="language_device_default">Device</string>
     <string name="confirm_delete">Confirm Delete</string>
-    <string name="sure_delete_task">Are you sure you want to delete\nthe following tasks?</string>
+    <string name="sure_delete_tasks">Are you sure you want to delete\nthe following tasks?</string>
+    <string name="sure_delete_task">Are you sure you want to delete\nthe following task %s?</string>
     <string name="can_i_do_for_you_today">What can I do for you today?</string>
     <string name="added_new_task">Added new task!</string>
     <string name="developer_settings">Developer Settings</string>
@@ -200,7 +201,7 @@
     <string name="record_audio_permission_title">Record Audio Permission</string>
     <string name="record_audio_permission_description">Recording audio is required for this feature to be available.\nPlease grant the permission</string>
     <string name="voice_to_text_listening">Listening</string>
-    <string name="cta_lets_go">Let\'s Go! :)</string>
+    <string name="cta_lets_go">Let's Go! :)</string>
     <string name="cd_share_to_new_task">Share to new task</string>
     <string name="dev_settings_already_enabled">You have already enabled developer settings!</string>
     <string name="developer_settings_enabled">Developer settings enabled!</string>
