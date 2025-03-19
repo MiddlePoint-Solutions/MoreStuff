@@ -102,10 +102,12 @@ import morestuff.composeapp.generated.resources.cd_select_images
 import morestuff.composeapp.generated.resources.cd_task_done_icon
 import morestuff.composeapp.generated.resources.cd_undo
 import morestuff.composeapp.generated.resources.complete
+import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
+import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -333,6 +335,8 @@ private fun TaskChatContent(
 
   if (showDeleteConfirmationDialog) {
     ConfirmDeleteDialog(
+      title = stringResource(Res.string.confirm_delete),
+      text = stringResource(Res.string.sure_delete_task).replace("%s", task.title),
       onDismiss = { showDeleteConfirmationDialog = false },
       onConfirm = {
         onEvent(DeleteTask)

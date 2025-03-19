@@ -6,8 +6,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -51,11 +49,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,24 +65,23 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleOrNull
-import io.middlepoint.morestuff.shared.ui.components.swipeable.firstVisibleStateOrNull
 import io.middlepoint.morestuff.shared.ui.components.swipeable.lastSwipedItem
 import io.middlepoint.morestuff.shared.ui.components.swipeable.rememberSwipeableCardState
 import io.middlepoint.morestuff.shared.ui.components.swipeable.swipableCard
-import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
-import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData
-import io.middlepoint.morestuff.shared.ui.screen.chat.items.MockData.messageUiModel
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingReviewScreen
-import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.*
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.CompleteTask
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.DeleteTask
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ItemSwipe
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.LoadScope
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ToggleReviewHint
+import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.Undo
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.delay
@@ -98,6 +93,7 @@ import morestuff.composeapp.generated.resources.cd_highest_priority_hint_icon
 import morestuff.composeapp.generated.resources.cd_low_priority_hint_icon
 import morestuff.composeapp.generated.resources.cd_lowest_priority_hint_icon
 import morestuff.composeapp.generated.resources.cd_navigate_back
+import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.disable_hint_arrow
 import morestuff.composeapp.generated.resources.enable_hint_arrow
 import morestuff.composeapp.generated.resources.help
@@ -113,6 +109,7 @@ import morestuff.composeapp.generated.resources.review_hint_highest_priority
 import morestuff.composeapp.generated.resources.review_hint_low_priority
 import morestuff.composeapp.generated.resources.review_hint_lowest_priority
 import morestuff.composeapp.generated.resources.show_hint_arrow_priority
+import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 
@@ -406,6 +403,8 @@ private fun ReviewSwipeControls(
 
   if (showDeleteConfirmationDialog) {
     ConfirmDeleteDialog(
+      title = stringResource(Res.string.confirm_delete),
+      text = stringResource(Res.string.sure_delete_task).replace("%s", ""),
       onDismiss = { showDeleteConfirmationDialog = false },
       onConfirm = {
         firstVisibleItem()?.let { item ->

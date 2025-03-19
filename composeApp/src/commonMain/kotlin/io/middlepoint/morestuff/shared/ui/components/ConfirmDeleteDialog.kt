@@ -7,34 +7,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.style.TextAlign
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
-import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
-import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ConfirmDeleteDialog(
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
+  onDismiss: () -> Unit,
+  onConfirm: () -> Unit,
+  title: String,
+  text: String
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(Res.string.confirm_delete)) },
-        text = {
-            Text(
-                text = stringResource(Res.string.sure_delete_task),
-                textAlign = TextAlign.Start
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = onConfirm) {
-                Text(stringResource(Res.string.delete))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(Res.string.cancel))
-            }
-        }
-    )
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = {
+      Text(text = title)
+    },
+    text = {
+      Text(
+        text = text,
+        textAlign = TextAlign.Start
+      )
+    },
+    confirmButton = {
+      TextButton(onClick = onConfirm) {
+        Text(stringResource(Res.string.delete))
+      }
+    },
+    dismissButton = {
+      TextButton(onClick = onDismiss) {
+        Text(stringResource(Res.string.cancel))
+      }
+    }
+  )
 }
