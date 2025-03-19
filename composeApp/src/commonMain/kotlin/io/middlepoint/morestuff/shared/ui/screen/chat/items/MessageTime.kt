@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun MessageTime(
@@ -17,8 +18,13 @@ fun MessageTime(
   formattedTimeOnly?.let {
     Text(
       text = it,
-      style = MaterialTheme.typography.bodySmall.copy(color = textColor),
-      modifier = modifier.padding(start = 10.dp, end = 10.dp, bottom = 5.dp)
+      style = MaterialTheme.typography.bodySmall.copy(
+        color = textColor,
+        fontSize = 10.sp,
+        letterSpacing = 0.sp,
+        lineHeight = 12.sp
+      ),
+      modifier = modifier.padding(start = 6.dp, end = 6.dp, bottom = 3.dp)
     )
   }
 }
