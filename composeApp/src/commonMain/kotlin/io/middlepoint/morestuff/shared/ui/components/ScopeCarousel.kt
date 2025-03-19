@@ -3,9 +3,7 @@ package io.middlepoint.morestuff.shared.ui.components
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateInt
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.MaterialTheme
@@ -29,12 +26,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -136,7 +130,7 @@ private fun ScopeCarouselItem(
       style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 16.sp),
       fontSize = fontState.sp,
       color = MaterialTheme.colorScheme.secondary,
-      maxLines = 2,
+      maxLines = 1,
       overflow = TextOverflow.Ellipsis,
     )
   }
