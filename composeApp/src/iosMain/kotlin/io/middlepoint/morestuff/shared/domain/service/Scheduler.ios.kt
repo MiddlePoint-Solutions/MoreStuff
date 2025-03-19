@@ -131,14 +131,6 @@ class SchedulerImpl(
             }
     }
 
-    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
-        if (replaceExisting) {
-            cancelPlannedPriorityUpdate()
-        }
-
-        scheduleReviewWorker(hour, minute)
-    }
-
     override fun cancelSchedule(scheduleId: Long) {
         UNUserNotificationCenter.currentNotificationCenter()
             .removePendingNotificationRequestsWithIdentifiers(
