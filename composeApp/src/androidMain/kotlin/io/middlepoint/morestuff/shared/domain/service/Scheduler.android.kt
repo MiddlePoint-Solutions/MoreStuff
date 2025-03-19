@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.service
 
-import android.app.AlarmManager
 import android.content.Context
 import android.content.Intent
 import androidx.work.Constraints
@@ -92,51 +91,6 @@ class SchedulerImpl(
         }.build()
 
         workManager.enqueueUniqueWork(PRIORITY_REVIEW_WORK, ExistingWorkPolicy.REPLACE, work)
-    }
-
-    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val reviewIntent = NotificationReceiver.createReviewIntent(context)
-        val pendingIntent = NotificationReceiver.createCancelReviewPendingIntent(
-            context,
-            reviewIntent
-        )
-        when {
-            pendingIntent == null -> {
-                Logger.d("Review notification does not exist - creating...")
-                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
-            }
-
-            replaceExisting -> {
-                alarmManager.cancel(pendingIntent)
-                setReviewAlarm(alarmManager, hour, minute, reviewIntent)
-            }
-        }
-    }
-
-    private fun setReviewAlarm(
-        alarmManager: AlarmManager,
-        hour: Int,
-        minute: Int,
-        reviewIntent: Intent,
-    ) {
-        Calendar.getInstance().apply {
-            val hourOfDay = get(Calendar.HOUR_OF_DAY)
-            if (hourOfDay > hour) {
-                add(Calendar.DAY_OF_YEAR, 1)
-            }
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-        }.also {
-            alarmManager.setExact(
-                AlarmManager.RTC_WAKEUP,
-                it.timeInMillis,
-                NotificationReceiver.createReviewPendingIntent(
-                    context,
-                    reviewIntent,
-                )
-            )
-        }
     }
 
     override fun cancelSchedule(scheduleId: Long) {

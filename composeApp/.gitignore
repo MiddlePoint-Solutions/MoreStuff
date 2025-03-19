@@ -1,3 +1,5 @@
 /build
 /shared.podspec
 /composeApp.podspec
+/release/
+/staging/
