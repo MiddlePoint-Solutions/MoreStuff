@@ -2,8 +2,9 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,9 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -178,51 +178,58 @@ fun PriorityItem(
       }
     }
 
-    Column(
+
+    val badgesAlpha by animateFloatAsState(
+      targetValue = if (isSelected || isReorderModeActive) 0f else 1f,
+      animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+      label = "BadgesAlphaAnimation"
+    )
+
+    val toggleAlpha by animateFloatAsState(
+      targetValue = if (isSelected || isReorderModeActive) 1f else 0f,
+      animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+      label = "ToggleAlphaAnimation"
+    )
+
+    Box(
       modifier = Modifier
-        .align(if (isSelected || isReorderModeActive) Alignment.CenterEnd else Alignment.BottomEnd)
+        .align(Alignment.BottomEnd)
         .padding(end = 8.dp)
-        .width(48.dp),
-      verticalArrangement = Arrangement.spacedBy(4.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
+        .width(48.dp)
+        .height(48.dp)
+        .graphicsLayer {
+          alpha = badgesAlpha
+        },
+      contentAlignment = Alignment.Center
     ) {
-      Box(
-        modifier = Modifier
-          .height(48.dp)
-          .width(48.dp),
-        contentAlignment = Alignment.Center
-      ) {
-        androidx.compose.animation.AnimatedContent(
-          targetState = isSelected || isReorderModeActive,
-          transitionSpec = {
-            fadeIn(
-              animationSpec = tween(
-                durationMillis = 500,
-                easing = LinearOutSlowInEasing
-              )
-            ) togetherWith
-                fadeOut(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing))
-          },
-          label = "TaskToggleAnimation"
-        ) { state ->
-          if (state) {
-            ToggleTaskAsDone(
-              modifier = Modifier.fillMaxSize(),
-              selectedToComplete = isCompleted,
-              onClick = {
-                isCompleted = !isCompleted
-                onTaskComplete(isCompleted)
-              },
-              enabled = enabled,
-            )
-          } else {
-            TaskItemBadges(
-              modifier = Modifier.fillMaxSize(),
-              task = task
-            )
+      TaskItemBadges(
+        modifier = Modifier.fillMaxSize(),
+        task = task
+      )
+    }
+
+    Box(
+      modifier = Modifier
+        .align(Alignment.CenterEnd)
+        .padding(end = 8.dp)
+        .width(48.dp)
+        .height(48.dp)
+        .graphicsLayer {
+          alpha = toggleAlpha
+        },
+      contentAlignment = Alignment.Center
+    ) {
+      ToggleTaskAsDone(
+        modifier = Modifier.fillMaxSize(),
+        selectedToComplete = isCompleted,
+        onClick = {
+          if (toggleAlpha > 0.8f) {
+            isCompleted = !isCompleted
+            onTaskComplete(isCompleted)
           }
-        }
-      }
+        },
+        enabled = enabled
+      )
     }
   }
 }
