@@ -50,9 +50,11 @@ import co.touchlab.kermit.Logger
 import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.picker.coil.KmpFileFetcher
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.createImageLoader
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_send
 import morestuff.composeapp.generated.resources.import_image_title
@@ -98,15 +100,15 @@ fun ImageImportScreen(
 
       val platformContext = LocalPlatformContext.current
       val imageLoader = remember {
-        ImageLoader(platformContext).newBuilder()
-          .components {
-            add(KmpFileFetcher.Factory())
-          }.build()
+        createImageLoader(platformContext)
       }
 
       Image(
         painter = rememberAsyncImagePainter(
-          model = imagePath,
+          model = ImageRequest.Builder(LocalPlatformContext.current)
+            .data(imagePath)
+            .fetcherFactory(KmpFileFetcher.Factory())
+            .build(),
           imageLoader = imageLoader
         ),
         contentDescription = "Selected Image",

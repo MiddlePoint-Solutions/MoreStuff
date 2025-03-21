@@ -56,7 +56,7 @@ sonner = "0.3.6"
 reorderable = "2.1.1"
 zoomable = "1.6.1"
 kottie = "1.9.6-alpha02"
-calf = "0.6.1"
+calf = "0.7.1"
 
 
 [libraries]

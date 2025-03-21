@@ -19,12 +19,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.ImageLoader
+import coil3.PlatformContext
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.size.Scale
+import com.mohamedrejeb.calf.picker.coil.KmpFileFetcher
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.utils.getPlatformFetcherFactory
 
 @Composable
 fun ImageMessageItem(
@@ -39,6 +42,10 @@ fun ImageMessageItem(
     val uri by remember {
       derivedStateOf { message.messageData?.filePath }
     }
+    val platformContext = LocalPlatformContext.current
+    val imageLoader = remember(platformContext) {
+      createImageLoader(platformContext)
+    }
 
     Image(
       painter = rememberAsyncImagePainter(
@@ -48,7 +55,7 @@ fun ImageMessageItem(
           .scale(Scale.FIT)
           .memoryCacheKey(message.messageData?.filePath)
           .build(),
-        imageLoader = ImageLoader(LocalPlatformContext.current)
+        imageLoader = imageLoader
       ),
       contentDescription = null,
       contentScale = ContentScale.Crop,
@@ -78,4 +85,17 @@ fun ImageMessageItem(
       )
     }
   }
+}
+
+
+
+fun createImageLoader(context: PlatformContext): ImageLoader {
+  return ImageLoader.Builder(context)
+    .components {
+      add(getPlatformFetcherFactory())
+      add(KmpFileFetcher.Factory())
+    }
+    .crossfade(true)
+    //.logger(DebugLogger()) // Útil para depuración, puedes eliminar en producción
+    .build()
 }
