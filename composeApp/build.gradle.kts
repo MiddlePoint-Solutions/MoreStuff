@@ -158,6 +158,8 @@ kotlin {
 
       implementation(libs.reorderable)
       implementation(libs.coil.compose)
+      implementation(libs.coil.ktor3)
+      implementation(libs.coil.ktor2)
       implementation(libs.zoomable)
       implementation(libs.kottie)
       implementation(libs.calf.permissions)

@@ -221,18 +221,6 @@ private fun TaskChatContent(
   var titleLineCount by remember { mutableStateOf(0) }
 
 
-  /*  val singleImagePickerLauncher =
-      rememberFilePickerLauncher(
-        type = FilePickerFileType.Image,
-        selectionMode = FilePickerSelectionMode.Single,
-        onResult = { files ->
-          files.firstOrNull()?.let {
-            logger.d { "Image path: $it" }
-            imagePicked(it)
-          }
-        }
-      )*/
-
   val singleImagePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.Image,
   ) { files ->
@@ -242,17 +230,6 @@ private fun TaskChatContent(
     }
   }
 
-  /*  val singleFilePickerLauncher =
-      rememberFilePickerLauncher(
-        type = FilePickerFileType.Pdf,
-        selectionMode = FilePickerSelectionMode.Single,
-        onResult = { files ->
-          files.firstOrNull()?.let {
-            logger.d { "PDF path: $it" }
-            pdfPicked(it)
-          }
-        }
-      )*/
 
   val singleFilePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.File(extensions = listOf("pdf", "docx"))

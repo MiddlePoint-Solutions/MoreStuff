@@ -97,6 +97,19 @@ class ShareViewController: UIViewController {
                             }
                             group.leave()
                         }
+                    } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
+                        group.enter()
+                        itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { (item, error) in
+                            if let url = item as? URL {
+                                print("Received URL: \(url)")
+                                let urlString = url.absoluteString
+                                self.sharedFilePath = "\(self.docPath)/shared_url.txt"
+                                try? urlString.write(toFile: self.sharedFilePath, atomically: true, encoding: .utf8)
+                            } else if let error = error {
+                                print("Error loading URL: \(error.localizedDescription)")
+                            }
+                            group.leave()
+                        }
                     } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                         group.enter()
                         itemProvider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { (item, error) in

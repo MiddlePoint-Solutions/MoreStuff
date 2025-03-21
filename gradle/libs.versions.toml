@@ -1,6 +1,6 @@
 [versions]
 turbine = "1.0.0"
-coilCompose = "3.0.1"
+coilCompose = "3.1.0"
 firebaseBom = "33.9.0"
 googleServices = "4.4.2"
 koinTest = "3.5.6"
@@ -30,7 +30,7 @@ androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
 androidx-lifecycle = "2.8.7"
 kermit = "2.0.3"
-ktor = "2.3.12"
+ktor = "3.1.1"
 multiplatform-settings = "1.1.1"
 koin-bom = "4.1.0-Beta1"
 sqldelight = "2.0.2"
@@ -126,6 +126,8 @@ settingsStoragePreferences = { group = "com.github.alorma.compose-settings", nam
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilCompose" }
+coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
+coil-ktor2 = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coilCompose" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 kottie = { module = "io.github.ismai117:kottie", version.ref = "kottie" }
 calf-permissions = { module = "com.mohamedrejeb.calf:calf-permissions", version.ref = "calf" }
