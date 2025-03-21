@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared
 
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -25,4 +25,4 @@ expect fun requiresNotificationsPermission(): Boolean
 
 expect val platform: Platform
 
-expect fun createKmpFile(path: String) : KmpFile
+expect fun createKmpFile(path: String): PlatformFile

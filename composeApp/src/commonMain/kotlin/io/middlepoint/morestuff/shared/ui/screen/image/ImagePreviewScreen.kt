@@ -23,11 +23,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import com.mxalbert.zoomable.Zoomable
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
-import io.middlepoint.morestuff.shared.ui.screen.chat.items.createImageLoader
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_share
 import org.jetbrains.compose.resources.stringResource
@@ -46,8 +46,8 @@ fun ImagePreviewScreen(
   ) {
     val platformContext = LocalPlatformContext.current
     val imageLoader = remember(platformContext) {
-      createImageLoader(platformContext)
-    }
+      ImageLoader(platformContext).newBuilder()
+    }.build()
 
     Zoomable {
       Image(

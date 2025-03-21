@@ -50,11 +50,9 @@ import co.touchlab.kermit.Logger
 import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
-import coil3.request.ImageRequest
 import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.picker.coil.KmpFileFetcher
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
-import io.middlepoint.morestuff.shared.ui.screen.chat.items.createImageLoader
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_send
 import morestuff.composeapp.generated.resources.import_image_title
@@ -63,10 +61,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
+
+val logger = Logger.withTag("imageImport")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
-  imagePath: KmpFile,
+  imagePath: String,
   onImport: (String) -> Unit,
   onBack: () -> Unit,
 ) {
@@ -99,16 +100,17 @@ fun ImageImportScreen(
     ) {
 
       val platformContext = LocalPlatformContext.current
-      val imageLoader = remember {
-        createImageLoader(platformContext)
-      }
+      val imageLoader = ImageLoader.Builder(platformContext)
+        .build()
+
+      logger.d { "imageLoader: $imageLoader" }
+
+
+      logger.d { "image path: $imagePath" }
 
       Image(
         painter = rememberAsyncImagePainter(
-          model = ImageRequest.Builder(LocalPlatformContext.current)
-            .data(imagePath)
-            .fetcherFactory(KmpFileFetcher.Factory())
-            .build(),
+          model = imagePath,
           imageLoader = imageLoader
         ),
         contentDescription = "Selected Image",

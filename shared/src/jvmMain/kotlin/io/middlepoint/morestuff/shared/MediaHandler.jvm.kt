@@ -1,11 +1,11 @@
 package io.middlepoint.morestuff.shared
 
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.datetime.LocalDateTime
 
 class MediaHandlerImpl : MediaHandler {
 
-    override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String? {
+    override suspend fun saveMedia(media: PlatformFile, time: LocalDateTime): String? {
         TODO("Not yet implemented")
     }
 
@@ -13,7 +13,7 @@ class MediaHandlerImpl : MediaHandler {
         TODO("Not yet implemented")
     }
 
-    override suspend fun savePDF(media: KmpFile): String? {
+    override suspend fun savePDF(media: PlatformFile): String? {
         TODO("Not yet implemented")
     }
 

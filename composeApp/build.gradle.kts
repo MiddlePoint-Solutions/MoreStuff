@@ -164,6 +164,10 @@ kotlin {
       implementation(libs.calf.filepicker)
       implementation(libs.calf.filepicker.coil)
       implementation(libs.calf.io)
+      implementation(libs.filekit.dialogs)
+      implementation(libs.filekit.dialogs.compose)
+      implementation(libs.filekit.core)
+      implementation(libs.filekit.coil)
 
       // About
       implementation(libs.aboutLibrariesCore)

@@ -11,9 +11,10 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import co.touchlab.kermit.Logger
-import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getName
-import com.mohamedrejeb.calf.io.readByteArray
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.uri
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.readBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
@@ -27,7 +28,7 @@ class MediaHandlerImpl(
   private val logger: Logger
 ) : MediaHandler {
 
-  override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String? =
+  override suspend fun saveMedia(media: PlatformFile, time: LocalDateTime): String? =
     withContext(Dispatchers.IO) {
       val uri = media.uri
       val outputStream: FileOutputStream?
@@ -103,12 +104,12 @@ class MediaHandlerImpl(
     context.startActivity(chooserIntent)
   }
 
-  override suspend fun savePDF(media: KmpFile): String? = withContext(Dispatchers.IO) {
+  override suspend fun savePDF(media: PlatformFile): String? = withContext(Dispatchers.IO) {
     try {
-      val originalFileName = media.getName(context) ?: "PDF_Default.pdf"
+      val originalFileName = media.name ?: "PDF_Default.pdf"
       val pdfFile = createPDFFile(originalFileName).toFile()
 
-      media.readByteArray(context).inputStream().use { inputStream ->
+      media.readBytes().inputStream().use { inputStream ->
         FileOutputStream(pdfFile).use { outputStream ->
           inputStream.copyTo(outputStream)
         }

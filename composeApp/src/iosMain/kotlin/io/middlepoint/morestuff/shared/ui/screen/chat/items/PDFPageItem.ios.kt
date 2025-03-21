@@ -16,8 +16,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import com.mohamedrejeb.calf.core.LocalPlatformContext
-import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.refTo
@@ -56,18 +56,16 @@ import platform.posix.memcpy
 
 @Composable
 actual fun PDFPagePreview(
-    pdfFile: KmpFile,
-    width: Int,
-    height: Int,
-    scale: Float,
+  pdfFile: PlatformFile,
+  width: Int,
+  height: Int,
+  scale: Float,
 ) {
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     val platformContext = LocalPlatformContext.current
 
     LaunchedEffect(pdfFile) {
-        val url = pdfFile.getPath(platformContext) ?: run {
-            return@LaunchedEffect
-        }
+        val url = pdfFile.path
 
         val imageData = renderPage(url, width, height, scale)
         if (imageData != null) {
