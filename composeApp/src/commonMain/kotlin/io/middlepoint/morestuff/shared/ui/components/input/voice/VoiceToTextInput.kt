@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
@@ -57,12 +58,13 @@ import morestuff.composeapp.generated.resources.record_audio_permission_title
 import morestuff.composeapp.generated.resources.request_permission
 import morestuff.composeapp.generated.resources.voice_to_text_listening
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun VoiceToTextInput(
     onUpdateValue: (String) -> Unit,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
+    iconSize: Dp = 24.dp
 ) {
 
     val viewModel = koinInjectOnRoute(VoiceToTextViewModel::class)
@@ -78,7 +80,9 @@ fun VoiceToTextInput(
         recordingState = recordingState,
         startListening = { viewModel.take(VoiceToTextUiEvent.StartListening) },
         stopListening = { viewModel.take(VoiceToTextUiEvent.StopListening) },
-        selectedLanguage = displayLanguageName(viewModel)
+        selectedLanguage = displayLanguageName(viewModel),
+        tint = tint,
+        iconSize = iconSize
     )
 }
 
@@ -90,6 +94,8 @@ private fun VoiceToTextInputContent(
     startListening: () -> Unit,
     stopListening: () -> Unit,
     selectedLanguage: String,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
+    iconSize: Dp = 24.dp
 ) {
 
     var canRecord by remember { mutableStateOf(false) }
@@ -144,6 +150,10 @@ private fun VoiceToTextInputContent(
             Icon(
                 imageVector = Icons.Filled.Mic,
                 contentDescription = "",
+                modifier = Modifier
+                    .size(iconSize)
+                    .align(Alignment.Center),
+                tint = tint,
             )
         }
     }
