@@ -185,8 +185,15 @@ fun InputItem(
         keyboardController?.show()
       },
       onUpdateInputValue = { newText ->
-        inputValue = inputValue.copy(text = newText)
-      }
+        val updatedText = inputValue.text + newText
+        inputValue = TextFieldValue(
+          text = updatedText,
+          selection = androidx.compose.ui.text.TextRange(updatedText.length)
+        )
+        focusRequester.requestFocus()
+        keyboardController?.show()
+      },
+
     )
   }
 }
@@ -200,7 +207,7 @@ fun ScheduleSelectorRow(
   onClearSetPriority: () -> Unit,
   onDateChange: (Long) -> Unit,
   onTimeChange: (Int, Int) -> Unit,
-  onUpdateInputValue: (String) -> Unit = {}
+  onUpdateInputValue: (String) -> Unit = {},
 ) {
   var isVisible by remember { mutableStateOf(schedule != null) }
   var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -405,7 +412,7 @@ fun ScheduleSelectorRow(
               onUpdateInputValue(newText)
             },
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            iconSize = 18.dp
+            iconSize = 18.dp,
           )
         }
       }
