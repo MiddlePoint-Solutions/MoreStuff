@@ -38,7 +38,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need access to the microphone to capture your voice for speech recognition.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Just for tests</string>
+	<string>Gallery permission is required to pick images</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>We need access to speech recognition to convert your speech to text.</string>
 	<key>NSUserNotificationsUsageDescription</key>
@@ -53,7 +53,9 @@
       <string>We need access to the microphone to capture your voice for speech recognition.</string>
 
       <key>NSPhotoLibraryUsageDescription</key>
-      <string>Just for tests</string>
+          <string>We need access to your photo library to select images.</string>
+          <key>NSCameraUsageDescription</key>
+          <string>Camera permission is required to take pictures</string>
 
       <key>NSSpeechRecognitionUsageDescription</key>
       <string>We need access to speech recognition to convert your speech to text.</string>

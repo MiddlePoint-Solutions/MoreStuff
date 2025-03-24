@@ -9,11 +9,14 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,6 +36,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
@@ -67,13 +71,13 @@ import com.mohamedrejeb.calf.permissions.PermissionStatus
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
+import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.at
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
@@ -179,7 +183,17 @@ fun InputItem(
         onTimeChange(hour, minute)
         focusRequester.requestFocus()
         keyboardController?.show()
-      }
+      },
+      onUpdateInputValue = { newText ->
+        val updatedText = inputValue.text + newText
+        inputValue = TextFieldValue(
+          text = updatedText,
+          selection = androidx.compose.ui.text.TextRange(updatedText.length)
+        )
+        focusRequester.requestFocus()
+        keyboardController?.show()
+      },
+
     )
   }
 }
@@ -193,6 +207,7 @@ fun ScheduleSelectorRow(
   onClearSetPriority: () -> Unit,
   onDateChange: (Long) -> Unit,
   onTimeChange: (Int, Int) -> Unit,
+  onUpdateInputValue: (String) -> Unit = {},
 ) {
   var isVisible by remember { mutableStateOf(schedule != null) }
   var showDatePickerDialog by remember { mutableStateOf(false) }
@@ -243,11 +258,20 @@ fun ScheduleSelectorRow(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 12.dp, vertical = 8.dp),
-    verticalAlignment = Alignment.CenterVertically
+      .padding(horizontal = 12.dp, vertical = 8.dp)
+      .clickable(
+        enabled = true,
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() },
+        onClick = { }
+      ),
+
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.SpaceBetween
   ) {
     Box(
-      contentAlignment = Alignment.CenterStart
+      contentAlignment = Alignment.CenterStart,
+      modifier = Modifier.weight(1f)
     ) {
       // expandible Background
       Box(
@@ -293,7 +317,9 @@ fun ScheduleSelectorRow(
               imageVector = vectorResource(Res.drawable.ic_schedule),
               contentDescription = stringResource(Res.string.cd_schedule_icon),
               modifier = Modifier.size(buttonSizeAnimation),
-              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+              tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                alpha = 0.6f
+              ),
             )
           }
         }
@@ -340,13 +366,6 @@ fun ScheduleSelectorRow(
                     )
                   )
                 }
-              /*  Text(
-                  text = stringResource(Res.string.at),
-                  style = TextStyle(
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                  )
-                )*/
                 Button(
                   onClick = { showTimePickerDialog = true },
                   contentPadding = PaddingValues(horizontal = 12.dp, vertical = 2.dp),
@@ -372,6 +391,29 @@ fun ScheduleSelectorRow(
               placeable[0].place(0, 0)
             }
           }
+        }
+      }
+    }
+    Box(
+      modifier = Modifier.size(48.dp),
+      contentAlignment = Alignment.Center
+    ) {
+      Surface(
+        modifier = Modifier.fillMaxSize(),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F)
+      ) {
+        Box(
+          contentAlignment = Alignment.Center,
+          modifier = Modifier.fillMaxSize()
+        ) {
+          VoiceToTextInput(
+            onUpdateValue = { newText ->
+              onUpdateInputValue(newText)
+            },
+            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            iconSize = 18.dp,
+          )
         }
       }
     }

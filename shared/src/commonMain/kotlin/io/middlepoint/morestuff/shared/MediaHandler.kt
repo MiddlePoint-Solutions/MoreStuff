@@ -1,13 +1,13 @@
 package io.middlepoint.morestuff.shared
 
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import kotlinx.datetime.LocalDateTime
 
 interface MediaHandler {
-    suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String?
+    suspend fun saveMedia(media: PlatformFile, time: LocalDateTime): String?
     fun shareImage(imagePath: String)
 
-    suspend fun savePDF(media: KmpFile): String?
+    suspend fun savePDF(media: PlatformFile): String?
     fun sharePDF(path: String)
     fun openPDF(path: String)
 }

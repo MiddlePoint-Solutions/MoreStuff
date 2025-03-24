@@ -9,6 +9,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
+import io.middlepoint.morestuff.shared.ui.utils.HttpClientProvider
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import kotlinx.coroutines.Dispatchers
@@ -17,22 +18,34 @@ import kotlinx.coroutines.withContext
 
 
 class OpenGraphFetcherImpl : OpenGraphFetcher {
+  private val httpClientProvider = HttpClientProvider()
+
   override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
     withContext(Dispatchers.IO) {
-      val client = HttpClient(CIO) {
-        expectSuccess = true
-        followRedirects = true
-      }
+      val client = httpClientProvider.createHttpClient(followRedirects = true)
+
       try {
         var url = inputUrl
         if (!url.startsWith("http://") && !url.startsWith("https://")) {
-          url = "http://$url"
+          url = "https://$url"
         }
+
+        val domainBase = extractDomain(url)
+        val referrer =
+          if (domainBase.isNotEmpty()) "https://$domainBase" else "https://www.google.com"
 
         val response: HttpResponse = client.get(url) {
           headers {
-            append(HttpHeaders.UserAgent, "WhatsApp/2")
-            append(HttpHeaders.Referrer, "http://www.google.com")
+            append(
+              HttpHeaders.UserAgent,
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
+            )
+            append(HttpHeaders.Referrer, referrer)
+            append(HttpHeaders.AcceptLanguage, "en-US,en;q=0.9")
+            append(
+              HttpHeaders.Accept,
+              "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8"
+            )
           }
         }
 
@@ -72,4 +85,13 @@ class OpenGraphFetcherImpl : OpenGraphFetcher {
         client.close()
       }
     }
+
+  private fun extractDomain(url: String): String {
+    return try {
+      val withoutProtocol = url.replace(Regex("^https?://"), "")
+      withoutProtocol.split("/").firstOrNull() ?: ""
+    } catch (e: Exception) {
+      ""
+    }
+  }
 }

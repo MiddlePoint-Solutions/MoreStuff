@@ -14,6 +14,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
+import io.github.vinceglb.filekit.path
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
@@ -31,6 +32,7 @@ import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
+import io.middlepoint.morestuff.shared.ui.screen.image.logger
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
@@ -85,10 +87,12 @@ fun MainContent(
 
         is ImagePreview -> {
           val imageFile = remember { createKmpFile(screen.imageUri) }
+          logger.d { " shareable imageFile: $imageFile" }
           ImageImportScreen(
-            imagePath = imageFile,
+            imagePath = imageFile.path,
             onImport = { message ->
               val shareableImage = Shareable.Image(screen.imageUri, message)
+              logger.d { "shareableImage: $shareableImage" }
               shareContent(screen.taskId, shareableImage)
               router.replaceAll(Home, TaskChat(screen.taskId))
             },

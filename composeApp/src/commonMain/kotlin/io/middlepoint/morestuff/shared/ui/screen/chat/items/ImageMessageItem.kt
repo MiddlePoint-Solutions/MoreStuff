@@ -39,6 +39,10 @@ fun ImageMessageItem(
     val uri by remember {
       derivedStateOf { message.messageData?.filePath }
     }
+    val platformContext = LocalPlatformContext.current
+    val imageLoader = remember(platformContext) {
+      ImageLoader(platformContext).newBuilder()
+    }.build()
 
     Image(
       painter = rememberAsyncImagePainter(
@@ -48,7 +52,7 @@ fun ImageMessageItem(
           .scale(Scale.FIT)
           .memoryCacheKey(message.messageData?.filePath)
           .build(),
-        imageLoader = ImageLoader(LocalPlatformContext.current)
+        imageLoader = imageLoader
       ),
       contentDescription = null,
       contentScale = ContentScale.Crop,
@@ -79,3 +83,16 @@ fun ImageMessageItem(
     }
   }
 }
+
+
+/*
+fun createImageLoader(context: PlatformContext): ImageLoader {
+  return ImageLoader.Builder(context)
+    .components {
+      add(getPlatformFetcherFactory())
+      //add(KmpFileFetcher.Factory())
+    }
+    .crossfade(true)
+    //.logger(DebugLogger()) // Útil para depuración, puedes eliminar en producción
+    .build()
+}*/

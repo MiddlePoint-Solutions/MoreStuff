@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.core.net.toUri
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import java.util.Locale
 
 actual fun formatString(format: String, vararg args: Any): String {
@@ -17,4 +17,4 @@ actual fun requiresNotificationsPermission(): Boolean =
 actual val platform: Platform
   get() = Platform.Android
 
-actual fun createKmpFile(path: String): KmpFile = KmpFile(path.toUri())
+actual fun createKmpFile(path: String): PlatformFile = PlatformFile(path.toUri())
