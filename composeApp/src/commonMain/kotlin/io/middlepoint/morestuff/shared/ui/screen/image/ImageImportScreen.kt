@@ -61,10 +61,13 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
+
+val logger = Logger.withTag("imageImport")
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
-  imagePath: KmpFile,
+  imagePath: String,
   onImport: (String) -> Unit,
   onBack: () -> Unit,
 ) {
@@ -97,12 +100,13 @@ fun ImageImportScreen(
     ) {
 
       val platformContext = LocalPlatformContext.current
-      val imageLoader = remember {
-        ImageLoader(platformContext).newBuilder()
-          .components {
-            add(KmpFileFetcher.Factory())
-          }.build()
-      }
+      val imageLoader = ImageLoader.Builder(platformContext)
+        .build()
+
+      logger.d { "imageLoader: $imageLoader" }
+
+
+      logger.d { "image path: $imagePath" }
 
       Image(
         painter = rememberAsyncImagePainter(

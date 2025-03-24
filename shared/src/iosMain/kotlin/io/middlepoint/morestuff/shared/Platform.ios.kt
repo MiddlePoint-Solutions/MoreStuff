@@ -1,9 +1,8 @@
 package io.middlepoint.morestuff.shared
 
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import platform.Foundation.NSString
 import platform.Foundation.NSURL
-import platform.Foundation.NSUUID
 import platform.Foundation.stringWithFormat
 
 actual fun formatString(format: String, vararg args: Any): String = stringWithFormat(format, args)
@@ -33,4 +32,4 @@ actual fun requiresNotificationsPermission(): Boolean = true
 actual val platform: Platform
   get() = Platform.iOS
 
-actual fun createKmpFile(path: String): KmpFile = KmpFile(NSURL(fileURLWithPath = path))
+actual fun createKmpFile(path: String): PlatformFile = PlatformFile(NSURL(fileURLWithPath = path))

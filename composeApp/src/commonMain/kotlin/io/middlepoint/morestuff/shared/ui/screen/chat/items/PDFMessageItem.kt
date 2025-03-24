@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.calf.core.LocalPlatformContext
+import io.github.vinceglb.filekit.nameWithoutExtension
 import io.middlepoint.morestuff.shared.createKmpFile
-import io.middlepoint.morestuff.shared.ui.extension.getFileName
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.error
@@ -53,7 +53,7 @@ fun PDFMessageItem(
             .weight(2f)
         ) {
           Text(
-            text = pdfFile.getFileName(platformContext)
+            text = pdfFile.nameWithoutExtension
               ?: stringResource(Res.string.error),
             textAlign = TextAlign.Start,
             maxLines = 2,

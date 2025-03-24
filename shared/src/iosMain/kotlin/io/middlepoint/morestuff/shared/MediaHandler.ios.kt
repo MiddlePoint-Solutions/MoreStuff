@@ -1,10 +1,9 @@
 package io.middlepoint.morestuff.shared
 
 import co.touchlab.kermit.Logger
-import com.mohamedrejeb.calf.core.PlatformContext
-import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.io.getPath
-import com.mohamedrejeb.calf.io.readByteArray
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.readBytes
 import io.middlepoint.morestuff.shared.MediaFolder.Files
 import io.middlepoint.morestuff.shared.MediaFolder.Images
 import kotlinx.cinterop.BetaInteropApi
@@ -37,17 +36,17 @@ class MediaHandlerImpl(
   private val logger: Logger
 ) : MediaHandler {
 
-  override suspend fun saveMedia(media: KmpFile, time: LocalDateTime): String =
+  override suspend fun saveMedia(media: PlatformFile, time: LocalDateTime): String =
     withContext(Dispatchers.Main) {
-      media.readByteArray(PlatformContext.INSTANCE).let {
-        val path = media.getPath(PlatformContext.INSTANCE) ?: ""
+      media.readBytes().let {
+        val path = media.path
         writeToFile(it, path, Images, generateFileName(time))
       }
     }
 
-  override suspend fun savePDF(media: KmpFile): String = withContext(Dispatchers.Main) {
-    media.readByteArray(PlatformContext.INSTANCE).let {
-      val path = media.getPath(PlatformContext.INSTANCE) ?: ""
+  override suspend fun savePDF(media: PlatformFile): String = withContext(Dispatchers.Main) {
+    media.readBytes().let {
+      val path = media.path
       writeToFile(it, path, Files, getFileName(path))
     }
   }

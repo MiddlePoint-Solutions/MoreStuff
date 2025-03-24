@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
-import com.mohamedrejeb.calf.io.KmpFile
+import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.displayTitle
@@ -28,13 +28,13 @@ sealed class MessageAction : Action.FeatureAction() {
 
     data class CreateFileMessageAction(
         val taskId: Long,
-        val file: KmpFile,
+        val file: PlatformFile,
         val message: String
     ) : MessageAction()
 
     data class CreatePDFMessageAction(
         val taskId: Long,
-        val file: KmpFile,
+        val file: PlatformFile,
         val message: String
     ) : MessageAction()
 

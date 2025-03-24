@@ -57,10 +57,11 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-import com.mohamedrejeb.calf.io.KmpFile
-import com.mohamedrejeb.calf.picker.FilePickerFileType
-import com.mohamedrejeb.calf.picker.FilePickerSelectionMode
-import com.mohamedrejeb.calf.picker.rememberFilePickerLauncher
+
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.path
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -175,7 +176,7 @@ fun TaskChatScreen(
 
       is ImageImport -> {
         ImageImportScreen(
-          imagePath = screen.imageFile,
+          imagePath = screen.imageFile.path,
           onImport = { title ->
             viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
             router.pop()
@@ -204,8 +205,8 @@ private fun TaskChatContent(
   modifier: Modifier = Modifier,
   onBack: () -> Unit = {},
   sendTaskMessage: (String) -> Unit = {},
-  imagePicked: (KmpFile) -> Unit = {},
-  pdfPicked: (KmpFile) -> Unit = {},
+  imagePicked: (PlatformFile) -> Unit = {},
+  pdfPicked: (PlatformFile) -> Unit = {},
   logger: Logger = koinInject()
 ) {
   val scope = rememberCoroutineScope()
@@ -220,29 +221,24 @@ private fun TaskChatContent(
   var titleLineCount by remember { mutableStateOf(0) }
 
 
-  val singleImagePickerLauncher =
-    rememberFilePickerLauncher(
-      type = FilePickerFileType.Image,
-      selectionMode = FilePickerSelectionMode.Single,
-      onResult = { files ->
-        files.firstOrNull()?.let {
-          logger.d { "Image path: $it" }
-          imagePicked(it)
-        }
-      }
-    )
+  val singleImagePickerLauncher = rememberFilePickerLauncher(
+    type = FileKitType.Image,
+  ) { files ->
+    files?.let {
+      logger.d { "Image path: $it" }
+      imagePicked(it)
+    }
+  }
 
-  val singleFilePickerLauncher =
-    rememberFilePickerLauncher(
-      type = FilePickerFileType.Pdf,
-      selectionMode = FilePickerSelectionMode.Single,
-      onResult = { files ->
-        files.firstOrNull()?.let {
-          logger.d { "PDF path: $it" }
-          pdfPicked(it)
-        }
-      }
-    )
+
+  val singleFilePickerLauncher = rememberFilePickerLauncher(
+    type = FileKitType.File(extensions = listOf("pdf", "docx"))
+  ) { files ->
+    files?.let {
+      logger.d { "PDF path: $it" }
+      pdfPicked(it)
+    }
+  }
 
   Scaffold(
     topBar = {
@@ -292,7 +288,10 @@ private fun TaskChatContent(
               scheduleId = 0L,
               contentType = ContentType.APP_TASK_MESSAGE,
               createTime = "",
-              content = stringResource(Res.string.task_chat_complete_message_with_date).replace("%s", task.completeTime),
+              content = stringResource(Res.string.task_chat_complete_message_with_date).replace(
+                "%s",
+                task.completeTime
+              ),
               formattedTime = "",
               formattedTimeOnly = ""
             ),

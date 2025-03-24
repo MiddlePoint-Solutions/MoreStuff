@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,17 +17,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.ImageLoader
 import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
-import coil3.request.crossfade
 import com.mxalbert.zoomable.Zoomable
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
 import morestuff.composeapp.generated.resources.Res
@@ -47,13 +44,16 @@ fun ImagePreviewScreen(
   Box(
     modifier = Modifier.fillMaxSize()
   ) {
+    val platformContext = LocalPlatformContext.current
+    val imageLoader = remember(platformContext) {
+      ImageLoader(platformContext).newBuilder()
+    }.build()
 
     Zoomable {
       Image(
         painter = rememberAsyncImagePainter(
           model = imagePath,
-          imageLoader = ImageLoader.Builder(LocalPlatformContext.current)
-            .crossfade(true).build(),
+          imageLoader = imageLoader
         ),
         contentDescription = null,
         modifier = Modifier.fillMaxSize()

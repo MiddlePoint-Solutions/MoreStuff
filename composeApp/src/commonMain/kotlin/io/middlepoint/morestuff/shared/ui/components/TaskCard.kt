@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,13 +57,11 @@ fun TaskCard(
     Column(
       modifier = Modifier.padding(start = 20.dp, end = 20.dp)
     ) {
-      Text(
+      AutoResizingText(
         text = item.title,
         color = MaterialTheme.colorScheme.onSecondaryContainer,
-        textAlign = TextAlign.Start,
-        style = MaterialTheme.typography.displaySmall.copy(
+        textStyle = MaterialTheme.typography.displaySmall.copy(
           fontWeight = FontWeight(400),
-          fontSize = 25.sp,
           lineHeight = 28.sp
         ),
         modifier = Modifier
@@ -72,9 +69,10 @@ fun TaskCard(
           .padding(top = 20.dp),
         maxLines = 2,
         minLines = 2,
+        maxTextSize = 25.sp,
+        minTextSize = 16.sp,
         overflow = TextOverflow.Ellipsis
       )
-
       Box(
         modifier = Modifier
           .aspectRatio(1f)
@@ -102,13 +100,17 @@ fun TaskCard(
           .padding(top = 10.dp)
       ) {
         Text(
-          text = stringResource(Res.string.text_created_time_placeholder).replace("%s", item.createTime),
+          text = stringResource(Res.string.text_created_time_placeholder).replace(
+            "%s",
+            item.createTime
+          ),
           color = MaterialTheme.colorScheme.onSecondaryContainer,
         )
       }
     }
   }
 }
+
 
 @NonRestartableComposable
 @Composable
