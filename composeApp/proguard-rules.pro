@@ -24,3 +24,8 @@
 
 -keep class coil3.** { *; }
 -keep class coil3.network.ktor2.** { *; }
+
+-dontwarn java.lang.management.**
+-keep class java.lang.management.** { *; }
+
+-keep class io.ktor.util.debug.** { *; }
