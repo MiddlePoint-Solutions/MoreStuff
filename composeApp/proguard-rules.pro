@@ -18,24 +18,4 @@
 -keep class org.xmlpull.** { *; }
 -keepclassmembers class org.xmlpull.** { *; }
 
--keep class io.ktor.** { *; }
--keep class io.ktor.utils.io.** { *; }
--keep class io.ktor.utils.io.jvm.nio.** { *; }
-
--keep class coil3.** { *; }
--keep class coil3.network.ktor2.** { *; }
-
--dontwarn java.lang.management.**
--keep class java.lang.management.** { *; }
-
--keep class io.ktor.util.debug.** { *; }
-
--keep class io.** { *; }
--keep class okio.** { *; }
--keep class kotlinx.coroutines.** { *; }
-
--keep class io.ktor.client.network.sockets.** { *; }
--keep class io.ktor.client.plugins.* { *; }
--keep class io.ktor.util.* { *;}
--keep class io.ktor.utils.io.* { *; }
--keep class java.lang.management.* { *; }
+-dontwarn io.ktor.utils.io.jvm.nio.WritingKt
