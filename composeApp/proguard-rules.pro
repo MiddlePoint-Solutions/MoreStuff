@@ -17,3 +17,10 @@
 
 -keep class org.xmlpull.** { *; }
 -keepclassmembers class org.xmlpull.** { *; }
+
+-keep class io.ktor.** { *; }
+-keep class io.ktor.utils.io.** { *; }
+-keep class io.ktor.utils.io.jvm.nio.** { *; }
+
+-keep class coil3.** { *; }
+-keep class coil3.network.ktor2.** { *; }
