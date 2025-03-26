@@ -29,3 +29,13 @@
 -keep class java.lang.management.** { *; }
 
 -keep class io.ktor.util.debug.** { *; }
+
+-keep class io.** { *; }
+-keep class okio.** { *; }
+-keep class kotlinx.coroutines.** { *; }
+
+-keep class io.ktor.client.network.sockets.** { *; }
+-keep class io.ktor.client.plugins.* { *; }
+-keep class io.ktor.util.* { *;}
+-keep class io.ktor.utils.io.* { *; }
+-keep class java.lang.management.* { *; }
