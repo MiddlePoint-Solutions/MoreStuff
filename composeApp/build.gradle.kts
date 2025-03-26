@@ -21,6 +21,10 @@ object Env {
   const val Release = "release"
 }
 
+val projectVersionName = project.findProperty("buildConfig.versionName") as String
+val projectVersionCode = (project.findProperty("buildConfig.versionCode") as String?)?.toInt()
+
+
 buildConfig {
   buildConfigField(
     name = "DEBUG",
@@ -248,8 +252,8 @@ android {
     compileSdk = libs.versions.android.sdk.compile.get().toInt()
     minSdk = libs.versions.android.sdk.min.get().toInt()
     targetSdk = libs.versions.android.sdk.target.get().toInt()
-    versionCode = 32
-    versionName = "0.6.2"
+    versionCode = projectVersionCode
+    versionName = projectVersionName
     vectorDrawables {
       useSupportLibrary = true
     }
