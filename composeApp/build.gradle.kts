@@ -264,6 +264,13 @@ android {
   }
 
   signingConfigs {
+    getByName(Env.Dev) {
+      storeFile = file("./debug.keystore")
+      storePassword = "android"
+      keyAlias = "AndroidDebugKey"
+      keyPassword = "android"
+    }
+
     create(Env.Staging) {
       storeFile = file("./stage_key")
       storePassword = "StageKey"
