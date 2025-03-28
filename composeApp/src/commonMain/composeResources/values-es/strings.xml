@@ -113,7 +113,7 @@
     <string name="cd_move_to_top">Mover tarea al principio</string>
     <string name="move_to_bottom">Mover al final</string>
     <string name="cd_move_task_to_bottom">Mover tarea al final</string>
-    <string name="select_theme">Seleccionar Tema</string>
+    <string name="select_theme">Tema</string>
     <string name="cd_select_theme">Seleccionar Tema</string>
     <string name="theme_system">Sistema</string>
     <string name="theme_light">Claro</string>
@@ -139,7 +139,7 @@
     <string name="cd_reminder_icon">Icono de recordatorio</string>
     <string name="task_chat_reminder_action">Recordatorio</string>
     <string name="cd_show_task_chat">Mostrar chat de tarea</string>
-    <string name="select_language">Seleccionar idioma de entrada de voz</string>
+    <string name="select_language">Idioma de entrada de voz</string>
     <string name="language_english">Inglés</string>
     <string name="language_spanish">Español</string>
     <string name="language_hebrew">Hebreo</string>

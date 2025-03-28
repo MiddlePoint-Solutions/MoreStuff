@@ -277,9 +277,6 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
-        style = MaterialTheme.typography.titleLarge.copy(
-          color = MaterialTheme.colorScheme.onSurface
-        )
       )
     },
     subtitle = {
@@ -525,9 +522,6 @@ private fun SelectLanguage(
       Column {
         Text(
           text = stringResource(Res.string.select_language),
-          style = MaterialTheme.typography.titleLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface
-          )
         )
       }
     },
