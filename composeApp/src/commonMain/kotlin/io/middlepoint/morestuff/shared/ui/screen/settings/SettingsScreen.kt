@@ -436,7 +436,6 @@ private fun showToast() {
 private fun ReviewTimeSelector(
   valueChanged: (hour: Int, minute: Int) -> Unit,
   defaultValue: Pair<Int, Int>,
-  modifier: Modifier = Modifier,
 ) {
 
   val selectedTimeState = rememberAppSettingState(
@@ -468,15 +467,16 @@ private fun ReviewTimeSelector(
 
   SettingsMenuLink(
     title = {
-      Column {
-        Text(text = stringResource(Res.string.set_review_time))
-        selectedTimeState.value.let {
-          Text(
-            text = "${it.first}:${formatString("%02d", it.second)}",
-            fontSize = 12.sp
+      Text(text = stringResource(Res.string.set_review_time))
 
-          )
-        }
+    },
+    subtitle = {
+      selectedTimeState.value.let {
+        Text(
+          text = "${it.first}:${formatString("%02d", it.second)}",
+          fontSize = 12.sp
+
+        )
       }
     },
     onClick = { showTimePickerDialog = true },
@@ -484,6 +484,7 @@ private fun ReviewTimeSelector(
       Icon(
         imageVector = vectorResource(Res.drawable.ic_schedule),
         contentDescription = stringResource(Res.string.cd_schedule_icon),
+        modifier = Modifier.padding(end = 5.dp)
       )
     },
     colors = ListItemDefaults.colors(
