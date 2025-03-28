@@ -20,13 +20,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import java.io.File
 import java.io.FileOutputStream
-import java.nio.file.Path
-import kotlin.io.path.createTempFile
 
 class MediaHandlerImpl(
   private val context: Context,
   private val logger: Logger
 ) : MediaHandler {
+
 
   override suspend fun saveMedia(media: PlatformFile, time: LocalDateTime): String? =
     withContext(Dispatchers.IO) {
@@ -58,7 +57,7 @@ class MediaHandlerImpl(
           }
         }
 
-        val imageFile = createImageFile(time).toFile()
+        val imageFile = createImageFile(time)
         outputStream = FileOutputStream(imageFile)
         rotatedBitmap?.compress(Bitmap.CompressFormat.JPEG, 50, outputStream)
         outputStream.close()
@@ -78,12 +77,25 @@ class MediaHandlerImpl(
   }
 
 
-  private fun createImageFile(time: LocalDateTime): Path {
+  private fun getAppSpecificStorageDir(type: String): File {
+    val appFilesDir = context.getExternalFilesDir(null) ?: context.filesDir
+    val mediaDir = File(appFilesDir, type)
+    if (!mediaDir.exists()) {
+      mediaDir.mkdirs()
+    }
+    return mediaDir
+  }
+
+
+  // TODO: change files location according to: https://developer.android.com/training/data-storage
+  private fun createImageFile(time: LocalDateTime): File {
     val timeStamp =
       "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
-    val imageFileName = "JPEG_" + timeStamp + "_"
-    // TODO: change files location according to: https://developer.android.com/training/data-storage
-    return createTempFile(prefix = imageFileName, suffix = ".jpg")
+    val imageFileName = "JPEG_$timeStamp.jpg"
+
+    val storageDir = getAppSpecificStorageDir("images")
+
+    return File(storageDir, imageFileName)
   }
 
   override fun shareImage(imagePath: String) {
@@ -107,7 +119,7 @@ class MediaHandlerImpl(
   override suspend fun savePDF(media: PlatformFile): String? = withContext(Dispatchers.IO) {
     try {
       val originalFileName = media.name ?: "PDF_Default.pdf"
-      val pdfFile = createPDFFile(originalFileName).toFile()
+      val pdfFile = createPDFFile(originalFileName)
 
       media.readBytes().inputStream().use { inputStream ->
         FileOutputStream(pdfFile).use { outputStream ->
@@ -115,17 +127,19 @@ class MediaHandlerImpl(
         }
       }
 
-      pdfFile.toUri().toString()
+      pdfFile.absolutePath
     } catch (e: Exception) {
       logger.e("Error saving PDF: $e")
       null
     }
   }
 
-  private fun createPDFFile(originalFileName: String): Path {
+
+  private fun createPDFFile(originalFileName: String): File {
     val pdfFileName =
       if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
-    return createTempFile(prefix = "", suffix = pdfFileName)
+    val storageDir = getAppSpecificStorageDir("files")
+    return File(storageDir, pdfFileName)
   }
 
   override fun sharePDF(path: String) {

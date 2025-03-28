@@ -32,6 +32,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
 
 
 @Composable
@@ -52,9 +53,16 @@ actual fun PDFPagePreview(
   LaunchedEffect(pdfFile) {
     withContext(Dispatchers.IO) {
       try {
-        val file = ParcelFileDescriptor.open(
-          pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
-        )
+        val file = if (pdfFile.uri.path?.contains("/cache/") == true) {
+          ParcelFileDescriptor.open(
+            pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
+          )
+        } else {
+          ParcelFileDescriptor.open(
+            File(pdfFile.uri.path ?: ""), ParcelFileDescriptor.MODE_READ_ONLY
+          )
+        }
+
         val renderer = PdfRenderer(file)
         val destBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(destBitmap)
