@@ -281,7 +281,7 @@ private fun HomeContent(
 
   Box(
     modifier = modifier.fillMaxSize()
-      .then(
+   /*   .then(
         if (taskInputActive) {
           Modifier.clickable(
             interactionSource = remember { MutableInteractionSource() },
@@ -292,7 +292,7 @@ private fun HomeContent(
         } else {
           Modifier
         }
-      )
+      )*/
   ) {
     Column {
       Row(
@@ -371,7 +371,7 @@ private fun HomeContent(
                 selectedTasks = selectedTasks,
                 onItemClick = { taskId ->
                   if (taskInputActive) {
-                    onEvent(HomeEvent.HideTaskInput)
+                    //onEvent(HomeEvent.HideTaskInput)
                   } else if (selectedTasks.isNotEmpty()) {
                     onEvent(ToggleTaskSelection(taskId))
                   } else {
