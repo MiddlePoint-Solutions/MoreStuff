@@ -57,7 +57,6 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.scale
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
-
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
@@ -355,6 +354,8 @@ private fun TaskChatInput(
   modifier: Modifier = Modifier,
 ) {
   val isTextEmpty = remember { mutableStateOf(true) }
+  val isRecording = remember { mutableStateOf(false) }
+  val showSendIcon = remember { mutableStateOf(false) }
 
   var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
     mutableStateOf(TextFieldValue())
@@ -418,13 +419,22 @@ private fun TaskChatInput(
                   }
                   VoiceToTextInput(
                     onUpdateValue = {
-                      userInputValue = userInputValue.copy(text = it)
-                      isTextEmpty.value = it.isBlank()
-                    }
+                     userInputValue = userInputValue.copy(text = it)
+                      androidx.compose.ui.text.TextRange(it.length)
+
+                    },
+                    onRecordingStateChanged = { recording ->
+                      isRecording.value = recording
+                      if (!recording && userInputValue.text.isNotBlank()) {
+                        showSendIcon.value = true
+
+                      }
+                    },
+                    isHomeScreen = true
                   )
                 } else {
                   AnimatedVisibility(
-                    visible = !isTextEmpty.value,
+                    visible = showSendIcon.value || !isTextEmpty.value,
                     enter = fadeIn(),
                     exit = fadeOut()
                   ) {
@@ -432,6 +442,7 @@ private fun TaskChatInput(
                       sendTaskMessage(userInputValue.text)
                       userInputValue = userInputValue.copy(text = "")
                       isTextEmpty.value = true
+                      showSendIcon.value = false
                     })
                   }
                 }

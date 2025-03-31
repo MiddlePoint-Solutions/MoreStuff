@@ -118,7 +118,7 @@ fun InputItem(
     Row(
       modifier = modifier
         .fillMaxWidth()
-        .height(78.dp)
+        .height(100.dp)
         .padding(start = 24.dp, end = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start
@@ -127,7 +127,7 @@ fun InputItem(
         value = inputValue,
         onValueChange = { inputValue = it },
         modifier = Modifier
-          .weight(0.95f)
+          .weight(1f)
           .clearFocusOnKeyboardDismiss()
           .focusRequester(focusRequester),
         keyboardOptions = KeyboardOptions(
@@ -185,10 +185,9 @@ fun InputItem(
         keyboardController?.show()
       },
       onUpdateInputValue = { newText ->
-        val updatedText = inputValue.text + newText
         inputValue = TextFieldValue(
-          text = updatedText,
-          selection = androidx.compose.ui.text.TextRange(updatedText.length)
+          text = newText,
+          selection = androidx.compose.ui.text.TextRange(newText.length)
         )
         focusRequester.requestFocus()
         keyboardController?.show()
@@ -259,6 +258,7 @@ fun ScheduleSelectorRow(
     modifier = Modifier
       .fillMaxWidth()
       .padding(horizontal = 12.dp, vertical = 8.dp)
+      .padding(bottom = 18.dp)
       .clickable(
         enabled = true,
         indication = null,
@@ -413,6 +413,7 @@ fun ScheduleSelectorRow(
             },
             tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             iconSize = 18.dp,
+            isHomeScreen = true
           )
         }
       }
