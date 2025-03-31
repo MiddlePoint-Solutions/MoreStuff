@@ -90,6 +90,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleWorkUseCase
@@ -299,6 +301,9 @@ val scheduleUseCases = module {
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
+    factoryOf(::GetTaskSchedulesUseCaseImpl) bind GetTaskSchedulesUseCase::class
+
+
 }
 
 val messageUseCases = module {

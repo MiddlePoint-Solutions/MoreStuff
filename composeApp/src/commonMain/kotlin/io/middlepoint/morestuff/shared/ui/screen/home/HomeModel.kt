@@ -8,9 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Priority
+import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
@@ -18,6 +20,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
@@ -37,6 +40,7 @@ fun homeModel(
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
   createScopeUseCase: CreateScopeUseCase = koinInject(),
+  getTaskSchedulesUseCase: GetTaskSchedulesUseCase = koinInject(),
   timeManager: TimeManager = koinInject(),
   timeFormatter: TimeFormatter = koinInject(),
 ): HomeState {
@@ -49,6 +53,8 @@ fun homeModel(
   var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
+  var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
+
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
@@ -59,6 +65,12 @@ fun homeModel(
     getScopesFlowUseCase().collect {
       Logger.i { "Scopes updated: ${it.size} scopes received" }
       scopes = it
+    }
+  }
+
+  LaunchedEffect(Unit) {
+    getTaskSchedulesUseCase().collect { schedules ->
+      taskSchedules = schedules
     }
   }
 
@@ -122,11 +134,28 @@ fun homeModel(
 
         is CompleteSelectedTasks -> {
           val completed = selectedTasks.toList()
+          val schedulesToRestore = completed.mapNotNull { taskId ->
+            taskSchedules[taskId]?.let { schedule -> taskId to schedule }
+          }.toMap()
+
           selectedTasks = listOf()
           store.dispatch(TaskAction.CompleteTasksAction(completed, true))
+
           if (completed.isNotEmpty()) {
             val notification = NotificationState.Complete {
               store.dispatch(TaskAction.CompleteTasksAction(completed, false))
+
+              schedulesToRestore.forEach { (taskId, schedule) ->
+                schedule.scheduleLocalDateTime?.let { dateTime ->
+                  store.dispatch(
+                    ScheduleAction.RescheduleTaskAction(
+                      taskId,
+                      schedule.scheduleType,
+                      dateTime
+                    )
+                  )
+                }
+              }
             }
             launch { notifications.emit(notification) }
           }
@@ -203,6 +232,7 @@ fun homeModel(
         is ScopeSelected -> {
           currentScopeId = event.scopeId
         }
+
         is ToggleTaskSelection -> {
           selectedTasks = if (event.taskId in selectedTasks) {
             selectedTasks - event.taskId
@@ -218,10 +248,21 @@ fun homeModel(
         }
 
         is CompleteTask -> {
+          val schedule = taskSchedules[event.taskId]
           store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
           selectedTasks = selectedTasks - event.taskId
           val notification = NotificationState.Complete {
             store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+            schedule?.scheduleLocalDateTime?.let { dateTime ->
+              store.dispatch(
+                ScheduleAction.RescheduleTaskAction(
+                  event.taskId,
+                  schedule.scheduleType,
+                  dateTime
+                )
+              )
+            }
+
             selectedTasks = selectedTasks + event.taskId
           }
           launch { notifications.emit(notification) }
