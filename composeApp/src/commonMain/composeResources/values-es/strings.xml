@@ -269,5 +269,6 @@
 
     <string name="description_scopes">Usa scopes para separar lógicamente tus cosas.</string>
     <string name="description_create_scope">Mantenlo corto y simple</string>
+    <string name="edit_message">Editar mensaje</string>
 
 </resources>

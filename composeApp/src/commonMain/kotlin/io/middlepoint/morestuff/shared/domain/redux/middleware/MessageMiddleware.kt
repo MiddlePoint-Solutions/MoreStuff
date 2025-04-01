@@ -18,6 +18,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.CreateScheduleMess
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.DeleteMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,9 @@ sealed class MessageAction : Action.FeatureAction() {
     ) : MessageAction()
 
     data class DeleteMessageAction(val messageId: Long) : MessageAction()
+
+    data class UpdateMessageContentAction(val messageId: Long, val content: String) : TaskAction()
+
 }
 
 class MessageMiddleware(
@@ -49,6 +53,7 @@ class MessageMiddleware(
     private val createMediaMessageUseCase: CreateMediaMessageUseCase,
     private val createPDFMessageUseCase: CreatePDFMessageUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val updateMessageContentUseCase: UpdateMessageContentUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -117,6 +122,10 @@ class MessageMiddleware(
 
             is TaskAction.CompleteTasksAction -> scope.launch {
                 setScheduleResponseMessage(action.taskIds, "Done", ReplyType.DONE)
+            }
+
+            is MessageAction.UpdateMessageContentAction -> scope.launch {
+                updateMessageContentUseCase(action.messageId, action.content)
             }
 
 

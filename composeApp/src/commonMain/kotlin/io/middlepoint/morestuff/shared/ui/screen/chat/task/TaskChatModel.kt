@@ -21,17 +21,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlo
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
@@ -56,6 +46,9 @@ fun taskChatModel(
 
   var task by remember { mutableStateOf(initialState.task) }
   var messages by remember { mutableStateOf(initialState.messages) }
+  var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
+  var originalMessageContent by remember { mutableStateOf(initialState.originalMessageContent) }
+  var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -72,7 +65,21 @@ fun taskChatModel(
     }
     messagesFlow
       .map(messageUiMapper::map)
-      .collect { messages = it }
+      .collect { updatedMessages ->
+        messages = updatedMessages
+
+        editingMessageId?.let { id ->
+          if (id > 0) {
+            updatedMessages.find { it.id == id }?.let { updatedMessage ->
+              originalMessageContent = updatedMessage.content
+
+              if (editingMessageContent.isEmpty() || editingMessageContent == originalMessageContent) {
+                editingMessageContent = updatedMessage.content
+              }
+            }
+          }
+        }
+      }
   }
 
   LaunchedEffect(Unit) {
@@ -93,7 +100,7 @@ fun taskChatModel(
             )
           }
 
-          is TaskChatEvent.InputUserMedia -> {
+          is InputUserMedia -> {
             store.dispatch(
               MessageAction.CreateFileMessageAction(taskId, imageFile, title.trim())
             )
@@ -147,6 +154,32 @@ fun taskChatModel(
             val complete = !task.isComplete
             store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
           }
+
+          is SetEditingMessage -> {
+            val previousEditingId = editingMessageId
+            editingMessageId = messageId
+
+            if (messageId > 0) {
+              val message = messages.find { it.id == messageId }
+              message?.let {
+                originalMessageContent = it.content
+                editingMessageContent = it.content
+              }
+            } else {
+              if (previousEditingId != null && previousEditingId > 0) {
+                if (editingMessageContent.isNotEmpty()) {
+                  store.dispatch(MessageAction.UpdateMessageContentAction(previousEditingId, editingMessageContent.trim()))
+                }
+              }
+
+              originalMessageContent = ""
+              editingMessageContent = ""
+            }
+          }
+
+          is UpdateMessageContent -> {
+            editingMessageContent = content
+          }
         }
       }
     }
@@ -154,6 +187,9 @@ fun taskChatModel(
 
   return TaskChatState(
     task = task,
-    messages = messages
+    messages = messages,
+    editingMessageId = editingMessageId,
+    originalMessageContent = originalMessageContent,
+    editingMessageContent = editingMessageContent
   )
 }

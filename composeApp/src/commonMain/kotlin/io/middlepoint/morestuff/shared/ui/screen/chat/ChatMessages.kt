@@ -58,6 +58,7 @@ private fun isAutoScrollingEnabled(
   scrollState: LazyListState,
 ) = (pagingItemsCount > itemsCount) && scrollState.firstVisibleItemIndex == 0
 
+
 @Composable
 fun Messages(
   messages: List<MessageUiModel>,
@@ -66,6 +67,7 @@ fun Messages(
   actions: ChatActions = ChatActions(),
   userInteractionEnabled: Boolean = true,
   contentPadding: PaddingValues = PaddingValues(0.dp),
+  originalMessageContent: String? = null
 ) {
   val scope = rememberCoroutineScope()
   var itemsCount by remember { mutableIntStateOf(0) }
@@ -102,18 +104,20 @@ fun Messages(
 
             when (item.contentType) {
               ContentType.TASK_MESSAGE,
-              ContentType.USER_NEW_TASK -> UserChatItem(item, actions)
+              ContentType.USER_NEW_TASK -> UserChatItem(
+                message = item,
+                actions = actions,
+                originalMessageContent = if (actions.isMessageBeingEdited(item.id)) originalMessageContent else null
+              )
 
               ContentType.CONFIRM_NEW_TASK,
               ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
 
               ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
-
             }
           }
         }
       }
-
 
       if (enableAutoScroll) {
         LaunchedEffect(key1 = itemsCount) {
@@ -134,7 +138,7 @@ fun Messages(
       val jumpToBottomButtonEnabled by remember {
         derivedStateOf {
           (scrollState.firstVisibleItemIndex != 0 ||
-                  scrollState.firstVisibleItemScrollOffset > jumpThreshold)
+              scrollState.firstVisibleItemScrollOffset > jumpThreshold)
         }
       }
 

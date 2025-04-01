@@ -37,13 +37,17 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun UserChatItem(
   message: MessageUiModel,
   actions: ChatActions,
+  originalMessageContent: String? = null
 ) {
-
   val isNewUserTask by remember {
     derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
   }
 
   var showMenu by remember { mutableStateOf(false) }
+
+  val isEditing by remember(message.id) {
+    derivedStateOf { actions.isMessageBeingEdited(message.id) }
+  }
 
   val messageType by remember {
     derivedStateOf {
@@ -80,7 +84,7 @@ fun UserChatItem(
       color = MaterialTheme.colorScheme.primary,
       modifier = Modifier
         .combinedClickable(
-          enabled = LocalUserInteractionEnabled.current,
+          enabled = LocalUserInteractionEnabled.current && !isEditing,
           onClick = {
             when (messageType) {
               MessageType.Text -> showMenu = true
@@ -91,13 +95,14 @@ fun UserChatItem(
           onLongClick = { showMenu = true }
         )
     ) {
-
-      UserMessageContextMenu(
-        message,
-        showMenu = showMenu,
-        actions = actions,
-        onDismissRequest = { showMenu = false },
-      )
+      if (!isEditing) {
+        UserMessageContextMenu(
+          message,
+          showMenu = showMenu,
+          actions = actions,
+          onDismissRequest = { showMenu = false },
+        )
+      }
 
       when (messageType) {
         MessageType.Pdf -> {
@@ -114,12 +119,18 @@ fun UserChatItem(
         }
 
         else -> {
-          TextMessageItem(message = message, onNonLinkClick = { showMenu = true })
+          TextMessageItem(
+            message = message,
+            onNonLinkClick = { showMenu = true },
+            isBeingEdited = isEditing,
+            originalContent = if (isEditing) originalMessageContent else null
+          )
         }
       }
     }
   }
 }
+
 
 @Preview
 @Composable
@@ -128,3 +139,7 @@ fun UserChatItemPreview() {
     UserChatItem(messageUiModel, ChatActions())
   }
 }
+
+
+
+

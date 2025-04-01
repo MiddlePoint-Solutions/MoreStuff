@@ -1,8 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,13 +13,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
@@ -37,6 +40,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,9 +50,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -96,6 +105,7 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_more_options
 import morestuff.composeapp.generated.resources.cd_navigate_back
 import morestuff.composeapp.generated.resources.cd_select_images
@@ -104,6 +114,7 @@ import morestuff.composeapp.generated.resources.cd_undo
 import morestuff.composeapp.generated.resources.complete
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
+import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
@@ -157,7 +168,16 @@ fun TaskChatScreen(
             },
             shareImage = { viewModel.take(ShareImage(it)) },
             sharePdf = { viewModel.take(ShareDocument(it)) },
-            shareMessage = { viewModel.take(ShareMessage(it)) }
+            shareMessage = { viewModel.take(ShareMessage(it)) },
+            setEditingMessage = { messageId ->
+              viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
+            },
+            updateMessageContent = { content ->
+              viewModel.take(TaskChatEvent.UpdateMessageContent(content))
+            },
+            isMessageBeingEdited = { messageId ->
+              model.editingMessageId == messageId
+            }
           )
         }
 
@@ -196,6 +216,7 @@ fun TaskChatScreen(
   }
 }
 
+
 @Composable
 private fun TaskChatContent(
   model: TaskChatState,
@@ -215,10 +236,15 @@ private fun TaskChatContent(
 
   val task = model.task
   val messages = model.messages
-  val platformContext = com.mohamedrejeb.calf.core.LocalPlatformContext.current
+  val editingMessageId = model.editingMessageId
+  val originalMessageContent = model.originalMessageContent
+  val editingMessageContent = model.editingMessageContent
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
+  val editingMessage = remember(editingMessageId, messages) {
+    messages.find { it.id == editingMessageId }
+  }
 
   val singleImagePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.Image,
@@ -228,7 +254,6 @@ private fun TaskChatContent(
       imagePicked(it)
     }
   }
-
 
   val singleFilePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.File(extensions = listOf("pdf", "docx"))
@@ -273,7 +298,8 @@ private fun TaskChatContent(
           actions = chatActions,
           modifier = modifier.weight(1f),
           scrollState = scrollState,
-          contentPadding = contentPadding
+          contentPadding = contentPadding,
+          originalMessageContent = originalMessageContent
         )
 
         AnimatedVisibility(
@@ -303,25 +329,47 @@ private fun TaskChatContent(
           visible = !task.isComplete,
           modifier = Modifier.background(Color.Transparent)
         ) {
-          TaskChatInput(
-            sendTaskMessage = {
-              sendTaskMessage(it)
-              scope.launch {
-                delay(200)
-                scrollState.animateScrollToItem(index = 0)
-              }
-            },
-            pickImage = { singleImagePickerLauncher.launch() },
-            pickPdf = { singleFilePickerLauncher.launch() },
-            modifier = Modifier
-              .fillMaxWidth()
-              .background(Color.Transparent),
-          )
-
+          Column {
+            AnimatedVisibility(
+              visible = editingMessageId != null && editingMessage != null,
+              modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp)
+            ) {
+              EditingMessageReference(
+                message = editingMessage,
+                originalContent = originalMessageContent,
+                onCancelEdit = { onEvent(TaskChatEvent.SetEditingMessage(-1)) }
+              )
+            }
+            Spacer(modifier.height(8.dp))
+            TaskChatInput(
+              sendTaskMessage = {
+                sendTaskMessage(it)
+                scope.launch {
+                  delay(200)
+                  scrollState.animateScrollToItem(index = 0)
+                }
+              },
+              pickImage = { singleImagePickerLauncher.launch() },
+              pickPdf = { singleFilePickerLauncher.launch() },
+              editingMessageId = editingMessageId,
+              editingContent = editingMessageContent,
+              onCancelEdit = {
+                onEvent(TaskChatEvent.SetEditingMessage(-1))
+              },
+              onUpdateMessage = { content ->
+                onEvent(TaskChatEvent.UpdateMessageContent(content))
+              },
+              modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Transparent),
+            )
+          }
         }
       }
 
-      TaskDetails(//TODO
+      TaskDetails(
         taskId = task.id,
         modifier = Modifier.align(Alignment.TopCenter),
         onTitleLineCount = { count ->
@@ -352,14 +400,43 @@ private fun TaskChatInput(
   pickImage: () -> Unit,
   pickPdf: () -> Unit,
   modifier: Modifier = Modifier,
+  editingMessageId: Long? = null,
+  editingContent: String = "",
+  onCancelEdit: () -> Unit = {},
+  onUpdateMessage: (String) -> Unit = {}
 ) {
-  val isTextEmpty = remember { mutableStateOf(true) }
+  val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
-  val showSendIcon = remember { mutableStateOf(false) }
+  val showSendIcon = remember { mutableStateOf(editingContent.isNotEmpty()) }
+  val focusRequester = remember { FocusRequester() }
+  val keyboardController = LocalSoftwareKeyboardController.current
 
-  var userInputValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-    mutableStateOf(TextFieldValue())
+  var userInputValue by rememberSaveable(
+    stateSaver = TextFieldValue.Saver,
+    inputs = arrayOf(editingMessageId, editingContent)
+  ) {
+    mutableStateOf(
+      if (editingMessageId != null && editingMessageId > 0)
+        TextFieldValue(editingContent, TextRange(editingContent.length))
+      else
+        TextFieldValue("")
+    )
   }
+
+  LaunchedEffect(editingMessageId, editingContent) {
+    if (editingMessageId != null && editingMessageId > 0) {
+      userInputValue = TextFieldValue(editingContent, TextRange(editingContent.length))
+      isTextEmpty.value = editingContent.isEmpty()
+      showSendIcon.value = !isTextEmpty.value
+      focusRequester.requestFocus()
+      keyboardController?.show()
+    } else {
+      userInputValue = TextFieldValue("")
+      isTextEmpty.value = true
+      showSendIcon.value = false
+    }
+  }
+
   var showMenu by remember { mutableStateOf(false) }
 
   Box(
@@ -375,15 +452,20 @@ private fun TaskChatInput(
             onValueChange = {
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
+              showSendIcon.value = !isTextEmpty.value
+              if (editingMessageId != null && editingMessageId > 0) {
+                onUpdateMessage(it.text)
+              }
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.focusRequester(focusRequester),
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
                 modifier = Modifier.fillMaxWidth()
               ) {
-                if (isTextEmpty.value) {
+                if (isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0)) {
                   IconButton(
                     onClick = { showMenu = true },
                     modifier = Modifier.weight(1f)
@@ -415,36 +497,33 @@ private fun TaskChatInput(
                           text = stringResource(Res.string.select_pdf)
                         )
                       })
-
                   }
                   VoiceToTextInput(
                     onUpdateValue = {
-                     userInputValue = userInputValue.copy(text = it)
-                      androidx.compose.ui.text.TextRange(it.length)
-
+                      userInputValue = userInputValue.copy(text = it)
+                      showSendIcon.value = it.isNotBlank()
+                      isTextEmpty.value = it.isBlank()
                     },
                     onRecordingStateChanged = { recording ->
                       isRecording.value = recording
                       if (!recording && userInputValue.text.isNotBlank()) {
                         showSendIcon.value = true
-
                       }
                     },
                     isHomeScreen = true
                   )
                 } else {
-                  AnimatedVisibility(
-                    visible = showSendIcon.value || !isTextEmpty.value,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                  ) {
-                    SendIcon(onClick = {
+                  SendIcon(onClick = {
+                    if (editingMessageId != null && editingMessageId > 0) {
+                      onUpdateMessage(userInputValue.text)
+                      onCancelEdit()
+                    } else {
                       sendTaskMessage(userInputValue.text)
-                      userInputValue = userInputValue.copy(text = "")
+                      userInputValue = TextFieldValue("")
                       isTextEmpty.value = true
                       showSendIcon.value = false
-                    })
-                  }
+                    }
+                  })
                 }
               }
             },
@@ -454,6 +533,62 @@ private fun TaskChatInput(
     )
   }
 }
+
+
+@Composable
+fun EditingMessageReference(
+  message: MessageUiModel?,
+  originalContent: String,
+  onCancelEdit: () -> Unit
+) {
+  if (message == null) return
+
+  Surface(
+    shape = RoundedCornerShape(12.dp),
+    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
+    modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
+  ) {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+      Column(
+        modifier = Modifier.weight(1f)
+      ) {
+        Text(
+          text = stringResource(Res.string.edit_message),
+          style = MaterialTheme.typography.labelMedium,
+          color = MaterialTheme.colorScheme.primary
+        )
+
+        Text(
+          text = originalContent,
+          style = MaterialTheme.typography.bodyMedium,
+          color = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = Modifier.padding(top = 2.dp),
+          maxLines = 2,
+          overflow = TextOverflow.Ellipsis
+        )
+      }
+
+      IconButton(
+        onClick = onCancelEdit,
+        modifier = Modifier.size(32.dp)
+      ) {
+        Icon(
+          imageVector = Icons.Default.Close,
+          contentDescription = stringResource(Res.string.cancel),
+          tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+      }
+    }
+  }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

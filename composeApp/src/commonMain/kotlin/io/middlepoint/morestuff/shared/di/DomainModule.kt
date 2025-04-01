@@ -56,6 +56,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetHighestPriorityScoreUseCase
@@ -323,6 +325,8 @@ val messageUseCases = module {
     factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
     factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
     factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
+    factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
+
 }
 
 

@@ -42,8 +42,16 @@ fun TextMessageItem(
   message: MessageUiModel,
   modifier: Modifier = Modifier,
   onNonLinkClick: () -> Unit = {},
+  isBeingEdited: Boolean = false,
+  originalContent: String? = null
 ) {
-  val content = handleUrlText(message.content)
+  val displayContent = if (isBeingEdited && originalContent != null) {
+    originalContent
+  } else {
+    message.content
+  }
+
+  val content = handleUrlText(displayContent)
   val uriHandler = LocalUriHandler.current
 
   Column(modifier) {

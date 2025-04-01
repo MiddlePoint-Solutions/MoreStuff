@@ -108,6 +108,9 @@ deleteMessage:
 DELETE FROM message
 WHERE id = ?;
 
-
+updateMessageContent:
+UPDATE message
+SET content = ?
+WHERE id = ?;
 
 

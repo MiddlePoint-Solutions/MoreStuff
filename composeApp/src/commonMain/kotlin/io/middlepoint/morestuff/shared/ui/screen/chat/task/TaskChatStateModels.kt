@@ -9,7 +9,10 @@ import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 @Immutable
 data class TaskChatState(
   val task: TaskUiModel = TaskUiModel(),
-  val messages: List<MessageUiModel> = listOf()
+  val messages: List<MessageUiModel> = listOf(),
+  val editingMessageId: Long? = null,
+  val originalMessageContent: String = "",
+  val editingMessageContent: String = ""
 )
 
 @Immutable
@@ -26,5 +29,6 @@ sealed class TaskChatEvent {
   data class ScheduleResponse(val scheduleId: Long, val replyType: ReplyType) : TaskChatEvent()
   data object DeleteTask : TaskChatEvent()
   data object ToggleTaskComplete : TaskChatEvent()
-
+  data class SetEditingMessage(val messageId: Long) : TaskChatEvent()
+  data class UpdateMessageContent(val content: String) : TaskChatEvent()
 }
