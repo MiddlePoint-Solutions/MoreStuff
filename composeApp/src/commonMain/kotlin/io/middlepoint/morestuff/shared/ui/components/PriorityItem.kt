@@ -1,16 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -19,10 +15,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -73,11 +69,6 @@ fun PriorityItem(
   val sharedFunctionsHandler: SharedFunctionsHandler = koinInject()
   val haptic = sharedFunctionsHandler.rememberReorderHapticFeedback()
 
-  val offsetX by animateDpAsState(
-    targetValue = if (isReorderModeActive) 4.dp else 0.dp,
-    label = "PriorityItemOffset"
-  )
-
   var isCompleted by remember { mutableStateOf(task.isComplete) }
 
   Box(
@@ -98,109 +89,92 @@ fun PriorityItem(
     Row(
       modifier = modifier
         .fillMaxSize()
-        .padding(start = 14.dp),
+        .padding(start = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      if (isReorderModeActive) {
-        AnimatedVisibility(
-          visible = isReorderModeActive,
-          enter = slideInHorizontally(initialOffsetX = { -40 }) + fadeIn(animationSpec = tween(300)),
-          exit = slideOutHorizontally(targetOffsetX = { 40 }) + fadeOut(animationSpec = tween(300))
+      ToggleTaskAsDone(
+        selectedToComplete = isCompleted,
+        onClick = {
+          isCompleted = !isCompleted
+          onTaskComplete(isCompleted)
+
+        },
+        enabled = enabled
+      )
+      Spacer(modifier = Modifier.width(8.dp))
+      Box {
+        TaskProfile(task.title)
+        androidx.compose.animation.AnimatedVisibility(
+          visible = isSelected,
+          enter = fadeIn(animationSpec = tween(durationMillis = 300)),
+          exit = fadeOut(animationSpec = tween(durationMillis = 300)),
+          modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-          Box(
-            modifier = handleModifier.padding(end = 8.dp),
-            contentAlignment = Alignment.Center
-          ) {
-            Icon(
-              imageVector = Icons.Default.DragHandle,
-              contentDescription = "Reorder",
-              tint = MaterialTheme.colorScheme.onSurfaceVariant,
-              modifier = Modifier.size(30.dp)
-            )
-          }
-        }
-      }
-
-      Row(
-        modifier = Modifier
-          .offset(x = offsetX)
-          .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-      ) {
-        Box {
-          TaskProfile(task.title)
-          androidx.compose.animation.AnimatedVisibility(
-            visible = isSelected,
-            enter = fadeIn(animationSpec = tween(durationMillis = 300)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 300)),
-            modifier = Modifier.align(Alignment.BottomEnd)
-          ) {
-            Icon(
-              imageVector = Icons.Default.CheckCircle,
-              contentDescription = null,
-              tint = MaterialTheme.colorScheme.primary,
-              modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(start = 30.dp)
-                .background(
-                  color = MaterialTheme.colorScheme.surface,
-                  shape = CircleShape
-                )
-                .border(
-                  width = 2.dp,
-                  color = MaterialTheme.colorScheme.surfaceContainer,
-                  shape = CircleShape
-                )
-                .size(20.dp)
-            )
-          }
-        }
-
-        val title by remember { derivedStateOf { task.title } }
-
-        Text(
-          text = title,
-          modifier = Modifier
-            .fillMaxWidth(0.85f)
-            .padding(12.dp),
-          maxLines = 2,
-          color = MaterialTheme.colorScheme.onSurface,
-          overflow = TextOverflow.Ellipsis,
-          style = TextStyle(
-            fontSize = 16.sp,
-            lineHeight = 18.sp,
-            fontWeight = FontWeight(700),
-            color = Color(0xFFFFFFFF),
-            textAlign = TextAlign.Start,
-            textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+          Icon(
+            imageVector = Icons.Default.CheckCircle,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+              .align(Alignment.BottomEnd)
+              .padding(start = 30.dp)
+              .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+              )
+              .border(
+                width = 2.dp,
+                color = MaterialTheme.colorScheme.surfaceContainer,
+                shape = CircleShape
+              )
+              .size(20.dp)
           )
-        )
+        }
       }
+
+      val title by remember { derivedStateOf { task.title } }
+
+      Text(
+        text = title,
+        modifier = Modifier
+          .fillMaxWidth(0.85f)
+          .padding(12.dp),
+        maxLines = 2,
+        color = MaterialTheme.colorScheme.onSurface,
+        overflow = TextOverflow.Ellipsis,
+        style = TextStyle(
+          fontSize = 16.sp,
+          lineHeight = 18.sp,
+          fontWeight = FontWeight(700),
+          color = Color(0xFFFFFFFF),
+          textAlign = TextAlign.Start,
+          textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
+        )
+      )
+
     }
 
 
     val badgesAlpha by animateFloatAsState(
       targetValue = if (isSelected || isReorderModeActive) 0f else 1f,
-      animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+      animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
       label = "BadgesAlphaAnimation"
     )
 
     val toggleAlpha by animateFloatAsState(
       targetValue = if (isSelected || isReorderModeActive) 1f else 0f,
-      animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+      animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
       label = "ToggleAlphaAnimation"
     )
 
     Box(
       modifier = Modifier
         .align(Alignment.BottomEnd)
-        .padding(end = 8.dp)
         .width(48.dp)
         .height(48.dp)
         .graphicsLayer {
           alpha = badgesAlpha
         },
-      contentAlignment = Alignment.Center
+      contentAlignment = Alignment.BottomEnd
     ) {
       TaskItemBadges(
         modifier = Modifier.fillMaxSize(),
@@ -211,7 +185,6 @@ fun PriorityItem(
     Box(
       modifier = Modifier
         .align(Alignment.CenterEnd)
-        .padding(end = 8.dp)
         .width(48.dp)
         .height(48.dp)
         .graphicsLayer {
@@ -219,17 +192,14 @@ fun PriorityItem(
         },
       contentAlignment = Alignment.Center
     ) {
-      ToggleTaskAsDone(
-        modifier = Modifier.fillMaxSize(),
-        selectedToComplete = isCompleted,
-        onClick = {
-          if (toggleAlpha > 0.8f) {
-            isCompleted = !isCompleted
-            onTaskComplete(isCompleted)
-          }
-        },
-        enabled = enabled
-      )
+      if (isReorderModeActive) {
+        Icon(
+          imageVector = Icons.Default.DragHandle,
+          contentDescription = "Reorder",
+          tint = MaterialTheme.colorScheme.onSurfaceVariant,
+          modifier = handleModifier.size(30.dp)
+        )
+      }
     }
   }
 }
@@ -245,7 +215,6 @@ fun ToggleTaskAsDone(
   Box(
     contentAlignment = Alignment.Center,
     modifier = modifier
-      .size(30.dp)
       .clickable(enabled = enabled) { onClick() }
   ) {
     AnimatedContent(
@@ -259,7 +228,7 @@ fun ToggleTaskAsDone(
           Icon(
             imageVector = Icons.Filled.CheckCircle,
             contentDescription = "Completed Task",
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(26.dp),
             tint = MaterialTheme.colorScheme.onSurface
           )
         }
@@ -268,7 +237,7 @@ fun ToggleTaskAsDone(
           Icon(
             imageVector = Icons.Outlined.Circle,
             contentDescription = "Incomplete Task",
-            modifier = Modifier.size(30.dp),
+            modifier = Modifier.size(26.dp),
             tint = MaterialTheme.colorScheme.onSurface
           )
         }

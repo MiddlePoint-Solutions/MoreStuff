@@ -2,8 +2,10 @@ package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.NotificationsActive
@@ -29,8 +31,8 @@ fun TaskItemBadges(
 ) {
     Row(
         modifier = modifier.padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(5.dp),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.End,
+        verticalAlignment = Alignment.Bottom
     ) {
         if (task.extraDetails) {
             Icon(
@@ -40,6 +42,7 @@ fun TaskItemBadges(
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
+        Spacer(modifier = Modifier.width(5.dp))
 
         if (task.hasSchedule) {
             Icon(
@@ -49,6 +52,7 @@ fun TaskItemBadges(
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
+        Spacer(modifier = Modifier.width(5.dp))
 
         if (task.hasReminder) {
             Icon(
