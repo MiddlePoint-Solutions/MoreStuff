@@ -26,7 +26,7 @@ fun OnBoardingScreen(
       items = buildList {
         add(Welcome)
         add(ChatWithYourTasks)
-        add(Review)
+        //add(Review)
         if (requiresNotificationsPermission()) {
           add(NotificationPermission)
         }
@@ -53,7 +53,7 @@ fun OnBoardingScreen(
       Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
       ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
-      Review -> OnBoardingReviewScreen(onNext = navigation::selectNext)
+      //Review -> OnBoardingReviewScreen(onNext = navigation::selectNext)
       Ready -> OnBoardingCompleteScreen(onFinish = onBoardingComplete)
     }
   }

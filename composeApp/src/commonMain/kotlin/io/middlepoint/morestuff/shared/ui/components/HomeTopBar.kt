@@ -133,12 +133,12 @@ fun HomeTopBar(
                     )
                 }
 
-                IconButton(onClick = reviewSelected) {
+               /* IconButton(onClick = reviewSelected) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_review_new),
                         contentDescription = stringResource(Res.string.cd_priority_review)
                     )
-                }
+                }*/
 
                 IconButton(onClick = settingsSelected) {
                     Icon(

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -36,6 +37,7 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
 import morestuff.composeapp.generated.resources.developer_settings
+import morestuff.composeapp.generated.resources.review_item_title_text_color
 import morestuff.composeapp.generated.resources.test_onboarding
 import morestuff.composeapp.generated.resources.test_review_notifications
 import org.jetbrains.compose.resources.stringResource
@@ -127,6 +129,10 @@ fun DevSettings(
         SettingsMenuLink(
             title = { Text(text = stringResource(Res.string.test_review_notifications)) },
             onClick = devTools::testReviewNotification,
+        )
+        SettingsMenuLink(
+            title = { Text(text = "Review Screen") },
+            onClick = { navigation.push(Screen.Review(1)) },
         )
 
 //        SettingsMenuLink(
