@@ -1,15 +1,28 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Close
+import androidx.compose.material.icons.sharp.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +41,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.SubcomposeLayout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -39,13 +54,14 @@ import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
 import io.middlepoint.morestuff.shared.ui.components.NotificationPermissionDialog
-import io.middlepoint.morestuff.shared.ui.components.priority.PriorityButton
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
+import morestuff.composeapp.generated.resources.cd_schedule_icon
 import org.jetbrains.compose.resources.stringResource
 
 
@@ -53,25 +69,46 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun TaskSchedule(
     model: ScheduleUiModel?,
-    actionText: String,
     onTimeChange: (Int, Int) -> Unit,
     onDateChange: (Long) -> Unit,
     createSchedule: () -> Unit,
     cancelSchedule: () -> Unit,
-    icon: @Composable () -> Unit = {},
 ) {
     var showDatePickerDialog by remember { mutableStateOf(false) }
     var showTimePickerDialog by remember { mutableStateOf(false) }
     var showRationaleDialog by remember { mutableStateOf(false) }
+    var isVisible by remember { mutableStateOf(model != null) }
+    var displayModel by remember { mutableStateOf(model) }
+    var contentWidth by remember { mutableStateOf(0.dp) }
 
     val permissionState = rememberPermissionState(Permission.Notification)
     val coroutineScope = rememberCoroutineScope()
     var hasBeenDeniedBefore by remember { mutableStateOf(false) }
 
+    val buttonExpanded = isVisible
+    val buttonSizeAnimation by animateDpAsState(
+        targetValue = if (buttonExpanded) 22.dp else 16.dp,
+        animationSpec = tween(400)
+    )
+
+    val expandedWidth by animateDpAsState(
+        targetValue = if (isVisible) (contentWidth + 60.dp).coerceAtLeast(220.dp) else 48.dp,
+        animationSpec = tween(400, easing = FastOutSlowInEasing)
+    )
+
+    LaunchedEffect(model) {
+        if (model != null) {
+            displayModel = model
+            isVisible = true
+        } else {
+            isVisible = false
+            delay(400)
+            displayModel = null
+        }
+    }
 
     LaunchedEffect(permissionState.status) {
         if (permissionState.status.isGranted) {
-
         } else if (permissionState.status is PermissionStatus.Denied) {
             hasBeenDeniedBefore = true
         }
@@ -84,114 +121,189 @@ fun TaskSchedule(
             .padding(start = 12.dp, top = 17.dp, bottom = 7.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        icon()
+        Box(
+            contentAlignment = Alignment.CenterStart,
+            modifier = Modifier.weight(1f)
+        ) {
+            // Expandable Background
+            Box(
+                modifier = Modifier
+                    .width(expandedWidth)
+                    .height(48.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                        shape = if (isVisible) RoundedCornerShape(24.dp) else CircleShape
+                    )
+            )
 
-        Spacer(modifier = Modifier.width(13.dp))
+            // Content (schedule button + date/time selector)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(40.dp)
+            ) {
+                Box(
+                    modifier = Modifier.size(48.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            when {
+                                permissionState.status.isGranted -> {
+                                    if (isVisible && displayModel != null) {
+                                        isVisible = false
+                                        coroutineScope.launch {
+                                            delay(400)
+                                            cancelSchedule()
+                                        }
+                                    } else {
+                                        createSchedule()
+                                        isVisible = true
+                                    }
+                                }
+                                else -> {
+                                    showRationaleDialog = true
+                                }
+                            }
+                        },
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Sharp.Schedule,
+                            contentDescription = stringResource(Res.string.cd_schedule_icon),
+                            modifier = Modifier.size(buttonSizeAnimation),
+                            tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.6f
+                            ),
+                        )
+                    }
+                }
 
-        when (model) {
-            null -> {
-                PriorityButton(
-                    onClick = {
-                        when {
-                            permissionState.status.isGranted -> {
-                                createSchedule()
+                // Time/date animated buttons
+                AnimatedVisibility(
+                    visible = isVisible && displayModel != null,
+                    enter = fadeIn(animationSpec = tween(300)) +
+                        expandHorizontally(
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                            expandFrom = Alignment.Start
+                        ),
+                    exit = fadeOut(animationSpec = tween(300)) +
+                        shrinkHorizontally(
+                            animationSpec = tween(400, easing = FastOutSlowInEasing),
+                            shrinkTowards = Alignment.Start
+                        ),
+                    modifier = Modifier.padding(end = 6.dp)
+                ) {
+                    SubcomposeLayout { constraints ->
+                        val placeable = subcompose("content") {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.onGloballyPositioned { coordinates ->
+                                    contentWidth = coordinates.size.width.toDp()
+                                }
+                            ) {
+                                // Date button
+                                Button(
+                                    onClick = { showDatePickerDialog = true },
+                                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                                        contentColor = MaterialTheme.colorScheme.secondary,
+                                    )
+                                ) {
+                                    Text(
+                                        text = displayModel?.displayDate ?: "Select Date",
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            lineHeight = 28.sp,
+                                            fontWeight = FontWeight(400),
+                                            color = MaterialTheme.colorScheme.secondary,
+                                        )
+                                    )
+                                }
+
+                                // Time button
+                                Button(
+                                    onClick = { showTimePickerDialog = true },
+                                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+                                        contentColor = MaterialTheme.colorScheme.secondary,
+                                    )
+                                ) {
+                                    Text(
+                                        text = displayModel?.displayTime ?: "Select Time",
+                                        style = TextStyle(
+                                            fontSize = 14.sp,
+                                            lineHeight = 28.sp,
+                                            fontWeight = FontWeight(400),
+                                            color = MaterialTheme.colorScheme.secondary,
+                                        )
+                                    )
+                                }
+
+                                // Close button
+                                IconButton(
+                                    onClick = {
+                                        isVisible = false
+                                        coroutineScope.launch {
+                                            delay(400)
+                                            cancelSchedule()
+                                        }
+                                    },
+                                    modifier = Modifier
+                                ) {
+                                    Icon(
+                                        Icons.Sharp.Close,
+                                        contentDescription = stringResource(Res.string.cd_cancel_schedule),
+                                        tint = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             }
-                            else -> {
-                                showRationaleDialog = true
-                            }
+                        }.map { it.measure(constraints) }
+
+                        layout(placeable[0].width, placeable[0].height) {
+                            placeable[0].place(0, 0)
                         }
-                    },
-                    text = actionText,
-                    shape = RoundedCornerShape(percent = 50),
-                )
-            }
-            else -> {
-                if (showDatePickerDialog) {
-                    val datePickerState = rememberDatePickerState(
-                        initialSelectedDateMillis = model.scheduleUtcTimeMillis
-                    )
-
-                    PriorityDatePicker(
-                        dismissDialog = { showDatePickerDialog = false },
-                        onDateChange = {
-                            datePickerState.selectedDateMillis?.let { onDateChange(it) }
-                            showDatePickerDialog = false
-                        },
-                        state = datePickerState,
-                    )
-                }
-
-                if (showTimePickerDialog) {
-                    val timePickerState = rememberTimePickerState(
-                        initialHour = model.hour,
-                        initialMinute = model.minute
-                    )
-                    PriorityTimePicker(
-                        dismissTimePicker = { showTimePickerDialog = false },
-                        onTimeChange = {
-                            onTimeChange(timePickerState.hour, timePickerState.minute)
-                            showTimePickerDialog = false
-                        },
-                        state = timePickerState
-                    )
-                }
-
-                Button(
-                    onClick = { showDatePickerDialog = true },
-                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-                        contentColor = MaterialTheme.colorScheme.secondary,
-                    )
-                ) {
-                    Text(
-                        text = model.displayDate,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Button(
-                    onClick = { showTimePickerDialog = true },
-                    contentPadding = PaddingValues(horizontal = 15.dp, vertical = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-                        contentColor = MaterialTheme.colorScheme.secondary,
-                    )
-                ) {
-                    Text(
-                        text = model.displayTime,
-                        style = TextStyle(
-                            fontSize = 14.sp,
-                            lineHeight = 28.sp,
-                            fontWeight = FontWeight(400),
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = { cancelSchedule() },
-                    modifier = Modifier
-                ) {
-                    Icon(
-                        Icons.Sharp.Close,
-                        contentDescription = stringResource(Res.string.cd_cancel_schedule),
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
+                    }
                 }
             }
         }
     }
 
+    // Date picker dialog
+    if (showDatePickerDialog && displayModel != null) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = displayModel?.scheduleUtcTimeMillis
+        )
+
+        PriorityDatePicker(
+            dismissDialog = { showDatePickerDialog = false },
+            onDateChange = {
+                datePickerState.selectedDateMillis?.let { onDateChange(it) }
+                showDatePickerDialog = false
+            },
+            state = datePickerState,
+        )
+    }
+
+    // Time picker dialog
+    if (showTimePickerDialog && displayModel != null) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = displayModel?.hour ?: 0,
+            initialMinute = displayModel?.minute ?: 0
+        )
+        PriorityTimePicker(
+            dismissTimePicker = { showTimePickerDialog = false },
+            onTimeChange = {
+                onTimeChange(timePickerState.hour, timePickerState.minute)
+                showTimePickerDialog = false
+            },
+            state = timePickerState
+        )
+    }
+
+    // Permission dialog
     NotificationPermissionDialog(
         showDialog = showRationaleDialog,
         onDismiss = {
@@ -208,7 +320,6 @@ fun TaskSchedule(
                     if (permissionState.status.isGranted){
                         createSchedule()
                     }
-
                 }
             }
         },
@@ -217,7 +328,6 @@ fun TaskSchedule(
         }
     )
 }
-
 
 
 

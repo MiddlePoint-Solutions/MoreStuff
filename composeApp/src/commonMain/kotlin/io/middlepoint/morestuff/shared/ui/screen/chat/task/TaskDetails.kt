@@ -65,7 +65,6 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
-import morestuff.composeapp.generated.resources.task_chat_schedule_action
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
 import org.koin.core.parameter.parametersOf
@@ -280,7 +279,6 @@ fun TaskDetails(
               AnimatedVisibility(visible = showSchedule) {
                 TaskSchedule(
                   model = model.scheduleModel,
-                  actionText = stringResource(Res.string.task_chat_schedule_action),
                   onTimeChange = { hour, minute ->
                     viewModel.take(
                       TaskDetailsEvent.UpdatePlanTime(
@@ -294,13 +292,6 @@ fun TaskDetails(
                   },
                   createSchedule = { viewModel.take(TaskDetailsEvent.CreateOneTimeSchedule) },
                   cancelSchedule = { viewModel.take(TaskDetailsEvent.CancelActiveSchedule) },
-                  icon = {
-                    Icon(
-                      imageVector = vectorResource(Res.drawable.ic_schedule),
-                      contentDescription = stringResource(Res.string.cd_schedule_icon),
-                      tint = MaterialTheme.colorScheme.inverseSurface
-                    )
-                  },
                 )
               }
             }
