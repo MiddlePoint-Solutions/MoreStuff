@@ -127,6 +127,7 @@ import org.koin.core.parameter.parametersOf
 fun TaskChatScreen(
   taskId: Long,
   onBack: () -> Unit,
+  scopeId: Long? = null,
   modifier: Modifier = Modifier,
 ) {
 
@@ -135,7 +136,7 @@ fun TaskChatScreen(
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
-    parameters = { parametersOf(taskId) }
+    parameters = { parametersOf(taskId, scopeId) }
   )
 
   RoutedContent(
@@ -227,12 +228,13 @@ private fun TaskChatContent(
   pdfPicked: (PlatformFile) -> Unit = {},
   logger: Logger = koinInject()
 ) {
-  val scope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
   var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
 
   val task = model.task
+  val scope = model.scope
   val messages = model.messages
   val editingMessageId = model.editingMessageId
   val originalMessageContent = model.originalMessageContent
@@ -290,6 +292,8 @@ private fun TaskChatContent(
       prevIsComplete.value = task.isComplete
     }
   }
+
+  val scopeName = scope.name
 
   Scaffold(
     topBar = {
@@ -350,7 +354,7 @@ private fun TaskChatContent(
             TaskChatInput(
               sendTaskMessage = {
                 sendTaskMessage(it)
-                scope.launch {
+                coroutineScope.launch {
                   delay(200)
                   scrollState.animateScrollToItem(index = 0)
                 }
@@ -375,6 +379,7 @@ private fun TaskChatContent(
 
       TaskDetails(
         taskId = task.id,
+        scopeName = scopeName,
         modifier = Modifier.align(Alignment.TopCenter),
         onTitleLineCount = { count ->
           titleLineCount = count

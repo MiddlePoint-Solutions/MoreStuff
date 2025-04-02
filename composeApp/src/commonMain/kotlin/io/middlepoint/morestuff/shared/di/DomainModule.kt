@@ -108,6 +108,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
@@ -285,6 +287,9 @@ val scopeUseCases = module{
     factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
     factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
+    factoryOf(::GetScopeByIdUseCaseImpl) bind GetScopeByIdUseCase::class
+
+
 }
 
 val scheduleUseCases = module {

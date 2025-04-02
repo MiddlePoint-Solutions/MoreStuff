@@ -18,3 +18,4 @@ val defaultScope = ScopeDomain(
   name = "Stuff",
   order = 0,
 )
+

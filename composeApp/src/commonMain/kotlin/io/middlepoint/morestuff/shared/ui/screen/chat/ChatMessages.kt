@@ -97,7 +97,7 @@ fun Messages(
             item.formattedTime != nextMessage?.formattedTime
           }
 
-          Column {
+          Column(modifier.padding(top = 8.dp)) {
             if (isLastMessageOfDay) {
               DateTimeItem(item)
             }

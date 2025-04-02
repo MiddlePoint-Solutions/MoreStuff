@@ -4,11 +4,13 @@ import androidx.compose.runtime.Immutable
 import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.ScopeUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 @Immutable
 data class TaskChatState(
   val task: TaskUiModel = TaskUiModel(),
+  val scope: ScopeUiModel = ScopeUiModel(),
   val messages: List<MessageUiModel> = listOf(),
   val editingMessageId: Long? = null,
   val originalMessageContent: String = "",

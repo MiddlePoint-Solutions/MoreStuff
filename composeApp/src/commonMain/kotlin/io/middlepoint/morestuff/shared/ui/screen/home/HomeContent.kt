@@ -7,8 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -375,7 +373,7 @@ private fun HomeContent(
                   } else if (selectedTasks.isNotEmpty()) {
                     onEvent(ToggleTaskSelection(taskId))
                   } else {
-                    navigation.push(Screen.TaskChat(taskId))
+                    navigation.push(Screen.TaskChat(taskId, scope.id))
                   }
                 },
                 onItemLongClick = { onEvent(ToggleTaskSelection(it)) },

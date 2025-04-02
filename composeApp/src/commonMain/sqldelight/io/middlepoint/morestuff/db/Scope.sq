@@ -45,3 +45,8 @@ SELECT COUNT(*) FROM scope;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+selectScopeById:
+SELECT scope_id, scope_uid, scope_name, scope_order
+FROM scope
+WHERE scope_id = :id;

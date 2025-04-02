@@ -18,8 +18,10 @@ import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
+import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import kotlinx.coroutines.flow.Flow
@@ -29,22 +31,26 @@ import org.koin.compose.koinInject
 @Composable
 fun taskChatModel(
   taskId: Long,
+  scopeId: Long? = null,
   initialState: TaskChatState,
   events: Flow<TaskChatEvent>,
   store: AppStore = koinInject(),
   clipboardHelper: ClipboardHelper = koinInject(),
   mediaHandler: MediaHandler = koinInject(),
   taskUiMapper: TaskUiMapper = koinInject(),
+  scopeUiMapper: ScopeUiMapper = koinInject(),
   shareHelper: ShareHelper = koinInject(),
   messageUiMapper: MessageUiMapper = koinInject(),
   getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
   getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
   getTaskFlow: GetTaskFlowUseCase = koinInject(),
+  getScopeByIdUseCase: GetScopeByIdUseCase = koinInject(),
   devTools: DevTools = koinInject(),
   logger: Logger = koinInject()
 ): TaskChatState {
 
   var task by remember { mutableStateOf(initialState.task) }
+  var scope by remember { mutableStateOf(initialState.scope) }
   var messages by remember { mutableStateOf(initialState.messages) }
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var originalMessageContent by remember { mutableStateOf(initialState.originalMessageContent) }
@@ -56,6 +62,21 @@ fun taskChatModel(
         logger.d { "Task flow" }
         task = taskUiMapper.map(it)
       }
+  }
+
+  LaunchedEffect(scopeId) {
+    scopeId?.let { id ->
+      if (id > 0) {
+        getScopeByIdUseCase(id).fold(
+          { failure ->
+            logger.e { "Error loading scope: $failure" }
+          },
+          { scopeDomain ->
+            scope = scopeUiMapper.map(scopeDomain)
+          }
+        )
+      }
+    }
   }
 
   LaunchedEffect(Unit) {
@@ -196,6 +217,7 @@ fun taskChatModel(
 
   return TaskChatState(
     task = task,
+    scope = scope,
     messages = messages,
     editingMessageId = editingMessageId,
     originalMessageContent = originalMessageContent,

@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
-import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import kotlinx.serialization.Serializable
 
@@ -19,7 +18,7 @@ sealed class Screen {
   data object Settings : Screen()
 
   @Serializable
-  data class TaskChat(val taskId: Long) : Screen()
+  data class TaskChat(val taskId: Long, val scopeId: Long?= null) : Screen()
 
   @Serializable
   data class Share(val shareable: Shareable, val content: String) : Screen()

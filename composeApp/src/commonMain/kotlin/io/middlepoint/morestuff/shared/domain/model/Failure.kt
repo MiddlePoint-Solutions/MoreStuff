@@ -18,3 +18,4 @@ data class OpenGraphMetadataFetchFailure(val message: String?) : FeatureFailure
 data object TaskReminderCancelled : FeatureFailure
 
 data object ScopeAlreadyExists: Failure
+data object NoScope: Failure
