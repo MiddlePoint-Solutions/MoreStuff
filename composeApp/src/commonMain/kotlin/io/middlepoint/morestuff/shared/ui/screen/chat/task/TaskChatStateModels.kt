@@ -31,4 +31,5 @@ sealed class TaskChatEvent {
   data object ToggleTaskComplete : TaskChatEvent()
   data class SetEditingMessage(val messageId: Long) : TaskChatEvent()
   data class UpdateMessageContent(val content: String) : TaskChatEvent()
+  data class CreateTaskCompletionMessage(val content: String) : TaskChatEvent()
 }

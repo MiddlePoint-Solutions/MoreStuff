@@ -87,7 +87,6 @@ import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInpu
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItem
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
@@ -123,7 +122,6 @@ import morestuff.composeapp.generated.resources.task_chat_complete_message_with_
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
-import kotlin.random.Random
 
 @Composable
 fun TaskChatScreen(
@@ -264,6 +262,35 @@ private fun TaskChatContent(
     }
   }
 
+  val completionMessage = stringResource(Res.string.task_chat_complete_message_with_date)
+    .replace("%s", task.completeTime)
+
+
+  val prevIsComplete = remember { mutableStateOf(task.isComplete) }
+
+  LaunchedEffect(task.isComplete) {
+    if (prevIsComplete.value != task.isComplete) {
+      if (task.isComplete && task.completeTime.isNotEmpty()) {
+        delay(500)
+        onEvent(
+          TaskChatEvent.CreateTaskCompletionMessage(
+            content = completionMessage
+          )
+        )
+      } else if (!task.isComplete) {
+        messages
+          .filter { message ->
+            message.contentType == ContentType.APP_TASK_MESSAGE &&
+                message.content.startsWith(completionMessage)
+          }
+          .forEach { message ->
+            onEvent(DeleteMessage(message))
+          }
+      }
+      prevIsComplete.value = task.isComplete
+    }
+  }
+
   Scaffold(
     topBar = {
       TaskTopAppBar(
@@ -301,29 +328,6 @@ private fun TaskChatContent(
           contentPadding = contentPadding,
           originalMessageContent = originalMessageContent
         )
-
-        AnimatedVisibility(
-          visible = task.isComplete,
-          modifier = Modifier.background(Color.Transparent)
-        ) {
-          AppChatItem(
-            message = MessageUiModel(
-              id = Random.nextLong(),
-              taskId = task.id,
-              scheduleId = 0L,
-              contentType = ContentType.APP_TASK_MESSAGE,
-              createTime = "",
-              content = stringResource(Res.string.task_chat_complete_message_with_date).replace(
-                "%s",
-                task.completeTime
-              ),
-              formattedTime = "",
-              formattedTimeOnly = ""
-            ),
-            chatActions
-          )
-          Spacer(modifier = Modifier.padding(bottom = 80.dp))
-        }
 
         AnimatedVisibility(
           visible = !task.isComplete,

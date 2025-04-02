@@ -180,6 +180,15 @@ fun taskChatModel(
           is UpdateMessageContent -> {
             editingMessageContent = content
           }
+
+          is CreateTaskCompletionMessage -> {
+            store.dispatch(
+              MessageAction.CreateAppTaskMessageAction(
+                taskId = taskId,
+                content = content,
+              )
+            )
+          }
         }
       }
     }
