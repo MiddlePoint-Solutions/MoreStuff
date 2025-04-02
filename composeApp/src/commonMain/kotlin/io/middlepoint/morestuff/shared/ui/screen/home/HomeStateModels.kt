@@ -15,7 +15,7 @@ data class HomeState(
   val scheduleModel: ScheduleUiModel? = null,
   val lastCreatedTaskId: Long? = null,
   val planTime: ScheduleUiModel? = null,
-
+  val taskNames: Map<Long, String> = mapOf()
   )
 
 @Immutable
@@ -31,7 +31,7 @@ sealed class HomeEvent {
   data class UpdatePlanDate(val dateMillis: Long) : HomeEvent()
   data object SetPlanPriority : HomeEvent()
   data object ClearPlanPriority : HomeEvent()
-  data class ToggleTaskSelection(val taskId: Long) : HomeEvent()
+  data class ToggleTaskSelection(val taskId: Long, val taskName: String? = null) : HomeEvent()
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()
   data class CreateScopeForSelectedTasks(val title: String) : HomeEvent()

@@ -49,7 +49,7 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.logger
-import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.InputItem
@@ -82,7 +82,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.confirm_delete
+import morestuff.composeapp.generated.resources.delete
+import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.sure_delete_tasks
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
@@ -98,8 +101,8 @@ fun HomeScreen() {
   val snackbarHostState = remember { SnackbarHostState() }
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
   var showScopeSelection by remember { mutableStateOf(false) }
-  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
-
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  var showDeleteBottomSheet by remember { mutableStateOf(false) }
   val model by homePresenter.models.collectAsState()
   val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
   var isReorderingActive = remember { mutableStateOf(false) }
@@ -119,7 +122,7 @@ fun HomeScreen() {
           isReorderingActive.value = false
         },
         completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
-        deleteSelectedTasks = { showDeleteConfirmationDialog = true },
+        deleteSelectedTasks = { showDeleteBottomSheet = true },
         selectScope = { showScopeSelection = true },
         isReorderingActive = isReorderingActive.value
       )
@@ -171,14 +174,26 @@ fun HomeScreen() {
     }
   }
 
-  if (showDeleteConfirmationDialog) {
-    ConfirmDeleteDialog(
+  if (showDeleteBottomSheet) {
+    val taskCount = model.selectedTasks.size
+    val message = if (taskCount == 1) {
+      val taskId = model.selectedTasks.first()
+      val taskName = model.taskNames[taskId] ?: ""
+      stringResource(Res.string.sure_delete_task).replace("%s", taskName)
+    } else {
+      stringResource(Res.string.sure_delete_tasks)
+    }
+
+    DeleteBottomSheet(
+      sheetState = sheetState,
+      onDismissRequest = { showDeleteBottomSheet = false },
       title = stringResource(Res.string.confirm_delete),
-      text = stringResource(Res.string.sure_delete_tasks),
-      onDismiss = { showDeleteConfirmationDialog = false },
+      message = message,
+      confirmButtonText = stringResource(Res.string.delete),
+      dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
         homePresenter.take(DeleteSelectedTasks)
-        showDeleteConfirmationDialog = false
+        showDeleteBottomSheet = false
       }
     )
   }
@@ -279,18 +294,18 @@ private fun HomeContent(
 
   Box(
     modifier = modifier.fillMaxSize()
-   /*   .then(
-        if (taskInputActive) {
-          Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = null,
-          ) {
-            onEvent(HomeEvent.HideTaskInput)
-          }
-        } else {
-          Modifier
-        }
-      )*/
+    /*   .then(
+         if (taskInputActive) {
+           Modifier.clickable(
+             interactionSource = remember { MutableInteractionSource() },
+             indication = null,
+           ) {
+             onEvent(HomeEvent.HideTaskInput)
+           }
+         } else {
+           Modifier
+         }
+       )*/
   ) {
     Column {
       Row(
@@ -371,12 +386,16 @@ private fun HomeContent(
                   if (taskInputActive) {
                     //onEvent(HomeEvent.HideTaskInput)
                   } else if (selectedTasks.isNotEmpty()) {
-                    onEvent(ToggleTaskSelection(taskId))
+                    val task = tasksModel.tasks.find { it.id == taskId }
+                    onEvent(ToggleTaskSelection(taskId, task?.title))
                   } else {
                     navigation.push(Screen.TaskChat(taskId, scope.id))
                   }
                 },
-                onItemLongClick = { onEvent(ToggleTaskSelection(it)) },
+                onItemLongClick = { taskId ->
+                  val task = tasksModel.tasks.find { it.id == taskId }
+                  onEvent(ToggleTaskSelection(taskId, task?.title))
+                },
                 listState = states[page],
                 enabled = !taskInputActive,
                 onReorder = { updatedTasks ->

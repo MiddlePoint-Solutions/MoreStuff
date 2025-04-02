@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -60,6 +62,7 @@ import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Root
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.CreateScope
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.DeleteScope
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.ReorderScopes
@@ -138,8 +141,9 @@ fun ScopesContent(
   onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-  var isDeleteDialogOpen by remember { mutableStateOf(false) }
   var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
   Scaffold(
     topBar = {
@@ -173,6 +177,7 @@ fun ScopesContent(
         .fillMaxSize()
         .padding(it),
       horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
     ) {
 
       Icon(
@@ -190,7 +195,8 @@ fun ScopesContent(
 
       Text(
         text = stringResource(Res.string.description_scopes),
-        color = MaterialTheme.colorScheme.onSurface
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(horizontal = 16.dp),
       )
 
       Spacer(
@@ -202,25 +208,28 @@ fun ScopesContent(
         onEditScope = onEditScope,
         onDeleteScope = { scopeId ->
           selectedScope = scopeId
-          isDeleteDialogOpen = true
+          showDeleteBottomSheet = true
         },
         onEvent = onEvent
       )
     }
   }
 
-  if (isDeleteDialogOpen) {
-    val scope = selectedScope ?: error("Scope is null")
-    DeleteScopeDialog(
-      onDismissRequest = { isDeleteDialogOpen = false },
-      scopeName = scope.name,
+  if (showDeleteBottomSheet) {
+    val scope = selectedScope ?: return
+    DeleteBottomSheet(
+      sheetState = sheetState,
+      onDismissRequest = { showDeleteBottomSheet = false },
+      title = stringResource(Res.string.delete_scope),
+      message = stringResource(Res.string.sure_delete_scope).replace("%s", scope.name),
+      confirmButtonText = stringResource(Res.string.delete),
+      dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
         onEvent(DeleteScope(scope.id))
-        isDeleteDialogOpen = false
-      },
+        showDeleteBottomSheet = false
+      }
     )
   }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -407,3 +416,5 @@ private fun DeleteScopeDialog(
     }
   )
 }
+
+

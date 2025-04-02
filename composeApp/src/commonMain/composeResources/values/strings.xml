@@ -168,7 +168,7 @@
     <string name="select_pdf">Select PDF</string>
 
 
-    <string name="sure_delete_scope">Are you sure you want to delete\n%s scope?</string>
+    <string name="sure_delete_scope">Are you sure you want to delete %s scope?\nAll tasks within this scope will also be deleted.</string>
     <string name="add_scope">Add Scope</string>
     <string name="save">Save</string>
     <string name="edit_scope">Edit Scope</string>

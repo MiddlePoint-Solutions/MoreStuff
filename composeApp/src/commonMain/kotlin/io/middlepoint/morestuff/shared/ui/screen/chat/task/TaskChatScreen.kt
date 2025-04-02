@@ -38,6 +38,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -79,6 +80,7 @@ import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
@@ -98,6 +100,7 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDo
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
@@ -216,6 +219,7 @@ fun TaskChatScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TaskChatContent(
   model: TaskChatState,
@@ -231,7 +235,8 @@ private fun TaskChatContent(
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
-  var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
   val task = model.task
   val scope = model.scope
@@ -300,7 +305,7 @@ private fun TaskChatContent(
       TaskTopAppBar(
         isComplete = task.isComplete,
         onBack = onBack,
-        onDelete = { showDeleteConfirmationDialog = true },
+        onDelete = { showDeleteBottomSheet = true },
         onToggleComplete = { onEvent(ToggleTaskComplete) }
       )
     },
@@ -388,15 +393,18 @@ private fun TaskChatContent(
     }
   }
 
-  if (showDeleteConfirmationDialog) {
-    ConfirmDeleteDialog(
+  if (showDeleteBottomSheet) {
+    DeleteBottomSheet(
+      sheetState = sheetState,
+      onDismissRequest = { showDeleteBottomSheet = false },
       title = stringResource(Res.string.confirm_delete),
-      text = stringResource(Res.string.sure_delete_task).replace("%s", task.title),
-      onDismiss = { showDeleteConfirmationDialog = false },
+      message = stringResource(Res.string.sure_delete_task).replace("%s", task.title),
+      confirmButtonText = stringResource(Res.string.delete),
+      dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
         onEvent(DeleteTask)
         onBack()
-        showDeleteConfirmationDialog = false
+        showDeleteBottomSheet = false
       }
     )
   }

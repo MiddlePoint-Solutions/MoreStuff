@@ -147,7 +147,9 @@
     <string name="language_catalan">Catalán</string>
     <string name="language_device_default">Dispositivo</string>
     <string name="confirm_delete">Confirmar eliminación</string>
-    <string name="sure_delete_task">Estás seguro que deseas eliminar \nla siguiente tarea?</string>
+    <string name="sure_delete_task">Estás seguro que deseas eliminar \nla siguiente tarea %s?</string>
+    <string name="sure_delete_tasks">¿Estás seguro de que deseas eliminar\nlas siguientes tareas?</string>
+
     <string name="can_i_do_for_you_today">¿Qué puedo hacer hoy por ti?</string>
     <string name="added_new_task">¡Nueva tarea añadida!</string>
     <string name="developer_settings">Ajustes de Desarrollador</string>
@@ -164,7 +166,7 @@
 
 
 
-    <string name="sure_delete_scope">Estás seguro que quieres eliminar\n%s scope?</string>
+    <string name="sure_delete_scope">¿Estás seguro de que deseas eliminar el scope %s?\nTodas las tareas dentro de este scope también serán eliminadas.</string>
     <string name="add_scope">Crear nuevo Scope</string>
     <string name="save">Confirmar</string>
     <string name="edit_scope">Editar nombre del Scope </string>

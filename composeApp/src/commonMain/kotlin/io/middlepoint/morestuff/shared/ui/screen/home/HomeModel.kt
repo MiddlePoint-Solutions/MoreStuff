@@ -54,6 +54,7 @@ fun homeModel(
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
   var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
+  var taskNames: Map<Long, String> by remember { mutableStateOf(initialState.taskNames) }
 
 
   fun dispatch(action: Action) {
@@ -234,6 +235,11 @@ fun homeModel(
         }
 
         is ToggleTaskSelection -> {
+          val taskId = event.taskId
+          val taskName = event.taskName ?: ""
+          if (taskName.isNotBlank()) {
+            taskNames = taskNames + (taskId to taskName)
+          }
           selectedTasks = if (event.taskId in selectedTasks) {
             selectedTasks - event.taskId
           } else {
@@ -277,7 +283,8 @@ fun homeModel(
     scopes = scopes,
     taskInputActive = taskInputActive,
     reorderingScopes = reorderingScopes,
-    planTime = planTime
+    planTime = planTime,
+    taskNames = taskNames,
   )
 }
 
