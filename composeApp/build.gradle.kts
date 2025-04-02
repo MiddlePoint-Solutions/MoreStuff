@@ -1,4 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.jetbrains.compose.internal.utils.getLocalProperty
+import org.jetbrains.compose.internal.utils.localPropertiesFile
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -21,39 +24,10 @@ object Env {
   const val Release = "release"
 }
 
-val projectVersionName = project.findProperty("buildConfig.versionName") as String
-val projectVersionCode = (project.findProperty("buildConfig.versionCode") as String?)?.toInt()
-
-
-buildConfig {
-  buildConfigField(
-    name = "DEBUG",
-    provider {
-      (property("buildConfig.debug") as String).toBoolean()
-    }
-  )
-
-  buildConfigField(
-    name = "VERSION_NAME",
-    provider {
-      property("buildConfig.versionName") as? String
-        ?: error("buildConfig.versionName undefined!")
-    }
-  )
-
-  buildConfigField(
-    name = "VERSION_CODE",
-    provider {
-      (property("buildConfig.versionCode") as? String)?.toInt()
-        ?: error("buildConfig.versionCode undefined!")
-    }
-  )
-}
-
 kotlin {
   jvmToolchain(20)
 
-  // TODO: once we have support for SqlDelight & Arrow
+  // TODO: once we have support for SqlDelight
 //    @OptIn(ExperimentalWasmDsl::class)
 //    wasmJs {
 //        moduleName = "composeApp"
@@ -90,7 +64,6 @@ kotlin {
 
   applyDefaultHierarchyTemplate()
 
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions {
     // Common compiler options applied to all Kotlin source sets
     freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -178,6 +151,12 @@ kotlin {
       // About
       implementation(libs.aboutLibrariesCore)
       implementation(libs.aboutLibrariesCompose)
+
+      // Supabase
+      implementation(project.dependencies.platform(libs.supabase.bom))
+      implementation(libs.supabase.auth)
+      implementation(libs.supabase.postgres)
+      implementation(libs.supabase.compose.auth)
     }
 
     commonTest.dependencies {
@@ -235,10 +214,44 @@ kotlin {
       implementation(libs.kotlinx.coroutines.swing)
     }
 
-    // TODO: Enable once we have support from SqlDelight & Arrow
+    // TODO: Enable once we have support from SqlDelight
 //        wasmJsMain.dependencies {
 //        }
   }
+}
+
+val projectVersionName = project.findProperty("buildConfig.versionName") as? String
+  ?: error("versionName undefined!")
+val projectVersionCode = (project.findProperty("buildConfig.versionCode") as? String)?.toInt()
+  ?: error("versionCode undefined!")
+
+buildConfig {
+
+  val localProperties = gradleLocalProperties(rootDir, providers)
+
+  buildConfigField(name = "VERSION_NAME", value = projectVersionName)
+  buildConfigField(name = "VERSION_CODE", value = projectVersionCode)
+
+  buildConfigField(
+    name = "DEBUG",
+    value = provider { (property("buildConfig.debug") as String).toBoolean() }
+  )
+
+  buildConfigField(
+    name = "SUPABASE_URL",
+    value = provider { localProperties.getProperty("buildConfig.supabaseUrl") }
+  )
+
+  buildConfigField(
+    name = "SUPABASE_KEY",
+    value = provider { localProperties.getProperty("buildConfig.supabaseKey") }
+  )
+
+  buildConfigField(
+    name = "GOOGLE_SERVER_CLIENT_ID",
+    value = provider { localProperties.getProperty("buildConfig.googleServerClientId") }
+  )
+
 }
 
 android {

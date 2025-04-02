@@ -1,5 +1,11 @@
 package io.middlepoint.morestuff.shared.di
 
+import MoreStuff.composeApp.BuildConfig
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.appleNativeLogin
+import io.github.jan.supabase.compose.auth.googleNativeLogin
+import io.github.jan.supabase.createSupabaseClient
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
@@ -75,5 +81,20 @@ val dataModule = module {
 
   factoryOf(::MigrationHelper)
 
+}
+
+val supabaseModule = module {
+  single {
+    createSupabaseClient(
+      supabaseUrl = BuildConfig.SUPABASE_URL,
+      supabaseKey = BuildConfig.SUPABASE_KEY
+    ) {
+      install(Auth)
+      install(ComposeAuth) {
+        googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
+        appleNativeLogin() // TODO
+      }
+    }
+  }
 }
 
