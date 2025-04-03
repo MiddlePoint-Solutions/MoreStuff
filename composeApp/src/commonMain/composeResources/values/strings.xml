@@ -97,6 +97,7 @@
     <string name="show">Show</string>
     <string name="undo">Undo</string>
     <string name="snack_task_completed">Task completed</string>
+    <string name="snack_tasks_deleted">Task deleted</string>
     <string name="snack_task_moved_to_new_scope">Task moved to scope</string>
 
     <string name="title_activity_share">ShareActivity</string>

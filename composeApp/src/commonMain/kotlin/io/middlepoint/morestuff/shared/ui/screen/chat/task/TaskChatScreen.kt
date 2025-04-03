@@ -34,6 +34,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -79,14 +81,15 @@ import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
-import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
+import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
@@ -100,11 +103,11 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDo
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
@@ -136,86 +139,104 @@ fun TaskChatScreen(
 
   val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
+  val snackbarHostState = remember { SnackbarHostState() }
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
     parameters = { parametersOf(taskId, scopeId) }
   )
 
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(scale() + fade()),
-  ) { screen ->
+  MoreStuffHomeScaffold(
+    snackbarHostState = snackbarHostState,
+    content = {
+      RoutedContent(
+        router = router,
+        animation = stackAnimation(scale() + fade()),
+      ) { screen ->
 
-    when (screen) {
-      is TaskChat -> {
+        when (screen) {
+          is TaskChat -> {
 
-        val model by viewModel.models.collectAsState()
+            val model by viewModel.models.collectAsState()
 
-        val chatActions = remember {
-          ChatActions(
-            scheduleAction = { scheduleId, replyType ->
-              viewModel.take(ScheduleResponse(scheduleId, replyType))
-            },
-            copyMessage = { viewModel.take(CopyText(it.content)) },
-            deleteMessage = { viewModel.take(DeleteMessage(it)) },
-            onImageSelected = {
-              val path = it.messageData?.filePath ?: ""
-              val title = it.content
-              router.push(ImagePreview(path, title))
-            },
-            onPdfSelected = {
-              val path = it.messageData?.filePath ?: ""
-              viewModel.take(OpenDocument(path))
-            },
-            shareImage = { viewModel.take(ShareImage(it)) },
-            sharePdf = { viewModel.take(ShareDocument(it)) },
-            shareMessage = { viewModel.take(ShareMessage(it)) },
-            setEditingMessage = { messageId ->
-              viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
-            },
-            updateMessageContent = { content ->
-              viewModel.take(TaskChatEvent.UpdateMessageContent(content))
-            },
-            isMessageBeingEdited = { messageId ->
-              model.editingMessageId == messageId
+            val chatActions = remember {
+              ChatActions(
+                scheduleAction = { scheduleId, replyType ->
+                  viewModel.take(ScheduleResponse(scheduleId, replyType))
+                },
+                copyMessage = { viewModel.take(CopyText(it.content)) },
+                deleteMessage = { viewModel.take(DeleteMessage(it)) },
+                onImageSelected = {
+                  val path = it.messageData?.filePath ?: ""
+                  val title = it.content
+                  router.push(ImagePreview(path, title))
+                },
+                onPdfSelected = {
+                  val path = it.messageData?.filePath ?: ""
+                  viewModel.take(OpenDocument(path))
+                },
+                shareImage = { viewModel.take(ShareImage(it)) },
+                sharePdf = { viewModel.take(ShareDocument(it)) },
+                shareMessage = { viewModel.take(ShareMessage(it)) },
+                setEditingMessage = { messageId ->
+                  viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
+                },
+                updateMessageContent = { content ->
+                  viewModel.take(TaskChatEvent.UpdateMessageContent(content))
+                },
+                isMessageBeingEdited = { messageId ->
+                  model.editingMessageId == messageId
+                }
+              )
             }
-          )
+
+            TaskChatContent(
+              model = model,
+              onEvent = viewModel::take,
+              chatActions = chatActions,
+              modifier = modifier,
+              onBack = onBack,
+              sendTaskMessage = { viewModel.take(InputText(it)) },
+              imagePicked = { scope.launch { router.push(ImageImport(it)) } },
+              pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
+            )
+          }
+
+          is ImageImport -> {
+            ImageImportScreen(
+              imagePath = screen.imageFile.path,
+              onImport = { title ->
+                viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
+                router.pop()
+              },
+              onBack = router::pop
+            )
+          }
+
+          is ImagePreview -> {
+            ImagePreviewScreen(
+              imagePath = screen.imagePath,
+              onBack = router::pop,
+              onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+              title = screen.title,
+            )
+          }
         }
-
-        TaskChatContent(
-          model = model,
-          onEvent = viewModel::take,
-          chatActions = chatActions,
-          modifier = modifier,
-          onBack = onBack,
-          sendTaskMessage = { viewModel.take(InputText(it)) },
-          imagePicked = { scope.launch { router.push(ImageImport(it)) } },
-          pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
-        )
       }
-
-      is ImageImport -> {
-        ImageImportScreen(
-          imagePath = screen.imageFile.path,
-          onImport = { title ->
-            viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
-            router.pop()
-          },
-          onBack = router::pop
-        )
-      }
-
-      is ImagePreview -> {
-        ImagePreviewScreen(
-          imagePath = screen.imagePath,
-          onBack = router::pop,
-          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-          title = screen.title,
-        )
+    }
+  )
+  LaunchedEffect(Unit) {
+    viewModel.notifications.collectLatest { notification ->
+      notification.show(snackbarHostState).let { result ->
+        if (result == SnackbarResult.ActionPerformed) {
+          launch {
+            notification.action()
+          }
+        }
       }
     }
   }
+
 }
 
 

@@ -11,6 +11,7 @@ import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.shared.domain.model.MessageData
@@ -188,6 +189,44 @@ class MessageRepositoryImpl(
   ): Either<Failure, Boolean> {
     messageQueries.updateMessageContent(content, messageId)
     return Right(true)
+  }
+
+  override suspend fun restoreMessage(
+    taskId: Long,
+    scheduleId: Long,
+    contentType: Int,
+    messageData: MessageData?,
+    content: String,
+    createTime: String,
+    seenTime: String?,
+    replyType: ReplyType?,
+    replyContent: String?,
+    replyTime: String?
+  ): Either<Failure, Message> = messageQueries.transactionWithResult {
+    messageQueries.insertMessageWithTime(
+      task_id = taskId,
+      schedule_id = scheduleId,
+      create_time = createTime,
+      content_type = contentType,
+      content = content,
+      seen_time = seenTime,
+      reply_type = replyType?.value,
+      reply_content = replyContent,
+      reply_time = replyTime
+    )
+    val messageId = lastInsertId
+    messageData?.let {
+      messageDataQueries.insertMessageData(
+        message_id = messageId,
+        file_path = messageData.filePath,
+        creation_time = messageData.creationTime,
+        data_type = messageData.messageType.name,
+      )
+    }
+    messageQueries.selectMessageById(
+      id = messageId,
+      mapper = mapper.messageDataMapper
+    ).executeAsOne().right()
   }
 
 }

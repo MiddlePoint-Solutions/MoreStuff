@@ -158,6 +158,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUse
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksWithoutScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
@@ -166,6 +168,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeU
 import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.task.RestoreTasksUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.RestoreTasksUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SetTaskCompleteImpl
@@ -277,6 +281,8 @@ val taskUseCases = module {
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
     factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
     factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
+    factoryOf(::RestoreTasksUseCaseImpl) bind RestoreTasksUseCase::class
+    factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class
 }
 
 val scopeUseCases = module{

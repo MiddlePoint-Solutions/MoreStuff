@@ -269,4 +269,57 @@ class TaskRepositoryImpl(
             }
         }
     }
+
+    override suspend fun getTasksByIds(taskIds: List<Long>): Either<Failure, List<TaskDomain>> {
+        if (taskIds.isEmpty()) return Either.Right(listOf())
+
+        return taskQueries.transactionWithResult {
+            val tasks = mutableListOf<TaskDomain>()
+
+            for (taskId in taskIds) {
+                val task = taskQueries.selectTaskById(taskId, mapper.taskDbMapper).executeAsOneOrNull()
+                    ?: continue
+
+                val schedules = scheduleQueries
+                    .selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
+                    .executeAsList()
+
+                tasks.add(task.copy(schedule = schedules))
+            }
+
+            tasks.right()
+        }
+    }
+
+    override suspend fun restoreTasks(
+        tasks: List<TaskDomain>,
+        taskScopes: Map<Long, List<Long>>
+    ): Either<Failure, List<TaskDomain>> {
+        val restoredTasks = mutableListOf<TaskDomain>()
+
+        return taskQueries.transactionWithResult {
+            tasks.forEach { originalTask ->
+                val data = createTaskData(
+                    title = originalTask.title,
+                    priorityScore = originalTask.priorityScore,
+                    taskType = originalTask.taskType
+                )
+                taskQueries.insertTask(data)
+                val taskId = lastInsertedRowId
+                val scopeIds = taskScopes[originalTask.id] ?: emptyList()
+                scopeIds.forEach { scopeId ->
+                    taskScopeQueries.insert(taskId, scopeId)
+                }
+                val restoredTask = taskQueries.selectTaskById(taskId, mapper.taskDbMapper).executeAsOne()
+                restoredTasks.add(restoredTask)
+            }
+
+            restoredTasks.right()
+        }
+    }
+
+
+
+
+
 }

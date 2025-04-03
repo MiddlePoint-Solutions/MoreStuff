@@ -168,6 +168,9 @@ fun HomeScreen() {
             if (notification is NotificationState.Complete) {
               homePresenter.take(ResetHomeState)
             }
+            if (notification is NotificationState.TasksDeleted) {
+              homePresenter.take(ResetHomeState)
+            }
           }
         }
       }

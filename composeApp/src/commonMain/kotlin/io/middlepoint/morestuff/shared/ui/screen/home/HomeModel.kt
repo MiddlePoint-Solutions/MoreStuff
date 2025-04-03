@@ -7,22 +7,27 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
@@ -41,6 +46,8 @@ fun homeModel(
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
   createScopeUseCase: CreateScopeUseCase = koinInject(),
   getTaskSchedulesUseCase: GetTaskSchedulesUseCase = koinInject(),
+  getTasksByIdsUseCase: GetTasksByIdsUseCase = koinInject(),
+  getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
   timeManager: TimeManager = koinInject(),
   timeFormatter: TimeFormatter = koinInject(),
 ): HomeState {
@@ -55,11 +62,28 @@ fun homeModel(
   var planTime by remember { mutableStateOf(initialState.planTime) }
   var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
   var taskNames: Map<Long, String> by remember { mutableStateOf(initialState.taskNames) }
-
+  var deletedTasks: List<TaskDomain> by remember { mutableStateOf(listOf()) }
+  var deletedTaskScopes: Map<Long, List<Long>> by remember { mutableStateOf(mapOf()) }
+  var deletedTaskMessages: Map<Long, List<Message>> by remember { mutableStateOf(mapOf()) }
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
     store.dispatch(action)
+  }
+
+  suspend fun prepareTaskDeletion(taskIds: List<Long>): Triple<List<TaskDomain>, Map<Long, List<Message>>, Map<Long, List<Long>>> {
+    val tasksWithDetails = getTasksByIdsUseCase(taskIds).getOrElse { emptyList() }
+    val taskMessagesMap = mutableMapOf<Long, List<Message>>()
+    tasksWithDetails.forEach { task ->
+      val messages = getTaskChatMessagesUseCase(task.id).asList()
+      taskMessagesMap[task.id] = messages
+    }
+    val scopeMap = mutableMapOf<Long, List<Long>>()
+    taskIds.forEach { taskId ->
+      scopeMap[taskId] = listOf(currentScopeId)
+    }
+
+    return Triple(tasksWithDetails, taskMessagesMap, scopeMap)
   }
 
   LaunchedEffect(Unit) {
@@ -163,7 +187,27 @@ fun homeModel(
         }
 
         DeleteSelectedTasks -> {
-          store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
+          val tasksToDelete = selectedTasks.toList()
+          launch {
+            val (tasksWithDetails, messagesMap, scopesMap) = prepareTaskDeletion(tasksToDelete)
+            deletedTasks = tasksWithDetails
+            deletedTaskMessages = messagesMap
+            deletedTaskScopes = scopesMap
+            dispatch(TaskAction.DeleteTasksAction(tasksToDelete))
+            if (tasksWithDetails.isNotEmpty()) {
+              val notification = NotificationState.TasksDeleted {
+                dispatch(
+                  TaskAction.RestoreDeletedTasksAction(
+                    tasks = deletedTasks,
+                    taskScopes = deletedTaskScopes,
+                    taskMessages = deletedTaskMessages
+                  )
+                )
+              }
+              notifications.emit(notification)
+            }
+          }
+
           selectedTasks = listOf()
         }
 

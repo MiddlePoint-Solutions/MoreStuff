@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.snack_task_completed
 import morestuff.composeapp.generated.resources.snack_task_moved_to_new_scope
+import morestuff.composeapp.generated.resources.snack_tasks_deleted
 import morestuff.composeapp.generated.resources.undo
 import org.jetbrains.compose.resources.getString
 
@@ -22,6 +23,9 @@ sealed class NotificationState(open val action: () -> Unit = {}) {
 
     @Immutable
     data class TaskMovedToScope(val scopeTitle: String) : NotificationState()
+
+    @Immutable
+    data class TasksDeleted(override val action: () -> Unit) : NotificationState(action)
 }
 
 suspend fun NotificationState.show(
@@ -38,6 +42,11 @@ suspend fun NotificationState.show(
             message = getString(Res.string.snack_task_moved_to_new_scope).let {
                 "$it $scopeTitle"
             },
+            duration = SnackbarDuration.Short
+        )
+        is NotificationState.TasksDeleted -> hostState.showSnackbar(
+            message = getString(Res.string.snack_tasks_deleted),
+            actionLabel = getString(Res.string.undo),
             duration = SnackbarDuration.Short
         )
     }

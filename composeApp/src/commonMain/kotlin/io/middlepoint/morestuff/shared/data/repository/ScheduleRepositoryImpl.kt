@@ -113,4 +113,19 @@ class ScheduleRepositoryImpl(
         return Right(limit.toInt())
     }
 
+    override suspend fun restoreSchedule(
+        schedule: ScheduleDomain,
+        newTaskId: Long
+    ): Either<Failure, ScheduleDomain> = scheduleQueries.transactionWithResult {
+        val scheduleToRestore = schedule.copy(
+            id = 0L,
+            taskId = newTaskId,
+            active = true
+        )
+
+        val data = mapScheduleDomain(scheduleToRestore)
+        scheduleQueries.insertSchedule(data)
+        scheduleToRestore.copy(id = lastInsertId).right()
+    }
+
 }

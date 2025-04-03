@@ -3,29 +3,51 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.ClipboardHelper
+import io.middlepoint.morestuff.shared.MediaHandler
+import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
+import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
-import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
+import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CreateTaskCompletionMessage
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputUserMedia
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.SetEditingMessage
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.UpdateMessageContent
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
@@ -45,6 +67,8 @@ fun taskChatModel(
   getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
   getTaskFlow: GetTaskFlowUseCase = koinInject(),
   getScopeByIdUseCase: GetScopeByIdUseCase = koinInject(),
+  getTasksByIdsUseCase: GetTasksByIdsUseCase = koinInject(),
+  notifications: MutableSharedFlow<NotificationState>,
   devTools: DevTools = koinInject(),
   logger: Logger = koinInject()
 ): TaskChatState {
@@ -55,6 +79,25 @@ fun taskChatModel(
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var originalMessageContent by remember { mutableStateOf(initialState.originalMessageContent) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
+  var deletedTasks: List<TaskDomain> by remember { mutableStateOf(listOf()) }
+  var deletedTaskScopes: Map<Long, List<Long>> by remember { mutableStateOf(mapOf()) }
+  var deletedTaskMessages: Map<Long, List<Message>> by remember { mutableStateOf(mapOf()) }
+  var currentScopeId: Long by remember { mutableLongStateOf(scopeId ?: 0L) }
+
+  suspend fun prepareTaskDeletion(taskIds: List<Long>): Triple<List<TaskDomain>, Map<Long, List<Message>>, Map<Long, List<Long>>> {
+    val tasksWithDetails = getTasksByIdsUseCase(taskIds).getOrElse { emptyList() }
+    val taskMessagesMap = mutableMapOf<Long, List<Message>>()
+    tasksWithDetails.forEach { task ->
+      val messages = getTaskChatMessagesUseCase(task.id).asList()
+      taskMessagesMap[task.id] = messages
+    }
+    val scopeMap = mutableMapOf<Long, List<Long>>()
+    taskIds.forEach { taskId ->
+      scopeMap[taskId] = listOf(currentScopeId)
+    }
+
+    return Triple(tasksWithDetails, taskMessagesMap, scopeMap)
+  }
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -73,6 +116,7 @@ fun taskChatModel(
           },
           { scopeDomain ->
             scope = scopeUiMapper.map(scopeDomain)
+            currentScopeId = id
           }
         )
       }
@@ -168,7 +212,28 @@ fun taskChatModel(
           }
 
           is DeleteTask -> {
-            store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
+            launch {
+              val (tasksWithDetails, messagesMap, scopesMap) = prepareTaskDeletion(listOf(taskId))
+
+              deletedTasks = tasksWithDetails
+              deletedTaskMessages = messagesMap
+              deletedTaskScopes = scopesMap
+
+              store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
+
+              if (tasksWithDetails.isNotEmpty()) {
+                val notification = NotificationState.TasksDeleted {
+                  store.dispatch(
+                    TaskAction.RestoreDeletedTasksAction(
+                      tasks = deletedTasks,
+                      taskScopes = deletedTaskScopes,
+                      taskMessages = deletedTaskMessages
+                    )
+                  )
+                }
+                notifications.emit(notification)
+              }
+            }
           }
 
           is ToggleTaskComplete -> {
