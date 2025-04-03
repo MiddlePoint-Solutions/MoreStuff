@@ -157,6 +157,7 @@ kotlin {
       implementation(libs.supabase.auth)
       implementation(libs.supabase.postgres)
       implementation(libs.supabase.compose.auth)
+      implementation(libs.supabase.compose.auth.ui)
     }
 
     commonTest.dependencies {
