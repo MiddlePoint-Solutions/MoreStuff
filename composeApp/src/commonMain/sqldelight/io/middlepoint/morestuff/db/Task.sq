@@ -123,13 +123,13 @@ LIMIT 1;
 
 searchTasks:
 SELECT * FROM task
-WHERE title LIKE '%' || :searchText || '%'
+WHERE title LIKE '%' || :searchText || '%' COLLATE NOCASE
 ORDER BY create_time DESC;
 
 searchActiveTasks:
 SELECT * FROM task
 WHERE task.complete_time IS NULL
-AND (title LIKE '%' || :searchText || '%')
+AND (title LIKE '%' || :searchText || '%' COLLATE NOCASE)
 ORDER BY create_time DESC;
 
 countActiveTasks:
@@ -156,4 +156,14 @@ WHERE id NOT IN (
    FROM task_scope
 );
 
+selectAllActiveForSearch:
+SELECT *
+FROM task
+WHERE task.complete_time IS NULL
+ORDER BY create_time DESC;
+
+selectAllForSearch:
+SELECT *
+FROM task
+ORDER BY create_time DESC;
 
