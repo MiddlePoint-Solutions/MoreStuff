@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.ui.compose
+package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -36,30 +36,30 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.shared.ui.compose.TabRowDefaults.tabIndicatorOffset
+import io.middlepoint.morestuff.shared.ui.components.TabRowDefaults.tabIndicatorOffset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
 @UiComposable
 fun CustomScrollableTabRow(
-  selectedTabIndex: Int,
-  modifier: Modifier = Modifier,
-  minItemWidth: Dp = ScrollableTabRowMinimumTabWidth,
-  containerColor: Color = MaterialTheme.colorScheme.surface,
-  contentColor: Color = contentColorFor(containerColor),
-  edgePadding: Dp = TabRowDefaults.ScrollableTabRowPadding,
-  indicator: @Composable @UiComposable
+    selectedTabIndex: Int,
+    modifier: Modifier = Modifier,
+    minItemWidth: Dp = ScrollableTabRowMinimumTabWidth,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = contentColorFor(containerColor),
+    edgePadding: Dp = TabRowDefaults.ScrollableTabRowPadding,
+    indicator: @Composable @UiComposable
         (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
-    TabRowDefaults.Indicator(
-      Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
-    )
+        TabRowDefaults.Indicator(
+            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex])
+        )
     },
-  divider: @Composable @UiComposable () -> Unit =
+    divider: @Composable @UiComposable () -> Unit =
         @Composable {
-          TabRowDefaults.Divider()
+            TabRowDefaults.Divider()
         },
-  tabs: @Composable @UiComposable () -> Unit
+    tabs: @Composable @UiComposable () -> Unit
 ) {
     Surface(
         modifier = modifier,
@@ -178,9 +178,9 @@ object TabRowDefaults {
      */
     @Composable
     fun Divider(
-      modifier: Modifier = Modifier,
-      thickness: Dp = DividerThickness,
-      color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
+        modifier: Modifier = Modifier,
+        thickness: Dp = DividerThickness,
+        color: Color = LocalContentColor.current.copy(alpha = DividerOpacity)
     ) {
         Divider(modifier = modifier, thickness = thickness, color = color)
     }
@@ -195,9 +195,9 @@ object TabRowDefaults {
      */
     @Composable
     fun Indicator(
-      modifier: Modifier = Modifier,
-      height: Dp = IndicatorHeight,
-      color: Color = LocalContentColor.current
+        modifier: Modifier = Modifier,
+        height: Dp = IndicatorHeight,
+        color: Color = LocalContentColor.current
     ) {
         Box(
             modifier
@@ -273,10 +273,10 @@ private class ScrollableTabData(
     private var selectedTab: Int? = null
 
     fun onLaidOut(
-      density: Density,
-      edgeOffset: Int,
-      tabPositions: List<TabPosition>,
-      selectedTab: Int
+        density: Density,
+        edgeOffset: Int,
+        tabPositions: List<TabPosition>,
+        selectedTab: Int
     ) {
         // Animate if the new tab is different from the old tab, or this is called for the first
         // time (i.e selectedTab is `null`).

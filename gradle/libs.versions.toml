@@ -114,6 +114,7 @@ supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "s
 supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth" }
+supabase-compose-auth-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui" }
 
 # Misc
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }

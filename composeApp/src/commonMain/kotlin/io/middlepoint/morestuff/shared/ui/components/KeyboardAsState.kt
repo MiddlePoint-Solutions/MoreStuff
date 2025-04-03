@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.ui.compose
+package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime

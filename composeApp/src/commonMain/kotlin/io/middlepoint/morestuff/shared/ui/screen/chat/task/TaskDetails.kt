@@ -57,7 +57,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
-import io.middlepoint.morestuff.shared.ui.compose.keyboardAsState
+import io.middlepoint.morestuff.shared.ui.components.keyboardAsState
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
