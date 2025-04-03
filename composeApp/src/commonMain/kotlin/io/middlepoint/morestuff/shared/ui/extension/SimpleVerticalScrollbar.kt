@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.ui.compose
+package io.middlepoint.morestuff.shared.ui.extension
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween

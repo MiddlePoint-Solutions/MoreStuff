@@ -17,7 +17,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
-import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
+import io.middlepoint.morestuff.shared.ui.extension.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
