@@ -15,8 +15,10 @@ sealed class OnBoarding() {
   @Serializable
   data object ChatWithYourTasks : OnBoarding()
 
-  //    data object ReviewReminder : OnBoarding()
   @Serializable
   data object Review : OnBoarding()
+
+  @Serializable
+  data object SignIn: OnBoarding()
 }
 
