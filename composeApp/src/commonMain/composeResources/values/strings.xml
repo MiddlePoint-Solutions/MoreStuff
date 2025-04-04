@@ -229,6 +229,10 @@
     <string name="onboarding_review_task9">Pay parking ticket</string>
     <string name="onboarding_review_task10">Listen to latest podcast</string>
 
+    <!--  OnBoarding SignIn screen  -->
+    <string name="onboarding_signin_title">Sign in</string>
+    <string name="onboarding_signin_subtitle">Save your stuff in the cloud </string>
+
     <!-- Hint tasks and messages  -->
     <string name="hint_task_1">Welcome to MoreStuff 🤗</string>
     <string name="hint_task_1_message_1">Here you can chat with your tasks</string>
