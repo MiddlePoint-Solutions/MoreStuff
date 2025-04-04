@@ -15,11 +15,18 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.uri
 import io.github.vinceglb.filekit.name
 import io.github.vinceglb.filekit.readBytes
+import io.middlepoint.morestuff.shared.Constants.KEY_FILES_DIRECTORY
+import io.middlepoint.morestuff.shared.Constants.KEY_IMAGES_DIRECTORY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import java.io.File
 import java.io.FileOutputStream
+
+object Constants {
+  const val KEY_IMAGES_DIRECTORY = "images"
+  const val KEY_FILES_DIRECTORY = "files"
+}
 
 class MediaHandlerImpl(
   private val context: Context,
@@ -93,7 +100,7 @@ class MediaHandlerImpl(
       "${time.year}${time.monthNumber}${time.dayOfMonth}_${time.hour}${time.minute}${time.second}"
     val imageFileName = "JPEG_$timeStamp.jpg"
 
-    val storageDir = getAppSpecificStorageDir("images")
+    val storageDir = getAppSpecificStorageDir(KEY_IMAGES_DIRECTORY)
 
     return File(storageDir, imageFileName)
   }
@@ -138,7 +145,7 @@ class MediaHandlerImpl(
   private fun createPDFFile(originalFileName: String): File {
     val pdfFileName =
       if (originalFileName.endsWith(".pdf")) originalFileName else "$originalFileName.pdf"
-    val storageDir = getAppSpecificStorageDir("files")
+    val storageDir = getAppSpecificStorageDir(KEY_FILES_DIRECTORY)
     return File(storageDir, pdfFileName)
   }
 
