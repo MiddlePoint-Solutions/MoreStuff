@@ -56,15 +56,7 @@ actual fun PDFPagePreview(
         /*val file = ParcelFileDescriptor.open(
           pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
         )*/
-        val file = if (pdfFile.uri.path?.contains("/cache/") == true) { //Todo:comprobar que diferencia hay entre un archivo del cache y otro de la app y extraerlo en otra funcion
-          ParcelFileDescriptor.open(
-            pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
-          )
-        } else {
-          ParcelFileDescriptor.open(
-            File(pdfFile.uri.path ?: ""), ParcelFileDescriptor.MODE_READ_ONLY
-          )
-        }
+        val file = openPdfFileDescriptor(pdfFile)
 
         val renderer = PdfRenderer(file)
         val destBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -111,4 +103,20 @@ actual fun PDFPagePreview(
     contentDescription = "PDF preview"
   )
 
+}
+
+
+private fun openPdfFileDescriptor(pdfFile: PlatformFile): ParcelFileDescriptor {
+  val file = if (pdfFile.uri.path?.contains("/cache/") == true) {
+    // For files in cache directory, we can directly convert the URI to a File
+    ParcelFileDescriptor.open(
+      pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
+    )
+  } else {
+    // For files in other locations, we need to create a File from the path string
+    ParcelFileDescriptor.open(
+      File(pdfFile.uri.path ?: ""), ParcelFileDescriptor.MODE_READ_ONLY
+    )
+  }
+  return file
 }
