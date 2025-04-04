@@ -138,9 +138,13 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun getScopeById(id: Long): Either<Failure, ScopeDomain> =
-        scopeQueries
-            .selectScope(id, dataMappers.scopeDbMapper)
+    override suspend fun getScopeByTaskId(taskId: Long): Either<Failure, ScopeDomain> {
+        val scopeId = taskScopeQueries
+            .selectScopeIdForTask(taskId)
+            .executeAsOneOrNull() ?: return Either.Left(NoScope)
+        return scopeQueries
+            .selectScope(scopeId, dataMappers.scopeDbMapper)
             .executeAsOneOrNull()
             ?.right() ?: Either.Left(NoScope)
+    }
 }

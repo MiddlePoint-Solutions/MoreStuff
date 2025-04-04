@@ -113,27 +113,3 @@ UPDATE message
 SET content = ?
 WHERE id = ?;
 
-
-insertMessageWithTime:
-INSERT INTO message (
-    task_id,
-    schedule_id,
-    create_time,
-    content_type,
-    content,
-    seen_time,
-    reply_type,
-    reply_content,
-    reply_time
-) VALUES (
-    ?,
-    ?,
-    ?,
-    ?,
-    ?,
-    ?,
-    ?,
-    ?,
-    ?
-);
-

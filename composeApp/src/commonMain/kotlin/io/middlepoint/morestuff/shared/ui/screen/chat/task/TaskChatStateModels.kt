@@ -13,7 +13,6 @@ data class TaskChatState(
   val scope: ScopeUiModel = ScopeUiModel(),
   val messages: List<MessageUiModel> = listOf(),
   val editingMessageId: Long? = null,
-  val originalMessageContent: String = "",
   val editingMessageContent: String = ""
 )
 

@@ -53,7 +53,10 @@ actual fun PDFPagePreview(
   LaunchedEffect(pdfFile) {
     withContext(Dispatchers.IO) {
       try {
-        val file = if (pdfFile.uri.path?.contains("/cache/") == true) {
+        /*val file = ParcelFileDescriptor.open(
+          pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
+        )*/
+        val file = if (pdfFile.uri.path?.contains("/cache/") == true) { //Todo:comprobar que diferencia hay entre un archivo del cache y otro de la app y extraerlo en otra funcion
           ParcelFileDescriptor.open(
             pdfFile.uri.toFile(), ParcelFileDescriptor.MODE_READ_ONLY
           )

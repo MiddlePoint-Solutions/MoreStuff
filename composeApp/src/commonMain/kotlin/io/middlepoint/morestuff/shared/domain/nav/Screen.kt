@@ -18,7 +18,7 @@ sealed class Screen {
   data object Settings : Screen()
 
   @Serializable
-  data class TaskChat(val taskId: Long, val scopeId: Long?= null) : Screen()
+  data class TaskChat(val taskId: Long) : Screen()
 
   @Serializable
   data class Share(val shareable: Shareable, val content: String) : Screen()

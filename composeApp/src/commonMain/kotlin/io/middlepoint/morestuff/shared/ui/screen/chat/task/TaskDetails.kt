@@ -34,7 +34,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -73,7 +72,6 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun TaskDetails(
   taskId: Long,
-  scopeName: String,
   modifier: Modifier = Modifier,
   taskOptions: @Composable ColumnScope.() -> Unit = {},
   onTitleLineCount: (Int) -> Unit
@@ -192,7 +190,7 @@ fun TaskDetails(
             Column(
               modifier = Modifier
                 .fillMaxWidth()
-                .padding(end = 20.dp)
+                .padding(end = 39.dp)
             ) {
               var firstTime by remember { mutableStateOf(true) }
               var showEllipsis by remember { mutableStateOf(false) }
@@ -253,24 +251,15 @@ fun TaskDetails(
                 ),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
               )
-
-              if (scopeName.isNotEmpty()) {
-                Text(
-                  text = scopeName,
-                  style = MaterialTheme.typography.bodySmall,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant,
-                  modifier = Modifier.padding(top = 4.dp)
-                )
-              }
             }
           }
 
-          AnimatedVisibility(
+          /*AnimatedVisibility(
             visible = !task.isComplete && !isEditing,
             modifier = Modifier.padding(horizontal = 16.dp),
           ) {
             Column(content = taskOptions)
-          }
+          }*/
 
           Box(
             modifier = Modifier.fillMaxWidth()
@@ -303,7 +292,7 @@ fun TaskDetails(
     AnimatedVisibility(
       visible = !isEditing && !task.isComplete,
       modifier = Modifier
-        .padding(end = 12.dp)
+        .padding(end = 6.dp)
         .align(Alignment.BottomEnd),
       enter = fadeIn(),
       exit = fadeOut()

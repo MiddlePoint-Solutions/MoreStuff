@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppState
@@ -21,7 +20,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.CreateHintTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.DeleteTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.RestoreTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SetTaskCompleteUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskTitleUseCase
@@ -53,11 +51,6 @@ sealed class TaskAction : Action.FeatureAction() {
 
   data class UpdateTasksToScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
   data class RemoveTasksFromScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
-  data class RestoreDeletedTasksAction(
-    val tasks: List<TaskDomain>,
-    val taskScopes: Map<Long, List<Long>> = mapOf(),
-    val taskMessages: Map<Long, List<Message>> = mapOf()
-  ) : TaskAction()
 }
 
 class TaskMiddleware(
@@ -68,7 +61,6 @@ class TaskMiddleware(
   private val deleteTasksUseCase: DeleteTasksUseCase,
   private val removeTasksFromScopeUseCase: RemoveTasksFromScopeUseCase,
   private val updateTasksScopeUseCase: UpdateTasksScopeUseCase,
-  private val restoreTasksUseCase: RestoreTasksUseCase,
 ) : Middleware<AppState> {
 
   override fun invoke(
@@ -113,10 +105,6 @@ class TaskMiddleware(
 
       is RemoveTasksFromScopeAction -> scope.launch {
         removeTasksFromScopeUseCase(action.taskIds, action.scopeId)
-      }
-
-      is TaskAction.RestoreDeletedTasksAction -> scope.launch {
-        restoreTasksUseCase(action.tasks, action.taskScopes, action.taskMessages)
       }
 
       else -> NoOp

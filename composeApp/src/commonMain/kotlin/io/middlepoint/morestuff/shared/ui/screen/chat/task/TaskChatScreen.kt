@@ -34,8 +34,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -60,7 +58,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
@@ -82,14 +79,12 @@ import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
-import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
-import io.middlepoint.morestuff.shared.ui.model.show
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
@@ -107,7 +102,6 @@ import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
@@ -125,6 +119,7 @@ import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
+import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -133,110 +128,91 @@ import org.koin.core.parameter.parametersOf
 fun TaskChatScreen(
   taskId: Long,
   onBack: () -> Unit,
-  scopeId: Long? = null,
   modifier: Modifier = Modifier,
 ) {
 
   val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
   val scope = rememberCoroutineScope()
-  val snackbarHostState = remember { SnackbarHostState() }
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
-    parameters = { parametersOf(taskId, scopeId) }
+    parameters = { parametersOf(taskId) }
   )
 
-  MoreStuffHomeScaffold(
-    snackbarHostState = snackbarHostState,
-    content = {
-      RoutedContent(
-        router = router,
-        animation = stackAnimation(scale() + fade()),
-      ) { screen ->
+  RoutedContent(
+    router = router,
+    animation = stackAnimation(scale() + fade()),
+  ) { screen ->
 
-        when (screen) {
-          is TaskChat -> {
+    when (screen) {
+      is TaskChat -> {
 
-            val model by viewModel.models.collectAsState()
+        val model by viewModel.models.collectAsState()
 
-            val chatActions = remember {
-              ChatActions(
-                scheduleAction = { scheduleId, replyType ->
-                  viewModel.take(ScheduleResponse(scheduleId, replyType))
-                },
-                copyMessage = { viewModel.take(CopyText(it.content)) },
-                deleteMessage = { viewModel.take(DeleteMessage(it)) },
-                onImageSelected = {
-                  val path = it.messageData?.filePath ?: ""
-                  val title = it.content
-                  router.push(ImagePreview(path, title))
-                },
-                onPdfSelected = {
-                  val path = it.messageData?.filePath ?: ""
-                  viewModel.take(OpenDocument(path))
-                },
-                shareImage = { viewModel.take(ShareImage(it)) },
-                sharePdf = { viewModel.take(ShareDocument(it)) },
-                shareMessage = { viewModel.take(ShareMessage(it)) },
-                setEditingMessage = { messageId ->
-                  viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
-                },
-                updateMessageContent = { content ->
-                  viewModel.take(TaskChatEvent.UpdateMessageContent(content))
-                },
-                isMessageBeingEdited = { messageId ->
-                  model.editingMessageId == messageId
-                }
-              )
+        val chatActions = remember {
+          ChatActions(
+            scheduleAction = { scheduleId, replyType ->
+              viewModel.take(ScheduleResponse(scheduleId, replyType))
+            },
+            copyMessage = { viewModel.take(CopyText(it.content)) },
+            deleteMessage = { viewModel.take(DeleteMessage(it)) },
+            onImageSelected = {
+              val path = it.messageData?.filePath ?: ""
+              val title = it.content
+              router.push(ImagePreview(path, title))
+            },
+            onPdfSelected = {
+              val path = it.messageData?.filePath ?: ""
+              viewModel.take(OpenDocument(path))
+            },
+            shareImage = { viewModel.take(ShareImage(it)) },
+            sharePdf = { viewModel.take(ShareDocument(it)) },
+            shareMessage = { viewModel.take(ShareMessage(it)) },
+            setEditingMessage = { messageId ->
+              viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
+            },
+            updateMessageContent = { content ->
+              viewModel.take(TaskChatEvent.UpdateMessageContent(content))
+            },
+            isMessageBeingEdited = { messageId ->
+              model.editingMessageId == messageId
             }
-
-            TaskChatContent(
-              model = model,
-              onEvent = viewModel::take,
-              chatActions = chatActions,
-              modifier = modifier,
-              onBack = onBack,
-              sendTaskMessage = { viewModel.take(InputText(it)) },
-              imagePicked = { scope.launch { router.push(ImageImport(it)) } },
-              pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
-            )
-          }
-
-          is ImageImport -> {
-            ImageImportScreen(
-              imagePath = screen.imageFile.path,
-              onImport = { title ->
-                viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
-                router.pop()
-              },
-              onBack = router::pop
-            )
-          }
-
-          is ImagePreview -> {
-            ImagePreviewScreen(
-              imagePath = screen.imagePath,
-              onBack = router::pop,
-              onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-              title = screen.title,
-            )
-          }
+          )
         }
+
+        TaskChatContent(
+          model = model,
+          onEvent = viewModel::take,
+          chatActions = chatActions,
+          modifier = modifier,
+          onBack = onBack,
+          sendTaskMessage = { viewModel.take(InputText(it)) },
+          imagePicked = { scope.launch { router.push(ImageImport(it)) } },
+          pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
+        )
       }
-    }
-  )
-  LaunchedEffect(Unit) {
-    viewModel.notifications.collectLatest { notification ->
-      notification.show(snackbarHostState).let { result ->
-        if (result == SnackbarResult.ActionPerformed) {
-          launch {
-            notification.action()
-          }
-        }
+
+      is ImageImport -> {
+        ImageImportScreen(
+          imagePath = screen.imageFile.path,
+          onImport = { title ->
+            viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
+            router.pop()
+          },
+          onBack = router::pop
+        )
+      }
+
+      is ImagePreview -> {
+        ImagePreviewScreen(
+          imagePath = screen.imagePath,
+          onBack = router::pop,
+          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+          title = screen.title,
+        )
       }
     }
   }
-
 }
 
 
@@ -263,7 +239,6 @@ private fun TaskChatContent(
   val scope = model.scope
   val messages = model.messages
   val editingMessageId = model.editingMessageId
-  val originalMessageContent = model.originalMessageContent
   val editingMessageContent = model.editingMessageContent
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
@@ -327,7 +302,8 @@ private fun TaskChatContent(
         isComplete = task.isComplete,
         onBack = onBack,
         onDelete = { showDeleteBottomSheet = true },
-        onToggleComplete = { onEvent(ToggleTaskComplete) }
+        onToggleComplete = { onEvent(ToggleTaskComplete) },
+        labelText = scopeName
       )
     },
     modifier = modifier.navigationBarsPadding(),
@@ -356,7 +332,6 @@ private fun TaskChatContent(
           modifier = modifier.weight(1f),
           scrollState = scrollState,
           contentPadding = contentPadding,
-          originalMessageContent = originalMessageContent
         )
 
         AnimatedVisibility(
@@ -372,7 +347,6 @@ private fun TaskChatContent(
             ) {
               EditingMessageReference(
                 message = editingMessage,
-                originalContent = originalMessageContent,
                 onCancelEdit = { onEvent(TaskChatEvent.SetEditingMessage(-1)) }
               )
             }
@@ -405,7 +379,6 @@ private fun TaskChatContent(
 
       TaskDetails(
         taskId = task.id,
-        scopeName = scopeName,
         modifier = Modifier.align(Alignment.TopCenter),
         onTitleLineCount = { count ->
           titleLineCount = count
@@ -415,6 +388,11 @@ private fun TaskChatContent(
   }
 
   if (showDeleteBottomSheet) {
+    val taskHasSchedule = if (task.hasSchedule) {
+      stringResource(Res.string.task_schedule_deletion_warning_singular)
+    } else {
+      null
+    }
     DeleteBottomSheet(
       sheetState = sheetState,
       onDismissRequest = { showDeleteBottomSheet = false },
@@ -426,7 +404,8 @@ private fun TaskChatContent(
         onEvent(DeleteTask)
         onBack()
         showDeleteBottomSheet = false
-      }
+      },
+      extraInfo = taskHasSchedule
     )
   }
 }
@@ -576,7 +555,6 @@ private fun TaskChatInput(
 @Composable
 fun EditingMessageReference(
   message: MessageUiModel?,
-  originalContent: String,
   onCancelEdit: () -> Unit
 ) {
   if (message == null) return
@@ -602,15 +580,6 @@ fun EditingMessageReference(
           style = MaterialTheme.typography.labelMedium,
           color = MaterialTheme.colorScheme.primary
         )
-
-        Text(
-          text = originalContent,
-          style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = Modifier.padding(top = 2.dp),
-          maxLines = 2,
-          overflow = TextOverflow.Ellipsis
-        )
       }
 
       IconButton(
@@ -635,6 +604,7 @@ private fun TaskTopAppBar(
   onBack: () -> Unit,
   onDelete: () -> Unit,
   onToggleComplete: () -> Unit,
+  labelText: String
 ) {
   Surface {
     TopAppBar(
@@ -648,7 +618,21 @@ private fun TaskTopAppBar(
         }
       },
       actions = {
-
+        Box(
+          modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .background(
+              color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+              shape = RoundedCornerShape(16.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+        ) {
+          Text(
+            text = labelText,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary
+          )
+        }
         var showMenu by remember { mutableStateOf(false) }
 
         IconButton(onClick = { showMenu = true }) {

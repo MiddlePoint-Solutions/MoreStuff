@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Close
-import androidx.compose.material.icons.sharp.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +61,9 @@ import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_cancel_schedule
 import morestuff.composeapp.generated.resources.cd_schedule_icon
+import morestuff.composeapp.generated.resources.ic_schedule
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.vectorResource
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -168,7 +169,7 @@ fun TaskSchedule(
                         modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Sharp.Schedule,
+                            imageVector = vectorResource(Res.drawable.ic_schedule),
                             contentDescription = stringResource(Res.string.cd_schedule_icon),
                             modifier = Modifier.size(buttonSizeAnimation),
                             tint = if (isVisible) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(

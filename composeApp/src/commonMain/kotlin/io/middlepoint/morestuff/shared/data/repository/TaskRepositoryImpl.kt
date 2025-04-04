@@ -309,33 +309,4 @@ class TaskRepositoryImpl(
       tasks.right()
     }
   }
-
-  override suspend fun restoreTasks(
-    tasks: List<TaskDomain>,
-    taskScopes: Map<Long, List<Long>>
-  ): Either<Failure, List<TaskDomain>> {
-    val restoredTasks = mutableListOf<TaskDomain>()
-
-    return taskQueries.transactionWithResult {
-      tasks.forEach { originalTask ->
-        val data = createTaskData(
-          title = originalTask.title,
-          priorityScore = originalTask.priorityScore,
-          taskType = originalTask.taskType
-        )
-        taskQueries.insertTask(data)
-        val taskId = lastInsertedRowId
-        val scopeIds = taskScopes[originalTask.id] ?: emptyList()
-        scopeIds.forEach { scopeId ->
-          taskScopeQueries.insert(taskId, scopeId)
-        }
-        val restoredTask = taskQueries.selectTaskById(taskId, mapper.taskDbMapper).executeAsOne()
-        restoredTasks.add(restoredTask)
-      }
-
-      restoredTasks.right()
-    }
-  }
-
-
 }

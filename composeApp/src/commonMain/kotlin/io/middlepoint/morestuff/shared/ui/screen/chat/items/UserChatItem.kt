@@ -37,7 +37,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun UserChatItem(
   message: MessageUiModel,
   actions: ChatActions,
-  originalMessageContent: String? = null
 ) {
   val isNewUserTask by remember {
     derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
@@ -122,8 +121,6 @@ fun UserChatItem(
           TextMessageItem(
             message = message,
             onNonLinkClick = { showMenu = true },
-            isBeingEdited = isEditing,
-            originalContent = if (isEditing) originalMessageContent else null
           )
         }
       }

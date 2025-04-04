@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.domain.repository
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
 import io.middlepoint.morestuff.shared.domain.model.Message
@@ -37,19 +36,6 @@ interface MessageRepository {
     messageId: Long,
     content: String,
   ): Either<Failure, Boolean>
-  suspend fun restoreMessage(
-    taskId: Long,
-    scheduleId: Long,
-    contentType: Int,
-    messageData: MessageData?,
-    content: String,
-    createTime: String,
-    seenTime: String?,
-    replyType: ReplyType?,
-    replyContent: String?,
-    replyTime: String?
-  ): Either<Failure, Message>
-
 }
 
 object MessageDoesNotExist : FeatureFailure

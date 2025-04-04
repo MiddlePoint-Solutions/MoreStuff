@@ -40,10 +40,8 @@ import morestuff.composeapp.generated.resources.app_name
 import morestuff.composeapp.generated.resources.cd_complete_tasks
 import morestuff.composeapp.generated.resources.cd_delete_tasks
 import morestuff.composeapp.generated.resources.cd_open_settings
-import morestuff.composeapp.generated.resources.cd_priority_review
 import morestuff.composeapp.generated.resources.cd_search_tasks
 import morestuff.composeapp.generated.resources.choose_scope
-import morestuff.composeapp.generated.resources.ic_review_new
 import morestuff.composeapp.generated.resources.ic_scope_add
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -132,13 +130,6 @@ fun HomeTopBar(
                         contentDescription = stringResource(Res.string.cd_search_tasks)
                     )
                 }
-
-               /* IconButton(onClick = reviewSelected) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_review_new),
-                        contentDescription = stringResource(Res.string.cd_priority_review)
-                    )
-                }*/
 
                 IconButton(onClick = settingsSelected) {
                     Icon(

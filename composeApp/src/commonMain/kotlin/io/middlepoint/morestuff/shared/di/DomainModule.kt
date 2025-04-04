@@ -92,8 +92,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskScheduleCountUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskScheduleCountUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleWorkUseCase
@@ -108,8 +106,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
@@ -168,8 +166,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeU
 import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.task.RestoreTasksUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.RestoreTasksUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SetTaskCompleteImpl
@@ -281,7 +277,6 @@ val taskUseCases = module {
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
     factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
     factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
-    factoryOf(::RestoreTasksUseCaseImpl) bind RestoreTasksUseCase::class
     factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class
 }
 
@@ -293,7 +288,7 @@ val scopeUseCases = module{
     factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
     factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
-    factoryOf(::GetScopeByIdUseCaseImpl) bind GetScopeByIdUseCase::class
+    factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
 
 
 }
@@ -314,7 +309,6 @@ val scheduleUseCases = module {
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
-    factoryOf(::GetTaskSchedulesUseCaseImpl) bind GetTaskSchedulesUseCase::class
 
 
 }

@@ -5,14 +5,14 @@ import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 
-interface GetScopeByIdUseCase {
+interface GetScopeByTaskIdUseCase {
     suspend operator fun invoke(id: Long): Either<Failure, ScopeDomain>
 }
 
-class GetScopeByIdUseCaseImpl(
+class GetScopeByTaskIdUseCaseImpl(
     private val scopeRepository: ScopeRepository
-) : GetScopeByIdUseCase {
+) : GetScopeByTaskIdUseCase {
     override suspend fun invoke(id: Long): Either<Failure, ScopeDomain> {
-        return scopeRepository.getScopeById(id)
+        return scopeRepository.getScopeByTaskId(id)
     }
 }

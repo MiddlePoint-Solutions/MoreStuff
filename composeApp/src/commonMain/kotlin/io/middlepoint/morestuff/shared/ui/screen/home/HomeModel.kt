@@ -7,30 +7,42 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetTaskSchedulesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearPlanPriority
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.HideTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.SetPlanPriority
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -45,9 +57,6 @@ fun homeModel(
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
   createScopeUseCase: CreateScopeUseCase = koinInject(),
-  getTaskSchedulesUseCase: GetTaskSchedulesUseCase = koinInject(),
-  getTasksByIdsUseCase: GetTasksByIdsUseCase = koinInject(),
-  getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
   timeManager: TimeManager = koinInject(),
   timeFormatter: TimeFormatter = koinInject(),
 ): HomeState {
@@ -61,41 +70,17 @@ fun homeModel(
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
   var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
-  var taskNames: Map<Long, String> by remember { mutableStateOf(initialState.taskNames) }
-  var deletedTasks: List<TaskDomain> by remember { mutableStateOf(listOf()) }
-  var deletedTaskScopes: Map<Long, List<Long>> by remember { mutableStateOf(mapOf()) }
-  var deletedTaskMessages: Map<Long, List<Message>> by remember { mutableStateOf(mapOf()) }
+  var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
     store.dispatch(action)
   }
 
-  suspend fun prepareTaskDeletion(taskIds: List<Long>): Triple<List<TaskDomain>, Map<Long, List<Message>>, Map<Long, List<Long>>> {
-    val tasksWithDetails = getTasksByIdsUseCase(taskIds).getOrElse { emptyList() }
-    val taskMessagesMap = mutableMapOf<Long, List<Message>>()
-    tasksWithDetails.forEach { task ->
-      val messages = getTaskChatMessagesUseCase(task.id).asList()
-      taskMessagesMap[task.id] = messages
-    }
-    val scopeMap = mutableMapOf<Long, List<Long>>()
-    taskIds.forEach { taskId ->
-      scopeMap[taskId] = listOf(currentScopeId)
-    }
-
-    return Triple(tasksWithDetails, taskMessagesMap, scopeMap)
-  }
-
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
       Logger.i { "Scopes updated: ${it.size} scopes received" }
       scopes = it
-    }
-  }
-
-  LaunchedEffect(Unit) {
-    getTaskSchedulesUseCase().collect { schedules ->
-      taskSchedules = schedules
     }
   }
 
@@ -187,28 +172,8 @@ fun homeModel(
         }
 
         DeleteSelectedTasks -> {
-          val tasksToDelete = selectedTasks.toList()
-          launch {
-            val (tasksWithDetails, messagesMap, scopesMap) = prepareTaskDeletion(tasksToDelete)
-            deletedTasks = tasksWithDetails
-            deletedTaskMessages = messagesMap
-            deletedTaskScopes = scopesMap
-            dispatch(TaskAction.DeleteTasksAction(tasksToDelete))
-            if (tasksWithDetails.isNotEmpty()) {
-              val notification = NotificationState.TasksDeleted {
-                dispatch(
-                  TaskAction.RestoreDeletedTasksAction(
-                    tasks = deletedTasks,
-                    taskScopes = deletedTaskScopes,
-                    taskMessages = deletedTaskMessages
-                  )
-                )
-              }
-              notifications.emit(notification)
-            }
-          }
+          store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
 
-          selectedTasks = listOf()
         }
 
         is UpdatePlanDate -> {
@@ -280,9 +245,8 @@ fun homeModel(
 
         is ToggleTaskSelection -> {
           val taskId = event.taskId
-          val taskName = event.taskName ?: ""
-          if (taskName.isNotBlank()) {
-            taskNames = taskNames + (taskId to taskName)
+          event.task?.let { task ->
+            tasks = tasks + (taskId to task)
           }
           selectedTasks = if (event.taskId in selectedTasks) {
             selectedTasks - event.taskId
@@ -328,7 +292,7 @@ fun homeModel(
     taskInputActive = taskInputActive,
     reorderingScopes = reorderingScopes,
     planTime = planTime,
-    taskNames = taskNames,
+    tasks = tasks
   )
 }
 

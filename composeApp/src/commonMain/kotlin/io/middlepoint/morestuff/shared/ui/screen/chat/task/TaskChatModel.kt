@@ -3,29 +3,23 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.ClipboardHelper
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
-import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
-import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
@@ -45,15 +39,12 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMe
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.UpdateMessageContent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
 fun taskChatModel(
   taskId: Long,
-  scopeId: Long? = null,
   initialState: TaskChatState,
   events: Flow<TaskChatEvent>,
   store: AppStore = koinInject(),
@@ -66,9 +57,7 @@ fun taskChatModel(
   getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
   getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
   getTaskFlow: GetTaskFlowUseCase = koinInject(),
-  getScopeByIdUseCase: GetScopeByIdUseCase = koinInject(),
-  getTasksByIdsUseCase: GetTasksByIdsUseCase = koinInject(),
-  notifications: MutableSharedFlow<NotificationState>,
+  getScopeByTaskIdUseCase: GetScopeByTaskIdUseCase = koinInject(),
   devTools: DevTools = koinInject(),
   logger: Logger = koinInject()
 ): TaskChatState {
@@ -77,27 +66,8 @@ fun taskChatModel(
   var scope by remember { mutableStateOf(initialState.scope) }
   var messages by remember { mutableStateOf(initialState.messages) }
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
-  var originalMessageContent by remember { mutableStateOf(initialState.originalMessageContent) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
-  var deletedTasks: List<TaskDomain> by remember { mutableStateOf(listOf()) }
-  var deletedTaskScopes: Map<Long, List<Long>> by remember { mutableStateOf(mapOf()) }
-  var deletedTaskMessages: Map<Long, List<Message>> by remember { mutableStateOf(mapOf()) }
-  var currentScopeId: Long by remember { mutableLongStateOf(scopeId ?: 0L) }
 
-  suspend fun prepareTaskDeletion(taskIds: List<Long>): Triple<List<TaskDomain>, Map<Long, List<Message>>, Map<Long, List<Long>>> {
-    val tasksWithDetails = getTasksByIdsUseCase(taskIds).getOrElse { emptyList() }
-    val taskMessagesMap = mutableMapOf<Long, List<Message>>()
-    tasksWithDetails.forEach { task ->
-      val messages = getTaskChatMessagesUseCase(task.id).asList()
-      taskMessagesMap[task.id] = messages
-    }
-    val scopeMap = mutableMapOf<Long, List<Long>>()
-    taskIds.forEach { taskId ->
-      scopeMap[taskId] = listOf(currentScopeId)
-    }
-
-    return Triple(tasksWithDetails, taskMessagesMap, scopeMap)
-  }
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -107,20 +77,15 @@ fun taskChatModel(
       }
   }
 
-  LaunchedEffect(scopeId) {
-    scopeId?.let { id ->
-      if (id > 0) {
-        getScopeByIdUseCase(id).fold(
-          { failure ->
-            logger.e { "Error loading scope: $failure" }
-          },
-          { scopeDomain ->
-            scope = scopeUiMapper.map(scopeDomain)
-            currentScopeId = id
-          }
-        )
+  LaunchedEffect(taskId) {
+    getScopeByTaskIdUseCase(taskId).fold(
+      { failure ->
+        logger.e { "Error loading scope for task: $failure" }
+      },
+      { scopeDomain ->
+        scope = scopeUiMapper.map(scopeDomain)
       }
-    }
+    )
   }
 
   LaunchedEffect(Unit) {
@@ -130,21 +95,7 @@ fun taskChatModel(
     }
     messagesFlow
       .map(messageUiMapper::map)
-      .collect { updatedMessages ->
-        messages = updatedMessages
-
-        editingMessageId?.let { id ->
-          if (id > 0) {
-            updatedMessages.find { it.id == id }?.let { updatedMessage ->
-              originalMessageContent = updatedMessage.content
-
-              if (editingMessageContent.isEmpty() || editingMessageContent == originalMessageContent) {
-                editingMessageContent = updatedMessage.content
-              }
-            }
-          }
-        }
-      }
+      .collect { messages = it }
   }
 
   LaunchedEffect(Unit) {
@@ -212,28 +163,7 @@ fun taskChatModel(
           }
 
           is DeleteTask -> {
-            launch {
-              val (tasksWithDetails, messagesMap, scopesMap) = prepareTaskDeletion(listOf(taskId))
-
-              deletedTasks = tasksWithDetails
-              deletedTaskMessages = messagesMap
-              deletedTaskScopes = scopesMap
-
-              store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
-
-              if (tasksWithDetails.isNotEmpty()) {
-                val notification = NotificationState.TasksDeleted {
-                  store.dispatch(
-                    TaskAction.RestoreDeletedTasksAction(
-                      tasks = deletedTasks,
-                      taskScopes = deletedTaskScopes,
-                      taskMessages = deletedTaskMessages
-                    )
-                  )
-                }
-                notifications.emit(notification)
-              }
-            }
+            store.dispatch(TaskAction.DeleteTasksAction(listOf(taskId)))
           }
 
           is ToggleTaskComplete -> {
@@ -248,17 +178,19 @@ fun taskChatModel(
             if (messageId > 0) {
               val message = messages.find { it.id == messageId }
               message?.let {
-                originalMessageContent = it.content
                 editingMessageContent = it.content
               }
             } else {
               if (previousEditingId != null && previousEditingId > 0) {
                 if (editingMessageContent.isNotEmpty()) {
-                  store.dispatch(MessageAction.UpdateMessageContentAction(previousEditingId, editingMessageContent.trim()))
+                  store.dispatch(
+                    MessageAction.UpdateMessageContentAction(
+                      previousEditingId,
+                      editingMessageContent.trim()
+                    )
+                  )
                 }
               }
-
-              originalMessageContent = ""
               editingMessageContent = ""
             }
           }
@@ -285,7 +217,6 @@ fun taskChatModel(
     scope = scope,
     messages = messages,
     editingMessageId = editingMessageId,
-    originalMessageContent = originalMessageContent,
     editingMessageContent = editingMessageContent
   )
 }

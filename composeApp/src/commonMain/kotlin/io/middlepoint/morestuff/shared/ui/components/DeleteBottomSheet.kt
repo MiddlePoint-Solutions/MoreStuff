@@ -1,8 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,15 +28,15 @@ fun DeleteBottomSheet(
   onDismissRequest: () -> Unit,
   title: String,
   message: String,
+  extraInfo: String? = null,
   confirmButtonText: String,
   dismissButtonText: String,
   onConfirm: () -> Unit,
-  icon: @Composable (() -> Unit)? = null,
 ) {
   ModalBottomSheet(
     onDismissRequest = onDismissRequest,
     sheetState = sheetState,
-    containerColor = MaterialTheme.colorScheme.surface,
+    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
   ) {
     Column(
       modifier = Modifier
@@ -46,45 +46,47 @@ fun DeleteBottomSheet(
     ) {
       Text(
         text = title,
-        style = MaterialTheme.typography.titleLarge,
+        style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 24.sp),
         modifier = Modifier.padding(bottom = 16.dp)
       )
 
-      icon?.invoke()
-
       Text(
         text = message,
-        style = MaterialTheme.typography.bodyLarge,
+        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp),
         textAlign = TextAlign.Center,
         modifier = Modifier.padding(bottom = 24.dp)
       )
-
-      Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-        Button(
-          onClick = onDismissRequest,
-          modifier = Modifier.weight(1f),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-          )
-        ) {
-          Text(text = dismissButtonText)
-        }
-
-        Button(
-          onClick = onConfirm,
-          modifier = Modifier.weight(1f),
-          colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.error,
-            contentColor = MaterialTheme.colorScheme.onError
-          )
-        ) {
-          Text(text = confirmButtonText)
-        }
+      if (extraInfo != null) {
+        Text(
+          text = extraInfo,
+          style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.error, fontSize = 12.sp),
+          textAlign = TextAlign.Center,
+          modifier = Modifier.padding(bottom = 24.dp)
+        )
       }
+      Button(
+        onClick = onConfirm,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.errorContainer,
+          contentColor = MaterialTheme.colorScheme.onErrorContainer
+        )
+      ) {
+        Text(text = confirmButtonText)
+      }
+
+      Spacer(modifier = Modifier.height(16.dp))
+      Button(
+        onClick = onDismissRequest,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+          contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+        )
+      ) {
+        Text(text = dismissButtonText)
+      }
+
 
       Spacer(modifier = Modifier.height(16.dp))
     }

@@ -67,7 +67,6 @@ fun Messages(
   actions: ChatActions = ChatActions(),
   userInteractionEnabled: Boolean = true,
   contentPadding: PaddingValues = PaddingValues(0.dp),
-  originalMessageContent: String? = null
 ) {
   val scope = rememberCoroutineScope()
   var itemsCount by remember { mutableIntStateOf(0) }
@@ -107,7 +106,6 @@ fun Messages(
               ContentType.USER_NEW_TASK -> UserChatItem(
                 message = item,
                 actions = actions,
-                originalMessageContent = if (actions.isMessageBeingEdited(item.id)) originalMessageContent else null
               )
 
               ContentType.CONFIRM_NEW_TASK,

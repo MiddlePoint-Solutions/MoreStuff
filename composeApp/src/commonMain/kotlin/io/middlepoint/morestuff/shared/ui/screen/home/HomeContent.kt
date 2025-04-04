@@ -87,6 +87,8 @@ import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.sure_delete_tasks
+import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
+import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.parameter.parametersOf
 
@@ -168,9 +170,6 @@ fun HomeScreen() {
             if (notification is NotificationState.Complete) {
               homePresenter.take(ResetHomeState)
             }
-            if (notification is NotificationState.TasksDeleted) {
-              homePresenter.take(ResetHomeState)
-            }
           }
         }
       }
@@ -181,10 +180,23 @@ fun HomeScreen() {
     val taskCount = model.selectedTasks.size
     val message = if (taskCount == 1) {
       val taskId = model.selectedTasks.first()
-      val taskName = model.taskNames[taskId] ?: ""
+      val taskName = model.tasks[taskId]?.title ?: ""
       stringResource(Res.string.sure_delete_task).replace("%s", taskName)
     } else {
       stringResource(Res.string.sure_delete_tasks)
+    }
+    val hasScheduledTask = model.selectedTasks.any { taskId ->
+      model.tasks[taskId]?.hasSchedule == true
+    }
+
+    val taskHasSchedule = if (hasScheduledTask) {
+      if (taskCount == 1) {
+        stringResource(Res.string.task_schedule_deletion_warning_singular)
+      } else {
+        stringResource(Res.string.task_schedule_deletion_warning_plural)
+      }
+    } else {
+      null
     }
 
     DeleteBottomSheet(
@@ -197,7 +209,8 @@ fun HomeScreen() {
       onConfirm = {
         homePresenter.take(DeleteSelectedTasks)
         showDeleteBottomSheet = false
-      }
+      },
+      extraInfo = taskHasSchedule
     )
   }
 
@@ -297,18 +310,6 @@ private fun HomeContent(
 
   Box(
     modifier = modifier.fillMaxSize()
-    /*   .then(
-         if (taskInputActive) {
-           Modifier.clickable(
-             interactionSource = remember { MutableInteractionSource() },
-             indication = null,
-           ) {
-             onEvent(HomeEvent.HideTaskInput)
-           }
-         } else {
-           Modifier
-         }
-       )*/
   ) {
     Column {
       Row(
@@ -390,14 +391,14 @@ private fun HomeContent(
                     //onEvent(HomeEvent.HideTaskInput)
                   } else if (selectedTasks.isNotEmpty()) {
                     val task = tasksModel.tasks.find { it.id == taskId }
-                    onEvent(ToggleTaskSelection(taskId, task?.title))
+                    onEvent(ToggleTaskSelection(taskId, task))
                   } else {
-                    navigation.push(Screen.TaskChat(taskId, scope.id))
+                    navigation.push(Screen.TaskChat(taskId))
                   }
                 },
                 onItemLongClick = { taskId ->
                   val task = tasksModel.tasks.find { it.id == taskId }
-                  onEvent(ToggleTaskSelection(taskId, task?.title))
+                  onEvent(ToggleTaskSelection(taskId, task))
                 },
                 listState = states[page],
                 enabled = !taskInputActive,

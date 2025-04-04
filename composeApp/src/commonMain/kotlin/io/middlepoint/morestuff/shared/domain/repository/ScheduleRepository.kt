@@ -47,11 +47,6 @@ interface ScheduleRepository {
         endTime: String
     ): Either<Failure, Int>
 
-    suspend fun restoreSchedule(
-        schedule: ScheduleDomain,
-        newTaskId: Long
-    ): Either<Failure, ScheduleDomain>
-
 }
 
 object ScheduleDoesNotExist : FeatureFailure

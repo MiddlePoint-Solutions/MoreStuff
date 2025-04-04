@@ -11,7 +11,6 @@ import io.github.xxfast.decompose.router.pages.rememberRouter
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.ChatWithYourTasks
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.NotificationPermission
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Ready
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Review
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Welcome
 import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 
@@ -26,7 +25,6 @@ fun OnBoardingScreen(
       items = buildList {
         add(Welcome)
         add(ChatWithYourTasks)
-        //add(Review)
         if (requiresNotificationsPermission()) {
           add(NotificationPermission)
         }
@@ -53,7 +51,6 @@ fun OnBoardingScreen(
       Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
       ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
-      //Review -> OnBoardingReviewScreen(onNext = navigation::selectNext)
       Ready -> OnBoardingCompleteScreen(onFinish = onBoardingComplete)
     }
   }

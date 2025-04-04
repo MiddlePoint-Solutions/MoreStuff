@@ -29,6 +29,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Close
+import androidx.compose.material.icons.sharp.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,7 +72,6 @@ import com.mohamedrejeb.calf.permissions.PermissionStatus
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
-import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityDatePicker
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -116,9 +116,46 @@ fun InputItem(
 
   Column {
     Row(
+      modifier = modifier.fillMaxWidth().height(50.dp).padding(8.dp),
+      verticalAlignment = Alignment.Bottom,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Box(
+        modifier = Modifier.weight(1f),
+        contentAlignment = Alignment.CenterStart
+      ) {
+        this@Row.AnimatedVisibility(
+          visible = inputValue.text.isNotEmpty(),
+          enter = fadeIn(animationSpec = tween(300)),
+          exit = fadeOut(animationSpec = tween(300))
+        ) {
+          Text(
+            text = stringResource(Res.string.main_input_hint),
+            style = TextStyle(
+              fontSize = 14.sp,
+              fontWeight = FontWeight.Medium,
+              color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            ),
+            modifier = Modifier.padding(start = 16.dp)
+          )
+        }
+      }
+
+      IconButton(
+        onClick = onCancel,
+        modifier = Modifier.size(40.dp)
+      ) {
+        Icon(
+          Icons.Sharp.Close,
+          contentDescription = stringResource(Res.string.cd_cancel_schedule),
+          tint = MaterialTheme.colorScheme.secondary
+        )
+      }
+    }
+    Row(
       modifier = modifier
         .fillMaxWidth()
-        .height(100.dp)
+        .height(85.dp)
         .padding(start = 24.dp, end = 12.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Start
@@ -136,7 +173,12 @@ fun InputItem(
           imeAction = ImeAction.Done
         ),
         keyboardActions = KeyboardActions(
-          onDone = { onDone(inputValue.text) }
+          onDone = {
+            val trimmedText = inputValue.text.trim()
+            if (trimmedText.isNotEmpty()) {
+              onDone(trimmedText)
+            }
+          }
         ),
         maxLines = 2,
         cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
@@ -160,14 +202,6 @@ fun InputItem(
           }
         }
       )
-
-      IconButton(onClick = onCancel) {
-        Icon(
-          Icons.Sharp.Close,
-          contentDescription = stringResource(Res.string.cd_cancel_schedule),
-          tint = MaterialTheme.colorScheme.secondary
-        )
-      }
     }
 
     ScheduleSelectorRow(
@@ -192,8 +226,15 @@ fun InputItem(
         focusRequester.requestFocus()
         keyboardController?.show()
       },
+      onDone = {
+        val trimmedText = inputValue.text.trim()
+        if (trimmedText.isNotEmpty()) {
+          onDone(trimmedText)
+        }
+      },
+      inputText = inputValue.text,
 
-    )
+      )
   }
 }
 
@@ -207,7 +248,10 @@ fun ScheduleSelectorRow(
   onDateChange: (Long) -> Unit,
   onTimeChange: (Int, Int) -> Unit,
   onUpdateInputValue: (String) -> Unit = {},
-) {
+  onDone: (String) -> Unit = {},
+  inputText: String = "",
+
+  ) {
   var isVisible by remember { mutableStateOf(schedule != null) }
   var showDatePickerDialog by remember { mutableStateOf(false) }
   var showTimePickerDialog by remember { mutableStateOf(false) }
@@ -220,6 +264,8 @@ fun ScheduleSelectorRow(
 
   var contentWidth by remember { mutableStateOf(0.dp) }
   var rowRef = remember { mutableStateOf<androidx.compose.ui.layout.LayoutCoordinates?>(null) }
+  val hasValidText = inputText.trim().isNotEmpty()
+
 
   val buttonExpanded = isVisible
   val buttonSizeAnimation by animateDpAsState(
@@ -394,30 +440,47 @@ fun ScheduleSelectorRow(
         }
       }
     }
-    Box(
-      modifier = Modifier.size(48.dp),
-      contentAlignment = Alignment.Center
+    AnimatedVisibility(
+      visible = hasValidText,
+      enter = fadeIn(animationSpec = tween(300)),
+      exit = fadeOut(animationSpec = tween(300))
     ) {
-      Surface(
-        modifier = Modifier.fillMaxSize(),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F)
+      Box(
+        modifier = Modifier.size(48.dp),
+        contentAlignment = Alignment.Center
       ) {
-        Box(
-          contentAlignment = Alignment.Center,
-          modifier = Modifier.fillMaxSize()
+        Surface(
+          modifier = Modifier.fillMaxSize(),
+          shape = CircleShape,
+          color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F)
         ) {
-          VoiceToTextInput(
-            onUpdateValue = { newText ->
-              onUpdateInputValue(newText)
-            },
-            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-            iconSize = 18.dp,
-            isHomeScreen = true
-          )
+          Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize()
+          ) {
+            IconButton(
+              onClick = { onDone("") },
+            ) {
+              Icon(
+                imageVector = Icons.Sharp.Done,
+                contentDescription = "Done",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(18.dp)
+              )
+            }
+            /*VoiceToTextInput(
+              onUpdateValue = { newText ->
+                onUpdateInputValue(newText)
+              },
+              tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+              iconSize = 18.dp,
+              isHomeScreen = true
+            )*/
+          }
         }
       }
     }
+
   }
 
   if (showDatePickerDialog && displaySchedule != null) {
