@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -114,94 +115,78 @@ fun InputItem(
     }
   }
 
-  Column {
-    Row(
-      modifier = modifier.fillMaxWidth().height(50.dp).padding(8.dp),
-      verticalAlignment = Alignment.Bottom,
-      horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-      Box(
-        modifier = Modifier.weight(1f),
-        contentAlignment = Alignment.CenterStart
+  Column(modifier.padding(top = 8.dp)) {
+    Box {
+      Row(
+        modifier = modifier
+          .fillMaxWidth()
+          .height(95.dp)
+          .padding(start = 24.dp, end = 12.dp, top = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
       ) {
-        this@Row.AnimatedVisibility(
-          visible = inputValue.text.isNotEmpty(),
-          enter = fadeIn(animationSpec = tween(300)),
-          exit = fadeOut(animationSpec = tween(300))
+        BasicTextField(
+          value = inputValue,
+          onValueChange = { inputValue = it },
+          modifier = Modifier
+            .weight(1f)
+            .clearFocusOnKeyboardDismiss()
+            .focusRequester(focusRequester),
+          keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Done
+          ),
+          keyboardActions = KeyboardActions(
+            onDone = {
+              val trimmedText = inputValue.text.trim()
+              if (trimmedText.isNotEmpty()) {
+                onDone(trimmedText)
+              }
+            }
+          ),
+          maxLines = 2,
+          cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+          textStyle = LocalTextStyle.current.copy(
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Start
+          ),
+          decorationBox = { innerTextField ->
+            Box(modifier = Modifier.padding(vertical = 6.dp)) {
+              if (inputValue.text.isEmpty()) {
+                Text(
+                  text = stringResource(Res.string.main_input_hint),
+                  style = LocalTextStyle.current.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    fontSize = 16.sp
+                  )
+                )
+              }
+              innerTextField()
+            }
+          }
+        )
+      }
+
+      Box(
+        modifier = Modifier
+          .align(Alignment.TopEnd)
+          .offset(y = (-10).dp)
+          .padding(top = 8.dp, end = 8.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        IconButton(
+          onClick = onCancel,
+          modifier = Modifier.size(44.dp)
         ) {
-          Text(
-            text = stringResource(Res.string.main_input_hint),
-            style = TextStyle(
-              fontSize = 14.sp,
-              fontWeight = FontWeight.Medium,
-              color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            ),
-            modifier = Modifier.padding(start = 16.dp)
+          Icon(
+            Icons.Sharp.Close,
+            contentDescription = stringResource(Res.string.cd_cancel_schedule),
+            tint = MaterialTheme.colorScheme.secondary
           )
         }
       }
-
-      IconButton(
-        onClick = onCancel,
-        modifier = Modifier.size(40.dp)
-      ) {
-        Icon(
-          Icons.Sharp.Close,
-          contentDescription = stringResource(Res.string.cd_cancel_schedule),
-          tint = MaterialTheme.colorScheme.secondary
-        )
-      }
-    }
-    Row(
-      modifier = modifier
-        .fillMaxWidth()
-        .height(85.dp)
-        .padding(start = 24.dp, end = 12.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Start
-    ) {
-      BasicTextField(
-        value = inputValue,
-        onValueChange = { inputValue = it },
-        modifier = Modifier
-          .weight(1f)
-          .clearFocusOnKeyboardDismiss()
-          .focusRequester(focusRequester),
-        keyboardOptions = KeyboardOptions(
-          capitalization = KeyboardCapitalization.Sentences,
-          keyboardType = KeyboardType.Text,
-          imeAction = ImeAction.Done
-        ),
-        keyboardActions = KeyboardActions(
-          onDone = {
-            val trimmedText = inputValue.text.trim()
-            if (trimmedText.isNotEmpty()) {
-              onDone(trimmedText)
-            }
-          }
-        ),
-        maxLines = 2,
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-        textStyle = LocalTextStyle.current.copy(
-          color = MaterialTheme.colorScheme.onSurface,
-          fontSize = 16.sp,
-          textAlign = TextAlign.Start
-        ),
-        decorationBox = { innerTextField ->
-          Box(modifier = Modifier.padding(vertical = 6.dp)) {
-            if (inputValue.text.isEmpty()) {
-              Text(
-                text = stringResource(Res.string.main_input_hint),
-                style = LocalTextStyle.current.copy(
-                  color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                  fontSize = 16.sp
-                )
-              )
-            }
-            innerTextField()
-          }
-        }
-      )
     }
 
     ScheduleSelectorRow(
@@ -233,8 +218,7 @@ fun InputItem(
         }
       },
       inputText = inputValue.text,
-
-      )
+    )
   }
 }
 
@@ -446,7 +430,7 @@ fun ScheduleSelectorRow(
       exit = fadeOut(animationSpec = tween(300))
     ) {
       Box(
-        modifier = Modifier.size(48.dp),
+        modifier = Modifier.size(54.dp),
         contentAlignment = Alignment.Center
       ) {
         Surface(
