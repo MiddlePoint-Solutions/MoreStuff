@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux
 
+import io.middlepoint.morestuff.shared.domain.redux.middleware.AuthMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.DevMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ErrorMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.LoggerMiddleware
@@ -18,6 +19,7 @@ class AppStore(
     logger: LoggerMiddleware,
     devMiddleware: DevMiddleware,
     errorMiddleware: ErrorMiddleware,
+    authMiddleware: AuthMiddleware,
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
@@ -35,6 +37,7 @@ class AppStore(
         logger,
         devMiddleware,
         errorMiddleware,
+        authMiddleware,
         settingsMiddleware,
         taskMiddleware,
         scheduleMiddleware,

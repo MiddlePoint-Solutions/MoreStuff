@@ -7,8 +7,8 @@ import org.koin.dsl.KoinAppDeclaration
 
 fun initKoin(appDeclaration: KoinAppDeclaration = {}) = startKoin {
     appDeclaration()
-    modules(domainModules)
     modules(supabaseModule)
+    modules(domainModules)
     modules(platformModule, sharedModule, dataModule, presentationModule)
 }
 
