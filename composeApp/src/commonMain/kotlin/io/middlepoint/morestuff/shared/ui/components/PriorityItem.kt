@@ -198,12 +198,23 @@ fun PriorityItem(
       contentAlignment = Alignment.Center
     ) {
       if (isReorderModeActive) {
-        Icon(
-          imageVector = Icons.Default.DragHandle,
-          contentDescription = "Reorder",
-          tint = MaterialTheme.colorScheme.onSurfaceVariant,
-          modifier = handleModifier.size(30.dp)
-        )
+        Box(
+          modifier = handleModifier
+            .size(48.dp)
+            .clickable(
+              interactionSource = remember { MutableInteractionSource() },
+              indication = null,
+              onClick = { }
+            ),
+          contentAlignment = Alignment.Center
+        ) {
+          Icon(
+            imageVector = Icons.Default.DragHandle,
+            contentDescription = "Reorder",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(30.dp)
+          )
+        }
       }
     }
   }

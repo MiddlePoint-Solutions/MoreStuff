@@ -173,7 +173,7 @@
     <string name="edit_scope">Editar nombre del Scope </string>
     <string name="task_scopes">Task Scopes</string>
     <string name="title_scopes">Scopes</string>
-    <string name="choose_scope">Añadir al Scope</string>
+    <string name="choose_scope">Mover al Scope</string>
     <string name="manage_scopes">Configurar Scopes</string>
     <string name="remove_from_scope">Eliminar del Scope actual</string>
 
