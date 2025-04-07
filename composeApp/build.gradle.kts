@@ -90,6 +90,7 @@ kotlin {
 
     commonMain.dependencies {
       implementation(projects.shared)
+      implementation(libs.kotlinx.coroutines)
 
       implementation(compose.foundation)
       implementation(compose.material3)
@@ -212,7 +213,7 @@ kotlin {
     desktopMain.dependencies {
       implementation(compose.desktop.currentOs)
       implementation(libs.sqldelight.driver.desktop)
-      implementation(libs.kotlinx.coroutines.swing)
+//      implementation(libs.kotlinx.coroutines.swing)
     }
 
     // TODO: Enable once we have support from SqlDelight

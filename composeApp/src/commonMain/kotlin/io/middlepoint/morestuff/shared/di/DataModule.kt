@@ -2,6 +2,10 @@ package io.middlepoint.morestuff.shared.di
 
 import MoreStuff.composeApp.BuildConfig
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.MemoryCodeVerifierCache
+import io.github.jan.supabase.auth.MemorySessionManager
+import io.github.jan.supabase.auth.SettingsCodeVerifierCache
+import io.github.jan.supabase.auth.SettingsSessionManager
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.appleNativeLogin
 import io.github.jan.supabase.compose.auth.googleNativeLogin
@@ -69,6 +73,7 @@ val dataModule = module {
   single<UserRepository> {
     UserRepositoryImpl(settings = get())
   }
+
   single<ScopeRepository> {
     ScopeRepositoryImpl(
       database = get(),
@@ -89,7 +94,10 @@ val supabaseModule = module {
       supabaseUrl = BuildConfig.SUPABASE_URL,
       supabaseKey = BuildConfig.SUPABASE_KEY
     ) {
-      install(Auth)
+      install(Auth) {
+        sessionManager = SettingsSessionManager(settings = get())
+        codeVerifierCache = SettingsCodeVerifierCache(settings = get())
+      }
       install(ComposeAuth) {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
         appleNativeLogin() // TODO
