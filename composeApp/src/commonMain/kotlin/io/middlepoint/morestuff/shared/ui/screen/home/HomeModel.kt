@@ -8,9 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Priority
+import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
@@ -22,7 +24,25 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.*
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearPlanPriority
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.HideTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.SetPlanPriority
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -49,6 +69,8 @@ fun homeModel(
   var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
+  var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
+  var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
@@ -122,11 +144,28 @@ fun homeModel(
 
         is CompleteSelectedTasks -> {
           val completed = selectedTasks.toList()
+          val schedulesToRestore = completed.mapNotNull { taskId ->
+            taskSchedules[taskId]?.let { schedule -> taskId to schedule }
+          }.toMap()
+
           selectedTasks = listOf()
           store.dispatch(TaskAction.CompleteTasksAction(completed, true))
+
           if (completed.isNotEmpty()) {
             val notification = NotificationState.Complete {
               store.dispatch(TaskAction.CompleteTasksAction(completed, false))
+
+              schedulesToRestore.forEach { (taskId, schedule) ->
+                schedule.scheduleLocalDateTime?.let { dateTime ->
+                  store.dispatch(
+                    ScheduleAction.RescheduleTaskAction(
+                      taskId,
+                      schedule.scheduleType,
+                      dateTime
+                    )
+                  )
+                }
+              }
             }
             launch { notifications.emit(notification) }
           }
@@ -134,7 +173,7 @@ fun homeModel(
 
         DeleteSelectedTasks -> {
           store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
-          selectedTasks = listOf()
+
         }
 
         is UpdatePlanDate -> {
@@ -203,7 +242,12 @@ fun homeModel(
         is ScopeSelected -> {
           currentScopeId = event.scopeId
         }
+
         is ToggleTaskSelection -> {
+          val taskId = event.taskId
+          event.task?.let { task ->
+            tasks = tasks + (taskId to task)
+          }
           selectedTasks = if (event.taskId in selectedTasks) {
             selectedTasks - event.taskId
           } else {
@@ -218,10 +262,21 @@ fun homeModel(
         }
 
         is CompleteTask -> {
+          val schedule = taskSchedules[event.taskId]
           store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
           selectedTasks = selectedTasks - event.taskId
           val notification = NotificationState.Complete {
             store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+            schedule?.scheduleLocalDateTime?.let { dateTime ->
+              store.dispatch(
+                ScheduleAction.RescheduleTaskAction(
+                  event.taskId,
+                  schedule.scheduleType,
+                  dateTime
+                )
+              )
+            }
+
             selectedTasks = selectedTasks + event.taskId
           }
           launch { notifications.emit(notification) }
@@ -236,7 +291,8 @@ fun homeModel(
     scopes = scopes,
     taskInputActive = taskInputActive,
     reorderingScopes = reorderingScopes,
-    planTime = planTime
+    planTime = planTime,
+    tasks = tasks
   )
 }
 

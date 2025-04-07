@@ -94,7 +94,7 @@ class VoiceToTextParserImpl : VoiceToTextParser {
       }
 
 
-      request?.shouldReportPartialResults = false
+      request?.shouldReportPartialResults = true
 
       recognitionTask = speechRecognizer?.recognitionTaskWithRequest(request!!) { result, error ->
         if (error != null) {

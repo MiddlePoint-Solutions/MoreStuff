@@ -14,6 +14,7 @@ data class TaskDomain(
   val taskType: TaskType = TaskType.System,
   val schedule: List<ScheduleDomain> = listOf(),
   val extraDetails: Boolean = false,
+  val deletedTime: String? = null,
 ) {
 
     val isComplete: Boolean get() = completeTime != null

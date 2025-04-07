@@ -56,6 +56,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SaveUserPDFUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetHighestPriorityScoreUseCase
@@ -104,6 +106,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
@@ -152,6 +156,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUse
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksByIdsUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksWithoutScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTasksWithoutScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.IncreaseTaskPriorityScoreUseCaseImpl
@@ -271,6 +277,7 @@ val taskUseCases = module {
     factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
     factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
     factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
+    factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class
 }
 
 val scopeUseCases = module{
@@ -281,6 +288,9 @@ val scopeUseCases = module{
     factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
     factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
+    factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
+
+
 }
 
 val scheduleUseCases = module {
@@ -299,6 +309,8 @@ val scheduleUseCases = module {
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
     factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
+
+
 }
 
 val messageUseCases = module {
@@ -318,6 +330,8 @@ val messageUseCases = module {
     factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
     factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
     factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
+    factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
+
 }
 
 

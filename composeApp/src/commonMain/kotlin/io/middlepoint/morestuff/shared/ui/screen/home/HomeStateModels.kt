@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.defaultScope
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
+import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 @Immutable
 data class HomeState(
@@ -15,7 +16,7 @@ data class HomeState(
   val scheduleModel: ScheduleUiModel? = null,
   val lastCreatedTaskId: Long? = null,
   val planTime: ScheduleUiModel? = null,
-
+  val tasks: Map<Long, TaskUiModel> = mapOf()
   )
 
 @Immutable
@@ -31,7 +32,7 @@ sealed class HomeEvent {
   data class UpdatePlanDate(val dateMillis: Long) : HomeEvent()
   data object SetPlanPriority : HomeEvent()
   data object ClearPlanPriority : HomeEvent()
-  data class ToggleTaskSelection(val taskId: Long) : HomeEvent()
+  data class ToggleTaskSelection(val taskId: Long, val task: TaskUiModel? = null) : HomeEvent()
   data class MoveSelectedTasksToScope(val scopeId: Long) : HomeEvent()
   data class ScopeSelected(val scopeId: Long) : HomeEvent()
   data class CreateScopeForSelectedTasks(val title: String) : HomeEvent()

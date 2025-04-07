@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
-import com.mohamedrejeb.calf.io.KmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import kotlinx.serialization.Serializable
 

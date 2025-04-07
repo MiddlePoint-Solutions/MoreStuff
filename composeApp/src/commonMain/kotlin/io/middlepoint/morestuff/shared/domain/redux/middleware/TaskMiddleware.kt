@@ -51,7 +51,6 @@ sealed class TaskAction : Action.FeatureAction() {
 
   data class UpdateTasksToScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
   data class RemoveTasksFromScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
-
 }
 
 class TaskMiddleware(

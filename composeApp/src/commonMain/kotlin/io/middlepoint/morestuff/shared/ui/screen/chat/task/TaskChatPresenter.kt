@@ -7,10 +7,9 @@ import kotlinx.coroutines.flow.SharedFlow
 
 class TaskChatPresenter(
     private val taskId: Long,
-) : MoleculeViewModel<TaskChatEvent, TaskChatState>() {
+    ) : MoleculeViewModel<TaskChatEvent, TaskChatState>() {
 
     override val initialState: TaskChatState = TaskChatState()
-
     @Composable
     override fun models(events: SharedFlow<TaskChatEvent>): TaskChatState {
         return taskChatModel(taskId, initialState, events)

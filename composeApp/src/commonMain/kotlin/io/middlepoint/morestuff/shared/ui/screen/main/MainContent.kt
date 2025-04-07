@@ -82,7 +82,7 @@ fun MainContent(
 
         is TaskChat -> TaskChatScreen(
           taskId = screen.taskId,
-          onBack = router::pop
+          onBack = router::pop,
         )
 
         is ImagePreview -> {

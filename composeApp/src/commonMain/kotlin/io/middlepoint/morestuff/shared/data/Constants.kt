@@ -14,10 +14,12 @@ object Constants {
     const val KEY_REVIEW_HINT = "key_review_hint"
     const val KEY_LANGUAGE_INPUT = "key_language_input"
 
+
     // Developer keys
     const val KEY_DEBUG_MESSAGES = "key_show_debug_message"
     const val KEY_REMINDER_DEBUGGING_SWITCH_ENABLED = "key_enable_reminder_debugging"
     const val KEY_REMINDER_DEBUGGING_TIME = "key_reminder_debugging_time"
+
 
     const val DISCORD_INVITE_LINK = "https://discord.gg/pe2dwe52SX"
     const val TELEGRAM_INVITE_LINK = "https://t.me/+hzE7jInTlSRiOGVk"

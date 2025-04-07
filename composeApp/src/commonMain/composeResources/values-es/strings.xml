@@ -94,7 +94,8 @@
     <string name="mr_stuff_image">MR.Stuff imagen</string>
     <string name="snack_task_archived">Tarea archivada</string>
     <string name="undo">Deshacer</string>
-    <string name="snack_task_completed">Tarea Completada</string>
+    <string name="snack_task_completed">Tarea completada</string>
+    <string name="snack_tasks_deleted">Tarea eliminada</string>
     <string name="snack_task_moved_to_new_scope">Tarea movida a un nuevo scope</string>
     <string name="title_activity_share">Compartir Actividad</string>
     <string name="select_chat">Seleccionar Chat</string>
@@ -113,7 +114,7 @@
     <string name="cd_move_to_top">Mover tarea al principio</string>
     <string name="move_to_bottom">Mover al final</string>
     <string name="cd_move_task_to_bottom">Mover tarea al final</string>
-    <string name="select_theme">Seleccionar Tema</string>
+    <string name="select_theme">Tema</string>
     <string name="cd_select_theme">Seleccionar Tema</string>
     <string name="theme_system">Sistema</string>
     <string name="theme_light">Claro</string>
@@ -139,7 +140,7 @@
     <string name="cd_reminder_icon">Icono de recordatorio</string>
     <string name="task_chat_reminder_action">Recordatorio</string>
     <string name="cd_show_task_chat">Mostrar chat de tarea</string>
-    <string name="select_language">Seleccionar idioma de entrada de voz</string>
+    <string name="select_language">Idioma de entrada de voz</string>
     <string name="language_english">Inglés</string>
     <string name="language_spanish">Español</string>
     <string name="language_hebrew">Hebreo</string>
@@ -147,7 +148,9 @@
     <string name="language_catalan">Catalán</string>
     <string name="language_device_default">Dispositivo</string>
     <string name="confirm_delete">Confirmar eliminación</string>
-    <string name="sure_delete_task">Estás seguro que deseas eliminar \nla siguiente tarea?</string>
+    <string name="sure_delete_task">Estás seguro que deseas eliminar \nla siguiente tarea %s?</string>
+    <string name="sure_delete_tasks">¿Estás seguro de que deseas eliminar\nlas siguientes tareas?</string>
+
     <string name="can_i_do_for_you_today">¿Qué puedo hacer hoy por ti?</string>
     <string name="added_new_task">¡Nueva tarea añadida!</string>
     <string name="developer_settings">Ajustes de Desarrollador</string>
@@ -164,7 +167,7 @@
 
 
 
-    <string name="sure_delete_scope">Estás seguro que quieres eliminar\n%s scope?</string>
+    <string name="sure_delete_scope">¿Estás seguro de que deseas eliminar el scope %s?\nTodas las tareas dentro de este scope también serán eliminadas.</string>
     <string name="add_scope">Crear nuevo Scope</string>
     <string name="save">Confirmar</string>
     <string name="edit_scope">Editar nombre del Scope </string>
@@ -200,6 +203,7 @@
     <string name="cd_share_to_new_task">Compartir a una nueva tarea</string>
     <string name="dev_settings_already_enabled">¡Ya has activado los ajustes de desarrollador!</string>
     <string name="developer_settings_enabled">¡Ajustes de desarrollador activados!</string>
+    <string name="disable_developer_settings">Deshabilitar ajustes de dessarrollador</string>
     <string name="click_s_to_enable_developer_settings">Pincha %1$s veces para activar los ajustes de desarrollador</string>
     <string name="version">Versión</string>
     <string name="notification_permission_already_granted">Permiso de notificaciones ya concedido</string>
@@ -269,5 +273,7 @@
 
     <string name="description_scopes">Usa scopes para separar lógicamente tus cosas.</string>
     <string name="description_create_scope">Mantenlo corto y simple</string>
-
+    <string name="edit_message">Editar mensaje</string>
+    <string name="task_schedule_deletion_warning_singular">Esta tarea tiene una programación que también será eliminada.</string>
+    <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
 </resources>

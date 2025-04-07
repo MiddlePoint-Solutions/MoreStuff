@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
+import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
@@ -18,6 +19,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.CreateScheduleMess
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateTaskConfirmationMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.DeleteMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.SetScheduleMessageResponseUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageContentUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -25,6 +27,10 @@ sealed class MessageAction : Action.FeatureAction() {
     data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
     data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
         MessageAction()
+    data class CreateAppTaskMessageAction(
+        val taskId: Long,
+        val content: String
+    ) : MessageAction()
 
     data class CreateFileMessageAction(
         val taskId: Long,
@@ -39,8 +45,11 @@ sealed class MessageAction : Action.FeatureAction() {
     ) : MessageAction()
 
     data class DeleteMessageAction(val messageId: Long) : MessageAction()
-}
 
+    data class UpdateMessageContentAction(val messageId: Long, val content: String) : TaskAction()
+
+}
+val logger = Logger.withTag("MessageMiddleware")
 class MessageMiddleware(
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
@@ -49,6 +58,7 @@ class MessageMiddleware(
     private val createMediaMessageUseCase: CreateMediaMessageUseCase,
     private val createPDFMessageUseCase: CreatePDFMessageUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
+    private val updateMessageContentUseCase: UpdateMessageContentUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -72,6 +82,19 @@ class MessageMiddleware(
                     ContentType.TASK_MESSAGE,
                     messageData = null
                 )
+            }
+
+            is MessageAction.CreateAppTaskMessageAction -> scope.launch {
+                logger.d { "Creating app task message: ${action.content}" }
+
+                createMessageUseCase(
+                    action.taskId,
+                    action.content,
+                    ContentType.APP_TASK_MESSAGE,
+                    messageData = null
+                )
+                logger.d { "App task message created" }
+
             }
 
             is MessageAction.CreateFileMessageAction -> scope.launch {
@@ -117,6 +140,10 @@ class MessageMiddleware(
 
             is TaskAction.CompleteTasksAction -> scope.launch {
                 setScheduleResponseMessage(action.taskIds, "Done", ReplyType.DONE)
+            }
+
+            is MessageAction.UpdateMessageContentAction -> scope.launch {
+                updateMessageContentUseCase(action.messageId, action.content)
             }
 
 
