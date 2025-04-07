@@ -18,7 +18,9 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
@@ -58,6 +60,8 @@ fun taskChatModel(
   getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
   getTaskFlow: GetTaskFlowUseCase = koinInject(),
   getScopeByTaskIdUseCase: GetScopeByTaskIdUseCase = koinInject(),
+  getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
+  createScopeUseCase: CreateScopeUseCase = koinInject(),
   devTools: DevTools = koinInject(),
   logger: Logger = koinInject()
 ): TaskChatState {
@@ -67,7 +71,15 @@ fun taskChatModel(
   var messages by remember { mutableStateOf(initialState.messages) }
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
+  var allScopes by remember { mutableStateOf(initialState.allScopes) }
 
+  fun updateScopeAfterMove(scopeId: Long) {
+    val newScope = allScopes.find { it.id == scopeId }
+    newScope?.let {
+      scope = scopeUiMapper.map(it)
+      logger.d { "Scope updated to: ${it.name}" }
+    }
+  }
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -86,6 +98,13 @@ fun taskChatModel(
         scope = scopeUiMapper.map(scopeDomain)
       }
     )
+  }
+
+  LaunchedEffect(Unit) {
+    getScopesFlowUseCase().collect {
+      logger.d { "Scopes updated: ${it.size} scopes received" }
+      allScopes = it
+    }
   }
 
   LaunchedEffect(Unit) {
@@ -207,6 +226,25 @@ fun taskChatModel(
               )
             )
           }
+
+          is TaskChatEvent.MoveTaskToScope -> {
+            store.dispatch(
+              TaskAction.UpdateTasksToScopeAction(listOf(taskId), scopeId)
+            )
+            updateScopeAfterMove(scopeId)
+            val scopeTitle = allScopes.firstOrNull { it.id == scopeId }?.name ?: ""
+            logger.d { "Task moved to scope: $scopeTitle" }
+          }
+
+          is TaskChatEvent.CreateNewScopeForTask -> {
+            createScopeUseCase(title).onRight { newScope ->
+              store.dispatch(
+                TaskAction.UpdateTasksToScopeAction(listOf(taskId), newScope.id)
+              )
+
+              logger.d { "Task moved to new scope: ${newScope.name}" }
+            }
+          }
         }
       }
     }
@@ -217,6 +255,7 @@ fun taskChatModel(
     scope = scope,
     messages = messages,
     editingMessageId = editingMessageId,
-    editingMessageContent = editingMessageContent
+    editingMessageContent = editingMessageContent,
+    allScopes = allScopes
   )
 }

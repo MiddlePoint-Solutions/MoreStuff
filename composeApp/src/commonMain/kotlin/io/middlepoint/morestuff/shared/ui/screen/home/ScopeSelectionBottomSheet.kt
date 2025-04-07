@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_add_new_scope
 import morestuff.composeapp.generated.resources.choose_scope
@@ -28,72 +29,79 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScopeSelectionBottomSheet(
-    onDismissRequest: () -> Unit,
-    addSelectedTasksToScope: (Long) -> Unit,
-    createNewScope: () -> Unit,
-    scopes: List<ScopeDomain>,
-    sheetState: SheetState,
+  onDismissRequest: () -> Unit,
+  addSelectedTasksToScope: (Long) -> Unit,
+  createNewScope: () -> Unit,
+  scopes: List<ScopeDomain>,
+  sheetState: SheetState,
 ) {
 
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-        content = {
-            ScopeSelection(
-                scopes = scopes,
-                onScopeSelected = {
-                    addSelectedTasksToScope(it)
-                    onDismissRequest()
-                },
-                createNewScope = {
-                    createNewScope()
-                    onDismissRequest()
-                },
-            )
+  ModalBottomSheet(
+    onDismissRequest = onDismissRequest,
+    sheetState = sheetState,
+    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+    content = {
+      ScopeSelection(
+        scopes = scopes,
+        onScopeSelected = {
+          addSelectedTasksToScope(it)
+          onDismissRequest()
         },
-    )
+        createNewScope = {
+          createNewScope()
+          onDismissRequest()
+        },
+      )
+    },
+  )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScopeSelection(
-    scopes: List<ScopeDomain>,
-    onScopeSelected: (Long) -> Unit,
-    createNewScope: () -> Unit,
+  scopes: List<ScopeDomain>,
+  onScopeSelected: (Long) -> Unit,
+  createNewScope: () -> Unit,
 ) {
-    Column {
-        CenterAlignedTopAppBar(
-            title = {
-                Text(
-                    text = stringResource(Res.string.choose_scope),
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-            },
-            actions = {
-                IconButton(onClick = createNewScope) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(Res.string.cd_add_new_scope),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
+  Column {
+    CenterAlignedTopAppBar(
+      title = {
+        Text(
+          text = stringResource(Res.string.choose_scope),
+          modifier = Modifier.padding(vertical = 8.dp),
+          color = MaterialTheme.colorScheme.primary,
+          style = MaterialTheme.typography.headlineSmall,
         )
-
-        LazyColumn {
-            items(
-                items = scopes,
-                key = { scope -> "Scope${scope.id}" }
-            ) { scope ->
-                ListItem(
-                    modifier = Modifier.clickable { onScopeSelected(scope.id) },
-                    headlineContent = { Text(scope.name) },
-                )
-            }
+      },
+      actions = {
+        IconButton(onClick = createNewScope) {
+          Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = stringResource(Res.string.cd_add_new_scope),
+            tint = MaterialTheme.colorScheme.primary
+          )
         }
+      },
+      colors = androidx.compose.material3.TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+      )
+    )
+
+    LazyColumn {
+      items(
+        items = scopes,
+        key = { scope -> "Scope${scope.id}" }
+      ) { scope ->
+        ListItem(
+          modifier = Modifier.clickable { onScopeSelected(scope.id) },
+          headlineContent = { Text(scope.name) },
+          colors = androidx.compose.material3.ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          )
+        )
+      }
     }
+  }
 }
 
 //@Preview(
