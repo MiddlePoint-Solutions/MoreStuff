@@ -34,7 +34,7 @@ actual val platformModule: Module = module {
     single { WorkManager.getInstance(androidApplication()) }
     single { NotificationManagerCompat.from(androidApplication()) }
 
-    single<Settings> {
+    factory<Settings> {
         SharedPreferencesSettings(
             PreferenceManager.getDefaultSharedPreferences(androidApplication())
         )

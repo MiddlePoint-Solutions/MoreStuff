@@ -63,7 +63,10 @@ fun OnBoardingSignInScreen(
     onResult = { result -> //optional error handling
       Logger.d("Login: $result")
       when (result) {
-        is NativeSignInResult.Success -> {}
+        is NativeSignInResult.Success -> {
+          onNext()
+        }
+
         is NativeSignInResult.ClosedByUser -> {}
         is NativeSignInResult.Error -> {}
         is NativeSignInResult.NetworkError -> {}
@@ -109,7 +112,7 @@ fun OnBoardingSignInContent(
           horizontalArrangement = Arrangement.End
         ) {
           TextButton(onClick = {
-            scope.launch {  }
+            scope.launch { }
             showRationaleDialog = false
             checkPermission = true
 
