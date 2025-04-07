@@ -16,7 +16,7 @@ data class SettingsState(
 sealed class SettingsEvent {
   data class ChangeSnoozeLimit(val limit: Int) : SettingsEvent()
   data class SelectAppTheme(val index: Int) : SettingsEvent()
-  data object EnableDevSettings : SettingsEvent()
+  data class EnableDevSettings(val enable: Boolean = true) : SettingsEvent()
   data class SetReviewTime(val hour: Int, val minute: Int) : SettingsEvent()
   data class SelectLanguage(val index: Int) : SettingsEvent()
 }

@@ -40,6 +40,9 @@ interface TaskRepository {
     suspend fun insertTasksIntoScope(taskIds: List<Long>, scopeId: Long)
     suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long)
     suspend fun updateTasksScope(taskIds: List<Long>, scopeId: Long)
+    suspend fun getTasksByIds(taskIds: List<Long>): Either<Failure, List<TaskDomain>>
+
+
 }
 
 object TaskDoesNotExist : FeatureFailure

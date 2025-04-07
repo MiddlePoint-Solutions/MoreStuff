@@ -17,27 +17,27 @@ import org.jetbrains.compose.resources.getString
 @Immutable
 sealed class NotificationState(open val action: () -> Unit = {}) {
 
-    @Immutable
-    data class Complete(override val action: () -> Unit) : NotificationState(action)
+  @Immutable
+  data class Complete(override val action: () -> Unit) : NotificationState(action)
 
-    @Immutable
-    data class TaskMovedToScope(val scopeTitle: String) : NotificationState()
+  @Immutable
+  data class TaskMovedToScope(val scopeTitle: String) : NotificationState()
 }
 
 suspend fun NotificationState.show(
-    hostState: SnackbarHostState,
+  hostState: SnackbarHostState,
 ): SnackbarResult =
-    when (this) {
-        is Complete -> hostState.showSnackbar(
-            message = getString(Res.string.snack_task_completed),
-            actionLabel = getString(Res.string.undo),
-            duration = SnackbarDuration.Short
-        )
+  when (this) {
+    is Complete -> hostState.showSnackbar(
+      message = getString(Res.string.snack_task_completed),
+      actionLabel = getString(Res.string.undo),
+      duration = SnackbarDuration.Short
+    )
 
-        is TaskMovedToScope -> hostState.showSnackbar(
-            message = getString(Res.string.snack_task_moved_to_new_scope).let {
-                "$it $scopeTitle"
-            },
-            duration = SnackbarDuration.Short
-        )
-    }
+    is TaskMovedToScope -> hostState.showSnackbar(
+      message = getString(Res.string.snack_task_moved_to_new_scope).let {
+        "$it $scopeTitle"
+      },
+      duration = SnackbarDuration.Short
+    )
+  }

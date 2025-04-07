@@ -5,6 +5,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import arrow.core.Either
+import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
@@ -20,7 +21,6 @@ import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class MessageRepositoryImpl(
@@ -179,6 +179,15 @@ class MessageRepositoryImpl(
 //            }
     }
     messageQueries.deleteMessage(messageId)
+  }
+
+
+  override suspend fun updateMessageContent(
+    messageId: Long,
+    content: String,
+  ): Either<Failure, Boolean> {
+    messageQueries.updateMessageContent(content, messageId)
+    return Right(true)
   }
 
 }

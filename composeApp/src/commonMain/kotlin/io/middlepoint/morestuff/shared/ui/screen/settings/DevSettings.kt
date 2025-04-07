@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -36,6 +37,7 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
 import morestuff.composeapp.generated.resources.developer_settings
+import morestuff.composeapp.generated.resources.disable_developer_settings
 import morestuff.composeapp.generated.resources.test_onboarding
 import morestuff.composeapp.generated.resources.test_review_notifications
 import org.jetbrains.compose.resources.stringResource
@@ -44,6 +46,7 @@ import org.koin.compose.koinInject
 @Composable
 fun DevSettingsScreen(
     onBack: () -> Unit,
+    onDevSettingsDisabled: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -54,7 +57,7 @@ fun DevSettingsScreen(
         }
     ) {
         Box(modifier = Modifier.padding(it)) {
-            DevSettings()
+            DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
         }
     }
 }
@@ -62,6 +65,8 @@ fun DevSettingsScreen(
 @Composable
 fun DevSettings(
     devTools: DevTools = koinInject(),
+    onBack: () -> Unit,
+    onDevSettingsDisabled: () -> Unit = {}
 ) {
 
     val scope = rememberCoroutineScope()
@@ -119,6 +124,18 @@ fun DevSettings(
 
     val navigation = LocalAppRouter.current
     Column {
+        DisableDeveloperSettings(
+            state = rememberAppSettingState(
+                defaultValue = { devTools.showDevSettings },
+                valueChanged = { newValue ->
+                    devTools.showDevSettings = newValue
+                    if (!newValue) {
+                        onDevSettingsDisabled()
+                        onBack()
+                    }
+                },
+            )
+        )
         SettingsMenuLink(
             title = { Text(text = stringResource(Res.string.test_onboarding)) },
             onClick = { navigation.replaceAll(Screen.OnBoarding) },
@@ -127,6 +144,10 @@ fun DevSettings(
         SettingsMenuLink(
             title = { Text(text = stringResource(Res.string.test_review_notifications)) },
             onClick = devTools::testReviewNotification,
+        )
+        SettingsMenuLink(
+            title = { Text(text = "Review Screen") },
+            onClick = { navigation.push(Screen.Review(1)) },
         )
 
 //        SettingsMenuLink(
@@ -171,6 +192,38 @@ private fun DebugMessageSwitch(
             title = {
                 Text(
                     text = stringResource(Res.string.debug_messages),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            modifier = Modifier.padding(end = 16.dp),
+            onCheckedChange = { state.value = it }
+        )
+    }
+}
+
+@Composable
+private fun DisableDeveloperSettings(
+    state: AppSettingValueState<Boolean>,
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SettingsSwitch(
+            state = state.value,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = "Debug Messages"
+                )
+            },
+            title = {
+                Text(
+                    text = stringResource(Res.string.disable_developer_settings),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )

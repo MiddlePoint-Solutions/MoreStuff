@@ -97,6 +97,7 @@
     <string name="show">Show</string>
     <string name="undo">Undo</string>
     <string name="snack_task_completed">Task completed</string>
+    <string name="snack_tasks_deleted">Task deleted</string>
     <string name="snack_task_moved_to_new_scope">Task moved to scope</string>
 
     <string name="title_activity_share">ShareActivity</string>
@@ -117,7 +118,7 @@
     <string name="cd_move_to_top">Move task to top</string>
     <string name="move_to_bottom">Move to Bottom</string>
     <string name="cd_move_task_to_bottom">Move task to bottom</string>
-    <string name="select_theme">Select Theme</string>
+    <string name="select_theme">Theme</string>
     <string name="cd_select_theme">Select Theme</string>
     <string name="theme_system">System</string>
     <string name="theme_light">Light</string>
@@ -168,7 +169,7 @@
     <string name="select_pdf">Select PDF</string>
 
 
-    <string name="sure_delete_scope">Are you sure you want to delete\n%s scope?</string>
+    <string name="sure_delete_scope">Are you sure you want to delete %s scope?\nAll tasks within this scope will also be deleted.</string>
     <string name="add_scope">Add Scope</string>
     <string name="save">Save</string>
     <string name="edit_scope">Edit Scope</string>
@@ -205,6 +206,7 @@
     <string name="cd_share_to_new_task">Share to new task</string>
     <string name="dev_settings_already_enabled">You have already enabled developer settings!</string>
     <string name="developer_settings_enabled">Developer settings enabled!</string>
+    <string name="disable_developer_settings">Disable developer settings</string>
     <string name="click_s_to_enable_developer_settings">Click %1$s more times to enable developer settings</string>
     <string name="version">Version</string>
 
@@ -282,5 +284,11 @@
     <string name="month_november">November</string>
     <string name="month_december">December</string>
 
+
+
+
+    <string name="edit_message">Edit message</string>
+    <string name="task_schedule_deletion_warning_singular">This task has a schedule that will also be deleted.</string>
+    <string name="task_schedule_deletion_warning_plural">Some of these tasks have schedules that will also be deleted.</string>
 
 </resources>

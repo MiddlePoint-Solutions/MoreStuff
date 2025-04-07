@@ -4,6 +4,7 @@ import io.middlepoint.morestuff.shared.ui.components.input.UserInputViewModel
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextViewModel
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ReviewTasksMapper
+import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatPresenter
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskDetailsViewModel
@@ -40,5 +41,6 @@ val presentationModule = module {
     singleOf(::AppPresenter)
     factoryOf(::ReviewTasksMapper)
     factoryOf(::TaskUiMapper)
+    factoryOf(::ScopeUiMapper)
     factoryOf(::MessageUiMapper)
 }

@@ -15,4 +15,7 @@ data class ChatActions(
     val shareImage: (imagePath: String) -> Unit = {},
     val sharePdf: (pdfPath: String) -> Unit = {},
     val shareMessage: (MessageUiModel) -> Unit = {},
+    val setEditingMessage: (Long) -> Unit = {},
+    val updateMessageContent: (String) -> Unit = {},
+    val isMessageBeingEdited: (Long) -> Boolean = { false }
 )

@@ -4,12 +4,16 @@ import androidx.compose.runtime.Immutable
 import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
+import io.middlepoint.morestuff.shared.ui.model.ScopeUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
 @Immutable
 data class TaskChatState(
   val task: TaskUiModel = TaskUiModel(),
-  val messages: List<MessageUiModel> = listOf()
+  val scope: ScopeUiModel = ScopeUiModel(),
+  val messages: List<MessageUiModel> = listOf(),
+  val editingMessageId: Long? = null,
+  val editingMessageContent: String = ""
 )
 
 @Immutable
@@ -26,5 +30,7 @@ sealed class TaskChatEvent {
   data class ScheduleResponse(val scheduleId: Long, val replyType: ReplyType) : TaskChatEvent()
   data object DeleteTask : TaskChatEvent()
   data object ToggleTaskComplete : TaskChatEvent()
-
+  data class SetEditingMessage(val messageId: Long) : TaskChatEvent()
+  data class UpdateMessageContent(val content: String) : TaskChatEvent()
+  data class CreateTaskCompletionMessage(val content: String) : TaskChatEvent()
 }

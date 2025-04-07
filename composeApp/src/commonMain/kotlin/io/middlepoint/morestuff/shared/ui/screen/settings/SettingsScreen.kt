@@ -118,6 +118,7 @@ import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Composable
@@ -150,14 +151,14 @@ fun SettingsScreen(
             )
           },
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
+          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
           showDevSettings = { router.push(Developer) },
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
         )
       }
 
-      Developer -> DevSettingsScreen(onBack = router::pop)
+      Developer -> DevSettingsScreen(onBack = router::pop, onDevSettingsDisabled = {viewModel.take(SettingsEvent.EnableDevSettings(false))})
 
       Scopes -> ScopesScreen(onBack = router::pop)
 
@@ -277,9 +278,6 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
-        style = MaterialTheme.typography.titleLarge.copy(
-          color = MaterialTheme.colorScheme.onSurface
-        )
       )
     },
     subtitle = {
@@ -311,7 +309,9 @@ private fun About(
   val scope = rememberCoroutineScope()
 
   val toaster = rememberToasterState()
-  var devSettingsCounter by remember { mutableIntStateOf(7) }
+  var devSettingsCounter by remember { mutableIntStateOf(6) }
+  var initialClickCounter by remember { mutableIntStateOf(0) }
+  var showDevCounter by remember { mutableStateOf(false) }
 
   Surface(modifier = modifier) {
     HorizontalDivider()
@@ -395,27 +395,37 @@ private fun About(
           modifier = Modifier.clickable {
             scope.launch {
               if (!devSettingsEnabled) {
-                if (devSettingsCounter > 1) {
-                  val message = getString(
-                    Res.string.click_s_to_enable_developer_settings,
-                    devSettingsCounter.toString()
-                  )
-                  devSettingsCounter -= 1
-                  toaster.show(message, id = "DevSettings")
+                if (!showDevCounter) {
+                  initialClickCounter++
+                  if (initialClickCounter >= 3) {
+                    showDevCounter = true
+                  }
                 } else {
-                  enableDevSettings()
-                  val message = getString(
-                    Res.string.developer_settings_enabled,
-                    devSettingsCounter.toString()
-                  )
-                  toaster.show(message, id = "DevSettings")
+                  if (devSettingsCounter > 0) {
+                    val message = getString(
+                      Res.string.click_s_to_enable_developer_settings,
+                      devSettingsCounter.toString()
+                    )
+                    devSettingsCounter -= 1
+                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                  } else {
+                    enableDevSettings()
+                    val message = getString(
+                      Res.string.developer_settings_enabled,
+                      devSettingsCounter.toString()
+                    )
+                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                    showDevCounter = false
+                    initialClickCounter = 0
+                    devSettingsCounter = 6
+                  }
                 }
               } else {
                 val message = getString(
                   Res.string.dev_settings_already_enabled,
                   devSettingsCounter.toString()
                 )
-                toaster.show(message, id = "DevSettings")
+                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
               }
             }
           }
@@ -439,7 +449,6 @@ private fun showToast() {
 private fun ReviewTimeSelector(
   valueChanged: (hour: Int, minute: Int) -> Unit,
   defaultValue: Pair<Int, Int>,
-  modifier: Modifier = Modifier,
 ) {
 
   val selectedTimeState = rememberAppSettingState(
@@ -471,15 +480,16 @@ private fun ReviewTimeSelector(
 
   SettingsMenuLink(
     title = {
-      Column {
-        Text(text = stringResource(Res.string.set_review_time))
-        selectedTimeState.value.let {
-          Text(
-            text = "${it.first}:${formatString("%02d", it.second)}",
-            fontSize = 12.sp
+      Text(text = stringResource(Res.string.set_review_time))
 
-          )
-        }
+    },
+    subtitle = {
+      selectedTimeState.value.let {
+        Text(
+          text = "${it.first}:${formatString("%02d", it.second)}",
+          fontSize = 12.sp
+
+        )
       }
     },
     onClick = { showTimePickerDialog = true },
@@ -487,6 +497,7 @@ private fun ReviewTimeSelector(
       Icon(
         imageVector = vectorResource(Res.drawable.ic_schedule),
         contentDescription = stringResource(Res.string.cd_schedule_icon),
+        modifier = Modifier.padding(end = 5.dp)
       )
     },
     colors = ListItemDefaults.colors(
@@ -525,9 +536,6 @@ private fun SelectLanguage(
       Column {
         Text(
           text = stringResource(Res.string.select_language),
-          style = MaterialTheme.typography.titleLarge.copy(
-            color = MaterialTheme.colorScheme.onSurface
-          )
         )
       }
     },

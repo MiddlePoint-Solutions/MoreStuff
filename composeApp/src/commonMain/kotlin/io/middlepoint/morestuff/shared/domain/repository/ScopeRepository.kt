@@ -14,4 +14,5 @@ interface ScopeRepository {
     suspend fun updateScopeName(id: Long, name: String): Either<Failure, ScopeDomain>
     suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, ScopeDomain>
     suspend fun updateScopesOrder(scopesOrder: List<Pair<Long, Int>>)
+    suspend fun getScopeByTaskId(taskId: Long): Either<Failure, ScopeDomain>
 }

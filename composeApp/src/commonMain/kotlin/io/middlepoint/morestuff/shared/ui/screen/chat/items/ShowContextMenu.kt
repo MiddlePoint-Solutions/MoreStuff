@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -18,6 +19,7 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.copy_message
 import morestuff.composeapp.generated.resources.delete
+import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.share
 import org.jetbrains.compose.resources.stringResource
 
@@ -77,6 +79,10 @@ private fun getContextMenuItems(
         )
     } else {
         listOf(
+            ContextMenuItem(stringResource(Res.string.edit_message), Icons.Default.Edit) {
+                actions.setEditingMessage(message.id)
+                close()
+            },
             ContextMenuItem(stringResource(Res.string.copy_message), Icons.Default.ContentCopy) {
                 actions.copyMessage(message)
                 close()

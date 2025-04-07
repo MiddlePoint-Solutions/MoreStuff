@@ -7,31 +7,37 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.ClipboardHelper
+import io.middlepoint.morestuff.shared.MediaHandler
+import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
-import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
+import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CreateTaskCompletionMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputUserMedia
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.SetEditingMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.UpdateMessageContent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
@@ -45,17 +51,23 @@ fun taskChatModel(
   clipboardHelper: ClipboardHelper = koinInject(),
   mediaHandler: MediaHandler = koinInject(),
   taskUiMapper: TaskUiMapper = koinInject(),
+  scopeUiMapper: ScopeUiMapper = koinInject(),
   shareHelper: ShareHelper = koinInject(),
   messageUiMapper: MessageUiMapper = koinInject(),
   getTaskChatMessagesUseCase: GetTaskChatMessagesUseCase = koinInject(),
   getTaskMessagesFlowUseCase: GetTaskMessagesFlowUseCase = koinInject(),
   getTaskFlow: GetTaskFlowUseCase = koinInject(),
+  getScopeByTaskIdUseCase: GetScopeByTaskIdUseCase = koinInject(),
   devTools: DevTools = koinInject(),
   logger: Logger = koinInject()
 ): TaskChatState {
 
   var task by remember { mutableStateOf(initialState.task) }
+  var scope by remember { mutableStateOf(initialState.scope) }
   var messages by remember { mutableStateOf(initialState.messages) }
+  var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
+  var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
+
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -63,6 +75,17 @@ fun taskChatModel(
         logger.d { "Task flow" }
         task = taskUiMapper.map(it)
       }
+  }
+
+  LaunchedEffect(taskId) {
+    getScopeByTaskIdUseCase(taskId).fold(
+      { failure ->
+        logger.e { "Error loading scope for task: $failure" }
+      },
+      { scopeDomain ->
+        scope = scopeUiMapper.map(scopeDomain)
+      }
+    )
   }
 
   LaunchedEffect(Unit) {
@@ -93,7 +116,7 @@ fun taskChatModel(
             )
           }
 
-          is TaskChatEvent.InputUserMedia -> {
+          is InputUserMedia -> {
             store.dispatch(
               MessageAction.CreateFileMessageAction(taskId, imageFile, title.trim())
             )
@@ -147,6 +170,43 @@ fun taskChatModel(
             val complete = !task.isComplete
             store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
           }
+
+          is SetEditingMessage -> {
+            val previousEditingId = editingMessageId
+            editingMessageId = messageId
+
+            if (messageId > 0) {
+              val message = messages.find { it.id == messageId }
+              message?.let {
+                editingMessageContent = it.content
+              }
+            } else {
+              if (previousEditingId != null && previousEditingId > 0) {
+                if (editingMessageContent.isNotEmpty()) {
+                  store.dispatch(
+                    MessageAction.UpdateMessageContentAction(
+                      previousEditingId,
+                      editingMessageContent.trim()
+                    )
+                  )
+                }
+              }
+              editingMessageContent = ""
+            }
+          }
+
+          is UpdateMessageContent -> {
+            editingMessageContent = content
+          }
+
+          is CreateTaskCompletionMessage -> {
+            store.dispatch(
+              MessageAction.CreateAppTaskMessageAction(
+                taskId = taskId,
+                content = content,
+              )
+            )
+          }
         }
       }
     }
@@ -154,6 +214,9 @@ fun taskChatModel(
 
   return TaskChatState(
     task = task,
-    messages = messages
+    scope = scope,
+    messages = messages,
+    editingMessageId = editingMessageId,
+    editingMessageContent = editingMessageContent
   )
 }

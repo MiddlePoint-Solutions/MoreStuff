@@ -43,6 +43,8 @@ fun TextMessageItem(
   modifier: Modifier = Modifier,
   onNonLinkClick: () -> Unit = {},
 ) {
+
+
   val content = handleUrlText(message.content)
   val uriHandler = LocalUriHandler.current
 
