@@ -309,7 +309,9 @@ private fun About(
   val scope = rememberCoroutineScope()
 
   val toaster = rememberToasterState()
-  var devSettingsCounter by remember { mutableIntStateOf(7) }
+  var devSettingsCounter by remember { mutableIntStateOf(6) }
+  var initialClickCounter by remember { mutableIntStateOf(0) }
+  var showDevCounter by remember { mutableStateOf(false) }
 
   Surface(modifier = modifier) {
     HorizontalDivider()
@@ -393,20 +395,30 @@ private fun About(
           modifier = Modifier.clickable {
             scope.launch {
               if (!devSettingsEnabled) {
-                if (devSettingsCounter > 1) {
-                  val message = getString(
-                    Res.string.click_s_to_enable_developer_settings,
-                    devSettingsCounter.toString()
-                  )
-                  devSettingsCounter -= 1
-                  toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                if (!showDevCounter) {
+                  initialClickCounter++
+                  if (initialClickCounter >= 3) {
+                    showDevCounter = true
+                  }
                 } else {
-                  enableDevSettings()
-                  val message = getString(
-                    Res.string.developer_settings_enabled,
-                    devSettingsCounter.toString()
-                  )
-                  toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                  if (devSettingsCounter > 0) {
+                    val message = getString(
+                      Res.string.click_s_to_enable_developer_settings,
+                      devSettingsCounter.toString()
+                    )
+                    devSettingsCounter -= 1
+                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                  } else {
+                    enableDevSettings()
+                    val message = getString(
+                      Res.string.developer_settings_enabled,
+                      devSettingsCounter.toString()
+                    )
+                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+                    showDevCounter = false
+                    initialClickCounter = 0
+                    devSettingsCounter = 6
+                  }
                 }
               } else {
                 val message = getString(

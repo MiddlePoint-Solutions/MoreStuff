@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
@@ -38,7 +37,7 @@ import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
 import morestuff.composeapp.generated.resources.developer_settings
-import morestuff.composeapp.generated.resources.review_item_title_text_color
+import morestuff.composeapp.generated.resources.disable_developer_settings
 import morestuff.composeapp.generated.resources.test_onboarding
 import morestuff.composeapp.generated.resources.test_review_notifications
 import org.jetbrains.compose.resources.stringResource
@@ -224,7 +223,7 @@ private fun DisableDeveloperSettings(
             },
             title = {
                 Text(
-                    text = "Disable developer Settings",
+                    text = stringResource(Res.string.disable_developer_settings),
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )

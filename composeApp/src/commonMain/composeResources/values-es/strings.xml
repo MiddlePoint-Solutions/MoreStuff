@@ -203,6 +203,7 @@
     <string name="cd_share_to_new_task">Compartir a una nueva tarea</string>
     <string name="dev_settings_already_enabled">¡Ya has activado los ajustes de desarrollador!</string>
     <string name="developer_settings_enabled">¡Ajustes de desarrollador activados!</string>
+    <string name="disable_developer_settings">Deshabilitar ajustes de dessarrollador</string>
     <string name="click_s_to_enable_developer_settings">Pincha %1$s veces para activar los ajustes de desarrollador</string>
     <string name="version">Versión</string>
     <string name="notification_permission_already_granted">Permiso de notificaciones ya concedido</string>
