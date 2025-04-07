@@ -78,12 +78,14 @@ import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
 import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
+import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
@@ -98,6 +100,7 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDo
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.home.ScopeSelectionBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
@@ -132,12 +135,21 @@ fun TaskChatScreen(
 ) {
 
   val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
+  val navigation = LocalAppRouter.current
   val scope = rememberCoroutineScope()
 
   val viewModel = koinInjectOnRoute(
     type = TaskChatPresenter::class,
     parameters = { parametersOf(taskId) }
   )
+
+  val navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = { onScopeCreated ->
+    val createScopeScreen = Screen.CreateScope { title ->
+      onScopeCreated(title)
+      navigation.pop()
+    }
+    navigation.push(createScopeScreen)
+  }
 
   RoutedContent(
     router = router,
@@ -180,6 +192,7 @@ fun TaskChatScreen(
           )
         }
 
+
         TaskChatContent(
           model = model,
           onEvent = viewModel::take,
@@ -188,7 +201,12 @@ fun TaskChatScreen(
           onBack = onBack,
           sendTaskMessage = { viewModel.take(InputText(it)) },
           imagePicked = { scope.launch { router.push(ImageImport(it)) } },
-          pdfPicked = { viewModel.take(InputDocument(it, title = "")) }
+          pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
+          onCreateNewScope = { title ->
+            viewModel.take(TaskChatEvent.CreateNewScopeForTask(title))
+            navigation.pop()
+          },
+          navigateToCreateScope = navigateToCreateScope
         )
       }
 
@@ -227,19 +245,24 @@ private fun TaskChatContent(
   sendTaskMessage: (String) -> Unit = {},
   imagePicked: (PlatformFile) -> Unit = {},
   pdfPicked: (PlatformFile) -> Unit = {},
-  logger: Logger = koinInject()
+  logger: Logger = koinInject(),
+  onCreateNewScope: (String) -> Unit = {},
+  navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = {},
 ) {
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
+  var showScopeSelection by remember { mutableStateOf(false) }
+
 
   val task = model.task
   val scope = model.scope
   val messages = model.messages
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
+  val allScopes = model.allScopes
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -303,7 +326,8 @@ private fun TaskChatContent(
         onBack = onBack,
         onDelete = { showDeleteBottomSheet = true },
         onToggleComplete = { onEvent(ToggleTaskComplete) },
-        labelText = scopeName
+        labelText = scopeName,
+        onLabelClick = { showScopeSelection = true }
       )
     },
     modifier = modifier.navigationBarsPadding(),
@@ -406,6 +430,25 @@ private fun TaskChatContent(
         showDeleteBottomSheet = false
       },
       extraInfo = taskHasSchedule
+    )
+  }
+  if (showScopeSelection) {
+    val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    ScopeSelectionBottomSheet(
+      onDismissRequest = {
+        coroutineScope.launch {
+          scopeSheetState.hide()
+          showScopeSelection = false
+        }
+      },
+      scopes = allScopes,
+      sheetState = scopeSheetState,
+      addSelectedTasksToScope = { scopeId ->
+        onEvent(TaskChatEvent.MoveTaskToScope(scopeId))
+      },
+      createNewScope = {
+        navigateToCreateScope(onCreateNewScope)
+      }
     )
   }
 }
@@ -604,7 +647,8 @@ private fun TaskTopAppBar(
   onBack: () -> Unit,
   onDelete: () -> Unit,
   onToggleComplete: () -> Unit,
-  labelText: String
+  labelText: String,
+  onLabelClick: () -> Unit
 ) {
   Surface {
     TopAppBar(
@@ -618,20 +662,22 @@ private fun TaskTopAppBar(
         }
       },
       actions = {
-        Box(
-          modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .background(
-              color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
-              shape = RoundedCornerShape(16.dp)
+        Surface(
+          onClick = onLabelClick,
+          color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
+          shape = RoundedCornerShape(16.dp),
+
+          ) {
+          Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Text(
+              text = labelText,
+              style = MaterialTheme.typography.labelMedium,
+              color = MaterialTheme.colorScheme.secondary
             )
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-          Text(
-            text = labelText,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.secondary
-          )
+          }
         }
         var showMenu by remember { mutableStateOf(false) }
 
