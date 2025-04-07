@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -46,6 +47,7 @@ import org.koin.compose.koinInject
 @Composable
 fun DevSettingsScreen(
     onBack: () -> Unit,
+    onDevSettingsDisabled: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -56,7 +58,7 @@ fun DevSettingsScreen(
         }
     ) {
         Box(modifier = Modifier.padding(it)) {
-            DevSettings()
+            DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
         }
     }
 }
@@ -64,6 +66,8 @@ fun DevSettingsScreen(
 @Composable
 fun DevSettings(
     devTools: DevTools = koinInject(),
+    onBack: () -> Unit,
+    onDevSettingsDisabled: () -> Unit = {}
 ) {
 
     val scope = rememberCoroutineScope()
@@ -121,6 +125,18 @@ fun DevSettings(
 
     val navigation = LocalAppRouter.current
     Column {
+        DisableDeveloperSettings(
+            state = rememberAppSettingState(
+                defaultValue = { devTools.showDevSettings },
+                valueChanged = { newValue ->
+                    devTools.showDevSettings = newValue
+                    if (!newValue) {
+                        onDevSettingsDisabled()
+                        onBack()
+                    }
+                },
+            )
+        )
         SettingsMenuLink(
             title = { Text(text = stringResource(Res.string.test_onboarding)) },
             onClick = { navigation.replaceAll(Screen.OnBoarding) },
@@ -177,6 +193,38 @@ private fun DebugMessageSwitch(
             title = {
                 Text(
                     text = stringResource(Res.string.debug_messages),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Left
+                )
+            },
+            modifier = Modifier.padding(end = 16.dp),
+            onCheckedChange = { state.value = it }
+        )
+    }
+}
+
+@Composable
+private fun DisableDeveloperSettings(
+    state: AppSettingValueState<Boolean>,
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        SettingsSwitch(
+            state = state.value,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Settings,
+                    contentDescription = "Debug Messages"
+                )
+            },
+            title = {
+                Text(
+                    text = "Disable developer Settings",
                     color = MaterialTheme.colorScheme.onSurface,
                     textAlign = TextAlign.Left
                 )

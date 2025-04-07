@@ -31,9 +31,9 @@ fun settingsModel(
                     store.dispatch(SettingAction.SetAppTheme(AppTheme[event.index]))
                     state.copy(appTheme = AppTheme[event.index])
                 }
-                SettingsEvent.EnableDevSettings -> {
-                    store.dispatch(SettingAction.EnableDevSettings(true))
-                    state.copy(devSettings = true)
+                is SettingsEvent.EnableDevSettings -> {
+                    store.dispatch(SettingAction.EnableDevSettings(event.enable))
+                    state.copy(devSettings = event.enable)
                 }
                 is SettingsEvent.SetReviewTime -> {
                     store.dispatch(SettingAction.SetReviewTimeAction(event.hour, event.minute))

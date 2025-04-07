@@ -118,6 +118,7 @@ import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @Composable
@@ -150,14 +151,14 @@ fun SettingsScreen(
             )
           },
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings) },
+          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
           showDevSettings = { router.push(Developer) },
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
         )
       }
 
-      Developer -> DevSettingsScreen(onBack = router::pop)
+      Developer -> DevSettingsScreen(onBack = router::pop, onDevSettingsDisabled = {viewModel.take(SettingsEvent.EnableDevSettings(false))})
 
       Scopes -> ScopesScreen(onBack = router::pop)
 
@@ -398,21 +399,21 @@ private fun About(
                     devSettingsCounter.toString()
                   )
                   devSettingsCounter -= 1
-                  toaster.show(message, id = "DevSettings")
+                  toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
                 } else {
                   enableDevSettings()
                   val message = getString(
                     Res.string.developer_settings_enabled,
                     devSettingsCounter.toString()
                   )
-                  toaster.show(message, id = "DevSettings")
+                  toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
                 }
               } else {
                 val message = getString(
                   Res.string.dev_settings_already_enabled,
                   devSettingsCounter.toString()
                 )
-                toaster.show(message, id = "DevSettings")
+                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
               }
             }
           }
