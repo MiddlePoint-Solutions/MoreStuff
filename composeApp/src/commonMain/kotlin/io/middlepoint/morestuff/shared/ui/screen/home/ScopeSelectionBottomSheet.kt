@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,23 +68,37 @@ private fun ScopeSelection(
 ) {
   Column {
     Row(
-      modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween
+      modifier = Modifier
+        .fillMaxWidth()
+        ,
+      verticalAlignment = Alignment.CenterVertically
     ) {
-      Text(
-        text = stringResource(Res.string.choose_scope),
-        color = MaterialTheme.colorScheme.primary,
-        style = MaterialTheme.typography.headlineSmall,
-      )
-      IconButton(onClick = createNewScope) {
-        Icon(
-          imageVector = Icons.Filled.Add,
-          contentDescription = stringResource(Res.string.cd_add_new_scope),
-          tint = MaterialTheme.colorScheme.primary
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 16.dp),
+      ) {
+        Text(
+          text = stringResource(Res.string.choose_scope),
+          color = MaterialTheme.colorScheme.primary,
+          style = MaterialTheme.typography.headlineSmall,
+          modifier = Modifier.align(Alignment.Center)
         )
+
+        IconButton(
+          onClick = createNewScope,
+          modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+          Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = stringResource(Res.string.cd_add_new_scope),
+            tint = MaterialTheme.colorScheme.primary
+          )
+        }
       }
+
     }
+
 
     LazyColumn {
       items(

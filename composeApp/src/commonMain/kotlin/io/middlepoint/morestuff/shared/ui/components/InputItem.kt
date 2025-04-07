@@ -430,7 +430,7 @@ fun ScheduleSelectorRow(
       exit = fadeOut(animationSpec = tween(300))
     ) {
       Box(
-        modifier = Modifier.size(54.dp),
+        modifier = Modifier.size(48.dp),
         contentAlignment = Alignment.Center
       ) {
         Surface(
@@ -449,7 +449,7 @@ fun ScheduleSelectorRow(
                 imageVector = Icons.Sharp.Done,
                 contentDescription = "Done",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(24.dp)
               )
             }
             /*VoiceToTextInput(
