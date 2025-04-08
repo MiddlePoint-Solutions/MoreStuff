@@ -100,8 +100,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfil
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ToggleQuickReminderUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCaseImpl
+
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
@@ -308,7 +307,6 @@ val scheduleUseCases = module {
     factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
     factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
     factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
-    factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
 
 
 }

@@ -20,7 +20,7 @@ data class AppSettings(
     val isFirstTime: Boolean = FirstTime.defaultValue,
     val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
-    val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
+    //val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
     val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
     val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
 )
@@ -31,7 +31,7 @@ sealed class SettingAction : Action.FeatureAction() {
     data class SetSnoozeLimit(val amount: Int) : SettingAction()
     data class SetAppTheme(val theme: AppTheme) : SettingAction()
     data object OnBoardingComplete : SettingAction()
-    data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
+    //data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
     data class SetVoiceLanguage(val language: Language) : SettingAction()
 
@@ -51,7 +51,7 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SetAppTheme -> copy(appTheme = action.theme)
         OnBoardingComplete -> copy(isFirstTime = false)
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
-        is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
+        //is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
         is SettingAction.SetVoiceLanguage -> copy(voiceInputLanguage = action.language)
     }

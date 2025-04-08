@@ -142,14 +142,14 @@ fun SettingsScreen(
           onBack = onBack,
           model = model,
           selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-          setReviewTime = { hour, minute ->
+         /* setReviewTime = { hour, minute ->
             viewModel.take(
               SettingsEvent.SetReviewTime(
                 hour,
                 minute
               )
             )
-          },
+          },*/
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
           enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
           showDevSettings = { router.push(Developer) },
@@ -172,7 +172,7 @@ fun SettingsContent(
   onBack: () -> Unit,
   model: SettingsState,
   selectAppTheme: (Int) -> Unit,
-  setReviewTime: (Int, Int) -> Unit,
+  //setReviewTime: (Int, Int) -> Unit,
   selectLanguage: (Int) -> Unit,
   enableDevSettings: () -> Unit,
   showLibraries: () -> Unit,
@@ -214,10 +214,10 @@ fun SettingsContent(
           defaultValue = { model.appTheme.ordinal }
         )
 
-        ReviewTimeSelector(
+       /* ReviewTimeSelector(
           valueChanged = setReviewTime,
           defaultValue = model.reviewTime,
-        )
+        )*/
         SelectLanguage(
           languageSelected = selectLanguage,
           defaultValue = { model.inputVoiceLanguage.ordinal }

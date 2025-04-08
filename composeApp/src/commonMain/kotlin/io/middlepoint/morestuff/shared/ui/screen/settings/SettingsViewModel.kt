@@ -14,7 +14,7 @@ class SettingsViewModel(
             appTheme = appTheme,
             snoozeLimit = snoozeLimit,
             devSettings = devSettings,
-            reviewTime = reviewTime,
+            //reviewTime = reviewTime,
             inputVoiceLanguage = voiceInputLanguage
         )
     }

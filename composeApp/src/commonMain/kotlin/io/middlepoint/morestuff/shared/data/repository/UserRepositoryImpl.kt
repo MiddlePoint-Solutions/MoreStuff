@@ -20,7 +20,7 @@ class UserRepositoryImpl(
             isFirstTime = getSetting(FirstTime, isFirstTime),
             appTheme = AppTheme.valueOf(getSetting(Theme, appTheme.name)),
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
-            reviewTime = getSetting(ReviewTime, reviewTime),
+            //reviewTime = getSetting(ReviewTime, reviewTime),
             enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
             voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
         )

@@ -15,9 +15,9 @@ class SchedulerImpl : Scheduler {
         // TODO:
     }
 
-    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+  /*  override fun scheduleReviewWorker(hour: Int, minute: Int) {
         // TODO:
-    }
+    }*/
 
     override fun cancelSchedule(scheduleId: Long) {
         TODO("Not yet implemented")
@@ -27,7 +27,7 @@ class SchedulerImpl : Scheduler {
         TODO("Not yet implemented")
     }
 
-    override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
+    /*override fun scheduleNextReview(hour: Int, minute: Int, replaceExisting: Boolean) {
         TODO("Not yet implemented")
-    }
+    }*/
 }
