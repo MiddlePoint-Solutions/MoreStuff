@@ -5,7 +5,7 @@ import io.middlepoint.morestuff.shared.data.service.HintTaskProviderImpl
 import io.middlepoint.morestuff.shared.data.service.OpenGraphFetcherImpl
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.AuthMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.AuthMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.DevMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ErrorMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.LoggerMiddleware
