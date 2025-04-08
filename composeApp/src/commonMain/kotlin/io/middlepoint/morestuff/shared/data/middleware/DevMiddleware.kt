@@ -1,6 +1,8 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.DevAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
@@ -8,10 +10,6 @@ import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-sealed class DevAction : Action.FeatureAction() {
-    object ClearActiveReminderMessages : DevAction()
-}
 
 class DevMiddleware(
     private val clearActiveReminderMessagesUseCase: ClearActiveReminderMessagesUseCase

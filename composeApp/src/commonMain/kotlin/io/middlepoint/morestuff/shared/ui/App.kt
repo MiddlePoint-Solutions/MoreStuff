@@ -35,7 +35,6 @@ fun App(
     val router: Router<Screen> = rememberRouter { listOf(Screen.Home) }
     val viewModel = koinInjectOnRoute(MainViewModel::class)
     val model by viewModel.models.collectAsState()
-    val logger = Logger.withTag("AppMain")
     ProvideAppTheme(model.theme) {
       MoreStuffTheme {
         ProvideAppRouter(router) {
@@ -47,9 +46,7 @@ fun App(
             if (model.ready) {
               MainContent(
                 shareContent = { taskId, content ->
-                  viewModel.take(
-                    MainEvent.ShareContent(taskId, content)
-                  )
+                  viewModel.take(MainEvent.ShareContent(taskId, content))
                 },
                 onBoardingComplete = {
                   viewModel.take(MainEvent.OnBoardingComplete)

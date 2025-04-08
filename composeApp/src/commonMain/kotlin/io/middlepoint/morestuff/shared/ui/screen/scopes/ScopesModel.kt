@@ -6,12 +6,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.*
+import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.*
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import org.koin.compose.koinInject
 

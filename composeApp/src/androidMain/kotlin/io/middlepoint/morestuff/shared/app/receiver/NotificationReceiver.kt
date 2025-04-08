@@ -5,8 +5,8 @@ import android.content.Context
 import android.content.Intent
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get

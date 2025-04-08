@@ -17,8 +17,8 @@ import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager

@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.redux.state
 
 import io.middlepoint.morestuff.shared.domain.model.User
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.UserAction.*
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 data class UserState(
@@ -9,7 +9,8 @@ data class UserState(
 )
 
 sealed class UserAction : Action.FeatureAction() {
-    data class InitSettings(val settings: AppSettings) : UserAction()
+    data class Authenticated(val user: User) : UserAction()
+    data class NotAuthenticated(val isSignOut: Boolean) : UserAction()
 }
 
 fun AppState.reduceUserState(action: Action): AppState {
@@ -21,7 +22,8 @@ fun AppState.reduceUserState(action: Action): AppState {
 
 fun UserState.reduce(action: UserAction): UserState {
     return when (action) {
-        else -> this
+        is Authenticated -> copy(user = action.user)
+        is NotAuthenticated -> copy(user = null)
     }
 }
 
