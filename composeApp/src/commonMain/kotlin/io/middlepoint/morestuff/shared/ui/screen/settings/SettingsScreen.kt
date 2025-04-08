@@ -71,6 +71,7 @@ import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
+import io.middlepoint.morestuff.shared.Platform
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen
@@ -79,6 +80,7 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
 import io.middlepoint.morestuff.shared.formatString
+import io.middlepoint.morestuff.shared.platform
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
@@ -142,14 +144,14 @@ fun SettingsScreen(
           onBack = onBack,
           model = model,
           selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-         /* setReviewTime = { hour, minute ->
-            viewModel.take(
-              SettingsEvent.SetReviewTime(
-                hour,
-                minute
-              )
-            )
-          },*/
+          /* setReviewTime = { hour, minute ->
+             viewModel.take(
+               SettingsEvent.SetReviewTime(
+                 hour,
+                 minute
+               )
+             )
+           },*/
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
           enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
           showDevSettings = { router.push(Developer) },
@@ -158,7 +160,9 @@ fun SettingsScreen(
         )
       }
 
-      Developer -> DevSettingsScreen(onBack = router::pop, onDevSettingsDisabled = {viewModel.take(SettingsEvent.EnableDevSettings(false))})
+      Developer -> DevSettingsScreen(
+        onBack = router::pop,
+        onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) })
 
       Scopes -> ScopesScreen(onBack = router::pop)
 
@@ -214,16 +218,18 @@ fun SettingsContent(
           defaultValue = { model.appTheme.ordinal }
         )
 
-       /* ReviewTimeSelector(
-          valueChanged = setReviewTime,
-          defaultValue = model.reviewTime,
-        )*/
+        /* ReviewTimeSelector(
+           valueChanged = setReviewTime,
+           defaultValue = model.reviewTime,
+         )*/
         SelectLanguage(
           languageSelected = selectLanguage,
           defaultValue = { model.inputVoiceLanguage.ordinal }
         )
+        if (Platform.iOS == platform) {
+          NotificationPermissionButton()
+        }
 
-        NotificationPermissionButton()
 
         ScopeSettings(onClick = showScopesSettings)
 
