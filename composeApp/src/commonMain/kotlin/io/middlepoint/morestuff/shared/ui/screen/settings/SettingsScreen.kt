@@ -511,25 +511,29 @@ private fun SelectLanguage(
   languageSelected: (Int) -> Unit,
   defaultValue: () -> Int,
 ) {
-
   var languageOptions by remember { mutableStateOf(listOf("")) }
   var selectedLanguage by remember { mutableStateOf("") }
+  var currentSelectedIndex by remember { mutableStateOf(defaultValue()) }
 
-  LaunchedEffect(Unit) {
+  LaunchedEffect(Unit, currentSelectedIndex) {
     languageOptions = Language.entries.map { it.displayTitle() }
-    selectedLanguage = if (Language.entries[defaultValue()] == Language.Device) {
-      Locale.current.toLanguageTag()
+
+    selectedLanguage = if (Language.entries[currentSelectedIndex] == Language.Device) {
+      val currentLocale = Locale.current.toLanguageTag()
+      localeToStringResource(currentLocale)
     } else {
-      languageOptions[defaultValue()]
+      Language.entries[currentSelectedIndex].displayTitle()
     }
   }
 
   val state = rememberAppSettingState(
     defaultValue = defaultValue,
-    valueChanged = languageSelected,
+    valueChanged = { newIndex ->
+      currentSelectedIndex = newIndex
+      languageSelected(newIndex)
+    },
   )
 
-  // TODO:
   SettingsList(
     state = state,
     title = {
@@ -553,6 +557,15 @@ private fun SelectLanguage(
       )
     },
   )
+}
+
+private suspend fun localeToStringResource(currentLocale: String) = when {
+  currentLocale.startsWith("en") -> getString(Res.string.language_english)
+  currentLocale.startsWith("es") -> getString(Res.string.language_spanish)
+  currentLocale.startsWith("he") -> getString(Res.string.language_hebrew)
+  currentLocale.startsWith("ru") -> getString(Res.string.language_russian)
+  currentLocale.startsWith("ca") -> getString(Res.string.language_catalan)
+  else -> getString(Res.string.language_device_default)
 }
 
 private suspend fun Language.displayTitle(): String = when (this) {
