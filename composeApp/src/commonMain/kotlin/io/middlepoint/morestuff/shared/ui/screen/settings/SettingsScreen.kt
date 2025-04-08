@@ -222,10 +222,11 @@ fun SettingsContent(
            valueChanged = setReviewTime,
            defaultValue = model.reviewTime,
          )*/
-        SelectLanguage(
+        /*SelectLanguage(
           languageSelected = selectLanguage,
           defaultValue = { model.inputVoiceLanguage.ordinal }
-        )
+        )*/
+
         if (Platform.iOS == platform) {
           NotificationPermissionButton()
         }

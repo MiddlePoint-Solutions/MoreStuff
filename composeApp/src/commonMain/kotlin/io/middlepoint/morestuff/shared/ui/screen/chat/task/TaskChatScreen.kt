@@ -1,6 +1,10 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -521,70 +525,82 @@ private fun TaskChatInput(
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
               ) {
-                if (isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0)) {
-                  IconButton(
-                    onClick = { showMenu = true },
-                    modifier = Modifier.weight(1f)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                  this@Row.AnimatedVisibility(
+                    visible = isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0),
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                   ) {
-                    Icon(
-                      Icons.Filled.AttachFile,
-                      contentDescription = stringResource(Res.string.cd_select_images)
-                    )
-                  }
-                  DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                  ) {
-                    DropdownMenuItem(onClick = {
-                      pickImage()
-                      showMenu = false
-                    },
-                      text = {
-                        Text(
-                          text = stringResource(Res.string.select_image)
-                        )
-                      })
-                    DropdownMenuItem(onClick = {
-                      pickPdf()
-                      showMenu = false
-                    },
-                      text = {
-                        Text(
-                          text = stringResource(Res.string.select_pdf)
-                        )
-                      })
-                  }
-                  VoiceToTextInput(
-                    onUpdateValue = {
-                      userInputValue = userInputValue.copy(text = it)
-                      showSendIcon.value = it.isNotBlank()
-                      isTextEmpty.value = it.isBlank()
-                    },
-                    onRecordingStateChanged = { recording ->
-                      isRecording.value = recording
-                      if (!recording && userInputValue.text.isNotBlank()) {
-                        showSendIcon.value = true
-                      }
-                    },
-                    isHomeScreen = true
-                  )
-                } else {
-                  SendIcon(onClick = {
-                    if (editingMessageId != null && editingMessageId > 0) {
-                      onUpdateMessage(userInputValue.text)
-                      onCancelEdit()
-                    } else {
-                      sendTaskMessage(userInputValue.text)
-                      userInputValue = TextFieldValue("")
-                      isTextEmpty.value = true
-                      showSendIcon.value = false
+                    IconButton(
+                      onClick = { showMenu = true }
+                    ) {
+                      Icon(
+                        Icons.Filled.AttachFile,
+                        contentDescription = stringResource(Res.string.cd_select_images)
+                      )
                     }
-                  })
+                  }
+
+                  this@Row.AnimatedVisibility(
+                    visible = !isTextEmpty.value || (editingMessageId != null && editingMessageId > 0),
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                  ) {
+                    SendIcon(onClick = {
+                      if (editingMessageId != null && editingMessageId > 0) {
+                        onUpdateMessage(userInputValue.text)
+                        onCancelEdit()
+                      } else {
+                        sendTaskMessage(userInputValue.text)
+                        userInputValue = TextFieldValue("")
+                        isTextEmpty.value = true
+                        showSendIcon.value = false
+                      }
+                    })
+                  }
                 }
               }
+
+              DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+              ) {
+                DropdownMenuItem(onClick = {
+                  pickImage()
+                  showMenu = false
+                },
+                  text = {
+                    Text(
+                      text = stringResource(Res.string.select_image)
+                    )
+                  })
+                DropdownMenuItem(onClick = {
+                  pickPdf()
+                  showMenu = false
+                },
+                  text = {
+                    Text(
+                      text = stringResource(Res.string.select_pdf)
+                    )
+                  })
+              }
+              /*VoiceToTextInput(
+                onUpdateValue = {
+                  userInputValue = userInputValue.copy(text = it)
+                  showSendIcon.value = it.isNotBlank()
+                  isTextEmpty.value = it.isBlank()
+                },
+                onRecordingStateChanged = { recording ->
+                  isRecording.value = recording
+                  if (!recording && userInputValue.text.isNotBlank()) {
+                    showSendIcon.value = true
+                  }
+                },
+                isHomeScreen = true
+              )*/
             },
           )
         }
