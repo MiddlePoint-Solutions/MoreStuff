@@ -1,10 +1,11 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.middlepoint.morestuff.shared.domain.redux.*
+import io.middlepoint.morestuff.shared.domain.redux.middleware.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
@@ -44,18 +45,8 @@ class AuthMiddleware(
       supabase.auth.sessionStatus.collect {
         when (it) {
           is SessionStatus.Authenticated -> {
-            logger.d("Received new authenticated session.")
-//            when (it.source) { //Check the source of the session
-//              SessionSource.External -> TODO()
-//              is SessionSource.Refresh -> TODO()
-//              is SessionSource.SignIn -> TODO()
-//              is SessionSource.SignUp -> TODO()
-//              SessionSource.Storage -> TODO()
-//              SessionSource.Unknown -> TODO()
-//              is SessionSource.UserChanged -> TODO()
-//              is SessionSource.UserIdentitiesChanged -> TODO()
-//              SessionSource.AnonymousSignIn -> TODO()
-//            }
+            logger.d("Received new authenticated session: ${it.source}")
+            logger.d { "user: ${it.session.user}" }
           }
 
           SessionStatus.Initializing -> logger.d("Initializing")

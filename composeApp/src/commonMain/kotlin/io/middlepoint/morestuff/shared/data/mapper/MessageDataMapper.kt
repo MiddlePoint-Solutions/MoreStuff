@@ -44,8 +44,12 @@ typealias MessageDataMapper = (
   message_data_type: String?,
 ) -> Message
 
+fun makeMessageDataMap(
+  pathToSavedFile: (MediaFolder, String) -> String
+) : MessageDataMapper = MessageDataMap(pathToSavedFile)
+
 data class MessageDataMap(
-  private val storageManager: StorageManager
+  private val pathToSavedFile: (MediaFolder, String) -> String
 ) : MessageDataMapper {
   override fun invoke(
     id: Long,
@@ -75,7 +79,8 @@ data class MessageDataMap(
     ) { dataId, dataPath, dataCreationTime, dataType ->
       MessageData(
         id = dataId,
-        filePath = storageManager.getAppStoragePathToSavedFile(dataType.toMediaFolder(), dataPath),
+//        filePath = storageManager.getAppStoragePathToSavedFile(dataType.toMediaFolder(), dataPath),
+        filePath = pathToSavedFile(dataType.toMediaFolder(), dataPath),
         creationTime = dataCreationTime,
         messageType = dataType
       )

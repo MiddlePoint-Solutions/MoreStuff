@@ -14,11 +14,10 @@ interface DataMappers {
 
 class DataMappersImpl(
     private val storageManager: StorageManager,
-    private val messageDataMap: MessageDataMap
 ) : DataMappers {
 
     override val messageDataMapper: MessageDataMapper
-        get() = messageDataMap
+        get() = makeMessageDataMap(storageManager::getAppStoragePathToSavedFile)
 
     override val messageDbMapper: MessageDbMapper
         get() = makeMessageDbMapper()

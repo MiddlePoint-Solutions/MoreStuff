@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux
 
-import io.middlepoint.morestuff.shared.domain.redux.middleware.AuthMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.AuthMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.DevMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ErrorMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.LoggerMiddleware
@@ -16,18 +16,18 @@ import io.middlepoint.morestuff.shared.domain.redux.state.reduceSettingState
 import io.middlepoint.morestuff.shared.domain.redux.store.SimpleStore
 
 class AppStore(
-    logger: LoggerMiddleware,
-    devMiddleware: DevMiddleware,
-    errorMiddleware: ErrorMiddleware,
-    authMiddleware: AuthMiddleware,
-    taskMiddleware: TaskMiddleware,
-    messageMiddleware: MessageMiddleware,
-    scheduleMiddleware: ScheduleMiddleware,
-    responseMiddleware: ReminderMiddleware,
-    notificationMiddleware: NotificationMiddleware,
-    settingsMiddleware: SettingsMiddleware,
-    priorityMiddleware: PriorityMiddleware,
-    scopeMiddleware: ScopeMiddleware
+  logger: LoggerMiddleware,
+  devMiddleware: DevMiddleware,
+  errorMiddleware: ErrorMiddleware,
+  authMiddleware: AuthMiddleware,
+  taskMiddleware: TaskMiddleware,
+  messageMiddleware: MessageMiddleware,
+  scheduleMiddleware: ScheduleMiddleware,
+  responseMiddleware: ReminderMiddleware,
+  notificationMiddleware: NotificationMiddleware,
+  settingsMiddleware: SettingsMiddleware,
+  priorityMiddleware: PriorityMiddleware,
+  scopeMiddleware: ScopeMiddleware
 ) : SimpleStore<AppState>(
     AppState(),
     listOf(
