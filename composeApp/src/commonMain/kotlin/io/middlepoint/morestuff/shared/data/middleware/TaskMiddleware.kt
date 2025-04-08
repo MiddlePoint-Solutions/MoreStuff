@@ -1,17 +1,16 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
-import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.CompleteTasksAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.CreateHintTask
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.CreateUserTaskAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.DeleteTasksAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.RemoveTasksFromScopeAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.TaskCreatedAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.UpdateTaskTitleAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.UpdateTasksToScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CompleteTasksAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CreateHintTask
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CreateUserTaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.DeleteTasksAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.RemoveTasksFromScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.TaskCreatedAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.UpdateTaskTitleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.UpdateTasksToScopeAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
@@ -26,32 +25,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskTitleUseCas
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTasksScopeUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-sealed class TaskAction : Action.FeatureAction() {
-
-  data class CreateUserTaskAction(
-    val title: String,
-    val priority: Priority,
-    val scopeId: Long,
-    val onTaskCreated: ((TaskDomain) -> Unit)? = null
-  ) : TaskAction()
-
-  data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
-
-  data class UpdateTaskTitleAction(val taskId: Long, val title: String) : TaskAction()
-
-  data object CreateHintTask : TaskAction()
-
-  data class DeleteTasksAction(val taskIds: List<Long>) : TaskAction()
-
-  data class TaskCreatedAction(
-    val task: TaskDomain,
-    val priority: Priority,
-  ) : TaskAction()
-
-  data class UpdateTasksToScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
-  data class RemoveTasksFromScopeAction(val taskIds: List<Long>, val scopeId: Long) : TaskAction()
-}
 
 class TaskMiddleware(
   private val createTaskUseCase: CreateTaskUseCase,

@@ -1,10 +1,10 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
-import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityAction.*
+import io.middlepoint.morestuff.shared.domain.redux.action.PriorityAction.*
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.usecase.priority.UpdateTaskReviewPriorityUseCase
@@ -12,22 +12,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.UpdatePlannedTasksPri
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-sealed class PriorityAction : Action.FeatureAction() {
-
-    data class UndoTaskPriorityUpdateAction(
-        val taskId: Long,
-        val score: Long,
-    ) : PriorityAction()
-
-    data class TaskPriorityUpdateAction(
-        val task: Long,
-        val actionType: ReviewActionType,
-    ) : PriorityAction()
-
-    data object UpdatePlannedPriorityAction : PriorityAction()
-
-}
 
 class PriorityMiddleware(
     private val updateTaskReviewPriorityUseCase: UpdateTaskReviewPriorityUseCase,

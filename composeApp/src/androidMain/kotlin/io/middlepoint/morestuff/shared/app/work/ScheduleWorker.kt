@@ -6,7 +6,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

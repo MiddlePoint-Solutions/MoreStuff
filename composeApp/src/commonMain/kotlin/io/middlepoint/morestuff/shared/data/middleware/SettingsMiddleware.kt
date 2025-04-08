@@ -1,13 +1,15 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
-import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.EnableDevSettings
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.InitSettings
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.OnBoardingComplete
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.SetAppTheme
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.SetSnoozeLimit
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.EnableDevSettings
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.InitSettings
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.OnBoardingComplete
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.SetAppTheme
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.SetSnoozeLimit
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction

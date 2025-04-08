@@ -13,9 +13,9 @@ import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase

@@ -1,11 +1,11 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.CreateScopeAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.DeleteScopeAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.UpdateScopeNameAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.UpdateScopeOrderAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.CreateScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.DeleteScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.UpdateScopeNameAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.UpdateScopeOrderAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
@@ -18,13 +18,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopeNameUseCa
 import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopesOrderUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-sealed class ScopeAction : Action.FeatureAction() {
-    data class CreateScopeAction(val name: String) : ScopeAction()
-    data class DeleteScopeAction(val scopeId: Long) : ScopeAction()
-    data class UpdateScopeNameAction(val scopeId: Long, val newName: String) : ScopeAction()
-    data class UpdateScopeOrderAction(val scopes: List<ScopeDomain>) : ScopeAction()
-}
 
 class ScopeMiddleware(
     private val initScopesUseCase: InitScopesUseCase,

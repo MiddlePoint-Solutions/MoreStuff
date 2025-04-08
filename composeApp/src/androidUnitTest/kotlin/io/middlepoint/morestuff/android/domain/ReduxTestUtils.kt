@@ -1,24 +1,24 @@
 package io.middlepoint.morestuff.android.domain
 
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
-import io.middlepoint.morestuff.shared.domain.redux.middleware.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import kotlinx.coroutines.coroutineScope
 import org.junit.jupiter.api.Assertions
 
 suspend fun Middleware<AppState>.testWith(
-    state: AppState,
-    action: Action,
+  state: AppState,
+  action: Action,
 ): Action = coroutineScope { invoke(state, action,
   defaultDispatch(),
   createNext(), this) }
 
 suspend fun Middleware<AppState>.testActionDispatch(
-    state: AppState,
-    action: Action,
-    expected: Action
+  state: AppState,
+  action: Action,
+  expected: Action
 ): Action =
     coroutineScope { invoke(state, action,
       expectedDispatch(expected),
