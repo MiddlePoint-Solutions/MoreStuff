@@ -4,8 +4,10 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
-import io.middlepoint.morestuff.shared.domain.redux.*
-import io.middlepoint.morestuff.shared.domain.redux.middleware.Middleware
+import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.UserAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
@@ -17,6 +19,7 @@ import kotlinx.coroutines.Job
 
 class AuthMiddleware(
   private val supabase: SupabaseClient,
+  private val dataMappers: DataMappers
 ) : Middleware<AppState> {
 
   private var eventsJob: Job? = null
@@ -32,7 +35,7 @@ class AuthMiddleware(
 
     when (action) {
       is InitStoreAction -> {
-        initAuthEvents(scope)
+        initAuthEvents(scope, dispatch)
       }
 
       else -> NoOp
@@ -40,18 +43,24 @@ class AuthMiddleware(
     return next(state, action, dispatch)
   }
 
-  private fun initAuthEvents(scope: CoroutineScope) {
+  private fun initAuthEvents(scope: CoroutineScope, dispatch: Dispatch) {
     eventsJob = scope.launch {
       supabase.auth.sessionStatus.collect {
         when (it) {
           is SessionStatus.Authenticated -> {
             logger.d("Received new authenticated session: ${it.source}")
             logger.d { "user: ${it.session.user}" }
+
+            it.session.user?.let { userInfo ->
+              val user = dataMappers.userDataMapper(userInfo)
+              dispatch(UserAction.Authenticated(user))
+            }
           }
 
           SessionStatus.Initializing -> logger.d("Initializing")
-          is SessionStatus.RefreshFailure -> logger.d("Refresh failure ${it.cause}") //Either a network error or a internal server error
+          is SessionStatus.RefreshFailure -> logger.d("Refresh failure ${it.cause}")
           is SessionStatus.NotAuthenticated -> {
+            dispatch(UserAction.NotAuthenticated(it.isSignOut))
             if (it.isSignOut) {
               logger.d("User signed out")
             } else {

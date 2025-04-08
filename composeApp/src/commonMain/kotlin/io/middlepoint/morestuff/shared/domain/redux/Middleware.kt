@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.domain.redux
 
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
@@ -13,4 +13,8 @@ interface Middleware<State> {
         next: Next<State>,
         scope: CoroutineScope
     ): Action
+}
+
+interface MiddlewareProvider<State> {
+    val middlewareOrder: List<Middleware<State>>
 }

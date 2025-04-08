@@ -8,11 +8,11 @@ import io.middlepoint.morestuff.shared.domain.enums.AppSetting.SnoozeLimit
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.Theme
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.InitSettings
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.OnBoardingComplete
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.SetAppTheme
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction.SetSnoozeLimit
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.InitSettings
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.OnBoardingComplete
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.SetAppTheme
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction.SetSnoozeLimit
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 data class AppSettings(
@@ -20,21 +20,10 @@ data class AppSettings(
     val isFirstTime: Boolean = FirstTime.defaultValue,
     val appTheme: AppTheme = AppTheme.valueOf(Theme.defaultValue),
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
-    //val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
+    val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
     val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
     val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
 )
-
-sealed class SettingAction : Action.FeatureAction() {
-    data class InitSettings(val settings: AppSettings) : SettingAction()
-    data class EnableDevSettings(val enable: Boolean) : SettingAction()
-    data class SetSnoozeLimit(val amount: Int) : SettingAction()
-    data class SetAppTheme(val theme: AppTheme) : SettingAction()
-    data object OnBoardingComplete : SettingAction()
-    //data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
-    data class EnableReviewHint(val enable: Boolean) : SettingAction()
-    data class SetVoiceLanguage(val language: Language) : SettingAction()
-}
 
 fun AppState.reduceSettingState(action: Action): AppState {
     return when (action) {
@@ -50,7 +39,7 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         is SetAppTheme -> copy(appTheme = action.theme)
         OnBoardingComplete -> copy(isFirstTime = false)
         is SettingAction.EnableDevSettings -> copy(devSettings = action.enable)
-        //is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
+        is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
         is SettingAction.SetVoiceLanguage -> copy(voiceInputLanguage = action.language)
     }

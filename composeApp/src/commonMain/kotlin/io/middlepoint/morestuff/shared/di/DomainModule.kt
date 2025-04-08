@@ -6,17 +6,20 @@ import io.middlepoint.morestuff.shared.data.service.OpenGraphFetcherImpl
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.data.middleware.AuthMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.DevMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ErrorMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.LoggerMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.SettingsMiddleware
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.DevMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.ErrorMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.LoggerMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.MessageMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.MiddlewareProviderImpl
+import io.middlepoint.morestuff.shared.data.middleware.NotificationMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.PriorityMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.ReminderMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.ScheduleMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.ScopeMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.SettingsMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.TaskMiddleware
+import io.middlepoint.morestuff.shared.domain.redux.MiddlewareProvider
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
@@ -101,7 +104,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfil
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfilledUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ToggleQuickReminderUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ToggleQuickReminderUseCaseImpl
-
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
@@ -178,172 +182,155 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskTitleUseCas
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskTitleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTasksScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTasksScopeUseCaseImpl
+import org.koin.core.module.dsl.createdAtStart
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val domainModules
-    get() = buildList {
-        add(storeModule)
-        add(serviceModule)
-        addAll(useCaseModules)
-        add(timeManagerModule)
-    }
+  get() = buildList {
+    add(storeModule)
+    add(serviceModule)
+    addAll(useCaseModules)
+    add(timeManagerModule)
+  }
 
 val useCaseModules
-    get() = buildList {
-        add(taskUseCases)
-        add(scheduleUseCases)
-        add(messageUseCases)
-        add(settingsUseCases)
-        add(scopeUseCases)
-    }
+  get() = buildList {
+    add(taskUseCases)
+    add(scheduleUseCases)
+    add(messageUseCases)
+    add(settingsUseCases)
+    add(scopeUseCases)
+  }
 
 val serviceModule = module {
-    factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
-    factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
-    factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
+  factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
+  factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
+  factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
 }
 
 val storeModule = module {
-    // Store
-
-    single(createdAtStart = true) {
-        AppStore(
-            logger = get(),
-            devMiddleware = get(),
-            errorMiddleware = get(),
-            taskMiddleware = get(),
-            messageMiddleware = get(),
-            scheduleMiddleware = get(),
-            responseMiddleware = get(),
-            notificationMiddleware = get(),
-            settingsMiddleware = get(),
-            priorityMiddleware = get(),
-            scopeMiddleware = get(),
-            authMiddleware = get()
-        )
-    }
-
-    // Middleware
-    factoryOf(::LoggerMiddleware)
-    factoryOf(::TaskMiddleware)
-    factoryOf(::ScheduleMiddleware)
-    factoryOf(::MessageMiddleware)
-    factoryOf(::NotificationMiddleware)
-    factoryOf(::SettingsMiddleware)
-    factoryOf(::ReminderMiddleware)
-    factoryOf(::ErrorMiddleware)
-    factoryOf(::AuthMiddleware)
-    factoryOf(::PriorityMiddleware)
-    factoryOf(::DevMiddleware)
-    factoryOf(::ScopeMiddleware)
-
+  singleOf(::AppStore) { createdAtStart() }
+  factoryOf(::MiddlewareProviderImpl) bind MiddlewareProvider::class
+  factoryOf(::LoggerMiddleware)
+  factoryOf(::TaskMiddleware)
+  factoryOf(::ScheduleMiddleware)
+  factoryOf(::MessageMiddleware)
+  factoryOf(::NotificationMiddleware)
+  factoryOf(::SettingsMiddleware)
+  factoryOf(::ReminderMiddleware)
+  factoryOf(::ErrorMiddleware)
+  factoryOf(::AuthMiddleware)
+  factoryOf(::PriorityMiddleware)
+  factoryOf(::DevMiddleware)
+  factoryOf(::ScopeMiddleware)s
 }
 
 val taskUseCases = module {
-    factoryOf(::CreateNewTaskUseCaseImpl) bind CreateTaskUseCase::class
-    factoryOf(::GetTaskUseCaseImpl) bind GetTaskUseCase::class
-    factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
-    factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
-    factoryOf(::GetActiveTasksFlowUseCaseImpl) bind GetActiveTasksFlowUseCase::class
-    factoryOf(::GetScopeActiveTasksFlowUseCaseImpl) bind GetScopeActiveTasksFlowUseCase::class
-    factoryOf(::GetCompletedTasksUseCaseImpl) bind GetCompletedTasksUseCase::class
-    factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
-    factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
-    factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
-    factoryOf(::GetTasksWithoutScheduleUseCaseImpl) bind GetTasksWithoutScheduleUseCase::class
-    factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
-    factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
-    factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
-    factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
-    factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
-    factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
-    factoryOf(::RemoveTasksFromScopeUseCaseImpl) bind RemoveTasksFromScopeUseCase::class
-    factoryOf(::UpdateTasksScopeUseCaseImpl) bind UpdateTasksScopeUseCase::class
+  factoryOf(::CreateNewTaskUseCaseImpl) bind CreateTaskUseCase::class
+  factoryOf(::GetTaskUseCaseImpl) bind GetTaskUseCase::class
+  factoryOf(::GetTaskFlowUseCaseImpl) bind GetTaskFlowUseCase::class
+  factoryOf(::GetTaskMessagesFlowUseCaseImpl) bind GetTaskMessagesFlowUseCase::class
+  factoryOf(::GetActiveTasksFlowUseCaseImpl) bind GetActiveTasksFlowUseCase::class
+  factoryOf(::GetScopeActiveTasksFlowUseCaseImpl) bind GetScopeActiveTasksFlowUseCase::class
+  factoryOf(::GetCompletedTasksUseCaseImpl) bind GetCompletedTasksUseCase::class
+  factoryOf(::SetTaskCompleteImpl) bind SetTaskCompleteUseCase::class
+  factoryOf(::UpdateTaskTitleUseCaseImpl) bind UpdateTaskTitleUseCase::class
+  factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
+  factoryOf(::GetTasksWithoutScheduleUseCaseImpl) bind GetTasksWithoutScheduleUseCase::class
+  factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
+  factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
+  factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
+  factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
+  factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
+  factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
+  factoryOf(::RemoveTasksFromScopeUseCaseImpl) bind RemoveTasksFromScopeUseCase::class
+  factoryOf(::UpdateTasksScopeUseCaseImpl) bind UpdateTasksScopeUseCase::class
 
-    // Task priority score
-    factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
-    factoryOf(::GetTaskAbovePriorityScoreUseCaseImpl) bind GetTaskAbovePriorityScoreUseCase::class
-    factoryOf(::GetTaskBelowPriorityScoreUseCaseImpl) bind GetTaskBelowPriorityScoreUseCase::class
-    factoryOf(::GetPlanPriorityScoreUseCaseImpl) bind GetPlanPriorityScoreUseCase::class
-    factoryOf(::GetHighestPriorityScoreUseCaseImpl) bind GetHighestPriorityScoreUseCase::class
-    factoryOf(::GetLowestPriorityScoreUseCaseImpl) bind GetLowestPriorityScoreUseCase::class
-    factoryOf(::GetDefaultPriorityScoreUseCaseImpl) bind GetDefaultPriorityScoreUseCase::class
-    factoryOf(::IncreaseTaskPriorityScoreUseCaseImpl) bind IncrementTaskPriorityScoreUseCase::class
-    factoryOf(::DecreaseTaskPriorityScoreUseCaseImpl) bind DecrementTaskPriorityScoreUseCase::class
-    factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
-    factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
-    factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
-    factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
-    factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
-    factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class
+  // Task priority score
+  factoryOf(::UpdateTaskReviewPriorityUseCaseImpl) bind UpdateTaskReviewPriorityUseCase::class
+  factoryOf(::GetTaskAbovePriorityScoreUseCaseImpl) bind GetTaskAbovePriorityScoreUseCase::class
+  factoryOf(::GetTaskBelowPriorityScoreUseCaseImpl) bind GetTaskBelowPriorityScoreUseCase::class
+  factoryOf(::GetPlanPriorityScoreUseCaseImpl) bind GetPlanPriorityScoreUseCase::class
+  factoryOf(::GetHighestPriorityScoreUseCaseImpl) bind GetHighestPriorityScoreUseCase::class
+  factoryOf(::GetLowestPriorityScoreUseCaseImpl) bind GetLowestPriorityScoreUseCase::class
+  factoryOf(::GetDefaultPriorityScoreUseCaseImpl) bind GetDefaultPriorityScoreUseCase::class
+  factoryOf(::IncreaseTaskPriorityScoreUseCaseImpl) bind IncrementTaskPriorityScoreUseCase::class
+  factoryOf(::DecreaseTaskPriorityScoreUseCaseImpl) bind DecrementTaskPriorityScoreUseCase::class
+  factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
+  factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
+  factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
+  factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
+  factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
+  factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class
 }
 
-val scopeUseCases = module{
-    factoryOf(::CreateScopeUseCaseImpl) bind CreateScopeUseCase::class
-    factoryOf(::DeleteScopeUseCaseImpl) bind DeleteScopeUseCase::class
-    factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
-    factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
-    factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
-    factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
-    factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
-    factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
+val scopeUseCases = module {
+  factoryOf(::CreateScopeUseCaseImpl) bind CreateScopeUseCase::class
+  factoryOf(::DeleteScopeUseCaseImpl) bind DeleteScopeUseCase::class
+  factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
+  factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
+  factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
+  factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
+  factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
+  factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
 
 
 }
 
 val scheduleUseCases = module {
-    factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
-    factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
-    factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
-    factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
-    factoryOf(::ToggleQuickReminderUseCaseImpl) bind ToggleQuickReminderUseCase::class
-    factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
-    factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
-    factoryOf(::GetAllActiveSchedulesUseCaseImpl) bind GetAllActiveSchedulesUseCase::class
-    factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
-    factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
-    factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
-    factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
-    factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
-    factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
+  factoryOf(::GetActiveSchedulesUseCaseImpl) bind GetActiveSchedulesUseCase::class
+  factoryOf(::CreateScheduleUseCaseImpl) bind CreateScheduleUseCase::class
+  factoryOf(::CreateOneTimeScheduleUseCaseImpl) bind CreateOneTimeScheduleUseCase::class
+  factoryOf(::CreateReminderUseCaseImpl) bind CreateReminderUseCase::class
+  factoryOf(::ToggleQuickReminderUseCaseImpl) bind ToggleQuickReminderUseCase::class
+  factoryOf(::GetActiveScheduleFlowUseCaseImpl) bind GetActiveScheduleFlowUseCase::class
+  factoryOf(::CancelActiveScheduleUseCaseImpl) bind CancelActiveScheduleUseCase::class
+  factoryOf(::GetAllActiveSchedulesUseCaseImpl) bind GetAllActiveSchedulesUseCase::class
+  factoryOf(::GetScheduleImpl) bind GetScheduleUseCase::class
+  factoryOf(::SetScheduleFulfilledUseCaseImpl) bind SetScheduleFulfilledUseCase::class
+  factoryOf(::SetScheduleMessageResponseUseCaseImpl) bind SetScheduleMessageResponseUseCase::class
+  factoryOf(::GetTaskScheduleCountUseCaseImpl) bind GetTaskScheduleCountUseCase::class
+  factoryOf(::ScheduleAtTimeUseCaseImpl) bind ScheduleAtTimeUseCase::class
+  factoryOf(::ScheduleWorkUseCaseImpl) bind ScheduleWorkUseCase::class
+  factoryOf(::UpdateReviewNotificationScheduleUseCaseImpl) bind UpdateReviewNotificationScheduleUseCase::class
 
 
 }
 
 val messageUseCases = module {
-    factoryOf(::GetMessagesUseCaseImpl) bind GetMessagesUseCase::class
-    factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
-    factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
-    factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
-    factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
-    factoryOf(::ClearActivePendingMessagesUseCaseImpl) bind ClearActiveReminderMessagesUseCase::class
-    factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
-    factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
-    factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
-    factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
-    factoryOf(::SaveMediaUseCaseImpl) bind SaveMediaUseCase::class
-    factoryOf(::SaveUserPDFUseCaseImpl) bind SaveUserPDFUseCase::class
-    factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
-    factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
-    factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
-    factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
-    factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
+  factoryOf(::GetMessagesUseCaseImpl) bind GetMessagesUseCase::class
+  factoryOf(::CreateMessageUseCaseImpl) bind CreateMessageUseCase::class
+  factoryOf(::GetMessageImpl) bind GetMessageUseCase::class
+  factoryOf(::CreateTaskConfirmationMessageUseCaseImpl) bind CreateTaskConfirmationMessageUseCase::class
+  factoryOf(::CreateScheduleMessageUseCaseImpl) bind CreateScheduleMessageUseCase::class
+  factoryOf(::ClearActivePendingMessagesUseCaseImpl) bind ClearActiveReminderMessagesUseCase::class
+  factoryOf(::CountActiveReminderMessagesUseCaseImpl) bind CountActiveReminderMessagesUseCase::class
+  factoryOf(::GetTaskChatMessagesUseCaseImpl) bind GetTaskChatMessagesUseCase::class
+  factoryOf(::FetchOpenGraphMetadataUseCaseImpl) bind FetchOpenGraphMetadataUseCase::class
+  factoryOf(::CheckForUrlMetadataUseCaseImpl) bind CheckForUrlMetadataUseCase::class
+  factoryOf(::SaveMediaUseCaseImpl) bind SaveMediaUseCase::class
+  factoryOf(::SaveUserPDFUseCaseImpl) bind SaveUserPDFUseCase::class
+  factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
+  factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
+  factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
+  factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
+  factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
 
 }
 
 
 val settingsUseCases = module {
-    factoryOf(::GetAppSettingsUseCaseImpl) bind GetAppSettingsUseCase::class
-    factoryOf(::GetAppSettingUseCaseImpl) bind GetAppSettingUseCase::class
-    factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
-    factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
-    factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
+  factoryOf(::GetAppSettingsUseCaseImpl) bind GetAppSettingsUseCase::class
+  factoryOf(::GetAppSettingUseCaseImpl) bind GetAppSettingUseCase::class
+  factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
+  factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
+  factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
 }
 
 val timeManagerModule = module {
-    singleOf(::TimeManagerImpl) bind TimeManager::class
+  singleOf(::TimeManagerImpl) bind TimeManager::class
 }
 

@@ -1,22 +1,21 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.DONE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.LATER
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
-import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction.*
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction.ScheduleCreatedAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction.ScheduleReplyAction
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction.CreateScheduleMessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.*
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ScheduleCreatedAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ScheduleReplyAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
@@ -32,32 +31,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfil
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.datetime.LocalDateTime
-
-sealed class ScheduleAction : Action.FeatureAction() {
-    data class ExecuteScheduleAction(val scheduleId: Long) : ScheduleAction()
-    data class RescheduleTaskAction(
-        val taskId: Long,
-        val scheduleType: ScheduleType,
-        val localDateTime: LocalDateTime
-    ) : ScheduleAction()
-
-    data class CancelActiveScheduleAction(val taskId: Long) : ScheduleAction()
-    data class ToggleReminderScheduleAction(val taskId: Long) : ScheduleAction()
-    data class CreateReminderScheduleAction(val taskId: Long) : ScheduleAction()
-    data class CancelScheduleAction(
-        val taskIds: List<Long>,
-        val scheduleType: List<ScheduleType> = ScheduleType.entries.toList()
-    ) : ScheduleAction()
-
-    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain, val task: TaskDomain) : ScheduleAction()
-
-    internal data class ScheduleReplyAction(
-        val schedule: ScheduleDomain,
-        val replyType: ReplyType,
-    ) : ScheduleAction()
-
-}
 
 class ScheduleMiddleware(
     private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,

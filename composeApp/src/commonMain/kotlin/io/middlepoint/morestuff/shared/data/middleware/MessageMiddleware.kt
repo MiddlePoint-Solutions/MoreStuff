@@ -1,13 +1,16 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
 import co.touchlab.kermit.Logger
-import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.displayTitle
-import io.middlepoint.morestuff.shared.domain.redux.AppState
-import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction.CreateScheduleMessageAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction.CreateScheduleMessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReminderNotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
@@ -23,33 +26,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.UpdateMessageConte
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class MessageAction : Action.FeatureAction() {
-    data class CreateScheduleMessageAction(val scheduleId: Long) : MessageAction()
-    data class CreateUserTaskMessageAction(val taskId: Long, val content: String) :
-        MessageAction()
-    data class CreateAppTaskMessageAction(
-        val taskId: Long,
-        val content: String
-    ) : MessageAction()
-
-    data class CreateFileMessageAction(
-        val taskId: Long,
-        val file: PlatformFile,
-        val message: String
-    ) : MessageAction()
-
-    data class CreatePDFMessageAction(
-        val taskId: Long,
-        val file: PlatformFile,
-        val message: String
-    ) : MessageAction()
-
-    data class DeleteMessageAction(val messageId: Long) : MessageAction()
-
-    data class UpdateMessageContentAction(val messageId: Long, val content: String) : TaskAction()
-
-}
-val logger = Logger.withTag("MessageMiddleware")
 class MessageMiddleware(
     private val createTaskConfirmationMessageUseCase: CreateTaskConfirmationMessageUseCase,
     private val createScheduleMessageUseCase: CreateScheduleMessageUseCase,
@@ -60,6 +36,8 @@ class MessageMiddleware(
     private val deleteMessageUseCase: DeleteMessageUseCase,
     private val updateMessageContentUseCase: UpdateMessageContentUseCase,
 ) : Middleware<AppState> {
+
+    val logger = Logger.withTag("MessageMiddleware")
 
     override fun invoke(
         state: AppState,

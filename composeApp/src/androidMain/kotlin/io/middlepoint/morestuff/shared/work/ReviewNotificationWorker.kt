@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
