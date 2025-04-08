@@ -85,8 +85,6 @@ import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
-import morestuff.composeapp.generated.resources.sure_delete_task
-import morestuff.composeapp.generated.resources.sure_delete_tasks
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
@@ -181,9 +179,11 @@ fun HomeScreen() {
     val message = if (taskCount == 1) {
       val taskId = model.selectedTasks.first()
       val taskName = model.tasks[taskId]?.title ?: ""
-      stringResource(Res.string.sure_delete_task).replace("%s", taskName)
+      taskName
     } else {
-      stringResource(Res.string.sure_delete_tasks)
+      model.selectedTasks.joinToString(separator = ", ") { taskId ->
+        model.tasks[taskId]?.title ?: ""
+      }
     }
     val hasScheduledTask = model.selectedTasks.any { taskId ->
       model.tasks[taskId]?.hasSchedule == true

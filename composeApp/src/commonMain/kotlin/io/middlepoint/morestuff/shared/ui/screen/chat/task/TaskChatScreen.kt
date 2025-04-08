@@ -120,7 +120,6 @@ import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
-import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
@@ -252,7 +251,8 @@ private fun TaskChatContent(
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
-  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
   var showScopeSelection by remember { mutableStateOf(false) }
 
@@ -418,10 +418,10 @@ private fun TaskChatContent(
       null
     }
     DeleteBottomSheet(
-      sheetState = sheetState,
+      sheetState = deleteSheetState,
       onDismissRequest = { showDeleteBottomSheet = false },
       title = stringResource(Res.string.confirm_delete),
-      message = stringResource(Res.string.sure_delete_task).replace("%s", task.title),
+      message = task.title,
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
@@ -433,7 +433,6 @@ private fun TaskChatContent(
     )
   }
   if (showScopeSelection) {
-    val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ScopeSelectionBottomSheet(
       onDismissRequest = {
         coroutineScope.launch {
