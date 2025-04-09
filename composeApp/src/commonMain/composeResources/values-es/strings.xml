@@ -276,4 +276,6 @@
     <string name="edit_message">Editar mensaje</string>
     <string name="task_schedule_deletion_warning_singular">Esta tarea tiene una programación que también será eliminada.</string>
     <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
+
+    <string name="scope_name">Nombre del scope</string>
 </resources>
