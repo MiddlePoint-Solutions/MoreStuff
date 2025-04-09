@@ -49,6 +49,7 @@ import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.logger
+import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
@@ -85,8 +86,6 @@ import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
-import morestuff.composeapp.generated.resources.sure_delete_task
-import morestuff.composeapp.generated.resources.sure_delete_tasks
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
@@ -102,9 +101,17 @@ fun HomeScreen() {
   val navigation = LocalAppRouter.current
   val snackbarHostState = remember { SnackbarHostState() }
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
+
   var showScopeSelection by remember { mutableStateOf(false) }
-  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val showScopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+  val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
+
+  var showCreateScopeSheet by remember { mutableStateOf(false) }
+  val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+
   val model by homePresenter.models.collectAsState()
   val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
   var isReorderingActive = remember { mutableStateOf(false) }
@@ -136,11 +143,12 @@ fun HomeScreen() {
           onEvent = homePresenter::take,
           modifier = Modifier.padding(it),
           createNewScope = {
-            val createScopeScreen = Screen.CreateScope {
+            showCreateScopeSheet = true
+           /* val createScopeScreen = Screen.CreateScope {
               homePresenter.take(CreateScope(it))
               navigation.pop()
             }
-            navigation.push(createScopeScreen)
+            navigation.push(createScopeScreen)*/
           },
           onTaskComplete = { taskId ->
             if (pendingCompletionTasks.contains(taskId)) {
@@ -181,9 +189,11 @@ fun HomeScreen() {
     val message = if (taskCount == 1) {
       val taskId = model.selectedTasks.first()
       val taskName = model.tasks[taskId]?.title ?: ""
-      stringResource(Res.string.sure_delete_task).replace("%s", taskName)
+      taskName
     } else {
-      stringResource(Res.string.sure_delete_tasks)
+      model.selectedTasks.joinToString(separator = ", ") { taskId ->
+        model.tasks[taskId]?.title ?: ""
+      }
     }
     val hasScheduledTask = model.selectedTasks.any { taskId ->
       model.tasks[taskId]?.hasSchedule == true
@@ -200,7 +210,7 @@ fun HomeScreen() {
     }
 
     DeleteBottomSheet(
-      sheetState = sheetState,
+      sheetState = deleteSheetState,
       onDismissRequest = { showDeleteBottomSheet = false },
       title = stringResource(Res.string.confirm_delete),
       message = message,
@@ -227,16 +237,15 @@ fun HomeScreen() {
   }
 
   if (showScopeSelection) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ScopeSelectionBottomSheet(
       onDismissRequest = {
         coroutineScope.launch {
-          sheetState.hide()
+          showScopeSelectionSheetState.hide()
           showScopeSelection = false
         }
       },
       scopes = model.scopes,
-      sheetState = sheetState,
+      sheetState = showScopeSelectionSheetState,
       addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
       createNewScope = {
         val createScopeScreen = Screen.CreateScope {
@@ -244,6 +253,24 @@ fun HomeScreen() {
           navigation.pop()
         }
         navigation.push(createScopeScreen)
+      }
+    )
+  }
+  if (showCreateScopeSheet) {
+    CreateScopeBottomSheet(
+      sheetState = createScopeSheetState,
+      onDismissRequest = {
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
+      },
+      onConfirm = { scopeName ->
+        homePresenter.take(CreateScope(scopeName))
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
       }
     )
   }

@@ -9,18 +9,15 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +49,7 @@ fun SettingsList(
   action: (@Composable () -> Unit)? = null,
 ) {
 
-  var showDialog by remember { mutableStateOf(false) }
+  var showSheet by remember { mutableStateOf(false) }
 
   SettingsMenuLink(
     modifier = modifier,
@@ -60,16 +57,16 @@ fun SettingsList(
     title = title,
     subtitle = subtitle,
     action = action,
-    onClick = { showDialog = true },
+    onClick = { showSheet = true },
     colors = ListItemDefaults.colors(
       containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
     )
   )
 
-  if (showDialog) {
+  if (showSheet) {
 
     if (state.value >= items.size) {
-      throw IndexOutOfBoundsException("Current value for $title list setting cannot be grater than items size")
+      throw IndexOutOfBoundsException("El valor actual para $title no puede ser mayor que el tamaño de la lista")
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -77,15 +74,16 @@ fun SettingsList(
       coroutineScope.launch {
         state.value = selectedIndex
         delay(closeDialogDelay)
-        showDialog = false
+        showSheet = false
       }
     }
 
-    BasicAlertDialog(
-      onDismissRequest = { showDialog = false },
+    ModalBottomSheet(
+      onDismissRequest = { showSheet = false },
+      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
     ) {
       Surface(
-        shape = RoundedCornerShape(10),
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
         color = MaterialTheme.colorScheme.surfaceContainerElevation
       ) {
         Column(

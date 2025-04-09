@@ -88,7 +88,7 @@ class SchedulerImpl(
             }*/
     }
 
-    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+/*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
         val currentTime = timeManager.nowLocalDateTime
         val scheduleTime =
             if (currentTime.hour > hour || (currentTime.hour == hour && currentTime.minute >= minute)) {
@@ -129,7 +129,7 @@ class SchedulerImpl(
                     println("Error scheduling review worker: ${it.localizedDescription}")
                 }
             }
-    }
+    }*/
 
     override fun cancelSchedule(scheduleId: Long) {
         UNUserNotificationCenter.currentNotificationCenter()

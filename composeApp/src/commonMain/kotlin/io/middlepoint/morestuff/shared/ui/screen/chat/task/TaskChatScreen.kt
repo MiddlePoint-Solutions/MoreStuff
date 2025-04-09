@@ -1,6 +1,10 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -120,7 +124,6 @@ import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
-import morestuff.composeapp.generated.resources.sure_delete_task
 import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
@@ -252,7 +255,8 @@ private fun TaskChatContent(
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
-  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
   var showScopeSelection by remember { mutableStateOf(false) }
 
@@ -418,10 +422,10 @@ private fun TaskChatContent(
       null
     }
     DeleteBottomSheet(
-      sheetState = sheetState,
+      sheetState = deleteSheetState,
       onDismissRequest = { showDeleteBottomSheet = false },
       title = stringResource(Res.string.confirm_delete),
-      message = stringResource(Res.string.sure_delete_task).replace("%s", task.title),
+      message = task.title,
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
@@ -433,7 +437,6 @@ private fun TaskChatContent(
     )
   }
   if (showScopeSelection) {
-    val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     ScopeSelectionBottomSheet(
       onDismissRequest = {
         coroutineScope.launch {
@@ -522,70 +525,82 @@ private fun TaskChatInput(
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier.fillMaxWidth()
               ) {
-                if (isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0)) {
-                  IconButton(
-                    onClick = { showMenu = true },
-                    modifier = Modifier.weight(1f)
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                  this@Row.AnimatedVisibility(
+                    visible = isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0),
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                   ) {
-                    Icon(
-                      Icons.Filled.AttachFile,
-                      contentDescription = stringResource(Res.string.cd_select_images)
-                    )
-                  }
-                  DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                  ) {
-                    DropdownMenuItem(onClick = {
-                      pickImage()
-                      showMenu = false
-                    },
-                      text = {
-                        Text(
-                          text = stringResource(Res.string.select_image)
-                        )
-                      })
-                    DropdownMenuItem(onClick = {
-                      pickPdf()
-                      showMenu = false
-                    },
-                      text = {
-                        Text(
-                          text = stringResource(Res.string.select_pdf)
-                        )
-                      })
-                  }
-                  VoiceToTextInput(
-                    onUpdateValue = {
-                      userInputValue = userInputValue.copy(text = it)
-                      showSendIcon.value = it.isNotBlank()
-                      isTextEmpty.value = it.isBlank()
-                    },
-                    onRecordingStateChanged = { recording ->
-                      isRecording.value = recording
-                      if (!recording && userInputValue.text.isNotBlank()) {
-                        showSendIcon.value = true
-                      }
-                    },
-                    isHomeScreen = true
-                  )
-                } else {
-                  SendIcon(onClick = {
-                    if (editingMessageId != null && editingMessageId > 0) {
-                      onUpdateMessage(userInputValue.text)
-                      onCancelEdit()
-                    } else {
-                      sendTaskMessage(userInputValue.text)
-                      userInputValue = TextFieldValue("")
-                      isTextEmpty.value = true
-                      showSendIcon.value = false
+                    IconButton(
+                      onClick = { showMenu = true }
+                    ) {
+                      Icon(
+                        Icons.Filled.AttachFile,
+                        contentDescription = stringResource(Res.string.cd_select_images)
+                      )
                     }
-                  })
+                  }
+
+                  this@Row.AnimatedVisibility(
+                    visible = !isTextEmpty.value || (editingMessageId != null && editingMessageId > 0),
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                  ) {
+                    SendIcon(onClick = {
+                      if (editingMessageId != null && editingMessageId > 0) {
+                        onUpdateMessage(userInputValue.text)
+                        onCancelEdit()
+                      } else {
+                        sendTaskMessage(userInputValue.text)
+                        userInputValue = TextFieldValue("")
+                        isTextEmpty.value = true
+                        showSendIcon.value = false
+                      }
+                    })
+                  }
                 }
               }
+
+              DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+              ) {
+                DropdownMenuItem(onClick = {
+                  pickImage()
+                  showMenu = false
+                },
+                  text = {
+                    Text(
+                      text = stringResource(Res.string.select_image)
+                    )
+                  })
+                DropdownMenuItem(onClick = {
+                  pickPdf()
+                  showMenu = false
+                },
+                  text = {
+                    Text(
+                      text = stringResource(Res.string.select_pdf)
+                    )
+                  })
+              }
+              /*VoiceToTextInput(
+                onUpdateValue = {
+                  userInputValue = userInputValue.copy(text = it)
+                  showSendIcon.value = it.isNotBlank()
+                  isTextEmpty.value = it.isBlank()
+                },
+                onRecordingStateChanged = { recording ->
+                  isRecording.value = recording
+                  if (!recording && userInputValue.text.isNotBlank()) {
+                    showSendIcon.value = true
+                  }
+                },
+                isHomeScreen = true
+              )*/
             },
           )
         }
