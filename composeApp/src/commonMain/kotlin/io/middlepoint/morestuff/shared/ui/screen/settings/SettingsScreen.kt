@@ -285,6 +285,9 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
+        style = MaterialTheme.typography.titleLarge.copy(
+          color = MaterialTheme.colorScheme.onSurface
+        ),
       )
     },
     subtitle = {
