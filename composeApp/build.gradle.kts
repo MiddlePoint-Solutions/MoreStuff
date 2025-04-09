@@ -259,6 +259,10 @@ android {
     }
   }
 
+  androidResources {
+    generateLocaleConfig = true
+  }
+
   signingConfigs {
     create(Env.Staging) {
       storeFile = file("./stage_key")
