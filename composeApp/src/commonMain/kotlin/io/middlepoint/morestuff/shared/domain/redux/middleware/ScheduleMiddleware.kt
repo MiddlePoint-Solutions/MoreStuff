@@ -84,7 +84,7 @@ class ScheduleMiddleware(
         when (action) {
 
             is SettingAction.InitSettings -> scope.launch {
-                scheduleWorkUseCase(action.settings.reviewTime)
+                scheduleWorkUseCase(/*action.settings*/)
             }
 
             is TaskAction.TaskCreatedAction -> scope.launch {

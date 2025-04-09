@@ -65,6 +65,7 @@ fun PriorityItem(
   onTaskLongPress: () -> Unit,
   modifier: Modifier = Modifier,
   isSelected: Boolean = false,
+  isInSearch: Boolean = false,
   isReorderModeActive: Boolean = false,
   handleModifier: Modifier = Modifier,
 ) {
@@ -97,15 +98,18 @@ fun PriorityItem(
         .padding(start = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      ToggleTaskAsDone(
-        selectedToComplete = isCompleted,
-        onClick = {
-          isCompleted = !isCompleted
-          onTaskComplete(isCompleted)
+      if(!isInSearch){
+        ToggleTaskAsDone(
+          selectedToComplete = isCompleted,
+          onClick = {
+            isCompleted = !isCompleted
+            onTaskComplete(isCompleted)
 
-        },
-        enabled = enabled
-      )
+          },
+          enabled = enabled
+        )
+      }
+
       Spacer(modifier = Modifier.width(8.dp))
       Box {
         TaskProfile(task.title)

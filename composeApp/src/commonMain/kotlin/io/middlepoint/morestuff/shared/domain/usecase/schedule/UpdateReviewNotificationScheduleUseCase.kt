@@ -4,6 +4,7 @@ import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 
+/*
 interface UpdateReviewNotificationScheduleUseCase {
     operator fun invoke(hour: Int, minute: Int): Either<Failure, Boolean>
 }
@@ -16,4 +17,4 @@ class UpdateReviewNotificationScheduleUseCaseImpl(
         scheduler.scheduleReviewWorker(hour, minute)
         return Either.Right(true)
     }
-}
+}*/

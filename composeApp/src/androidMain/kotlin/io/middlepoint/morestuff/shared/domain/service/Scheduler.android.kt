@@ -66,7 +66,7 @@ class SchedulerImpl(
         }
     }
 
-    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+/*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
 
         val currentTime = timeManager.nowLocalDateTime
 
@@ -91,7 +91,7 @@ class SchedulerImpl(
         }.build()
 
         workManager.enqueueUniqueWork(PRIORITY_REVIEW_WORK, ExistingWorkPolicy.REPLACE, work)
-    }
+    }*/
 
     override fun cancelSchedule(scheduleId: Long) {
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))

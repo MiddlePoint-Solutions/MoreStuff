@@ -35,10 +35,10 @@ fun settingsModel(
                     store.dispatch(SettingAction.EnableDevSettings(event.enable))
                     state.copy(devSettings = event.enable)
                 }
-                is SettingsEvent.SetReviewTime -> {
+                /*is SettingsEvent.SetReviewTime -> {
                     store.dispatch(SettingAction.SetReviewTimeAction(event.hour, event.minute))
                     state.copy(reviewTime = Pair(event.hour, event.minute))
-                }
+                }*/
                 is SettingsEvent.SelectLanguage -> {
                     store.dispatch(SettingAction.SetVoiceLanguage(Language[event.index]))
                     state.copy(inputVoiceLanguage = Language[event.index])

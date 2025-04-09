@@ -179,6 +179,7 @@
     <string name="choose_scope">Choose Scope</string>
     <string name="manage_scopes">Manage Scopes</string>
     <string name="remove_from_scope">Remove from current scope</string>
+    <string name="scope_name">Scope name</string>
 
     <!--  onBoarding  -->
     <string name="onboarding_welcome_title">"Our Intention"</string>
