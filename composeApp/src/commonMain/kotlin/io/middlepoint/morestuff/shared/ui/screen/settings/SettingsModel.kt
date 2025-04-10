@@ -12,12 +12,15 @@ import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
 import kotlinx.coroutines.flow.Flow
+import org.koin.compose.koinInject
 
 @Composable
 fun settingsModel(
   initialState: SettingsState,
   events: Flow<SettingsEvent>,
+  openAppSettingsUseCase: OpenAppSettingsUseCase = koinInject(),
   store: AppStore
 ): SettingsState {
     var state by remember { mutableStateOf(initialState) }
@@ -44,6 +47,11 @@ fun settingsModel(
 
                 SettingsEvent.SignOut -> {
                     store.dispatch(UserAction.SignOut)
+                    state
+                }
+
+                SettingsEvent.OpenAppSettings -> {
+                    openAppSettingsUseCase()
                     state
                 }
             }

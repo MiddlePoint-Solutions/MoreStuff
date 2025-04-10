@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Translate
@@ -151,7 +152,8 @@ fun SettingsScreen(
           showDevSettings = { router.push(Developer) },
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
-          signOut = { viewModel.take(SettingsEvent.SignOut) }
+          signOut = { viewModel.take(SettingsEvent.SignOut) },
+          openAppSettings = {viewModel.take(SettingsEvent.OpenAppSettings)}
         )
       }
 
@@ -177,7 +179,8 @@ fun SettingsContent(
   signOut: () -> Unit,
   showLibraries: () -> Unit,
   showDevSettings: () -> Unit,
-  showScopesSettings: () -> Unit
+  showScopesSettings: () -> Unit,
+  openAppSettings: () -> Unit
 ) {
 
   val scrollState = rememberScrollState()
@@ -237,6 +240,11 @@ fun SettingsContent(
           )
         )
 
+        if (Platform.Android == platform) {
+          LanguageSettings(onClick = openAppSettings )
+        }
+
+
         if (model.devSettings) {
           SettingsMenuLink(
             title = {
@@ -288,7 +296,7 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
-        style = MaterialTheme.typography.titleLarge.copy(
+        style = MaterialTheme.typography.bodyLarge.copy(
           color = MaterialTheme.colorScheme.onSurface
         ),
       )
@@ -599,6 +607,23 @@ private fun ScopeSettings(onClick: () -> Unit) {
     },
     colors = ListItemDefaults.colors(
       containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+  )
+}
+
+@Composable
+private fun LanguageSettings(onClick: () -> Unit) {
+  SettingsMenuLink(
+    title = { Text(text = "Language") },
+    onClick = onClick,
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Language,
+        contentDescription = "Scopes"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
     )
   )
 }

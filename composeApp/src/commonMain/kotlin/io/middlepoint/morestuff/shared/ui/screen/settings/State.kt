@@ -18,4 +18,5 @@ sealed class SettingsEvent {
   data class EnableDevSettings(val enable: Boolean = true) : SettingsEvent()
   data class SelectLanguage(val index: Int) : SettingsEvent()
   data object SignOut: SettingsEvent()
+  data object OpenAppSettings : SettingsEvent()
 }
