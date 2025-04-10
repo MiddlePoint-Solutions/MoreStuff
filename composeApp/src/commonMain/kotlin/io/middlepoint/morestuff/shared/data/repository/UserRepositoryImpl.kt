@@ -6,7 +6,7 @@ import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.*
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.redux.state.AppSettings
+import io.middlepoint.morestuff.shared.domain.model.AppSettings
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository
 
 
