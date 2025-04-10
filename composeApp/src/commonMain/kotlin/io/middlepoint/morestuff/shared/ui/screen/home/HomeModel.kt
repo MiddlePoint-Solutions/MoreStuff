@@ -48,6 +48,11 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
@@ -75,22 +80,22 @@ fun homeModel(
   var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
-  var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
+  val taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
   var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
+  var username by remember { mutableStateOf(initialState.username) }
 
+  fun dispatch(action: Action) = store.dispatch(action)
   val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
   val coroutineScope = rememberCoroutineScope()
 
-  fun dispatch(action: Action) {
-    Logger.i { "Dispatching action: ${action::class.simpleName}" }
-    store.dispatch(action)
+  LaunchedEffect(Unit) {
+    getScopesFlowUseCase().collect { scopes = it }
   }
 
   LaunchedEffect(Unit) {
-    getScopesFlowUseCase().collect {
-      Logger.i { "Scopes updated: ${it.size} scopes received" }
-      scopes = it
-    }
+    store.state
+      .distinctUntilChangedBy { it.userState.user }
+      .collectLatest { username = it.userState.user?.fullName ?: "" }
   }
 
   LaunchedEffect(Unit) {
@@ -301,6 +306,7 @@ fun homeModel(
   }
 
   return HomeState(
+    username = username,
     currentScopeId = currentScopeId,
     selectedTasks = selectedTasks,
     scopes = scopes,

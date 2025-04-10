@@ -94,7 +94,7 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun HomeScreen() {
 
-  val homePresenter = koinInjectOnRoute(HomePresenter::class)
+  val homeState = koinInjectOnRoute(HomeViewModel::class)
 
   val coroutineScope = rememberCoroutineScope()
   val navigation = LocalAppRouter.current
@@ -110,57 +110,56 @@ fun HomeScreen() {
   var showCreateScopeSheet by remember { mutableStateOf(false) }
   val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-
-  val model by homePresenter.models.collectAsState()
+  val model by homeState.models.collectAsState()
   val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
-  var isReorderingActive = remember { mutableStateOf(false) }
+  var isReorderingActive by remember { mutableStateOf(false) }
 
 
   MoreStuffHomeScaffold(
     snackbarHostState = snackbarHostState,
     topBar = {
       HomeTopBar(
+        username = model.username,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         selectedTaskCount = model.selectedTasks.size,
-        reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
         settingsSelected = { navigation.push(Screen.Settings) },
         searchAction = { isSearchActive = true },
         clearTaskSelection = {
-          homePresenter.take(ResetHomeState)
-          isReorderingActive.value = false
+          homeState.take(ResetHomeState)
+          isReorderingActive = false
         },
-        completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
+        completeSelectedTasks = { homeState.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteBottomSheet = true },
         selectScope = { showScopeSelection = true },
-        isReorderingActive = isReorderingActive.value
+        isReorderingActive = isReorderingActive
       )
     },
     content = {
       if (model.scopes.isNotEmpty()) {
         HomeContent(
           model = model,
-          onEvent = homePresenter::take,
+          onEvent = homeState::take,
           modifier = Modifier.padding(it),
           createNewScope = {
             showCreateScopeSheet = true
           },
           onTaskComplete = { taskId ->
-            homePresenter.take(HomeEvent.CompleteTask(taskId))
+            homeState.take(HomeEvent.CompleteTask(taskId))
           },
-          onReorderingChanged = { isReordering -> isReorderingActive.value = isReordering }
+          onReorderingChanged = { isReordering -> isReorderingActive = isReordering }
         )
       }
     },
   )
 
   LaunchedEffect(Unit) {
-    homePresenter.notifications.collectLatest { notification ->
+    homeState.notifications.collectLatest { notification ->
       notification.show(snackbarHostState).let { result ->
         if (result == SnackbarResult.ActionPerformed) {
           launch {
             notification.action()
             if (notification is NotificationState.Complete) {
-              homePresenter.take(ResetHomeState)
+              homeState.take(ResetHomeState)
             }
           }
         }
@@ -201,7 +200,7 @@ fun HomeScreen() {
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
-        homePresenter.take(DeleteSelectedTasks)
+        homeState.take(DeleteSelectedTasks)
         showDeleteBottomSheet = false
       },
       extraInfo = taskHasSchedule
@@ -230,10 +229,10 @@ fun HomeScreen() {
       },
       scopes = model.scopes,
       sheetState = showScopeSelectionSheetState,
-      addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
+      addSelectedTasksToScope = { homeState.take(MoveSelectedTasksToScope(it)) },
       createNewScope = {
         val createScopeScreen = Screen.CreateScope {
-          homePresenter.take(CreateScopeForSelectedTasks(it))
+          homeState.take(CreateScopeForSelectedTasks(it))
           navigation.pop()
         }
         navigation.push(createScopeScreen)
@@ -250,7 +249,7 @@ fun HomeScreen() {
         }
       },
       onConfirm = { scopeName ->
-        homePresenter.take(CreateScope(scopeName))
+        homeState.take(CreateScope(scopeName))
         coroutineScope.launch {
           createScopeSheetState.hide()
           showCreateScopeSheet = false

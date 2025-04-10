@@ -8,6 +8,6 @@ sealed class Action {
     abstract class FeatureAction : Action()
 }
 
-object NoOp
-object InitStoreAction : Action.FeatureAction()
+data object NoOp
+data object InitStoreAction : Action.FeatureAction()
 data class Test(val message: String) : Action.FeatureAction()

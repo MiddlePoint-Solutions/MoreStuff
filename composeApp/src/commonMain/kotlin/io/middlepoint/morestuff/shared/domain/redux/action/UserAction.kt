@@ -6,4 +6,5 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Action
 sealed class UserAction : Action.FeatureAction() {
   data class Authenticated(val user: User) : UserAction()
   data class NotAuthenticated(val isSignOut: Boolean) : UserAction()
+  data object SignOut : UserAction()
 }
