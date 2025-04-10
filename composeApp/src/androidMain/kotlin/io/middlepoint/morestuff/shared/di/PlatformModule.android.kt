@@ -6,8 +6,8 @@ import androidx.work.WorkManager
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.SharedPreferencesSettings
-import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
-import io.middlepoint.morestuff.shared.domain.service.SchedulerImpl
+import io.middlepoint.morestuff.shared.data.NotifierImpl
+import io.middlepoint.morestuff.shared.data.SchedulerImpl
 import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl

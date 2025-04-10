@@ -11,6 +11,7 @@ import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.state.isReady
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
@@ -27,7 +28,7 @@ fun mainModel(
     LaunchedEffect(Unit) {
         store.state.collectLatest {
             currentState = MainState(
-                ready = true,
+                ready = it.isReady(),
                 theme = it.settings.appTheme,
                 showOnBoarding = it.settings.isFirstTime
             )

@@ -7,7 +7,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
-import io.middlepoint.morestuff.shared.domain.redux.state.UserAction
+import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
