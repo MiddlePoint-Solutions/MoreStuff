@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -21,18 +22,21 @@ import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.theme.TaskColors
 
 @Composable
-fun TaskProfile(title: String) {
+fun TaskProfile(
+  title: String,
+  modifier: Modifier = Modifier,
+) {
 
-  val profileColor by remember {
+  val profileColor by remember(title) {
     derivedStateOf { TaskColors.getProfileColorsForTask(title) }
   }
 
-  val profileTitle by remember {
+  val profileTitle by remember(title) {
     derivedStateOf { title.getOrNull(0)?.uppercase() ?: "" }
   }
 
   Box(
-    modifier = Modifier
+    modifier = modifier
       .clip(CircleShape)
       .size(50.dp)
       .background(

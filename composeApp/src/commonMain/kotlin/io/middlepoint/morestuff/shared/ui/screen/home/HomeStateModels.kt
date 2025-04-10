@@ -9,6 +9,7 @@ import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 @Immutable
 data class HomeState(
   val currentScopeId: Long = defaultScope.id,
+  val username: String = "",
   val scopes: List<ScopeDomain> = listOf(),
   val selectedTasks: List<Long> = listOf(),
   val taskInputActive: Boolean = false,

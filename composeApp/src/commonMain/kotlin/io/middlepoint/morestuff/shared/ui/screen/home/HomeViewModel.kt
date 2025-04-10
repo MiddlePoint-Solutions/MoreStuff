@@ -1,11 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Composable
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-class HomePresenter(
+class HomeViewModel(
   private val appPresenter: AppPresenter,
 ) : MoleculeViewModel<HomeEvent, HomeState>() {
 
@@ -20,6 +21,10 @@ class HomePresenter(
             events = events,
             notifications = appPresenter.notifications
         )
+    }
+
+    override fun onSaveState(model: HomeState) {
+        Logger.d { "HomeViewModel Username: ${model.username}" }
     }
 
 }

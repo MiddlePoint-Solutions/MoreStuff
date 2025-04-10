@@ -14,7 +14,7 @@ fun mapUserData(
 ): User = userInfo.run {
   User(
     id = id,
-    fullName = userMetadata?.get("full_name")?.toString() ?: "",
+    fullName = userMetadata?.get("full_name")?.toString()?.replace("\"", "") ?: "",
     email = email,
     createdAt = createdAt,
     lastLogin = lastSignInAt

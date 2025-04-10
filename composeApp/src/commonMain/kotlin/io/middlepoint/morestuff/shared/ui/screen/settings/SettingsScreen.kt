@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
 import androidx.compose.material.icons.filled.ModeStandby
@@ -141,28 +142,23 @@ fun SettingsScreen(
     when (screen) {
       Root -> {
         SettingsContent(
+          // TODO: pass ViewModel::take and a router lambda to reduce the number of properties.
           onBack = onBack,
           model = model,
           selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-          /* setReviewTime = { hour, minute ->
-             viewModel.take(
-               SettingsEvent.SetReviewTime(
-                 hour,
-                 minute
-               )
-             )
-           },*/
           selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
           enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
           showDevSettings = { router.push(Developer) },
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
+          signOut = { viewModel.take(SettingsEvent.SignOut) }
         )
       }
 
       Developer -> DevSettingsScreen(
         onBack = router::pop,
-        onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) })
+        onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) }
+      )
 
       Scopes -> ScopesScreen(onBack = router::pop)
 
@@ -176,9 +172,9 @@ fun SettingsContent(
   onBack: () -> Unit,
   model: SettingsState,
   selectAppTheme: (Int) -> Unit,
-  //setReviewTime: (Int, Int) -> Unit,
   selectLanguage: (Int) -> Unit,
   enableDevSettings: () -> Unit,
+  signOut: () -> Unit,
   showLibraries: () -> Unit,
   showDevSettings: () -> Unit,
   showScopesSettings: () -> Unit
@@ -218,21 +214,28 @@ fun SettingsContent(
           defaultValue = { model.appTheme.ordinal }
         )
 
-        /* ReviewTimeSelector(
-           valueChanged = setReviewTime,
-           defaultValue = model.reviewTime,
-         )*/
-        /*SelectLanguage(
-          languageSelected = selectLanguage,
-          defaultValue = { model.inputVoiceLanguage.ordinal }
-        )*/
-
         if (Platform.iOS == platform) {
           NotificationPermissionButton()
         }
 
 
         ScopeSettings(onClick = showScopesSettings)
+
+        SettingsMenuLink(
+          title = {
+            Text(text = "Sign out")
+          },
+          icon = {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.Logout,
+              contentDescription = ""
+            )
+          },
+          onClick = signOut,
+          colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          )
+        )
 
         if (model.devSettings) {
           SettingsMenuLink(
@@ -447,11 +450,6 @@ private fun About(
   Toaster(
     state = toaster
   )
-}
-
-@Composable
-private fun showToast() {
-
 }
 
 @Composable
