@@ -9,7 +9,7 @@ import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatPresenter
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskDetailsViewModel
 import io.middlepoint.morestuff.shared.ui.screen.home.AppPresenter
-import io.middlepoint.morestuff.shared.ui.screen.home.HomePresenter
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeViewModel
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewModel
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
@@ -30,7 +30,7 @@ val presentationModule = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::MainViewModel)
     viewModelOf(::ReviewViewModel)
-    viewModelOf(::HomePresenter)
+    viewModelOf(::HomeViewModel)
     viewModelOf(::ScopeTasksViewModel)
 
     viewModelOf(::ShareViewModel)

@@ -28,13 +28,12 @@ import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import org.koin.compose.KoinContext
 
 @Composable
-fun App(
-  screen: Screen? = null
-) {
+fun App(screen: Screen? = null) {
   KoinContext {
     val router: Router<Screen> = rememberRouter { listOf(Screen.Home) }
     val viewModel = koinInjectOnRoute(MainViewModel::class)
     val model by viewModel.models.collectAsState()
+
     ProvideAppTheme(model.theme) {
       MoreStuffTheme {
         ProvideAppRouter(router) {
@@ -44,6 +43,9 @@ fun App(
               .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
           ) {
             if (model.ready) {
+              if (model.showOnBoarding) {
+                router.navigate { listOf(Screen.OnBoarding) }
+              }
               MainContent(
                 shareContent = { taskId, content ->
                   viewModel.take(MainEvent.ShareContent(taskId, content))
@@ -52,10 +54,6 @@ fun App(
                   viewModel.take(MainEvent.OnBoardingComplete)
                 }
               )
-
-              if (model.showOnBoarding) {
-                router.navigate { listOf(Screen.OnBoarding) }
-              }
             }
           }
         }
