@@ -143,11 +143,6 @@ fun HomeScreen() {
           modifier = Modifier.padding(it),
           createNewScope = {
             showCreateScopeSheet = true
-           /* val createScopeScreen = Screen.CreateScope {
-              homePresenter.take(CreateScope(it))
-              navigation.pop()
-            }
-            navigation.push(createScopeScreen)*/
           },
           onTaskComplete = { taskId ->
             if (pendingCompletionTasks.contains(taskId)) {
