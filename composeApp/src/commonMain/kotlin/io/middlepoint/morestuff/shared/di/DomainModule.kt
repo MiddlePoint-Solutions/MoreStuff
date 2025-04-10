@@ -225,7 +225,7 @@ val storeModule = module {
   factoryOf(::AuthMiddleware)
   factoryOf(::PriorityMiddleware)
   factoryOf(::DevMiddleware)
-  factoryOf(::ScopeMiddleware)s
+  factoryOf(::ScopeMiddleware)
 }
 
 val taskUseCases = module {

@@ -1,23 +1,18 @@
-package io.middlepoint.morestuff.shared.domain.service
+package io.middlepoint.morestuff.shared.data
 
 import android.content.Context
-import android.content.Intent
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver
-import io.middlepoint.morestuff.shared.app.receiver.createCancelReviewPendingIntent
-import io.middlepoint.morestuff.shared.app.receiver.createReviewIntent
-import io.middlepoint.morestuff.shared.app.receiver.createReviewPendingIntent
 import io.middlepoint.morestuff.shared.work.PlannedPriorityUpdateWorker
 import io.middlepoint.morestuff.shared.app.work.ReviewNotificationWorker
 import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
+import io.middlepoint.morestuff.shared.domain.service.Scheduler
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.work.ScheduleWorker
-import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 class SchedulerImpl(
