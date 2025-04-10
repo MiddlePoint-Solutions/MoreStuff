@@ -10,12 +10,15 @@ import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
 import kotlinx.coroutines.flow.Flow
+import org.koin.compose.koinInject
 
 @Composable
 fun settingsModel(
   initialState: SettingsState,
   events: Flow<SettingsEvent>,
+  openAppSettingsUseCase: OpenAppSettingsUseCase = koinInject(),
   store: AppStore
 ): SettingsState {
     var state by remember { mutableStateOf(initialState) }
@@ -42,6 +45,11 @@ fun settingsModel(
                 is SettingsEvent.SelectLanguage -> {
                     store.dispatch(SettingAction.SetVoiceLanguage(Language[event.index]))
                     state.copy(inputVoiceLanguage = Language[event.index])
+                }
+
+                SettingsEvent.OpenAppSettings -> {
+                    openAppSettingsUseCase()
+                    state
                 }
             }
         }

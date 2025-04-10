@@ -125,6 +125,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUse
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppThemeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppThemeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCase
@@ -339,6 +341,8 @@ val settingsUseCases = module {
     factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
     factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
     factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
+    factoryOf(::OpenAppSettingsUseCaseImpl) bind OpenAppSettingsUseCase::class
+
 }
 
 val timeManagerModule = module {
