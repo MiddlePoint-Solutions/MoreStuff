@@ -7,13 +7,11 @@ import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.Sh
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReviewNotification
 import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
-import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.service.Notifier
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.UpdateReviewNotificationScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -21,7 +19,6 @@ import kotlinx.coroutines.launch
 class NotificationMiddleware(
     private val notifier: Notifier,
     private val clearTaskNotificationsUseCase: ClearTaskNotificationsUseCase,
-    private val updateReviewNotificationScheduleUseCase: UpdateReviewNotificationScheduleUseCase,
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -53,13 +50,6 @@ class NotificationMiddleware(
                 if (action.complete) scope.launch {
                     clearTaskNotificationsUseCase(action.taskIds)
                 }
-            }
-
-            is SettingAction.SetReviewTimeAction -> scope.launch {
-                updateReviewNotificationScheduleUseCase(
-                    action.hour,
-                    action.minute
-                )
             }
 
             else -> NoOp

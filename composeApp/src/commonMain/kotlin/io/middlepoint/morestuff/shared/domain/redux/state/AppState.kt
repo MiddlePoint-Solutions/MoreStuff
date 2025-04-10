@@ -11,3 +11,5 @@ fun AppState.isReady() =
     userState.status.isReady()
             && settings.status.isReady()
 
+fun AppState.isAuthenticated() = userState.user != null
+
