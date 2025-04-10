@@ -11,6 +11,7 @@ import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.state.isAuthenticated
 import io.middlepoint.morestuff.shared.domain.redux.state.isReady
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -30,7 +31,7 @@ fun mainModel(
             currentState = MainState(
                 ready = it.isReady(),
                 theme = it.settings.appTheme,
-                showOnBoarding = it.settings.isFirstTime
+                showOnBoarding = it.settings.isFirstTime && !it.isAuthenticated()
             )
         }
     }
