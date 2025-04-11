@@ -6,6 +6,7 @@ import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
+import io.middlepoint.morestuff.shared.data.repository.OpenAIRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScheduleRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScopeRepositoryImpl
@@ -16,6 +17,7 @@ import io.middlepoint.morestuff.shared.data.service.DevToolsImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
+import io.middlepoint.morestuff.shared.domain.repository.OpenAIRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
@@ -37,7 +39,7 @@ val dataModule = module {
 
   single<StuffDb> { createDatabase(get()) }
 
-  singleOf(::DevToolsImpl) bind DevTools::class
+  single<DevTools> { DevToolsImpl(settings = get(named(SharedSettings.Unencrypted)), notifier = get(), dataMigration = get()) }
   singleOf(::DataMappersImpl) bind DataMappers::class
   singleOf(::MessageDataMap)
 
@@ -81,6 +83,7 @@ val dataModule = module {
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
+  singleOf(::OpenAIRepositoryImpl) bind OpenAIRepository::class
 
   factoryOf(::MigrationHelper)
 

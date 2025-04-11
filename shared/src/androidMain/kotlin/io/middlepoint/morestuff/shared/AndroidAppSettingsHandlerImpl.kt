@@ -8,7 +8,7 @@ import android.provider.Settings
 import co.touchlab.kermit.Logger
 
 
-class AppSettingsHandlerImpl(
+class AndroidAppSettingsHandlerImpl(
     private val context: Context,
     private val logger: Logger
 ) : AppSettingsHandler {
