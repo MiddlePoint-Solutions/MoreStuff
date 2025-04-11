@@ -15,7 +15,8 @@ class SettingsViewModel(
             snoozeLimit = snoozeLimit,
             devSettings = devSettings,
             //reviewTime = reviewTime,
-            inputVoiceLanguage = voiceInputLanguage
+            inputVoiceLanguage = voiceInputLanguage,
+            apiKey = apiKey
         )
     }
 

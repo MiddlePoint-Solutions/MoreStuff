@@ -37,8 +37,14 @@ import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
+
+enum class SharedSettings {
+  Unencrypted,
+  Encrypted
+}
 
 val dataModule = module {
 
@@ -69,7 +75,9 @@ val dataModule = module {
   singleOf(::ScheduleRepositoryImpl) bind ScheduleRepository::class
 
   single<UserRepository> {
-    UserRepositoryImpl(settings = get())
+    UserRepositoryImpl(
+      settings = get(named(SharedSettings.Encrypted))
+    )
   }
 
   singleOf(::ScopeRepositoryImpl) bind ScopeRepository::class

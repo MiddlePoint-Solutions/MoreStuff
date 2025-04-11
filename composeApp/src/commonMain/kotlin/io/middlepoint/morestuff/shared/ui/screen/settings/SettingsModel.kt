@@ -44,6 +44,10 @@ fun settingsModel(
                     store.dispatch(SettingAction.SetVoiceLanguage(Language[event.index]))
                     state.copy(inputVoiceLanguage = Language[event.index])
                 }
+                is SettingsEvent.SetApiKey -> {
+                    store.dispatch(SettingAction.SetApiKey(event.apiKey))
+                    state.copy(apiKey = event.apiKey)
+                }
 
                 SettingsEvent.SignOut -> {
                     store.dispatch(UserAction.SignOut)

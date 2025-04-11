@@ -1,7 +1,9 @@
 package io.middlepoint.morestuff.shared.di
 
+import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import androidx.work.WorkManager
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
@@ -12,12 +14,15 @@ import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl
 import io.middlepoint.morestuff.shared.domain.service.Notifier
+import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
+import io.middlepoint.morestuff.shared.domain.service.SchedulerImpl
 import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import org.koin.android.ext.koin.androidApplication
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -34,9 +39,22 @@ actual val platformModule: Module = module {
     single { WorkManager.getInstance(androidApplication()) }
     single { NotificationManagerCompat.from(androidApplication()) }
 
-    factory<Settings> {
+
+    single<Settings>(named(SharedSettings.Encrypted)) {
         SharedPreferencesSettings(
-            PreferenceManager.getDefaultSharedPreferences(androidApplication())
+            EncryptedSharedPreferences.create(
+                "ENCRYPTED_SETTINGS",
+                MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+                get<Context>(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            ),
+            false
         )
+    }
+
+
+    single<Settings> {
+        get<Settings>(named(SharedSettings.Unencrypted))
     }
 }

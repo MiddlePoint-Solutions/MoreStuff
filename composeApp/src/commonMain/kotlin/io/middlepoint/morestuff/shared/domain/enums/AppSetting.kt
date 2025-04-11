@@ -8,4 +8,5 @@ sealed class AppSetting<T>(val defaultValue: T) {
     data object ReviewTime : AppSetting<Pair<Int, Int>>(9 to 0)
     data object ShowHintArrowPriority : AppSetting<Boolean>(true)
     data object VoiceInputLanguage : AppSetting<String>(Language.Device.name)
+    data object ApiKey : AppSetting<String>("")
 }
