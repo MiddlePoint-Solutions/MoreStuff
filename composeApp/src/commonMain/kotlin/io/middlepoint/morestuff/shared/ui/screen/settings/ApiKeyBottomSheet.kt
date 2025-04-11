@@ -26,11 +26,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.api_key_label
 import morestuff.composeapp.generated.resources.api_key_title
@@ -54,17 +56,20 @@ fun ApiKeyBottomSheet(
 
   ModalBottomSheet(
     onDismissRequest = onDismiss,
-    sheetState = sheetState
+    sheetState = sheetState,
+    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
   ) {
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp)
+        .padding(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
       Text(
         text = stringResource(Res.string.api_key_title),
         style = MaterialTheme.typography.headlineSmall,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = 16.dp),
+        color = MaterialTheme.colorScheme.onSurface
       )
 
       OutlinedTextField(

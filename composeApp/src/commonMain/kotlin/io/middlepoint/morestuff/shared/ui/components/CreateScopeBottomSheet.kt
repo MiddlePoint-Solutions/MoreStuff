@@ -1,19 +1,19 @@
 package io.middlepoint.morestuff.shared.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -29,17 +29,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopeTitleEditor
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.add_scope
 import morestuff.composeapp.generated.resources.cancel
+import morestuff.composeapp.generated.resources.cd_scopes_icon
+import morestuff.composeapp.generated.resources.description_create_scope
+import morestuff.composeapp.generated.resources.ic_scope_add
 import morestuff.composeapp.generated.resources.save
-import morestuff.composeapp.generated.resources.scope_name
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,14 +54,22 @@ fun CreateScopeBottomSheet(
   onDismissRequest: () -> Unit,
   onConfirm: (String) -> Unit,
 ) {
-  var scopeName by remember { mutableStateOf("") }
+  var scopeTitle by remember { mutableStateOf("") }
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
+  var showSaveAction by remember { mutableStateOf(false) }
+
+  LaunchedEffect(Unit) {
+    snapshotFlow { scopeTitle }
+      .distinctUntilChanged()
+      .collectLatest { title -> showSaveAction = title.isNotBlank() }
+  }
 
   LaunchedEffect(sheetState) {
     snapshotFlow { sheetState.currentValue }
       .filter { it == SheetValue.Expanded }
       .first()
+    delay(300)
     focusRequester.requestFocus()
     keyboardController?.show()
   }
@@ -67,70 +80,67 @@ fun CreateScopeBottomSheet(
     containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
   ) {
     Column(
-      modifier = Modifier
-        .padding(16.dp)
-        .fillMaxWidth(),
-      horizontalAlignment = Alignment.CenterHorizontally
+      modifier = Modifier.fillMaxWidth(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
     ) {
-      Text(
-        text = stringResource(Res.string.add_scope),
-        style = MaterialTheme.typography.titleLarge.copy(
-          color = MaterialTheme.colorScheme.onSurface,
-          fontSize = 24.sp
-        ),
-        modifier = Modifier.padding(bottom = 16.dp)
-      )
-
-      OutlinedTextField(
-        value = scopeName,
-        onValueChange = { scopeName = it },
-        label = { Text(stringResource(Res.string.scope_name)) },
+      Icon(
+        painter = painterResource(Res.drawable.ic_scope_add),
+        contentDescription = stringResource(Res.string.cd_scopes_icon),
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(bottom = 24.dp)
-          .focusRequester(focusRequester),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(
-          onDone = {
-            if (scopeName.isNotBlank()) {
-              onConfirm(scopeName)
-              keyboardController?.hide()
-            }
-          }
-        ),
-        shape = RoundedCornerShape(16.dp)
+          .size(50.dp),
+        tint = MaterialTheme.colorScheme.onSurface
       )
 
+      Spacer(
+        modifier = Modifier.height(16.dp)
+      )
+
+      Text(
+        text = stringResource(Res.string.description_create_scope),
+        color = MaterialTheme.colorScheme.onSurface,
+        style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+      )
+
+      Spacer(
+        modifier = Modifier.height(16.dp)
+      )
+    }
+
+    Box {
+      ScopeTitleEditor(
+        title = scopeTitle,
+        onTitleChange = { title -> scopeTitle = title.trim() },
+        modifier = Modifier.focusRequester(focusRequester)
+      )
+    }
+
+    Column(
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp),
+    ) {
       Button(
         onClick = {
-          if (scopeName.isNotBlank()) {
-            onConfirm(scopeName)
+          if (scopeTitle.isNotBlank()) {
+            onConfirm(scopeTitle.trim())
             keyboardController?.hide()
           }
         },
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp),
-        colors = ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.primary,
-          contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        enabled = scopeName.isNotBlank()
+        modifier = Modifier.fillMaxWidth(),
+        enabled = showSaveAction
       ) {
         Text(text = stringResource(Res.string.save))
       }
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(8.dp))
 
       Button(
         onClick = {
           keyboardController?.hide()
           onDismissRequest()
         },
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
           containerColor = MaterialTheme.colorScheme.secondaryContainer,
           contentColor = MaterialTheme.colorScheme.onSecondaryContainer
@@ -139,8 +149,7 @@ fun CreateScopeBottomSheet(
         Text(text = stringResource(Res.string.cancel))
       }
 
-      Spacer(modifier = Modifier.height(16.dp))
+      Spacer(modifier = Modifier.height(8.dp))
     }
   }
-
 }
