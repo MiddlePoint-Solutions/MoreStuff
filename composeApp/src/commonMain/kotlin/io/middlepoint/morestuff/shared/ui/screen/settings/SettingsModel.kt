@@ -10,16 +10,20 @@ import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCase
 import kotlinx.coroutines.flow.Flow
 import org.koin.compose.koinInject
 
 @Composable
 fun settingsModel(
-  initialState: SettingsState,
-  events: Flow<SettingsEvent>,
-  openAppSettingsUseCase: OpenAppSettingsUseCase = koinInject(),
-  store: AppStore
+    initialState: SettingsState,
+    events: Flow<SettingsEvent>,
+    openAppSettingsUseCase: OpenAppSettingsUseCase = koinInject(),
+    saveApiKeyUseCase: SaveApiKeyUseCase = koinInject(),
+    getApiKeyUseCase: GetApiKeyUseCase = koinInject(),
+    store: AppStore
 ): SettingsState {
     var state by remember { mutableStateOf(initialState) }
 
@@ -47,8 +51,16 @@ fun settingsModel(
                     state.copy(inputVoiceLanguage = Language[event.index])
                 }
                 is SettingsEvent.SetApiKey -> {
-                    store.dispatch(SettingAction.SetApiKey(event.apiKey))
+                    saveApiKeyUseCase(event.apiKey)
                     state.copy(apiKey = event.apiKey)
+                }
+                is SettingsEvent.GetApiKey -> {
+                    try {
+                        val apiKey = getApiKeyUseCase()
+                        state.copy(apiKey = apiKey)
+                    } catch (e: IllegalStateException) {
+                        state
+                    }
                 }
 
                 SettingsEvent.OpenAppSettings -> {

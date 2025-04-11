@@ -8,6 +8,7 @@ import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl
+import io.middlepoint.morestuff.shared.data.repository.OpenAIRepositoryImpl
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
@@ -36,12 +37,12 @@ actual val platformModule: Module = module {
         KeychainSettings(service = "ENCRYPTED_SETTINGS")
     }
 
+    single<Settings>(named(SharedSettings.Encrypted)) {
+        KeychainSettings(service = OpenAIRepositoryImpl.ENCRYPTED_DATABASE_NAME)
+    }
+
     single<Settings>(named(SharedSettings.Unencrypted)) {
         val delegate: NSUserDefaults = NSUserDefaults.standardUserDefaults
         NSUserDefaultsSettings(delegate)
-    }
-
-    single<Settings> {
-        get<Settings>(named(SharedSettings.Unencrypted))
     }
 }

@@ -22,4 +22,5 @@ sealed class SettingsEvent {
   data class SelectLanguage(val index: Int) : SettingsEvent()
   data object OpenAppSettings : SettingsEvent()
   data class SetApiKey(val apiKey: String) : SettingsEvent()
+  data object GetApiKey : SettingsEvent()
 }
