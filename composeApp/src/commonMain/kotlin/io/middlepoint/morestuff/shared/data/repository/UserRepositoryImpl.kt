@@ -3,7 +3,14 @@ package io.middlepoint.morestuff.shared.data.repository
 import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.shared.data.settingKey
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
-import io.middlepoint.morestuff.shared.domain.enums.AppSetting.*
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ApiKey
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.DevSettings
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.FirstTime
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ReviewTime
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ShowHintArrowPriority
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.SnoozeLimit
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.Theme
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.VoiceInputLanguage
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.redux.state.AppSettings
@@ -22,7 +29,8 @@ class UserRepositoryImpl(
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             //reviewTime = getSetting(ReviewTime, reviewTime),
             enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
-            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
+            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage),
+            apiKey = getSetting(ApiKey, apiKey)
         )
     }
 
@@ -39,6 +47,7 @@ class UserRepositoryImpl(
             )
             ShowHintArrowPriority -> settings.putBoolean(setting.settingKey, settingValue as Boolean)
             is VoiceInputLanguage -> settings.putString(setting.settingKey, settingValue as String)
+            ApiKey -> settings.putString(setting.settingKey, settingValue as String)
         }
     }
 
@@ -52,10 +61,14 @@ class UserRepositoryImpl(
             ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
             ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
             VoiceInputLanguage -> Language.valueOf(settings.getString(setting.settingKey, (setting.defaultValue as Language).name))
+            ApiKey -> getSetting(setting, setting.defaultValue as String)
         } as R
 
     override fun getAppTheme(): AppTheme =
         AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
+
+    override fun getApiKey(): String =
+        getSetting(ApiKey, "")
 
     private inline fun <reified T> getSetting(setting: AppSetting<*>, defaultValue: T): T =
         when (setting) {
@@ -72,6 +85,7 @@ class UserRepositoryImpl(
                 val languageName = settings.getString(setting.settingKey, (defaultValue as Language).name)
                 Language.valueOf(languageName)
             }
+            ApiKey -> settings.getString(setting.settingKey, defaultValue as String)
         } as T
 
 }

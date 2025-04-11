@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.domain.redux.state
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.DevSettings
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.FirstTime
-import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ReviewTime
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.SnoozeLimit
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting.Theme
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
@@ -22,7 +21,8 @@ data class AppSettings(
     val snoozeLimit: Int = SnoozeLimit.defaultValue,
     //val reviewTime: Pair<Int,Int> = ReviewTime.defaultValue,
     val enableReviewHint: Boolean = AppSetting.ShowHintArrowPriority.defaultValue,
-    val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue)
+    val voiceInputLanguage: Language = Language.valueOf(AppSetting.VoiceInputLanguage.defaultValue),
+    val apiKey: String = AppSetting.ApiKey.defaultValue
 )
 
 sealed class SettingAction : Action.FeatureAction() {
@@ -34,7 +34,7 @@ sealed class SettingAction : Action.FeatureAction() {
     //data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
     data class SetVoiceLanguage(val language: Language) : SettingAction()
-
+    data class SetApiKey(val apiKey: String) : SettingAction()
 }
 
 fun AppState.reduceSettingState(action: Action): AppState {
@@ -54,5 +54,6 @@ fun AppSettings.reduce(action: SettingAction): AppSettings {
         //is SettingAction.SetReviewTimeAction -> copy(reviewTime = action.hour to action.minute)
         is SettingAction.EnableReviewHint -> copy(enableReviewHint = action.enable)
         is SettingAction.SetVoiceLanguage -> copy(voiceInputLanguage = action.language)
+        is SettingAction.SetApiKey -> copy(apiKey = action.apiKey)
     }
 }

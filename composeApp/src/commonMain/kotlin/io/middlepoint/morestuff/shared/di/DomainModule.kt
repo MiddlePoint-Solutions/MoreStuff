@@ -119,6 +119,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopesOrderUse
 import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopesOrderUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.CheckFirstTimeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.CheckFirstTimeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUseCase
@@ -342,6 +344,7 @@ val settingsUseCases = module {
     factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
     factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
     factoryOf(::OpenAppSettingsUseCaseImpl) bind OpenAppSettingsUseCase::class
+    factoryOf(::GetApiKeyUseCaseImpl) bind GetApiKeyUseCase::class
 
 }
 

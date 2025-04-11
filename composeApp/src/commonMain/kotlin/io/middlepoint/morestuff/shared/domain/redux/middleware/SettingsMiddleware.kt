@@ -64,6 +64,10 @@ class SettingsMiddleware(
                 saveUserSettingUseCase(AppSetting.VoiceInputLanguage, action.language.name)
             }
 
+            is SettingAction.SetApiKey -> scope.launch {
+                saveUserSettingUseCase(AppSetting.ApiKey, action.apiKey)
+            }
+
             else -> NoOp
         }
 

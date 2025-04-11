@@ -278,4 +278,8 @@
     <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
 
     <string name="scope_name">Nombre del scope</string>
+    <string name="api_key_title">API Key</string>
+    <string name="api_key_label">Añade API Key</string>
+    <string name="api_key_not_set">No establecida</string>
+
 </resources>

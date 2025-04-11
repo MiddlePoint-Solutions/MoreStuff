@@ -14,4 +14,6 @@ interface UserRepository {
 
     fun getAppTheme(): AppTheme
 
+    fun getApiKey(): String
+
 }

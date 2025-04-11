@@ -13,6 +13,9 @@ object Constants {
     const val KEY_REVIEW_TIME = "key_review_time"
     const val KEY_REVIEW_HINT = "key_review_hint"
     const val KEY_LANGUAGE_INPUT = "key_language_input"
+    const val UNENCRYPTED_SETTINGS_NAME = "APP_SETTINGS"
+    const val ENCRYPTED_SETTINGS_NAME = "ENCRYPTED_SETTINGS"
+    const val KEY_API_KEY = "key_api_key"
 
 
     // Developer keys
