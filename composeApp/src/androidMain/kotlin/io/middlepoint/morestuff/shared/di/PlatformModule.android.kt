@@ -13,6 +13,7 @@ import io.middlepoint.morestuff.shared.data.SchedulerImpl
 import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl
+import io.middlepoint.morestuff.shared.data.repository.OpenAIRepositoryImpl
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
@@ -43,7 +44,7 @@ actual val platformModule: Module = module {
     single<Settings>(named(SharedSettings.Encrypted)) {
         SharedPreferencesSettings(
             EncryptedSharedPreferences.create(
-                "ENCRYPTED_SETTINGS",
+                OpenAIRepositoryImpl.ENCRYPTED_DATABASE_NAME,
                 MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
                 get<Context>(),
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
@@ -61,10 +62,5 @@ actual val platformModule: Module = module {
             ),
             false
         )
-    }
-
-
-    single<Settings> {
-        get<Settings>(named(SharedSettings.Unencrypted))
     }
 }

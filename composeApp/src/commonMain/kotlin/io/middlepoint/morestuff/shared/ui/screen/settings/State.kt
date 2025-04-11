@@ -9,7 +9,9 @@ data class SettingsState(
   val appTheme: AppTheme = AppTheme.System,
   val snoozeLimit: Int = 0,
   val devSettings: Boolean = false,
-  val inputVoiceLanguage: Language = Language.Device
+  //val reviewTime: Pair<Int, Int> = Pair(9, 0),
+  val inputVoiceLanguage: Language = Language.Device,
+  val apiKey: String = ""
 )
 
 sealed class SettingsEvent {
@@ -19,4 +21,6 @@ sealed class SettingsEvent {
   data class SelectLanguage(val index: Int) : SettingsEvent()
   data object SignOut: SettingsEvent()
   data object OpenAppSettings : SettingsEvent()
+  data class SetApiKey(val apiKey: String) : SettingsEvent()
+  data object GetApiKey : SettingsEvent()
 }
