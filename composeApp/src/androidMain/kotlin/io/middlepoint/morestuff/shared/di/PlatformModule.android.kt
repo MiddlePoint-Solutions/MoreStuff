@@ -53,6 +53,16 @@ actual val platformModule: Module = module {
         )
     }
 
+    single<Settings>(named(SharedSettings.Unencrypted)) {
+        SharedPreferencesSettings(
+            androidApplication().getSharedPreferences(
+                "UNENCRYPTED_SETTINGS",
+                Context.MODE_PRIVATE
+            ),
+            false
+        )
+    }
+
 
     single<Settings> {
         get<Settings>(named(SharedSettings.Unencrypted))
