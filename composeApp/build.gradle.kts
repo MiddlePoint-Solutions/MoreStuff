@@ -287,7 +287,7 @@ android {
     }
 
     create(Env.Staging) {
-      storeFile = file("./stage_key")
+      storeFile = file("./staging.keystore")
       storePassword = "StageKey"
       keyAlias = "staging"
       keyPassword = "StageKey"
