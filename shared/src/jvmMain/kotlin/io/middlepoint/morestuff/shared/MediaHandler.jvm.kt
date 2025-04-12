@@ -24,4 +24,12 @@ class MediaHandlerImpl : MediaHandler {
     override fun openPDF(path: String) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun saveJsonToFile(jsonString: String, fileName: String): String? {
+        TODO("Not yet implemented")
+    }
+
+    override fun shareFile(path: String) {
+        TODO("Not yet implemented")
+    }
 }

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.CreateScopeAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeAction.DeleteScopeAction

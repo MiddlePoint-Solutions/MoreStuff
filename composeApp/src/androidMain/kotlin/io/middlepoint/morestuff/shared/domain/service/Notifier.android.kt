@@ -32,7 +32,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType.LATER
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
 import io.middlepoint.morestuff.shared.domain.model.Defaults
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.GROUP_KEY_REMINDERS
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REMINDERS_CHANNEL_ID
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.REVIEW_CHANNEL_ID
@@ -207,9 +207,9 @@ class NotifierImpl(
     }
 
     private fun addMessage(
-        style: NotificationCompat.MessagingStyle,
-        message: Message,
-        time: Long
+      style: NotificationCompat.MessagingStyle,
+      message: Message,
+      time: Long
     ) {
         style.addMessage(
             message.content, time, getMessagePerson(message.contentType)

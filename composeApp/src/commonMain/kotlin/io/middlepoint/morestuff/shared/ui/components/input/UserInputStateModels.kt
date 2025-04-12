@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.components.input
 
-import io.middlepoint.morestuff.shared.domain.model.ChatContext
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel

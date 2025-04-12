@@ -14,7 +14,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
@@ -63,6 +63,10 @@ class TaskRepositoryImpl(
 
   override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> =
     getTaskFlow(taskId).firstOrNull()?.right() ?: TaskDoesNotExist.left()
+
+  override suspend fun getAllTasks(): List<TaskDomain> {
+    return taskQueries.selectAllActive(mapper.taskDbMapper).executeAsList()
+  }
 
   override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
     val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)

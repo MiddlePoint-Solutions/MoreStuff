@@ -210,4 +210,47 @@ class MediaHandlerImpl(
       Toast.makeText(context, "PDF file not found", Toast.LENGTH_SHORT).show()
     }
   }
+
+  override suspend fun saveJsonToFile(jsonString: String, fileName: String): String? = withContext(Dispatchers.IO) {
+    try {
+      val jsonFileName = "$fileName.json"
+      val storageDir = getAppSpecificStorageDir(KEY_FILES_DIRECTORY)
+      val jsonFile = File(storageDir, jsonFileName)
+
+      FileOutputStream(jsonFile).use { outputStream ->
+        outputStream.write(jsonString.toByteArray())
+      }
+
+      jsonFile.absolutePath
+    } catch (e: Exception) {
+      logger.e("Error saving JSON file: $e")
+      null
+    }
+  }
+
+  override fun shareFile(path: String) {
+    logger.d("share - File path: $path")
+
+    val file = if (path.startsWith("/")) {
+      File(path)
+    } else {
+      File(context.cacheDir, path.toUri().lastPathSegment ?: "")
+    }
+
+    val contentUri = FileProvider.getUriForFile(
+      context, "${context.packageName}.fileprovider", file
+    )
+
+    val intent = Intent().apply {
+      action = Intent.ACTION_SEND
+      putExtra(Intent.EXTRA_STREAM, contentUri)
+//      type = "application/pdf"
+      flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+    val chooserIntent = Intent.createChooser(intent, null).apply {
+      flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
+    context.startActivity(chooserIntent)
+  }
 }

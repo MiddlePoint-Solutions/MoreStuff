@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.domain.model
+package io.middlepoint.morestuff.shared.domain.model.core
 
 import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable

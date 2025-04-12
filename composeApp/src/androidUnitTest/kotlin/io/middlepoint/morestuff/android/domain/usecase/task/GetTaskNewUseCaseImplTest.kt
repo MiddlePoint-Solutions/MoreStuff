@@ -9,7 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class GetTaskUseCaseImplTest {
+class GetTaskNewUseCaseImplTest {
 
     @Test
     fun `invoke should return task when task is found`()  {

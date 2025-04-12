@@ -2,15 +2,15 @@ package io.middlepoint.morestuff.android.domain
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
-import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Message
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import kotlinx.datetime.*
 import java.util.UUID
 

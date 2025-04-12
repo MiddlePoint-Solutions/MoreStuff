@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 

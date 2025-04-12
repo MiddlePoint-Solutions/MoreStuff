@@ -5,6 +5,9 @@ interface DevTools {
     var showDebugMessages: Boolean
     var showDevSettings: Boolean
     fun testReviewNotification()
-    suspend fun exportData(uri: String)
-    suspend fun importData(uri: String)
+    suspend fun exportDatabase(uri: String)
+    suspend fun importDatabase(uri: String)
+
+    suspend fun exportJsonData()
+    suspend fun importJsonData(uri: String)
 }

@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.redux.middleware
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.CompleteTasksAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction.CreateHintTask

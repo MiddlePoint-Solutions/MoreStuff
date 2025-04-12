@@ -12,7 +12,7 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.mapScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class ScheduleRepositoryImpl(
     private val lastInsertId: Long get() = scheduleQueries.lastInsertRowId().executeAsOne()
 
     override suspend fun createSchedule(
-        schedule: ScheduleDomain,
+      schedule: ScheduleDomain,
     ): Either<Failure, ScheduleDomain> = scheduleQueries.transactionWithResult {
         val data = mapScheduleDomain(schedule)
         scheduleQueries.insertSchedule(data)

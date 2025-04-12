@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.model.map
 
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.model.ScopeUiModel
 
 class ScopeUiMapper {

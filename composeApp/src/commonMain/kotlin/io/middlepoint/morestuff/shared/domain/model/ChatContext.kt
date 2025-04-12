@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.model
 
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
+
 sealed class ChatContext(open val scopeId: Long) {
 
     data class Main(override val scopeId: Long) : ChatContext(scopeId)

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class ReorderTaskUseCaseImplTest {
+class ReorderTaskNewUseCaseImplTest {
 
     private val priorityRepository: PriorityRepository = mockk()
     private lateinit var reorderTaskUseCase: ReorderTaskUseCaseImpl

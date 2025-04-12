@@ -13,6 +13,7 @@ import io.middlepoint.morestuff.shared.data.repository.TaskRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
 import io.middlepoint.morestuff.shared.data.repository.UserRepositoryImpl
 import io.middlepoint.morestuff.shared.data.service.DevToolsImpl
+import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
@@ -21,6 +22,7 @@ import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -70,6 +72,8 @@ val dataModule = module {
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
+
+  factoryOf(::MigrationHelper)
 
 }
 

@@ -34,6 +34,7 @@ import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
 import morestuff.composeapp.generated.resources.developer_settings
@@ -148,6 +149,11 @@ fun DevSettings(
         SettingsMenuLink(
             title = { Text(text = "Review Screen") },
             onClick = { navigation.push(Screen.Review(1)) },
+        )
+
+        SettingsMenuLink(
+            title = { Text(text = "Export JSON data") },
+            onClick = { scope.launch { devTools.exportJsonData() } },
         )
 
 //        SettingsMenuLink(

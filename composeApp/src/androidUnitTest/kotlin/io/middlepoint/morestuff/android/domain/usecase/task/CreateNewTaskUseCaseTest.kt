@@ -4,7 +4,7 @@ import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.mockk

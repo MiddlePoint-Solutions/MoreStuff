@@ -10,7 +10,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class GetTaskFlowUseCaseImplTest {
+class GetTaskNewFlowUseCaseImplTest {
     private val taskRepository = mockk<TaskRepository>()
     private val getTaskFlowUseCase = GetTaskFlowUseCaseImpl(taskRepository)
 

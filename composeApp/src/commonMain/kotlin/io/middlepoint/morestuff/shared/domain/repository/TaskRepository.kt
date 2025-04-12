@@ -6,7 +6,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {
@@ -19,6 +19,8 @@ interface TaskRepository {
     ): TaskDomain
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
+    suspend fun getAllTasks(): List<TaskDomain>
+
     suspend fun updateTasksComplete(
         taskIds: List<Long>,
         complete: Boolean,

@@ -12,7 +12,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
-class UpdateTaskReviewPriorityUseCaseTest {
+class UpdateTaskNewReviewPriorityUseCaseTest {
 
     private val getDefaultPriorityScoreUseCase: GetDefaultPriorityScoreUseCase = mockk()
     private val getTaskAbovePriorityScoreUseCase: GetTaskAbovePriorityScoreUseCase = mockk()

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction.RemoveScheduleNotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationAction.ShowReminderNotificationAction

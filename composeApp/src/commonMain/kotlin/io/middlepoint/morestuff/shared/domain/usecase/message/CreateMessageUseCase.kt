@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 

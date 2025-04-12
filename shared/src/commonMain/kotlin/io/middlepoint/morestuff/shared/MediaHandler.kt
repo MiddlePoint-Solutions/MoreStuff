@@ -10,4 +10,7 @@ interface MediaHandler {
     suspend fun savePDF(media: PlatformFile): String?
     fun sharePDF(path: String)
     fun openPDF(path: String)
+
+    suspend fun saveJsonToFile(jsonString: String, fileName: String): String?
+    fun shareFile(path: String)
 }

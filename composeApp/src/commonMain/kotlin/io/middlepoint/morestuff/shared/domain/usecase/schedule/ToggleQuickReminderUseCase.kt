@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 import arrow.core.Either
 import arrow.core.flatMap
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.TaskReminderCancelled
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase

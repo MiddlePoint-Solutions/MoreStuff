@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.model.map
 
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 

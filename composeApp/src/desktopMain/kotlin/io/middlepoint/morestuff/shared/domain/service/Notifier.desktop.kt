@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.service
 
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 
 class NotifierImpl : Notifier {
     override fun showReminderNotification(message: Message) {
