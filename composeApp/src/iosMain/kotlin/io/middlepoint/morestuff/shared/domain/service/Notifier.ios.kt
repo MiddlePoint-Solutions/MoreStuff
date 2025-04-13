@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.service
 
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import platform.Foundation.NSDateComponents

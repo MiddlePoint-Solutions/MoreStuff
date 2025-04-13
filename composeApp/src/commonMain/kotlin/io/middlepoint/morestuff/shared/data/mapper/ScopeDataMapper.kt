@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 
 typealias ScopeDataMapper = (
     scope_id: Long,

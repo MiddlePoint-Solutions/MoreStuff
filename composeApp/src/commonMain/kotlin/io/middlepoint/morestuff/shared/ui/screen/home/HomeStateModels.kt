@@ -1,8 +1,8 @@
 package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 

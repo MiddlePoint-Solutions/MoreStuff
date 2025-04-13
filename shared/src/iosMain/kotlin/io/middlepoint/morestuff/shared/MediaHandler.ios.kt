@@ -164,6 +164,13 @@ class MediaHandlerImpl(
         }
       }
 
+  override suspend fun saveJsonToFile(jsonString: String, fileName: String): String? {
+    return null // NO-OP
+  }
+
+  override fun shareFile(path: String) {
+    TODO("Not yet implemented")
+  }
 }
 
 

@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.model.TaskReminderCancelled
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.mockk.coEvery

@@ -25,7 +25,7 @@ import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.App
 

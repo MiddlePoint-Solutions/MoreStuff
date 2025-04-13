@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 
 
 @Immutable

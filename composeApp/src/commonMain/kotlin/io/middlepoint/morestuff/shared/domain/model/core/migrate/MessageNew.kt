@@ -1,13 +1,13 @@
-package io.middlepoint.morestuff.shared.domain.model
+package io.middlepoint.morestuff.shared.domain.model.core.migrate
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 
-data class Message(
-  val id: Long = 0,
-  val taskId: Long = 0,
+data class MessageNew(
+  val id: String = "",
+  val taskId: String = "",
   val scheduleId: Long = 0,
   val contentType: ContentType,
   val createTime: String,

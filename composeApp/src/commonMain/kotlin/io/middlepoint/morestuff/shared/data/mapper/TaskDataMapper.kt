@@ -3,7 +3,7 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 
 typealias TaskDb = io.middlepoint.morestuff.db.Task
 typealias TaskDataMapper = (

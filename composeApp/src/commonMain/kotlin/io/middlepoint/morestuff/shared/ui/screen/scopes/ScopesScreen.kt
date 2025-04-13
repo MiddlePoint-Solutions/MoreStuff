@@ -56,8 +56,8 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit

@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
 
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.mockk.coVerify
 import io.mockk.mockk

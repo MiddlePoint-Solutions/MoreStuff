@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.data.utils
 
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import kotlinx.datetime.*
 
 val ScheduleDomain.scheduleLocalDateTime: LocalDateTime?
