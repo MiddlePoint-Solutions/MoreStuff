@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 
 typealias MessageDataMapper = (
   id: Long,
+  uuid: String,
   taskId: Long,
   scheduleId: Long,
   createTime: String,
@@ -40,6 +41,7 @@ data class MessageDataMap(
 ) : MessageDataMapper {
   override fun invoke(
     id: Long,
+    uuid: String,
     taskId: Long,
     scheduleId: Long,
     createTime: String,

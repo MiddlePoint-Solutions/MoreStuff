@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.StorageManager
-import io.middlepoint.morestuff.shared.data.sync.TaskSync
+import io.middlepoint.morestuff.shared.data.model.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 
 
@@ -25,7 +25,7 @@ class DataMappersImpl(
     get() = makeMessageDataMap(storageManager::getAppStoragePathToSavedFile)
 
   override val scheduleDataMapper: ScheduleDataMapper
-    get() = makeScheduleDbMapper()
+    get() = makeScheduleDataMapper()
 
   override val taskDataMapper: TaskDataMapper<Task>
     get() = makeTaskDataMapper()

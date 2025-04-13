@@ -29,10 +29,10 @@ class ScopeRepositoryImpl(
         scopeQueries.transaction {
             val allScope = scopeQueries.selectScope(defaultScope.id).executeAsOneOrNull()
             if (allScope != null) {
-                scopeQueries.updateScopeName("Stuff", allScope.scope_id)
+                scopeQueries.updateScopeName("Stuff", allScope.id)
                 val tasks = taskQueries.selectTasksWithoutScope().executeAsList()
                 tasks.forEach {
-                    taskScopeQueries.insert(it.id, allScope.scope_id)
+                    taskScopeQueries.insert(it.id, allScope.id)
                 }
             } else {
                 scopeQueries.createScope(generateUUID(), "Stuff", 1)
@@ -74,7 +74,7 @@ class ScopeRepositoryImpl(
                 .executeAsList()
                 .forEachIndexed { index, scope ->
                     scopeQueries.updateScopeOrder(
-                        scopeId = scope.scope_id,
+                        scopeId = scope.id,
                         scopeOrder = index + 1
                     )
                 }
@@ -112,11 +112,11 @@ class ScopeRepositoryImpl(
             scopeQueries
                 .selectAllScopes()
                 .executeAsList()
-                .map { if (it.scope_id == id) it.copy(scope_order = order) else it }
+                .map { if (it.id == id) it.copy(scope_order = order) else it }
                 .sortedBy { it.scope_order }
                 .onEachIndexed { index, scope ->
                     scopeQueries.updateScopeOrder(
-                        scopeId = scope.scope_id,
+                        scopeId = scope.id,
                         scopeOrder = index + 1
                     )
                 }

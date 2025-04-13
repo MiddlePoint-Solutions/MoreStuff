@@ -5,10 +5,9 @@ package io.middlepoint.morestuff.shared.data.mapper
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 
-typealias ScheduleData = io.middlepoint.morestuff.db.Schedule
-
 typealias ScheduleDataMapper = (
     id: Long,
+    uuid: String,
     task_id: Long,
     create_time: String,
     schedule_time_local: String?,
@@ -18,10 +17,11 @@ typealias ScheduleDataMapper = (
     schedule_type: ScheduleType
 ) -> Schedule
 
-fun makeScheduleDbMapper(): ScheduleDataMapper = ::mapScheduleDb
+fun makeScheduleDataMapper(): ScheduleDataMapper = ::mapScheduleData
 
-fun mapScheduleDb(
+fun mapScheduleData(
     id: Long,
+    uuid: String,
     task_id: Long,
     create_time: String,
     schedule_time_local: String?,
@@ -29,30 +29,13 @@ fun mapScheduleDb(
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
-): Schedule {
-    return Schedule(
-        id = id,
-        taskId = task_id,
-        createTime = create_time,
-        scheduleLocalTime = schedule_time_local,
-        scheduleUtcTime = schedule_time_utc,
-        timezone = timezone,
-        active = active,
-        scheduleType = schedule_type
-    )
-}
-
-fun mapScheduleDomain(input: Schedule): ScheduleData {
-    return with(input) {
-        ScheduleData(
-            id = input.id,
-            task_id = taskId,
-            create_time = createTime,
-            schedule_time_local = scheduleLocalTime,
-            schedule_time_utc = scheduleUtcTime,
-            timezone = timezone,
-            active = active,
-            schedule_type = scheduleType
-        )
-    }
-}
+): Schedule = Schedule(
+    id = id,
+    taskId = task_id,
+    createTime = create_time,
+    scheduleLocalTime = schedule_time_local,
+    scheduleUtcTime = schedule_time_utc,
+    timezone = timezone,
+    active = active,
+    scheduleType = schedule_type
+)

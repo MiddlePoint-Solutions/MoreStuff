@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.shared.domain.redux.action
 
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import kotlinx.datetime.LocalDateTime
 
@@ -23,10 +23,10 @@ sealed class ScheduleAction : Action.FeatureAction() {
         val scheduleType: List<ScheduleType> = ScheduleType.entries.toList()
     ) : ScheduleAction()
 
-    internal data class ScheduleCreatedAction(val schedule: ScheduleDomain, val task: TaskDomain) : ScheduleAction()
+    internal data class ScheduleCreatedAction(val schedule: Schedule, val task: Task) : ScheduleAction()
 
     internal data class ScheduleReplyAction(
-      val schedule: ScheduleDomain,
+      val schedule: Schedule,
       val replyType: ReplyType,
     ) : ScheduleAction()
 

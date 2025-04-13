@@ -2,6 +2,7 @@ import kotlin.Int;
 
 CREATE TABLE message(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT NOT NULL,
     task_id INTEGER NOT NULL,
     schedule_id INTEGER NOT NULL,
     create_time TEXT NOT NULL,
@@ -68,7 +69,7 @@ SELECT message.id, url_metadata.json_data
 FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 WHERE task_id = ? AND content_type = ?
-ORDER BY id DESC LIMIT 1;
+ORDER BY message.id DESC LIMIT 1;
 
 selectLastTaskMessageByContentType:
 SELECT * FROM message
@@ -76,8 +77,8 @@ WHERE content_type = ?
 ORDER BY id DESC LIMIT 1;
 
 insertMessage:
-INSERT INTO message(task_id, schedule_id, create_time, content_type, content)
-VALUES (?,?,?,?,?);
+INSERT INTO message(uuid ,task_id, schedule_id, create_time, content_type, content)
+VALUES (?,?,?,?,?,?);
 
 updateTaskMessageReply:
 UPDATE message

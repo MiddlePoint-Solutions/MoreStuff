@@ -2,11 +2,10 @@
 
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.data.sync.TaskSync
+import io.middlepoint.morestuff.shared.data.model.TaskSync
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 
-typealias TaskDb = io.middlepoint.morestuff.db.Task
 typealias TaskDataMapper<R> = (
     id: Long,
     uuid: String,

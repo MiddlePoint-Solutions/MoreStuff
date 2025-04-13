@@ -18,7 +18,6 @@ interface CreateScheduleUseCase {
 
 class CreateScheduleUseCaseImpl(
     private val scheduleRepository: ScheduleRepository,
-    private val timeManager: TimeManager,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
 ) : CreateScheduleUseCase {
     override suspend fun invoke(
@@ -27,17 +26,6 @@ class CreateScheduleUseCaseImpl(
         localDateTime: LocalDateTime
     ): Either<Failure, Schedule> {
         cancelActiveScheduleUseCase(listOf(taskId), listOf(scheduleType))
-        val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
-        val schedule = Schedule(
-            id = 0,
-            taskId = taskId,
-            createTime = timeManager.getCreateTime(),
-            scheduleLocalTime = localDateTime.toString(),
-            scheduleUtcTime = utcTime,
-            timezone = timeManager.currentTimeZone.id,
-            active = true,
-            scheduleType = scheduleType,
-        )
-        return scheduleRepository.createSchedule(schedule)
+        return scheduleRepository.createSchedule(taskId, scheduleType, localDateTime)
     }
 }

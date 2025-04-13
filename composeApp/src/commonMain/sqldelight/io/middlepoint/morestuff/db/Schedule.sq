@@ -3,6 +3,7 @@ import kotlin.Boolean;
 
 CREATE TABLE schedule(
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    uuid TEXT NOT NULL,
     task_id INTEGER NOT NULL,
     create_time TEXT NOT NULL,
     schedule_time_local TEXT,
@@ -67,7 +68,7 @@ WHERE task_id = :task_id
 AND schedule_time_local BETWEEN :start AND :end;
 
 insertSchedule:
-INSERT INTO schedule(task_id, create_time, schedule_time_local, schedule_time_utc, timezone, schedule_type)
+INSERT INTO schedule(uuid, task_id, create_time, schedule_time_local, schedule_time_utc, timezone, schedule_type)
 VALUES ?;
 
 updateScheduleActive:

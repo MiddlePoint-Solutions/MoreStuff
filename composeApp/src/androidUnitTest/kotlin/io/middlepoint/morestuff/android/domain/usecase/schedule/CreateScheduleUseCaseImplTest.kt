@@ -44,7 +44,7 @@ class CreateScheduleUseCaseImplTest {
 
         coEvery { cancelActiveScheduleUseCase(any(), any()) } coAnswers { listOf(schedule).right() }
 
-        coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
+        coEvery { scheduleRepository.createSchedule(,,) } coAnswers {
             Either.Right(schedule)
         }
 
@@ -53,7 +53,7 @@ class CreateScheduleUseCaseImplTest {
 
         coVerify {
             cancelActiveScheduleUseCase(any(), any())
-            scheduleRepository.createSchedule(any())
+            scheduleRepository.createSchedule(,,)
         }
 
     }

@@ -62,12 +62,7 @@ val dataModule = module {
     )
   }
 
-  single<ScheduleRepository> {
-    ScheduleRepositoryImpl(
-      database = get(),
-      mapper = get(),
-    )
-  }
+  singleOf(::ScheduleRepositoryImpl) bind ScheduleRepository::class
 
   single<UserRepository> {
     UserRepositoryImpl(settings = get())

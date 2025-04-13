@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.redux.action
 
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 sealed class TaskAction : Action.FeatureAction() {
@@ -10,7 +10,7 @@ sealed class TaskAction : Action.FeatureAction() {
     val title: String,
     val priority: Priority,
     val scopeId: Long,
-    val onTaskCreated: ((TaskDomain) -> Unit)? = null
+    val onTaskCreated: ((Task) -> Unit)? = null
   ) : TaskAction()
 
   data class CompleteTasksAction(val taskIds: List<Long>, val complete: Boolean) : TaskAction()
@@ -22,7 +22,7 @@ sealed class TaskAction : Action.FeatureAction() {
   data class DeleteTasksAction(val taskIds: List<Long>) : TaskAction()
 
   data class TaskCreatedAction(
-    val task: TaskDomain,
+    val task: Task,
     val priority: Priority,
   ) : TaskAction()
 

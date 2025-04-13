@@ -7,10 +7,15 @@ import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDateTime
 
 interface ScheduleRepository {
 
-    suspend fun createSchedule(schedule: Schedule): Either<Failure, Schedule>
+    suspend fun createSchedule(
+        taskId: Long,
+        scheduleType: ScheduleType,
+        localDateTime: LocalDateTime
+    ): Either<Failure, Schedule>
 
     suspend fun getSchedule(scheduleId: Long): Either<Failure, Schedule>
     suspend fun getSchedules(scheduleIds: List<Long>): Either<Failure, List<Schedule>>

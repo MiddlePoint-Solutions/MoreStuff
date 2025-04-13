@@ -9,7 +9,7 @@ import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.mapper.TaskDb
+import io.middlepoint.morestuff.shared.data.model.TaskData
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
@@ -234,7 +234,7 @@ class TaskRepositoryImpl(
     title: String,
     priorityScore: Long,
     taskType: TaskType,
-  ) = TaskDb(
+  ) = TaskData(
     id = 0,
     uuid = generateUUID(),
     title = title,

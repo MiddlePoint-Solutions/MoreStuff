@@ -3,21 +3,21 @@ package io.middlepoint.morestuff.shared.data.repository
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import app.cash.sqldelight.coroutines.mapToOneOrNull
 import arrow.core.Either
-import arrow.core.Either.Right
+import arrow.core.Either.*
 import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.repository.MessageDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.generateUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -77,6 +77,7 @@ class MessageRepositoryImpl(
     content: String,
   ): Either<Failure, Message> = messageQueries.transactionWithResult {
     messageQueries.insertMessage(
+      uuid = generateUUID(),
       task_id = taskId,
       schedule_id = scheduleId,
       create_time = timeManager.getCreateTime(),
@@ -105,7 +106,7 @@ class MessageRepositoryImpl(
   ) {
     // TODO: this logic should be moved into 2 use cases
     when (val messageId = getCurrentTaskMessageId(taskId, ContentType.TASK_REMINDER)) {
-      is Either.Right -> {
+      is Right -> {
         messageQueries.updateTaskMessageReply(
           reply_type = replyType,
           reply_content = replyContent,
@@ -114,7 +115,7 @@ class MessageRepositoryImpl(
         )
       }
 
-      is Either.Left -> MessageDoesNotExist
+      is Left -> MessageDoesNotExist
     }
   }
 
@@ -132,7 +133,7 @@ class MessageRepositoryImpl(
     messageQueries.selectTaskMessage(
       task_id = taskId,
       content_type = contentType.value
-    ).executeAsOneOrNull()?.let { Either.Right(it.id) } ?: Either.Left(MessageDoesNotExist)
+    ).executeAsOneOrNull()?.let { Right(it.id) } ?: Left(MessageDoesNotExist)
 
 
   override suspend fun insertUrlMetadata(
