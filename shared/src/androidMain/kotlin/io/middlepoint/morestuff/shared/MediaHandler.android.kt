@@ -244,7 +244,7 @@ class MediaHandlerImpl(
     val intent = Intent().apply {
       action = Intent.ACTION_SEND
       putExtra(Intent.EXTRA_STREAM, contentUri)
-//      type = "application/pdf"
+      type = "*/*"
       flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
     }
     val chooserIntent = Intent.createChooser(intent, null).apply {
