@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.android.domain.createListOfTasks
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.mockk.coEvery
 import io.mockk.mockk

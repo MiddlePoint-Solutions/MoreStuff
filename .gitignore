@@ -13,3 +13,4 @@ iosApp/Podfile.lock
 iosApp/Pods/
 iosApp/iosApp.xcworkspace/
 /.kotlin/
+/supabase/

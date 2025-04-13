@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 
 
-class IncreaseTaskPriorityScoreUseCaseImplTest {
+class IncreaseTaskNewPriorityScoreUseCaseImplTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test

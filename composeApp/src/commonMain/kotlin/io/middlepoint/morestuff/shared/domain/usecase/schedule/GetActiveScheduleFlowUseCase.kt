@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import kotlinx.coroutines.flow.Flow

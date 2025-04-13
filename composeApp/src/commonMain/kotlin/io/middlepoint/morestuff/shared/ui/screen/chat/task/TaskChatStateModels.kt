@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 import androidx.compose.runtime.Immutable
 import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScopeUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel

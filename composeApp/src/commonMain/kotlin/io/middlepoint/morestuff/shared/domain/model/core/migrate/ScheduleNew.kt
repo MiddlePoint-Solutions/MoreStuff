@@ -1,12 +1,12 @@
-package io.middlepoint.morestuff.shared.domain.model
+package io.middlepoint.morestuff.shared.domain.model.core.migrate
 
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ScheduleDomain(
-    val id: Long = 0L,
-    val taskId: Long = 0L,
+data class ScheduleNew(
+    val id: String = "",
+    val taskId: String = "",
     val createTime: String = "",
     val scheduleLocalTime: String? = null,
     val scheduleUtcTime: String? = null,
@@ -15,5 +15,5 @@ data class ScheduleDomain(
     val scheduleType: ScheduleType,
 )
 
-fun ScheduleDomain.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
-fun ScheduleDomain.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime
+fun ScheduleNew.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
+fun ScheduleNew.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime

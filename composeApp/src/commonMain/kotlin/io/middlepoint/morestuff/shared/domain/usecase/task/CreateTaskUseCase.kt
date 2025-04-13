@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 

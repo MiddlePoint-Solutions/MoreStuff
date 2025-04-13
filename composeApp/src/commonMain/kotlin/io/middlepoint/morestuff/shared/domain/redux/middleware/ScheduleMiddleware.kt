@@ -6,9 +6,9 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType.DONE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.LATER
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
@@ -53,8 +53,8 @@ sealed class ScheduleAction : Action.FeatureAction() {
     internal data class ScheduleCreatedAction(val schedule: ScheduleDomain, val task: TaskDomain) : ScheduleAction()
 
     internal data class ScheduleReplyAction(
-      val schedule: ScheduleDomain,
-      val replyType: ReplyType,
+        val schedule: ScheduleDomain,
+        val replyType: ReplyType,
     ) : ScheduleAction()
 
 }

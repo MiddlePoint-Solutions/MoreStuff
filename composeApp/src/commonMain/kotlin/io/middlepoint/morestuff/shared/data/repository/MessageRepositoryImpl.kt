@@ -12,7 +12,7 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.repository.MessageDoesNotExist

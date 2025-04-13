@@ -9,8 +9,8 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

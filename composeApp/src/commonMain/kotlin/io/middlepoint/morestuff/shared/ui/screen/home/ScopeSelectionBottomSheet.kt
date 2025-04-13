@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_add_new_scope

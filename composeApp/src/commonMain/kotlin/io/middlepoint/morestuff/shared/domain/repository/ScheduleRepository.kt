@@ -4,7 +4,7 @@ package io.middlepoint.morestuff.shared.domain.repository
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import kotlinx.coroutines.flow.Flow
 

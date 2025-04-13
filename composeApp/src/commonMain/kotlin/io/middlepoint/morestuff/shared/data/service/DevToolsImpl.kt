@@ -6,12 +6,14 @@ import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEV_SETTINGS
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.DataMigrationHelper
+import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 
 class DevToolsImpl(
     private val settings: Settings,
     private val notifier: Notifier,
     private val dataMigration: DataMigrationHelper,
+    private val migrationHelper: MigrationHelper,
 ) : DevTools {
 
     override var showDebugMessages: Boolean
@@ -29,16 +31,24 @@ class DevToolsImpl(
         notifier.showReviewNotification()
     }
 
-    override suspend fun exportData(uri: String) {
+    override suspend fun exportDatabase(uri: String) {
         dataMigration.exportDatabase(uri).also {
             Logger.d("exportData, finished: $it")
         }
     }
 
-    override suspend fun importData(uri: String) {
+    override suspend fun importDatabase(uri: String) {
         dataMigration.importDatabase(uri).also {
             Logger.d("importData, finished: $it")
         }
+    }
+
+    override suspend fun exportJsonData() {
+        migrationHelper.export()
+    }
+
+    override suspend fun importJsonData(uri: String) {
+        TODO("Not yet implemented")
     }
 }
 

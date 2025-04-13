@@ -1,12 +1,14 @@
-package io.middlepoint.morestuff.shared.domain.model
+package io.middlepoint.morestuff.shared.domain.model.core.migrate
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.isOneTime
+import io.middlepoint.morestuff.shared.domain.model.core.isReminder
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class TaskDomain(
-  val id: Long = 0L,
-  val uuid: String = "",
+data class TaskNew(
+  val id: String = "",
   val title: String = "",
   val createTime: String = "",
   val completeTime: String? = null,
@@ -22,4 +24,4 @@ data class TaskDomain(
     val hasReminder: Boolean get() = schedule.any { it.isReminder() }
     fun getScheduleOrNull() = schedule.firstOrNull { it.isOneTime() }
     fun getReminderOrNull() = schedule.firstOrNull { it.isReminder() }
-}
+} 

@@ -11,8 +11,8 @@ import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
-import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.model.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.core.Message
+import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter

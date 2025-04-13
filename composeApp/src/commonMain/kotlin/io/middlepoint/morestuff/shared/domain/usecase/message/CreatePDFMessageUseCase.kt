@@ -5,7 +5,7 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.Message
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.SavePdfFailure
 import io.middlepoint.morestuff.shared.domain.service.TimeManager

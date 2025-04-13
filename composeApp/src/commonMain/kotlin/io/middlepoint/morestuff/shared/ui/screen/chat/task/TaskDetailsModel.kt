@@ -8,9 +8,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.isOneTime
-import io.middlepoint.morestuff.shared.domain.model.isReminder
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.isOneTime
+import io.middlepoint.morestuff.shared.domain.model.core.isReminder
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderAction
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleAction
