@@ -2,10 +2,9 @@ package io.middlepoint.morestuff.shared.data.utils
 
 import arrow.core.getOrElse
 import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
@@ -16,8 +15,8 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class DataMigration(
   val items: List<MigrationItem>,
-  val tasks: List<TaskDomain>,
-  val scopes: List<ScopeDomain>,
+  val tasks: List<Task>,
+  val scopes: List<Scope>,
   val messages: List<Message>,
 )
 

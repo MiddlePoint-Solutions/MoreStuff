@@ -1,10 +1,5 @@
 package io.middlepoint.morestuff.shared.di
 
-import io.middlepoint.morestuff.shared.data.service.AppMessagesProviderImpl
-import io.middlepoint.morestuff.shared.data.service.HintTaskProviderImpl
-import io.middlepoint.morestuff.shared.data.service.OpenGraphFetcherImpl
-import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
-import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.data.middleware.AuthMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.DevMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.ErrorMiddleware
@@ -18,8 +13,12 @@ import io.middlepoint.morestuff.shared.data.middleware.ScheduleMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.ScopeMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.SettingsMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.TaskMiddleware
+import io.middlepoint.morestuff.shared.data.service.AppMessagesProviderImpl
+import io.middlepoint.morestuff.shared.data.service.HintTaskProviderImpl
+import io.middlepoint.morestuff.shared.data.service.OpenGraphFetcherImpl
+import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.MiddlewareProvider
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
@@ -44,8 +43,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.message.DeleteMessageUseCa
 import io.middlepoint.morestuff.shared.domain.usecase.message.DeleteMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.FetchOpenGraphMetadataUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.FetchOpenGraphMetadataUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlowUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlowUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetMessageImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetMessagesUseCase
@@ -311,7 +308,6 @@ val messageUseCases = module {
   factoryOf(::DeleteMessageUseCaseImpl) bind DeleteMessageUseCase::class
   factoryOf(::CreateMediaMessageUseCaseImpl) bind CreateMediaMessageUseCase::class
   factoryOf(::CreatePDFMessageUseCaseImpl) bind CreatePDFMessageUseCase::class
-  factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
   factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
 
 }

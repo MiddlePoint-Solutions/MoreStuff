@@ -3,19 +3,19 @@ package io.middlepoint.morestuff.android.domain
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import kotlinx.datetime.*
 import java.util.UUID
 
 val timeManager = TimeManagerImpl()
-fun createListOfTasks(amount: Long): List<TaskDomain> {
+fun createListOfTasks(amount: Long): List<Task> {
     return buildList {
         for (i in 1..amount) {
             add(
@@ -36,12 +36,12 @@ fun createTaskForTest(
   timeUtils: String = timeManager.nowLocalDateTimeString,
   priorityScore: Long = 0,
   taskType: TaskType = TaskType.System,
-  activeSchedule: ScheduleDomain = createScheduleForTest(
+  activeSchedule: Schedule = createScheduleForTest(
     taskId = id,
     scheduleType = ScheduleType.OneTime
   )
-): TaskDomain {
-    return TaskDomain(
+): Task {
+    return Task(
         id = id,
         uuid = UUID.randomUUID().toString(),
         title = title,
@@ -54,7 +54,7 @@ fun createTaskForTest(
 }
 
 
-fun createListOfSchedulesForTest(amount: Long): List<ScheduleDomain> {
+fun createListOfSchedulesForTest(amount: Long): List<Schedule> {
     return buildList {
         for (i in 1..amount) {
             add(
@@ -73,8 +73,8 @@ fun createScheduleForTest(
     timeZone: String = "",
     active: Boolean = true,
     scheduleType: ScheduleType
-): ScheduleDomain {
-    return ScheduleDomain(
+): Schedule {
+    return Schedule(
         id,
         taskId,
         createTime,
@@ -95,8 +95,8 @@ fun createScheduleUseCaseTest(
     timeZone: String = "",
     active: Boolean = true,
     scheduleType: ScheduleType = ScheduleType.OneTime
-): ScheduleDomain {
-    return ScheduleDomain(
+): Schedule {
+    return Schedule(
         id,
         taskId,
         createTime,

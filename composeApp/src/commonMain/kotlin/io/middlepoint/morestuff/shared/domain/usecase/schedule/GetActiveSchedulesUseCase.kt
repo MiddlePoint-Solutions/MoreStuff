@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 
@@ -11,7 +11,7 @@ interface GetActiveSchedulesUseCase {
     suspend operator fun invoke(
         taskIds: List<Long>,
         scheduleType: List<ScheduleType> = ScheduleType.entries
-    ): Either<Failure, List<ScheduleDomain>>
+    ): Either<Failure, List<Schedule>>
 }
 
 class GetActiveSchedulesUseCaseImpl(
@@ -20,7 +20,7 @@ class GetActiveSchedulesUseCaseImpl(
     override suspend fun invoke(
         taskIds: List<Long>,
         scheduleType: List<ScheduleType>
-    ): Either<Failure, List<ScheduleDomain>> {
+    ): Either<Failure, List<Schedule>> {
         return scheduleRepository.getActiveSchedulesForTasks(taskIds, scheduleType)
     }
 } 

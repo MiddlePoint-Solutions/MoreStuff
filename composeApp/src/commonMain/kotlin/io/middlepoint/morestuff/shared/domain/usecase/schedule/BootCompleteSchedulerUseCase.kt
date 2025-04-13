@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 
@@ -29,7 +29,7 @@ class BootCompleteSchedulerUseCaseImpl(
         }
     }
 
-    private fun reschedule(activeSchedules: MutableList<ScheduleDomain>) {
+    private fun reschedule(activeSchedules: MutableList<Schedule>) {
         val currentTime = timeManager.nowLocalDateTime
 
         val futureSchedules = activeSchedules.filter { schedule ->

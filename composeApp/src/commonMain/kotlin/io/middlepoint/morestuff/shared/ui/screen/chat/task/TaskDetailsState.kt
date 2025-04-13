@@ -2,12 +2,12 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 
 @Immutable
 data class TaskDetailsState(
-  val task: TaskDomain = TaskDomain(),
+  val task: Task = Task(),
   val scheduleModel: ScheduleUiModel? = null,
   val reminderModel: ScheduleUiModel? = null,
   val taskTitle: String = ""

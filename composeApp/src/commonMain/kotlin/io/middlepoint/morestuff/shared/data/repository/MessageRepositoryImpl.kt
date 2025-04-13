@@ -69,13 +69,6 @@ class MessageRepositoryImpl(
     }
   }
 
-  override fun getLastMessageFlow(contentType: ContentType): Flow<Message?> =
-    messageQueries.selectLastTaskMessageByContentType(
-      contentType.value,
-      mapper = mapper.messageDbMapper
-    ).asFlow().mapToOneOrNull(Dispatchers.IO)
-
-
   override suspend fun createMessage(
     taskId: Long,
     scheduleId: Long,

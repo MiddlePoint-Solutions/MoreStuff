@@ -95,8 +95,8 @@ val supabaseModule = module {
       supabaseKey = BuildConfig.SUPABASE_KEY
     ) {
       install(Auth) {
-        sessionManager = SettingsSessionManager(settings = get())
-        codeVerifierCache = SettingsCodeVerifierCache(settings = get())
+        sessionManager = SettingsSessionManager(settings = get()) // TODO: use encrypted settings
+        codeVerifierCache = SettingsCodeVerifierCache(settings = get()) // TODO: use encrypted settings
       }
       install(ComposeAuth) {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)

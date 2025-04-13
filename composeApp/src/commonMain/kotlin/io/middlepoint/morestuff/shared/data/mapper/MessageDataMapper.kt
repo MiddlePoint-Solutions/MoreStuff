@@ -13,19 +13,6 @@ import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import kotlinx.serialization.json.Json
 
-typealias MessageDbMapper = (
-  id: Long,
-  task_id: Long,
-  schedule_id: Long,
-  create_time: String,
-  seen_time: String?,
-  content_type: Int,
-  content: String,
-  reply_type: Int?,
-  reply_content: String?,
-  reply_time: String?,
-) -> Message
-
 typealias MessageDataMapper = (
   id: Long,
   taskId: Long,
@@ -79,7 +66,6 @@ data class MessageDataMap(
     ) { dataId, dataPath, dataCreationTime, dataType ->
       MessageData(
         id = dataId,
-//        filePath = storageManager.getAppStoragePathToSavedFile(dataType.toMediaFolder(), dataPath),
         filePath = pathToSavedFile(dataType.toMediaFolder(), dataPath),
         creationTime = dataCreationTime,
         messageType = dataType
@@ -109,40 +95,4 @@ private fun MessageDataType.toMediaFolder() : MediaFolder = when(this) {
   MessageDataType.Audio -> TODO()
   MessageDataType.Pdf -> MediaFolder.Files
 }
-
-fun makeMessageDbMapper(): MessageDbMapper = ::mapMessageDb
-
-fun mapMessageDb(
-  id: Long,
-  task_id: Long,
-  schedule_id: Long,
-  create_time: String,
-  seen_time: String?,
-  content_type: Int,
-  content: String,
-  reply_type: Int?,
-  reply_content: String?,
-  reply_time: String?,
-): Message {
-  return Message(
-    id = id,
-    taskId = task_id,
-    scheduleId = schedule_id,
-    contentType = ContentType.withValue(content_type),
-    createTime = create_time,
-    seenTime = seen_time,
-    content = content,
-    replyType = reply_type?.let { ReplyType.withValue(it) },
-    replyContent = reply_content,
-    replyTime = reply_time,
-    openGraphResult = null,
-    messageData = null
-  )
-}
-
-
-
-
-
-
 

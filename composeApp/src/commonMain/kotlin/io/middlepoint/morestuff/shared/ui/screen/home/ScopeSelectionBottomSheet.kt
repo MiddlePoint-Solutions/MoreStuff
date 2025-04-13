@@ -22,7 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_add_new_scope
@@ -35,7 +35,7 @@ fun ScopeSelectionBottomSheet(
   onDismissRequest: () -> Unit,
   addSelectedTasksToScope: (Long) -> Unit,
   createNewScope: () -> Unit,
-  scopes: List<ScopeDomain>,
+  scopes: List<Scope>,
   sheetState: SheetState,
 ) {
 
@@ -62,7 +62,7 @@ fun ScopeSelectionBottomSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScopeSelection(
-  scopes: List<ScopeDomain>,
+  scopes: List<Scope>,
   onScopeSelected: (Long) -> Unit,
   createNewScope: () -> Unit,
 ) {

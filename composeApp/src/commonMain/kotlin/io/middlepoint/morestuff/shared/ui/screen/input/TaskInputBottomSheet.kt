@@ -67,7 +67,7 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun TaskInputBottomSheet(
+fun TaskInputBottomSheet( // TODO: we can use this for the "Scope Chat" feature
   onDismissRequest: () -> Unit,
   sheetState: SheetState,
   context: ChatContext,

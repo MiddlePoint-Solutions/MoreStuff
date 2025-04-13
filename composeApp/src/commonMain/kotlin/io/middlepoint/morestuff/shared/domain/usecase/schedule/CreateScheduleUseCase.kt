@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
@@ -13,7 +13,7 @@ interface CreateScheduleUseCase {
         taskId: Long,
         scheduleType: ScheduleType,
         localDateTime: LocalDateTime
-    ): Either<Failure, ScheduleDomain>
+    ): Either<Failure, Schedule>
 }
 
 class CreateScheduleUseCaseImpl(
@@ -25,10 +25,10 @@ class CreateScheduleUseCaseImpl(
         taskId: Long,
         scheduleType: ScheduleType,
         localDateTime: LocalDateTime
-    ): Either<Failure, ScheduleDomain> {
+    ): Either<Failure, Schedule> {
         cancelActiveScheduleUseCase(listOf(taskId), listOf(scheduleType))
         val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
-        val schedule = ScheduleDomain(
+        val schedule = Schedule(
             id = 0,
             taskId = taskId,
             createTime = timeManager.getCreateTime(),

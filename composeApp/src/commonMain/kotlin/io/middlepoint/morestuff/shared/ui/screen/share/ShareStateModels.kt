@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.screen.share
 
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
@@ -10,7 +10,7 @@ data class ShareModel(
   val shareable: Shareable,
   val taskInputActive: Boolean = false,
   val currentScopeId: Long = defaultScope.id,
-  val scopes: List<ScopeDomain> = listOf(),
+  val scopes: List<Scope> = listOf(),
   val searchResults: List<TaskUiModel> = listOf(),
   val createdTaskId: Long? = null,
   val scheduleModel: ScheduleUiModel? = null,

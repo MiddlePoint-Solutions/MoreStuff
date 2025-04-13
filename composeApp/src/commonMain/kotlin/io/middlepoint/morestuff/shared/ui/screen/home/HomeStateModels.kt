@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.home
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
@@ -10,7 +10,7 @@ import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 data class HomeState(
   val currentScopeId: Long = defaultScope.id,
   val username: String = "",
-  val scopes: List<ScopeDomain> = listOf(),
+  val scopes: List<Scope> = listOf(),
   val selectedTasks: List<Long> = listOf(),
   val taskInputActive: Boolean = false,
   val reorderingScopes: Map<Long, Boolean> = emptyMap(),

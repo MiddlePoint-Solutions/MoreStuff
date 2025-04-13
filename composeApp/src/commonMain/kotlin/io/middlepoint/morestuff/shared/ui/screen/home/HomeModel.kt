@@ -7,13 +7,12 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
@@ -63,7 +62,7 @@ fun homeModel(
   timeFormatter: TimeFormatter = koinInject(),
 ): HomeState {
 
-  var scopes: List<ScopeDomain> by remember { mutableStateOf(initialState.scopes) }
+  var scopes: List<Scope> by remember { mutableStateOf(initialState.scopes) }
   var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
   var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
   var taskInputActive: Boolean by remember { mutableStateOf(initialState.taskInputActive) }
@@ -71,7 +70,7 @@ fun homeModel(
   var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
   var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
-  val taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
+  val taskSchedules: Map<Long, Schedule> by remember { mutableStateOf(emptyMap()) }
   var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
   var username by remember { mutableStateOf(initialState.username) }
 

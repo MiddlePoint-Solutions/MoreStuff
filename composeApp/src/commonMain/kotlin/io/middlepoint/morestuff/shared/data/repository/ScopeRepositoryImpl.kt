@@ -9,7 +9,7 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import kotlinx.coroutines.Dispatchers
@@ -40,12 +40,12 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun createScope(name: String): Either<Failure, ScopeDomain> {
+    override suspend fun createScope(name: String): Either<Failure, Scope> {
         return scopeQueries.transactionWithResult {
 
             scopeQueries
-                .selectScopeByName(name, dataMappers.scopeDbMapper)
-                .executeAsOneOrNull()?.let { existingScope: ScopeDomain ->
+                .selectScopeByName(name, dataMappers.scopeDataMapper)
+                .executeAsOneOrNull()?.let { existingScope: Scope ->
                     return@transactionWithResult existingScope.right()
                 }
 
@@ -53,18 +53,18 @@ class ScopeRepositoryImpl(
             scopeQueries.createScope(generateUUID(), name, count)
             val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
             scopeQueries
-                .selectScope(scopeId, dataMappers.scopeDbMapper)
+                .selectScope(scopeId, dataMappers.scopeDataMapper)
                 .executeAsOne()
                 .right()
         }
     }
 
-    override suspend fun deleteScope(id: Long): Either<Failure, ScopeDomain> =
+    override suspend fun deleteScope(id: Long): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
 
             val deleted = scopeQueries.selectScope(
                 id = id,
-                mapper = dataMappers.scopeDbMapper
+                mapper = dataMappers.scopeDataMapper
             ).executeAsOne()
 
             scopeQueries.deleteScope(id)
@@ -82,27 +82,27 @@ class ScopeRepositoryImpl(
             deleted.right()
         }
 
-    override suspend fun getScopes(): Either<Failure, List<ScopeDomain>> = scopeQueries
-        .selectAllScopes(mapper = dataMappers.scopeDbMapper)
+    override suspend fun getScopes(): Either<Failure, List<Scope>> = scopeQueries
+        .selectAllScopes(mapper = dataMappers.scopeDataMapper)
         .executeAsList()
         .right()
 
-    override fun getScopesFlow(): Flow<List<ScopeDomain>> = scopeQueries
-        .selectAllScopes(mapper = dataMappers.scopeDbMapper)
+    override fun getScopesFlow(): Flow<List<Scope>> = scopeQueries
+        .selectAllScopes(mapper = dataMappers.scopeDataMapper)
         .asFlow()
         .mapToList(Dispatchers.IO)
 
-    override suspend fun updateScopeName(id: Long, name: String): Either<Failure, ScopeDomain> =
+    override suspend fun updateScopeName(id: Long, name: String): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeName(name, id)
             scopeQueries
-                .selectScope(id, dataMappers.scopeDbMapper)
+                .selectScope(id, dataMappers.scopeDataMapper)
                 .executeAsOne()
                 .right()
         }
 
     // TODO: consider passing the entire list of scopes that will update their order
-    override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, ScopeDomain> =
+    override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeOrder(
                 scopeId = id,
@@ -122,7 +122,7 @@ class ScopeRepositoryImpl(
                 }
 
 
-            scopeQueries.selectScope(id, dataMappers.scopeDbMapper)
+            scopeQueries.selectScope(id, dataMappers.scopeDataMapper)
                 .executeAsOne()
                 .right()
         }
@@ -138,12 +138,12 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun getScopeByTaskId(taskId: Long): Either<Failure, ScopeDomain> {
+    override suspend fun getScopeByTaskId(taskId: Long): Either<Failure, Scope> {
         val scopeId = taskScopeQueries
             .selectScopeIdForTask(taskId)
             .executeAsOneOrNull() ?: return Either.Left(NoScope)
         return scopeQueries
-            .selectScope(scopeId, dataMappers.scopeDbMapper)
+            .selectScope(scopeId, dataMappers.scopeDataMapper)
             .executeAsOneOrNull()
             ?.right() ?: Either.Left(NoScope)
     }

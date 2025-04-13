@@ -5,14 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Immutable
-data class ScopeDomain(
+data class Scope(
   val id: Long,
   val uid: String,
   val name: String,
   val order: Int,
 )
 
-val defaultScope = ScopeDomain(
+val defaultScope = Scope(
   id = 1,
   uid = "",
   name = "Stuff",

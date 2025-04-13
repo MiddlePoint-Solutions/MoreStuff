@@ -18,7 +18,6 @@ import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import io.middlepoint.morestuff.shared.domain.usecase.message.GetLastMessageFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
@@ -29,9 +28,6 @@ import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.mapToDomain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
@@ -42,7 +38,6 @@ fun userInputModel(
   context: ChatContext,
   events: Flow<UserInputEvent>,
   store: AppStore = koinInject(),
-  getLastMessageFlowUseCase: GetLastMessageFlowUseCase = koinInject(),
   getScopesUseCase: GetScopesUseCase = koinInject(),
   createTaskUseCase: CreateTaskUseCase = koinInject(),
   timeManager: TimeManager = koinInject(),
@@ -75,30 +70,6 @@ fun userInputModel(
       messages = mutableListOf<MessageUiModel>().apply { add(0, intro) },
       priority = PriorityUiModel.Now
     )
-
-    getLastMessageFlowUseCase(ContentType.USER_NEW_TASK)
-      .drop(1)
-      .distinctUntilChanged { old, new -> old?.id == new?.id }
-      .map { message -> message?.let(messageUiMapper::map) }
-      .collect { message ->
-        message?.let {
-          state = state.copy(
-            messages = state.messages.toMutableList().apply { add(0, it) }
-          )
-          delay(1500)
-
-          val appMessage =
-            createAppMessage( // TODO: this might be better moved into AppMessageProvider
-              appMessageProvider.getNewTaskAddedMessage(),
-              timeManager,
-              messageUiMapper
-            )
-
-          state = state.copy(
-            messages = state.messages.toMutableList().apply { add(0, appMessage) }
-          )
-        }
-      }
   }
 
   LaunchedEffect(Unit) {

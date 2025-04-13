@@ -3,12 +3,11 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 
 typealias ScheduleData = io.middlepoint.morestuff.db.Schedule
-typealias ScheduleDomainMapper = (ScheduleDomain) -> ScheduleData
 
-typealias ScheduleDbMapper = (
+typealias ScheduleDataMapper = (
     id: Long,
     task_id: Long,
     create_time: String,
@@ -17,13 +16,9 @@ typealias ScheduleDbMapper = (
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
-) -> ScheduleDomain
+) -> Schedule
 
-fun makeScheduleDbMapper(): ScheduleDbMapper = ::mapScheduleDb
-
-fun makeScheduleDomainMapper(): ScheduleDomainMapper = { schedule ->
-    mapScheduleDomain(schedule)
-}
+fun makeScheduleDbMapper(): ScheduleDataMapper = ::mapScheduleDb
 
 fun mapScheduleDb(
     id: Long,
@@ -34,8 +29,8 @@ fun mapScheduleDb(
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
-): ScheduleDomain {
-    return ScheduleDomain(
+): Schedule {
+    return Schedule(
         id = id,
         taskId = task_id,
         createTime = create_time,
@@ -47,7 +42,7 @@ fun mapScheduleDb(
     )
 }
 
-fun mapScheduleDomain(input: ScheduleDomain): ScheduleData {
+fun mapScheduleDomain(input: Schedule): ScheduleData {
     return with(input) {
         ScheduleData(
             id = input.id,

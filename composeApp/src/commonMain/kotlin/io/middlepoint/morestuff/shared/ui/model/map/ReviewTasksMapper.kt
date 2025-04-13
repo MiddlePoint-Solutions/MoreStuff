@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.model.map
 
 import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 
@@ -10,7 +10,7 @@ class ReviewTasksMapper(
   private val messageUiMapper: MessageUiMapper,
 ) {
 
-  fun map(input: TaskDomain, messages: List<Message>, position: Int): ReviewItemUiModel =
+  fun map(input: Task, messages: List<Message>, position: Int): ReviewItemUiModel =
     ReviewItemUiModel(
       id = input.id,
       createTime = timeFormatter.formatDisplayFullTimeAndDate(input.createTime),
@@ -22,7 +22,7 @@ class ReviewTasksMapper(
       messages = messageUiMapper.map(messages)
     )
 
-  fun map(tasks: List<TaskDomain>, messages: Map<Long, List<Message>>) = tasks.map {
+  fun map(tasks: List<Task>, messages: Map<Long, List<Message>>) = tasks.map {
     map(it, messages[it.id] ?: listOf(), 0)
   }
 

@@ -56,7 +56,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
@@ -137,11 +137,11 @@ fun ScopesContent(
   model: ScopesState,
   onBack: () -> Unit,
   onCreateScope: () -> Unit,
-  onEditScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-  var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
+  var selectedScope by remember { mutableStateOf<Scope?>(null) }
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
@@ -236,8 +236,8 @@ fun ScopesContent(
 @Composable
 private fun OrderedScopesList(
   model: ScopesState,
-  onEditScope: (ScopeDomain) -> Unit,
-  onDeleteScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
+  onDeleteScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit
 ) {
 

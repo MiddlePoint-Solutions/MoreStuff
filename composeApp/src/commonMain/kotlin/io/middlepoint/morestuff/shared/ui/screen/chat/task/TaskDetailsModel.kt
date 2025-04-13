@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.isOneTime
 import io.middlepoint.morestuff.shared.domain.model.core.isReminder
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
@@ -150,10 +150,10 @@ fun taskDetailsModel(
 }
 
 private fun createModelForSchedule(
-  scheduleDomain: ScheduleDomain?, timeManager: TimeManager,
-  timeFormatter: TimeFormatter,
+    schedule: Schedule?, timeManager: TimeManager,
+    timeFormatter: TimeFormatter,
 ) =
-    scheduleDomain?.scheduleLocalTime?.let {
+    schedule?.scheduleLocalTime?.let {
         val localTime = LocalDateTime.parse(it)
         createScheduleModel(localTime, timeManager, timeFormatter)
     }

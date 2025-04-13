@@ -4,7 +4,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ScheduleDomain(
+data class Schedule(
     val id: Long = 0L,
     val taskId: Long = 0L,
     val createTime: String = "",
@@ -15,5 +15,5 @@ data class ScheduleDomain(
     val scheduleType: ScheduleType,
 )
 
-fun ScheduleDomain.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
-fun ScheduleDomain.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime
+fun Schedule.isReminder(): Boolean = scheduleType == ScheduleType.Reminder
+fun Schedule.isOneTime(): Boolean = scheduleType == ScheduleType.OneTime

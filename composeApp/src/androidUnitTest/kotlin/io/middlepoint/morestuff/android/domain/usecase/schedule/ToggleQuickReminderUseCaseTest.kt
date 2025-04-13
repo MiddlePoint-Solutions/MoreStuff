@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.right
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.model.TaskReminderCancelled
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.mockk.coEvery
@@ -22,8 +22,8 @@ class ToggleQuickReminderUseCaseTest {
     @Test
     fun `Toggle quick reminder when task has reminder, cancels the reminder`() =
         runBlocking {
-            val schedule = ScheduleDomain(id = 1, scheduleType = ScheduleType.Reminder)
-            val task = TaskDomain(
+            val schedule = Schedule(id = 1, scheduleType = ScheduleType.Reminder)
+            val task = Task(
                 id = 1,
                 schedule = listOf(schedule)
             )
@@ -53,8 +53,8 @@ class ToggleQuickReminderUseCaseTest {
     fun `Toggle quick reminder when task has no reminder, schedules the reminder`() =
         runBlocking {
 
-            val schedule = ScheduleDomain(id = 1, scheduleType = ScheduleType.Reminder)
-            val task = TaskDomain(id = 1)
+            val schedule = Schedule(id = 1, scheduleType = ScheduleType.Reminder)
+            val task = Task(id = 1)
 
             val toggleQuickReminderUseCase = ToggleQuickReminderUseCaseImpl(
                 getTaskUseCase,

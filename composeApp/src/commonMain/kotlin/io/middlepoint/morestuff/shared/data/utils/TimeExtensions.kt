@@ -1,9 +1,9 @@
 package io.middlepoint.morestuff.shared.data.utils
 
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import kotlinx.datetime.*
 
-val ScheduleDomain.scheduleLocalDateTime: LocalDateTime?
+val Schedule.scheduleLocalDateTime: LocalDateTime?
     get() = scheduleLocalTime?.let(LocalDateTime.Companion::parse)
 
 val LocalDateTime.currentTimeZoneInstant: Instant get() = this.toInstant(TimeZone.currentSystemDefault())

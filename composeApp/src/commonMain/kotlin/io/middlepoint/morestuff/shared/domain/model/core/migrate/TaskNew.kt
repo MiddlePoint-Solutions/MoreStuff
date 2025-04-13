@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.model.core.migrate
 
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.isOneTime
 import io.middlepoint.morestuff.shared.domain.model.core.isReminder
 import kotlinx.serialization.Serializable
@@ -14,7 +14,7 @@ data class TaskNew(
   val completeTime: String? = null,
   val priorityScore: Long = 0,
   val taskType: TaskType = TaskType.System,
-  val schedule: List<ScheduleDomain> = listOf(),
+  val schedule: List<Schedule> = listOf(),
   val extraDetails: Boolean = false,
   val deletedTime: String? = null,
 ) {

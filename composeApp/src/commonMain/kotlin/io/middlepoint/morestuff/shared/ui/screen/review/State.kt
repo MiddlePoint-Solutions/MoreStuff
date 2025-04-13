@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.ui.screen.review
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import io.middlepoint.morestuff.shared.ui.components.swipeable.SwipeDirection
 import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 
 sealed class ReviewRound {
@@ -13,11 +13,11 @@ sealed class ReviewRound {
 
 data class ReviewState(
   val round: ReviewRound = ReviewRound.Review(scopeId = defaultScope.id),
-  val currentScope: ScopeDomain = defaultScope,
+  val currentScope: Scope = defaultScope,
   val items: List<ReviewItemUiModel> = listOf(),
   val itemsForReview: Int = 0,
   val actions: List<Pair<ReviewItemUiModel, ReviewActionType>> = listOf(),
-  val scopes: List<ScopeDomain> = listOf(),
+  val scopes: List<Scope> = listOf(),
   val reviewHintEnabled: Boolean = false
 )
 

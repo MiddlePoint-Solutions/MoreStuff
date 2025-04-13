@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 @Composable
 fun ScopeCarousel(
-  scopes: List<ScopeDomain>,
+  scopes: List<Scope>,
   currentScopeId: Long,
   onScopeSelected: (Long) -> Unit,
   onScroll: (Boolean) -> Unit = {},
@@ -92,7 +92,7 @@ fun ScopeCarousel(
 
 @Composable
 private fun ScopeCarouselItem(
-  scope: ScopeDomain,
+  scope: Scope,
   onClick: () -> Unit,
   isSelected: Boolean,
   modifier: Modifier = Modifier,
