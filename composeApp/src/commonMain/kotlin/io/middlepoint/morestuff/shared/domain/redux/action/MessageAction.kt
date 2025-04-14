@@ -28,5 +28,9 @@ sealed class MessageAction : Action.FeatureAction() {
     data class DeleteMessageAction(val messageId: Uuid) : MessageAction()
 
     data class UpdateMessageContentAction(val messageId: Uuid, val content: String) : TaskAction()
+  data class CreateAITaskMessageAction(
+    val taskId: Long,
+    val prompt: String
+  ) : MessageAction()
 
 }

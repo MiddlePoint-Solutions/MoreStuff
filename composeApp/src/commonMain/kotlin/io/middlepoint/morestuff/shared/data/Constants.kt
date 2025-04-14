@@ -28,4 +28,8 @@ object Constants {
     const val TELEGRAM_INVITE_LINK = "https://t.me/+hzE7jInTlSRiOGVk"
 
     const val PRIVACY_POLICY_LINK = "https://bit.ly/3P4Sd3I"
+
+
+    const val IA_MODEL_OPEN_AI = "gpt-4o-mini"
+    const val IA_MODEL_DEEPSEEK = "deepseek-chat"
 }

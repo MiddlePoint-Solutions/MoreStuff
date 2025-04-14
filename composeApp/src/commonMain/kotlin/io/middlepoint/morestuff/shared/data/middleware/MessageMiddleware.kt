@@ -5,6 +5,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction.CreateAITaskMessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction.CreateScheduleMessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
@@ -12,6 +13,7 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
+import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMediaMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreatePDFMessageUseCase
@@ -30,6 +32,7 @@ class MessageMiddleware(
     private val createPDFMessageUseCase: CreatePDFMessageUseCase,
     private val deleteMessageUseCase: DeleteMessageUseCase,
     private val updateMessageContentUseCase: UpdateMessageContentUseCase,
+    private val createAIMessageUseCase: CreateAIMessageUseCase,
 ) : Middleware<AppState> {
 
     val logger = Logger.withTag("MessageMiddleware")
@@ -60,7 +63,6 @@ class MessageMiddleware(
 
             is MessageAction.CreateAppTaskMessageAction -> scope.launch {
                 logger.d { "Creating app task message: ${action.content}" }
-
                 createMessageUseCase(
                     action.taskId,
                     action.content,
@@ -69,8 +71,14 @@ class MessageMiddleware(
                     scheduleId = null
                 )
                 logger.d { "App task message created" }
-
             }
+
+            is CreateAITaskMessageAction -> scope.launch {
+                logger.d { "Creating AI task message for prompt: ${action.prompt}" }
+                createAIMessageUseCase(action.taskId, action.prompt)
+                logger.d { "AI task message created" }
+            }
+
 
             is MessageAction.CreateFileMessageAction -> scope.launch {
                 createMediaMessageUseCase(

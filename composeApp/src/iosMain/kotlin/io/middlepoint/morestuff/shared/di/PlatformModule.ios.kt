@@ -8,7 +8,7 @@ import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.shared.data.DriverFactory
 import io.middlepoint.morestuff.shared.data.VoiceToTextParser
 import io.middlepoint.morestuff.shared.data.VoiceToTextParserImpl
-import io.middlepoint.morestuff.shared.data.repository.OpenAIRepositoryImpl
+import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
@@ -38,7 +38,7 @@ actual val platformModule: Module = module {
     }
 
     single<Settings>(named(SharedSettings.Encrypted)) {
-        KeychainSettings(service = OpenAIRepositoryImpl.ENCRYPTED_DATABASE_NAME)
+        KeychainSettings(service = LlmRepositoryImpl.ENCRYPTED_DATABASE_NAME)
     }
 
     single<Settings>(named(SharedSettings.Unencrypted)) {

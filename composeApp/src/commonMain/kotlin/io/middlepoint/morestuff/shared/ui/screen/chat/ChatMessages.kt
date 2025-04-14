@@ -40,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.local.ProvideUserInteractionEnabled
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItem
@@ -72,6 +73,13 @@ fun Messages(
   var itemsCount by remember { mutableIntStateOf(0) }
   val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount, scrollState)
   itemsCount = messages.size
+
+  LaunchedEffect(messages) {
+    logger.d { "Messages in Messages component: ${messages.size}" }
+    messages.forEach { message ->
+      logger.d { "Message in component: id=${message.id}, type=${message.contentType}, content='${message.content}'" }
+    }
+  }
 
   ProvideUserInteractionEnabled(userInteractionEnabled) {
 
@@ -110,7 +118,10 @@ fun Messages(
 
               ContentType.CONFIRM_NEW_TASK,
               ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
-
+              ContentType.AI_TASK_MESSAGE -> {
+                logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
+                AppChatItem(item, actions)
+              }
               ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
             }
           }
