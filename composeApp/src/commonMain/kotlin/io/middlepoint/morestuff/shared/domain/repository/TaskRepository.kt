@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.domain.repository
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
 import io.middlepoint.morestuff.shared.domain.model.core.Task
@@ -13,12 +12,11 @@ interface TaskRepository {
 
     suspend fun createTask(
         title: String,
+        scopeId: String,
         priorityScore: Long,
-        taskType: TaskType,
-        scopeId: Long?,
     ): Task
 
-    suspend fun getTask(taskId: Long): Either<Failure, Task>
+    suspend fun getTask(taskId: String): Either<Failure, Task>
     suspend fun getAllTasks(): List<Task>
 
     suspend fun updateTasksComplete(
@@ -27,7 +25,7 @@ interface TaskRepository {
     ): Either<Failure, Boolean>
 
     suspend fun updateTaskTitle(taskId: Long, title: String): Either<Failure, Boolean>
-    fun getTaskFlow(taskId: Long): Flow<Task>
+    fun getTaskFlow(taskId: String): Flow<Task>
     fun getActiveTasksFlow(): Flow<List<Task>>
     fun getScopeActiveTasksFlow(scopeId: Long): Flow<List<Task>>
     fun getCompleteTasksFlow(): Flow<List<Task>>

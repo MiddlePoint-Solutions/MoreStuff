@@ -43,10 +43,10 @@ fun createTaskForTest(
 ): Task {
     return Task(
         id = id,
-        uuid = UUID.randomUUID().toString(),
+        id = UUID.randomUUID().toString(),
         title = title,
-        createTime = timeUtils,
-        completeTime = null,
+        createdAt = timeUtils,
+        completedAt = null,
         priorityScore = priorityScore,
         taskType = taskType,
         schedule = listOf(activeSchedule)

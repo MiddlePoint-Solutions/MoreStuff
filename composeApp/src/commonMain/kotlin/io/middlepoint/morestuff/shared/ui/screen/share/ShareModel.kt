@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
@@ -95,7 +94,7 @@ fun shareModel(
         is CreateNewTask -> {
           val domainPriority = Priority.Now()
           val trimmedTitle = event.title.trim()
-          val params = TaskParams(trimmedTitle, domainPriority, TaskType.User, state.currentScopeId)
+          val params = TaskParams(trimmedTitle, domainPriority, state.currentScopeId)
           val task = createTaskUseCase(params)
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
           state = state.copy(createdTaskId = task.id)
@@ -115,7 +114,7 @@ fun shareModel(
         is CreateTaskWithSchedule -> {
           val domainPriority = Priority.Now()
           val trimmedTitle = event.title.trim()
-          val params = TaskParams(trimmedTitle, domainPriority, TaskType.User, state.currentScopeId)
+          val params = TaskParams(trimmedTitle, domainPriority, state.currentScopeId)
           val task = createTaskUseCase(params)
 
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))

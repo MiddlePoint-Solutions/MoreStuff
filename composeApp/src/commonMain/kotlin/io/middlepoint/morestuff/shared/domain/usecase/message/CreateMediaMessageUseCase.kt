@@ -41,7 +41,7 @@ class CreateMediaMessageUseCaseImpl(
             }
             is Either.Right -> {
                 val imagePath = imageResult.value
-                val creationTime = timeManager.getCreateTime()
+                val creationTime = timeManager.getCreatedTime()
                 val messageData = MessageData(taskId, imagePath, creationTime, MessageDataType.Image)
 
                 createMessageUseCase.invoke(taskId, message, contentType, messageData, scheduleId)

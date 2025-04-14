@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.StorageManager
+import io.middlepoint.morestuff.shared.data.model.TaskData
 import io.middlepoint.morestuff.shared.data.model.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 

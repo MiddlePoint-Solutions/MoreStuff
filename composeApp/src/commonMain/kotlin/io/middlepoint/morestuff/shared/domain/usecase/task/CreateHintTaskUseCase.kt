@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
@@ -26,7 +25,7 @@ class CreateHintTaskUseCaseImpl(
     hintTasks.forEach { hintTask ->
       val priorityParams = Priority.Now()
       val title = getString(hintTask.taskTitle)
-      val taskParams = TaskParams(title, priorityParams, TaskType.User, defaultScope.id)
+      val taskParams = TaskParams(title, priorityParams, defaultScope.id)
       val createdTask = createTaskUseCase(taskParams)
 
       hintTask.taskMessages.forEach { messageHint ->

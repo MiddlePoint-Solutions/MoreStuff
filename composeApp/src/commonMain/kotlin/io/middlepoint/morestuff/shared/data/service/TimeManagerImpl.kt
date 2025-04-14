@@ -29,7 +29,7 @@ class TimeManagerImpl : TimeManager {
         get() = tomorrowLocalDateTime(0, 0).toString() to
                 tomorrowLocalDateTime(23, 59).toString()
 
-    override fun getCreateTime(): String = nowUtcInstant.toString()
+    override fun getCreatedTime(): String = nowUtcInstant.toString()
 
 
     override val localDateTime1HourBack: String

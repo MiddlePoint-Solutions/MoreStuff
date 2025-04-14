@@ -2,14 +2,13 @@ package io.middlepoint.morestuff.shared.data
 
 import app.cash.sqldelight.EnumColumnAdapter
 import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
-import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.db.SqlSchema
 import io.middlepoint.morestuff.db.Message
 import io.middlepoint.morestuff.db.Schedule
 import io.middlepoint.morestuff.db.Scope
 import io.middlepoint.morestuff.db.StuffDb
-import io.middlepoint.morestuff.db.Task
+import io.middlepoint.morestuff.db.Tasks
+import io.middlepoint.morestuff.shared.data.adapter.InstantColumnAdapter
 
 expect class DriverFactory {
     fun createDriver(): SqlDriver
@@ -17,7 +16,9 @@ expect class DriverFactory {
 
 fun createDatabase(driverFactory: DriverFactory) = StuffDb(
     driver = driverFactory.createDriver(),
-    taskAdapter = Task.Adapter(
+    taskAdapter = Tasks.Adapter(
+        updated_atAdapter = InstantColumnAdapter,
+        created_atAdapter = InstantColumnAdapter,
         task_typeAdapter = EnumColumnAdapter()
     ),
     scheduleAdapter = Schedule.Adapter(

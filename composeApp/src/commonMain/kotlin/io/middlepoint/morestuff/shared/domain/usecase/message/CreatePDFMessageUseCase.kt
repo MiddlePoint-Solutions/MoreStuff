@@ -37,7 +37,7 @@ class CreatePDFMessageUseCaseImpl(
             is Either.Left -> Either.Left(SavePdfFailure(pdfResult.toString()))
             is Either.Right -> {
                 val pdfPath = pdfResult.value
-                val creationTime = timeManager.getCreateTime()
+                val creationTime = timeManager.getCreatedTime()
                 val messageData = MessageData(taskId, pdfPath, creationTime, MessageDataType.Pdf)
 
                 createMessageUseCase(taskId, message, contentType, messageData, scheduleId)

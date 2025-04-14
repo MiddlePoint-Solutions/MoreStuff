@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
-import kotlinx.datetime.toLocalDateTime
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetPlanPriorityScoreUseCase
 import kotlinx.datetime.LocalDateTime
@@ -21,7 +20,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
                 task.getScheduleOrNull()?.scheduleLocalTime?.let { scheduleLocalTime ->
                     val newPriorityScore = getPlanPriorityScoreUseCase(
                         scheduleTimeLocal = LocalDateTime.parse(scheduleLocalTime),
-                        taskCreateTimeUtc = task.createTime
+                        taskCreateTimeUtc = task.createdAt
                     )
                     updateTaskPriorityScoreUseCase(task.id, newPriorityScore)
                 }

@@ -80,7 +80,7 @@ class MessageRepositoryImpl(
       uuid = generateUUID(),
       task_id = taskId,
       schedule_id = scheduleId,
-      create_time = timeManager.getCreateTime(),
+      create_time = timeManager.getCreatedTime(),
       content_type = contentType,
       content = content
     )
@@ -89,7 +89,7 @@ class MessageRepositoryImpl(
       messageDataQueries.insertMessageData(
         message_id = messageId,
         file_path = messageData.filePath,
-        creation_time = timeManager.getCreateTime(),
+        creation_time = timeManager.getCreatedTime(),
         data_type = messageData.messageType.name,
       )
     }

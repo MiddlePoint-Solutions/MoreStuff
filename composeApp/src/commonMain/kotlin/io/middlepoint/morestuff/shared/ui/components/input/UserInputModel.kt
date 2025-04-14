@@ -9,7 +9,6 @@ import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.ChatContext
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
@@ -128,7 +127,7 @@ fun userInputModel(
         is UserInputEvent.CreateNewTask -> {
           val domainPriority = state.priority.mapToDomain()
           val trimmedTitle = event.title.trim()
-          val params = TaskParams(trimmedTitle, domainPriority, TaskType.User, currentScope.id)
+          val params = TaskParams(trimmedTitle, domainPriority, currentScope.id)
           val task = createTaskUseCase(params)
 
           store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
@@ -157,7 +156,7 @@ private fun createAppMessage(
   val message = Message(
     id = timeManager.nowUtcMillis,
     contentType = ContentType.APP_TASK_MESSAGE,
-    createTime = timeManager.getCreateTime(),
+    createTime = timeManager.getCreatedTime(),
     content = content,
   )
   return messageUiMapper.map(message)

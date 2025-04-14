@@ -1,24 +1,24 @@
 import kotlin.Int;
+import kotlinx.datetime.Instant;
 
 CREATE TABLE message(
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    uuid TEXT NOT NULL,
-    task_id INTEGER NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY,
+    task_id TEXT NOT NULL,
     schedule_id INTEGER NOT NULL,
-    create_time TEXT NOT NULL,
-    seen_time TEXT,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
     content_type INTEGER AS Int NOT NULL,
     content TEXT NOT NULL,
     reply_type INTEGER AS Int,
     reply_content TEXT,
     reply_time TEXT,
-    FOREIGN KEY(task_id) REFERENCES task(id)
+    FOREIGN KEY(task_id) REFERENCES tasks(id)
     );
 
 selectAll:
 SELECT *
 FROM message
-ORDER BY datetime(create_time) DESC;
+ORDER BY datetime(created_at) DESC;
 
 selectMasterMessages:
 SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
@@ -26,7 +26,7 @@ FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE (content_type = 100 OR content_type = 101 OR (content_type = 200 AND reply_content IS NULL))
-ORDER BY datetime(create_time) DESC;
+ORDER BY datetime(created_at) DESC;
 
 selectMessageById:
 SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
@@ -42,7 +42,7 @@ FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE task_id = ?
-ORDER BY datetime(create_time) DESC;
+ORDER BY datetime(created_at) DESC;
 
 selectTaskMessagesByContentType:
 SELECT message.*, url_metadata.json_data, message_data.data_id ,message_data.file_path,message_data.creation_time,message_data.data_type
@@ -50,19 +50,19 @@ FROM message
 LEFT JOIN url_metadata ON message.id = url_metadata.message_id
 LEFT JOIN message_data ON message.id = message_data.message_id
 WHERE message.task_id = ? AND message.content_type IN ?
-ORDER BY datetime(message.create_time) DESC;
+ORDER BY datetime(message.created_at) DESC;
 
 selectFirstTaskMessageWithType:
 WITH LatestMessage AS (
-    SELECT task_id, MAX(datetime(create_time)) AS latest_time
+    SELECT task_id, MAX(datetime(created_at)) AS latest_time
     FROM message
     WHERE content_type = ?
     GROUP BY task_id
 )
 SELECT m.*
 FROM message AS m
-JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND datetime(m.create_time) = lm.latest_time
-ORDER BY datetime(m.create_time) DESC;
+JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND datetime(m.created_at) = lm.latest_time
+ORDER BY datetime(m.created_at) DESC;
 
 selectTaskMessage:
 SELECT message.id, url_metadata.json_data
@@ -77,8 +77,8 @@ WHERE content_type = ?
 ORDER BY id DESC LIMIT 1;
 
 insertMessage:
-INSERT INTO message(uuid ,task_id, schedule_id, create_time, content_type, content)
-VALUES (?,?,?,?,?,?);
+INSERT INTO message
+VALUES ?;
 
 updateTaskMessageReply:
 UPDATE message

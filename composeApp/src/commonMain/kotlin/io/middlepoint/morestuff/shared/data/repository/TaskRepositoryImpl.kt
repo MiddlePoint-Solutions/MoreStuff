@@ -8,11 +8,11 @@ import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.model.TaskData
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.datetime.Instant
 
 class TaskRepositoryImpl(
   database: StuffDb,
@@ -32,43 +33,46 @@ class TaskRepositoryImpl(
   private val timeManager: TimeManager,
 ) : TaskRepository {
 
-  private val taskQueries = database.taskQueries
+  private val taskQueries = database.tasksQueries
   private val scheduleQueries = database.scheduleQueries
   private val messageQueries = database.messageQueries
-  private val taskScopeQueries = database.taskScopeQueries
+  private val taskScopeQueries = database.tasksScopesQueries
   private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
 
   override suspend fun createTask(
     title: String,
+    scopeId: String,
     priorityScore: Long,
-    taskType: TaskType,
-    scopeId: Long?,
   ): Task {
     return taskQueries.transactionWithResult {
+
       val data = createTaskData(
         title = title,
+        createdAt = timeManager.nowUtcInstant,
         priorityScore = priorityScore,
-        taskType = taskType
       )
       taskQueries.insertTask(data)
-      val taskId = lastInsertedRowId
 
-      scopeId?.let {
-        taskScopeQueries.insert(taskId, it)
-      }
+      val tasksScopesItem = Tasks_scopes(
+        task_id = data.id,
+        scope_id = scopeId,
+        created_at = data.created_at,
+        updated_at = data.updated_at
+      )
+      taskScopeQueries.insert(tasksScopesItem)
 
-      taskQueries.selectTaskById(taskId, mapper = mapper.taskDataMapper).executeAsOne()
+      taskQueries.selectTaskById(data.id, mapper = mapper.taskDataMapper).executeAsOne()
     }
   }
 
-  override suspend fun getTask(taskId: Long): Either<Failure, Task> =
-    getTaskFlow(taskId).firstOrNull()?.right() ?: TaskDoesNotExist.left()
+  override suspend fun getTask(taskId: String): Either<Failure, Task> =
+    taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
+      .executeAsOneOrNull()?.right() ?: TaskDoesNotExist.left()
 
-  override suspend fun getAllTasks(): List<Task> {
-    return taskQueries.selectAllActive(mapper.taskDataMapper).executeAsList()
-  }
+  override suspend fun getAllTasks(): List<Task> =
+    taskQueries.selectAllActive(mapper = mapper.taskDataMapper).executeAsList()
 
-  override fun getTaskFlow(taskId: Long): Flow<Task> {
+  override fun getTaskFlow(taskId: String): Flow<Task> {
     val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
       .asFlow()
       .mapToOneNotNull(Dispatchers.IO)
@@ -157,8 +161,8 @@ class TaskRepositoryImpl(
     val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutScheduleByScopeId(
       scope_id = scopeId,
       schedule_types = listOf(ScheduleType.OneTime),
-      mapper = mapper.taskDataMapper
     ).executeAsList()
+      .map { mapper.taskDataMapper1(it) }
 
     val firstTaskMessagesWithType =
       messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
@@ -232,16 +236,16 @@ class TaskRepositoryImpl(
 
   private fun createTaskData(
     title: String,
+    createdAt: Instant,
     priorityScore: Long,
-    taskType: TaskType,
   ) = TaskData(
-    id = 0,
-    uuid = generateUUID(),
+    id = generateUUID(),
     title = title,
-    create_time = timeManager.getCreateTime(),
-    complete_time = null,
-    priority_score = priorityScore,
-    task_type = taskType
+    created_at = createdAt,
+    updated_at = createdAt,
+    completed_at = null,
+    completed_timezone = null,
+    priority_score = priorityScore
   )
 
   override suspend fun deleteTasks(taskIds: List<Long>): Either<Failure, Boolean> {

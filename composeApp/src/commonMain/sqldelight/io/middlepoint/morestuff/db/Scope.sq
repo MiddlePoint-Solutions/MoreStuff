@@ -1,15 +1,17 @@
 import kotlin.Int;
+import kotlinx.datetime.Instant;
 
 CREATE TABLE scope (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    uuid TEXT NOT NULL,
+    id TEXT NOT NULL PRIMARY KEY,
     scope_name TEXT UNIQUE NOT NULL,
-    scope_order INTEGER AS Int NOT NULL
+    scope_order INTEGER AS Int NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL
 );
 
 createScope:
-INSERT OR IGNORE INTO scope (uuid, scope_name, scope_order)
-VALUES (:uid, :name, :order);
+INSERT OR IGNORE INTO scope
+VALUES ?;
 
 deleteScope:
 DELETE FROM scope
@@ -47,6 +49,6 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 selectScopeById:
-SELECT id, uuid, scope_name, scope_order
+SELECT id, id, scope_name, scope_order
 FROM scope
 WHERE id = :id;

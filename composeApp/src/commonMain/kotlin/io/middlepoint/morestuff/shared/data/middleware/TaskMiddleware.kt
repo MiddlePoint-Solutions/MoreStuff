@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CompleteTasksAction
@@ -46,7 +45,7 @@ class TaskMiddleware(
     when (action) {
       is CreateUserTaskAction -> scope.launch {
         with(action) {
-          val params = TaskParams(title, priority, TaskType.User, scopeId)
+          val params = TaskParams(title, priority, scopeId)
           val task = createTaskUseCase(params)
           onTaskCreated?.invoke(task)
           dispatch(TaskCreatedAction(task, priority))

@@ -41,9 +41,9 @@ class ScheduleRepositoryImpl(
     val utcTime = timeManager.localDateTimeToUtc(localDateTime).toString()
     val data = ScheduleData(
       id = 0,
-      uuid = generateUUID(),
+      id = generateUUID(),
       task_id = taskId,
-      create_time = timeManager.getCreateTime(),
+      created_at = timeManager.getCreatedTime(),
       schedule_time_local = localDateTime.toString(),
       schedule_time_utc = utcTime,
       timezone = timeManager.currentTimeZone.id,

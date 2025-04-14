@@ -11,7 +11,7 @@ CREATE TABLE schedule(
     timezone TEXT NOT NULL,
     active INTEGER AS Boolean NOT NULL DEFAULT 1,
     schedule_type TEXT AS ScheduleType NOT NULL,
-    FOREIGN KEY(task_id) REFERENCES task(id)
+    FOREIGN KEY(task_id) REFERENCES tasks(id)
     );
 
 selectAll:

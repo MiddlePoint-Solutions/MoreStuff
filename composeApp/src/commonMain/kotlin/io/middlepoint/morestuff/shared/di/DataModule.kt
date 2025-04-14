@@ -97,6 +97,7 @@ val supabaseModule = module {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
         appleNativeLogin() // TODO
       }
+
     }
   }
 }
