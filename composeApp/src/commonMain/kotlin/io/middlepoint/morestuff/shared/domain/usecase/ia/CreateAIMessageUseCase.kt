@@ -3,10 +3,8 @@ package io.middlepoint.morestuff.shared.domain.usecase.ia
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.Message
-import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.service.logger
-import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCase
 
 interface CreateAIMessageUseCase {

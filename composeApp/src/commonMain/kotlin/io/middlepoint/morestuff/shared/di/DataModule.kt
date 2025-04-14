@@ -39,7 +39,7 @@ val dataModule = module {
 
   single<StuffDb> { createDatabase(get()) }
 
-  single<DevTools> { DevToolsImpl(settings = get(named(SharedSettings.Unencrypted)), notifier = get(), dataMigration = get()) }
+  single<DevTools> { DevToolsImpl(settings = get(named(SharedSettings.Unencrypted)), notifier = get(), dataMigration = get(), migrationHelper = get()) }
   singleOf(::DataMappersImpl) bind DataMappers::class
   singleOf(::MessageDataMap)
 
