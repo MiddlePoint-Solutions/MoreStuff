@@ -18,6 +18,7 @@ import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.repository.MessageDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.service.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -47,14 +48,14 @@ class MessageRepositoryImpl(
   override fun getTaskChatMessages(taskId: Long): List<Message> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
-      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
+      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).executeAsList()
 
   override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
-      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
+      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).asFlow().mapToList(Dispatchers.IO)
 
@@ -83,6 +84,7 @@ class MessageRepositoryImpl(
     messageData: MessageData?,
     content: String,
   ): Either<Failure, Message> = messageQueries.transactionWithResult {
+    logger.d { "MessageRepository: Creating message with contentType: $contentType, content: $content" }
     messageQueries.insertMessage(
       task_id = taskId,
       schedule_id = scheduleId,
@@ -91,6 +93,7 @@ class MessageRepositoryImpl(
       content = content
     )
     val messageId = lastInsertId
+    logger.d { "MessageRepository: Message created with ID: $messageId" }
     messageData?.let {
       messageDataQueries.insertMessageData(
         message_id = messageId,

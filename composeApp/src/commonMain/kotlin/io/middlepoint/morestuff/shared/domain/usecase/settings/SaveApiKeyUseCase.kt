@@ -1,15 +1,15 @@
 package io.middlepoint.morestuff.shared.domain.usecase.settings
 
-import io.middlepoint.morestuff.shared.domain.repository.OpenAIRepository
+import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 
 interface SaveApiKeyUseCase {
     operator fun invoke(apiKey: String)
 }
 
 class SaveApiKeyUseCaseImpl(
-    private val openAIRepository: OpenAIRepository
+    private val llmRepository: LlmRepository
 ) : SaveApiKeyUseCase {
     override fun invoke(apiKey: String) {
-        openAIRepository.saveApiKey(apiKey)
+        llmRepository.saveApiKey(apiKey)
     }
 }

@@ -6,6 +6,7 @@ import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
+import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScheduleRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScopeRepositoryImpl
@@ -16,6 +17,7 @@ import io.middlepoint.morestuff.shared.data.service.DevToolsImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
+import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository

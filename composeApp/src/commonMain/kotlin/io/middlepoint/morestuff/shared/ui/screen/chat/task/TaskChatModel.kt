@@ -72,6 +72,7 @@ fun taskChatModel(
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
   var allScopes by remember { mutableStateOf(initialState.allScopes) }
+  var isAIEnabled by remember { mutableStateOf(initialState.isAIEnabled) }
 
   fun updateScopeAfterMove(scopeId: Long) {
     val newScope = allScopes.find { it.id == scopeId }
@@ -141,11 +142,22 @@ fun taskChatModel(
             )
           }
 
-          is InputText -> {
+          /*is InputText -> {
             store.dispatch(
               MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
             )
-          }
+            store.dispatch(
+              MessageAction.CreateAITaskMessageAction(taskId, content.trim())
+            )
+
+
+          }*/
+
+            is InputText -> {
+              store.dispatch(
+                MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
+              )
+            }
 
           is OpenDocument -> {
             mediaHandler.openPDF(path)
@@ -245,6 +257,17 @@ fun taskChatModel(
               logger.d { "Task moved to new scope: ${newScope.name}" }
             }
           }
+
+          is TaskChatEvent.CreateAIMessage -> {
+            store.dispatch(
+              MessageAction.CreateAITaskMessageAction(taskId, prompt)
+            )
+          }
+
+          is TaskChatEvent.ActivateAI -> {
+            isAIEnabled = !isAIEnabled
+            logger.d { "AI ${if (isAIEnabled) "enabled" else "disabled"} for task: $taskId" }
+          }
         }
       }
     }
@@ -256,6 +279,7 @@ fun taskChatModel(
     messages = messages,
     editingMessageId = editingMessageId,
     editingMessageContent = editingMessageContent,
-    allScopes = allScopes
+    allScopes = allScopes,
+    isAIEnabled = isAIEnabled
   )
 }

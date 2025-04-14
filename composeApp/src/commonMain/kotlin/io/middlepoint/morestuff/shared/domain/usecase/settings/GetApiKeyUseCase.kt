@@ -1,14 +1,14 @@
 package io.middlepoint.morestuff.shared.domain.usecase.settings
 
-import io.middlepoint.morestuff.shared.domain.repository.OpenAIRepository
+import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 
 interface GetApiKeyUseCase {
     operator fun invoke(): String
 }
 
 class GetApiKeyUseCaseImpl(
-    private val openAIRepository: OpenAIRepository
+    private val llmRepository: LlmRepository
 ) : GetApiKeyUseCase {
     override fun invoke(): String =
-        openAIRepository.getApiKey() ?: throw IllegalStateException("API key not found")
+        llmRepository.getApiKey() ?: throw IllegalStateException("API key not found")
 }

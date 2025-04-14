@@ -58,6 +58,7 @@ zoomable = "1.6.1"
 kottie = "1.9.6-alpha02"
 calf = "0.7.1"
 filekit = "0.10.0-beta01"
+openAi = "4.0.1"
 
 
 [libraries]
@@ -139,6 +140,7 @@ filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref =
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekit" }
+open-ai = { module = "com.aallam.openai:openai-client", version.ref = "openAi" }
 
 
 # Testing

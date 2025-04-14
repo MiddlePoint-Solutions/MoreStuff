@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.SmartToy
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -163,6 +165,7 @@ fun TaskChatScreen(
       is TaskChat -> {
 
         val model by viewModel.models.collectAsState()
+        val isAiEnabled = model.isAIEnabled
 
         val chatActions = remember {
           ChatActions(
@@ -202,7 +205,10 @@ fun TaskChatScreen(
           chatActions = chatActions,
           modifier = modifier,
           onBack = onBack,
-          sendTaskMessage = { viewModel.take(InputText(it)) },
+          sendTaskMessage = {
+            viewModel.take(InputText(it))
+            if (isAiEnabled) viewModel.take(TaskChatEvent.CreateAIMessage(it))
+          },
           imagePicked = { scope.launch { router.push(ImageImport(it)) } },
           pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
           onCreateNewScope = { title ->
@@ -251,6 +257,7 @@ private fun TaskChatContent(
   logger: Logger = koinInject(),
   onCreateNewScope: (String) -> Unit = {},
   navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = {},
+  isAIEnabled: Boolean = false
 ) {
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
@@ -267,6 +274,7 @@ private fun TaskChatContent(
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
   val allScopes = model.allScopes
+  //val isAIEnabled = model.isAIEnabled
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -318,6 +326,17 @@ private fun TaskChatContent(
           }
       }
       prevIsComplete.value = task.isComplete
+    }
+  }
+
+  val aiMessages = remember(messages) {
+    messages.filter { it.contentType == ContentType.AI_TASK_MESSAGE }
+  }
+
+  LaunchedEffect(aiMessages) {
+    logger.d { "AI Messages: ${aiMessages.size}" }
+    aiMessages.forEach { message ->
+      logger.d { "AI Message: id=${message.id}, content='${message.content}'" }
     }
   }
 
@@ -397,6 +416,8 @@ private fun TaskChatContent(
               onUpdateMessage = { content ->
                 onEvent(TaskChatEvent.UpdateMessageContent(content))
               },
+              isAIEnabled = isAIEnabled,
+              onToggleAI = { onEvent(TaskChatEvent.ActivateAI) },
               modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent),
@@ -466,7 +487,9 @@ private fun TaskChatInput(
   editingMessageId: Long? = null,
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
-  onUpdateMessage: (String) -> Unit = {}
+  onUpdateMessage: (String) -> Unit = {},
+  isAIEnabled: Boolean = false,
+  onToggleAI: () -> Unit = {}
 ) {
   val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
@@ -507,6 +530,25 @@ private fun TaskChatInput(
   ) {
     UserInput(
       modifier = Modifier.align(Alignment.BottomCenter),
+      leadingContent = {
+        //TODO: change and improve AI icon
+        IconButton(
+          onClick = onToggleAI,
+          modifier = Modifier.padding(start = 8.dp)
+        ) {
+          Icon(
+            imageVector = if (isAIEnabled)
+              Icons.Default.SmartToy
+            else
+              Icons.Outlined.SmartToy,
+            contentDescription = "Toggle AI",
+            tint = if (isAIEnabled)
+              MaterialTheme.colorScheme.primary
+            else
+              MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+          )
+        }
+      },
       textContent = {
         val weight = if (isTextEmpty.value) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {

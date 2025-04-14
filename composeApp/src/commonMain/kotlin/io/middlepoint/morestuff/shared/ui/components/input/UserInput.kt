@@ -14,6 +14,7 @@ fun UserInput(
     modifier: Modifier = Modifier,
     priorityContent: @Composable () -> Unit = {},
     textContent: @Composable () -> Unit = {},
+    leadingContent: @Composable () -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -21,6 +22,7 @@ fun UserInput(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
+        leadingContent()
         priorityContent()
         textContent()
     }
