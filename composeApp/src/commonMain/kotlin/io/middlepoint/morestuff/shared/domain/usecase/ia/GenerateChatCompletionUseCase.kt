@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.usecase.ia
 
-import io.middlepoint.morestuff.shared.domain.model.Message
 import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
