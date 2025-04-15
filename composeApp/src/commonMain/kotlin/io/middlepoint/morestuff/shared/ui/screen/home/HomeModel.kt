@@ -49,10 +49,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
@@ -95,7 +92,14 @@ fun homeModel(
   LaunchedEffect(Unit) {
     store.state
       .distinctUntilChangedBy { it.userState.user }
-      .collectLatest { username = it.userState.user?.fullName ?: "" }
+      .collectLatest { state ->
+        Logger.d("user = ${state.userState.user}")
+        val newUsername = state.userState.user?.fullName
+          .takeUnless { it.isNullOrBlank() }
+          ?: state.userState.user?.email.orEmpty()
+        Logger.d("username = $newUsername")
+        username = newUsername
+      }
   }
 
   LaunchedEffect(Unit) {
