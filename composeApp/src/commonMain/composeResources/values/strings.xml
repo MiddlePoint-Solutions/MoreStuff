@@ -297,4 +297,14 @@
     <string name="task_schedule_deletion_warning_singular">This task has a schedule that will also be deleted.</string>
     <string name="task_schedule_deletion_warning_plural">Some of these tasks have schedules that will also be deleted.</string>
 
+
+    <string name="sign_in_with_email">Sign in with Email</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="email_label">Email</string>
+    <string name="continue">Continue</string>
+    <string name="enter_code_sent_to_email">Enter the code sent to %1$s</string>
+    <string name="six_digit_code_label">6-digit code</string>
+    <string name="verify">Verify</string>
+    <string name="error_invalid_email">The email address is invalid or does not exist.</string>
+    <string name="error_generic">An error occurred. Please try again.</string>
 </resources>
