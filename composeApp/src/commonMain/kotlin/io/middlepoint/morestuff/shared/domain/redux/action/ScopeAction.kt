@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.action
 
-import io.middlepoint.morestuff.shared.domain.model.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 sealed class ScopeAction : Action.FeatureAction() {

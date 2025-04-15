@@ -37,12 +37,16 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
+import io.github.jan.supabase.compose.auth.composable.rememberSignInWithApple
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.middlepoint.morestuff.shared.Platform
+import io.middlepoint.morestuff.shared.platform
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_enable
@@ -74,8 +78,24 @@ fun OnBoardingSignInScreen(
     }
   )
 
+  val signInWithApple = supabase.composeAuth.rememberSignInWithApple(
+    onResult = { result -> //optional error handling
+      Logger.d("Login: $result")
+      when (result) {
+        is NativeSignInResult.Success -> {
+          onNext()
+        }
+
+        is NativeSignInResult.ClosedByUser -> {}
+        is NativeSignInResult.Error -> {}
+        is NativeSignInResult.NetworkError -> {}
+      }
+    }
+  )
+
   OnBoardingSignInContent(
     signInWithGoogle = { signInWithGoogle.startFlow() },
+    signInWithApple = { signInWithApple.startFlow() },
     onNext = onNext
   )
 }
@@ -86,6 +106,7 @@ fun OnBoardingSignInScreen(
 @Composable
 fun OnBoardingSignInContent(
   signInWithGoogle: () -> Unit,
+  signInWithApple: () -> Unit,
   onNext: () -> Unit
 ) {
 
@@ -175,6 +196,13 @@ fun OnBoardingSignInContent(
         onClick = signInWithGoogle,
         content = { ProviderButtonContent(Google) }
       )
+
+      if (platform == Platform.iOS) {
+        OutlinedButton(
+          onClick = signInWithApple,
+          content = { ProviderButtonContent(Apple) }
+        )
+      }
 
       Spacer(modifier = Modifier.padding(10.dp))
 

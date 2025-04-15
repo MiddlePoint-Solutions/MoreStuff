@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.redux.action
 
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 sealed class TaskAction : Action.FeatureAction() {
