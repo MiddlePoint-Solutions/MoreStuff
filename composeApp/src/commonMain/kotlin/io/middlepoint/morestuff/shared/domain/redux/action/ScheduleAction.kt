@@ -2,8 +2,8 @@ package io.middlepoint.morestuff.shared.domain.redux.action
 
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.ScheduleDomain
-import io.middlepoint.morestuff.shared.domain.model.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import kotlinx.datetime.LocalDateTime
 

@@ -1,8 +1,5 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
-import org.jetbrains.compose.internal.utils.getLocalProperty
-import org.jetbrains.compose.internal.utils.localPropertiesFile
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -104,7 +101,7 @@ kotlin {
       implementation(libs.stately.isolate)
       implementation(libs.stately.iso.collections)
       implementation(libs.ktor.core)
-      implementation(libs.ktor.client.cio)
+      //implementation(libs.ktor.client.cio)
       implementation(libs.ktor.client.logging)
       implementation(libs.ktor.client.content.negotiation)
       implementation(libs.ktor.serialization.kotlinx.json)
@@ -241,17 +238,17 @@ buildConfig {
 
   buildConfigField(
     name = "SUPABASE_URL",
-    value = provider { localProperties.getProperty("buildConfig.supabaseUrl") }
+    value = provider { localProperties.getProperty("SUPABASE_URL") }
   )
 
   buildConfigField(
     name = "SUPABASE_KEY",
-    value = provider { localProperties.getProperty("buildConfig.supabaseKey") }
+    value = provider { localProperties.getProperty("SUPABASE_KEY") }
   )
 
   buildConfigField(
     name = "GOOGLE_SERVER_CLIENT_ID",
-    value = provider { localProperties.getProperty("buildConfig.googleServerClientId") }
+    value = provider { localProperties.getProperty("GOOGLE_SERVER_CLIENT_ID") }
   )
 
 }

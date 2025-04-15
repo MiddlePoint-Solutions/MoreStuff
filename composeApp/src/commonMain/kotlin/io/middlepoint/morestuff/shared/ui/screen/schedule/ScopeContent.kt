@@ -119,29 +119,26 @@ fun ScopeContent(
             }
           },
 
-          onTaskLongPress = {
-            if (!isReordering) {
-              onToggleReordering(true)
-              onItemLongClick(item.id)
-            } else {
-              onToggleReordering(false)
-            }
-          },
-          handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-          modifier = Modifier.animateItem(
-            fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
-            fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
-            placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
-          ),
-          onTaskComplete = {
-            isVisible = false
-            scope.launch {
-              delay(200)
-              onTaskComplete(item.id)
-            }
-          },
-          enabled = enabled,
-        )
+            onTaskLongPress = {
+              if (!isReordering) {
+                onToggleReordering(true)
+                onItemLongClick(item.id)
+              } else {
+                onToggleReordering(false)
+              }
+            },
+            handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
+
+            onTaskComplete = {
+              isVisible = false
+              scope.launch {
+                delay(200)
+                onTaskComplete(item.id)
+              }
+            },
+            enabled = enabled,
+          )
+        }
       }
     }
   }

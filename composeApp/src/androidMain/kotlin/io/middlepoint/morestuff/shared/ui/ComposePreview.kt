@@ -3,9 +3,7 @@ package io.middlepoint.morestuff.shared.ui
 import android.content.res.Configuration
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingSignInContent
-import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingSignInScreen
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 
 
@@ -22,6 +20,7 @@ fun PriorityItemPreview() {
     MoreStuffTheme {
         OnBoardingSignInContent(
             signInWithGoogle = {},
+            signInWithApple = {},
             onNext = {}
         )
     }

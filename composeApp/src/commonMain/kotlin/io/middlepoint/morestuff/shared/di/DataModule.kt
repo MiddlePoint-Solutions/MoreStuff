@@ -1,9 +1,8 @@
 package io.middlepoint.morestuff.shared.di
 
 import MoreStuff.composeApp.BuildConfig
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.MemoryCodeVerifierCache
-import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.SettingsCodeVerifierCache
 import io.github.jan.supabase.auth.SettingsSessionManager
 import io.github.jan.supabase.compose.auth.ComposeAuth
@@ -88,6 +87,7 @@ val dataModule = module {
 
 }
 
+@OptIn(SupabaseInternal::class)
 val supabaseModule = module {
   single {
     createSupabaseClient(
