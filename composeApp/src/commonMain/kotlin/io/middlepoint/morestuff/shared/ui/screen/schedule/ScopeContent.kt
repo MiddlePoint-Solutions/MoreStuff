@@ -1,8 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -149,11 +147,7 @@ fun ScopeContent(
               }
             },
             handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-            modifier = Modifier.animateItem(
-              fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
-              fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
-              placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
-            ),
+
             onTaskComplete = {
               isVisible = false
               scope.launch {
