@@ -278,4 +278,14 @@
     <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
 
     <string name="scope_name">Nombre del scope</string>
+
+    <string name="sign_in_with_email">Iniciar sesión con Email</string>
+    <string name="enter_your_email">Introduce tu email</string>
+    <string name="email_label">Email</string>
+    <string name="continue">Continuar</string>
+    <string name="enter_code_sent_to_email">Introduce el código enviado a %1$s</string>
+    <string name="six_digit_code_label">Código de 6 dígitos</string>
+    <string name="verify">Verificar</string>
+    <string name="error_invalid_email">El email introducido no es válido o no existe.</string>
+    <string name="error_generic">Ha ocurrido un error. Inténtalo de nuevo.</string>
 </resources>
