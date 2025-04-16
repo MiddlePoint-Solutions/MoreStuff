@@ -27,6 +27,7 @@ fun OnBoardingScreen(
           add(NotificationPermission)
         }
         add(SignIn)
+        add(SignInEmail)
         add(Ready)
       },
       selectedIndex = 0
@@ -48,7 +49,15 @@ fun OnBoardingScreen(
   ) { screen ->
     when (screen) {
       Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
-      SignIn -> OnBoardingSignInScreen(onNext = navigation::selectNext)
+      SignIn -> OnBoardingSignInScreen(
+        onNext = navigation::selectNext,
+        onSignInWithEmail = { navigation.selectNext() }
+      )
+
+      SignInEmail -> OnBoardingSignInEmailScreen(
+        onNext = navigation::selectNext
+      )
+
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
       ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
       Ready -> OnBoardingCompleteScreen(onFinish = onBoardingComplete)
