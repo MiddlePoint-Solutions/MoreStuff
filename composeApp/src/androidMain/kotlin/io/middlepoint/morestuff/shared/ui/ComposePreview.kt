@@ -19,11 +19,11 @@ import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 fun PriorityItemPreview() {
     MoreStuffTheme {
         OnBoardingSignInContent(
-            signInWithGoogle = {},
-            signInWithApple = {},
-           onSendOtpToEmail = { _, _, _ -> },
-            onVerifyOtp = { _, _, _ -> },
-            onNext = {}
+          signInWithGoogle = {},
+          signInWithApple = {},
+          onNext = {},
+          onSignInWithEmail = {}
         )
     }
+
 }
