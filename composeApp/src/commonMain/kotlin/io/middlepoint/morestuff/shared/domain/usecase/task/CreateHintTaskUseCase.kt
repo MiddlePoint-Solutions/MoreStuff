@@ -34,7 +34,7 @@ class CreateHintTaskUseCaseImpl(
           taskId = createdTask.id,
           title = content,
           contentType = ContentType.APP_TASK_MESSAGE,
-          messageData = null
+          messageExtra = null
         )
       }
     }

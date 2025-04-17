@@ -47,7 +47,7 @@ val dataModule = module {
   // Repositories
   single<TaskRepository> {
     TaskRepositoryImpl(
-      database = get(),
+      database = get(),\
       timeManager = get(),
       mapper = get(),
     )

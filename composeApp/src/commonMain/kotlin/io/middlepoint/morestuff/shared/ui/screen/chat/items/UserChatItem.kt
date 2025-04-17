@@ -105,7 +105,7 @@ fun UserChatItem(
 
       when (messageType) {
         MessageType.Pdf -> {
-          message.messageData?.filePath?.let { filePath ->
+          message.messageExtra?.filePath?.let { filePath ->
             PDFMessageItem(
               pdfPath = filePath,
               message = message,

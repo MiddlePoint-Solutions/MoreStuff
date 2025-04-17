@@ -15,7 +15,6 @@ import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.Data
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.Loading
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
 @Composable
@@ -30,8 +29,7 @@ fun scopeTasksModel(
   var tasks: List<TaskUiModel>? by remember { mutableStateOf(null) }
 
   LaunchedEffect(Unit) {
-    getScopeActiveTasksFlowUseCase(scopeId)
-      .map(taskMapper::map)
+    getScopeActiveTasksFlowUseCase(scopeId).getScopeActiveTasksFlowUseCase.invoke(scopeId)
       .collect { taskList ->
         tasks = taskList
       }

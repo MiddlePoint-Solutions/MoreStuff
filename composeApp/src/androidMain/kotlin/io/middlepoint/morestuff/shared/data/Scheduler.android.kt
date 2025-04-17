@@ -3,13 +3,12 @@ package io.middlepoint.morestuff.shared.data
 import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import io.middlepoint.morestuff.shared.work.PlannedPriorityUpdateWorker
-import io.middlepoint.morestuff.shared.app.work.ReviewNotificationWorker
 import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.work.ScheduleWorker
@@ -22,10 +21,10 @@ class SchedulerImpl(
 ) : Scheduler {
 
     override fun scheduleAtExact(
-        scheduleId: Long,
+        scheduleId: Uuid,
         scheduleTime: String,
         taskTitle: String,
-        taskId: Long,
+        taskId: Uuid,
     ) {
         val data = ScheduleWorker.createWorkerData(scheduleId)
 
@@ -88,7 +87,7 @@ class SchedulerImpl(
         workManager.enqueueUniqueWork(PRIORITY_REVIEW_WORK, ExistingWorkPolicy.REPLACE, work)
     }*/
 
-    override fun cancelSchedule(scheduleId: Long) {
+    override fun cancelSchedule(scheduleId: Uuid) {
         workManager.cancelAllWorkByTag(getScheduleWorkTag(scheduleId))
     }
 
@@ -96,7 +95,7 @@ class SchedulerImpl(
         workManager.cancelAllWorkByTag(PLANNED_PRIORITY_WORK)
     }
 
-    private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
+    private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_${scheduleId.value}"
 
     companion object {
         private const val PLANNED_PRIORITY_WORK = "SmartReminder"

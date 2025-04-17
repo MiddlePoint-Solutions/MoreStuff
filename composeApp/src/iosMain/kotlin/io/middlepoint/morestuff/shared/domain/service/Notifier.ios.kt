@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.service
 
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
@@ -143,7 +144,7 @@ class NotifierImpl(
     }
   }
 
-  override fun clearScheduleNotification(scheduleId: Long) {
+  override fun clearScheduleNotification(scheduleId: Uuid) {
     logger.i { "Clearing notification for scheduleId=$scheduleId" }
     notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(scheduleId.toString()))
     notificationCenter.removeDeliveredNotificationsWithIdentifiers(listOf(scheduleId.toString()))

@@ -1,8 +1,9 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
 import kotlin.Int;
 import kotlinx.datetime.Instant;
 
 CREATE TABLE scope (
-    id TEXT NOT NULL PRIMARY KEY,
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
     scope_name TEXT UNIQUE NOT NULL,
     scope_order INTEGER AS Int NOT NULL,
     created_at INTEGER AS Instant NOT NULL,

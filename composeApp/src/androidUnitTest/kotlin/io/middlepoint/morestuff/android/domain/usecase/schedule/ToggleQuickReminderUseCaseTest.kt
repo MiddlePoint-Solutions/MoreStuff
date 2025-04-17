@@ -36,14 +36,14 @@ class ToggleQuickReminderUseCaseTest {
 
             coEvery { getTaskUseCase(any()) } returns task.right()
             coEvery {
-                cancelActiveScheduleUseCase(listOf(task.id), any())
+              cancelActiveScheduleUseCase(listOf(task.id), any())
             } returns listOf(schedule).right()
 
             val result = toggleQuickReminderUseCase(task.id)
 
             coVerify {
                 getTaskUseCase(task.id)
-                cancelActiveScheduleUseCase(listOf(task.id), any())
+              cancelActiveScheduleUseCase(listOf(task.id), any())
             }
 
             assertTrue(result.isLeft { it is TaskReminderCancelled } )

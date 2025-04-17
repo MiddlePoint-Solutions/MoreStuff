@@ -23,7 +23,7 @@ object MockData {
           replyType = userNewTask.replyType,
           replyContent = userNewTask.replyContent,
           openGraphResult = userNewTask.openGraphResult,
-          messageData = userNewTask.messageData,
+          messageExtra = userNewTask.messageExtra,
           formattedTime = "",
           formattedTimeOnly = "10:00"
         )
@@ -47,7 +47,7 @@ object MockData {
         replyType = userNewTaskMessage.replyType,
         replyContent = userNewTaskMessage.replyContent,
         openGraphResult = userNewTaskMessage.openGraphResult,
-        messageData = userNewTaskMessage.messageData,
+        messageExtra = userNewTaskMessage.messageExtra,
         formattedTime = formattedTime,
         formattedTimeOnly = formattedTimeOnly
       )

@@ -22,7 +22,7 @@ class UpdatePlannedTasksPriorityUseCaseImpl(
                         scheduleTimeLocal = LocalDateTime.parse(scheduleLocalTime),
                         taskCreateTimeUtc = task.createdAt
                     )
-                    updateTaskPriorityScoreUseCase(task.id, newPriorityScore)
+                  updateTaskPriorityScoreUseCase(task.id, newPriorityScore)
                 }
             }
         }

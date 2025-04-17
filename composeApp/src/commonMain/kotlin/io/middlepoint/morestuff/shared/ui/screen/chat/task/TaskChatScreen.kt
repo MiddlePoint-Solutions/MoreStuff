@@ -88,7 +88,6 @@ import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
-import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
@@ -172,12 +171,12 @@ fun TaskChatScreen(
             copyMessage = { viewModel.take(CopyText(it.content)) },
             deleteMessage = { viewModel.take(DeleteMessage(it)) },
             onImageSelected = {
-              val path = it.messageData?.filePath ?: ""
+              val path = it.messageExtra?.filePath ?: ""
               val title = it.content
               router.push(ImagePreview(path, title))
             },
             onPdfSelected = {
-              val path = it.messageData?.filePath ?: ""
+              val path = it.messageExtra?.filePath ?: ""
               viewModel.take(OpenDocument(path))
             },
             shareImage = { viewModel.take(ShareImage(it)) },

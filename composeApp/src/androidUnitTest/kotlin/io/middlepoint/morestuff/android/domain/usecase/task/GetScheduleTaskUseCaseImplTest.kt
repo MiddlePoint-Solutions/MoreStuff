@@ -25,12 +25,12 @@ class GetScheduleTaskUseCaseImplTest {
           createScheduleForTest(scheduleType = ScheduleType.OneTime)
         val task = createTaskForTest()
 
-        coEvery { getScheduleUseCase(scheduleId) } returns schedule.right()
+        coEvery { getScheduleUseCase.invoke(scheduleId) } returns schedule.right()
         coEvery { getTaskUseCase(taskId) } returns task.right()
 
         runBlocking {
 
-            when (val result = getScheduleUseCase(scheduleId)) {
+            when (val result = getScheduleUseCase.invoke(scheduleId)) {
                 is Either.Right -> getTaskUseCase(result.value.taskId)
                 is Either.Left -> result
             }

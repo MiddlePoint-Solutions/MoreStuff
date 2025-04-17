@@ -39,7 +39,7 @@ class NotificationMiddleware(
             }
 
             is RemoveScheduleNotificationAction -> {
-                notifier.clearScheduleNotification(action.scheduleId)
+                notifier.clearScheduleNotification(action.scheduleId) // TODO: continue with notifier
             }
 
             is ReminderAction.UserResponseAction -> {

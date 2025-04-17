@@ -9,6 +9,7 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
@@ -59,7 +60,7 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun deleteScope(id: Long): Either<Failure, Scope> =
+    override suspend fun deleteScope(id: Uuid): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
 
             val deleted = scopeQueries.selectScope(
@@ -92,7 +93,7 @@ class ScopeRepositoryImpl(
         .asFlow()
         .mapToList(Dispatchers.IO)
 
-    override suspend fun updateScopeName(id: Long, name: String): Either<Failure, Scope> =
+    override suspend fun updateScopeName(id: Uuid, name: String): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeName(name, id)
             scopeQueries
@@ -102,7 +103,7 @@ class ScopeRepositoryImpl(
         }
 
     // TODO: consider passing the entire list of scopes that will update their order
-    override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, Scope> =
+    override suspend fun updateScopeOrder(id: Uuid, order: Int): Either<Failure, Scope> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeOrder(
                 scopeId = id,
@@ -127,7 +128,7 @@ class ScopeRepositoryImpl(
                 .right()
         }
 
-    override suspend fun updateScopesOrder(scopesOrder: List<Pair<Long, Int>>) {
+    override suspend fun updateScopesOrder(scopesOrder: List<Pair<Uuid, Int>>) {
         scopeQueries.transaction {
             scopesOrder.forEach {
                 scopeQueries.updateScopeOrder(
@@ -138,7 +139,7 @@ class ScopeRepositoryImpl(
         }
     }
 
-    override suspend fun getScopeByTaskId(taskId: Long): Either<Failure, Scope> {
+    override suspend fun getScopeByTaskId(taskId: Uuid): Either<Failure, Scope> {
         val scopeId = taskScopeQueries
             .selectScopeIdForTask(taskId)
             .executeAsOneOrNull() ?: return Either.Left(NoScope)

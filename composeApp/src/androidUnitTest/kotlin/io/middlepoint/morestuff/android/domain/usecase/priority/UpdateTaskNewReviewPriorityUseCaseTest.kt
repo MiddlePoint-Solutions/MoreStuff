@@ -36,7 +36,7 @@ class UpdateTaskNewReviewPriorityUseCaseTest {
             val priority = Priority.Now()
 
             coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
-            useCase(taskId, ReviewActionType.Now)
+          useCase.invoke(taskId, ReviewActionType.Now)
             coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
@@ -50,7 +50,7 @@ class UpdateTaskNewReviewPriorityUseCaseTest {
             val priority = Priority.Later()
 
             coEvery { getDefaultPriorityScoreUseCase(priority) } returns priorityScore
-            useCase(taskId, ReviewActionType.Later)
+          useCase.invoke(taskId, ReviewActionType.Later)
             coVerify { getDefaultPriorityScoreUseCase(priority) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, priorityScore) }
         }
@@ -74,7 +74,7 @@ class UpdateTaskNewReviewPriorityUseCaseTest {
 
             coEvery { getTaskUseCase(taskId) } returns currentTask.right()
             coEvery { getTaskAbovePriorityScoreUseCase(taskPriorityScore) } returns nextPriorityTask.right()
-            useCase(taskId, ReviewActionType.More)
+          useCase.invoke(taskId, ReviewActionType.More)
             coVerify { getTaskUseCase(taskId) }
             coVerify { getTaskAbovePriorityScoreUseCase(taskPriorityScore) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, expectedPriorityScore) }
@@ -99,7 +99,7 @@ class UpdateTaskNewReviewPriorityUseCaseTest {
 
             coEvery { getTaskUseCase(taskId) } returns currentTask.right()
             coEvery { getTaskBelowPriorityScoreUseCase(taskPriorityScore) } returns nextPriorityTask.right()
-            useCase(taskId, ReviewActionType.Less)
+          useCase.invoke(taskId, ReviewActionType.Less)
             coVerify { getTaskUseCase(taskId) }
             coVerify { getTaskBelowPriorityScoreUseCase(taskPriorityScore) }
             coVerify { updateTaskPriorityScoreUseCase(taskId, expectedPriorityScore) }

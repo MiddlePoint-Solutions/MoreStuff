@@ -2,13 +2,14 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
 import arrow.core.flatMap
-import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUseCase
 
 interface CreateScheduleMessageUseCase {
-    suspend operator fun invoke(scheduleId: Long): Either<Failure, Message>
+    suspend operator fun invoke(scheduleId: Uuid): Either<Failure, Message>
 }
 
 class CreateScheduleMessageUseCaseImpl(
@@ -16,13 +17,13 @@ class CreateScheduleMessageUseCaseImpl(
     private val createMessageUseCase: CreateMessageUseCase
 ) : CreateScheduleMessageUseCase {
 
-    override suspend fun invoke(scheduleId: Long): Either<Failure, Message> {
+    override suspend fun invoke(scheduleId: Uuid): Either<Failure, Message> {
         return getTaskForScheduleUseCase(scheduleId).flatMap { task ->
             createMessageUseCase(
                 task.id,
                 task.title,
                 ContentType.TASK_REMINDER,
-                messageData = null,
+                messageExtra = null,
                 scheduleId
             )
         }

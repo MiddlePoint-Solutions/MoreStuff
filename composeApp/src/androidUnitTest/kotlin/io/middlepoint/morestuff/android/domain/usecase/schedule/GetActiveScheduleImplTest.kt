@@ -31,7 +31,7 @@ class GetActiveScheduleImplTest {
             )
         } returns schedule.right()
 
-        val result = getActiveScheduleImpl(taskId, listOf(ScheduleType.OneTime))
+        val result = getActiveScheduleImpl.invoke(taskId, listOf(ScheduleType.OneTime))
 
         assertEquals(schedule.right(), result)
         coVerify { scheduleRepository.getActiveSchedulesForTasks(taskId, any()) }

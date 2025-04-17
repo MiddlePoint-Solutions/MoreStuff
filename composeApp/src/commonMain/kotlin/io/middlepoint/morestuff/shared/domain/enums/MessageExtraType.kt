@@ -1,5 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.enums
 
-enum class MessageDataType {
+enum class MessageExtraType {
     Image, Video, Audio, Pdf
 }

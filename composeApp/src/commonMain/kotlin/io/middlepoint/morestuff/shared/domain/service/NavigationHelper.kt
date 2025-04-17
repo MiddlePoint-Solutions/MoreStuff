@@ -46,7 +46,7 @@ class NavigationHelper: ViewModel(), KoinComponent {
         viewModelScope.launch {
             logger.d { "Emitting Screen to navigate to: $taskId" }
             navigation.emit(Screen.TaskChat(taskId))
-            cancelActiveScheduleUseCase(listOf(taskId))
+          cancelActiveScheduleUseCase(listOf(taskId))
         }
     }
 

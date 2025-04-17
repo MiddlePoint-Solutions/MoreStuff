@@ -5,9 +5,9 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
-import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
+import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.MessageData
+import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.model.core.Task
@@ -107,7 +107,7 @@ fun createScheduleUseCaseTest(
         scheduleType
     )
         .copy(
-            scheduleUtcTime = LocalDateTime.parse(scheduleTimeLocal)
+            scheduledAt = LocalDateTime.parse(scheduleTimeLocal)
                 .toInstant(TimeZone.of(timeZone)).toString()
         )
 }
@@ -133,11 +133,11 @@ fun createMessageForTest(
   replyContent: String = "",
   replyTime: String = "",
   openGraphResult: OpenGraphResult = OpenGraphResult(),
-  messageData: MessageData = MessageData(
+  messageExtra: MessageExtra = MessageExtra(
         id = 1L,
         filePath = "",
         creationTime = "",
-        messageType = MessageDataType.Image
+        messageType = MessageExtraType.Image
     )
 
 ): Message {
@@ -153,6 +153,6 @@ fun createMessageForTest(
         replyContent,
         replyTime,
         openGraphResult,
-        messageData
+        messageExtra
     )
 }

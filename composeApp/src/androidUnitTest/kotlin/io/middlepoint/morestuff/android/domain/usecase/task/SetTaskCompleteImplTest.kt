@@ -21,7 +21,7 @@ class SetTaskCompleteImplTest {
         )
 
         runBlocking {
-            val result = setTaskCompleteUseCase(taskId, true)
+            val result = setTaskCompleteUseCase.invoke(taskId, true)
             coVerify { taskRepository.updateTasksComplete(taskId, true) }
             assertTrue(result is Either.Right)
             result.map { assertTrue(it) }

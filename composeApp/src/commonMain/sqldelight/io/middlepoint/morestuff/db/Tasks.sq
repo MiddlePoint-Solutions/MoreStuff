@@ -1,7 +1,8 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
 import kotlinx.datetime.Instant;
 
 CREATE TABLE tasks(
-    id TEXT NOT NULL PRIMARY KEY,
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
     created_at INTEGER AS Instant NOT NULL,
     updated_at INTEGER AS Instant NOT NULL,
     completed_at TEXT AS Instant,
@@ -27,7 +28,7 @@ FROM tasks
 WHERE completed_at IS NULL
   AND id NOT IN (
       SELECT task_id
-      FROM schedule
+      FROM schedules
       WHERE active = 1 AND schedule_type IN :schedule_types
   )
 ORDER BY tasks.priority_score DESC;
@@ -40,7 +41,7 @@ WHERE tasks_scopes.scope_id = :scope_id
   AND completed_at IS NULL
   AND id NOT IN (
       SELECT task_id
-      FROM schedule
+      FROM schedules
       WHERE active = 1 AND schedule_type IN :schedule_types
   )
 ORDER BY tasks.priority_score DESC;

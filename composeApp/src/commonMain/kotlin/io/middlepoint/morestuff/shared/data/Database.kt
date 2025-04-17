@@ -16,15 +16,15 @@ expect class DriverFactory {
 
 fun createDatabase(driverFactory: DriverFactory) = StuffDb(
     driver = driverFactory.createDriver(),
-    taskAdapter = Tasks.Adapter(
+    tasksAdapter = Tasks.Adapter(
         updated_atAdapter = InstantColumnAdapter,
         created_atAdapter = InstantColumnAdapter,
         task_typeAdapter = EnumColumnAdapter()
     ),
-    scheduleAdapter = Schedule.Adapter(
+    schedulesAdapter = Schedule.Adapter(
         schedule_typeAdapter = EnumColumnAdapter()
     ),
-    messageAdapter = Message.Adapter(
+    messagesAdapter = Message.Adapter(
         content_typeAdapter = IntColumnAdapter,
         reply_typeAdapter = IntColumnAdapter
     ),

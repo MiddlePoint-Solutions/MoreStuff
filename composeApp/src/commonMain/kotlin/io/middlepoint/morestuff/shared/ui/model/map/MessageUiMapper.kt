@@ -14,7 +14,7 @@ class MessageUiMapper(private val timeFormatter: TimeFormatter) {
       contentType = input.contentType,
       createTime = timeFormatter.formatToDateTime(input.createTime),
       content = input.content,
-      messageData = input.messageData,
+      messageExtra = input.messageExtra,
       replyType = input.replyType,
       replyContent = input.replyContent,
       formattedTime = timeFormatter.formatDisplayDayMonth(input.createTime),

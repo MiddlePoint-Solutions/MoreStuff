@@ -37,7 +37,7 @@ fun ImageMessageItem(
   ) {
 
     val uri by remember {
-      derivedStateOf { message.messageData?.filePath }
+      derivedStateOf { message.messageExtra?.filePath }
     }
     val platformContext = LocalPlatformContext.current
     val imageLoader = remember(platformContext) {
@@ -50,7 +50,7 @@ fun ImageMessageItem(
           .data(data = uri)
           .crossfade(true)
           .scale(Scale.FIT)
-          .memoryCacheKey(message.messageData?.filePath)
+          .memoryCacheKey(message.messageExtra?.filePath)
           .build(),
         imageLoader = imageLoader
       ),

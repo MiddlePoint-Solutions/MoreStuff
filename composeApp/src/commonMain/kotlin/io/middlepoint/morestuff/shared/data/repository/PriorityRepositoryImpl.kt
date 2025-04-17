@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.data.repository
 import arrow.core.Either
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.service.logger
@@ -12,7 +13,7 @@ class PriorityRepositoryImpl(
     database: StuffDb,
 ) : PriorityRepository {
 
-    private val taskQueries = database.taskQueries
+    private val taskQueries = database.tasksQueries
 
     override suspend fun getHighestPriorityScore(): Long = taskQueries
         .selectHighestPriorityScore().executeAsOne().max ?: 0
@@ -20,7 +21,7 @@ class PriorityRepositoryImpl(
     override suspend fun getLowestPriorityScore(): Long = taskQueries
         .selectLowestPriorityScore().executeAsOne().min ?: 0
 
-    override suspend fun increaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
+    override suspend fun increaseTaskPriorityScore(taskId: Uuid): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
             when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
                 null -> Either.Left(TaskDoesNotExist)
@@ -33,7 +34,7 @@ class PriorityRepositoryImpl(
         }
     }
 
-    override suspend fun decreaseTaskPriorityScore(taskId: Long): Either<Failure, Long> {
+    override suspend fun decreaseTaskPriorityScore(taskId: Uuid): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
             when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
                 null -> Either.Left(TaskDoesNotExist)
@@ -47,7 +48,7 @@ class PriorityRepositoryImpl(
     }
 
     override suspend fun updateTasksPriorityScoreByAdding(
-        taskId: Long,
+        taskId: Uuid,
         priorityScore: Long,
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
@@ -58,7 +59,7 @@ class PriorityRepositoryImpl(
     }
 
     override suspend fun updateTasksPriorityScoreBySubtracting(
-        taskId: Long,
+        taskId: Uuid,
         priorityScore: Long,
     ): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
@@ -69,7 +70,7 @@ class PriorityRepositoryImpl(
     }
 
     override suspend fun updateTaskPriority(
-        taskId: Long,
+        taskId: Uuid,
         priorityScore: Long,
     ): Either<Failure, Long> {
         taskQueries.updateTaskPriorityScore(priorityScore, taskId)

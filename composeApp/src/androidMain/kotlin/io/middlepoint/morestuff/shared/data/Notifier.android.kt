@@ -32,6 +32,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType.LATER
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
 import io.middlepoint.morestuff.shared.domain.model.Defaults
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.Notifier.Companion.GROUP_KEY_REMINDERS
@@ -229,7 +230,7 @@ class NotifierImpl(
     private fun getActiveNotificationById(id: Int): Notification? =
         activeNotifications.firstOrNull { it.id == id }?.notification
 
-    override fun clearScheduleNotification(scheduleId: Long) {
+    override fun clearScheduleNotification(scheduleId: Uuid) {
         notificationManager.cancel(scheduleId.toInt())
     }
 

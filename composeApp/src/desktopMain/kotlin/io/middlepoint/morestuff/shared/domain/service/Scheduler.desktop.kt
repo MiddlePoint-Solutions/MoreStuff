@@ -1,12 +1,14 @@
 package io.middlepoint.morestuff.shared.domain.service
 
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+
 class SchedulerImpl : Scheduler {
 
     override fun scheduleAtExact(
-        scheduleId: Long,
-        scheduleTime: String,
-        taskTitle: String,
-        taskId: Long
+      scheduleId: Uuid,
+      scheduleTime: String,
+      taskTitle: String,
+      taskId: Uuid
     ) {
         TODO("Not yet implemented")
     }

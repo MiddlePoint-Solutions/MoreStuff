@@ -3,15 +3,16 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import kotlinx.datetime.Instant
 
 typealias ScheduleDataMapper = (
-    id: Long,
-    uuid: String,
-    task_id: Long,
-    create_time: String,
-    schedule_time_local: String?,
-    schedule_time_utc: String?,
+    id: Uuid,
+    task_id: Uuid,
+    created_at: Instant,
+    updated_at: Instant,
+    scheduled_at: Instant,
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
@@ -20,21 +21,20 @@ typealias ScheduleDataMapper = (
 fun makeScheduleDataMapper(): ScheduleDataMapper = ::mapScheduleData
 
 fun mapScheduleData(
-    id: Long,
-    uuid: String,
-    task_id: Long,
-    create_time: String,
-    schedule_time_local: String?,
-    schedule_time_utc: String?,
+    id: Uuid,
+    task_id: Uuid,
+    created_at: Instant,
+    updated_at: Instant,
+    scheduled_at: Instant,
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
 ): Schedule = Schedule(
     id = id,
     taskId = task_id,
-    createTime = create_time,
-    scheduleLocalTime = schedule_time_local,
-    scheduleUtcTime = schedule_time_utc,
+    createdAt = created_at.toString(),
+    updatedAt = updated_at.toString(),
+    scheduledAt = scheduled_at.toString(),
     timezone = timezone,
     active = active,
     scheduleType = schedule_type

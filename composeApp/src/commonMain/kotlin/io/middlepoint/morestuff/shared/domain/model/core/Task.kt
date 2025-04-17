@@ -1,10 +1,11 @@
 package io.middlepoint.morestuff.shared.domain.model.core
 
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Task(
-  val id: String,
+  val id: Uuid,
   val title: String,
   val createdAt: String,
   val updatedAt: String,

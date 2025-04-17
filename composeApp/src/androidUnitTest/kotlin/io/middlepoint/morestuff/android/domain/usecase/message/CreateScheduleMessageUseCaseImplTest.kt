@@ -5,7 +5,7 @@ import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createMessageForTest
 import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.model.MessageData
+import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -28,7 +28,7 @@ class CreateScheduleMessageUseCaseImplTest {
     val taskId = 1L
     val task = createTaskForTest()
     val message = createMessageForTest()
-    val messageData: MessageData? = null
+    val messageExtra: MessageExtra? = null
 
     coEvery { getScheduleTaskUseCase(scheduleId) } returns Either.Right(task)
     coEvery {
@@ -36,13 +36,13 @@ class CreateScheduleMessageUseCaseImplTest {
         taskId,
         task.title,
         ContentType.TASK_REMINDER,
-        messageData,
+        messageExtra,
         scheduleId,
       )
     } returns message.right()
 
     runBlocking {
-      val result = createScheduleMessageUseCaseImpl(scheduleId)
+      val result = createScheduleMessageUseCaseImpl.invoke(scheduleId)
       assertTrue(result is Either.Right)
       result as Either.Right
       assertEquals(message, result.value)

@@ -1,18 +1,14 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
-import io.middlepoint.morestuff.shared.domain.redux.action.DevAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
-import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
-import io.middlepoint.morestuff.shared.domain.usecase.message.ClearActiveReminderMessagesUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 class DevMiddleware(
-    private val clearActiveReminderMessagesUseCase: ClearActiveReminderMessagesUseCase
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -23,9 +19,7 @@ class DevMiddleware(
         scope: CoroutineScope
     ): Action {
         when (action) {
-            is DevAction.ClearActiveReminderMessages -> scope.launch {
-                clearActiveReminderMessagesUseCase()
-            }
+
             else -> NoOp
         }
 

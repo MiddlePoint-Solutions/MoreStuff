@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createMessageForTest
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.model.MessageData
+import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -22,14 +22,14 @@ class CreateMessageUseCaseImplTest {
         val scheduleId = 1L
         val title = "Test Message"
         val contentType = ContentType.CONFIRM_NEW_TASK
-        val messageData: MessageData? = null
+        val messageExtra: MessageExtra? = null
         val expectedMessage = createMessageForTest()
 
-        coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value,messageData, title) } returns expectedMessage.right()
+        coEvery { messageRepository.createMessage(taskId, scheduleId, contentType.value,messageExtra, title) } returns expectedMessage.right()
         coEvery { checkForUrlMetadataUseCase(title, any()) } returns Unit.right()
 
         runBlocking {
-            val result = createMessageUseCaseImpl.invoke(taskId,title,   contentType,messageData, scheduleId)
+            val result = createMessageUseCaseImpl.invoke(taskId,title,   contentType,messageExtra, scheduleId)
             assertEquals(expectedMessage.right(), result)
         }
     }

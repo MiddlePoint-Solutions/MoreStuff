@@ -1,12 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.model
 
 import androidx.compose.runtime.Immutable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.serialization.Serializable
 
 @Immutable
 @Serializable
 data class TaskUiModel(
-    val id: Long = 0L,
+    val id: Uuid,
     val title: String = "",
     val createTime: String = "",
     val completeTime: String = "",

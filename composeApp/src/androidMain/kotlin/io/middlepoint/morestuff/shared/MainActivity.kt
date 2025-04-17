@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
       }
 
       ACTION_NOTIFICATION_REVIEW -> {
-        Screen.Review(intent.getLongExtra(EXTRA_SCOPE_ID, defaultScope.id))
+        Screen.Review(intent.getLongExtra(EXTRA_SCOPE_ID, 0)) // TODO: use Uuid instead
       }
 
       else -> null

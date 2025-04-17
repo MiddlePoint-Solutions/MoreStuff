@@ -9,15 +9,18 @@ import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.data.model.MessageData
+import io.middlepoint.morestuff.shared.data.model.MessageExtraData
+import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.MessageData
+import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.repository.MessageDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import io.middlepoint.morestuff.shared.generateUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -29,36 +32,30 @@ class MessageRepositoryImpl(
   private val timeManager: TimeManager,
 ) : MessageRepository {
 
-  private val messageQueries = database.messageQueries
+  private val messageQueries = database.messagesQueries
   private val urlMetadataQueries = database.urlMetadataQueries
-  private val messageDataQueries = database.messageDataQueries
-  private val lastInsertId: Long get() = messageQueries.lastInsertRowId().executeAsOne()
+  private val messageDataQueries = database.messagesExtraQueries
 
-  override fun getAllMessages(): Flow<List<Message>> =
-    messageQueries.selectMasterMessages(mapper = mapper.messageDataMapper)
-      .asFlow()
-      .mapToList(Dispatchers.IO)
-
-  override fun getTaskMessagesFlow(taskId: Long): Flow<List<Message>> =
+  override fun getTaskMessagesFlow(taskId: Uuid): Flow<List<Message>> =
     messageQueries.selectMessageByTaskId(taskId, mapper = mapper.messageDataMapper)
       .asFlow()
       .mapToList(Dispatchers.IO)
 
-  override fun getTaskChatMessages(taskId: Long): List<Message> =
+  override fun getTaskChatMessages(taskId: Uuid): List<Message> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
       listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).executeAsList()
 
-  override fun getTaskChatMessagesFlow(taskId: Long): Flow<List<Message>> =
+  override fun getTaskChatMessagesFlow(taskId: Uuid): Flow<List<Message>> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
       listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).asFlow().mapToList(Dispatchers.IO)
 
-  override suspend fun getMessage(messageId: Long): Either<Failure, Message> {
+  override suspend fun getMessage(messageId: Uuid): Either<Failure, Message> {
     val message = messageQueries.selectMessageById(
       id = messageId,
       mapper = mapper.messageDataMapper
@@ -70,76 +67,45 @@ class MessageRepositoryImpl(
   }
 
   override suspend fun createMessage(
-    taskId: Long,
-    scheduleId: Long,
+    taskId: Uuid,
+    scheduleId: Uuid?,
     contentType: Int,
-    messageData: MessageData?,
+    messageExtra: MessageExtra?,
     content: String,
   ): Either<Failure, Message> = messageQueries.transactionWithResult {
-    messageQueries.insertMessage(
-      uuid = generateUUID(),
+    val createdAt = timeManager.nowUtcInstant
+    val messageData = MessageData(
+      id = Uuid.generate(),
       task_id = taskId,
       schedule_id = scheduleId,
-      create_time = timeManager.getCreatedTime(),
+      created_at = createdAt,
+      updated_at = createdAt,
       content_type = contentType,
       content = content
     )
-    val messageId = lastInsertId
-    messageData?.let {
-      messageDataQueries.insertMessageData(
-        message_id = messageId,
-        file_path = messageData.filePath,
-        creation_time = timeManager.getCreatedTime(),
-        data_type = messageData.messageType.name,
+    messageQueries.insertMessage(messageData)
+    // TODO: message extra should be created before the message.
+    messageExtra?.let {
+      val messageExtraData = MessageExtraData(
+        id = Uuid.generate(),
+        message_id = messageData.id,
+        file_path = messageExtra.filePath,
+        created_at = timeManager.nowUtcInstant,
+        data_type = messageExtra.messageType.name,
       )
+      messageDataQueries.insertMessageExtra(messageExtraData)
+      messageData.copy()
     }
     messageQueries.selectMessageById(
-      id = messageId,
+      id = messageData.id,
       mapper = mapper.messageDataMapper
     ).executeAsOne().right()
   }
 
-  override suspend fun addUserReplyMessage(
-    taskId: Long,
-    replyType: Int,
-    replyContent: String,
-  ) {
-    // TODO: this logic should be moved into 2 use cases
-    when (val messageId = getCurrentTaskMessageId(taskId, ContentType.TASK_REMINDER)) {
-      is Right -> {
-        messageQueries.updateTaskMessageReply(
-          reply_type = replyType,
-          reply_content = replyContent,
-          reply_time = timeManager.nowUtcInstantString,
-          id = messageId.value
-        )
-      }
-
-      is Left -> MessageDoesNotExist
-    }
-  }
-
-  override suspend fun clearActiveReminderMessages() {
-    messageQueries.deleteActiveReminderMessages()
-  }
-
-  override suspend fun countActiveReminderMessages(): Int =
-    messageQueries.countActiveReminderMessages().executeAsOne().toInt()
-
-  private fun getCurrentTaskMessageId(
-    taskId: Long,
-    contentType: ContentType,
-  ): Either<Failure, Long> =
-    messageQueries.selectTaskMessage(
-      task_id = taskId,
-      content_type = contentType.value
-    ).executeAsOneOrNull()?.let { Right(it.id) } ?: Left(MessageDoesNotExist)
-
-
   override suspend fun insertUrlMetadata(
     url: String,
     openGraphResult: OpenGraphResult,
-    messageId: Long,
+    messageId: Uuid,
   ) {
     val openGraphResultJson = Json.encodeToString(openGraphResult)
     urlMetadataQueries.insertUrlMetadata(
@@ -149,22 +115,13 @@ class MessageRepositoryImpl(
     )
   }
 
-  override suspend fun insertMessageData(messageData: MessageData) {
-    messageDataQueries.insertMessageData(
-      messageData.id,
-      messageData.filePath,
-      messageData.creationTime,
-      messageData.messageType.name
-    )
-  }
-
-  override suspend fun deleteMessage(messageId: Long) {
+  override suspend fun deleteMessage(messageId: Uuid) {
     val message = messageQueries.selectMessageById(
       id = messageId,
       mapper = mapper.messageDataMapper
     ).executeAsOneOrNull()
 
-    val imagePath = message?.messageData?.filePath
+    val imagePath = message?.messageExtra?.filePath
     imagePath?.let {
       // TODO
 //            val file = File(it)
@@ -177,7 +134,7 @@ class MessageRepositoryImpl(
 
 
   override suspend fun updateMessageContent(
-    messageId: Long,
+    messageId: Uuid,
     content: String,
   ): Either<Failure, Boolean> {
     messageQueries.updateMessageContent(content, messageId)

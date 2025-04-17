@@ -23,7 +23,7 @@ class GetActiveTasksUseCaseTest {
     @Test
     fun `when not 'All' scopeId is passed, should get scoped tasks`() = runTest {
         val scopeId = 1337L
-        getScopeActiveTasksUseCase(scopeId)
+      getScopeActiveTasksUseCase(scopeId)
         coVerify { taskRepository.getScopeActiveTasksFlow(scopeId) }
     }
 

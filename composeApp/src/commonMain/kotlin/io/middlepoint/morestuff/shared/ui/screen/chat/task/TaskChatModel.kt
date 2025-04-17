@@ -11,7 +11,7 @@ import io.middlepoint.morestuff.shared.ClipboardHelper
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
+import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
@@ -152,17 +152,17 @@ fun taskChatModel(
           }
 
           is ShareMessage -> {
-            when (message.messageData?.messageType) {
-              MessageDataType.Image -> {
-                mediaHandler.shareImage(message.messageData.filePath)
+            when (message.messageExtra?.messageType) {
+              MessageExtraType.Image -> {
+                mediaHandler.shareImage(message.messageExtra.filePath)
               }
 
-              MessageDataType.Pdf -> {
-                mediaHandler.sharePDF(message.messageData.filePath)
+              MessageExtraType.Pdf -> {
+                mediaHandler.sharePDF(message.messageExtra.filePath)
               }
 
-              MessageDataType.Video -> {}
-              MessageDataType.Audio -> {}
+              MessageExtraType.Video -> {}
+              MessageExtraType.Audio -> {}
               null -> {
                 shareHelper.shareMessage(message.content)
               }
