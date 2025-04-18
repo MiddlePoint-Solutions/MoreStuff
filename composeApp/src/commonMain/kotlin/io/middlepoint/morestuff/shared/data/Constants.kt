@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.data
 
 object Constants {
 
-    const val DATABASE_NAME = "morestuff.db"
+    const val DATABASE_NAME = "morestuff_data.db"
 
     // User keys
     const val KEY_DEV_SETTINGS = "key_enable_dev_settings"

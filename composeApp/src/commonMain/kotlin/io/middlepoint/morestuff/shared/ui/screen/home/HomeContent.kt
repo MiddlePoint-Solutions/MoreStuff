@@ -387,14 +387,14 @@ private fun HomeContent(
           .graphicsLayer {
             alpha = if (taskInputActive) 0.4f else 1f
           },
-        key = { model.scopes[it].id }
+        key = { model.scopes[it].id.value }
       ) { page ->
 
         val scope = model.scopes[page]
 
         val scopeViewModel = koinInjectOnRoute(
           type = ScopeTasksViewModel::class,
-          key = "Scope${scope.id}",
+          key = "Scope${scope.id.value}",
           parameters = { parametersOf(scope.id) }
         )
 

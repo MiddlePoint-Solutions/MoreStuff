@@ -103,7 +103,7 @@ private fun ScopeSelection(
     LazyColumn {
       items(
         items = scopes,
-        key = { scope -> "Scope${scope.id}" }
+        key = { scope -> "Scope${scope.id.value}" }
       ) { scope ->
         ListItem(
           modifier = Modifier.clickable { onScopeSelected(scope.id) },

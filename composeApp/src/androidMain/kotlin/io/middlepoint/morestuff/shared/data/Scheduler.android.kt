@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.data
 
-import android.content.Context
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -15,7 +14,6 @@ import io.middlepoint.morestuff.shared.work.ScheduleWorker
 import java.util.concurrent.TimeUnit
 
 class SchedulerImpl(
-    private val context: Context,
     private val timeManager: TimeManager,
     private val workManager: WorkManager
 ) : Scheduler {

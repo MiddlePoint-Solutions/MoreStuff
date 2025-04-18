@@ -80,7 +80,7 @@ fun homeModel(
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
       if(currentScopeId.value.isEmpty()) {
-        currentScopeId = scopes.first { it.name == DEFAULT_SCOPE_NAME }.id
+        currentScopeId = it.first { scope -> scope.name == DEFAULT_SCOPE_NAME }.id
       }
       scopes = it
     }

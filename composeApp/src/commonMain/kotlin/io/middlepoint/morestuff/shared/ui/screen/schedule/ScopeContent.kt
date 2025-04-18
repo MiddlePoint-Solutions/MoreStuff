@@ -101,7 +101,7 @@ fun ScopeContent(
   ) {
     itemsIndexed(
       items = reorderList,
-      key = { _, task -> task.id }
+      key = { _, task -> task.id.value }
     ) { index, item ->
 
       val isLast by remember(index) {
@@ -126,7 +126,7 @@ fun ScopeContent(
           animationSpec = tween(durationMillis = 600)
         )
       ) {
-        ReorderableItem(reorderableState, key = item.id) {
+        ReorderableItem(reorderableState, key = item.id.value) {
           PriorityItem(
             task = item,
             isSelected = selected,

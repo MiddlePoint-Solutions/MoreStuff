@@ -80,7 +80,7 @@ fun TaskDetails(
 
   val viewModel = koinInjectOnRoute(
     type = TaskDetailsViewModel::class,
-    key = "TaskChat$taskId",
+    key = "TaskChat${taskId.value}",
     parameters = { parametersOf(taskId) }
   )
 

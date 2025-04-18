@@ -325,7 +325,7 @@ private fun ShareContent(
 
       val scopeViewModel = koinInjectOnRoute(
         type = ScopeTasksViewModel::class,
-        key = "Scope${scope.id}",
+        key = "Scope${scope.id.value}",
         parameters = { parametersOf(scope.id) }
       )
 
@@ -383,7 +383,7 @@ private fun ShareTasksList(
 
       items(
         tasks,
-        key = { it.id }
+        key = { it.id.value }
       ) { task ->
         PriorityItem(
           task = task,

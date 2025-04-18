@@ -241,7 +241,7 @@ fun SearchBar(
                   LazyColumn {
                     items(
                       items = result,
-                      key = { item -> item.id },
+                      key = { item -> item.id.value },
                       contentType = { item ->
                         when (item.isComplete) {
                           true -> SearchContentType.Complete

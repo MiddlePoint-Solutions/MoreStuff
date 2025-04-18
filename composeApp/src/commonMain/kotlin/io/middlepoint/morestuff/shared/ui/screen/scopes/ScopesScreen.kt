@@ -299,9 +299,9 @@ private fun OrderedScopesList(
     ) {
       itemsIndexed(
         items = scopes,
-        key = { _, scope -> scope.id }
+        key = { _, scope -> scope.id.value }
       ) { _, scope ->
-        ReorderableItem(reorderState, key = scope.id) {
+        ReorderableItem(reorderState, key = scope.id.value) {
           Column(
             modifier = Modifier.background(
               color = MaterialTheme.colorScheme.surfaceContainerElevation
