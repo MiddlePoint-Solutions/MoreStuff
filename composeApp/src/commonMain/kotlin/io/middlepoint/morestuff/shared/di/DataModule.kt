@@ -47,7 +47,7 @@ val dataModule = module {
   // Repositories
   single<TaskRepository> {
     TaskRepositoryImpl(
-      database = get(),\
+      database = get(),
       timeManager = get(),
       mapper = get(),
     )
@@ -68,16 +68,9 @@ val dataModule = module {
     UserRepositoryImpl(settings = get())
   }
 
-  single<ScopeRepository> {
-    ScopeRepositoryImpl(
-      database = get(),
-      dataMappers = get()
-    )
-  }
-
+  singleOf(::ScopeRepositoryImpl) bind ScopeRepository::class
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
-
   factoryOf(::MigrationHelper)
 
 }

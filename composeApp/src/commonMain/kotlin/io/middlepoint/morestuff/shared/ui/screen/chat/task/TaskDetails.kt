@@ -57,6 +57,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.keyboardAsState
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
@@ -71,7 +72,7 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TaskDetails(
-  taskId: Long,
+  taskId: Uuid,
   modifier: Modifier = Modifier,
   taskOptions: @Composable ColumnScope.() -> Unit = {},
   onTitleLineCount: (Int) -> Unit

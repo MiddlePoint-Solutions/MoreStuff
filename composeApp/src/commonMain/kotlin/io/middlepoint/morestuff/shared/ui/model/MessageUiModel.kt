@@ -3,20 +3,18 @@ package io.middlepoint.morestuff.shared.ui.model
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 
 @Immutable
 data class MessageUiModel(
-  val id: Long = 0,
-  val taskId: Long = 0,
-  val scheduleId: Long = 0,
+  val id: Uuid,
+  val taskId: Uuid,
+  val scheduleId: Uuid?,
   val contentType: ContentType,
-  val createTime: String,
+  val createAt: String,
   val content: String,
-  val replyType: ReplyType? = null,
-  val replyContent: String? = null,
   val openGraphResult: OpenGraphResult? = null,
   val messageExtra: MessageExtra? = null,
   val formattedTime: String,

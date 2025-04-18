@@ -2,12 +2,13 @@ package io.middlepoint.morestuff.shared.ui.screen.chat
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 
 @Immutable
 data class ChatActions(
-    val scheduleAction: (scheduleId: Long, ReplyType) -> Unit = { _, _ -> },
-    val taskChatAction: (taskId: Long) -> Unit = {},
+    val scheduleAction: (scheduleId: Uuid, ReplyType) -> Unit = { _, _ -> },
+    val taskChatAction: (taskId: Uuid) -> Unit = {},
     val copyMessage: (MessageUiModel) -> Unit = {},
     val deleteMessage: (MessageUiModel) -> Unit = {},
     val onImageSelected: (MessageUiModel) -> Unit = {},
@@ -15,7 +16,7 @@ data class ChatActions(
     val shareImage: (imagePath: String) -> Unit = {},
     val sharePdf: (pdfPath: String) -> Unit = {},
     val shareMessage: (MessageUiModel) -> Unit = {},
-    val setEditingMessage: (Long) -> Unit = {},
+    val setEditingMessage: (Uuid) -> Unit = {},
     val updateMessageContent: (String) -> Unit = {},
-    val isMessageBeingEdited: (Long) -> Boolean = { false }
+    val isMessageBeingEdited: (Uuid) -> Boolean = { false }
 )

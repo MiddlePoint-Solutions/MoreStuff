@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetScopeActiveTasksFlowUseCase
@@ -15,11 +16,12 @@ import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.Data
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels.Loading
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
 @Composable
 fun scopeTasksModel(
-  scopeId: Long,
+  scopeId: Uuid,
   events: SharedFlow<ScopeTasksEvent>,
   getScopeActiveTasksFlowUseCase: GetScopeActiveTasksFlowUseCase = koinInject(),
   cancelActiveScheduleUseCase: CancelActiveScheduleUseCase = koinInject(),
@@ -29,7 +31,8 @@ fun scopeTasksModel(
   var tasks: List<TaskUiModel>? by remember { mutableStateOf(null) }
 
   LaunchedEffect(Unit) {
-    getScopeActiveTasksFlowUseCase(scopeId).getScopeActiveTasksFlowUseCase.invoke(scopeId)
+    getScopeActiveTasksFlowUseCase(scopeId)
+      .map(taskMapper::map)
       .collect { taskList ->
         tasks = taskList
       }

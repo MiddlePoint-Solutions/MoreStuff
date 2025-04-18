@@ -6,7 +6,6 @@ import io.middlepoint.morestuff.shared.ui.model.ScopeUiModel
 class ScopeUiMapper {
     fun map(input: Scope): ScopeUiModel = ScopeUiModel(
         id = input.id,
-        uid = input.uid,
         name = input.name,
         order = input.order
     )

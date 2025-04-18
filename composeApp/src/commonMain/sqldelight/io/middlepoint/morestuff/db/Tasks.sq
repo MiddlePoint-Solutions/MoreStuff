@@ -5,7 +5,7 @@ CREATE TABLE tasks(
     id TEXT AS Uuid NOT NULL PRIMARY KEY,
     created_at INTEGER AS Instant NOT NULL,
     updated_at INTEGER AS Instant NOT NULL,
-    completed_at TEXT AS Instant,
+    completed_at INTEGER AS Instant,
     completed_timezone TEXT,
     title TEXT NOT NULL,
     priority_score INTEGER NOT NULL

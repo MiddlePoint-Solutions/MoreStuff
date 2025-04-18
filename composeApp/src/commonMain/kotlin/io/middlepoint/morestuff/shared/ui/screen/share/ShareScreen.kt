@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
@@ -94,7 +95,7 @@ import org.koin.core.parameter.parametersOf
 fun ShareScreen(
   onBack: () -> Unit,
   shareable: Shareable,
-  shareToExistingTask: (taskId: Long, shareable: Shareable) -> Unit,
+  shareToExistingTask: (taskId: Uuid, shareable: Shareable) -> Unit,
 ) {
 
   var isSearchActive by remember { mutableStateOf(false) }
@@ -223,7 +224,7 @@ fun ShareScreen(
 private fun ShareContent(
   model: ShareModel,
   onEvent: (ShareEvent) -> Unit,
-  shareToTask: (taskId: Long) -> Unit,
+  shareToTask: (taskId: Uuid) -> Unit,
   modifier: Modifier = Modifier,
 ) {
 
@@ -360,7 +361,7 @@ private fun ShareContent(
 private fun ShareTasksList(
   tasks: List<TaskUiModel>,
   searchBarActive: Boolean,
-  shareToTask: (taskId: Long) -> Unit,
+  shareToTask: (taskId: Uuid) -> Unit,
   modifier: Modifier = Modifier,
   showUserInput: () -> Unit = {}
 ) {

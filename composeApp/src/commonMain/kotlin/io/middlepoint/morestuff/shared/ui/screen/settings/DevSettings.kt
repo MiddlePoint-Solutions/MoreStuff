@@ -29,6 +29,7 @@ import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
@@ -146,9 +147,10 @@ fun DevSettings(
             title = { Text(text = stringResource(Res.string.test_review_notifications)) },
             onClick = devTools::testReviewNotification,
         )
+
         SettingsMenuLink(
             title = { Text(text = "Review Screen") },
-            onClick = { navigation.push(Screen.Review(1)) },
+            onClick = { navigation.push(Screen.Review(Uuid("test"))) },
         )
 
         SettingsMenuLink(

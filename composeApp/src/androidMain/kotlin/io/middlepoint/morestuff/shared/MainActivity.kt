@@ -25,7 +25,7 @@ import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.App
 
@@ -94,11 +94,15 @@ class MainActivity : AppCompatActivity() {
       }
 
       ACTION_NOTIFICATION_REMINDER -> {
-        Screen.TaskChat(intent.getLongExtra(EXTRA_TASK_ID, 0))
+        intent.getStringExtra(EXTRA_TASK_ID)?.let {
+          Screen.TaskChat(Uuid(it))
+        }
       }
 
       ACTION_NOTIFICATION_REVIEW -> {
-        Screen.Review(intent.getLongExtra(EXTRA_SCOPE_ID, 0)) // TODO: use Uuid instead
+        intent.getStringExtra(EXTRA_SCOPE_ID)?.let {
+          Screen.Review(Uuid(it))
+        }
       }
 
       else -> null

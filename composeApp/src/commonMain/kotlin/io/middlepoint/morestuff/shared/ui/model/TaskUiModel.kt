@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Immutable
 @Serializable
 data class TaskUiModel(
-    val id: Uuid,
+    val id: Uuid = Uuid(""),
     val title: String = "",
     val createTime: String = "",
     val completeTime: String = "",

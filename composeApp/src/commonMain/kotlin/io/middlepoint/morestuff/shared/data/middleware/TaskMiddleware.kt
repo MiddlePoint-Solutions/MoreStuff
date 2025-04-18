@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CompleteTasksAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.CreateHintTask
@@ -10,11 +9,11 @@ import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.RemoveTask
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.TaskCreatedAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.UpdateTaskTitleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction.UpdateTasksToScopeAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
-import io.middlepoint.morestuff.shared.domain.usecase.task.CreateHintTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.DeleteTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.RemoveTasksFromScopeUseCase
@@ -29,7 +28,6 @@ class TaskMiddleware(
   private val createTaskUseCase: CreateTaskUseCase,
   private val setTaskCompleteUseCase: SetTaskCompleteUseCase,
   private val updateTaskTitleUseCase: UpdateTaskTitleUseCase,
-  private val createHintTaskUseCase: CreateHintTaskUseCase,
   private val deleteTasksUseCase: DeleteTasksUseCase,
   private val removeTasksFromScopeUseCase: RemoveTasksFromScopeUseCase,
   private val updateTasksScopeUseCase: UpdateTasksScopeUseCase,
@@ -64,7 +62,7 @@ class TaskMiddleware(
       }
 
       is CreateHintTask -> scope.launch {
-        createHintTaskUseCase()
+        // TODO: start onboarding?
       }
 
       is DeleteTasksAction -> scope.launch {

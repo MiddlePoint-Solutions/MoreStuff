@@ -19,7 +19,7 @@ class GetMessagesUseCaseForTaskNewImplTest {
         val messages = flowOf(createListOfMessages(2))
         coEvery { messageRepository.getTaskMessagesFlow(taskId) } returns messages
 
-        val result = runBlocking { getMessagesForTask(taskId) }
+        val result = runBlocking { getMessagesForTask.invoke(taskId) }
         assertEquals(messages , result)
     }
 }

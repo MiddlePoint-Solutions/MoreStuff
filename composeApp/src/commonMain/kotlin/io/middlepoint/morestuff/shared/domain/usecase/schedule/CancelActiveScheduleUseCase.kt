@@ -37,7 +37,7 @@ class CancelActiveScheduleUseCaseImpl(
     return getActiveSchedule(taskIds, adjustedScheduleType).onRight { schedules ->
       schedules.forEach { schedule ->
         setScheduleFulfilled(schedule.id)
-        scheduler.cancelSchedule(Instant.parse(schedule.createdAt).toEpochMilliseconds())
+        scheduler.cancelSchedule(schedule.id)
       }
     }
   }

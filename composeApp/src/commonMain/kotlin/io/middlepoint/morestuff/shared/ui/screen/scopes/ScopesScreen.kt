@@ -56,8 +56,9 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
-import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
@@ -232,7 +233,6 @@ fun ScopesContent(
   }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun OrderedScopesList(
   model: ScopesState,
@@ -244,7 +244,7 @@ private fun OrderedScopesList(
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
 
   val menuVisibility = remember(scopes) {
-    mutableStateMapOf<Long, Boolean>().apply {
+    mutableStateMapOf<Uuid, Boolean>().apply {
       scopes.forEach { scope ->
         put(scope.id, false)
       }
@@ -323,7 +323,7 @@ private fun OrderedScopesList(
                 Text(text = scope.name)
               },
               trailingContent = {
-                if (scope.id != defaultScope.id) {
+                if (scope.id != model.stuffScope?.id) {
                   IconButton(onClick = {
                     menuVisibility[scope.id] = !menuVisibility[scope.id]!!
                   }) {

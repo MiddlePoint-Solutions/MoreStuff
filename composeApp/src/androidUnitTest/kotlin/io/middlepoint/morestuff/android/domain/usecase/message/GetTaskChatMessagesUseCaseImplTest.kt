@@ -31,7 +31,7 @@ class GetTaskChatMessagesUseCaseImplTest {
 
         val getTaskChatMessagesImpl = GetTaskChatMessagesUseCaseImpl(messageRepository)
 
-        val messages = getTaskChatMessagesImpl(taskId).asFlow().toList().flatten()
+        val messages = getTaskChatMessagesImpl(taskId).getTaskChatMessagesImpl.invoke(taskId).toList().flatten()
         assertEquals(listOf(message1, message2), messages)
     }
 }

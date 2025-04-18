@@ -93,57 +93,6 @@ class NotifierImpl(
     }
   }
 
-
-  override fun showReminderNotifications(messages: List<Message>) {
-    logger.i { "Preparing to show ${messages.size} reminder notifications" }
-    messages.forEach { message ->
-      showReminderNotification(message)
-    }
-
-    if (messages.size > 1) {
-      logger.i { "Creating summary notification for ${messages.size} reminders" }
-      val summaryContent = createSummaryNotificationContent(messages.size)
-      val summaryRequest = UNNotificationRequest.requestWithIdentifier(
-        identifier = Notifier.GROUP_KEY_REMINDERS,
-        content = summaryContent,
-        trigger = null
-      )
-
-      notificationCenter.addNotificationRequest(summaryRequest) { error ->
-        if (error == null) {
-          logger.i { "Successfully scheduled summary notification for reminders" }
-        } else {
-          logger.e { "Error scheduling summary notification: ${error.localizedDescription}" }
-        }
-      }
-    }
-  }
-
-  override fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>) {
-    logger.i { "Preparing to show reminder notification reply for scheduleId=$scheduleId" }
-    val message = messages.lastOrNull() ?: run {
-      logger.e { "No messages found to create reply notification for scheduleId=$scheduleId" }
-      return
-    }
-
-    val notificationContent = createReminderNotificationContent(message)
-
-    val request = UNNotificationRequest.requestWithIdentifier(
-      identifier = scheduleId.toString(),
-      content = notificationContent,
-      trigger = null
-    )
-
-    logger.i { "Adding reply notification request for scheduleId=$scheduleId" }
-    notificationCenter.addNotificationRequest(request) { error ->
-      if (error == null) {
-        logger.i { "Successfully scheduled reminder notification reply for scheduleId=$scheduleId" }
-      } else {
-        logger.e { "Error scheduling reminder notification reply: ${error.localizedDescription}" }
-      }
-    }
-  }
-
   override fun clearScheduleNotification(scheduleId: Uuid) {
     logger.i { "Clearing notification for scheduleId=$scheduleId" }
     notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(scheduleId.toString()))

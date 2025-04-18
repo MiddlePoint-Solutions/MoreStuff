@@ -7,5 +7,7 @@ import kotlin.jvm.JvmInline
 @JvmInline
 @Serializable
 value class Uuid(val value: String) {
-  companion object
+  companion object {
+    fun empty() = Uuid("")
+  }
 }

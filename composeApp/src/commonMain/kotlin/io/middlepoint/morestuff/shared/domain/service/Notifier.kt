@@ -6,8 +6,6 @@ import io.middlepoint.morestuff.shared.domain.model.core.Message
 interface Notifier {
 
     fun showReminderNotification(message: Message)
-    fun showReminderNotifications(messages: List<Message>)
-    fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>)
     fun clearScheduleNotification(scheduleId: Uuid)
     fun showReviewNotification()
     fun cancelReminderNotifications()

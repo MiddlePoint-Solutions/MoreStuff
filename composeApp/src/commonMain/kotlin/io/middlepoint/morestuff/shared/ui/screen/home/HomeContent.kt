@@ -47,6 +47,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
@@ -112,7 +113,7 @@ fun HomeScreen() {
   val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val model by homeState.models.collectAsState()
-  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
+  val pendingCompletionTasks = remember { mutableStateMapOf<Uuid, Job>() }
   var isReorderingActive by remember { mutableStateOf(false) }
 
 
@@ -275,7 +276,7 @@ private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
   createNewScope: () -> Unit,
-  onTaskComplete: (Long) -> Unit,
+  onTaskComplete: (Uuid) -> Unit,
   modifier: Modifier = Modifier,
   onReorderingChanged: (Boolean) -> Unit,
 ) {

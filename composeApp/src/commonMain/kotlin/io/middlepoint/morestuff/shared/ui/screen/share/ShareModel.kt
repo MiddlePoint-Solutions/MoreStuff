@@ -61,7 +61,10 @@ fun shareModel(
 
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
-      state = state.copy(scopes = it)
+      state = state.copy(
+        currentScopeId = it.first().id,
+        scopes = it,
+      )
     }
   }
 
@@ -92,44 +95,40 @@ fun shareModel(
         }
 
         is CreateNewTask -> {
-          val domainPriority = Priority.Now()
-          val trimmedTitle = event.title.trim()
-          val params = TaskParams(trimmedTitle, domainPriority, state.currentScopeId)
-          val task = createTaskUseCase(params)
-          store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
-          state = state.copy(createdTaskId = task.id)
-//          launch {
-//            // Hack for not using the same taskId in share screen.
-//            // This will be solved when adding new navigation with decompose router
-//            delay(300)
-//            state = state.copy(
-//              lastCreatedTaskId = null
-//            )
-//          }
+          state.currentScopeId?.let { scopeId ->
+            val domainPriority = Priority.Now()
+            val trimmedTitle = event.title.trim()
+            val params = TaskParams(trimmedTitle, domainPriority, scopeId)
+            val task = createTaskUseCase(params)
+            store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
+            state = state.copy(createdTaskId = task.id)
+          }
         }
 
         ClearSearchQuery -> searchQueryFlow.update { "" }
         is UpdateSearchQuery -> searchQueryFlow.update { event.query }
 
         is CreateTaskWithSchedule -> {
-          val domainPriority = Priority.Now()
-          val trimmedTitle = event.title.trim()
-          val params = TaskParams(trimmedTitle, domainPriority, state.currentScopeId)
-          val task = createTaskUseCase(params)
+          state.currentScopeId?.let { scopeId ->
+            val domainPriority = Priority.Now()
+            val trimmedTitle = event.title.trim()
+            val params = TaskParams(trimmedTitle, domainPriority, scopeId)
+            val task = createTaskUseCase(params)
 
-          store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
+            store.dispatch(TaskAction.TaskCreatedAction(task, domainPriority))
 
-          state = state.copy(createdTaskId = task.id)
+            state = state.copy(createdTaskId = task.id)
 
-          state.planTime?.let { schedule ->
-            state = state.copy(scheduleModel = schedule)
-            store.dispatch(
-              ScheduleAction.RescheduleTaskAction(
-                task.id,
-                ScheduleType.OneTime,
-                schedule.scheduleLocalDateTime
+            state.planTime?.let { schedule ->
+              state = state.copy(scheduleModel = schedule)
+              store.dispatch(
+                ScheduleAction.RescheduleTaskAction(
+                  task.id,
+                  ScheduleType.OneTime,
+                  schedule.scheduleLocalDateTime
+                )
               )
-            )
+            }
           }
         }
 

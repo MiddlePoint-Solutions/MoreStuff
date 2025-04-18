@@ -16,6 +16,4 @@ sealed class PriorityAction : Action.FeatureAction() {
       val actionType: ReviewActionType,
     ) : PriorityAction()
 
-    data object UpdatePlannedPriorityAction : PriorityAction()
-
 }

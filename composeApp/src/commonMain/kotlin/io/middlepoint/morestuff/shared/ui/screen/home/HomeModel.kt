@@ -11,6 +11,8 @@ import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Priority
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
@@ -63,21 +65,25 @@ fun homeModel(
 ): HomeState {
 
   var scopes: List<Scope> by remember { mutableStateOf(initialState.scopes) }
-  var currentScopeId: Long by remember { mutableLongStateOf(initialState.currentScopeId) }
-  var selectedTasks: List<Long> by remember { mutableStateOf(initialState.selectedTasks) }
+  var currentScopeId: Uuid by remember { mutableStateOf(initialState.currentScopeId) }
+  var selectedTasks: List<Uuid> by remember { mutableStateOf(initialState.selectedTasks) }
   var taskInputActive: Boolean by remember { mutableStateOf(initialState.taskInputActive) }
-  var reorderingScopes: Map<Long, Boolean> by remember { mutableStateOf(initialState.reorderingScopes) }
+  var reorderingScopes: Map<Uuid, Boolean> by remember { mutableStateOf(initialState.reorderingScopes) }
   var scheduleModel by remember { mutableStateOf(initialState.scheduleModel) }
-  var lastCreatedTaskId by remember { mutableLongStateOf(initialState.lastCreatedTaskId ?: -1) }
   var planTime by remember { mutableStateOf(initialState.planTime) }
-  val taskSchedules: Map<Long, Schedule> by remember { mutableStateOf(emptyMap()) }
-  var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
+  val taskSchedules: Map<Uuid, Schedule> by remember { mutableStateOf(emptyMap()) }
+  var tasks: Map<Uuid, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
   var username by remember { mutableStateOf(initialState.username) }
 
   fun dispatch(action: Action) = store.dispatch(action)
 
   LaunchedEffect(Unit) {
-    getScopesFlowUseCase().collect { scopes = it }
+    getScopesFlowUseCase().collect {
+      if(currentScopeId.value.isEmpty()) {
+        currentScopeId = scopes.first { it.name == DEFAULT_SCOPE_NAME }.id
+      }
+      scopes = it
+    }
   }
 
   LaunchedEffect(Unit) {
@@ -118,8 +124,7 @@ fun homeModel(
                 event.title,
                 Priority.Now(),
                 currentScopeId,
-                onTaskCreated = { createdTask ->
-                  lastCreatedTaskId = createdTask.id
+                onTaskCreated = { createdTask -> // TODO: why do we need this?
                   planTime?.let { schedule ->
                     scheduleModel = schedule
                     store.dispatch(
@@ -178,11 +183,6 @@ fun homeModel(
             }
             launch { notifications.emit(notification) }
           }
-        }
-
-        DeleteSelectedTasks -> {
-          store.dispatch(TaskAction.DeleteTasksAction(selectedTasks))
-
         }
 
         is UpdatePlanDate -> {

@@ -23,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.extension.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
@@ -39,10 +40,10 @@ fun ScopeContent(
   tasks: List<TaskUiModel>,
   modifier: Modifier = Modifier,
   listState: LazyListState = rememberLazyListState(),
-  selectedTasks: List<Long> = listOf(),
-  onItemClick: (taskId: Long) -> Unit = {},
-  onItemLongClick: (taskId: Long) -> Unit = {},
-  onTaskComplete: (taskId: Long) -> Unit = {},
+  selectedTasks: List<Uuid> = listOf(),
+  onItemClick: (taskId: Uuid) -> Unit = {},
+  onItemLongClick: (taskId: Uuid) -> Unit = {},
+  onTaskComplete: (taskId: Uuid) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
   isReordering: Boolean,

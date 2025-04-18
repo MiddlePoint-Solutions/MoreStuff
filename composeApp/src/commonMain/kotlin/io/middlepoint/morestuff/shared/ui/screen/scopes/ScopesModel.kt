@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScopeAction.*
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
@@ -19,11 +21,13 @@ fun scopesModel(
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject()
 ): ScopesState {
+  var stuffScope: Scope? by remember { mutableStateOf(null) }
   var scopesState by remember { mutableStateOf(initialState.scopes) }
 
   LaunchedEffect(Unit) {
-    getScopesFlowUseCase().collect { newScopes ->
-      scopesState = newScopes
+    getScopesFlowUseCase().collect { scopes ->
+      stuffScope = scopes.first { it.name == DEFAULT_SCOPE_NAME }
+      scopesState = scopes
     }
   }
 
@@ -49,5 +53,8 @@ fun scopesModel(
     }
   }
 
-  return ScopesState(scopes = scopesState)
+  return ScopesState(
+    stuffScope = stuffScope,
+    scopes = scopesState
+  )
 }

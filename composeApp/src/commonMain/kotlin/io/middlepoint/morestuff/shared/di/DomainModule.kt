@@ -64,8 +64,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.priority.GetTaskBelowPrior
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetTaskBelowPriorityScoreUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.priority.UpdateTaskReviewPriorityUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.priority.UpdateTaskReviewPriorityUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.BootCompleteSchedulerUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.BootCompleteSchedulerUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateOneTimeScheduleUseCase
@@ -114,8 +112,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCas
 import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.ClearTaskNotificationsUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.ClearTaskNotificationsUseCaseImpl
-import io.middlepoint.morestuff.shared.domain.usecase.task.CreateHintTaskUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.CreateHintTaskUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateNewTaskUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.CreateTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.DecreaseTaskPriorityScoreUseCaseImpl
@@ -150,8 +146,6 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SetTaskCompleteImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.SetTaskCompleteUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.UpdatePlannedTasksPriorityUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskTitleUseCase
@@ -182,7 +176,6 @@ val useCaseModules
   }
 
 val serviceModule = module {
-  factoryOf(::BootCompleteSchedulerUseCaseImpl) bind BootCompleteSchedulerUseCase::class
   factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
   factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
 }
@@ -216,7 +209,6 @@ val taskUseCases = module {
   factoryOf(::GetTaskForScheduleUseCaseImpl) bind GetTaskForScheduleUseCase::class
   factoryOf(::GetActiveTasksWithScheduleUseCaseImpl) bind GetActiveTasksWithScheduleUseCase::class
   factoryOf(::SearchTasksUseCaseImpl) bind SearchTasksUseCase::class
-  factoryOf(::CreateHintTaskUseCaseImpl) bind CreateHintTaskUseCase::class
   factoryOf(::HintTaskProviderImpl) bind HintTaskProvider::class
   factoryOf(::DeleteTasksUseCaseImpl) bind DeleteTasksUseCase::class
   factoryOf(::AddTasksToScopeUseCaseImpl) bind AddTasksToScopeUseCase::class
@@ -235,7 +227,6 @@ val taskUseCases = module {
   factoryOf(::DecreaseTaskPriorityScoreUseCaseImpl) bind DecrementTaskPriorityScoreUseCase::class
   factoryOf(::ReorderTaskUseCaseImpl) bind ReorderTaskUseCase::class
   factoryOf(::UpdateTaskPriorityScoreUseCaseImpl) bind UpdateTaskPriorityScoreUseCase::class
-  factoryOf(::UpdatePlannedTasksPriorityUseCaseImpl) bind UpdatePlannedTasksPriorityUseCase::class
   factoryOf(::ClearTaskNotificationsUseCaseImpl) bind ClearTaskNotificationsUseCase::class
   factoryOf(::GetReviewTasksUseCaseImpl) bind GetReviewTasksUseCase::class
   factoryOf(::GetTasksByIdsUseCaseImpl) bind GetTasksByIdsUseCase::class

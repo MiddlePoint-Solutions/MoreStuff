@@ -63,7 +63,6 @@
                 tools:node="remove" />
         </provider>
 
-
         <receiver
             android:name="io.middlepoint.morestuff.shared.app.receiver.BootReceiver"
             android:exported="true">

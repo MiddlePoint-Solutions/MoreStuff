@@ -14,7 +14,7 @@ class DeleteScopeUseCaseTest {
     fun `delete scope`() = runBlocking {
         val scopeId = 1L
 
-        useCase(scopeId)
+      useCase(scopeId)
 
         coVerify(exactly = 1) { scopeRepository.deleteScope(scopeId) }
     }

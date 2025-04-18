@@ -18,6 +18,7 @@ import io.github.vinceglb.filekit.path
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen.ImagePreview
@@ -44,7 +45,7 @@ import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 @OptIn(DelicateDecomposeApi::class)
 @Composable
 fun MainContent(
-  shareContent: (taskId: Long, content: Shareable) -> Unit,
+  shareContent: (taskId: Uuid, content: Shareable) -> Unit,
   onBoardingComplete: () -> Unit,
 ) {
   CompositionLocalProvider(
@@ -69,7 +70,7 @@ fun MainContent(
 
         Home -> HomeScreen()
 
-        is Review -> ReviewScreen(onBack = router::pop, currentScopeId = screen.scopeId)
+        is Review -> ReviewScreen(onBack = router::pop, initialScopeId = screen.scopeId)
 
         Settings -> SettingsScreen(onBack = router::pop)
 
