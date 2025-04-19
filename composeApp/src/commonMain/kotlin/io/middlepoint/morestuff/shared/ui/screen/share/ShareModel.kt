@@ -178,7 +178,7 @@ fun shareModel(
   return state
 }
 
-
+// TODO: this is duplicated
 private fun createPlanTime(
   timeManager: TimeManager,
   timeFormatter: TimeFormatter,

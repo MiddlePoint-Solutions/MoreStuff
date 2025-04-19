@@ -56,7 +56,8 @@ class ScopeRepositoryImpl(
   override suspend fun createScope(name: String): Either<Failure, Scope> = either {
     scopeQueries.transactionWithResult {
       val count = scopeQueries.countScopes().executeAsOne().toInt()
-      createScopeData(name, count)
+      val scopeData = createScopeData(name, count)
+      scopeQueries.createScope(scopeData)
       scopeQueries
         .selectScopeByName(name, dataMappers.scopeDataMapper)
         .executeAsOne()

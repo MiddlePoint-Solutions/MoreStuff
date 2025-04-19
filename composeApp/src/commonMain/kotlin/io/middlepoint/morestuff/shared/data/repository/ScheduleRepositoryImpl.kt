@@ -40,14 +40,15 @@ class ScheduleRepositoryImpl(
   ): Either<Failure, Schedule> = scheduleQueries.transactionWithResult {
 
     val createdAt = timeManager.nowUtcInstant
+    val timezone = timeManager.currentTimeZone
 
     val data = ScheduleData(
       id = Uuid.generate(),
       task_id = taskId,
       created_at = createdAt,
       updated_at = createdAt,
-      scheduled_at = localDateTime.toInstant(TimeZone.UTC),
-      timezone = timeManager.currentTimeZone.id,
+      scheduled_at = localDateTime.toInstant(timezone),
+      timezone = timezone.id,
       active = true,
       schedule_type = scheduleType,
     )

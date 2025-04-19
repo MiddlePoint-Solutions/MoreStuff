@@ -48,7 +48,8 @@ import kotlin.random.Random
 class NotifierImpl(
   private val context: Context,
   private val notificationManager: NotificationManagerCompat,
-  private val settings: Settings
+  private val settings: Settings,
+  private val logger: Logger
 ) : Notifier, KoinComponent {
 
   private val activeNotifications: Array<StatusBarNotification>
@@ -62,17 +63,38 @@ class NotifierImpl(
 
   private var notificationMap: Map<String, Int>
     get() = settings.getString(SCHEDULE_MAP_KEY, "")
-      .split(";")
-      .associate {
-        it.split("=").let { schedulePair -> schedulePair[0] to schedulePair[1].toInt() }
+      .let {
+        when {
+          it.isEmpty() -> mapOf()
+          it.contains(SCHEDULE_MAP_SEPARATOR) -> {
+            it.split(SCHEDULE_MAP_SEPARATOR)
+              .also { logger.e { "$it" } }
+              .associate { scheduleSplit ->
+                scheduleSplit.split("=")
+                  .let { schedulePair ->
+                    logger.e { "$schedulePair" }
+                    schedulePair[0] to schedulePair[1].toInt()
+                  }
+              }
+          }
+          else -> {
+            buildMap {
+              it.split("=").let { schedulePair ->
+                logger.e { "$schedulePair" }
+                put(schedulePair[0], schedulePair[1].toInt())
+              }
+            }
+          }
+        }
       }
     set(value) {
+      logger.d { "Set: $value" }
       val mapString = buildString {
         value.toList().let { values ->
           values.forEachIndexed { index, pair ->
             append("${pair.first}=${pair.second}")
             if (values.lastIndex != index) {
-              append(";")
+              append(SCHEDULE_MAP_SEPARATOR)
             }
           }
         }
@@ -83,6 +105,7 @@ class NotifierImpl(
   companion object {
     private const val SUMMARY_ID = 99999
     private const val SCHEDULE_MAP_KEY = "SCHEDULE_MAP_KEY"
+    private const val SCHEDULE_MAP_SEPARATOR = ";"
   }
 
   init {

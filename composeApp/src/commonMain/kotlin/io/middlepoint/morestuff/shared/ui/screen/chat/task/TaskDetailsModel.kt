@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
@@ -162,6 +163,7 @@ private fun createModelForSchedule(
   timeFormatter: TimeFormatter,
 ) =
   schedule?.scheduledAt?.let {
+    Logger.d { "SCHEDULE: $it" }
     val localTime = Instant.parse(it).toLocalDateTime(TimeZone.of(schedule.timezone))
     createScheduleModel(localTime, timeManager, timeFormatter)
   }
