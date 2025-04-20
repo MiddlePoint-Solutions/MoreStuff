@@ -5,154 +5,144 @@ import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
+import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import kotlinx.datetime.*
 import java.util.UUID
 
 val timeManager = TimeManagerImpl()
 fun createListOfTasks(amount: Long): List<Task> {
-    return buildList {
-        for (i in 1..amount) {
-            add(
-              createTaskForTest(
-                id = i,
-                priorityScore = i,
-                timeUtils = timeManager.nowLocalDateTimeString
-              )
-            )
-        }
+  return buildList {
+    for (i in 1..amount) {
+      add(
+        createTaskForTest(
+          priorityScore = i,
+        )
+      )
     }
+  }
 }
 
 
 fun createTaskForTest(
-  id: Long = 1,
-  title: String = "",
-  timeUtils: String = timeManager.nowLocalDateTimeString,
+  id: Uuid = Uuid.generate(),
+  title: String = "Task ${id.value}",
   priorityScore: Long = 0,
-  taskType: TaskType = TaskType.System,
   activeSchedule: Schedule = createScheduleForTest(
     taskId = id,
     scheduleType = ScheduleType.OneTime
   )
 ): Task {
-    return Task(
-        id = id,
-        id = UUID.randomUUID().toString(),
-        title = title,
-        createdAt = timeUtils,
-        completedAt = null,
-        priorityScore = priorityScore,
-        taskType = taskType,
-        schedule = listOf(activeSchedule)
-    )
+  return Task(
+    id = Uuid("id"),
+    title = title,
+    createdAt = timeManager.nowUtcInstant.toString(),
+    updatedAt = timeManager.nowUtcInstant.toString(),
+    completedAt = null,
+    timezone = null,
+    priorityScore = priorityScore,
+    schedule = listOf(activeSchedule)
+  )
 }
 
 
 fun createListOfSchedulesForTest(amount: Long): List<Schedule> {
-    return buildList {
-        for (i in 1..amount) {
-            add(
-              createScheduleForTest(scheduleType = ScheduleType.OneTime)
-            )
-        }
+  return buildList {
+    for (i in 1..amount) {
+      add(
+        createScheduleForTest(scheduleType = ScheduleType.OneTime)
+      )
     }
+  }
 }
 
 fun createScheduleForTest(
-    id: Long = 1,
-    taskId: Long = 1,
-    createTime: String = "",
-    scheduleTimeLocal: String = "",
-    scheduleTimeUtc: String = "",
-    timeZone: String = "",
-    active: Boolean = true,
-    scheduleType: ScheduleType
+  id: Uuid = Uuid.generate(),
+  taskId: Uuid = Uuid.generate(),
+  createTime: String = "",
+  scheduleTimeLocal: String = "",
+  scheduleTimeUtc: String = "",
+  timeZone: String = "",
+  active: Boolean = true,
+  scheduleType: ScheduleType
 ): Schedule {
-    return Schedule(
-        id,
-        taskId,
-        createTime,
-        scheduleTimeLocal,
-        scheduleTimeUtc,
-        timeZone,
-        active,
-        scheduleType
-    )
+  return Schedule(
+    Uuid("$id"),
+    Uuid("$taskId"),
+    createTime,
+    scheduleTimeLocal,
+    scheduleTimeUtc,
+    timeZone,
+    active,
+    scheduleType
+  )
 }
 
 fun createScheduleUseCaseTest(
-    id: Long = 1,
-    taskId: Long = 1,
-    createTime: String = "",
-    scheduleTimeLocal: String = "",
-    scheduleTimeUtc: String = "",
-    timeZone: String = "",
-    active: Boolean = true,
-    scheduleType: ScheduleType = ScheduleType.OneTime
+  id: Uuid = Uuid.generate(),
+  taskId: Uuid = Uuid.generate(),
+  createTime: String = "",
+  scheduleTimeLocal: String = "",
+  scheduleTimeUtc: String = "",
+  timeZone: String = TimeZone.currentSystemDefault().id,
+  active: Boolean = true,
+  scheduleType: ScheduleType = ScheduleType.OneTime
 ): Schedule {
-    return Schedule(
-        id,
-        taskId,
-        createTime,
-        scheduleTimeLocal,
-        scheduleTimeUtc,
-        timeZone,
-        active,
-        scheduleType
+  return Schedule(
+    Uuid("$id"),
+    Uuid("$taskId"),
+    createTime,
+    scheduleTimeLocal,
+    scheduleTimeUtc,
+    timeZone,
+    active,
+    scheduleType
+  )
+    .copy(
+      scheduledAt = LocalDateTime.parse(scheduleTimeLocal)
+        .toInstant(TimeZone.of(timeZone)).toString()
     )
-        .copy(
-            scheduledAt = LocalDateTime.parse(scheduleTimeLocal)
-                .toInstant(TimeZone.of(timeZone)).toString()
-        )
 }
 
 fun createListOfMessages(amount: Long): List<Message> {
-    return buildList {
-        for (i in 1..amount) {
-            add(createMessageForTest())
-        }
+  return buildList {
+    for (i in 1..amount) {
+      add(createMessageForTest())
     }
+  }
 }
 
 
 fun createMessageForTest(
-  id: Long = 1,
-  taskId: Long = 1,
-  scheduleId: Long = 1,
+  id: Uuid = Uuid.generate(),
+  taskId: Uuid = Uuid.generate(),
+  scheduleId: Uuid = Uuid.generate(),
   contentType: ContentType = ContentType.CONFIRM_NEW_TASK,
-  createTime: String = "",
-  seenTime: String = "",
   content: String = "",
-  replyType: ReplyType = ReplyType.DONE,
-  replyContent: String = "",
-  replyTime: String = "",
   openGraphResult: OpenGraphResult = OpenGraphResult(),
   messageExtra: MessageExtra = MessageExtra(
-        id = 1L,
-        filePath = "",
-        creationTime = "",
-        messageType = MessageExtraType.Image
-    )
+    Uuid("$id"),
+    filePath = "",
+    creationTime = "",
+    messageType = MessageExtraType.Image
+  )
 
 ): Message {
-    return Message(
-        id,
-        taskId,
-        scheduleId,
-        contentType,
-        createTime,
-        seenTime,
-        content,
-        replyType,
-        replyContent,
-        replyTime,
-        openGraphResult,
-        messageExtra
-    )
+  return Message(
+    id = id,
+    taskId = taskId,
+    scheduleId = scheduleId,
+    createdAt = Clock.System.now(),
+    updatedAt = Clock.System.now(),
+    contentType = contentType,
+    content = content,
+    openGraphResult,
+    messageExtra
+  )
 }

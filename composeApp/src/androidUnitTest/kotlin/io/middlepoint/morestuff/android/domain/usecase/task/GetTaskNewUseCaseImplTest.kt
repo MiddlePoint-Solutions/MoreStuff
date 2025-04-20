@@ -1,8 +1,11 @@
-package io.middlepoint.morestuff.shared.domain.usecase.task
+package io.middlepoint.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
 import io.middlepoint.morestuff.android.domain.createTaskForTest
+import io.middlepoint.morestuff.shared.data.utils.generate
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
+import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
@@ -15,9 +18,8 @@ class GetTaskNewUseCaseImplTest {
     fun `invoke should return task when task is found`()  {
         val taskRepository: TaskRepository = mockk()
         val getTaskUseCaseImpl = GetTaskUseCaseImpl(taskRepository)
-        val taskId = 1L
-        val task =
-            createTaskForTest()/*Task(1, "Task 1", TimeUtils.nowLocalDateTimeString)*/
+        val taskId = Uuid.generate()
+        val task = createTaskForTest(id = taskId)
 
         coEvery { taskRepository.getTask(taskId) } returns Either.Right(task)
 

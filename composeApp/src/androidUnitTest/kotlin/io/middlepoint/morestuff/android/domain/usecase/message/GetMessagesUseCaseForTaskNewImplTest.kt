@@ -1,7 +1,9 @@
-package io.middlepoint.morestuff.shared.domain.usecase.message
+package io.middlepoint.morestuff.android.domain.usecase.message
 
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.android.domain.createListOfMessages
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCaseImpl
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -15,7 +17,7 @@ class GetMessagesUseCaseForTaskNewImplTest {
 
     @Test
     fun `messageRepository getMessagesForTask`() {
-        val taskId = 1L
+        val taskId = Uuid("1")
         val messages = flowOf(createListOfMessages(2))
         coEvery { messageRepository.getTaskMessagesFlow(taskId) } returns messages
 
