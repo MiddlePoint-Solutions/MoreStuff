@@ -2,7 +2,6 @@ package io.middlepoint.morestuff.shared.data.utils
 
 import arrow.core.getOrElse
 import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
 import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
@@ -50,11 +49,16 @@ class MigrationHelper(
 
     val taskScopeMap = buildMap {
       tasks.forEach { task ->
-        val scope = scopeRepository.getScopeByTaskId(task.id).getOrElse { defaultScope }
-        put(
-          task.id,
-          scope.id
-        ) // TODO: when migrating we need to take into account the "Stuff" scope
+        try { // This is to fix errors that arise when task belongs to more then one scope (legacy issue).
+          scopeRepository.getScopeByTaskId(task.id).getOrElse { defaultScope }
+        } catch (e: Throwable) {
+          defaultScope
+        }.let { scope ->
+          put(
+            task.id,
+            scope.id
+          ) // TODO: when migrating we need to take into account the "Stuff" scope
+        }
       }
     }
 
