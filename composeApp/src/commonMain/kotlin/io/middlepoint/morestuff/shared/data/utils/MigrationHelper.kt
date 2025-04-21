@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.data.utils
 
+import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
@@ -79,6 +80,10 @@ class MigrationHelper(
 //    path?.let {
 //      mediaHandler.shareFile(it)
 //    }
+
+  }
+
+  suspend fun import(jsonFile: PlatformFile) {
 
   }
 

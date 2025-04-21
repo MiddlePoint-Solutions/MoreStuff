@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.domain
 
+import io.github.vinceglb.filekit.PlatformFile
+
 interface DevTools {
 
     var showDebugMessages: Boolean
@@ -9,5 +11,5 @@ interface DevTools {
     suspend fun importDatabase(uri: String)
 
     suspend fun exportJsonData()
-    suspend fun importJsonData(uri: String)
+    suspend fun importJsonData(jsonFile: PlatformFile)
 }
