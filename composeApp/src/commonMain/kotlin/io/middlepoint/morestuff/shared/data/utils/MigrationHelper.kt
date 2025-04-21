@@ -2,24 +2,18 @@ package io.middlepoint.morestuff.shared.data.utils
 
 import arrow.core.Either
 import arrow.core.raise.either
-import arrow.core.right
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.readString
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.core.Scope
-import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyMessage
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyScope
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyTask
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
