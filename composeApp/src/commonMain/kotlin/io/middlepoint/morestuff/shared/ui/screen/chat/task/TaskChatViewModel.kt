@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 
 import androidx.compose.runtime.Composable
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow

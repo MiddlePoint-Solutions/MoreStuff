@@ -42,11 +42,7 @@ fun scopeTasksModel(
     events.collect { event ->
       when (event) {
         is ScopeTasksEvent.ReorderTasks -> {
-          logger.d { "Reordering tasks..." }
-          reorderTaskUseCase(event.updatedTasks).fold(
-            { failure -> logger.e { "Error reordering tasks: $failure" } },
-            { logger.d { "Tasks reordered successfully" } }
-          )
+          reorderTaskUseCase(event.updatedTasks)
         }
 
       }

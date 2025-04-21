@@ -90,11 +90,9 @@ fun homeModel(
     store.state
       .distinctUntilChangedBy { it.userState.user }
       .collectLatest { state ->
-        Logger.d("user = ${state.userState.user}")
         val newUsername = state.userState.user?.fullName
           .takeUnless { it.isNullOrBlank() }
           ?: state.userState.user?.email.orEmpty()
-        Logger.d("username = $newUsername")
         username = newUsername
       }
   }
