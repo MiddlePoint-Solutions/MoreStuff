@@ -1,21 +1,34 @@
 package io.middlepoint.morestuff.shared.data.utils
 
+import arrow.core.Either
+import arrow.core.raise.either
+import arrow.core.right
 import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.readString
 import io.middlepoint.morestuff.shared.MediaHandler
+import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.Task
+import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyMessage
+import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyScope
+import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyTask
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class DataMigration(
   val items: List<MigrationItem>,
-  val tasks: List<Task>,
-  val scopes: List<Scope>,
-  val messages: List<Message>,
+  val tasks: List<LegacyTask>,
+  val scopes: List<LegacyScope>,
+  val messages: List<LegacyMessage>,
 )
 
 @Serializable
@@ -83,8 +96,49 @@ class MigrationHelper(
 
   }
 
-  suspend fun import(jsonFile: PlatformFile) {
+  suspend fun import(jsonFile: PlatformFile): Either<Failure, Boolean> = either {
 
+    val jsonContent = jsonFile.readString()
+    val dataMigration = Json.decodeFromString<DataMigration>(jsonContent)
+
+    val newScopesMap = buildMap {
+      dataMigration.scopes.sortedBy { it.order }.forEach { scope ->
+        scopeRepository.createScope(scope.name).onRight { newScope ->
+          put(scope.id, newScope.id)
+        }
+      }
+    }
+
+    dataMigration.tasks.sortedBy { it.priorityScore }.forEach { oldTask ->
+
+      val migrationItem = dataMigration.items.first { it.taskId == oldTask.id }
+
+      val newTaskScopeId = newScopesMap.getValue(migrationItem.scopeId)
+      val newTask = taskRepository.createTask(oldTask.title, newTaskScopeId, oldTask.priorityScore)
+
+      dataMigration.messages.filter {
+        migrationItem.messageIds.contains(it.id)
+      }.sortedByDescending {
+        it.createTime
+      }.forEach { message ->
+        messageRepository.createMessage(
+          newTask.id,
+          null,
+          message.contentType.value,
+          message.messageData?.let { data ->
+            MessageExtra(
+              id = Uuid.generate(),
+              filePath = data.filePath,
+              creationTime = data.creationTime,
+              messageType = data.messageType
+            )
+          },
+          message.content
+        )
+      }
+    }
+
+    true
   }
 
 }

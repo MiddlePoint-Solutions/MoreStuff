@@ -11,5 +11,5 @@ interface DevTools {
     suspend fun importDatabase(uri: String)
 
     suspend fun exportJsonData()
-    suspend fun importJsonData(jsonFile: PlatformFile)
+    suspend fun importJsonData(jsonFile: PlatformFile): Boolean
 }

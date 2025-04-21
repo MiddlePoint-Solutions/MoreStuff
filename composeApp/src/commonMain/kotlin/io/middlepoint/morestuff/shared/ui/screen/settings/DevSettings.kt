@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
@@ -81,7 +82,9 @@ fun DevSettings(
   ) { files ->
     files?.let {
       scope.launch {
-        devTools.importJsonData(it.absoluteFile())
+        devTools.importJsonData(it.absoluteFile()).let {
+          Logger.d { "Data migration successful!" }
+        }
       }
     }
   }

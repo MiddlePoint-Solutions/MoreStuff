@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.data.service
 
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import io.github.vinceglb.filekit.PlatformFile
@@ -48,8 +49,8 @@ class DevToolsImpl(
         migrationHelper.export()
     }
 
-    override suspend fun importJsonData(uri: PlatformFile) {
-        TODO("Not yet implemented")
+    override suspend fun importJsonData(jsonFile: PlatformFile): Boolean {
+        return migrationHelper.import(jsonFile).getOrElse { false }
     }
 }
 
