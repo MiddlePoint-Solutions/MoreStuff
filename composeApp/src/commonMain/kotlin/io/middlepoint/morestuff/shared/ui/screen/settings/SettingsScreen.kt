@@ -247,7 +247,7 @@ fun SettingsContent(
             },
             onClick = showDevSettings,
             colors = ListItemDefaults.colors(
-              containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+              containerColor = MaterialTheme.colorScheme.surfaceContainer
             )
           )
         }
