@@ -19,7 +19,9 @@ interface TaskRepository {
     ): TaskDomain
 
     suspend fun getTask(taskId: Long): Either<Failure, TaskDomain>
+
     suspend fun getAllTasks(): List<TaskDomain>
+    suspend fun getActiveTasks(): List<TaskDomain>
 
     suspend fun updateTasksComplete(
         taskIds: List<Long>,
