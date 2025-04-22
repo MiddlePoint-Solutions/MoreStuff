@@ -71,7 +71,7 @@ fun taskChatModel(
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
       .collect {
-        logger.d { "Task flow" }
+        logger.d { "Task flow ${taskId.value}" }
         task = taskUiMapper.map(it)
       }
   }
