@@ -70,10 +70,10 @@ class TaskRepositoryImpl(
       .executeAsOneOrNull()?.right() ?: TaskDoesNotExist.left()
 
   override suspend fun getAllTasks(): List<Task> =
-    taskQueries.selectAll(mapper.taskDbMapper).executeAsList()
+    taskQueries.selectAll(mapper = mapper.taskDataMapper).executeAsList()
 
   override suspend fun getActiveTasks(): List<Task> {
-    return taskQueries.selectAllActive(mapper.taskDbMapper).executeAsList()
+    return taskQueries.selectAllActive(mapper = mapper.taskDataMapper).executeAsList()
   }
 
   override fun getTaskFlow(taskId: Uuid): Flow<Task> {
