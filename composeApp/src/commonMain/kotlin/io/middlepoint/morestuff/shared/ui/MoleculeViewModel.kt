@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.cash.molecule.RecompositionMode.Immediate
 import app.cash.molecule.launchMolecule
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +17,8 @@ import kotlinx.coroutines.launch
 
 abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 
+  val scope: CoroutineScope = CoroutineScope(viewModelScope.coroutineContext + Dispatchers.Main)
+
   protected abstract val initialState: Model
 
   // Events have a capacity large enough to handle simultaneous UI events, but
@@ -23,10 +27,10 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
 
   // TODO: the model is only active when state is collected. This also means that events will not be collected either.
   val models: StateFlow<Model> by lazy {
-    viewModelScope.launchMolecule(mode = Immediate) {
+    scope.launchMolecule(mode = Immediate) {
       models(events)
     }.onEach(::onSaveState)
-      .stateIn(viewModelScope, SharingStarted.Lazily, initialState)
+      .stateIn(scope, SharingStarted.Lazily, initialState)
   }
 
   fun take(event: Event) {
