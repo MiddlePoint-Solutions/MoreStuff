@@ -5,6 +5,7 @@ import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
+import io.middlepoint.morestuff.db.Ia_message
 import io.middlepoint.morestuff.db.Message
 import io.middlepoint.morestuff.db.Schedule
 import io.middlepoint.morestuff.db.Scope
@@ -29,5 +30,9 @@ fun createDatabase(driverFactory: DriverFactory) = StuffDb(
     ),
     scopeAdapter = Scope.Adapter(
         scope_orderAdapter = IntColumnAdapter,
+    ),
+    ia_messageAdapter = Ia_message.Adapter(
+        content_typeAdapter = IntColumnAdapter,
+        reply_typeAdapter = IntColumnAdapter
     )
 )

@@ -47,6 +47,8 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.essenty.backhandler.BackCallback
 import io.github.xxfast.decompose.router.LocalRouterContext
+import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeType
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
@@ -58,8 +60,10 @@ import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
+import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.show
+import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
@@ -71,6 +75,7 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.schedule.iaScope.IAScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
@@ -407,7 +412,13 @@ private fun HomeContent(
 
         when (val tasksModel = scopeTasks) {
           is ScopeTasksModels.Data -> {
-            if (tasksModel.tasks.isEmpty()) {
+            if (scope.scopeType == ScopeType.IA_SCOPE) {
+              IAScopeContent(
+                scopeId = scope.id,
+
+              )
+            }
+           else if (tasksModel.tasks.isEmpty()) {
               EmptyScopeContent { onEvent(ShowTaskInput) }
             } else {
               ScopeContent(

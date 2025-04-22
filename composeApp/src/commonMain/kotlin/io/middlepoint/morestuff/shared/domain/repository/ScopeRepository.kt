@@ -3,11 +3,12 @@ package io.middlepoint.morestuff.shared.domain.repository
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeType
 import kotlinx.coroutines.flow.Flow
 
 interface ScopeRepository {
     suspend fun initScopes()
-    suspend fun createScope(name: String): Either<Failure, ScopeDomain>
+    suspend fun createScope(name: String, scopeType: ScopeType = ScopeType.NORMAL): Either<Failure, ScopeDomain>
     suspend fun deleteScope(id: Long): Either<Failure, ScopeDomain>
     suspend fun getScopes(): Either<Failure, List<ScopeDomain>>
     fun getScopesFlow(): Flow<List<ScopeDomain>>

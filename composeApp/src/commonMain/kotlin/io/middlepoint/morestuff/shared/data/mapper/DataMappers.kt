@@ -10,6 +10,8 @@ interface DataMappers {
     val scheduleDomainMapper: ScheduleDomainMapper
     val taskDbMapper: TaskDataMapper
     val scopeDbMapper: ScopeDataMapper
+    val iaMessageDbMapper: IAMessageDbMapper
+    val iaMessageDataMapper: IAMessageDataMapper
 }
 
 class DataMappersImpl(
@@ -35,5 +37,10 @@ class DataMappersImpl(
     override val scopeDbMapper: ScopeDataMapper
         get() = makeScopeDbMapper()
 
+    override val iaMessageDbMapper: IAMessageDbMapper
+        get() = makeIAMessageDbMapper()
+
+    override val iaMessageDataMapper: IAMessageDataMapper
+        get() = IAMessageDataMap(storageManager)
 }
 

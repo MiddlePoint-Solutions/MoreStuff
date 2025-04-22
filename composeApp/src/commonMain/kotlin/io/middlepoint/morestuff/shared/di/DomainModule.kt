@@ -13,6 +13,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationMiddl
 import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleMiddleware
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeIAMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.SettingsMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskMiddleware
@@ -22,12 +23,26 @@ import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeIAMediaMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeIAMediaMessageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeIAMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeIAMessageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeMessageByIAUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.CreateScopeMessageByIAUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.DeleteScopeIAMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.DeleteScopeIAMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateImageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateImageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.GetIAMessagesByScopeIdUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.GetIAMessagesByScopeIdUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.GetScopeIAChatMessagesUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.GetScopeIAChatMessagesUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.StreamChatCompletionUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.ia.StreamChatCompletionUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.UpdateScopeIAMessageContentUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.iaScope.UpdateScopeIAMessageContentUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.CheckForUrlMetadataUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CheckForUrlMetadataUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.ClearActivePendingMessagesUseCaseImpl
@@ -209,6 +224,7 @@ val useCaseModules
         add(taskUseCases)
         add(scheduleUseCases)
         add(messageUseCases)
+        add(scopeIA)
         add(settingsUseCases)
         add(scopeUseCases)
         add(iaUseCases)
@@ -235,7 +251,8 @@ val storeModule = module {
             notificationMiddleware = get(),
             settingsMiddleware = get(),
             priorityMiddleware = get(),
-            scopeMiddleware = get()
+            scopeMiddleware = get(),
+            scopeIAMiddleware = get(),
 
         )
     }
@@ -245,6 +262,7 @@ val storeModule = module {
     factoryOf(::TaskMiddleware)
     factoryOf(::ScheduleMiddleware)
     factoryOf(::MessageMiddleware)
+    factoryOf(::ScopeIAMiddleware)
     factoryOf(::NotificationMiddleware)
     factoryOf(::SettingsMiddleware)
     factoryOf(::ReminderMiddleware)
@@ -303,7 +321,7 @@ val scopeUseCases = module{
     factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
     factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
     factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
-
+    factoryOf(::CreateScopeIAMediaMessageUseCaseImpl) bind CreateScopeIAMediaMessageUseCase::class
 
 }
 
@@ -345,6 +363,15 @@ val messageUseCases = module {
     factoryOf(::GetLastMessageFlowUseCaseImpl) bind GetLastMessageFlowUseCase::class
     factoryOf(::UpdateMessageContentUseCaseImpl) bind UpdateMessageContentUseCase::class
 
+}
+
+val scopeIA = module {
+    factoryOf(::CreateScopeIAMessageUseCaseImpl) bind CreateScopeIAMessageUseCase::class
+    factoryOf(::GetScopeIAChatMessagesUseCaseImpl) bind GetScopeIAChatMessagesUseCase::class
+    factoryOf(::DeleteScopeIAMessageUseCaseImpl) bind DeleteScopeIAMessageUseCase::class
+    factoryOf(::UpdateScopeIAMessageContentUseCaseImpl) bind UpdateScopeIAMessageContentUseCase::class
+    factoryOf(::GetIAMessagesByScopeIdUseCaseImpl) bind GetIAMessagesByScopeIdUseCase::class
+    factoryOf(::CreateScopeMessageByIAUseCaseImpl) bind CreateScopeMessageByIAUseCase::class
 }
 
 val iaUseCases = module {

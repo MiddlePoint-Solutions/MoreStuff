@@ -1,0 +1,59 @@
+import kotlin.Int;
+
+CREATE TABLE ia_message(
+   id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    scope_id INTEGER NOT NULL,
+    create_time TEXT NOT NULL,
+    seen_time TEXT,
+    content_type INTEGER AS Int NOT NULL,
+    content TEXT NOT NULL,
+    reply_type INTEGER AS Int,
+    reply_content TEXT,
+    reply_time TEXT,
+    FOREIGN KEY(scope_id) REFERENCES scope(scope_id)
+);
+
+
+selectAllIAMessages:
+SELECT *
+FROM ia_message
+ORDER BY datetime(create_time) DESC;
+
+selectIAMessageById:
+SELECT *
+FROM ia_message
+WHERE id = ?;
+
+selectIAMessagesByScopeId:
+SELECT *
+FROM ia_message
+WHERE scope_id = ?
+ORDER BY datetime(create_time) DESC;
+
+insertIAMessage:
+INSERT INTO ia_message(scope_id, create_time, content_type, content)
+VALUES (?, ?, ?, ?);
+
+updateIAMessageReply:
+UPDATE ia_message
+SET reply_type = ?, reply_content = ?, reply_time = ?
+WHERE id = ?;
+
+deleteIAMessage:
+DELETE FROM ia_message
+WHERE id = ?;
+
+updateIAMessageContent:
+UPDATE ia_message
+SET content = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+selectIAMessagesByScopeIdAndContentTypes:
+SELECT *
+FROM ia_message
+WHERE scope_id = ?
+  AND content_type IN ?
+ORDER BY datetime(create_time) DESC;

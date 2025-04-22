@@ -479,7 +479,7 @@ private fun TaskChatContent(
 
 
 @Composable
-private fun TaskChatInput(
+ fun TaskChatInput(
   sendTaskMessage: (String) -> Unit,
   pickImage: () -> Unit,
   pickPdf: () -> Unit,

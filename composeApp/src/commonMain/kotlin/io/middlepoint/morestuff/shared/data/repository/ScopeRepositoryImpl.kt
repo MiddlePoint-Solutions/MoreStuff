@@ -4,14 +4,15 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
 import arrow.core.right
-import io.middlepoint.morestuff.shared.generateUUID
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope
 import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.ScopeType
 import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
+import io.middlepoint.morestuff.shared.generateUUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -27,20 +28,29 @@ class ScopeRepositoryImpl(
 
     override suspend fun initScopes() {
         scopeQueries.transaction {
-            val allScope = scopeQueries.selectScope(defaultScope.id).executeAsOneOrNull()
-            if (allScope != null) {
-                scopeQueries.updateScopeName("Stuff", allScope.scope_id)
+            val default = scopeQueries.selectScope(defaultScope.id).executeAsOneOrNull()
+            if (default == null) {
+                scopeQueries.createScope(generateUUID(), "Stuff", 1, ScopeType.NORMAL.value.toLong())
+            } else {
+                scopeQueries.updateScopeName("Stuff", default.scope_id)
                 val tasks = taskQueries.selectTasksWithoutScope().executeAsList()
                 tasks.forEach {
-                    taskScopeQueries.insert(it.id, allScope.scope_id)
+                    taskScopeQueries.insert(it.id, default.scope_id)
                 }
-            } else {
-                scopeQueries.createScope(generateUUID(), "Stuff", 1)
+            }
+
+            val iaScope = scopeQueries.selectScopeByName("Mo", dataMappers.scopeDbMapper).executeAsOneOrNull()
+            if (iaScope == null) {
+                scopeQueries.createScope(generateUUID(), "Mo", 2, ScopeType.IA_SCOPE.value.toLong())
             }
         }
     }
 
-    override suspend fun createScope(name: String): Either<Failure, ScopeDomain> {
+
+    override suspend fun createScope(
+        name: String,
+        scopeType: ScopeType
+    ): Either<Failure, ScopeDomain> {
         return scopeQueries.transactionWithResult {
 
             scopeQueries
@@ -50,8 +60,8 @@ class ScopeRepositoryImpl(
                 }
 
             val count = scopeQueries.countScopes().executeAsOne().toInt()
-            scopeQueries.createScope(generateUUID(), name, count)
-            val scopeId = scopeQueries.lastInsertRowId().executeAsOne();
+            scopeQueries.createScope(generateUUID(), name, count, scopeType.value.toLong())
+            val scopeId = scopeQueries.lastInsertRowId().executeAsOne()
             scopeQueries
                 .selectScope(scopeId, dataMappers.scopeDbMapper)
                 .executeAsOne()
@@ -101,7 +111,6 @@ class ScopeRepositoryImpl(
                 .right()
         }
 
-    // TODO: consider passing the entire list of scopes that will update their order
     override suspend fun updateScopeOrder(id: Long, order: Int): Either<Failure, ScopeDomain> =
         scopeQueries.transactionWithResult {
             scopeQueries.updateScopeOrder(
@@ -120,7 +129,6 @@ class ScopeRepositoryImpl(
                         scopeOrder = index + 1
                     )
                 }
-
 
             scopeQueries.selectScope(id, dataMappers.scopeDbMapper)
                 .executeAsOne()

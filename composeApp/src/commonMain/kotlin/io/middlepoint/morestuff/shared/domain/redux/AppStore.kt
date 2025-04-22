@@ -8,6 +8,7 @@ import io.middlepoint.morestuff.shared.domain.redux.middleware.NotificationMiddl
 import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ReminderMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScheduleMiddleware
+import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeIAMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.ScopeMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.SettingsMiddleware
 import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskMiddleware
@@ -20,6 +21,7 @@ class AppStore(
     errorMiddleware: ErrorMiddleware,
     taskMiddleware: TaskMiddleware,
     messageMiddleware: MessageMiddleware,
+    scopeIAMiddleware: ScopeIAMiddleware,
     scheduleMiddleware: ScheduleMiddleware,
     responseMiddleware: ReminderMiddleware,
     notificationMiddleware: NotificationMiddleware,
@@ -39,6 +41,7 @@ class AppStore(
         taskMiddleware,
         scheduleMiddleware,
         messageMiddleware,
+        scopeIAMiddleware,
         responseMiddleware,
         notificationMiddleware,
         priorityMiddleware,

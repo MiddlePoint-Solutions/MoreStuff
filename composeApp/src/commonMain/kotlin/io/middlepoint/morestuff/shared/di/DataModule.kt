@@ -9,6 +9,7 @@ import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScheduleRepositoryImpl
+import io.middlepoint.morestuff.shared.data.repository.ScopeIAMessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScopeRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.TaskRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
@@ -20,6 +21,7 @@ import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
+import io.middlepoint.morestuff.shared.domain.repository.ScopeIAMessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
@@ -39,7 +41,14 @@ val dataModule = module {
 
   single<StuffDb> { createDatabase(get()) }
 
-  single<DevTools> { DevToolsImpl(settings = get(named(SharedSettings.Unencrypted)), notifier = get(), dataMigration = get(), migrationHelper = get()) }
+  single<DevTools> {
+    DevToolsImpl(
+      settings = get(named(SharedSettings.Unencrypted)),
+      notifier = get(),
+      dataMigration = get(),
+      migrationHelper = get()
+    )
+  }
   singleOf(::DataMappersImpl) bind DataMappers::class
   singleOf(::MessageDataMap)
 
@@ -55,6 +64,14 @@ val dataModule = module {
 
   single<MessageRepository> {
     MessageRepositoryImpl(
+      database = get(),
+      mapper = get(),
+      timeManager = get(),
+    )
+  }
+
+  single<ScopeIAMessageRepository> {
+    ScopeIAMessageRepositoryImpl(
       database = get(),
       mapper = get(),
       timeManager = get(),
@@ -85,7 +102,7 @@ val dataModule = module {
     LlmRepositoryImpl(
       settings = get(named(SharedSettings.Encrypted)),
 
-    )
+      )
   }
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
