@@ -58,13 +58,13 @@ fun PDFMessageItem(
             textAlign = TextAlign.Start,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
           )
 
           Text(
             text = stringResource(Res.string.filetype_pdf),
             style = MaterialTheme.typography.bodySmall.copy(
-              color = MaterialTheme.colorScheme.outlineVariant
+              color = MaterialTheme.colorScheme.onSurface
             )
           )
         }

@@ -88,7 +88,7 @@ fun TextMessageItem(
             } ?: onNonLinkClick()
           }
         },
-      style = MaterialTheme.typography.bodyLarge,
+      style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
       onTextLayout = { result ->
         layoutResult = result
       }

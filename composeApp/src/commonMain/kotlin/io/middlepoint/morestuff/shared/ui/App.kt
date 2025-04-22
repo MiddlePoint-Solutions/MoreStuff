@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.router.stack.navigate
-import com.arkivanov.decompose.router.stack.replaceAll
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -26,7 +25,6 @@ import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
-import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import org.koin.compose.KoinContext
 
 @Composable
@@ -43,7 +41,7 @@ fun App(
         ProvideAppRouter(router) {
           Box(
             modifier = Modifier
-              .background(MaterialTheme.colorScheme.surfaceContainerElevation)
+              .background(MaterialTheme.colorScheme.surfaceContainer)
               .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
           ) {
             if (model.ready) {
