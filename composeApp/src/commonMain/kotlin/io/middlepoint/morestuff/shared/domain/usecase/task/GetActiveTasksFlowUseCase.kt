@@ -11,7 +11,5 @@ interface GetActiveTasksFlowUseCase {
 class GetActiveTasksFlowUseCaseImpl(
     private val taskRepository: TaskRepository
 ) : GetActiveTasksFlowUseCase {
-    override fun invoke(): Flow<List<Task>> {
-        return taskRepository.getActiveTasksFlow()
-    }
+    override fun invoke(): Flow<List<Task>> = taskRepository.getActiveTasksFlow()
 }

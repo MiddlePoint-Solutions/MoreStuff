@@ -90,11 +90,10 @@ class MessageRepositoryImpl(
         id = Uuid.generate(),
         message_id = messageData.id,
         file_path = messageExtra.filePath,
-        created_at = timeManager.nowUtcInstant,
+        created_at = createdAt,
         data_type = messageExtra.messageType.name,
       )
       messageDataQueries.insertMessageExtra(messageExtraData)
-      messageData.copy()
     }
     messageQueries.selectMessageById(
       id = messageData.id,

@@ -181,7 +181,6 @@ private fun DateTimeItem(item: MessageUiModel) {
   }
 }
 
-
 private enum class Visibility {
   VISIBLE,
   GONE
