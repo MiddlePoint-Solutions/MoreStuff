@@ -711,7 +711,7 @@ fun NotificationPermissionButton() {
       )
     },
     colors = ListItemDefaults.colors(
-      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
   )
 }
