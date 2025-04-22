@@ -13,7 +13,6 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,12 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
+import io.github.vinceglb.filekit.absoluteFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
@@ -56,14 +60,12 @@ fun DevSettingsScreen(
         onBack = onBack,
         title = stringResource(Res.string.developer_settings)
       )
-    },
-    containerColor = MaterialTheme.colorScheme.surfaceContainer
+    }
   ) {
     Box(modifier = Modifier.padding(it)) {
       DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
     }
   }
-
 }
 
 @Composable
@@ -75,59 +77,20 @@ fun DevSettings(
 
   val scope = rememberCoroutineScope()
 
-  // TODO: Import / export database
-//    var exportData by remember { mutableStateOf(false) }
-//    if (exportData) {
-//        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "application/octet-stream"
-//            putExtra(Intent.EXTRA_TITLE, "morestuff.db")
-//        }
-//        val launcher = rememberLauncherForActivityResult(
-//            contract = ActivityResultContracts.StartActivityForResult()
-//        ) { result: ActivityResult ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.also { uri ->
-//                    scope.launch {
-//                        devTools.exportData(uri.toString())
-//                    }
-//                }
-//            }
-//            exportData = false
-//        }
-//
-//        LaunchedEffect(Unit) {
-//            launcher.launch(intent)
-//        }
-//    }
-//
-//    var importData by remember { mutableStateOf(false) }
-//    if (importData) {
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "application/octet-stream"
-//        }
-//        val launcher = rememberLauncherForActivityResult(
-//            contract = ActivityResultContracts.StartActivityForResult()
-//        ) { result: ActivityResult ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.also { uri ->
-//                    scope.launch {
-//                        devTools.importData(uri.toString())
-//                    }
-//                }
-//            }
-//            importData = false
-//        }
-//
-//        LaunchedEffect(Unit) {
-//            launcher.launch(intent)
-//        }
-//    }
-
+  val singleImagePickerLauncher = rememberFilePickerLauncher(
+    type = FileKitType.File("json"),
+  ) { files ->
+    files?.let {
+      scope.launch {
+        devTools.importJsonData(it.absoluteFile()).let {
+          Logger.d { "Data migration successful!" }
+        }
+      }
+    }
+  }
 
   val navigation = LocalAppRouter.current
-  Column(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
+  Column {
     DisableDeveloperSettings(
       state = rememberAppSettingState(
         defaultValue = { devTools.showDevSettings },
@@ -143,33 +106,28 @@ fun DevSettings(
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_onboarding)) },
       onClick = { navigation.replaceAll(Screen.OnBoarding) },
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
     )
 
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_review_notifications)) },
       onClick = devTools::testReviewNotification,
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
     )
+
     SettingsMenuLink(
       title = { Text(text = "Review Screen") },
-      onClick = { navigation.push(Screen.Review(1)) },
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
+      onClick = { navigation.push(Screen.Review(Uuid("test"))) },
     )
 
     SettingsMenuLink(
       title = { Text(text = "Export JSON data") },
-      onClick = { scope.launch { devTools.exportJsonData(true) } },
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
+      onClick = { scope.launch { devTools.exportJsonData() } },
     )
+
+    SettingsMenuLink(
+      title = { Text(text = "Import JSON data") },
+      onClick = { scope.launch { singleImagePickerLauncher.launch() } },
+    )
+
 
 //        SettingsMenuLink(
 //            title = { Text(text = stringResource(Res.string.export_database)) },
@@ -198,9 +156,6 @@ private fun DebugMessageSwitch(
 
   Row(
     modifier = Modifier
-      .background(
-        MaterialTheme.colorScheme.surfaceContainer
-      )
       .fillMaxWidth()
       .height(IntrinsicSize.Min),
     verticalAlignment = Alignment.CenterVertically
@@ -221,10 +176,7 @@ private fun DebugMessageSwitch(
         )
       },
       modifier = Modifier.padding(end = 16.dp),
-      onCheckedChange = { state.value = it },
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
+      onCheckedChange = { state.value = it }
     )
   }
 }
@@ -256,10 +208,7 @@ private fun DisableDeveloperSettings(
         )
       },
       modifier = Modifier.padding(end = 16.dp),
-      onCheckedChange = { state.value = it },
-      colors = ListItemDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
-      )
+      onCheckedChange = { state.value = it }
     )
   }
 }

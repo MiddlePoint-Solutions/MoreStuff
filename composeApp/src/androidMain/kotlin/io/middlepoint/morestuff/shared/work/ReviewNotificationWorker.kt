@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.android.app.work
+package io.middlepoint.morestuff.shared.work
 
 import android.content.Context
 import androidx.work.CoroutineWorker

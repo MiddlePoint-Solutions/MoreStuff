@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
@@ -112,18 +113,19 @@ import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.core.parameter.parametersOf
 
 @NonRestartableComposable
 @Composable
 fun ReviewScreen(
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
-  currentScopeId: Long,
+  initialScopeId: Uuid,
 ) {
   ReviewContent(
     onBack = onBack,
     modifier = modifier,
-    currentScopeId = currentScopeId
+    currentScopeId = initialScopeId
   )
 }
 
@@ -132,10 +134,14 @@ fun ReviewScreen(
 fun ReviewContent(
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
-  currentScopeId: Long,
+  currentScopeId: Uuid,
 ) {
 
-  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
+  val viewModel = koinInjectOnRoute(
+    ReviewViewModel::class,
+    parametersOf(currentScopeId)
+  )
+
   val model by viewModel.models.collectAsState()
 
   val scope = rememberCoroutineScope()
@@ -167,6 +173,7 @@ fun ReviewContent(
             navigateUp = onBack,
             showReviewHelpScreen = { showReviewHelpScreen = true },
             isReviewHintActive = model.reviewHintEnabled,
+            onEvent = viewModel::take,
             modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
           ) {
             ScopeCarousel(
@@ -323,6 +330,7 @@ private fun PriorityReviewTopBar(
   isReviewHintActive: Boolean,
   modifier: Modifier = Modifier,
   navigateUp: () -> Unit = {},
+  onEvent: (ReviewViewEvent) -> Unit,
   scopeSelectorContent: @Composable () -> Unit
 ) {
 
@@ -364,12 +372,13 @@ private fun PriorityReviewTopBar(
           expanded = showMenu,
           onDismissRequest = { showMenu = false }
         ) {
-          DropdownMenuItem(onClick = {
-            coroutineScope.launch {
-              viewModel.take(ToggleReviewHint)
-              showMenu = false
-            }
-          },
+          DropdownMenuItem(
+            onClick = {
+              coroutineScope.launch {
+                onEvent(ToggleReviewHint)
+                showMenu = false
+              }
+            },
             text = {
               Text(
                 text = if (isReviewHintActive) {

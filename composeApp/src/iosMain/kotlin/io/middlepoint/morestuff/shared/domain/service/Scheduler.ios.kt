@@ -2,14 +2,13 @@ package io.middlepoint.morestuff.shared.domain.service
 
 
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.datetime.LocalDateTime
 import platform.Foundation.NSDateComponents
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
-import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
-import kotlin.time.Duration.Companion.days
 
 class SchedulerImpl(
   private val timeManager: TimeManager,
@@ -22,7 +21,7 @@ class SchedulerImpl(
         notificationCenter.delegate()
     }
 
-    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String, taskId: Long) {
+    override fun scheduleAtExact(scheduleId: Uuid, scheduleTime: String, taskTitle: String, taskId: Uuid) {
         logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
 
         val localDateTime = LocalDateTime.parse(scheduleTime)

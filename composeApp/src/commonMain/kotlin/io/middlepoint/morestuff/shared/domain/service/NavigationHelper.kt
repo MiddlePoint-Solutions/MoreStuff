@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import kotlinx.coroutines.launch
@@ -42,15 +43,15 @@ class NavigationHelper: ViewModel(), KoinComponent {
         }
     }
 
-    fun navigateToTaskChat(taskId: Long) {
+    fun navigateToTaskChat(taskId: Uuid) {
         viewModelScope.launch {
             logger.d { "Emitting Screen to navigate to: $taskId" }
             navigation.emit(Screen.TaskChat(taskId))
-            cancelActiveScheduleUseCase(listOf(taskId))
+          cancelActiveScheduleUseCase(listOf(taskId))
         }
     }
 
-    fun cancelTaskSchedule(taskId: Long) {
+    fun cancelTaskSchedule(taskId: Uuid) {
         viewModelScope.launch {
             logger.d { "Cancelling active schedule for taskId: $taskId" }
 

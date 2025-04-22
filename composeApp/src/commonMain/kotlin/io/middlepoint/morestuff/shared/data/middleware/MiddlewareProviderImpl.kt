@@ -11,7 +11,6 @@ class MiddlewareProviderImpl(
   taskMiddleware: TaskMiddleware,
   messageMiddleware: MessageMiddleware,
   scheduleMiddleware: ScheduleMiddleware,
-  responseMiddleware: ReminderMiddleware,
   notificationMiddleware: NotificationMiddleware,
   settingsMiddleware: SettingsMiddleware,
   priorityMiddleware: PriorityMiddleware,
@@ -27,7 +26,6 @@ class MiddlewareProviderImpl(
     taskMiddleware,
     scheduleMiddleware,
     messageMiddleware,
-    responseMiddleware,
     notificationMiddleware,
     priorityMiddleware,
     scopeMiddleware

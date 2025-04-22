@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.action
 
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
@@ -11,6 +12,6 @@ sealed class NotificationAction : Action.FeatureAction() {
     data object ShowReviewNotification : NotificationAction()
 
     internal data class RemoveScheduleNotificationAction(
-        val scheduleId: Long,
+        val scheduleId: Uuid,
     ) : NotificationAction()
 }

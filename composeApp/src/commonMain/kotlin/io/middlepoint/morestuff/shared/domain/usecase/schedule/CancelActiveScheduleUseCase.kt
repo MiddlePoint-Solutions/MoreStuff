@@ -2,15 +2,18 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toInstant
 
 interface CancelActiveScheduleUseCase {
   suspend operator fun invoke(
-    taskIds: List<Long>,
+    taskIds: List<Uuid>,
     scheduleType: List<ScheduleType> = listOf()
-  ): Either<Failure, List<ScheduleDomain>>
+  ): Either<Failure, List<Schedule>>
 }
 
 class CancelActiveScheduleUseCaseImpl(
@@ -20,9 +23,9 @@ class CancelActiveScheduleUseCaseImpl(
 ) : CancelActiveScheduleUseCase {
 
   override suspend fun invoke(
-    taskIds: List<Long>,
+    taskIds: List<Uuid>,
     scheduleType: List<ScheduleType>
-  ): Either<Failure, List<ScheduleDomain>> {
+  ): Either<Failure, List<Schedule>> {
     if (taskIds.isEmpty()) {
       return Either.Right(emptyList())
     }
@@ -31,13 +34,12 @@ class CancelActiveScheduleUseCaseImpl(
       listOf(ScheduleType.OneTime, ScheduleType.Reminder)
     }
 
-    return getActiveSchedule(taskIds, adjustedScheduleType)
-      .onRight { schedules ->
-        schedules.forEach { schedule ->
-          setScheduleFulfilled(schedule.id)
-          scheduler.cancelSchedule(schedule.id)
-        }
+    return getActiveSchedule(taskIds, adjustedScheduleType).onRight { schedules ->
+      schedules.forEach { schedule ->
+        setScheduleFulfilled(schedule.id)
+        scheduler.cancelSchedule(schedule.id)
       }
+    }
   }
 }
 

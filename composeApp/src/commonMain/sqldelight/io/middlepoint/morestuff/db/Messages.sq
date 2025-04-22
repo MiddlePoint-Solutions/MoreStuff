@@ -1,0 +1,87 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Int;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE messages(
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    task_id TEXT AS Uuid NOT NULL,
+    schedule_id TEXT AS Uuid,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    content_type INTEGER AS Int NOT NULL,
+    content TEXT NOT NULL,
+    FOREIGN KEY(task_id) REFERENCES tasks(id)
+);
+
+selectMessageById:
+SELECT messages.*, url_metadata.json_data, messages_extra.id AS messages_extra_id ,messages_extra.file_path,messages_extra.created_at,messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE messages.id = ?;
+
+selectMessageByTaskId:
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.file_path,messages_extra.created_at,messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE task_id = ?
+ORDER BY datetime(messages.created_at) DESC;
+
+selectTaskMessagesByContentType:
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.file_path,messages_extra.created_at,messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE messages.task_id = ? AND messages.content_type IN ?
+ORDER BY datetime(messages.created_at) DESC;
+
+selectFirstTaskMessageWithType:
+WITH LatestMessage AS (
+    SELECT task_id, MAX(datetime(created_at)) AS latest_time
+    FROM messages
+    WHERE content_type = ?
+    GROUP BY task_id
+)
+SELECT m.*
+FROM messages AS m
+JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND datetime(m.created_at) = lm.latest_time
+ORDER BY datetime(m.created_at) DESC;
+
+selectTaskMessage:
+SELECT messages.id, url_metadata.json_data
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+WHERE task_id = ? AND content_type = ?
+ORDER BY messages.id DESC LIMIT 1;
+
+selectLastTaskMessageByContentType:
+SELECT * FROM messages
+WHERE content_type = ?
+ORDER BY id DESC LIMIT 1;
+
+insertMessage:
+INSERT INTO messages
+VALUES ?;
+
+countMessages:
+SELECT count(*) FROM messages;
+
+pageMessages:
+SELECT *
+FROM messages
+ORDER BY id DESC
+LIMIT :limit OFFSET :offset;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+deleteMessage:
+DELETE FROM messages
+WHERE id = ?;
+
+updateMessageContent:
+UPDATE messages
+SET content = ?
+WHERE id = ?;
+

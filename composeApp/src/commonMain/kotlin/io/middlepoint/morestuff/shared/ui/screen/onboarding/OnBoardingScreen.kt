@@ -8,8 +8,12 @@ import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.selectNext
 import io.github.xxfast.decompose.router.pages.RoutedContent
 import io.github.xxfast.decompose.router.pages.rememberRouter
-
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.*
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.ChatWithYourTasks
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.NotificationPermission
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Ready
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignIn
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignInEmail
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Welcome
 import io.middlepoint.morestuff.shared.requiresNotificationsPermission
 
 
@@ -27,7 +31,7 @@ fun OnBoardingScreen(
           add(NotificationPermission)
         }
         add(SignIn)
-        add(SignInEmail)
+//        add(SignInEmail)
         add(Ready)
       },
       selectedIndex = 0

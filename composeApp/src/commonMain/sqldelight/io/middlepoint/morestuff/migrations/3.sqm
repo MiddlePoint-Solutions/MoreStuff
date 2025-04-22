@@ -1,8 +1,0 @@
-CREATE TABLE message_data (
-    data_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    message_id INTEGER NOT NULL,
-    file_path TEXT NOT NULL,
-    creation_time TEXT NOT NULL,
-    data_type TEXT NOT NULL,
-    FOREIGN KEY(message_id) REFERENCES message(id)
-);

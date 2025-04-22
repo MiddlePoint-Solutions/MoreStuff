@@ -22,7 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_add_new_scope
@@ -33,9 +34,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ScopeSelectionBottomSheet(
   onDismissRequest: () -> Unit,
-  addSelectedTasksToScope: (Long) -> Unit,
+  addSelectedTasksToScope: (Uuid) -> Unit,
   createNewScope: () -> Unit,
-  scopes: List<ScopeDomain>,
+  scopes: List<Scope>,
   sheetState: SheetState,
 ) {
 
@@ -59,11 +60,10 @@ fun ScopeSelectionBottomSheet(
   )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScopeSelection(
-  scopes: List<ScopeDomain>,
-  onScopeSelected: (Long) -> Unit,
+  scopes: List<Scope>,
+  onScopeSelected: (Uuid) -> Unit,
   createNewScope: () -> Unit,
 ) {
   Column {
@@ -103,7 +103,7 @@ private fun ScopeSelection(
     LazyColumn {
       items(
         items = scopes,
-        key = { scope -> "Scope${scope.id}" }
+        key = { scope -> "Scope${scope.id.value}" }
       ) { scope ->
         ListItem(
           modifier = Modifier.clickable { onScopeSelected(scope.id) },

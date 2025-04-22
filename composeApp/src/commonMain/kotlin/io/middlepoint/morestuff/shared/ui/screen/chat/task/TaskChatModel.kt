@@ -11,7 +11,8 @@ import io.middlepoint.morestuff.shared.ClipboardHelper
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
+import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
@@ -25,28 +26,14 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CreateTaskCompletionMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputUserMedia
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.SetEditingMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.UpdateMessageContent
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.compose.koinInject
 
 @Composable
 fun taskChatModel(
-  taskId: Long,
+  taskId: Uuid,
   initialState: TaskChatState,
   events: Flow<TaskChatEvent>,
   store: AppStore = koinInject(),
@@ -73,7 +60,7 @@ fun taskChatModel(
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
   var allScopes by remember { mutableStateOf(initialState.allScopes) }
 
-  fun updateScopeAfterMove(scopeId: Long) {
+  fun updateScopeAfterMove(scopeId: Uuid) {
     val newScope = allScopes.find { it.id == scopeId }
     newScope?.let {
       scope = scopeUiMapper.map(it)
@@ -84,7 +71,7 @@ fun taskChatModel(
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
       .collect {
-        logger.d { "Task flow" }
+        logger.d { "Task flow ${taskId.value}" }
         task = taskUiMapper.map(it)
       }
   }
@@ -152,17 +139,17 @@ fun taskChatModel(
           }
 
           is ShareMessage -> {
-            when (message.messageData?.messageType) {
-              MessageDataType.Image -> {
-                mediaHandler.shareImage(message.messageData.filePath)
+            when (message.messageExtra?.messageType) {
+              MessageExtraType.Image -> {
+                mediaHandler.shareImage(message.messageExtra.filePath)
               }
 
-              MessageDataType.Pdf -> {
-                mediaHandler.sharePDF(message.messageData.filePath)
+              MessageExtraType.Pdf -> {
+                mediaHandler.sharePDF(message.messageExtra.filePath)
               }
 
-              MessageDataType.Video -> {}
-              MessageDataType.Audio -> {}
+              MessageExtraType.Video -> {}
+              MessageExtraType.Audio -> {}
               null -> {
                 shareHelper.shareMessage(message.content)
               }
@@ -186,32 +173,32 @@ fun taskChatModel(
           }
 
           is ToggleTaskComplete -> {
-            val complete = !task.isComplete
+            val complete = task?.isComplete == true
             store.dispatch(TaskAction.CompleteTasksAction(listOf(taskId), complete))
           }
 
           is SetEditingMessage -> {
             val previousEditingId = editingMessageId
             editingMessageId = messageId
+            val message = messages.first { it.id == messageId }
+            editingMessageContent = message.content
 
-            if (messageId > 0) {
-              val message = messages.find { it.id == messageId }
-              message?.let {
-                editingMessageContent = it.content
-              }
-            } else {
-              if (previousEditingId != null && previousEditingId > 0) {
-                if (editingMessageContent.isNotEmpty()) {
-                  store.dispatch(
-                    MessageAction.UpdateMessageContentAction(
-                      previousEditingId,
-                      editingMessageContent.trim()
-                    )
+            // TODO: what is this and why do we need it?
+            if (previousEditingId != null) {
+              if (editingMessageContent.isNotEmpty()) {
+                store.dispatch(
+                  MessageAction.UpdateMessageContentAction(
+                    previousEditingId,
+                    editingMessageContent.trim()
                   )
-                }
+                )
               }
-              editingMessageContent = ""
             }
+            editingMessageContent = ""
+          }
+
+          is CancelEditingMessage -> {
+            editingMessageId = null
           }
 
           is UpdateMessageContent -> {
@@ -227,7 +214,7 @@ fun taskChatModel(
             )
           }
 
-          is TaskChatEvent.MoveTaskToScope -> {
+          is MoveTaskToScope -> {
             store.dispatch(
               TaskAction.UpdateTasksToScopeAction(listOf(taskId), scopeId)
             )
@@ -236,7 +223,7 @@ fun taskChatModel(
             logger.d { "Task moved to scope: $scopeTitle" }
           }
 
-          is TaskChatEvent.CreateNewScopeForTask -> {
+          is CreateNewScopeForTask -> {
             createScopeUseCase(title).onRight { newScope ->
               store.dispatch(
                 TaskAction.UpdateTasksToScopeAction(listOf(taskId), newScope.id)

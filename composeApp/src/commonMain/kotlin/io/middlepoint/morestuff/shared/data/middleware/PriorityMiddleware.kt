@@ -1,40 +1,21 @@
-package io.middlepoint.morestuff.shared.domain.redux.middleware
+package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
-import io.middlepoint.morestuff.shared.domain.redux.AppState
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.PriorityAction.TaskPriorityUpdateAction
+import io.middlepoint.morestuff.shared.domain.redux.action.PriorityAction.UndoTaskPriorityUpdateAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
-import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityAction.*
-import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.usecase.priority.UpdateTaskReviewPriorityUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.task.UpdatePlannedTasksPriorityUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-sealed class PriorityAction : Action.FeatureAction() {
-
-    data class UndoTaskPriorityUpdateAction(
-        val taskId: Long,
-        val score: Long,
-    ) : PriorityAction()
-
-    data class TaskPriorityUpdateAction(
-        val task: Long,
-        val actionType: ReviewActionType,
-    ) : PriorityAction()
-
-    data object UpdatePlannedPriorityAction : PriorityAction()
-
-}
-
 class PriorityMiddleware(
     private val updateTaskReviewPriorityUseCase: UpdateTaskReviewPriorityUseCase,
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
-    private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase,
-    private val devTools: DevTools
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -52,11 +33,6 @@ class PriorityMiddleware(
 
             is UndoTaskPriorityUpdateAction -> scope.launch {
                 updateTaskPriorityScoreUseCase(action.taskId, action.score)
-            }
-
-            is UpdatePlannedPriorityAction -> scope.launch {
-                devTools.exportJsonData(false)
-                updatePlannedTasksPriorityUseCase()
             }
 
             else -> NoOp

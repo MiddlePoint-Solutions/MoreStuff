@@ -1,0 +1,16 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE messages_extra (
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    message_id TEXT AS Uuid NOT NULL,
+    file_path TEXT NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    data_type TEXT NOT NULL,
+    FOREIGN KEY(message_id) REFERENCES messages(id)
+);
+
+
+insertMessageExtra:
+INSERT INTO messages_extra
+VALUES ?;

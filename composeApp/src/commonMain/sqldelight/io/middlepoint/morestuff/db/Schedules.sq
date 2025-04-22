@@ -1,0 +1,74 @@
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType;
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE schedules(
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    task_id TEXT AS Uuid NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    scheduled_at INTEGER AS Instant NOT NULL,
+    timezone TEXT NOT NULL,
+    active INTEGER AS Boolean NOT NULL DEFAULT 1,
+    schedule_type TEXT AS ScheduleType NOT NULL,
+    FOREIGN KEY(task_id) REFERENCES tasks(id)
+    );
+
+selectAll:
+SELECT *
+FROM schedules
+ORDER BY datetime(created_at);
+
+selectScheduleById:
+SELECT *
+FROM schedules
+WHERE id = ?;
+
+selectSchedulesById:
+SELECT *
+FROM schedules
+WHERE id IN :schedule_ids;
+
+selectSchedulesByTaskId:
+SELECT *
+FROM schedules
+WHERE task_id = ?;
+
+selectActiveScheduleByTaskId:
+SELECT *
+FROM schedules
+WHERE task_id IN :task_ids
+AND active = 1
+AND schedule_type IN :schedule_types
+ORDER BY id DESC;
+
+selectActiveSchedules:
+SELECT *
+FROM schedules
+WHERE active = 1 AND schedule_type IN :schedule_types
+ORDER BY scheduled_at;
+
+selectActiveSchedulesByTaskId:
+SELECT schedules.*
+FROM schedules
+WHERE active = 1 AND task_id = :task_id
+ORDER BY scheduled_at;
+
+countTaskSchedulesByTime:
+SELECT COUNT(*)
+FROM schedules
+WHERE task_id = :task_id
+AND scheduled_at BETWEEN :start AND :end;
+
+insertSchedule:
+INSERT INTO schedules
+VALUES ?;
+
+updateScheduleActive:
+UPDATE schedules
+SET active = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();

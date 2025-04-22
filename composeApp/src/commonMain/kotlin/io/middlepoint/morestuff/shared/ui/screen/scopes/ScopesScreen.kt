@@ -56,8 +56,9 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
@@ -137,11 +138,11 @@ fun ScopesContent(
   model: ScopesState,
   onBack: () -> Unit,
   onCreateScope: () -> Unit,
-  onEditScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-  var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
+  var selectedScope by remember { mutableStateOf<Scope?>(null) }
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
@@ -232,19 +233,18 @@ fun ScopesContent(
   }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun OrderedScopesList(
   model: ScopesState,
-  onEditScope: (ScopeDomain) -> Unit,
-  onDeleteScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
+  onDeleteScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit
 ) {
 
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
 
   val menuVisibility = remember(scopes) {
-    mutableStateMapOf<Long, Boolean>().apply {
+    mutableStateMapOf<Uuid, Boolean>().apply {
       scopes.forEach { scope ->
         put(scope.id, false)
       }
@@ -299,9 +299,9 @@ private fun OrderedScopesList(
     ) {
       itemsIndexed(
         items = scopes,
-        key = { _, scope -> scope.id }
+        key = { _, scope -> scope.id.value }
       ) { _, scope ->
-        ReorderableItem(reorderState, key = scope.id) {
+        ReorderableItem(reorderState, key = scope.id.value) {
           Column(
             modifier = Modifier.background(
               color = MaterialTheme.colorScheme.surfaceContainerElevation
@@ -323,7 +323,7 @@ private fun OrderedScopesList(
                 Text(text = scope.name)
               },
               trailingContent = {
-                if (scope.id != defaultScope.id) {
+                if (scope.id != model.stuffScope?.id) {
                   IconButton(onClick = {
                     menuVisibility[scope.id] = !menuVisibility[scope.id]!!
                   }) {
