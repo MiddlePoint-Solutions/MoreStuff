@@ -88,7 +88,6 @@ import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
-import io.middlepoint.morestuff.shared.ui.components.input.voice.VoiceToTextInput
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
@@ -300,26 +299,36 @@ private fun TaskChatContent(
 
   LaunchedEffect(task.isComplete) {
     if (prevIsComplete.value != task.isComplete) {
+
       if (task.isComplete && task.completeTime.isNotEmpty()) {
-        delay(500)
-        onEvent(
-          TaskChatEvent.CreateTaskCompletionMessage(
-            content = completionMessage
+        val alreadyPosted = messages.any { msg ->
+          msg.contentType == ContentType.APP_TASK_MESSAGE &&
+              msg.content.startsWith(completionMessage)
+        }
+
+        if (!alreadyPosted) {
+          delay(500)
+          onEvent(
+            TaskChatEvent.CreateTaskCompletionMessage(
+              content = completionMessage
+            )
           )
-        )
+        }
+
       } else if (!task.isComplete) {
         messages
-          .filter { message ->
-            message.contentType == ContentType.APP_TASK_MESSAGE &&
-                message.content.startsWith(completionMessage)
+          .filter { msg ->
+            msg.contentType == ContentType.APP_TASK_MESSAGE &&
+                msg.content.startsWith(completionMessage)
           }
-          .forEach { message ->
-            onEvent(DeleteMessage(message))
+          .forEach { msg ->
+            onEvent(DeleteMessage(msg))
           }
       }
       prevIsComplete.value = task.isComplete
     }
   }
+
 
   val scopeName = scope.name
 
@@ -749,7 +758,7 @@ private fun TaskTopAppBar(
 
       },
       colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
       )
     )
   }

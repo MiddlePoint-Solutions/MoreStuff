@@ -35,8 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
-import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -100,7 +98,7 @@ fun CreateScopeScreen(
           }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
       )
     },

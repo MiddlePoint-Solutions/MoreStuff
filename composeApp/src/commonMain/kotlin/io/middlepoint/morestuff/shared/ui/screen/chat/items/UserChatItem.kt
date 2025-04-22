@@ -80,7 +80,7 @@ fun UserChatItem(
         bottomEnd = 5.dp,
         bottomStart = 14.dp
       ),
-      color = MaterialTheme.colorScheme.primary,
+      color = MaterialTheme.colorScheme.inversePrimary,
       modifier = Modifier
         .combinedClickable(
           enabled = LocalUserInteractionEnabled.current && !isEditing,

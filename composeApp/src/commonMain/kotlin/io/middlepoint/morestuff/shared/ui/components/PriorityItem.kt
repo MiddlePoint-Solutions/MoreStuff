@@ -153,7 +153,7 @@ fun PriorityItem(
         style = TextStyle(
           fontSize = 16.sp,
           lineHeight = 18.sp,
-          fontWeight = FontWeight(700),
+          fontWeight = FontWeight(500),
           color = Color(0xFFFFFFFF),
           textAlign = TextAlign.Start,
           textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
