@@ -1,7 +1,9 @@
 package io.middlepoint.morestuff.shared.data.service
 
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
+import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEV_SETTINGS
 import io.middlepoint.morestuff.shared.domain.DevTools
@@ -47,8 +49,8 @@ class DevToolsImpl(
         migrationHelper.export()
     }
 
-    override suspend fun importJsonData(uri: String) {
-        TODO("Not yet implemented")
+    override suspend fun importJsonData(jsonFile: PlatformFile): Boolean {
+        return migrationHelper.import(jsonFile).getOrElse { false }
     }
 }
 

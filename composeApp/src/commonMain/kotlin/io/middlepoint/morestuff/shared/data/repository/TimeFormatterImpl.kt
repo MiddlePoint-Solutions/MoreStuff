@@ -42,7 +42,6 @@ class TimeFormatterImpl(
   }
 
 
-
   private val displayCompleteTimeFormat = LocalDateTime.Format {
     dayOfMonth(Padding.NONE);
     char(' ');
@@ -58,10 +57,16 @@ class TimeFormatterImpl(
       .toLocalDateTime(timeZone)
       .format(displayDayMonth)
 
+  override fun formatDisplayDayMonth(instant: Instant, timeZone: TimeZone): String =
+    instant.toLocalDateTime(timeZone).format(displayDayMonth)
+
   override fun formatDisplayTime(timeString: String, timeZone: TimeZone): String =
     Instant.parse(timeString)
       .toLocalDateTime(timeZone).time
       .let(::formatDisplayTime)
+
+  override fun formatDisplayTime(instant: Instant, timeZone: TimeZone): String =
+    instant.toLocalDateTime(timeZone).time.let(::formatDisplayTime)
 
   override fun formatDisplayTime(time: LocalTime, timeZone: TimeZone): String =
     displayTimeFormat.format(time)

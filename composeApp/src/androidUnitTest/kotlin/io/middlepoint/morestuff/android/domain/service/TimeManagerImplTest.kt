@@ -1,9 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.service
 
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
-import kotlinx.datetime.Instant
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toLocalDateTime
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -18,7 +16,7 @@ class TimeManagerImplTest {
 
     @Test
     fun `getCreateTime should return the current UTC instant as a string`() {
-        val createTime = timeManager.getCreateTime()
+        val createTime = timeManager.getCreatedTime()
         assertNotNull(createTime)
     }
 

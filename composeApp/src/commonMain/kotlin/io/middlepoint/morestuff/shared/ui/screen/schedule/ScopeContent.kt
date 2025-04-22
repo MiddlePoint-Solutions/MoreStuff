@@ -24,9 +24,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.extension.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
+import io.middlepoint.morestuff.shared.ui.theme.divider
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,10 +41,10 @@ fun ScopeContent(
   tasks: List<TaskUiModel>,
   modifier: Modifier = Modifier,
   listState: LazyListState = rememberLazyListState(),
-  selectedTasks: List<Long> = listOf(),
-  onItemClick: (taskId: Long) -> Unit = {},
-  onItemLongClick: (taskId: Long) -> Unit = {},
-  onTaskComplete: (taskId: Long) -> Unit = {},
+  selectedTasks: List<Uuid> = listOf(),
+  onItemClick: (taskId: Uuid) -> Unit = {},
+  onItemLongClick: (taskId: Uuid) -> Unit = {},
+  onTaskComplete: (taskId: Uuid) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
   isReordering: Boolean,
@@ -100,7 +102,7 @@ fun ScopeContent(
   ) {
     itemsIndexed(
       items = reorderList,
-      key = { _, task -> task.id }
+      key = { _, task -> task.id.value }
     ) { index, item ->
 
       val isLast by remember(index) {
@@ -125,7 +127,7 @@ fun ScopeContent(
           animationSpec = tween(durationMillis = 600)
         )
       ) {
-        ReorderableItem(reorderableState, key = item.id) {
+        ReorderableItem(reorderableState, key = item.id.value) {
           PriorityItem(
             task = item,
             isSelected = selected,

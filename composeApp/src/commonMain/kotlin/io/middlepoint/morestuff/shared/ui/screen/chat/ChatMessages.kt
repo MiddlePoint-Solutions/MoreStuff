@@ -87,7 +87,7 @@ fun Messages(
       ) {
         itemsIndexed(
           items = messages,
-          key = { _, item -> item.id },
+          key = { _, item -> item.id.value },
           contentType = { _, item -> item.contentType }
         ) { index, item ->
 

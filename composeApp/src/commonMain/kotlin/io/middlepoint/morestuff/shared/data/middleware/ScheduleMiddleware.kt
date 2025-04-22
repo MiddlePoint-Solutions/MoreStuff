@@ -1,28 +1,26 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType.DONE
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType.LATER
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType.SNOOZE
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType.TOMORROW
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CancelActiveScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CancelScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CreateReminderScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ExecuteScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.RescheduleTaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ScheduleCreatedAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ToggleReminderScheduleAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
-import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction.CreateScheduleMessageAction
-import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.*
-import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ScheduleCreatedAction
-import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ScheduleReplyAction
-import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
-import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
-import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateOneTimeScheduleUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateReminderUseCase
-import io.middlepoint.morestuff.shared.domain.usecase.schedule.ToggleQuickReminderUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCase
@@ -38,8 +36,6 @@ class ScheduleMiddleware(
     private val getScheduleUseCase: GetScheduleUseCase,
     private val createScheduleUseCase: CreateScheduleUseCase,
     private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
-    private val createReminderUseCase: CreateReminderUseCase,
-    private val toggleQuickReminderUseCase: ToggleQuickReminderUseCase,
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
     private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
     private val getTaskUseCase: GetTaskUseCase
@@ -88,44 +84,9 @@ class ScheduleMiddleware(
                 cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.OneTime))
             }
 
-            // TODO: create use-case for this action
-            is ScheduleReplyAction -> with(action) {
-                when (replyType) {
-                    LATER -> {}
-                    TOMORROW -> {
-                        val tomorrowTime = timeManager.tomorrowLocalDateTime(12)
-                        dispatch(
-                            RescheduleTaskAction(
-                                schedule.taskId,
-                                schedule.scheduleType,
-                                tomorrowTime
-                            )
-                        )
-                    }
-
-                    SNOOZE -> {
-                        val snoozeTime =
-                            timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
-                        dispatch(
-                            RescheduleTaskAction(
-                                schedule.taskId,
-                                schedule.scheduleType,
-                                snoozeTime
-                            )
-                        )
-                    }
-
-                    DONE -> {
-                        dispatch(
-                            TaskAction.CompleteTasksAction(listOf(schedule.taskId), true)
-                        )
-                    }
-                }
-            }
-
             is ScheduleCreatedAction -> {
                 scope.launch {
-                    action.schedule.scheduleLocalTime?.let { time ->
+                    action.schedule.scheduledAt.let { time ->
                         scheduleAtTimeUseCase(action.schedule.id, time, action.task.title, action.task.id)
                     }
                 }
@@ -135,7 +96,7 @@ class ScheduleMiddleware(
                 getScheduleUseCase(action.scheduleId).map { schedule ->
                     if (schedule.active) {
                         setScheduleFulfilledUseCase(schedule.id)
-                        dispatch(CreateScheduleMessageAction(schedule.id))
+                        dispatch(MessageAction.CreateScheduleMessageAction(schedule.id))
                     }
                 }
             }

@@ -1,0 +1,55 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Int;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE scopes (
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    scope_name TEXT UNIQUE NOT NULL,
+    scope_order INTEGER AS Int NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL
+);
+
+createScope:
+INSERT OR IGNORE INTO scopes
+VALUES ?;
+
+deleteScope:
+DELETE FROM scopes
+WHERE id = :id;
+
+selectScope:
+SELECT scopes.*
+FROM scopes
+WHERE id = :id;
+
+selectAllScopes:
+SELECT scopes.*
+FROM scopes
+ORDER BY scope_order ASC;
+
+selectScopeByName:
+SELECT *
+FROM scopes
+WHERE scope_name = :name;
+
+updateScopeName:
+UPDATE scopes
+SET scope_name = :scopeName
+WHERE id = :scopeId;
+
+updateScopeOrder:
+UPDATE scopes
+SET scope_order = :scopeOrder
+WHERE id = :scopeId;
+
+countScopes:
+SELECT COUNT(*) FROM scopes;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+selectScopeById:
+SELECT id, id, scope_name, scope_order
+FROM scopes
+WHERE id = :id;

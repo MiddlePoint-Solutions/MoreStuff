@@ -60,15 +60,15 @@ private fun getContextMenuItems(
         close()
     }
 
-    return if (message.messageData?.filePath != null) {
+    return if (message.messageExtra?.filePath != null) {
         val shareAction = if (message.isPdfMessage) {
             {
-                actions.sharePdf(message.messageData.filePath)
+                actions.sharePdf(message.messageExtra.filePath)
                 close()
             }
         } else {
             {
-                actions.shareImage(message.messageData.filePath)
+                actions.shareImage(message.messageExtra.filePath)
                 close()
             }
         }

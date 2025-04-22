@@ -1,0 +1,28 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE tasks_scopes (
+    task_id TEXT AS Uuid NOT NULL REFERENCES tasks(id),
+    scope_id TEXT AS Uuid NOT NULL REFERENCES scopes(id),
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    PRIMARY KEY (task_id, scope_id)
+);
+
+insert:
+INSERT OR IGNORE INTO tasks_scopes
+VALUES ?;
+
+update:
+UPDATE tasks_scopes
+SET scope_id = :scope_id
+WHERE task_id IN :task_ids;
+
+remove:
+DELETE FROM tasks_scopes
+WHERE task_id IN :task_id AND scope_id = :scope_id;
+
+selectScopeIdForTask:
+SELECT scope_id
+FROM tasks_scopes
+WHERE task_id = :taskId;

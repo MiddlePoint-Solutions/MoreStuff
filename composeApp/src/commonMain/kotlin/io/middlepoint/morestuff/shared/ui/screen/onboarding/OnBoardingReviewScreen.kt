@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.model.ReviewItemUiModel
 import kotlinx.coroutines.delay
 import morestuff.composeapp.generated.resources.Res
@@ -88,7 +89,7 @@ fun OnBoardingReviewScreen(
 
     tasks = List(ids.size) { index ->
       ReviewItemUiModel(
-        id = index.toLong(),
+        id = Uuid("$index"),
         createTime = createDates[index],
         title = getString(ids[index]),
         position = "${index + 1}/${ids.size}",

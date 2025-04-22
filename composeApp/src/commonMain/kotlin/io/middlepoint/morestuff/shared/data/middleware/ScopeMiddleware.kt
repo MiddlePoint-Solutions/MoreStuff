@@ -46,7 +46,7 @@ class ScopeMiddleware(
             }
 
             is DeleteScopeAction -> scope.launch {
-                deleteScopeUseCase(action.scopeId)
+              deleteScopeUseCase(action.scopeId)
             }
 
             is UpdateScopeNameAction -> scope.launch {

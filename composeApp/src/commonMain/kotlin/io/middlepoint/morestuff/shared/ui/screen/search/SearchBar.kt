@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.domain.enums.FilterType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.Job
@@ -75,7 +76,7 @@ import org.jetbrains.compose.resources.vectorResource
 @Composable
 fun SearchBar(
   onSearchClose: () -> Unit,
-  showTaskChat: (taskId: Long) -> Unit,
+  showTaskChat: (taskId: Uuid) -> Unit,
   modifier: Modifier = Modifier,
 ) {
 
@@ -240,7 +241,7 @@ fun SearchBar(
                   LazyColumn {
                     items(
                       items = result,
-                      key = { item -> item.id },
+                      key = { item -> item.id.value },
                       contentType = { item ->
                         when (item.isComplete) {
                           true -> SearchContentType.Complete

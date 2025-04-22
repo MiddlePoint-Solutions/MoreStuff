@@ -78,6 +78,7 @@ import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
@@ -131,7 +132,7 @@ import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TaskChatScreen(
-  taskId: Long,
+  taskId: Uuid,
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -141,7 +142,7 @@ fun TaskChatScreen(
   val scope = rememberCoroutineScope()
 
   val viewModel = koinInjectOnRoute(
-    type = TaskChatPresenter::class,
+    type = TaskChatViewModel::class,
     parameters = { parametersOf(taskId) }
   )
 
@@ -171,12 +172,12 @@ fun TaskChatScreen(
             copyMessage = { viewModel.take(CopyText(it.content)) },
             deleteMessage = { viewModel.take(DeleteMessage(it)) },
             onImageSelected = {
-              val path = it.messageData?.filePath ?: ""
+              val path = it.messageExtra?.filePath ?: ""
               val title = it.content
               router.push(ImagePreview(path, title))
             },
             onPdfSelected = {
-              val path = it.messageData?.filePath ?: ""
+              val path = it.messageExtra?.filePath ?: ""
               viewModel.take(OpenDocument(path))
             },
             shareImage = { viewModel.take(ShareImage(it)) },
@@ -383,7 +384,7 @@ private fun TaskChatContent(
             ) {
               EditingMessageReference(
                 message = editingMessage,
-                onCancelEdit = { onEvent(TaskChatEvent.SetEditingMessage(-1)) }
+                onCancelEdit = { onEvent(TaskChatEvent.CancelEditingMessage) }
               )
             }
             Spacer(modifier.height(8.dp))
@@ -400,7 +401,7 @@ private fun TaskChatContent(
               editingMessageId = editingMessageId,
               editingContent = editingMessageContent,
               onCancelEdit = {
-                onEvent(TaskChatEvent.SetEditingMessage(-1))
+                onEvent(TaskChatEvent.CancelEditingMessage)
               },
               onUpdateMessage = { content ->
                 onEvent(TaskChatEvent.UpdateMessageContent(content))
@@ -471,7 +472,7 @@ private fun TaskChatInput(
   pickImage: () -> Unit,
   pickPdf: () -> Unit,
   modifier: Modifier = Modifier,
-  editingMessageId: Long? = null,
+  editingMessageId: Uuid? = null,
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
   onUpdateMessage: (String) -> Unit = {}
@@ -487,7 +488,7 @@ private fun TaskChatInput(
     inputs = arrayOf(editingMessageId, editingContent)
   ) {
     mutableStateOf(
-      if (editingMessageId != null && editingMessageId > 0)
+      if (editingMessageId != null)
         TextFieldValue(editingContent, TextRange(editingContent.length))
       else
         TextFieldValue("")
@@ -495,7 +496,7 @@ private fun TaskChatInput(
   }
 
   LaunchedEffect(editingMessageId, editingContent) {
-    if (editingMessageId != null && editingMessageId > 0) {
+    if (editingMessageId != null) {
       userInputValue = TextFieldValue(editingContent, TextRange(editingContent.length))
       isTextEmpty.value = editingContent.isEmpty()
       showSendIcon.value = !isTextEmpty.value
@@ -524,7 +525,7 @@ private fun TaskChatInput(
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
               showSendIcon.value = !isTextEmpty.value
-              if (editingMessageId != null && editingMessageId > 0) {
+              if (editingMessageId != null) {
                 onUpdateMessage(it.text)
               }
             },
@@ -538,7 +539,7 @@ private fun TaskChatInput(
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
                   this@Row.AnimatedVisibility(
-                    visible = isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0),
+                    visible = isTextEmpty.value && editingMessageId == null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                   ) {
@@ -553,12 +554,12 @@ private fun TaskChatInput(
                   }
 
                   this@Row.AnimatedVisibility(
-                    visible = !isTextEmpty.value || (editingMessageId != null && editingMessageId > 0),
+                    visible = !isTextEmpty.value || editingMessageId != null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                   ) {
                     SendIcon(onClick = {
-                      if (editingMessageId != null && editingMessageId > 0) {
+                      if (editingMessageId != null) {
                         onUpdateMessage(userInputValue.text)
                         onCancelEdit()
                       } else {

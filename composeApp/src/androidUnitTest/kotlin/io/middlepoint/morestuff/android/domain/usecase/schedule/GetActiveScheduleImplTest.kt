@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.schedule
 import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createScheduleForTest
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -17,7 +18,7 @@ class GetActiveScheduleImplTest {
 
     @Test
     fun `returns active schedule for a task`() = runBlocking {
-        val taskId = listOf(1L)
+        val taskId = listOf(Uuid("1"))
         val schedule = listOf(
           createScheduleForTest(
             scheduleType = ScheduleType.OneTime
@@ -31,7 +32,7 @@ class GetActiveScheduleImplTest {
             )
         } returns schedule.right()
 
-        val result = getActiveScheduleImpl(taskId, listOf(ScheduleType.OneTime))
+        val result = getActiveScheduleImpl.invoke(taskId, listOf(ScheduleType.OneTime))
 
         assertEquals(schedule.right(), result)
         coVerify { scheduleRepository.getActiveSchedulesForTasks(taskId, any()) }

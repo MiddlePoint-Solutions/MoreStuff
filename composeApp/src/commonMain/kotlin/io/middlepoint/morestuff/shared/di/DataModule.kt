@@ -62,27 +62,15 @@ val dataModule = module {
     )
   }
 
-  single<ScheduleRepository> {
-    ScheduleRepositoryImpl(
-      database = get(),
-      mapper = get(),
-    )
-  }
+  singleOf(::ScheduleRepositoryImpl) bind ScheduleRepository::class
 
   single<UserRepository> {
     UserRepositoryImpl(settings = get())
   }
 
-  single<ScopeRepository> {
-    ScopeRepositoryImpl(
-      database = get(),
-      dataMappers = get()
-    )
-  }
-
+  singleOf(::ScopeRepositoryImpl) bind ScopeRepository::class
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
-
   factoryOf(::MigrationHelper)
 
 }
@@ -95,13 +83,14 @@ val supabaseModule = module {
       supabaseKey = BuildConfig.SUPABASE_KEY
     ) {
       install(Auth) {
-        sessionManager = SettingsSessionManager(settings = get())
-        codeVerifierCache = SettingsCodeVerifierCache(settings = get())
+        sessionManager = SettingsSessionManager(settings = get()) // TODO: use encrypted settings
+        codeVerifierCache = SettingsCodeVerifierCache(settings = get()) // TODO: use encrypted settings
       }
       install(ComposeAuth) {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
         appleNativeLogin() // TODO
       }
+
     }
   }
 }

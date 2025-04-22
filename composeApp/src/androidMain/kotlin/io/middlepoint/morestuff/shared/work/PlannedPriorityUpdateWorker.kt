@@ -16,7 +16,7 @@ class PlannedPriorityUpdateWorker(
     private val store: AppStore by inject()
 
     override suspend fun doWork(): Result {
-        store.dispatchSuspend(PriorityAction.UpdatePlannedPriorityAction)
+        // TODO: This can be used for data sync
         return Result.success()
     }
 }

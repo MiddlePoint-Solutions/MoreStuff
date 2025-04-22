@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.components.CustomScrollableTabRow
 import io.middlepoint.morestuff.shared.ui.components.TabRowDefaults.tabIndicatorOffset
 import io.middlepoint.morestuff.shared.ui.utils.containsEmoji
@@ -31,8 +31,8 @@ import io.middlepoint.morestuff.shared.ui.utils.containsEmoji
 @Composable
 fun ScopeTabs(
     currentPage: Int,
-    scopes: List<ScopeDomain>,
-    onScopeSelected: (index: Int, scope: ScopeDomain) -> Unit,
+    scopes: List<Scope>,
+    onScopeSelected: (index: Int, scope: Scope) -> Unit,
     containerColor: Color,
     createNewScope: () -> Unit,
     isCreateScopeVisible: Boolean = true

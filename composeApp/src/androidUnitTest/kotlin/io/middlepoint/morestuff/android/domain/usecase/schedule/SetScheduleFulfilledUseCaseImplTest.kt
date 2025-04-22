@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.shared.domain.usecase.schedule
 
 import arrow.core.Either
+import arrow.core.getOrElse
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -12,14 +14,13 @@ class SetScheduleFulfilledUseCaseImplTest{
 
     private val scheduleRepository = mockk<ScheduleRepository>()
     private val setScheduleFulfilledUseCaseImpl = SetScheduleFulfilledUseCaseImpl(scheduleRepository)
-    private val scheduleId = 1L
+    private val scheduleId = Uuid("1")
 
     @Test
     fun `set schedule fulfilled use case impl`() = runBlocking{
-        coEvery { scheduleRepository.setScheduleFulfilled(scheduleId) } returns Either.Right(1L)
-        val result = setScheduleFulfilledUseCaseImpl.invoke(scheduleId)
-        assertTrue(result is Either.Right)
-        assertEquals(true, result.isRight())
+        coEvery { scheduleRepository.setScheduleFulfilled(scheduleId) } returns Either.Right(true)
+        val result = setScheduleFulfilledUseCaseImpl(scheduleId)
+        assertEquals(true, result.getOrNull())
     }
 
 }

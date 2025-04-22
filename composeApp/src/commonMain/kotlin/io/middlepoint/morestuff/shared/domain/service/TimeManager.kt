@@ -59,7 +59,7 @@ interface TimeManager {
     /**
     Returns the time the TimeManager instance was created as a string.
      */
-    fun getCreateTime(): String
+    fun getCreatedTime(): String
 
     /**
     Converts a LocalDateTime to UTC Instant.

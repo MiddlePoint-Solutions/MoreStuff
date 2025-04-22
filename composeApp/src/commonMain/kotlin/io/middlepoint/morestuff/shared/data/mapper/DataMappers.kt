@@ -1,16 +1,30 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.StorageManager
+import io.middlepoint.morestuff.shared.data.model.TaskData
+import io.middlepoint.morestuff.shared.data.model.TaskSync
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 
+typealias DataMapper<I, O> = (I) -> O
+
+inline fun <I, O> mapList(input: List<I>, mapListItem: (I) -> O): List<O> {
+  return input.map { mapListItem(it) }
+}
+
+inline fun <I, O> mapNullInputList(input: List<I>?, mapListItem: (I) -> O): List<O> {
+  return input?.map { mapListItem(it) } ?: emptyList()
+}
+
+inline fun <I, O> mapNullOutputList(input: List<I>, mapListItem: (I) -> O): List<O>? {
+  return if (input.isEmpty()) null else input.map { mapListItem(it) }
+}
 
 interface DataMappers {
   val userDataMapper: UserDataMapper
   val messageDataMapper: MessageDataMapper
-  val messageDbMapper: MessageDbMapper
-  val scheduleDbMapper: ScheduleDbMapper
-  val scheduleDomainMapper: ScheduleDomainMapper
-  val taskDbMapper: TaskDataMapper
-  val scopeDbMapper: ScopeDataMapper
+  val scheduleDataMapper: ScheduleDataMapper
+  val taskDataMapper: TaskDataMapper<Task>
+  val scopeDataMapper: ScopeDataMapper
 }
 
 class DataMappersImpl(
@@ -23,20 +37,13 @@ class DataMappersImpl(
   override val messageDataMapper: MessageDataMapper
     get() = makeMessageDataMap(storageManager::getAppStoragePathToSavedFile)
 
-  override val messageDbMapper: MessageDbMapper
-    get() = makeMessageDbMapper()
+  override val scheduleDataMapper: ScheduleDataMapper
+    get() = makeScheduleDataMapper()
 
-  override val scheduleDbMapper: ScheduleDbMapper
-    get() = makeScheduleDbMapper()
+  override val taskDataMapper: TaskDataMapper<Task>
+    get() = makeTaskDataMapper()
 
-  override val scheduleDomainMapper: ScheduleDomainMapper
-    get() = makeScheduleDomainMapper()
-
-  override val taskDbMapper: TaskDataMapper
-    get() = makeTaskDbMapper()
-
-  override val scopeDbMapper: ScopeDataMapper
+  override val scopeDataMapper: ScopeDataMapper
     get() = makeScopeDbMapper()
 
 }
-

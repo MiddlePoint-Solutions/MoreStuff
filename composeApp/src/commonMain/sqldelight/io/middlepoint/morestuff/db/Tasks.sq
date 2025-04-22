@@ -1,0 +1,168 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE tasks(
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    completed_at INTEGER AS Instant,
+    completed_timezone TEXT,
+    title TEXT NOT NULL,
+    priority_score INTEGER NOT NULL
+);
+
+selectAll:
+SELECT *
+FROM tasks
+ORDER BY datetime(created_at);
+
+selectAllActive:
+SELECT *
+FROM tasks
+WHERE tasks.completed_at IS NULL
+ORDER BY tasks.priority_score DESC;
+
+getActiveTaskWithoutSchedule:
+SELECT tasks.*
+FROM tasks
+WHERE completed_at IS NULL
+  AND id NOT IN (
+      SELECT task_id
+      FROM schedules
+      WHERE active = 1 AND schedule_type IN :schedule_types
+  )
+ORDER BY tasks.priority_score DESC;
+
+getActiveTaskWithoutScheduleByScopeId:
+SELECT tasks.*
+FROM tasks
+JOIN tasks_scopes ON tasks.id = tasks_scopes.task_id
+WHERE tasks_scopes.scope_id = :scope_id
+  AND completed_at IS NULL
+  AND id NOT IN (
+      SELECT task_id
+      FROM schedules
+      WHERE active = 1 AND schedule_type IN :schedule_types
+  )
+ORDER BY tasks.priority_score DESC;
+
+
+selectAllComplete:
+SELECT *
+FROM tasks
+WHERE completed_at IS NOT NULL
+ORDER BY tasks.completed_at DESC;
+
+selectHighestPriorityScore:
+SELECT max(priority_score) FROM tasks;
+
+selectLowestPriorityScore:
+SELECT min(priority_score) FROM tasks;
+
+selectTaskById:
+SELECT *
+FROM tasks
+WHERE id = ?;
+
+insertTask:
+INSERT INTO tasks
+VALUES ?;
+
+updateTaskComplete:
+UPDATE tasks
+SET completed_at = :completed_time
+WHERE id IN :task_ids;
+
+updateTaskTitle:
+UPDATE tasks
+SET title = ?
+WHERE id = ?;
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+updateTaskPriorityScore:
+UPDATE tasks
+SET priority_score = :priority_score
+WHERE id = :task_id AND EXISTS (
+    SELECT 1
+    FROM tasks_scopes
+    WHERE task_id = :task_id
+);
+
+decrementTasksPriorityScore:
+UPDATE tasks
+SET priority_score = priority_score - 1
+WHERE priority_score <= :priority_score;
+
+incrementTasksPriorityScore:
+UPDATE tasks
+SET priority_score = priority_score + 1
+WHERE priority_score >= :priority_score;
+
+selectAbovePriorityScore:
+SELECT tasks.* FROM tasks
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM tasks
+          WHERE completed_at IS NULL AND priority_score > :current_score
+          ORDER BY priority_score ASC LIMIT 1
+      )
+LIMIT 1;
+
+selectBelowPriorityScore:
+SELECT tasks.* FROM tasks
+WHERE priority_score IN (
+          SELECT priority_score
+          FROM tasks
+          WHERE completed_at IS NULL AND priority_score < :current_score
+          ORDER BY priority_score DESC LIMIT 1
+      )
+LIMIT 1;
+
+searchTasks:
+SELECT * FROM tasks
+WHERE title LIKE '%' || :searchText || '%' COLLATE NOCASE
+ORDER BY created_at DESC;
+
+searchActiveTasks:
+SELECT * FROM tasks
+WHERE tasks.completed_at IS NULL
+AND (title LIKE '%' || :searchText || '%' COLLATE NOCASE)
+ORDER BY created_at DESC;
+
+countActiveTasks:
+SELECT COUNT(*) FROM tasks
+WHERE tasks.completed_at IS NULL;
+
+deleteTask:
+DELETE FROM tasks
+WHERE id IN :task_ids;
+
+selectTasksByScopeId:
+SELECT tasks.*
+FROM tasks
+JOIN tasks_scopes ON tasks.id = tasks_scopes.task_id
+WHERE tasks_scopes.scope_id = :scope_id
+  AND tasks.completed_at IS NULL
+ORDER BY tasks.priority_score DESC;
+
+selectTasksWithoutScope:
+SELECT *
+FROM tasks
+WHERE id NOT IN (
+   SELECT task_id
+   FROM tasks_scopes
+);
+
+selectAllActiveForSearch:
+SELECT *
+FROM tasks
+WHERE tasks.completed_at IS NULL
+ORDER BY created_at DESC;
+
+selectAllForSearch:
+SELECT *
+FROM tasks
+ORDER BY created_at DESC;
+

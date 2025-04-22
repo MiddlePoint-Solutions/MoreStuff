@@ -86,38 +86,6 @@ fun AppChatItem(
 fun TaskReminderItem(message: MessageUiModel, actions: ChatActions) {
     Column {
         AppChatItem(message, actions)
-        if (message.replyType == null) {
-            Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.SNOOZE)
-                }) {
-                    Text(text = stringResource(Res.string.chat_action_today))
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.TOMORROW)
-                }) {
-                    Text(text = stringResource(Res.string.chat_action_tomorrow))
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.DONE)
-                }) {
-                    Text(text = stringResource(Res.string.done))
-                }
-            }
-        } else if (message.replyContent.isNullOrBlank().not()) {
-            Surface(
-                shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                contentColor = contentColorFor(MaterialTheme.colorScheme.secondaryContainer)
-            ) {
-                Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
-            }
-        }
     }
 }
 
