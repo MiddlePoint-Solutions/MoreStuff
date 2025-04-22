@@ -14,7 +14,7 @@ CREATE TABLE tasks(
 selectAll:
 SELECT *
 FROM tasks
-ORDER BY datetime(created_at);
+ORDER BY created_at;
 
 selectAllActive:
 SELECT *
