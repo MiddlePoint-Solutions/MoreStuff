@@ -118,7 +118,7 @@ fun TaskDetails(
       modifier = Modifier
         .padding(bottom = 18.dp)
         .animateContentSize(),
-      color = MaterialTheme.colorScheme.primaryContainer
+      color = MaterialTheme.colorScheme.surfaceContainerHighest
     ) {
       Box(
         modifier = Modifier
@@ -320,7 +320,7 @@ fun TaskDetails(
         FilledIconButton(
           onClick = { showSchedule = !showSchedule },
           colors = IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.outlineVariant
           )
         ) {
           Icon(

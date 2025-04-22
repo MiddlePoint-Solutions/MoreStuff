@@ -166,11 +166,11 @@ fun ScopesContent(
           }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+          containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
       )
     },
-    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+    containerColor = MaterialTheme.colorScheme.surfaceContainer
   ) {
     Column(
       modifier = Modifier
@@ -366,7 +366,7 @@ private fun OrderedScopesList(
                 }
               },
               colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
               )
             )
 

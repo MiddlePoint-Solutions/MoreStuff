@@ -193,7 +193,7 @@ fun SettingsContent(
         title = stringResource(Res.string.settings)
       )
     },
-    containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+    containerColor = MaterialTheme.colorScheme.surfaceContainer
   ) {
 
     ConstraintLayout(
@@ -302,7 +302,8 @@ private fun SelectTheme(
         contentDescription = stringResource(Res.string.cd_select_theme)
       )
     },
-    closeDialogDelay = 0
+    closeDialogDelay = 0,
+
   )
 }
 
@@ -328,7 +329,7 @@ private fun About(
 
     Column(
       modifier = Modifier
-        .background(color = MaterialTheme.colorScheme.surfaceContainerElevation)
+        .background(color = MaterialTheme.colorScheme.surfaceContainer)
         .padding(horizontal = 16.dp, vertical = 16.dp)
     ) {
 
@@ -599,7 +600,7 @@ private fun ScopeSettings(onClick: () -> Unit) {
       )
     },
     colors = ListItemDefaults.colors(
-      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
   )
 }
@@ -710,7 +711,7 @@ fun NotificationPermissionButton() {
       )
     },
     colors = ListItemDefaults.colors(
-      containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
     )
   )
 }

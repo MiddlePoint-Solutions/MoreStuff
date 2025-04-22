@@ -77,7 +77,6 @@ import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
 import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
-import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -121,7 +120,7 @@ fun HomeScreen() {
     snackbarHostState = snackbarHostState,
     topBar = {
       HomeTopBar(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
         selectedTaskCount = model.selectedTasks.size,
         reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
         settingsSelected = { navigation.push(Screen.Settings) },
@@ -352,7 +351,7 @@ private fun HomeContent(
               pagerState.animateScrollToPage(index)
             }
           },
-          containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
+          containerColor = MaterialTheme.colorScheme.surfaceContainer,
           createNewScope = createNewScope
         )
       }

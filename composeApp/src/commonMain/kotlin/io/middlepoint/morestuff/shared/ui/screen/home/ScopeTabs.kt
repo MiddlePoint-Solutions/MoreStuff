@@ -57,7 +57,7 @@ fun ScopeTabs(
                 )
             }
         },
-        divider = {}
+        divider = { }
     ) {
         scopes.forEachIndexed { index, scope ->
             Tab(

@@ -52,7 +52,7 @@ fun AppChatItem(
                     bottomEnd = 14.dp,
                     bottomStart = 5.dp
                 ),
-                color = MaterialTheme.colorScheme.secondaryContainer,
+                color = MaterialTheme.colorScheme.surfaceVariant,
             ) {
                 Column {
                     Text(

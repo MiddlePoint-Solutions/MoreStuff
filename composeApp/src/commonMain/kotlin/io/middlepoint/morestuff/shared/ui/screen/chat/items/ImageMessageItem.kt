@@ -71,7 +71,7 @@ fun ImageMessageItem(
             bottom = 3.dp
           ),
         text = message.content,
-        style = MaterialTheme.typography.bodyLarge
+        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
       )
     }
 

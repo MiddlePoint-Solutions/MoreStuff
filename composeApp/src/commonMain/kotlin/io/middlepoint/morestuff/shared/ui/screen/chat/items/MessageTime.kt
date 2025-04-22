@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.sp
 fun MessageTime(
   formattedTimeOnly: String?,
   modifier: Modifier = Modifier,
-  textColor: Color = MaterialTheme.colorScheme.onPrimary,
+  textColor: Color = MaterialTheme.colorScheme.surfaceTint,
 ) {
   formattedTimeOnly?.let {
     Text(

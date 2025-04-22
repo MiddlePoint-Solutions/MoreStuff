@@ -25,10 +25,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
-import io.middlepoint.morestuff.shared.ui.theme.divider
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -171,12 +171,12 @@ fun ScopeContent(
         modifier = Modifier.fillParentMaxWidth(),
         horizontalArrangement = Arrangement.End
       ) {
-        if (!isLast) {
           HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(0.8f),
-            color = MaterialTheme.colorScheme.divider
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 0.7.dp,
+            color = MaterialTheme.colorScheme.outlineVariant
           )
-        }
+
       }
     }
   }
