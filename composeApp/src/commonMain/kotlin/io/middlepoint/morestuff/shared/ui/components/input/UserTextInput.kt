@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -49,6 +50,7 @@ fun UserTextInput(
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,
     actionsContent: @Composable BoxScope.() -> Unit = {},
+    leadingContent: @Composable (() -> Unit)? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     focusRequester: FocusRequester = remember { FocusRequester() },
     startWithFocus: Boolean = false,
@@ -80,6 +82,14 @@ fun UserTextInput(
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (leadingContent != null) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                ) {
+                    leadingContent()
+                }
+            }
             BasicTextField(value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier
@@ -87,7 +97,7 @@ fun UserTextInput(
                     .focusRequester(focusRequester)
                     .weight(0.88f)
                     .align(Alignment.CenterVertically)
-                    .padding(start = 28.dp, end = 4.dp),
+                    .padding(start = 4.dp, end = 4.dp),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     keyboardType = KeyboardType.Text

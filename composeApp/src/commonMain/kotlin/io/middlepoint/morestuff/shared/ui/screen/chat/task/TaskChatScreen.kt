@@ -215,7 +215,8 @@ fun TaskChatScreen(
             viewModel.take(TaskChatEvent.CreateNewScopeForTask(title))
             navigation.pop()
           },
-          navigateToCreateScope = navigateToCreateScope
+          navigateToCreateScope = navigateToCreateScope,
+          isAIEnabled = isAiEnabled
         )
       }
 
@@ -274,7 +275,6 @@ private fun TaskChatContent(
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
   val allScopes = model.allScopes
-  //val isAIEnabled = model.isAIEnabled
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -538,25 +538,6 @@ private fun TaskChatInput(
   ) {
     UserInput(
       modifier = Modifier.align(Alignment.BottomCenter),
-      leadingContent = {
-        //TODO: change and improve AI icon
-        IconButton(
-          onClick = onToggleAI,
-          modifier = Modifier.padding(start = 8.dp)
-        ) {
-          Icon(
-            imageVector = if (isAIEnabled)
-              Icons.Default.SmartToy
-            else
-              Icons.Outlined.SmartToy,
-            contentDescription = "Toggle AI",
-            tint = if (isAIEnabled)
-              MaterialTheme.colorScheme.primary
-            else
-              MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-          )
-        }
-      },
       textContent = {
         val weight = if (isTextEmpty.value) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {
@@ -572,6 +553,23 @@ private fun TaskChatInput(
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.focusRequester(focusRequester),
+            leadingContent = {
+              IconButton(
+                onClick = onToggleAI,
+              ) {
+                Icon(
+                  imageVector = if (isAIEnabled)
+                    Icons.Default.SmartToy
+                  else
+                    Icons.Outlined.SmartToy,
+                  contentDescription = "Toggle AI",
+                  tint = if (isAIEnabled)
+                    MaterialTheme.colorScheme.primary
+                  else
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+              }
+            },
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
