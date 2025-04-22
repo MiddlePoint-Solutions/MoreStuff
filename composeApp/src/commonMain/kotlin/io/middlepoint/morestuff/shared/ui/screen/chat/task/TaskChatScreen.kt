@@ -123,7 +123,7 @@ import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
-import morestuff.composeapp.generated.resources.task_chat_complete_message_with_date
+import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -291,8 +291,7 @@ private fun TaskChatContent(
     }
   }
 
-  val completionMessage = stringResource(Res.string.task_chat_complete_message_with_date)
-    .replace("%s", task.completeTime)
+  val completionMessage = stringResource(Res.string.task_chat_complete_message)
 
 
   val prevIsComplete = remember { mutableStateOf(task.isComplete) }
