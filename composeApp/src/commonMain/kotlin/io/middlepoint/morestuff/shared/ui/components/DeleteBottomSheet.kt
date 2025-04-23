@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_errorContainer
+import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_onErrorContainer
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 
 
@@ -68,8 +70,8 @@ fun DeleteBottomSheet(
         onClick = onConfirm,
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         colors = ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.errorContainer,
-          contentColor = MaterialTheme.colorScheme.onErrorContainer
+          containerColor = md_theme_light_errorContainer,
+          contentColor = md_theme_light_onErrorContainer
         )
       ) {
         Text(text = confirmButtonText)

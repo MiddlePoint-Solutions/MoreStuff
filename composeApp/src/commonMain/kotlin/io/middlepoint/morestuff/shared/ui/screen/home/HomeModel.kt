@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.data.utils.scheduleLocalDateTime
@@ -43,11 +45,15 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReord
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+
 
 @Composable
 fun homeModel(
@@ -71,6 +77,9 @@ fun homeModel(
   var planTime by remember { mutableStateOf(initialState.planTime) }
   var taskSchedules: Map<Long, ScheduleDomain> by remember { mutableStateOf(emptyMap()) }
   var tasks: Map<Long, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
+
+  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
+  val coroutineScope = rememberCoroutineScope()
 
   fun dispatch(action: Action) {
     Logger.i { "Dispatching action: ${action::class.simpleName}" }
@@ -262,24 +271,30 @@ fun homeModel(
         }
 
         is CompleteTask -> {
-          val schedule = taskSchedules[event.taskId]
-          store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
-          selectedTasks = selectedTasks - event.taskId
-          val notification = NotificationState.Complete {
-            store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
-            schedule?.scheduleLocalDateTime?.let { dateTime ->
-              store.dispatch(
-                ScheduleAction.RescheduleTaskAction(
-                  event.taskId,
-                  schedule.scheduleType,
-                  dateTime
-                )
-              )
+          handleDelayTaskCompletion(
+            taskId = event.taskId,
+            pendingCompletionTasks = pendingCompletionTasks,
+            coroutineScope = coroutineScope,
+            onComplete = suspend {
+              val schedule = taskSchedules[event.taskId]
+              store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), true))
+              selectedTasks = selectedTasks - event.taskId
+              val notification = NotificationState.Complete {
+                store.dispatch(TaskAction.CompleteTasksAction(listOf(event.taskId), false))
+                schedule?.scheduleLocalDateTime?.let { dateTime ->
+                  store.dispatch(
+                    ScheduleAction.RescheduleTaskAction(
+                      event.taskId,
+                      schedule.scheduleType,
+                      dateTime
+                    )
+                  )
+                }
+                selectedTasks = selectedTasks + event.taskId
+              }
+              notifications.emit(notification)
             }
-
-            selectedTasks = selectedTasks + event.taskId
-          }
-          launch { notifications.emit(notification) }
+          )
         }
       }
     }
@@ -308,3 +323,22 @@ private fun createPlanTime(
   dayStartUtcTimeMillis = timeManager.nowLocalDateTime.toDayStartUtcTimeMillis(),
   currentUtcTimeMillis = timeManager.nowUtcMillis
 )
+
+private fun handleDelayTaskCompletion(
+  taskId: Long,
+  pendingCompletionTasks: MutableMap<Long, Job>,
+  coroutineScope: CoroutineScope,
+  onComplete: suspend () -> Unit
+) {
+  if (pendingCompletionTasks.contains(taskId)) {
+    pendingCompletionTasks[taskId]?.cancel()
+    pendingCompletionTasks.remove(taskId)
+  } else {
+    val job = coroutineScope.launch {
+      delay(1000)
+      onComplete()
+      pendingCompletionTasks.remove(taskId)
+    }
+    pendingCompletionTasks[taskId] = job
+  }
+}

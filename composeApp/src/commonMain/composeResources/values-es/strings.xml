@@ -168,7 +168,7 @@
 
 
 
-    <string name="sure_delete_scope">¿Estás seguro de que deseas eliminar el scope %s?\nTodas las tareas dentro de este scope también serán eliminadas.</string>
+    <string name="sure_delete_scope">Todas las tareas dentro de este scope también serán eliminadas.</string>
     <string name="add_scope">Crear nuevo Scope</string>
     <string name="save">Confirmar</string>
     <string name="edit_scope">Editar nombre del Scope </string>
@@ -279,4 +279,5 @@
     <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
 
     <string name="scope_name">Nombre del scope</string>
+    <string name="delete_scope">Eliminar Scope</string>
 </resources>

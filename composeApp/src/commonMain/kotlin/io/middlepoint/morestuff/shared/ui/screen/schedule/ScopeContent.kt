@@ -1,21 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -25,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
@@ -116,67 +106,42 @@ fun ScopeContent(
       val scope = rememberCoroutineScope()
       var isVisible by remember { mutableStateOf(true) }
 
-      AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInHorizontally(
-          initialOffsetX = { fullWidth -> fullWidth },
-          animationSpec = tween(durationMillis = 600)
-        ),
-        exit = slideOutHorizontally(
-          targetOffsetX = { fullWidth -> -fullWidth },
-          animationSpec = tween(durationMillis = 600)
+      ReorderableItem(reorderableState, key = item.id) {
+        PriorityItem(
+          task = item,
+          isSelected = selected,
+          isReorderModeActive = isReordering,
+          onTaskClick = {
+            if (isReordering) {
+              onItemLongClick(item.id)
+            } else {
+              onItemClick(item.id)
+            }
+          },
+
+          onTaskLongPress = {
+            if (!isReordering) {
+              onToggleReordering(true)
+              onItemLongClick(item.id)
+            } else {
+              onToggleReordering(false)
+            }
+          },
+          handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
+          modifier = Modifier.animateItem(
+            fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
+            fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
+            placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
+          ),
+          onTaskComplete = {
+            isVisible = false
+            scope.launch {
+              delay(200)
+              onTaskComplete(item.id)
+            }
+          },
+          enabled = enabled,
         )
-      ) {
-        ReorderableItem(reorderableState, key = item.id) {
-          PriorityItem(
-            task = item,
-            isSelected = selected,
-            isReorderModeActive = isReordering,
-            onTaskClick = {
-              if (isReordering) {
-                onItemLongClick(item.id)
-              } else {
-                onItemClick(item.id)
-              }
-            },
-
-            onTaskLongPress = {
-              if (!isReordering) {
-                onToggleReordering(true)
-                onItemLongClick(item.id)
-              } else {
-                onToggleReordering(false)
-              }
-            },
-            handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-            modifier = Modifier.animateItem(
-              fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
-              fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
-              placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
-            ),
-            onTaskComplete = {
-              isVisible = false
-              scope.launch {
-                delay(200)
-                onTaskComplete(item.id)
-              }
-            },
-            enabled = enabled,
-          )
-        }
-      }
-
-
-      Row(
-        modifier = Modifier.fillParentMaxWidth(),
-        horizontalArrangement = Arrangement.End
-      ) {
-          HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
-            thickness = 0.7.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-          )
-
       }
     }
   }

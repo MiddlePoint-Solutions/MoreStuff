@@ -143,24 +143,14 @@ fun HomeScreen() {
           modifier = Modifier.padding(it),
           createNewScope = {
             showCreateScopeSheet = true
-           /* val createScopeScreen = Screen.CreateScope {
-              homePresenter.take(CreateScope(it))
-              navigation.pop()
-            }
-            navigation.push(createScopeScreen)*/
+            /* val createScopeScreen = Screen.CreateScope {
+               homePresenter.take(CreateScope(it))
+               navigation.pop()
+             }
+             navigation.push(createScopeScreen)*/
           },
           onTaskComplete = { taskId ->
-            if (pendingCompletionTasks.contains(taskId)) {
-              pendingCompletionTasks[taskId]?.cancel()
-              pendingCompletionTasks.remove(taskId)
-            } else {
-              val job = coroutineScope.launch {
-                delay(1000)
-                homePresenter.take(HomeEvent.CompleteTask(taskId))
-                pendingCompletionTasks.remove(taskId)
-              }
-              pendingCompletionTasks[taskId] = job
-            }
+            homePresenter.take(HomeEvent.CompleteTask(taskId))
           },
           onReorderingChanged = { isReordering -> isReorderingActive.value = isReordering }
         )
