@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -90,32 +90,26 @@ fun CompletePriorityItem(
           )
         }
       }
-      Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-          .size(18.dp)
 
-      ) {
-        Icon(
-          imageVector = Icons.Filled.CheckCircle,
-          contentDescription = "Completed Task",
-          modifier = Modifier.fillMaxSize() .padding(end = 18.dp),
-          tint = MaterialTheme.colorScheme.onSurface
-        )
-      }
-      /*Icon(
-        imageVector = vectorResource(Res.drawable.ic_check_circle),
-        contentDescription = stringResource(Res.string.completed),
+      Icon(
+        imageVector = Icons.Filled.CheckCircle,
+        contentDescription = "Completed Task",
+        modifier = Modifier.fillMaxSize().padding(end = 18.dp),
         tint = MaterialTheme.colorScheme.onSurface,
-        modifier = Modifier
-          .align(Alignment.CenterVertically)
-          .padding(end = 18.dp)
-      )*/
+
+        )
     }
 
     TaskItemBadges(
       task = task,
       modifier = Modifier.align(Alignment.BottomEnd)
+    )
+    HorizontalDivider(
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .fillMaxWidth(),
+      thickness = 0.7.dp,
+      color = MaterialTheme.colorScheme.outlineVariant
     )
   }
 }

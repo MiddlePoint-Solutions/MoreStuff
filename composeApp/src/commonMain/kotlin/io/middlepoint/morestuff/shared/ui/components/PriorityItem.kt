@@ -29,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -221,6 +222,13 @@ fun PriorityItem(
         }
       }
     }
+    HorizontalDivider(
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .fillMaxWidth(),
+      thickness = 0.7.dp,
+      color = MaterialTheme.colorScheme.outlineVariant
+    )
   }
 }
 

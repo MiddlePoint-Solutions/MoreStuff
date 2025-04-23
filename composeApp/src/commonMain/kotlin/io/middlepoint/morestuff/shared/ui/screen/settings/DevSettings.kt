@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,33 +47,35 @@ import org.koin.compose.koinInject
 
 @Composable
 fun DevSettingsScreen(
-    onBack: () -> Unit,
-    onDevSettingsDisabled: () -> Unit = {}
+  onBack: () -> Unit,
+  onDevSettingsDisabled: () -> Unit = {}
 ) {
-    Scaffold(
-        topBar = {
-            SettingsTopBar(
-                onBack = onBack,
-                title = stringResource(Res.string.developer_settings)
-            )
-        }
-    ) {
-        Box(modifier = Modifier.padding(it)) {
-            DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
-        }
+  Scaffold(
+    topBar = {
+      SettingsTopBar(
+        onBack = onBack,
+        title = stringResource(Res.string.developer_settings)
+      )
+    },
+    containerColor = MaterialTheme.colorScheme.surfaceContainer
+  ) {
+    Box(modifier = Modifier.padding(it)) {
+      DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
     }
+  }
+
 }
 
 @Composable
 fun DevSettings(
-    devTools: DevTools = koinInject(),
-    onBack: () -> Unit,
-    onDevSettingsDisabled: () -> Unit = {}
+  devTools: DevTools = koinInject(),
+  onBack: () -> Unit,
+  onDevSettingsDisabled: () -> Unit = {}
 ) {
 
-    val scope = rememberCoroutineScope()
+  val scope = rememberCoroutineScope()
 
-    // TODO: Import / export database
+  // TODO: Import / export database
 //    var exportData by remember { mutableStateOf(false) }
 //    if (exportData) {
 //        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -123,38 +126,50 @@ fun DevSettings(
 //    }
 
 
-    val navigation = LocalAppRouter.current
-    Column {
-        DisableDeveloperSettings(
-            state = rememberAppSettingState(
-                defaultValue = { devTools.showDevSettings },
-                valueChanged = { newValue ->
-                    devTools.showDevSettings = newValue
-                    if (!newValue) {
-                        onDevSettingsDisabled()
-                        onBack()
-                    }
-                },
-            )
-        )
-        SettingsMenuLink(
-            title = { Text(text = stringResource(Res.string.test_onboarding)) },
-            onClick = { navigation.replaceAll(Screen.OnBoarding) },
-        )
+  val navigation = LocalAppRouter.current
+  Column(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
+    DisableDeveloperSettings(
+      state = rememberAppSettingState(
+        defaultValue = { devTools.showDevSettings },
+        valueChanged = { newValue ->
+          devTools.showDevSettings = newValue
+          if (!newValue) {
+            onDevSettingsDisabled()
+            onBack()
+          }
+        },
+      )
+    )
+    SettingsMenuLink(
+      title = { Text(text = stringResource(Res.string.test_onboarding)) },
+      onClick = { navigation.replaceAll(Screen.OnBoarding) },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
 
-        SettingsMenuLink(
-            title = { Text(text = stringResource(Res.string.test_review_notifications)) },
-            onClick = devTools::testReviewNotification,
-        )
-        SettingsMenuLink(
-            title = { Text(text = "Review Screen") },
-            onClick = { navigation.push(Screen.Review(1)) },
-        )
+    SettingsMenuLink(
+      title = { Text(text = stringResource(Res.string.test_review_notifications)) },
+      onClick = devTools::testReviewNotification,
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
+    SettingsMenuLink(
+      title = { Text(text = "Review Screen") },
+      onClick = { navigation.push(Screen.Review(1)) },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
 
-        SettingsMenuLink(
-            title = { Text(text = "Export JSON data") },
-            onClick = { scope.launch { devTools.exportJsonData() } },
-        )
+    SettingsMenuLink(
+      title = { Text(text = "Export JSON data") },
+      onClick = { scope.launch { devTools.exportJsonData() } },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
 
 //        SettingsMenuLink(
 //            title = { Text(text = stringResource(Res.string.export_database)) },
@@ -166,13 +181,13 @@ fun DevSettings(
 //            onClick = { importData = true },
 //        )
 
-        DebugMessageSwitch(
-            state = rememberAppSettingState(
-                defaultValue = { devTools.showDebugMessages },
-                valueChanged = { devTools.showDebugMessages = it },
-            )
-        )
-    }
+    DebugMessageSwitch(
+      state = rememberAppSettingState(
+        defaultValue = { devTools.showDebugMessages },
+        valueChanged = { devTools.showDebugMessages = it },
+      )
+    )
+  }
 
 }
 
@@ -181,63 +196,72 @@ private fun DebugMessageSwitch(
   state: AppSettingValueState<Boolean>,
 ) {
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        SettingsSwitch(
-            state = state.value,
-            icon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Message,
-                    contentDescription = "Debug Messages"
-                )
-            },
-            title = {
-                Text(
-                    text = stringResource(Res.string.debug_messages),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
-                )
-            },
-            modifier = Modifier.padding(end = 16.dp),
-            onCheckedChange = { state.value = it }
+  Row(
+    modifier = Modifier
+      .background(
+        MaterialTheme.colorScheme.surfaceContainer
+      )
+      .fillMaxWidth()
+      .height(IntrinsicSize.Min),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    SettingsSwitch(
+      state = state.value,
+      icon = {
+        Icon(
+          imageVector = Icons.AutoMirrored.Filled.Message,
+          contentDescription = "Debug Messages"
         )
-    }
+      },
+      title = {
+        Text(
+          text = stringResource(Res.string.debug_messages),
+          color = MaterialTheme.colorScheme.onSurface,
+          textAlign = TextAlign.Left
+        )
+      },
+      modifier = Modifier.padding(end = 16.dp),
+      onCheckedChange = { state.value = it },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
+  }
 }
 
 @Composable
 private fun DisableDeveloperSettings(
-    state: AppSettingValueState<Boolean>,
+  state: AppSettingValueState<Boolean>,
 ) {
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        SettingsSwitch(
-            state = state.value,
-            icon = {
-                Icon(
-                    imageVector = Icons.Rounded.Settings,
-                    contentDescription = "Debug Messages"
-                )
-            },
-            title = {
-                Text(
-                    text = stringResource(Res.string.disable_developer_settings),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Left
-                )
-            },
-            modifier = Modifier.padding(end = 16.dp),
-            onCheckedChange = { state.value = it }
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(IntrinsicSize.Min),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    SettingsSwitch(
+      state = state.value,
+      icon = {
+        Icon(
+          imageVector = Icons.Rounded.Settings,
+          contentDescription = "Debug Messages"
         )
-    }
+      },
+      title = {
+        Text(
+          text = stringResource(Res.string.disable_developer_settings),
+          color = MaterialTheme.colorScheme.onSurface,
+          textAlign = TextAlign.Left
+        )
+      },
+      modifier = Modifier.padding(end = 16.dp),
+      onCheckedChange = { state.value = it },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
+  }
 }
 
 @Composable
@@ -245,45 +269,45 @@ private fun DebugRemindersSwitch(
   enableState: AppSettingValueState<Boolean>,
   timeState: AppSettingValueState<Float>,
 ) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .background(color = Color(0xff2B3438)),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            SettingsSwitch(
-                state = enableState.value,
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Notifications,
-                        contentDescription = ""
-                    )
-                },
-                title = {
-                    Text(
-                        text = "Debug Reminders",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Left
-                    )
-                },
-                modifier = Modifier.padding(end = 16.dp),
-                onCheckedChange = { enableState.value = it }
-            )
-        }
-
-        SettingsSlider(
-            value = timeState.value,
-            title = {
-                Text(
-                    text = "Reminder delay ${timeState.value.toInt()}",
-                )
-            },
-            steps = 60,
-            valueRange = 1F..60F,
-            modifier = Modifier.weight(1f),
-            onValueChange = { timeState.value = it }
-        )
+  Column {
+    Row(
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(IntrinsicSize.Min)
+        .background(color = Color(0xff2B3438)),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      SettingsSwitch(
+        state = enableState.value,
+        icon = {
+          Icon(
+            imageVector = Icons.Default.Notifications,
+            contentDescription = ""
+          )
+        },
+        title = {
+          Text(
+            text = "Debug Reminders",
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Left
+          )
+        },
+        modifier = Modifier.padding(end = 16.dp),
+        onCheckedChange = { enableState.value = it }
+      )
     }
+
+    SettingsSlider(
+      value = timeState.value,
+      title = {
+        Text(
+          text = "Reminder delay ${timeState.value.toInt()}",
+        )
+      },
+      steps = 60,
+      valueRange = 1F..60F,
+      modifier = Modifier.weight(1f),
+      onValueChange = { timeState.value = it }
+    )
+  }
 }

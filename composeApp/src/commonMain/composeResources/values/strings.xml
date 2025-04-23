@@ -170,7 +170,7 @@
     <string name="select_pdf">Select PDF</string>
 
 
-    <string name="sure_delete_scope">Are you sure you want to delete %s scope?\nAll tasks within this scope will also be deleted.</string>
+    <string name="sure_delete_scope">All tasks within this scope will also be deleted.</string>
     <string name="add_scope">Add Scope</string>
     <string name="save">Save</string>
     <string name="edit_scope">Edit Scope</string>
@@ -267,7 +267,7 @@
     <string name="cd_add_new_scope">Add new scope</string>
     <string name="cd_undo">Undo</string>
     <string name="filetype_pdf">PDF</string>
-    <string name="delete_scope">Delete Scope?</string>
+    <string name="delete_scope">Delete Scope</string>
     <string name="title_edit_scope">Edit Scope</string>
 
     <string name="error">Error</string>
