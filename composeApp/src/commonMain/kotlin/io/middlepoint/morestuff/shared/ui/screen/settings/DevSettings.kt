@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -60,7 +61,8 @@ fun DevSettingsScreen(
         onBack = onBack,
         title = stringResource(Res.string.developer_settings)
       )
-    }
+    },
+    containerColor = MaterialTheme.colorScheme.surfaceContainer
   ) {
     Box(modifier = Modifier.padding(it)) {
       DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
@@ -106,26 +108,41 @@ fun DevSettings(
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_onboarding)) },
       onClick = { navigation.replaceAll(Screen.OnBoarding) },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
 
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_review_notifications)) },
       onClick = devTools::testReviewNotification,
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
 
     SettingsMenuLink(
       title = { Text(text = "Review Screen") },
       onClick = { navigation.push(Screen.Review(Uuid("test"))) },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
 
     SettingsMenuLink(
       title = { Text(text = "Export JSON data") },
       onClick = { scope.launch { devTools.exportJsonData() } },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
 
     SettingsMenuLink(
       title = { Text(text = "Import JSON data") },
       onClick = { scope.launch { singleImagePickerLauncher.launch() } },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
 
 
@@ -157,6 +174,9 @@ private fun DebugMessageSwitch(
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .background(
+        MaterialTheme.colorScheme.surfaceContainer
+      )
       .height(IntrinsicSize.Min),
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -176,7 +196,10 @@ private fun DebugMessageSwitch(
         )
       },
       modifier = Modifier.padding(end = 16.dp),
-      onCheckedChange = { state.value = it }
+      onCheckedChange = { state.value = it },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
   }
 }
@@ -189,6 +212,9 @@ private fun DisableDeveloperSettings(
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .background(
+        MaterialTheme.colorScheme.surfaceContainer
+      )
       .height(IntrinsicSize.Min),
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -208,7 +234,10 @@ private fun DisableDeveloperSettings(
         )
       },
       modifier = Modifier.padding(end = 16.dp),
-      onCheckedChange = { state.value = it }
+      onCheckedChange = { state.value = it },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
     )
   }
 }
