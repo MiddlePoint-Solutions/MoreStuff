@@ -16,8 +16,8 @@ import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
-import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
+import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScheduleRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.ScopeRepositoryImpl
@@ -29,8 +29,8 @@ import io.middlepoint.morestuff.shared.data.sync.DataSyncManager
 import io.middlepoint.morestuff.shared.data.sync.DataSyncManagerImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
+import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
@@ -52,7 +52,17 @@ val dataModule = module {
 
   single<StuffDb> { createDatabase(get()) }
 
-  singleOf(::DevToolsImpl) bind DevTools::class
+  single<DevTools> {
+    DevToolsImpl(
+      settings = get(named(SharedSettings.Unencrypted)),
+      notifier = get(),
+      dataMigration = get(),
+      migrationHelper = get(),
+      dataSyncManager = get(),
+    )
+  }
+
+  //singleOf(::DevToolsImpl) bind DevTools::class
   singleOf(::DataMappersImpl) bind DataMappers::class
   singleOf(::MessageDataMap)
 
@@ -111,8 +121,8 @@ val supabaseModule = module {
         defaultLogLevel = LogLevel.DEBUG
       }
       install(Auth) {
-        sessionManager = SettingsSessionManager(settings = get()) // TODO: use encrypted settings
-        codeVerifierCache = SettingsCodeVerifierCache(settings = get()) // TODO: use encrypted settings
+        sessionManager = SettingsSessionManager(settings = get(named(SharedSettings.Encrypted)))
+        codeVerifierCache = SettingsCodeVerifierCache(settings = get(named(SharedSettings.Encrypted)))
         host = BuildConfig.APP_HOST_LOGIN
         scheme = BuildConfig.APP_SCHEME
       }
