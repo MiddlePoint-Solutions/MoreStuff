@@ -1,4 +1,5 @@
 import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
 import kotlin.Int;
 import kotlinx.datetime.Instant;
 
@@ -7,7 +8,8 @@ CREATE TABLE scopes (
     scope_name TEXT UNIQUE NOT NULL,
     scope_order INTEGER AS Int NOT NULL,
     created_at INTEGER AS Instant NOT NULL,
-    updated_at INTEGER AS Instant NOT NULL
+    updated_at INTEGER AS Instant NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 createScope:
@@ -15,7 +17,8 @@ INSERT OR IGNORE INTO scopes
 VALUES ?;
 
 deleteScope:
-DELETE FROM scopes
+UPDATE scopes
+SET deleted = 1
 WHERE id = :id;
 
 selectScope:
@@ -26,6 +29,7 @@ WHERE id = :id;
 selectAllScopes:
 SELECT scopes.*
 FROM scopes
+WHERE scopes.deleted = 0
 ORDER BY scope_order ASC;
 
 selectScopeByName:
@@ -44,12 +48,24 @@ SET scope_order = :scopeOrder
 WHERE id = :scopeId;
 
 countScopes:
-SELECT COUNT(*) FROM scopes;
+SELECT COUNT(*)
+FROM scopes
+WHERE scopes.deleted = 0;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
 
-selectScopeById:
-SELECT id, id, scope_name, scope_order
-FROM scopes
-WHERE id = :id;
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER scopes_updated_at
+AFTER UPDATE ON scopes
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE scopes
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;
+
+

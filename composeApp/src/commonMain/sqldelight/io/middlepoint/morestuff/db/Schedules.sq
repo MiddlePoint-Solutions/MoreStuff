@@ -72,3 +72,16 @@ WHERE id = ?;
 
 lastInsertRowId:
 SELECT last_insert_rowid();
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER schedules_updated_at
+AFTER UPDATE ON schedules
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE schedules
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;

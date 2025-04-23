@@ -14,6 +14,7 @@ typealias TaskDataMapper<R> = (
   completed_timezone: String?,
   title: String,
   priority_score: Long,
+  deleted: Boolean
 ) -> R
 
 fun makeTaskDataMapper(): TaskDataMapper<Task> = ::mapTaskDomain
@@ -26,6 +27,7 @@ fun mapTaskDomain(
   completed_timezone: String?,
   title: String,
   priority_score: Long,
+  deleted: Boolean
 ): Task = Task(
   id = id,
   createdAt = created_at.toString(),
@@ -34,4 +36,5 @@ fun mapTaskDomain(
   timezone = completed_timezone,
   title = title,
   priorityScore = priority_score,
+  deleted = deleted
 )

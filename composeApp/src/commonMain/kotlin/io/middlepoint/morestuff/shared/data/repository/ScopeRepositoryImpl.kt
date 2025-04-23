@@ -27,7 +27,6 @@ class ScopeRepositoryImpl(
 ) : ScopeRepository {
 
   private val scopeQueries = database.scopesQueries
-  private val taskQueries = database.tasksQueries
   private val taskScopeQueries = database.tasksScopesQueries
 
   override suspend fun initScopes() {
@@ -43,14 +42,14 @@ class ScopeRepositoryImpl(
 
   private fun createScopeData(name: String, order: Int): ScopeData {
     val createdAt = timeManager.nowUtcInstant
-    val stuffScope = ScopeData(
+    return ScopeData(
       id = Uuid.generate(),
       scope_name = name,
       scope_order = order,
       created_at = createdAt,
-      updated_at = createdAt
+      updated_at = createdAt,
+      deleted = false
     )
-    return stuffScope
   }
 
   override suspend fun createScope(name: String): Either<Failure, Scope> = either {
@@ -83,7 +82,6 @@ class ScopeRepositoryImpl(
             scopeOrder = index + 1
           )
         }
-
       deleted.right()
     }
 

@@ -22,6 +22,7 @@ typealias MessageDataMapper = (
   updated_at: Instant,
   contentType: Int,
   content: String,
+  deleted: Boolean,
   json_data: String?,
   message_data_id: Uuid?,
   message_data_file_path: String?,
@@ -44,6 +45,7 @@ data class MessageDataMap(
     updated_at: Instant,
     contentType: Int,
     content: String,
+    deleted: Boolean,
     json_data: String?,
     message_data_id: Uuid?,
     message_data_file_path: String?,
@@ -75,6 +77,7 @@ data class MessageDataMap(
       updatedAt = updated_at,
       contentType = ContentType.withValue(contentType),
       content = content,
+      deleted = deleted,
       openGraphResult = openGraphResult,
       messageExtra = messageExtra
     )

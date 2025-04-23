@@ -14,6 +14,7 @@ data class Task(
   val priorityScore: Long,
   val schedule: List<Schedule> = listOf(),
   val extraDetails: Boolean = false,
+  val deleted: Boolean = false
 ) {
     val isComplete: Boolean get() = completedAt != null
     val hasSchedule: Boolean get() = schedule.any { it.isOneTime() }

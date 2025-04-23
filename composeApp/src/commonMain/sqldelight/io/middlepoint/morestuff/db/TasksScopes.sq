@@ -26,3 +26,16 @@ selectScopeIdForTask:
 SELECT scope_id
 FROM tasks_scopes
 WHERE task_id = :taskId;
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER tasks_scopes_updated_at
+AFTER UPDATE ON tasks_scopes
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE tasks_scopes
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE task_id = old.task_id;
+END;

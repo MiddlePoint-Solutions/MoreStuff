@@ -142,6 +142,7 @@ fun createMessageForTest(
     updatedAt = Clock.System.now(),
     contentType = contentType,
     content = content,
+    deleted = false,
     openGraphResult,
     messageExtra
   )

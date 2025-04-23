@@ -17,6 +17,7 @@ data class Message(
   val updatedAt: Instant,
   val contentType: ContentType,
   val content: String,
+  val deleted: Boolean,
   val openGraphResult: OpenGraphResult? = null,
   val messageExtra: MessageExtra? = null
 )

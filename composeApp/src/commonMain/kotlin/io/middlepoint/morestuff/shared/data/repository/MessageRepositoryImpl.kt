@@ -81,7 +81,8 @@ class MessageRepositoryImpl(
       created_at = createdAt,
       updated_at = createdAt,
       content_type = contentType,
-      content = content
+      content = content,
+      deleted = false
     )
     messageQueries.insertMessage(messageData)
     // TODO: message extra should be created before the message.

@@ -11,7 +11,8 @@ typealias ScopeDataMapper = (
   scope_name: String,
   scope_order: Int,
   created_at: Instant,
-  updated_at: Instant
+  updated_at: Instant,
+  deleted: Boolean
 ) -> Scope
 
 fun makeScopeDbMapper(): ScopeDataMapper = ::mapScopeDb
@@ -21,13 +22,15 @@ fun mapScopeDb(
   scope_name: String,
   scope_order: Int,
   created_at: Instant,
-  updated_at: Instant
+  updated_at: Instant,
+  deleted: Boolean
 ): Scope {
   return Scope(
     id = id,
     name = scope_name,
     order = scope_order,
     createdAt = created_at,
-    updatedAt = updated_at
+    updatedAt = updated_at,
+    deleted = deleted
   )
 }
