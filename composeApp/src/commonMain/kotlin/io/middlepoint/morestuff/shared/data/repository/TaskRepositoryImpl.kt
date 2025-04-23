@@ -201,12 +201,15 @@ class TaskRepositoryImpl(
         false -> taskQueries.searchTasks(searchText, mapper = mapper.taskDataMapper)
       }.asFlow()
         .mapToList(Dispatchers.IO)
+        .map { tasks -> tasks.sortedBy { it.isComplete } }
         .let { combinedTaskFlow(it) }
     } else {
       val tasksFlow = when (activeOnly) {
         true -> taskQueries.selectAllActiveForSearch(mapper.taskDataMapper)
         false -> taskQueries.selectAllForSearch(mapper.taskDataMapper)
-      }.asFlow().mapToList(Dispatchers.IO)
+      }.asFlow()
+        .mapToList(Dispatchers.IO)
+        .map { tasks -> tasks.sortedBy { it.isComplete } }
 
       return tasksFlow
         .map { tasks ->
