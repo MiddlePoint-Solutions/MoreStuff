@@ -44,6 +44,7 @@ import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.local.ProvideUserInteractionEnabled
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItem
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItemLoading
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.TaskReminderItem
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.UserChatItem
 import kotlinx.coroutines.launch
@@ -68,6 +69,7 @@ fun Messages(
   actions: ChatActions = ChatActions(),
   userInteractionEnabled: Boolean = true,
   contentPadding: PaddingValues = PaddingValues(0.dp),
+  isAILoading: Boolean = false
 ) {
   val scope = rememberCoroutineScope()
   var itemsCount by remember { mutableIntStateOf(0) }
@@ -93,6 +95,11 @@ fun Messages(
         state = scrollState,
         contentPadding = contentPadding
       ) {
+        if (isAILoading) {
+          item(key = "ai_loading") {
+            AppChatItemLoading()
+          }
+        }
         itemsIndexed(
           items = messages,
           key = { _, item -> item.id.value },
@@ -126,6 +133,7 @@ fun Messages(
             }
           }
         }
+
       }
 
       if (enableAutoScroll) {

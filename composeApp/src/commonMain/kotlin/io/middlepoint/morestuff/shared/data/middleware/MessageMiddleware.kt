@@ -74,9 +74,19 @@ class MessageMiddleware(
             }
 
             is CreateAITaskMessageAction -> scope.launch {
-                logger.d { "Creating AI task message for prompt: ${action.prompt}" }
-                createAIMessageUseCase(action.taskId, action.prompt)
-                logger.d { "AI task message created" }
+                logger.d { "AI request started for task=${action.taskId}" }
+                dispatch(MessageAction.AIRequestStarted(action.taskId))
+                val result = createAIMessageUseCase(action.taskId, action.prompt)
+                result.fold(
+                    { failure ->
+                        logger.e { "AI request failed: $failure" }
+                        dispatch(MessageAction.AIRequestFailed(action.taskId, failure.toString()))
+                    },
+                    { message ->
+                        logger.d { "AI request finished, got message id=${message.id}" }
+                        dispatch(MessageAction.AIRequestFinished(action.taskId))
+                    }
+                )
             }
 
 

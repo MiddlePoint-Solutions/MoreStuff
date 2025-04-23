@@ -276,6 +276,7 @@ private fun TaskChatContent(
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
   val allScopes = model.allScopes
+  val isAILoading = model.isAILoading
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -388,7 +389,9 @@ private fun TaskChatContent(
           modifier = modifier.weight(1f),
           scrollState = scrollState,
           contentPadding = contentPadding,
+          isAILoading = isAILoading
         )
+
 
         AnimatedVisibility(
           visible = !task.isComplete,

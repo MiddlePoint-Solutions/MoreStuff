@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,10 @@ fun taskChatModel(
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
   var allScopes by remember { mutableStateOf(initialState.allScopes) }
   var isAIEnabled by remember { mutableStateOf(initialState.isAIEnabled) }
+
+  val isAILoading by store.state
+    .map { it.aiMessageLoading[taskId] ?: false }
+    .collectAsState(initial = false)
 
   fun updateScopeAfterMove(scopeId: Uuid) {
     val newScope = allScopes.find { it.id == scopeId }
@@ -245,13 +250,13 @@ fun taskChatModel(
             }
           }
 
-          is TaskChatEvent.CreateAIMessage -> {
+          is CreateAIMessage -> {
             store.dispatch(
               MessageAction.CreateAITaskMessageAction(taskId, prompt)
             )
           }
 
-          is TaskChatEvent.ActivateAI -> {
+          is ActivateAI -> {
             isAIEnabled = !isAIEnabled
             logger.d { "AI ${if (isAIEnabled) "enabled" else "disabled"} for task: $taskId" }
           }
@@ -267,6 +272,7 @@ fun taskChatModel(
     editingMessageId = editingMessageId,
     editingMessageContent = editingMessageContent,
     allScopes = allScopes,
-    isAIEnabled = isAIEnabled
+    isAIEnabled = isAIEnabled,
+    isAILoading = isAILoading
   )
 }
