@@ -31,8 +31,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.SmartToy
-import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -123,11 +121,14 @@ import morestuff.composeapp.generated.resources.complete
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.edit_message
+import morestuff.composeapp.generated.resources.ic_ai_disabled
+import morestuff.composeapp.generated.resources.ic_ai_enabled
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -543,6 +544,7 @@ private fun TaskChatInput(
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
+            isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
@@ -558,15 +560,12 @@ private fun TaskChatInput(
                 onClick = onToggleAI,
               ) {
                 Icon(
-                  imageVector = if (isAIEnabled)
-                    Icons.Default.SmartToy
+                  painter = if (isAIEnabled)
+                    painterResource(Res.drawable.ic_ai_enabled)
                   else
-                    Icons.Outlined.SmartToy,
+                    painterResource(Res.drawable.ic_ai_disabled),
                   contentDescription = "Toggle AI",
-                  tint = if (isAIEnabled)
-                    MaterialTheme.colorScheme.primary
-                  else
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                  tint = Color.Unspecified
                 )
               }
             },
