@@ -233,7 +233,7 @@ fun SettingsContent(
           },
           onClick = signOut,
           colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
           )
         )
 

@@ -290,4 +290,5 @@
     <string name="verify">Verificar</string>
     <string name="error_invalid_email">El email introducido no es válido o no existe.</string>
     <string name="error_generic">Ha ocurrido un error. Inténtalo de nuevo.</string>
+    <string name="delete_scope">Eliminar Scope</string>
 </resources>

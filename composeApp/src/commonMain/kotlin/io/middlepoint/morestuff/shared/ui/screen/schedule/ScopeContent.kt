@@ -1,9 +1,5 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +24,6 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.extension.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
-import io.middlepoint.morestuff.shared.ui.theme.divider
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -116,62 +111,51 @@ fun ScopeContent(
       val scope = rememberCoroutineScope()
       var isVisible by remember { mutableStateOf(true) }
 
-      AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInHorizontally(
-          initialOffsetX = { fullWidth -> fullWidth },
-          animationSpec = tween(durationMillis = 600)
-        ),
-        exit = slideOutHorizontally(
-          targetOffsetX = { fullWidth -> -fullWidth },
-          animationSpec = tween(durationMillis = 600)
+      ReorderableItem(reorderableState, key = item.id.value) {
+        PriorityItem(
+          task = item,
+          isSelected = selected,
+          isReorderModeActive = isReordering,
+          onTaskClick = {
+            if (isReordering) {
+              onItemLongClick(item.id)
+            } else {
+              onItemClick(item.id)
+            }
+          },
+
+          onTaskLongPress = {
+            if (!isReordering) {
+              onToggleReordering(true)
+              onItemLongClick(item.id)
+            } else {
+              onToggleReordering(false)
+            }
+          },
+          handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
+
+          onTaskComplete = {
+            isVisible = false
+            scope.launch {
+              delay(200)
+              onTaskComplete(item.id)
+            }
+          },
+          enabled = enabled,
         )
-      ) {
-        ReorderableItem(reorderableState, key = item.id.value) {
-          PriorityItem(
-            task = item,
-            isSelected = selected,
-            isReorderModeActive = isReordering,
-            onTaskClick = {
-              if (isReordering) {
-                onItemLongClick(item.id)
-              } else {
-                onItemClick(item.id)
-              }
-            },
-
-            onTaskLongPress = {
-              if (!isReordering) {
-                onToggleReordering(true)
-                onItemLongClick(item.id)
-              } else {
-                onToggleReordering(false)
-              }
-            },
-            handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-
-            onTaskComplete = {
-              isVisible = false
-              scope.launch {
-                delay(200)
-                onTaskComplete(item.id)
-              }
-            },
-            enabled = enabled,
-          )
-        }
       }
+
 
 
       Row(
         modifier = Modifier.fillParentMaxWidth(),
         horizontalArrangement = Arrangement.End
       ) {
-          HorizontalDivider(
-            modifier = Modifier.fillMaxWidth(),
-            thickness = 0.7.dp,
-            color = MaterialTheme.colorScheme.outlineVariant
-          )
+        HorizontalDivider(
+          modifier = Modifier.fillMaxWidth(),
+          thickness = 0.7.dp,
+          color = MaterialTheme.colorScheme.outlineVariant
+        )
 
       }
     }

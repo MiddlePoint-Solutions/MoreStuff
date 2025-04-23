@@ -3,7 +3,6 @@ package io.middlepoint.morestuff.shared.ui.screen.home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +46,8 @@ import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelect
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -54,9 +55,6 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.compose.koinInject
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-
 
 @Composable
 fun homeModel(
@@ -80,10 +78,10 @@ fun homeModel(
   val taskSchedules: Map<Uuid, Schedule> by remember { mutableStateOf(emptyMap()) }
   var tasks: Map<Uuid, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
   var username by remember { mutableStateOf(initialState.username) }
+  val pendingCompletionTasks = remember { mutableStateMapOf<Uuid, Job>() }
+  val coroutineScope = rememberCoroutineScope()
 
   fun dispatch(action: Action) = store.dispatch(action)
-  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
-  val coroutineScope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
@@ -331,9 +329,10 @@ private fun createPlanTime(
   currentUtcTimeMillis = timeManager.nowUtcMillis
 )
 
+
 private fun handleDelayTaskCompletion(
-  taskId: Long,
-  pendingCompletionTasks: MutableMap<Long, Job>,
+  taskId: Uuid,
+  pendingCompletionTasks: MutableMap<Uuid, Job>,
   coroutineScope: CoroutineScope,
   onComplete: suspend () -> Unit
 ) {

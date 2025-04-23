@@ -76,6 +76,12 @@ fun CreateScopeBottomSheet(
     keyboardController?.show()
   }
 
+  LaunchedEffect(sheetState.currentValue) {
+    if (sheetState.currentValue == SheetValue.Hidden) {
+      keyboardController?.hide()
+    }
+  }
+
   ModalBottomSheet(
     onDismissRequest = onDismissRequest,
     sheetState = sheetState,
