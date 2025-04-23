@@ -171,25 +171,11 @@ fun SearchBar(
             modifier = Modifier
               .padding(top = 16.dp, start = 4.dp, end = 4.dp)
               .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceAround
           ) {
 
             SearchFilterChip(
               filter = FilterType.Scheduled,
-              selectedFilter = model.filter,
-              onFilterSelected = { selectedFilter ->
-                focusManager.clearFocus()
-                keyboardController?.hide()
-                viewModel.take(
-                  SearchEvent.SetSearchFilter(
-                    selectedFilter
-                  )
-                )
-              }
-            )
-
-            SearchFilterChip(
-              filter = FilterType.Reminder,
               selectedFilter = model.filter,
               onFilterSelected = { selectedFilter ->
                 focusManager.clearFocus()
