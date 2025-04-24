@@ -7,7 +7,7 @@ import arrow.core.raise.either
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.model.ScopeData
+import io.middlepoint.morestuff.shared.data.mapper.ScopeData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope

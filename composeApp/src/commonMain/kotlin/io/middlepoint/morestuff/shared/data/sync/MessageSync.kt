@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.data.model
+package io.middlepoint.morestuff.shared.data.sync
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import kotlinx.serialization.Serializable

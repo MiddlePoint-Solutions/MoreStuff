@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.data.model
+package io.middlepoint.morestuff.shared.data.mapper
 
 typealias ScheduleData = io.middlepoint.morestuff.db.Schedules
 typealias TaskData = io.middlepoint.morestuff.db.Tasks

@@ -10,7 +10,7 @@ import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.model.TaskData
+import io.middlepoint.morestuff.shared.data.mapper.TaskData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType

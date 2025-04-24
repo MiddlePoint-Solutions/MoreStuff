@@ -9,8 +9,8 @@ import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.model.MessageData
-import io.middlepoint.morestuff.shared.data.model.MessageExtraData
+import io.middlepoint.morestuff.shared.data.mapper.MessageData
+import io.middlepoint.morestuff.shared.data.mapper.MessageExtraData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
