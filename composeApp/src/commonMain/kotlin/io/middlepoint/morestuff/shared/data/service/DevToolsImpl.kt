@@ -58,5 +58,9 @@ class DevToolsImpl(
     override suspend fun testDataPush() {
         dataSyncManager.push()
     }
+
+    override suspend fun testDataPull() {
+        dataSyncManager.pull()
+    }
 }
 

@@ -141,11 +141,11 @@ fun taskChatModel(
           is ShareMessage -> {
             when (message.messageExtra?.messageType) {
               MessageExtraType.Image -> {
-                mediaHandler.shareImage(message.messageExtra.filePath)
+                mediaHandler.shareImage(message.messageExtra.url)
               }
 
               MessageExtraType.Pdf -> {
-                mediaHandler.sharePDF(message.messageExtra.filePath)
+                mediaHandler.sharePDF(message.messageExtra.url)
               }
 
               MessageExtraType.Video -> {}

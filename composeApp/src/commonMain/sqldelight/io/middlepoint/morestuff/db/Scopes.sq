@@ -12,6 +12,11 @@ CREATE TABLE scopes (
     deleted INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
+selectAllUpdates:
+SELECT *
+FROM scopes
+WHERE updated_at > ?;
+
 createScope:
 INSERT OR IGNORE INTO scopes
 VALUES ?;

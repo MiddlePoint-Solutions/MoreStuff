@@ -15,15 +15,20 @@ CREATE TABLE messages(
     FOREIGN KEY(task_id) REFERENCES tasks(id)
 );
 
+selectAllUpdates:
+SELECT *
+FROM messages
+WHERE updated_at > ?;
+
 selectMessageById:
-SELECT messages.*, url_metadata.json_data, messages_extra.id AS messages_extra_id ,messages_extra.file_path,messages_extra.created_at,messages_extra.data_type
+SELECT messages.*, url_metadata.json_data, messages_extra.id AS messages_extra_id ,messages_extra.url,messages_extra.created_at,messages_extra.data_type
 FROM messages
 LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
 LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
 WHERE messages.id = ?;
 
 selectMessageByTaskId:
-SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.file_path, messages_extra.created_at, messages_extra.data_type
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.url, messages_extra.created_at, messages_extra.data_type
 FROM messages
 LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
 LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
@@ -31,7 +36,7 @@ WHERE task_id = ? AND messages.deleted = 0
 ORDER BY messages.created_at DESC;
 
 selectTaskMessagesByContentType:
-SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.file_path, messages_extra.created_at, messages_extra.data_type
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.url, messages_extra.created_at, messages_extra.data_type
 FROM messages
 LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
 LEFT JOIN messages_extra ON messages.id = messages_extra.message_id

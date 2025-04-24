@@ -90,9 +90,11 @@ class MessageRepositoryImpl(
       val messageExtraData = MessageExtraData(
         id = Uuid.generate(),
         message_id = messageData.id,
-        file_path = messageExtra.filePath,
+        url = messageExtra.url,
         created_at = createdAt,
+        updated_at = createdAt,
         data_type = messageExtra.messageType.name,
+        deleted = false
       )
       messageDataQueries.insertMessageExtra(messageExtraData)
     }
@@ -121,7 +123,7 @@ class MessageRepositoryImpl(
       mapper = mapper.messageDataMapper
     ).executeAsOneOrNull()
 
-    val imagePath = message?.messageExtra?.filePath
+    val imagePath = message?.messageExtra?.url
     imagePath?.let {
       // TODO
 //            val file = File(it)

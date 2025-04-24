@@ -122,7 +122,7 @@ class MigrationHelper(
           message.messageData?.let { data ->
             MessageExtra(
               id = Uuid.generate(),
-              filePath = data.filePath,
+              url = data.filePath,
               creationTime = data.creationTime,
               messageType = data.messageType
             )

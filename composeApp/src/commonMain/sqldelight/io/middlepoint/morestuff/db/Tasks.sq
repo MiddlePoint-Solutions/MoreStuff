@@ -18,6 +18,11 @@ SELECT *
 FROM tasks
 ORDER BY created_at;
 
+selectAllUpdates:
+SELECT *
+FROM tasks
+WHERE updated_at > ?;
+
 selectAllActive:
 SELECT *
 FROM tasks

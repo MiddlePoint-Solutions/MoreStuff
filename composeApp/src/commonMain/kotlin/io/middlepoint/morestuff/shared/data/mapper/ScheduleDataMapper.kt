@@ -7,7 +7,7 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import kotlinx.datetime.Instant
 
-typealias ScheduleDataMapper = (
+typealias ScheduleDataMapper<R> = (
     id: Uuid,
     task_id: Uuid,
     created_at: Instant,
@@ -16,9 +16,9 @@ typealias ScheduleDataMapper = (
     timezone: String,
     active: Boolean,
     schedule_type: ScheduleType
-) -> Schedule
+) -> R
 
-fun makeScheduleDataMapper(): ScheduleDataMapper = ::mapScheduleData
+fun makeScheduleDataMapper(): ScheduleDataMapper<Schedule> = ::mapScheduleData
 
 fun mapScheduleData(
     id: Uuid,

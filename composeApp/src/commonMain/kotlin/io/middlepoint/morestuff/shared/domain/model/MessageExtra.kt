@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Immutable
 data class MessageExtra(
     val id: Uuid,
-    val filePath: String,
+    val url: String,
     val creationTime: String,
     val messageType: MessageExtraType
 )
