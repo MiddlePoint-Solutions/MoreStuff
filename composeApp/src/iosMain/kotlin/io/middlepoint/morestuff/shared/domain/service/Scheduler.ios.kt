@@ -87,57 +87,53 @@ class SchedulerImpl(
             }*/
     }
 
-/*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
-        val currentTime = timeManager.nowLocalDateTime
-        val scheduleTime =
-            if (currentTime.hour > hour || (currentTime.hour == hour && currentTime.minute >= minute)) {
-                timeManager.tomorrowLocalDateTime(hour, minute)
-            } else {
-                timeManager.todayLocalDateTime(hour, minute)
-            }
+  override fun cancelSchedule(scheduleId: Uuid) {
+    TODO("Not yet implemented")
+  }
 
-        val triggerDate = NSDateComponents().apply {
-            setYear(scheduleTime.year.toLong())
-            setMonth(scheduleTime.monthNumber.toLong())
-            setDay(scheduleTime.dayOfMonth.toLong())
-            setHour(scheduleTime.hour.toLong())
-            setMinute(scheduleTime.minute.toLong())
-        }
+  /*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+          val currentTime = timeManager.nowLocalDateTime
+          val scheduleTime =
+              if (currentTime.hour > hour || (currentTime.hour == hour && currentTime.minute >= minute)) {
+                  timeManager.tomorrowLocalDateTime(hour, minute)
+              } else {
+                  timeManager.todayLocalDateTime(hour, minute)
+              }
 
-
-        val content = UNMutableNotificationContent()
-        content.setTitle("Review Reminder")
-        content.setBody("It's time for your scheduled review.")
-
-
-        val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
-            dateComponents = triggerDate,
-            repeats = false
-        )
-
-        val request = UNNotificationRequest.requestWithIdentifier(
-            identifier = PRIORITY_REVIEW_WORK,
-            content = content,
-            trigger = trigger
-        )
+          val triggerDate = NSDateComponents().apply {
+              setYear(scheduleTime.year.toLong())
+              setMonth(scheduleTime.monthNumber.toLong())
+              setDay(scheduleTime.dayOfMonth.toLong())
+              setHour(scheduleTime.hour.toLong())
+              setMinute(scheduleTime.minute.toLong())
+          }
 
 
-        UNUserNotificationCenter.currentNotificationCenter()
-            .addNotificationRequest(request) { error ->
-                error?.let {
-                    println("Error scheduling review worker: ${it.localizedDescription}")
-                }
-            }
-    }*/
+          val content = UNMutableNotificationContent()
+          content.setTitle("Review Reminder")
+          content.setBody("It's time for your scheduled review.")
 
-    override fun cancelSchedule(scheduleId: Long) {
-        UNUserNotificationCenter.currentNotificationCenter()
-            .removePendingNotificationRequestsWithIdentifiers(
-                listOf(getScheduleWorkTag(scheduleId))
-            )
-        logger.i { "Cancelled notification with scheduleId= $scheduleId" }
 
-    }
+          val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
+              dateComponents = triggerDate,
+              repeats = false
+          )
+
+          val request = UNNotificationRequest.requestWithIdentifier(
+              identifier = PRIORITY_REVIEW_WORK,
+              content = content,
+              trigger = trigger
+          )
+
+
+          UNUserNotificationCenter.currentNotificationCenter()
+              .addNotificationRequest(request) { error ->
+                  error?.let {
+                      println("Error scheduling review worker: ${it.localizedDescription}")
+                  }
+              }
+      }*/
+
 
     override fun cancelPlannedPriorityUpdate() {
         UNUserNotificationCenter.currentNotificationCenter()
@@ -146,7 +142,7 @@ class SchedulerImpl(
             )
     }
 
-  private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
+  private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_$scheduleId"
 
     companion object {
         private const val PLANNED_PRIORITY_WORK = "SmartReminder"
