@@ -69,7 +69,8 @@ fun Messages(
   actions: ChatActions = ChatActions(),
   userInteractionEnabled: Boolean = true,
   contentPadding: PaddingValues = PaddingValues(0.dp),
-  isAILoading: Boolean = false
+  isAILoading: Boolean = false,
+
 ) {
   val scope = rememberCoroutineScope()
   var itemsCount by remember { mutableIntStateOf(0) }
