@@ -57,7 +57,8 @@ class TaskRepositoryImpl(
         task_id = data.id,
         scope_id = scopeId,
         created_at = data.created_at,
-        updated_at = data.updated_at
+        updated_at = data.updated_at,
+        deleted = false
       )
       taskScopeQueries.insert(tasksScopesItem)
 
@@ -266,7 +267,8 @@ class TaskRepositoryImpl(
       task_id = it,
       scope_id = scopeId,
       created_at = createdAt,
-      updated_at = createdAt
+      updated_at = createdAt,
+      deleted = false
     )
   }
 

@@ -4,7 +4,6 @@ package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.data.sync.ScopeSync
 import io.middlepoint.morestuff.shared.data.sync.Sync
-import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import kotlinx.datetime.Instant

@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.shared.ui.model
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 

@@ -3,7 +3,7 @@ package io.middlepoint.morestuff.android.domain.usecase.message
 import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createMessageForTest
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.usecase.message.CheckForUrlMetadataUseCase

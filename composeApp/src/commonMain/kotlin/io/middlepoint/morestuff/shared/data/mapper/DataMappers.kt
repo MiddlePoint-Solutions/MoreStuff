@@ -1,8 +1,10 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.StorageManager
+import io.middlepoint.morestuff.shared.data.sync.ScheduleSync
 import io.middlepoint.morestuff.shared.data.sync.ScopeSync
 import io.middlepoint.morestuff.shared.data.sync.Sync
+import io.middlepoint.morestuff.shared.data.sync.TaskRelationSync
 import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
@@ -26,7 +28,9 @@ interface DataMappers {
   val userDataMapper: UserDataMapper
   val messageDataMapper: MessageDataMapper
   val messageSyncMapper: MessageSyncMapper
+  val messageExtraSyncMapper: MessageExtraSyncMapper
   val scheduleDataMapper: ScheduleDataMapper<Schedule>
+  val scheduleSyncMapper: ScheduleDataMapper<TaskRelationSync<ScheduleSync>>
   val taskDataMapper: TaskDataMapper<Task>
   val taskSyncMapper: TaskDataMapper<Sync<TaskSync>>
   val taskScopeSyncMapper: TaskScopeSyncMapper
@@ -47,8 +51,14 @@ class DataMappersImpl(
   override val messageSyncMapper: MessageSyncMapper
     get() = makeMessageSyncMapper()
 
+  override val messageExtraSyncMapper: MessageExtraSyncMapper
+    get() = makeMessageExtraSyncMapper()
+
   override val scheduleDataMapper: ScheduleDataMapper<Schedule>
     get() = makeScheduleDataMapper()
+
+  override val scheduleSyncMapper: ScheduleDataMapper<TaskRelationSync<ScheduleSync>>
+    get() = makeScheduleSyncMapper()
 
   override val taskDataMapper: TaskDataMapper<Task>
     get() = makeTaskDataMapper()

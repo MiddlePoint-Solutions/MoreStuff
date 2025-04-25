@@ -12,13 +12,14 @@ CREATE TABLE schedules(
     timezone TEXT NOT NULL,
     active INTEGER AS Boolean NOT NULL DEFAULT 1,
     schedule_type TEXT AS ScheduleType NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
     FOREIGN KEY(task_id) REFERENCES tasks(id)
     );
 
-selectAll:
+selectAllUpdates:
 SELECT *
 FROM schedules
-ORDER BY created_at;
+WHERE updated_at > ?;
 
 selectScheduleById:
 SELECT *

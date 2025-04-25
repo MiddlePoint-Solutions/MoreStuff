@@ -1,7 +1,8 @@
-package io.middlepoint.morestuff.shared.domain.model
+package io.middlepoint.morestuff.shared.domain.model.core
 
 import androidx.compose.runtime.Immutable
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.serialization.Serializable
 
 @Serializable

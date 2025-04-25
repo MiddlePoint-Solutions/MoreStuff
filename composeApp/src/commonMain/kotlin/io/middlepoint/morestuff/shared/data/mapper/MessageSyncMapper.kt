@@ -3,7 +3,7 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
 import io.middlepoint.morestuff.shared.data.sync.MessageSync
-import io.middlepoint.morestuff.shared.data.sync.Sync
+import io.middlepoint.morestuff.shared.data.sync.TaskRelationSync
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.datetime.Instant
 
@@ -16,7 +16,7 @@ typealias MessageSyncMapper = (
   contentType: Int,
   content: String,
   deleted: Boolean
-) -> Sync<MessageSync>
+) -> TaskRelationSync<MessageSync>
 
 fun makeMessageSyncMapper(): MessageSyncMapper = ::mapMessageSync
 
@@ -29,8 +29,9 @@ fun mapMessageSync(
   contentType: Int,
   content: String,
   deleted: Boolean
-) = Sync(
+) = TaskRelationSync(
   id = id,
+  taskId = taskId,
   createdAt = created_at,
   updatedAt = updated_at,
   deleted = deleted,

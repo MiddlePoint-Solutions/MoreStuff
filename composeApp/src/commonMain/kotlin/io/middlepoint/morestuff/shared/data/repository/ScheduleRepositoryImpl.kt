@@ -50,6 +50,7 @@ class ScheduleRepositoryImpl(
       timezone = timezone.id,
       active = true,
       schedule_type = scheduleType,
+      deleted = false
     )
 
     scheduleQueries.insertSchedule(data)
