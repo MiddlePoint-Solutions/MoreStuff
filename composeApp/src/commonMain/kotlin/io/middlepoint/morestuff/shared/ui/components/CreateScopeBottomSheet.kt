@@ -1,10 +1,9 @@
-
-
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +18,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,8 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopeTitleEditor
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.delay
@@ -92,22 +94,44 @@ fun CreateScopeBottomSheet(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
-      Icon(
-        painter = painterResource(Res.drawable.ic_scope_add),
-        contentDescription = stringResource(Res.string.cd_scopes_icon),
-        modifier = Modifier
-          .size(50.dp),
-        tint = MaterialTheme.colorScheme.onSurface
-      )
 
-      Spacer(
-        modifier = Modifier.height(16.dp)
-      )
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(56.dp),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Spacer(modifier = Modifier.weight(1f))
+
+        TextButton(
+          onClick = {
+            if (scopeTitle.isNotBlank()) {
+              onConfirm(scopeTitle.trim())
+              keyboardController?.hide()
+            }
+          },
+          enabled = showSaveAction
+        ) {
+          Text(text = stringResource(Res.string.save).uppercase())
+        }
+      }
 
       Text(
         text = stringResource(Res.string.description_create_scope),
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
+      )
+      Spacer(
+        modifier = Modifier.height(8.dp)
+      )
+      Text(
+        text = (12 - scopeTitle.length).coerceAtLeast(0).toString(),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        style = MaterialTheme.typography.bodyLarge.copy(
+          fontWeight = FontWeight.Bold,
+          fontSize = 18.sp,
+          textAlign = TextAlign.End
+        ),
       )
 
       Spacer(
@@ -118,46 +142,12 @@ fun CreateScopeBottomSheet(
     Box {
       ScopeTitleEditor(
         title = scopeTitle,
-        onTitleChange = { title -> scopeTitle = title.trim() },
+        onTitleChange = { title -> scopeTitle = title },
         modifier = Modifier.focusRequester(focusRequester)
       )
     }
-
-    Column(
-      modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-      Button(
-        onClick = {
-          if (scopeTitle.isNotBlank()) {
-            onConfirm(scopeTitle.trim())
-            keyboardController?.hide()
-          }
-        },
-        modifier = Modifier.fillMaxWidth(),
-        enabled = showSaveAction
-      ) {
-        Text(text = stringResource(Res.string.save))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-
-      Button(
-        onClick = {
-          keyboardController?.hide()
-          onDismissRequest()
-        },
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-          contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-        )
-      ) {
-        Text(text = stringResource(Res.string.cancel))
-      }
-
-      Spacer(modifier = Modifier.height(8.dp))
-    }
+    Spacer(
+      modifier = Modifier.height(32.dp)
+    )
   }
 }

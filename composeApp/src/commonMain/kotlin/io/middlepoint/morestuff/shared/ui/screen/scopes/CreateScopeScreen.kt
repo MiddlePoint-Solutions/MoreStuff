@@ -33,6 +33,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import kotlinx.coroutines.delay
@@ -141,6 +142,18 @@ fun CreateScopeScreen(
           color = MaterialTheme.colorScheme.onSurface,
           style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
         )
+        Spacer(
+          modifier = Modifier.height(8.dp)
+        )
+        Text(
+          text = (12 - scopeTitle.length).coerceAtLeast(0).toString(),
+          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+          style = MaterialTheme.typography.bodyLarge.copy(
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            textAlign = TextAlign.End
+          ),
+        )
 
         Spacer(
           modifier = Modifier.height(16.dp)
@@ -157,7 +170,7 @@ fun CreateScopeScreen(
       ) {
         ScopeTitleEditor(
           title = scopeTitle,
-          onTitleChange = { title -> scopeTitle = title.trim() },
+          onTitleChange = { title -> scopeTitle = title },
           modifier = Modifier.focusRequester(focusRequester)
         )
       }
