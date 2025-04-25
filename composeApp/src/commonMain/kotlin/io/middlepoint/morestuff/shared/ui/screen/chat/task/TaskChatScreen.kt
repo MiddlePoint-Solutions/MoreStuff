@@ -62,9 +62,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
@@ -279,23 +277,10 @@ private fun TaskChatContent(
   val editingMessageContent = model.editingMessageContent
   val allScopes = model.allScopes
   val isAILoading = model.isAILoading
-  val aiErrorMessage = model.aiErrorMessage
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
 
-  var showAIError by remember { mutableStateOf(false) }
-
-  LaunchedEffect(aiErrorMessage) {
-    if (aiErrorMessage != null) {
-      showAIError = true
-      delay(2000)
-      showAIError = false
-      onEvent(TaskChatEvent.ClearAIError(task.id))
-    } else {
-      showAIError = false
-    }
-  }
 
 
 
@@ -410,22 +395,6 @@ private fun TaskChatContent(
           contentPadding = contentPadding,
           isAILoading = isAILoading,
         )
-        if (aiErrorMessage != null) {
-          Row(
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(vertical = 8.dp, horizontal = 16.dp)
-          ) {
-            Text(
-              text = "AI error, check the api key",
-              color = MaterialTheme.colorScheme.error,
-              fontSize = 14.sp,
-              modifier = Modifier.fillMaxWidth(),
-              textAlign = TextAlign.Center
-            )
-          }
-        }
-
         AnimatedVisibility(
           visible = !task.isComplete,
           modifier = Modifier.background(Color.Transparent)

@@ -66,9 +66,6 @@ fun taskChatModel(
     .map { it.aiMessageLoading[taskId] ?: false }
     .collectAsState(initial = false)
 
-  val aiErrorMessage by store.state
-    .map { it.aiMessageErrors[taskId] }
-    .collectAsState(initial = null)
 
   fun updateScopeAfterMove(scopeId: Uuid) {
     val newScope = allScopes.find { it.id == scopeId }
@@ -264,10 +261,6 @@ fun taskChatModel(
             isAIEnabled = !isAIEnabled
             logger.d { "AI ${if (isAIEnabled) "enabled" else "disabled"} for task: $taskId" }
           }
-
-          is ClearAIError -> {
-            store.dispatch(MessageAction.ClearAIErrorAction(taskId))
-          }
         }
       }
     }
@@ -282,6 +275,5 @@ fun taskChatModel(
     allScopes = allScopes,
     isAIEnabled = isAIEnabled,
     isAILoading = isAILoading,
-    aiErrorMessage = aiErrorMessage
   )
 }

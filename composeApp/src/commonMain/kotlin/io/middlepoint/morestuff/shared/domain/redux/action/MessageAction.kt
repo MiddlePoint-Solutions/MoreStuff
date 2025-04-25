@@ -38,6 +38,4 @@ sealed class MessageAction : Action.FeatureAction() {
   data class AIRequestStarted(val taskId: Uuid) : MessageAction()
   data class AIRequestFinished(val taskId: Uuid) : MessageAction()
   data class AIRequestFailed(val taskId: Uuid, val error: String?) :MessageAction()
-  data class ClearAIErrorAction(val taskId: Uuid) : MessageAction()
-
 }
