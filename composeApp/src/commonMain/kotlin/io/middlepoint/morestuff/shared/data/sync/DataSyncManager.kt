@@ -14,16 +14,18 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.db.Tasks
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.domain.enums.Status
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 interface DataSyncManager {
-
+  suspend fun sync(): Flow<Status>
   suspend fun push()
   suspend fun pull()
-
 }
 
 class DataSyncManagerImpl(
@@ -49,6 +51,22 @@ class DataSyncManagerImpl(
   private var lastPullTime: Instant
     get() = Instant.fromEpochMilliseconds(settings.getLong(KEY_LAST_PULL_TIME, 0))
     set(value) = settings.putLong(KEY_LAST_PULL_TIME, value.toEpochMilliseconds())
+
+  /**
+   * Current sync method: Push -> Pull
+   * In the future we should change to use a server‐time token.
+   */
+  override suspend fun sync() = flow {
+    emit(Status.Loading)
+    try {
+      push()
+      pull()
+      emit(Status.Ready)
+    } catch (e: Throwable) {
+      logger.e("Sync Exception", e)
+      emit(Status.Error)
+    }
+  }
 
   @OptIn(SupabaseInternal::class)
   override suspend fun push() {
@@ -165,13 +183,86 @@ class DataSyncManagerImpl(
   }
 
   private fun SyncData.toLocalData() = LocalData(
-      tasks = tasks.map { it.data.run { Tasks(id, created_at, updated_at, completed_at, completed_timezone, title, priority_score, deleted) } },
-      scopes = scopes.map { it.data.run { Scopes(id, scope_name, scope_order, created_at, updated_at, deleted) } },
-      messages = messages.map { it.data.run { Messages(id, taskId, schedule_id, created_at, updated_at, content_type, content, deleted) } },
-      tasksScopes = tasksScopes.map { it.run { Tasks_scopes(taskId, scopeId, createdAt, updatedAt, deleted) } },
-      messageExtras = messageExtras.map { it.data.run { Messages_extra(id, message_id, url, created_at, updated_at, data_type, deleted) } },
-      schedules = schedules.map { it.data.run { Schedules(id, task_id, created_at, updated_at, scheduled_at, timezone, active, schedule_type, deleted) } }
-    )
+    tasks = tasks.map {
+      it.data.run {
+        Tasks(
+          id,
+          created_at,
+          updated_at,
+          completed_at,
+          completed_timezone,
+          title,
+          priority_score,
+          deleted
+        )
+      }
+    },
+    scopes = scopes.map {
+      it.data.run {
+        Scopes(
+          id,
+          scope_name,
+          scope_order,
+          created_at,
+          updated_at,
+          deleted
+        )
+      }
+    },
+    messages = messages.map {
+      it.data.run {
+        Messages(
+          id,
+          taskId,
+          schedule_id,
+          created_at,
+          updated_at,
+          content_type,
+          content,
+          deleted
+        )
+      }
+    },
+    tasksScopes = tasksScopes.map {
+      it.run {
+        Tasks_scopes(
+          taskId,
+          scopeId,
+          createdAt,
+          updatedAt,
+          deleted
+        )
+      }
+    },
+    messageExtras = messageExtras.map {
+      it.data.run {
+        Messages_extra(
+          id,
+          message_id,
+          url,
+          created_at,
+          updated_at,
+          data_type,
+          deleted
+        )
+      }
+    },
+    schedules = schedules.map {
+      it.data.run {
+        Schedules(
+          id,
+          task_id,
+          created_at,
+          updated_at,
+          scheduled_at,
+          timezone,
+          active,
+          schedule_type,
+          deleted
+        )
+      }
+    }
+  )
 
   companion object {
     const val KEY_LAST_PUSH_TIME = "KEY_LAST_PUSH_TIME"

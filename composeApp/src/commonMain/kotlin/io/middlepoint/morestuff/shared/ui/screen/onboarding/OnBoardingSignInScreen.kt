@@ -24,6 +24,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,7 +68,6 @@ fun OnBoardingSignInScreen(
   onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
 ) {
-  val scope = rememberCoroutineScope()
   val signInWithGoogle = supabase.composeAuth.rememberSignInWithGoogle(
     onResult = { result ->
       Logger.d("Login: $result")
@@ -112,6 +112,7 @@ fun OnBoardingSignInContent(
 ) {
   var showRationaleDialog by remember { mutableStateOf(false) }
   var checkPermission by remember { mutableStateOf(false) }
+  val showAppleSignIn by remember { derivedStateOf { platform == Platform.iOS } }
   val scope = rememberCoroutineScope()
 
   if (showRationaleDialog) {
@@ -194,7 +195,7 @@ fun OnBoardingSignInContent(
         content = { ProviderButtonContent(Google) }
       )
 
-      if (platform == Platform.iOS) {
+      if (showAppleSignIn) {
         OutlinedButton(
           onClick = signInWithApple,
           content = { ProviderButtonContent(Apple) }
