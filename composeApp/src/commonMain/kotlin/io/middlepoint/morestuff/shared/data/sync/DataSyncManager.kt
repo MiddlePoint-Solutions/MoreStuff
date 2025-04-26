@@ -55,6 +55,8 @@ class DataSyncManagerImpl(
 
     val fromTime = lastPushTime
 
+    logger.d { "lastPushTime: $lastPushTime" }
+
     val data = tasks.transactionWithResult {
 
       val tasksSync = tasks.selectAllUpdates(
@@ -108,6 +110,7 @@ class DataSyncManagerImpl(
     logger.d { "Push Complete" }
 
     data.maxUpdatedAt()?.let { updatedAt ->
+      logger.d { "new lastPushTime: $updatedAt" }
       lastPushTime = updatedAt
     }
 
@@ -129,14 +132,18 @@ class DataSyncManagerImpl(
 
   override suspend fun pull() {
 
+    logger.d { "lastPullTime: $lastPullTime" }
+
     val data = supabase.postgrest.rpc(
       function = GET_ALL_CHANGES_RPC,
       parameters = buildJsonObject {
         put("since", lastPullTime.toString())
       }
-    ).decodeAs<SyncData>()
+    ).also {
+      logger.d { "debug: ${it.data}" }
+    }.decodeAs<SyncData>()
 
-    logger.d { "Pull result:  ${logSyncData(data)}\"" }
+    logger.d { "Pull result:  ${logSyncData(data)}" }
 
     val localData = data.toLocalData()
 
@@ -152,6 +159,7 @@ class DataSyncManagerImpl(
     logger.d { "Pull Complete" }
 
     data.maxUpdatedAt()?.let { updatedAt ->
+      logger.d { "new lastPullTime: $updatedAt" }
       lastPullTime = updatedAt
     }
   }

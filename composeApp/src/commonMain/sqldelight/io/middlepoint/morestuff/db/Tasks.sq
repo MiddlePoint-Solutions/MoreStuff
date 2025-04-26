@@ -55,7 +55,8 @@ ON CONFLICT(id) DO UPDATE
       title              = excluded.title,
       priority_score     = excluded.priority_score,
       updated_at         = excluded.updated_at,
-      deleted            = excluded.deleted;
+      deleted            = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
 
 insertTask:
 INSERT INTO tasks

@@ -28,7 +28,8 @@ ON CONFLICT(id) DO UPDATE
   SET scope_name  = excluded.scope_name,
       scope_order = excluded.scope_order,
       updated_at  = excluded.updated_at,
-      deleted     = excluded.deleted;
+      deleted     = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
 
 deleteScope:
 UPDATE scopes
