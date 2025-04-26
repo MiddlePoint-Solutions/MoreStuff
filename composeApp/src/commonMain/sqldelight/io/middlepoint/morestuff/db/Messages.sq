@@ -59,6 +59,15 @@ insertMessage:
 INSERT INTO messages
 VALUES ?;
 
+upsertMessage:
+INSERT INTO messages
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET content      = excluded.content,
+      content_type = excluded.content_type,
+      updated_at   = excluded.updated_at,
+      deleted      = excluded.deleted;
+
 countMessages:
 SELECT count(*) FROM messages;
 

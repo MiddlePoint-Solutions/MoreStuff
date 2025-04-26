@@ -46,6 +46,17 @@ SELECT *
 FROM tasks
 WHERE id = ?;
 
+upsertTask:
+INSERT INTO tasks
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET completed_at       = excluded.completed_at,
+      completed_timezone = excluded.completed_timezone,
+      title              = excluded.title,
+      priority_score     = excluded.priority_score,
+      updated_at         = excluded.updated_at,
+      deleted            = excluded.deleted;
+
 insertTask:
 INSERT INTO tasks
 VALUES ?;

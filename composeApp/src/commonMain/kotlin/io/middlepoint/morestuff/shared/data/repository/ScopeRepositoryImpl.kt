@@ -57,9 +57,7 @@ class ScopeRepositoryImpl(
       val count = scopeQueries.countScopes().executeAsOne().toInt()
       val scopeData = createScopeData(name, count)
       scopeQueries.createScope(scopeData)
-      scopeQueries
-        .selectScopeByName(name, dataMappers.scopeDataMapper)
-        .executeAsOne()
+      scopeQueries.selectScope(scopeData.id, dataMappers.scopeDataMapper).executeAsOne()
     }
   }
 

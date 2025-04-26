@@ -6,9 +6,14 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.toJsonObject
+import io.middlepoint.morestuff.db.Messages
+import io.middlepoint.morestuff.db.Messages_extra
+import io.middlepoint.morestuff.db.Schedules
+import io.middlepoint.morestuff.db.Scopes
 import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.db.Tasks
+import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -41,12 +46,16 @@ class DataSyncManagerImpl(
     get() = Instant.fromEpochMilliseconds(settings.getLong(KEY_LAST_PUSH_TIME, 0))
     set(value) = settings.putLong(KEY_LAST_PUSH_TIME, value.toEpochMilliseconds())
 
+  private var lastPullTime: Instant
+    get() = Instant.fromEpochMilliseconds(settings.getLong(KEY_LAST_PULL_TIME, 0))
+    set(value) = settings.putLong(KEY_LAST_PULL_TIME, value.toEpochMilliseconds())
+
   @OptIn(SupabaseInternal::class)
   override suspend fun push() {
 
     val fromTime = lastPushTime
 
-    val syncData = tasks.transactionWithResult {
+    val data = tasks.transactionWithResult {
 
       val tasksSync = tasks.selectAllUpdates(
         updated_at = fromTime,
@@ -88,17 +97,17 @@ class DataSyncManagerImpl(
       )
     }
 
-    logger.d { "Pushing: ${logSyncData(syncData)}" }
+    logger.d { "Pushing: ${logSyncData(data)}" }
     supabase.postgrest
       .rpc(
         function = UPSERT_BULK_RPC,
         parameters = buildJsonObject {
-          put("payload", Json.encodeToString(syncData).toJsonObject())
+          put("payload", Json.encodeToString(data).toJsonObject())
         }
       )
-    logger.d { "Pushed!" }
+    logger.d { "Push Complete" }
 
-    syncData.maxUpdatedAt()?.let { updatedAt ->
+    data.maxUpdatedAt()?.let { updatedAt ->
       lastPushTime = updatedAt
     }
 
@@ -119,18 +128,46 @@ class DataSyncManagerImpl(
   }
 
   override suspend fun pull() {
-    val dataSync = supabase.postgrest.rpc(
+
+    val data = supabase.postgrest.rpc(
       function = GET_ALL_CHANGES_RPC,
       parameters = buildJsonObject {
-        put("since", Instant.fromEpochMilliseconds(0).toString())
+        put("since", lastPullTime.toString())
       }
-    )
+    ).decodeAs<SyncData>()
 
-    logger.d { "Pull result: ${dataSync.decodeAs<SyncData>()}" }
+    logger.d { "Pull result:  ${logSyncData(data)}\"" }
+
+    val localData = data.toLocalData()
+
+    tasks.transactionWithResult {
+      localData.tasks.forEach(tasks::upsertTask)
+      localData.scopes.forEach(scopes::upsertScope)
+      localData.messages.forEach(messages::upsertMessage)
+      localData.tasksScopes.forEach(tasksScopes::upsert)
+      localData.messageExtras.forEach(messageExtras::upsertMessageExtra)
+      localData.schedules.forEach(schedules::upsertSchedule)
+    }
+
+    logger.d { "Pull Complete" }
+
+    data.maxUpdatedAt()?.let { updatedAt ->
+      lastPullTime = updatedAt
+    }
   }
+
+  private fun SyncData.toLocalData() = LocalData(
+      tasks = tasks.map { it.data.run { Tasks(id, created_at, updated_at, completed_at, completed_timezone, title, priority_score, deleted) } },
+      scopes = scopes.map { it.data.run { Scopes(id, scope_name, scope_order, created_at, updated_at, deleted) } },
+      messages = messages.map { it.data.run { Messages(id, taskId, schedule_id, created_at, updated_at, content_type, content, deleted) } },
+      tasksScopes = tasksScopes.map { it.run { Tasks_scopes(taskId, scopeId, createdAt, updatedAt, deleted) } },
+      messageExtras = messageExtras.map { it.data.run { Messages_extra(id, message_id, url, created_at, updated_at, data_type, deleted) } },
+      schedules = schedules.map { it.data.run { Schedules(id, task_id, created_at, updated_at, scheduled_at, timezone, active, schedule_type, deleted) } }
+    )
 
   companion object {
     const val KEY_LAST_PUSH_TIME = "KEY_LAST_PUSH_TIME"
+    const val KEY_LAST_PULL_TIME = "KEY_LAST_PULL_TIME"
     const val UPSERT_BULK_RPC = "upsert_bulk"
     const val GET_ALL_CHANGES_RPC = "get_all_changes"
   }
