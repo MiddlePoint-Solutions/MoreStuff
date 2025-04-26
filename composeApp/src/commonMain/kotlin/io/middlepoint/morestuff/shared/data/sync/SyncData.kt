@@ -29,6 +29,14 @@ data class SyncData(
             + schedules.map { it.updatedAt })
       .maxOrNull()
 
+  fun containsChanges() =
+    tasks.isNotEmpty() ||
+            scopes.isNotEmpty() ||
+            messages.isNotEmpty() ||
+            tasksScopes.isNotEmpty() ||
+            messageExtras.isNotEmpty() ||
+            schedules.isNotEmpty()
+
 }
 
 @Serializable

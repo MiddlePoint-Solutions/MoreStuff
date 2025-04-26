@@ -31,8 +31,8 @@ class ScopeRepositoryImpl(
 
   override suspend fun initScopes() {
     scopeQueries.transaction {
-      scopeQueries.selectScopeByName(DEFAULT_SCOPE_NAME).executeAsOneOrNull().let {
-        if (it == null) {
+      scopeQueries.selectScopeByName(DEFAULT_SCOPE_NAME).executeAsList().let {
+        if (it.isEmpty()) {
           val stuffScope = createScopeData(DEFAULT_SCOPE_NAME, 0)
           scopeQueries.createScope(stuffScope)
         }

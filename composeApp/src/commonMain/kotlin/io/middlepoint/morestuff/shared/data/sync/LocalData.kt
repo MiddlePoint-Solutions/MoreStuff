@@ -25,4 +25,12 @@ data class LocalData(
                 + schedules.map { it.updated_at })
             .maxOrNull()
 
+    fun containsChanges() =
+        tasks.isNotEmpty() ||
+                scopes.isNotEmpty() ||
+                messages.isNotEmpty() ||
+                tasksScopes.isNotEmpty() ||
+                messageExtras.isNotEmpty() ||
+                schedules.isNotEmpty()
+
 }

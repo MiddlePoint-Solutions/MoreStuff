@@ -14,7 +14,12 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.db.Tasks
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.domain.enums.Status
+import io.middlepoint.morestuff.shared.domain.enums.SyncFailure
+import io.middlepoint.morestuff.shared.domain.enums.SyncStatus
+import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Error
+import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Initializing
+import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Success
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
@@ -23,7 +28,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
 interface DataSyncManager {
-  suspend fun sync(): Flow<Status>
+  suspend fun sync(): Flow<SyncStatus>
   suspend fun push()
   suspend fun pull()
 }
@@ -32,7 +37,8 @@ class DataSyncManagerImpl(
   database: StuffDb,
   private val dataMappers: DataMappers,
   private val supabase: SupabaseClient,
-  private val settings: Settings
+  private val settings: Settings,
+  private val timeManager: TimeManager,
 ) : DataSyncManager {
 
   private val tasks = database.tasksQueries
@@ -57,14 +63,14 @@ class DataSyncManagerImpl(
    * In the future we should change to use a server‐time token.
    */
   override suspend fun sync() = flow {
-    emit(Status.Loading)
+    emit(Initializing)
     try {
       push()
       pull()
-      emit(Status.Ready)
+      emit(Success(timeManager.nowUtcInstant))
     } catch (e: Throwable) {
       logger.e("Sync Exception", e)
-      emit(Status.Error)
+      emit(Error(SyncFailure(e.toString())))
     }
   }
 
@@ -117,19 +123,21 @@ class DataSyncManagerImpl(
       )
     }
 
-    logger.d { "Pushing: ${logSyncData(data)}" }
-    supabase.postgrest
-      .rpc(
-        function = UPSERT_BULK_RPC,
-        parameters = buildJsonObject {
-          put("payload", Json.encodeToString(data).toJsonObject())
-        }
-      )
-    logger.d { "Push Complete" }
+    if (data.containsChanges()) {
+      logger.d { "Pushing: ${logSyncData(data)}" }
+      supabase.postgrest
+        .rpc(
+          function = UPSERT_BULK_RPC,
+          parameters = buildJsonObject {
+            put("payload", Json.encodeToString(data).toJsonObject())
+          }
+        )
+      logger.d { "Push Complete" }
+    }
 
-    data.maxUpdatedAt()?.let { updatedAt ->
-      logger.d { "new lastPushTime: $updatedAt" }
-      lastPushTime = updatedAt
+    data.maxUpdatedAt()?.let {
+      logger.d { "new lastPullTime: $it" }
+      lastPushTime = it
     }
 
   }
@@ -157,21 +165,20 @@ class DataSyncManagerImpl(
       parameters = buildJsonObject {
         put("since", lastPullTime.toString())
       }
-    ).also {
-      logger.d { "debug: ${it.data}" }
-    }.decodeAs<SyncData>()
+    ).decodeAs<SyncData>()
 
     logger.d { "Pull result:  ${logSyncData(data)}" }
 
-    val localData = data.toLocalData()
-
-    tasks.transactionWithResult {
-      localData.tasks.forEach(tasks::upsertTask)
-      localData.scopes.forEach(scopes::upsertScope)
-      localData.messages.forEach(messages::upsertMessage)
-      localData.tasksScopes.forEach(tasksScopes::upsert)
-      localData.messageExtras.forEach(messageExtras::upsertMessageExtra)
-      localData.schedules.forEach(schedules::upsertSchedule)
+    if (data.containsChanges()) {
+      val localData = data.toLocalData()
+      tasks.transactionWithResult {
+        localData.tasks.forEach(tasks::upsertTask)
+        localData.scopes.forEach(scopes::upsertScope)
+        localData.messages.forEach(messages::upsertMessage)
+        localData.tasksScopes.forEach(tasksScopes::upsert)
+        localData.messageExtras.forEach(messageExtras::upsertMessageExtra)
+        localData.schedules.forEach(schedules::upsertSchedule)
+      }
     }
 
     logger.d { "Pull Complete" }
