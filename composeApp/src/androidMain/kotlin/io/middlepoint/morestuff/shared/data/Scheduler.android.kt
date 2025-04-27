@@ -103,7 +103,7 @@ class SchedulerImpl(
     private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_${scheduleId.value}"
 
     companion object {
-        private const val DATA_SYNC_WORK = "SmartReminder"
+        private const val DATA_SYNC_WORK = "DataSync"
         private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }
