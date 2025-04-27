@@ -63,7 +63,7 @@ class SchedulerImpl(
     }
 
 
-    override fun schedulePlannedPriorityWorker() {
+    override fun scheduleDataSyncWorker() {
     /*    val content = UNMutableNotificationContent()
         content.setTitle("Planned Priority Update")
         content.setBody("Executing planned priority update.")

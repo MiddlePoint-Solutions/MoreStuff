@@ -9,18 +9,7 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Action
 data class UserState(
   val status: Status = Status.Loading,
   val user: User? = null
-) {
-
-  override fun equals(other: Any?): Boolean {
-    return super.equals(other)
-  }
-
-  override fun hashCode(): Int {
-    var result = status.hashCode()
-    result = 31 * result + (user?.hashCode() ?: 0)
-    return result
-  }
-}
+)
 
 fun AppState.reduceUserState(action: Action): AppState {
   return when (action) {

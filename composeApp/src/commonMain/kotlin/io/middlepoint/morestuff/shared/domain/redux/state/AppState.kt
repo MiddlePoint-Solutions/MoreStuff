@@ -4,6 +4,7 @@ import io.middlepoint.morestuff.shared.domain.enums.isReady
 
 data class AppState(
     val userState: UserState = UserState(),
+    val syncState: SyncState = SyncState(),
     val settings: AppSettingsState = AppSettingsState(),
 )
 

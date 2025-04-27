@@ -2,10 +2,11 @@ package io.middlepoint.morestuff.shared.data
 
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import io.middlepoint.morestuff.shared.work.PlannedPriorityUpdateWorker
+import io.middlepoint.morestuff.shared.work.DataSyncWorker
 import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
@@ -43,15 +44,21 @@ class SchedulerImpl(
         workManager.enqueue(work)
     }
 
-    override fun schedulePlannedPriorityWorker() {
-        PeriodicWorkRequestBuilder<PlannedPriorityUpdateWorker>(
-            repeatInterval = 20,
+    override fun scheduleDataSyncWorker() {
+        val networkConstraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        PeriodicWorkRequestBuilder<DataSyncWorker>(
+            repeatInterval = 15,
             repeatIntervalTimeUnit = TimeUnit.MINUTES,
-            flexTimeInterval = 2,
+            flexTimeInterval = 60,
             flexTimeIntervalUnit = TimeUnit.MINUTES
-        ).build().also { request ->
+        ).apply {
+            setConstraints(networkConstraints)
+        }.build().also { request ->
             workManager.enqueueUniquePeriodicWork(
-                PLANNED_PRIORITY_WORK,
+                DATA_SYNC_WORK,
                 ExistingPeriodicWorkPolicy.KEEP,
                 request
             )
@@ -90,13 +97,13 @@ class SchedulerImpl(
     }
 
     override fun cancelPlannedPriorityUpdate() {
-        workManager.cancelAllWorkByTag(PLANNED_PRIORITY_WORK)
+        workManager.cancelAllWorkByTag(DATA_SYNC_WORK)
     }
 
     private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_${scheduleId.value}"
 
     companion object {
-        private const val PLANNED_PRIORITY_WORK = "SmartReminder"
+        private const val DATA_SYNC_WORK = "SmartReminder"
         private const val PRIORITY_REVIEW_WORK = "PriorityReview"
     }
 }

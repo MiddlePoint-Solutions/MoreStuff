@@ -13,7 +13,7 @@ class SchedulerImpl : Scheduler {
         TODO("Not yet implemented")
     }
 
-    override fun schedulePlannedPriorityWorker() {
+    override fun scheduleDataSyncWorker() {
         // TODO:
     }
 
