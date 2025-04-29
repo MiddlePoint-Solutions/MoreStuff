@@ -1,10 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.screen.scopes
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -142,22 +145,6 @@ fun CreateScopeScreen(
           color = MaterialTheme.colorScheme.onSurface,
           style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
         )
-        Spacer(
-          modifier = Modifier.height(8.dp)
-        )
-        Text(
-          text = (12 - scopeTitle.length).coerceAtLeast(0).toString(),
-          color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-          style = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            textAlign = TextAlign.End
-          ),
-        )
-
-        Spacer(
-          modifier = Modifier.height(16.dp)
-        )
       }
 
       Box(
@@ -168,12 +155,31 @@ fun CreateScopeScreen(
             height = Dimension.wrapContent
           }
       ) {
-        ScopeTitleEditor(
-          title = scopeTitle,
-          onTitleChange = { title -> scopeTitle = title },
-          modifier = Modifier.focusRequester(focusRequester)
-        )
+        Column {
+          ScopeTitleEditor(
+            title = scopeTitle,
+            onTitleChange = { title -> scopeTitle = title },
+            modifier = Modifier.focusRequester(focusRequester)
+          )
+          Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+          ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+              text = "${scopeTitle.length}/12",
+              color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+              style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                textAlign = TextAlign.End
+              )
+            )
+          }
+        }
       }
+
     }
   }
 }

@@ -8,11 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -43,12 +40,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.cancel
-import morestuff.composeapp.generated.resources.cd_scopes_icon
 import morestuff.composeapp.generated.resources.description_create_scope
-import morestuff.composeapp.generated.resources.ic_scope_add
 import morestuff.composeapp.generated.resources.save
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,21 +81,20 @@ fun CreateScopeBottomSheet(
     onDismissRequest = onDismissRequest,
     sheetState = sheetState,
     containerColor = MaterialTheme.colorScheme.surfaceContainerElevation,
-  ) {
-    Column(
-      modifier = Modifier.fillMaxWidth(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-      verticalArrangement = Arrangement.Center
-    ) {
-
+    dragHandle = {
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .height(56.dp),
+          .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
         Spacer(modifier = Modifier.weight(1f))
-
+        Box(
+          modifier = Modifier.weight(1f),
+          contentAlignment = Alignment.Center
+        ) {
+          BottomSheetDefaults.DragHandle()
+        }
         TextButton(
           onClick = {
             if (scopeTitle.isNotBlank()) {
@@ -115,23 +107,18 @@ fun CreateScopeBottomSheet(
           Text(text = stringResource(Res.string.save).uppercase())
         }
       }
+    }
+  ) {
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center
+    ) {
 
       Text(
         text = stringResource(Res.string.description_create_scope),
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Center)
-      )
-      Spacer(
-        modifier = Modifier.height(8.dp)
-      )
-      Text(
-        text = (12 - scopeTitle.length).coerceAtLeast(0).toString(),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-        style = MaterialTheme.typography.bodyLarge.copy(
-          fontWeight = FontWeight.Bold,
-          fontSize = 18.sp,
-          textAlign = TextAlign.End
-        ),
       )
 
       Spacer(
@@ -139,15 +126,28 @@ fun CreateScopeBottomSheet(
       )
     }
 
-    Box {
-      ScopeTitleEditor(
-        title = scopeTitle,
-        onTitleChange = { title -> scopeTitle = title },
-        modifier = Modifier.focusRequester(focusRequester)
+    ScopeTitleEditor(
+      title = scopeTitle,
+      onTitleChange = { title -> scopeTitle = title },
+      modifier = Modifier.focusRequester(focusRequester)
+    )
+
+    Row(
+      modifier = Modifier
+        .fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.End
+    ) {
+      Text(
+        text = "${(scopeTitle.length)}/12",
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+        style = MaterialTheme.typography.bodyLarge.copy(
+          fontWeight = FontWeight.Bold,
+          fontSize = 18.sp,
+          textAlign = TextAlign.End
+        ),
+        modifier = Modifier.padding(end = 16.dp)
       )
     }
-    Spacer(
-      modifier = Modifier.height(32.dp)
-    )
   }
 }

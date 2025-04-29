@@ -1,12 +1,15 @@
 package io.middlepoint.morestuff.shared.ui.components.input
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -45,12 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.chat_whit_ai
 import morestuff.composeapp.generated.resources.task_chat_input_hint
 import morestuff.composeapp.generated.resources.textfield_desc
 import org.jetbrains.compose.resources.stringResource
 
 
 val LocalBoxWeight = compositionLocalOf { 0.12f }
+
 
 @Composable
 fun UserTextInput(
@@ -65,7 +70,6 @@ fun UserTextInput(
   isAIEnabled: Boolean = false,
   inputHint: String = stringResource(Res.string.task_chat_input_hint)
 ) {
-
   val a11ylabel = stringResource(Res.string.textfield_desc)
   val boxWeight = LocalBoxWeight.current
 
@@ -79,21 +83,41 @@ fun UserTextInput(
     ),
     label = "neonOffset"
   )
-  val neonGradient = Brush.linearGradient(
-    colors = listOf(
-      Color(0xFFBDC6FF),
-      Color.White.copy(alpha = 0.7f),
-      Color(0xFFDBCAFF)
-    ),
-    start = Offset(animatedOffset, 0f),
-    end = Offset(animatedOffset + 200f, 100f)
+
+  val aiEnabledTransition = updateTransition(
+    targetState = isAIEnabled,
+    label = "aiEnabledTransition"
   )
+
+  val borderWidth by aiEnabledTransition.animateDp(
+    label = "borderWidth",
+    transitionSpec = { tween(300) }
+  ) { enabled -> if (enabled) 2.dp else 0.dp }
+
+  val borderAlpha by aiEnabledTransition.animateFloat(
+    label = "borderAlpha",
+    transitionSpec = { tween(300) }
+  ) { enabled -> if (enabled) 1f else 0f }
+
 
   LaunchedEffect(Unit) {
     if (startWithFocus) {
       focusRequester.requestFocus()
     }
   }
+
+  val animatedBorder = if (borderAlpha > 0f) {
+    val animatedNeonGradient = Brush.linearGradient(
+      colors = listOf(
+        Color(0xFFBDC6FF).copy(alpha = borderAlpha),
+        Color.White.copy(alpha = 0.7f * borderAlpha),
+        Color(0xFFDBCAFF).copy(alpha = borderAlpha)
+      ),
+      start = Offset(animatedOffset, 0f),
+      end = Offset(animatedOffset + 200f, 100f)
+    )
+    BorderStroke(borderWidth, animatedNeonGradient)
+  } else null
 
   Surface(
     modifier = modifier
@@ -102,15 +126,13 @@ fun UserTextInput(
       .animateContentSize(),
     shape = RoundedCornerShape(42),
     color = backgroundColor,
-    border = if (isAIEnabled) BorderStroke(2.dp, neonGradient) else null,
+    border = animatedBorder,
   ) {
     Row(
       modifier = Modifier
         .fillMaxWidth()
         .defaultMinSize(minHeight = 42.dp)
-        .semantics {
-          contentDescription = a11ylabel
-        },
+        .semantics { contentDescription = a11ylabel },
       horizontalArrangement = Arrangement.End,
       verticalAlignment = Alignment.CenterVertically
     ) {
@@ -122,7 +144,9 @@ fun UserTextInput(
           leadingContent()
         }
       }
-      BasicTextField(value = value,
+
+      BasicTextField(
+        value = value,
         onValueChange = onValueChange,
         modifier = Modifier
           .clearFocusOnKeyboardDismiss()
@@ -137,7 +161,8 @@ fun UserTextInput(
         maxLines = 4,
         cursorBrush = SolidColor(LocalContentColor.current),
         textStyle = LocalTextStyle.current.copy(
-          color = LocalContentColor.current, fontSize = 18.sp
+          color = LocalContentColor.current,
+          fontSize = 18.sp
         ),
         decorationBox = { innerTextField ->
           Box(
@@ -145,18 +170,21 @@ fun UserTextInput(
             modifier = Modifier.padding(bottom = 6.dp, top = 6.dp)
           ) {
             if (value.text.isEmpty()) {
-              Text(
-                text = inputHint,
-                modifier = Modifier.align(Alignment.CenterStart),
-                style = LocalTextStyle.current.copy(
-                  color = LocalContentColor.current.copy(alpha = 0.6f),
-                  fontSize = 18.sp
+              Crossfade(targetState = isAIEnabled, animationSpec = tween(350)) { aiEnabled ->
+                Text(
+                  text = if (!aiEnabled) inputHint else stringResource(Res.string.chat_whit_ai),
+                  modifier = Modifier.align(Alignment.CenterStart),
+                  style = LocalTextStyle.current.copy(
+                    color = LocalContentColor.current.copy(alpha = 0.6f),
+                    fontSize = 18.sp
+                  )
                 )
-              )
+              }
             }
             innerTextField()
           }
-        })
+        }
+      )
 
       Box(
         modifier = Modifier
@@ -168,8 +196,6 @@ fun UserTextInput(
       }
     }
   }
-
-
 }
 
 

@@ -1,6 +1,9 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -279,10 +282,6 @@ private fun TaskChatContent(
   val isAILoading = model.isAILoading
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
-
-
-
-
 
   val editingMessage = remember(editingMessageId, messages) {
     messages.find { it.id == editingMessageId }
@@ -564,14 +563,22 @@ private fun TaskChatInput(
               IconButton(
                 onClick = onToggleAI,
               ) {
-                Icon(
-                  painter = if (isAIEnabled)
-                    painterResource(Res.drawable.ic_ai_enabled)
-                  else
-                    painterResource(Res.drawable.ic_ai_disabled),
-                  contentDescription = "Toggle AI",
-                  tint = Color.Unspecified
-                )
+                Crossfade(
+                  targetState = isAIEnabled,
+                  animationSpec = tween(
+                    durationMillis = 300,
+                    easing = FastOutSlowInEasing
+                  )
+                ) { aiEnabled ->
+                  Icon(
+                    painter = if (aiEnabled)
+                      painterResource(Res.drawable.ic_ai_enabled)
+                    else
+                      painterResource(Res.drawable.ic_ai_disabled),
+                    contentDescription = "Toggle AI",
+                    tint = Color.Unspecified
+                  )
+                }
               }
             },
             actionsContent = {

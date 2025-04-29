@@ -310,4 +310,5 @@
     <string name="verify">Verify</string>
     <string name="error_invalid_email">The email address is invalid or does not exist.</string>
     <string name="error_generic">An error occurred. Please try again.</string>
+    <string name="chat_whit_ai">Chat with MoreStuff AI.</string>
 </resources>
