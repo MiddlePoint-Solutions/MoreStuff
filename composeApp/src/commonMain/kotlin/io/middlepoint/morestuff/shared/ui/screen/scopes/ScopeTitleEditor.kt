@@ -40,7 +40,7 @@ fun ScopeTitleEditor(
         BasicTextField(
             value = title,
             onValueChange = {
-                val input = it.replace(" ", "-")
+                val input = it
                 if (input.length <= 12) {
                     onTitleChange(input)
                 }
