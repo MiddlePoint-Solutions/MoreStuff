@@ -11,6 +11,7 @@ import io.middlepoint.morestuff.shared.data.middleware.PriorityMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.ScheduleMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.ScopeMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.SettingsMiddleware
+import io.middlepoint.morestuff.shared.data.middleware.SyncMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.TaskMiddleware
 import io.middlepoint.morestuff.shared.data.service.AppMessagesProviderImpl
 import io.middlepoint.morestuff.shared.data.service.HintTaskProviderImpl
@@ -194,6 +195,7 @@ val storeModule = module {
   factoryOf(::PriorityMiddleware)
   factoryOf(::DevMiddleware)
   factoryOf(::ScopeMiddleware)
+  factoryOf(::SyncMiddleware)
 }
 
 val taskUseCases = module {

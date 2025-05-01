@@ -51,7 +51,8 @@ fun createDatabase(driverFactory: DriverFactory) = StuffDb(
     messages_extraAdapter = Messages_extra.Adapter(
         idAdapter = UuidColumnAdapter,
         message_idAdapter = UuidColumnAdapter,
-        created_atAdapter = InstantColumnAdapter
+        created_atAdapter = InstantColumnAdapter,
+        updated_atAdapter = InstantColumnAdapter
     ),
     url_metadataAdapter = Url_metadata.Adapter(
         message_idAdapter = UuidColumnAdapter,

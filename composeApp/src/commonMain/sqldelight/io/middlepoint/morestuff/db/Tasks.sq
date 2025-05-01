@@ -1,4 +1,5 @@
 import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
 import kotlinx.datetime.Instant;
 
 CREATE TABLE tasks(
@@ -8,7 +9,8 @@ CREATE TABLE tasks(
     completed_at INTEGER AS Instant,
     completed_timezone TEXT,
     title TEXT NOT NULL,
-    priority_score INTEGER NOT NULL
+    priority_score INTEGER NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
 selectAll:
@@ -16,41 +18,21 @@ SELECT *
 FROM tasks
 ORDER BY created_at;
 
+selectAllUpdates:
+SELECT *
+FROM tasks
+WHERE updated_at > ?;
+
 selectAllActive:
 SELECT *
 FROM tasks
-WHERE tasks.completed_at IS NULL
+WHERE tasks.completed_at IS NULL AND tasks.deleted = 0
 ORDER BY tasks.priority_score DESC;
-
-getActiveTaskWithoutSchedule:
-SELECT tasks.*
-FROM tasks
-WHERE completed_at IS NULL
-  AND id NOT IN (
-      SELECT task_id
-      FROM schedules
-      WHERE active = 1 AND schedule_type IN :schedule_types
-  )
-ORDER BY tasks.priority_score DESC;
-
-getActiveTaskWithoutScheduleByScopeId:
-SELECT tasks.*
-FROM tasks
-JOIN tasks_scopes ON tasks.id = tasks_scopes.task_id
-WHERE tasks_scopes.scope_id = :scope_id
-  AND completed_at IS NULL
-  AND id NOT IN (
-      SELECT task_id
-      FROM schedules
-      WHERE active = 1 AND schedule_type IN :schedule_types
-  )
-ORDER BY tasks.priority_score DESC;
-
 
 selectAllComplete:
 SELECT *
 FROM tasks
-WHERE completed_at IS NOT NULL
+WHERE completed_at IS NOT NULL AND deleted = 0
 ORDER BY tasks.completed_at DESC;
 
 selectHighestPriorityScore:
@@ -64,13 +46,25 @@ SELECT *
 FROM tasks
 WHERE id = ?;
 
+upsertTask:
+INSERT INTO tasks
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET completed_at       = excluded.completed_at,
+      completed_timezone = excluded.completed_timezone,
+      title              = excluded.title,
+      priority_score     = excluded.priority_score,
+      updated_at         = excluded.updated_at,
+      deleted            = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
+
 insertTask:
 INSERT INTO tasks
 VALUES ?;
 
 updateTaskComplete:
 UPDATE tasks
-SET completed_at = :completed_time
+SET completed_at = :completed_time, completed_timezone = :timezone
 WHERE id IN :task_ids;
 
 updateTaskTitle:
@@ -105,7 +99,7 @@ SELECT tasks.* FROM tasks
 WHERE priority_score IN (
           SELECT priority_score
           FROM tasks
-          WHERE completed_at IS NULL AND priority_score > :current_score
+          WHERE completed_at IS NULL AND deleted = 0 AND priority_score > :current_score
           ORDER BY priority_score ASC LIMIT 1
       )
 LIMIT 1;
@@ -115,28 +109,29 @@ SELECT tasks.* FROM tasks
 WHERE priority_score IN (
           SELECT priority_score
           FROM tasks
-          WHERE completed_at IS NULL AND priority_score < :current_score
+          WHERE completed_at IS NULL AND deleted = 0 AND priority_score < :current_score
           ORDER BY priority_score DESC LIMIT 1
       )
 LIMIT 1;
 
 searchTasks:
 SELECT * FROM tasks
-WHERE title LIKE '%' || :searchText || '%' COLLATE NOCASE
+WHERE deleted = 0 AND (title LIKE '%' || :searchText || '%' COLLATE NOCASE)
 ORDER BY created_at DESC;
 
 searchActiveTasks:
 SELECT * FROM tasks
-WHERE tasks.completed_at IS NULL
+WHERE tasks.completed_at IS NULL AND tasks.deleted = 0
 AND (title LIKE '%' || :searchText || '%' COLLATE NOCASE)
 ORDER BY created_at DESC;
 
 countActiveTasks:
 SELECT COUNT(*) FROM tasks
-WHERE tasks.completed_at IS NULL;
+WHERE tasks.completed_at IS NULL AND tasks.deleted = 0;
 
 deleteTask:
-DELETE FROM tasks
+UPDATE tasks
+SET deleted = 1
 WHERE id IN :task_ids;
 
 selectTasksByScopeId:
@@ -145,24 +140,31 @@ FROM tasks
 JOIN tasks_scopes ON tasks.id = tasks_scopes.task_id
 WHERE tasks_scopes.scope_id = :scope_id
   AND tasks.completed_at IS NULL
+  AND tasks.deleted = 0
 ORDER BY tasks.priority_score DESC;
-
-selectTasksWithoutScope:
-SELECT *
-FROM tasks
-WHERE id NOT IN (
-   SELECT task_id
-   FROM tasks_scopes
-);
 
 selectAllActiveForSearch:
 SELECT *
 FROM tasks
-WHERE tasks.completed_at IS NULL
+WHERE tasks.completed_at IS NULL AND tasks.deleted = 0
 ORDER BY created_at DESC;
 
 selectAllForSearch:
 SELECT *
 FROM tasks
+WHERE tasks.deleted = 0
 ORDER BY created_at DESC;
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER tasks_updated_at
+AFTER UPDATE ON tasks
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE tasks
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;
 

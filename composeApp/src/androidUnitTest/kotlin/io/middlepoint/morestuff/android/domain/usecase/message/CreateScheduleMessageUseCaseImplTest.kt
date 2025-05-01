@@ -5,15 +5,13 @@ import arrow.core.right
 import io.middlepoint.morestuff.android.domain.createMessageForTest
 import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateScheduleMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskForScheduleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

@@ -12,6 +12,7 @@ data class HomeState(
   val username: String = "",
   val scopes: List<Scope> = listOf(),
   val selectedTasks: List<Uuid> = listOf(),
+  val syncInProgress: Boolean = false,
   val taskInputActive: Boolean = false,
   val reorderingScopes: Map<Uuid, Boolean> = emptyMap(),
   val scheduleModel: ScheduleUiModel? = null,

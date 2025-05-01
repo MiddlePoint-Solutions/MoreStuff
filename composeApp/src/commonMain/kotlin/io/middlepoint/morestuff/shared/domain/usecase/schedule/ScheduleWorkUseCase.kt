@@ -14,7 +14,7 @@ class ScheduleWorkUseCaseImpl(
 ) : ScheduleWorkUseCase {
 
     override suspend fun invoke(/*reviewTime: Pair<Int, Int>*/): Either<Failure, Boolean> {
-        scheduler.schedulePlannedPriorityWorker()
+        scheduler.scheduleDataSyncWorker()
         //updateReviewNotificationScheduleUseCase(reviewTime.first, reviewTime.second)
         return Either.Right(true)
     }

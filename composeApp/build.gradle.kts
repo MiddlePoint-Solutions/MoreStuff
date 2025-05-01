@@ -1,5 +1,6 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.gradle.internal.declarativedsl.parsing.main
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -53,7 +54,12 @@ kotlin {
     )
   // spotless:on
 
-  jvm("desktop")
+  jvm("desktop") {
+//    main()
+    mainRun {
+      mainClass.set("MainKt")
+    }
+  }
 
   iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
@@ -210,7 +216,8 @@ kotlin {
     desktopMain.dependencies {
       implementation(compose.desktop.currentOs)
       implementation(libs.sqldelight.driver.desktop)
-//      implementation(libs.kotlinx.coroutines.swing)
+      implementation(libs.ktor.client.java)
+      implementation(libs.kotlinx.coroutines.swing)
     }
 
     // TODO: Enable once we have support from SqlDelight

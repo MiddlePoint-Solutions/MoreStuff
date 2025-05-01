@@ -10,7 +10,7 @@ import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.model.TaskData
+import io.middlepoint.morestuff.shared.data.mapper.TaskData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
@@ -57,7 +57,8 @@ class TaskRepositoryImpl(
         task_id = data.id,
         scope_id = scopeId,
         created_at = data.created_at,
-        updated_at = data.updated_at
+        updated_at = data.updated_at,
+        deleted = false
       )
       taskScopeQueries.insert(tasksScopesItem)
 
@@ -143,16 +144,21 @@ class TaskRepositoryImpl(
   override suspend fun updateTasksComplete(
     taskIds: List<Uuid>,
     complete: Boolean,
-  ): Either<Failure, Boolean> {
-    val time = when (complete) {
-      true -> timeManager.nowUtcInstant
-      false -> null
+  ): Either<Failure, Boolean> = taskQueries.transactionWithResult {
+    if (complete) {
+      taskQueries.updateTaskComplete(
+        task_ids = taskIds,
+        completed_time = timeManager.nowUtcInstant,
+        timezone = timeManager.currentTimeZone.id
+      )
+    } else {
+      taskQueries.updateTaskComplete(
+        task_ids = taskIds,
+        completed_time = null,
+        timezone = null
+      )
     }
-
-    return taskQueries.transactionWithResult {
-      taskQueries.updateTaskComplete(time, taskIds)
-      Right(true)
-    }
+    Right(true)
   }
 
   override suspend fun updateTaskTitle(
@@ -232,7 +238,8 @@ class TaskRepositoryImpl(
     updated_at = createdAt,
     completed_at = null,
     completed_timezone = null,
-    priority_score = priorityScore
+    priority_score = priorityScore,
+    deleted = false
   )
 
   override suspend fun deleteTasks(taskIds: List<Uuid>): Either<Failure, Boolean> {
@@ -260,7 +267,8 @@ class TaskRepositoryImpl(
       task_id = it,
       scope_id = scopeId,
       created_at = createdAt,
-      updated_at = createdAt
+      updated_at = createdAt,
+      deleted = false
     )
   }
 

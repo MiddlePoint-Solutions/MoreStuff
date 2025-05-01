@@ -1,16 +1,46 @@
 import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
 import kotlinx.datetime.Instant;
 
 CREATE TABLE messages_extra (
     id TEXT AS Uuid NOT NULL PRIMARY KEY,
     message_id TEXT AS Uuid NOT NULL,
-    file_path TEXT NOT NULL,
+    url TEXT NOT NULL,
     created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
     data_type TEXT NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
     FOREIGN KEY(message_id) REFERENCES messages(id)
 );
 
+selectAllUpdates:
+SELECT *
+FROM messages_extra
+WHERE updated_at > ?;
 
 insertMessageExtra:
 INSERT INTO messages_extra
 VALUES ?;
+
+upsertMessageExtra:
+INSERT INTO messages_extra
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET url           = excluded.url,
+      data_type     = excluded.data_type,
+      updated_at    = excluded.updated_at,
+      deleted       = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER messages_extra_updated_at
+AFTER UPDATE ON messages_extra
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE messages_extra
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;

@@ -8,5 +8,6 @@ val DEFAULT_SCOPE = Scope(
   name = "Stuff",
   order = 0,
   createdAt = timeManager.nowUtcInstant,
-  updatedAt = timeManager.nowUtcInstant
+  updatedAt = timeManager.nowUtcInstant,
+  deleted = false
 )

@@ -9,6 +9,7 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.appleNativeLogin
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
@@ -22,6 +23,8 @@ import io.middlepoint.morestuff.shared.data.repository.TaskRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
 import io.middlepoint.morestuff.shared.data.repository.UserRepositoryImpl
 import io.middlepoint.morestuff.shared.data.service.DevToolsImpl
+import io.middlepoint.morestuff.shared.data.sync.DataSyncManager
+import io.middlepoint.morestuff.shared.data.sync.DataSyncManagerImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
@@ -73,6 +76,8 @@ val dataModule = module {
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
   factoryOf(::MigrationHelper)
 
+  singleOf(::DataSyncManagerImpl) bind DataSyncManager::class
+
 }
 
 @OptIn(SupabaseInternal::class)
@@ -90,6 +95,8 @@ val supabaseModule = module {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
         appleNativeLogin() // TODO
       }
+
+      install(Postgrest)
 
     }
   }

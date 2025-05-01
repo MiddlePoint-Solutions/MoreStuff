@@ -51,7 +51,7 @@ object MockData {
       )
     }
 
-  val userNewTask: Message
+  private val userNewTask: Message
     get() = Message(
       id = Uuid("id"),
       taskId = Uuid("taskId"),
@@ -60,6 +60,7 @@ object MockData {
       createdAt = Clock.System.now(),
       updatedAt = Clock.System.now(),
       content = "Hello there!",
+      deleted = false,
     )
 
 }
