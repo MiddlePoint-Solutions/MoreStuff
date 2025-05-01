@@ -172,12 +172,12 @@ fun TaskChatScreen(
             copyMessage = { viewModel.take(CopyText(it.content)) },
             deleteMessage = { viewModel.take(DeleteMessage(it)) },
             onImageSelected = {
-              val path = it.messageExtra?.filePath ?: ""
+              val path = it.messageExtra?.url ?: ""
               val title = it.content
               router.push(ImagePreview(path, title))
             },
             onPdfSelected = {
-              val path = it.messageExtra?.filePath ?: ""
+              val path = it.messageExtra?.url ?: ""
               viewModel.take(OpenDocument(path))
             },
             shareImage = { viewModel.take(ShareImage(it)) },

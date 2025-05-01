@@ -8,14 +8,6 @@ class NotifierImpl : Notifier {
         TODO("Not yet implemented")
     }
 
-    override fun showReminderNotifications(messages: List<Message>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>) {
-        TODO("Not yet implemented")
-    }
-
     override fun clearScheduleNotification(scheduleId: Uuid) {
         TODO("Not yet implemented")
     }

@@ -19,6 +19,8 @@ import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.state.SyncState
+import io.middlepoint.morestuff.shared.domain.redux.state.isSyncInProgress
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
@@ -78,6 +80,7 @@ fun homeModel(
   val taskSchedules: Map<Uuid, Schedule> by remember { mutableStateOf(emptyMap()) }
   var tasks: Map<Uuid, TaskUiModel> by remember { mutableStateOf(initialState.tasks) }
   var username by remember { mutableStateOf(initialState.username) }
+  var syncInProgress by remember { mutableStateOf(initialState.syncInProgress) }
   val pendingCompletionTasks = remember { mutableStateMapOf<Uuid, Job>() }
   val coroutineScope = rememberCoroutineScope()
 
@@ -100,6 +103,14 @@ fun homeModel(
           .takeUnless { it.isNullOrBlank() }
           ?: state.userState.user?.email.orEmpty()
         username = newUsername
+      }
+  }
+
+  LaunchedEffect(Unit) {
+    store.state
+      .distinctUntilChangedBy { it.syncState.status }
+      .collectLatest { state ->
+        syncInProgress = state.isSyncInProgress()
       }
   }
 
@@ -174,7 +185,7 @@ fun homeModel(
               store.dispatch(TaskAction.CompleteTasksAction(completed, false))
 
               schedulesToRestore.forEach { (taskId, schedule) ->
-                schedule.scheduleLocalDateTime?.let { dateTime ->
+                schedule.scheduleLocalDateTime.let { dateTime ->
                   store.dispatch(
                     ScheduleAction.RescheduleTaskAction(
                       taskId,
@@ -305,11 +316,12 @@ fun homeModel(
   }
 
   return HomeState(
-    username = username,
     currentScopeId = currentScopeId,
-    selectedTasks = selectedTasks,
+    username = username,
     scopes = scopes,
+    selectedTasks = selectedTasks,
     taskInputActive = taskInputActive,
+    syncInProgress = syncInProgress,
     reorderingScopes = reorderingScopes,
     planTime = planTime,
     tasks = tasks

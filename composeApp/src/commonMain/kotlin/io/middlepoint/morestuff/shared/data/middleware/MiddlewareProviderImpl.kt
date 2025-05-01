@@ -14,7 +14,8 @@ class MiddlewareProviderImpl(
   notificationMiddleware: NotificationMiddleware,
   settingsMiddleware: SettingsMiddleware,
   priorityMiddleware: PriorityMiddleware,
-  scopeMiddleware: ScopeMiddleware
+  scopeMiddleware: ScopeMiddleware,
+  syncMiddleware: SyncMiddleware
 ) : MiddlewareProvider<AppState> {
 
   override val middlewareOrder = listOf(
@@ -22,6 +23,7 @@ class MiddlewareProviderImpl(
     devMiddleware,
     errorMiddleware,
     authMiddleware,
+    syncMiddleware,
     settingsMiddleware,
     taskMiddleware,
     scheduleMiddleware,

@@ -13,6 +13,7 @@ data class Schedule(
     val scheduledAt: String = "",
     val timezone: String = "",
     val active: Boolean = false,
+    val deleted: Boolean = false,
     val scheduleType: ScheduleType,
 )
 

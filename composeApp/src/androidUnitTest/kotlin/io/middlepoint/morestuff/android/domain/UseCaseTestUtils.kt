@@ -1,20 +1,17 @@
 package io.middlepoint.morestuff.android.domain
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import kotlinx.datetime.*
-import java.util.UUID
 
 val timeManager = TimeManagerImpl()
 fun createListOfTasks(amount: Long): List<Task> {
@@ -128,7 +125,7 @@ fun createMessageForTest(
   openGraphResult: OpenGraphResult = OpenGraphResult(),
   messageExtra: MessageExtra = MessageExtra(
     Uuid("$id"),
-    filePath = "",
+    url = "",
     creationTime = "",
     messageType = MessageExtraType.Image
   )
@@ -142,6 +139,7 @@ fun createMessageForTest(
     updatedAt = Clock.System.now(),
     contentType = contentType,
     content = content,
+    deleted = false,
     openGraphResult,
     messageExtra
   )

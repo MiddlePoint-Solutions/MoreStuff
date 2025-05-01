@@ -9,12 +9,12 @@ import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.model.MessageData
-import io.middlepoint.morestuff.shared.data.model.MessageExtraData
+import io.middlepoint.morestuff.shared.data.mapper.MessageData
+import io.middlepoint.morestuff.shared.data.mapper.MessageExtraData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
@@ -81,7 +81,8 @@ class MessageRepositoryImpl(
       created_at = createdAt,
       updated_at = createdAt,
       content_type = contentType,
-      content = content
+      content = content,
+      deleted = false
     )
     messageQueries.insertMessage(messageData)
     // TODO: message extra should be created before the message.
@@ -89,9 +90,11 @@ class MessageRepositoryImpl(
       val messageExtraData = MessageExtraData(
         id = Uuid.generate(),
         message_id = messageData.id,
-        file_path = messageExtra.filePath,
+        url = messageExtra.url,
         created_at = createdAt,
+        updated_at = createdAt,
         data_type = messageExtra.messageType.name,
+        deleted = false
       )
       messageDataQueries.insertMessageExtra(messageExtraData)
     }
@@ -120,7 +123,7 @@ class MessageRepositoryImpl(
       mapper = mapper.messageDataMapper
     ).executeAsOneOrNull()
 
-    val imagePath = message?.messageExtra?.filePath
+    val imagePath = message?.messageExtra?.url
     imagePath?.let {
       // TODO
 //            val file = File(it)

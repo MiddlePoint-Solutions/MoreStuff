@@ -13,6 +13,7 @@ data class Scope(
   val order: Int,
   val createdAt: Instant,
   val updatedAt: Instant,
+  val deleted: Boolean
 )
 
 const val DEFAULT_SCOPE_NAME = "Stuff"

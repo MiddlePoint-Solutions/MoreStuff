@@ -12,4 +12,7 @@ interface DevTools {
 
     suspend fun exportJsonData()
     suspend fun importJsonData(jsonFile: PlatformFile): Boolean
+
+    suspend fun testDataPush()
+    suspend fun testDataPull()
 }

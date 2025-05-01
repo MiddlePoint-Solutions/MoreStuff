@@ -5,7 +5,7 @@ import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
 import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.MessageExtra
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.coroutines.flow.Flow
