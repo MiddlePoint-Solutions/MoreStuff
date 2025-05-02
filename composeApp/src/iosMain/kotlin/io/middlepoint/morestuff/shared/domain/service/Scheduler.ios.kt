@@ -9,6 +9,9 @@ import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNUserNotificationCenter
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 class SchedulerImpl(
   private val timeManager: TimeManager,
@@ -24,7 +27,8 @@ class SchedulerImpl(
     override fun scheduleAtExact(scheduleId: Uuid, scheduleTime: String, taskTitle: String, taskId: Uuid) {
         logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
 
-        val localDateTime = LocalDateTime.parse(scheduleTime)
+      val localDateTime = Instant.parse(scheduleTime).toLocalDateTime(TimeZone.currentSystemDefault())
+
         val triggerDate = NSDateComponents().apply {
             setYear(localDateTime.year.toLong())
             setMonth(localDateTime.monthNumber.toLong())
@@ -37,7 +41,7 @@ class SchedulerImpl(
         val content = UNMutableNotificationContent().apply {
             setTitle("Reminder")
             setBody(taskTitle)
-            setUserInfo(mapOf("scheduleId" to scheduleId.toString(), "taskId" to taskId.toString()))
+            setUserInfo(mapOf("scheduleId" to scheduleId.value, "taskId" to taskId.value))
         }
 
         val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
@@ -87,8 +91,16 @@ class SchedulerImpl(
             }*/
     }
 
-  override fun cancelSchedule(scheduleId: Uuid) {
+/*  override fun cancelSchedule(scheduleId: Uuid) {
     TODO("Not yet implemented")
+  }*/
+
+  override fun cancelSchedule(scheduleId: Uuid) {
+    UNUserNotificationCenter.currentNotificationCenter()
+      .removePendingNotificationRequestsWithIdentifiers(
+        listOf(getScheduleWorkTag(scheduleId))
+      )
+    logger.i { "Cancelled notification with scheduleId= $scheduleId" }
   }
 
   /*    override fun scheduleReviewWorker(hour: Int, minute: Int) {

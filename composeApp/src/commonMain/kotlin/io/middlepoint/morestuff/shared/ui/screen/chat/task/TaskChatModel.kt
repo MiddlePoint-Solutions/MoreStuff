@@ -86,9 +86,10 @@ fun taskChatModel(
   LaunchedEffect(taskId) {
     getScopeByTaskIdUseCase(taskId).fold(
       { failure ->
-        logger.e { "Error loading scope for task: $failure" }
+        logger.e { "Error loading scope for task ${taskId.value}: $failure" }
       },
       { scopeDomain ->
+        logger.d { "✅ Scope loaded for task ${taskId.value}: id=${scopeDomain.id.value}, name=${scopeDomain.name}" }
         scope = scopeUiMapper.map(scopeDomain)
       }
     )
