@@ -226,9 +226,9 @@ kotlin {
   }
 }
 
-val projectVersionName = project.findProperty("buildConfig.versionName") as? String
+val projectVersionName = project.findProperty("app.morestuff.versionName") as? String
   ?: error("versionName undefined!")
-val projectVersionCode = (project.findProperty("buildConfig.versionCode") as? String)?.toInt()
+val projectVersionCode = (project.findProperty("app.morestuff.versionCode") as? String)?.toInt()
   ?: error("versionCode undefined!")
 
 buildConfig {
@@ -240,8 +240,11 @@ buildConfig {
 
   buildConfigField(
     name = "DEBUG",
-    value = provider { (property("buildConfig.debug") as String).toBoolean() }
+    value = provider { (property("app.morestuff.debug") as String).toBoolean() }
   )
+
+
+  // Supabase configs
 
   buildConfigField(
     name = "SUPABASE_URL",
@@ -256,6 +259,18 @@ buildConfig {
   buildConfigField(
     name = "GOOGLE_SERVER_CLIENT_ID",
     value = provider { localProperties.getProperty("GOOGLE_SERVER_CLIENT_ID") }
+  )
+
+  // Deeplinks
+
+  buildConfigField(
+    name = "APP_SCHEME",
+    value = provider { property("app.morestuff.scheme") as String }
+  )
+
+  buildConfigField(
+    name = "APP_HOST_LOGIN",
+    value = provider { property("app.morestuff.host.login") as String }
   )
 
 }

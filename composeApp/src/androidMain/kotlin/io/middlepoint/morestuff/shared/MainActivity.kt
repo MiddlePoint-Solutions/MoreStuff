@@ -16,6 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.handleDeeplinks
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import io.github.xxfast.decompose.router.LocalRouterContext
@@ -28,6 +30,7 @@ import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.App
+import org.koin.android.ext.android.get
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     val rootRouterContext: RouterContext = defaultRouterContext()
     val launchScreen = handleLaunchIntent(intent)
     FileKit.init(this)
+
+    val supabase = get<SupabaseClient>()
+    supabase.handleDeeplinks(intent)
 
     setContent {
       CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
@@ -55,8 +61,10 @@ class MainActivity : AppCompatActivity() {
 
         DisposableEffect(Unit) {
           val listener = Consumer<Intent> {
+            Logger.d("onNewIntent: $it")
+            supabase.handleDeeplinks(it)
             initialScreen = handleLaunchIntent(it)
-            Logger.d("onNewIntent: $initialScreen")
+            Logger.d("initialScreen: $initialScreen")
           }
           addOnNewIntentListener(listener)
           onDispose { removeOnNewIntentListener(listener) }
