@@ -9,6 +9,7 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.appleNativeLogin
 import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.postgrest.Postgrest
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.data.createDatabase
@@ -80,20 +81,24 @@ val dataModule = module {
 
 }
 
-@OptIn(SupabaseInternal::class)
 val supabaseModule = module {
   single {
     createSupabaseClient(
       supabaseUrl = BuildConfig.SUPABASE_URL,
       supabaseKey = BuildConfig.SUPABASE_KEY
     ) {
+      if(BuildConfig.DEBUG) {
+        defaultLogLevel = LogLevel.DEBUG
+      }
       install(Auth) {
         sessionManager = SettingsSessionManager(settings = get()) // TODO: use encrypted settings
         codeVerifierCache = SettingsCodeVerifierCache(settings = get()) // TODO: use encrypted settings
+        host = BuildConfig.APP_HOST_LOGIN
+        scheme = BuildConfig.APP_SCHEME
       }
       install(ComposeAuth) {
         googleNativeLogin(serverClientId = BuildConfig.GOOGLE_SERVER_CLIENT_ID)
-        appleNativeLogin() // TODO
+        appleNativeLogin()
       }
 
       install(Postgrest)

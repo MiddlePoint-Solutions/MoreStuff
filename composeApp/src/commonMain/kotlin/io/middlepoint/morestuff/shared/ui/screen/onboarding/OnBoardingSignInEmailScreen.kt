@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
@@ -46,11 +47,13 @@ import morestuff.composeapp.generated.resources.six_digit_code_label
 import morestuff.composeapp.generated.resources.verify
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun OnBoardingSignInEmailScreen(
   supabase: SupabaseClient = koinInject(),
-  onNext: () -> Unit
+  onNext: () -> Unit,
+  logger: Logger = koinInject { parametersOf("EmailSignIn") }
 ) {
   val scope = rememberCoroutineScope()
   val invalidEmailError = stringResource(Res.string.error_invalid_email)
@@ -71,6 +74,7 @@ fun OnBoardingSignInEmailScreen(
         }
         onSent()
       } catch (e: Exception) {
+        logger.e(e) { "Error sending otp to email" }
         emailError = when {
           e.message?.contains(
             "email_address_invalid",
@@ -104,6 +108,7 @@ fun OnBoardingSignInEmailScreen(
       }
     }
   }
+
   Box(
     modifier = Modifier
       .fillMaxSize()
