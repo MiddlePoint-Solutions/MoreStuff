@@ -1,44 +1,40 @@
 package io.middlepoint.morestuff.shared.ui.screen.onboarding
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
-import androidx.constraintlayout.compose.ConstraintLayout
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.providers.Apple
@@ -49,16 +45,11 @@ import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.middlepoint.morestuff.shared.Platform
-import io.middlepoint.morestuff.shared.platform
-import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.button_enable
 import morestuff.composeapp.generated.resources.button_skip
-import morestuff.composeapp.generated.resources.notification_permission_rationale
-import morestuff.composeapp.generated.resources.onboarding_signin_subtitle
-import morestuff.composeapp.generated.resources.onboarding_signin_title
+import morestuff.composeapp.generated.resources.ms_sign_in
 import morestuff.composeapp.generated.resources.sign_in_with_email
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -100,9 +91,7 @@ fun OnBoardingSignInScreen(
   )
 }
 
-@OptIn(
-  ExperimentalMaterial3Api::class, AuthUiExperimental::class
-)
+@OptIn(AuthUiExperimental::class)
 @Composable
 fun OnBoardingSignInContent(
   signInWithGoogle: () -> Unit,
@@ -110,128 +99,151 @@ fun OnBoardingSignInContent(
   onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
 ) {
-  var showRationaleDialog by remember { mutableStateOf(false) }
-  var checkPermission by remember { mutableStateOf(false) }
-  val showAppleSignIn by remember { derivedStateOf { platform == Platform.iOS } }
-  val scope = rememberCoroutineScope()
-
-  if (showRationaleDialog) {
-    BasicAlertDialog(
-      onDismissRequest = { showRationaleDialog = false },
-      properties = DialogProperties(
-        dismissOnBackPress = false,
-        dismissOnClickOutside = false
-      )
-    ) {
-      Card {
-        Text(
-          text = stringResource(Res.string.notification_permission_rationale),
-          modifier = Modifier.padding(10.dp)
-        )
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.End
-        ) {
-          TextButton(onClick = {
-            scope.launch { }
-            showRationaleDialog = false
-            checkPermission = true
-          }) {
-            Text(text = stringResource(Res.string.button_enable))
-          }
-          TextButton(onClick = {
-            scope.launch { onNext() }
-            showRationaleDialog = false
-          }) {
-            Text(text = stringResource(Res.string.button_skip))
-          }
-        }
-      }
-    }
-  }
+  val gradientBrush = Brush.linearGradient(
+    colors = listOf(Color(0xFF4C65FD), Color(0xFF4338D8)),
+    start = Offset(0f, 0f),
+    end = Offset(0f, Float.POSITIVE_INFINITY)
+  )
 
   Box(
     modifier = Modifier
-      .windowInsetsPadding(WindowInsets.safeContent)
       .fillMaxSize()
+      .background(gradientBrush)
+      .padding(horizontal = 10.dp)
   ) {
-    ConstraintLayout(
-      modifier = Modifier.fillMaxSize(),
-    ) {
-      val (image, title, subtitle) = createRefs()
-
-      Text(
-        text = stringResource(Res.string.onboarding_signin_title),
-        modifier = Modifier
-          .fillMaxWidth()
-          .constrainAs(title) { top.linkTo(parent.top, margin = 40.dp) },
-        style = MaterialTheme.typography.headlineMedium.copy(
-          fontSize = 40.sp,
-          lineHeight = 44.sp,
-          fontWeight = FontWeight.Black,
-          textAlign = TextAlign.Center
-        ),
-        color = MaterialTheme.colorScheme.primary,
-      )
-      Text(
-        text = stringResource(Res.string.onboarding_signin_subtitle),
-        modifier = Modifier
-          .fillMaxWidth()
-          .constrainAs(subtitle) { top.linkTo(title.bottom, margin = 20.dp) },
-        style = MaterialTheme.typography.headlineSmall,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.secondary,
-      )
-    }
-
     Column(
       modifier = Modifier
-        .align(Alignment.BottomCenter)
-        .padding(bottom = 40.dp),
-      horizontalAlignment = Alignment.CenterHorizontally,
+        .fillMaxSize(),
+      verticalArrangement = Arrangement.SpaceBetween,
+      horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      OutlinedButton(
-        onClick = signInWithGoogle,
-        content = { ProviderButtonContent(Google) }
-      )
+      Spacer(modifier = Modifier.height(40.dp))
 
-      if (showAppleSignIn) {
+      Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Icon(
+          painter = painterResource(Res.drawable.ms_sign_in),
+          tint = Color.Unspecified,
+          contentDescription = "signIn",
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+          text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+              append("Organize & prioritize")
+            }
+            append("\n")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+              append("your stuff")
+            }
+          },
+          style = MaterialTheme.typography.headlineMedium.copy(
+            color = Color.White
+          ),
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth()
+        )
+      }
+
+      Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        OutlinedButton(
+          onClick = signInWithGoogle,
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+          content = { ProviderButtonContent(Google, text = "Continue with Google") },
+          colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFF393AC5)
+          ),
+          border = null,
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         OutlinedButton(
           onClick = signInWithApple,
-          content = { ProviderButtonContent(Apple) }
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+          content = { ProviderButtonContent(Apple, text = "Sign in with Apple") },
+          colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFF393AC5)
+          ),
+          border = null,
         )
-      }
 
-      OutlinedButton(
-        onClick = onSignInWithEmail
-      ) {
-        Icon(
-          imageVector = Icons.Default.Email,
-          contentDescription = stringResource(Res.string.sign_in_with_email),
-          modifier = Modifier.padding(end = 8.dp)
-        )
-        Text(stringResource(Res.string.sign_in_with_email))
-      }
+        Spacer(modifier = Modifier.height(16.dp))
 
-      Spacer(modifier = Modifier.padding(10.dp))
-
-      TextButton(
-        onClick = { onNext() },
-        modifier = Modifier
-          .width(187.dp)
-          .height(43.dp),
-        content = {
-          Text(
-            text = stringResource(Res.string.button_skip),
-            style = TextStyle(
-              fontSize = 16.sp,
-              lineHeight = 28.sp,
-              fontWeight = FontWeight(700),
-              color = MaterialTheme.colorScheme.secondary,
+        Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+          OutlinedButton(
+            onClick = onSignInWithEmail,
+            colors = ButtonDefaults.outlinedButtonColors(
+              contentColor = Color.White,
+              containerColor = Color(0xFF393AC5)
+            ),
+            border = null,
+            modifier = Modifier
+              .weight(1f)
+              .height(56.dp),
+          ) {
+            Icon(
+              imageVector = Icons.Default.Email,
+              contentDescription = stringResource(Res.string.sign_in_with_email),
+              modifier = Modifier.padding(end = 8.dp)
             )
-          )
+            Text(stringResource(Res.string.sign_in_with_email),fontSize = 12.sp)
+          }
+
+          Spacer(modifier = Modifier.width(16.dp))
+
+          OutlinedButton(
+            onClick = { /* TODO: wallet */ },
+            colors = ButtonDefaults.outlinedButtonColors(
+              contentColor = Color.White,
+              containerColor = Color(0xFF393AC5)
+            ),
+            border = null,
+            modifier = Modifier
+              .weight(1f)
+              .height(56.dp),
+          ) {
+            Icon(
+              imageVector = Icons.Default.CurrencyBitcoin,
+              contentDescription = "Wallet",
+              modifier = Modifier.padding(end = 8.dp)
+            )
+            Text("Connect wallet", fontSize = 12.sp)
+          }
         }
-      )
+        Spacer(modifier = Modifier.height(34.dp))
+
+
+       // Box(modifier = Modifier.height(43.dp)) {}
+        TextButton(
+          onClick = onNext,
+          modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .height(43.dp),
+          content = {
+            Text(
+              text = stringResource(Res.string.button_skip),
+              style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+              )
+            )
+          }
+        )
+      }
     }
   }
 }
+
