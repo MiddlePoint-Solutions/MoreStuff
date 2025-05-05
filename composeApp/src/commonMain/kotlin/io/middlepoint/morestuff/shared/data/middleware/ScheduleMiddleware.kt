@@ -1,9 +1,12 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CancelActiveScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CancelScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.CreateReminderScheduleAction
@@ -31,95 +34,143 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class ScheduleMiddleware(
-    private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
-    private val scheduleWorkUseCase: ScheduleWorkUseCase,
-    private val getScheduleUseCase: GetScheduleUseCase,
-    private val createScheduleUseCase: CreateScheduleUseCase,
-    private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
-    private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
-    private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
-    private val getTaskUseCase: GetTaskUseCase
+  private val scheduleAtTimeUseCase: ScheduleAtTimeUseCase,
+  private val scheduleWorkUseCase: ScheduleWorkUseCase,
+  private val getScheduleUseCase: GetScheduleUseCase,
+  private val createScheduleUseCase: CreateScheduleUseCase,
+  private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
+  private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
+  private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
+  private val getTaskUseCase: GetTaskUseCase
 ) : Middleware<AppState> {
 
-    val timeManager: TimeManager = TimeManagerImpl()
+  val timeManager: TimeManager = TimeManagerImpl()
 
-    override fun invoke(
-        state: AppState,
-        action: Action,
-        dispatch: Dispatch,
-        next: Next<AppState>,
-        scope: CoroutineScope,
-    ): Action {
-        when (action) {
+  override fun invoke(
+    state: AppState,
+    action: Action,
+    dispatch: Dispatch,
+    next: Next<AppState>,
+    scope: CoroutineScope,
+  ): Action {
+    when (action) {
 
-            is SettingAction.InitSettings -> scope.launch {
-                scheduleWorkUseCase(/*action.settings*/)
-            }
+      is SettingAction.InitSettings -> scope.launch {
+        scheduleWorkUseCase(/*action.settings*/)
+      }
 
-            is TaskAction.TaskCreatedAction -> scope.launch {
-                with(action) {
-                    createOneTimeScheduleUseCase(task.id, priority).map {
-                        dispatch(ScheduleCreatedAction(it, task))
-                    }
-                }
-            }
-
-            is TaskAction.CompleteTasksAction -> scope.launch {
-                if (action.complete) {
-                    dispatch(CancelScheduleAction(action.taskIds))
-                }
-            }
-
-            is RescheduleTaskAction -> scope.launch {
-                with(action) {
-                    getTaskUseCase(taskId).map { task ->
-                        createScheduleUseCase(taskId, scheduleType, localDateTime).map { schedule ->
-                            dispatch(ScheduleCreatedAction(schedule, task))
-                        }
-                    }
-                }
-            }
-
-            is CancelActiveScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.OneTime))
-            }
-
-            is ScheduleCreatedAction -> {
-                scope.launch {
-                    action.schedule.scheduledAt.let { time ->
-                        scheduleAtTimeUseCase(action.schedule.id, time, action.task.title, action.task.id)
-                    }
-                }
-            }
-
-            is ExecuteScheduleAction -> scope.launch {
-                getScheduleUseCase(action.scheduleId).map { schedule ->
-                    if (schedule.active) {
-                        setScheduleFulfilledUseCase(schedule.id)
-                        dispatch(MessageAction.CreateScheduleMessageAction(schedule.id))
-                    }
-                }
-            }
-
-            is ToggleReminderScheduleAction -> scope.launch {
-               /* toggleQuickReminderUseCase(action.taskId).map { //TODO: fix this later
-                    dispatch(ScheduleCreatedAction(it))
-                }*/
-            }
-
-            is CreateReminderScheduleAction -> scope.launch {
-               /* createReminderUseCase(action.taskId).map { //TODO: fix this later
-                    dispatch(ScheduleCreatedAction(it))
-                }*/
-            }
-
-            is CancelScheduleAction -> scope.launch {
-                cancelActiveScheduleUseCase(action.taskIds, action.scheduleType)
-            }
-
-            else -> NoOp
+      is TaskAction.TaskCreatedAction -> scope.launch {
+        with(action) {
+          createOneTimeScheduleUseCase(task.id, priority).map {
+            dispatch(ScheduleCreatedAction(it, task))
+          }
         }
+      }
 
-        return next(state, action, dispatch)
+      is TaskAction.CompleteTasksAction -> scope.launch {
+        if (action.complete) {
+          dispatch(CancelScheduleAction(action.taskIds))
+        }
+      }
+
+      is RescheduleTaskAction -> scope.launch {
+        with(action) {
+          getTaskUseCase(taskId).map { task ->
+            createScheduleUseCase(taskId, scheduleType, localDateTime).map { schedule ->
+              dispatch(ScheduleCreatedAction(schedule, task))
+            }
+          }
+        }
+      }
+
+      is CancelActiveScheduleAction -> scope.launch {
+        cancelActiveScheduleUseCase(listOf(action.taskId), listOf(ScheduleType.OneTime))
+      }
+
+      is ScheduleAction.ScheduleReplyAction -> {
+        scheduleUserReply(scope, action.scheduleId, action.replyType, dispatch)
+      }
+
+      is ScheduleCreatedAction -> {
+        scope.launch {
+          action.schedule.scheduledAt.let { time ->
+            scheduleAtTimeUseCase(action.schedule.id, time, action.task.title, action.task.id)
+          }
+        }
+      }
+
+      is ExecuteScheduleAction -> scope.launch {
+        getScheduleUseCase(action.scheduleId).map { schedule ->
+          if (schedule.active) {
+            setScheduleFulfilledUseCase(schedule.id)
+            dispatch(MessageAction.CreateScheduleMessageAction(schedule.id))
+          }
+        }
+      }
+
+      is ToggleReminderScheduleAction -> scope.launch {
+        /* toggleQuickReminderUseCase(action.taskId).map { //TODO: fix this later
+             dispatch(ScheduleCreatedAction(it))
+         }*/
+      }
+
+      is CreateReminderScheduleAction -> scope.launch {
+        /* createReminderUseCase(action.taskId).map { //TODO: fix this later
+             dispatch(ScheduleCreatedAction(it))
+         }*/
+      }
+
+      is CancelScheduleAction -> scope.launch {
+        cancelActiveScheduleUseCase(action.taskIds, action.scheduleType)
+      }
+
+      else -> NoOp
     }
+
+    return next(state, action, dispatch)
+  }
+
+  // TODO: create use-case for this action - this would mean creating a
+  private fun scheduleUserReply(
+    scope: CoroutineScope,
+    scheduleId: Uuid,
+    replyType: ReplyType,
+    dispatch: Dispatch
+  ) {
+    scope.launch {
+      getScheduleUseCase(scheduleId).onRight { schedule ->
+        when (replyType) {
+          ReplyType.LATER -> {}
+          ReplyType.TOMORROW -> {
+            val tomorrowTime = timeManager.tomorrowLocalDateTime(12)
+            dispatch(
+              RescheduleTaskAction(
+                schedule.taskId,
+                schedule.scheduleType,
+                tomorrowTime
+              )
+            )
+          }
+
+          ReplyType.SNOOZE -> {
+            val snoozeTime =
+              timeManager.todayLocalDateTimeByAdding(hour = 1, minute = 0)
+            dispatch(
+              RescheduleTaskAction(
+                schedule.taskId,
+                schedule.scheduleType,
+                snoozeTime
+              )
+            )
+          }
+
+          ReplyType.DONE -> {
+            dispatch(
+              TaskAction.CompleteTasksAction(listOf(schedule.taskId), true)
+            )
+          }
+        }
+      }
+    }
+  }
 }

@@ -49,6 +49,7 @@ class AuthMiddleware(
 
   private fun initAuthEvents(scope: CoroutineScope, dispatch: Dispatch) {
     eventsJob = scope.launch {
+      supabase.auth.currentSessionOrNull()
       supabase.auth.sessionStatus.collect {
         when (it) {
           is SessionStatus.Authenticated -> {

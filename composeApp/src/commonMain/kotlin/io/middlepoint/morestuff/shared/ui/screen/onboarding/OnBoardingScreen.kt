@@ -31,7 +31,7 @@ fun OnBoardingScreen(
           add(NotificationPermission)
         }
 //        add(SignIn)
-        add(SignInEmail)
+//        add(SignInEmail)
         add(Ready)
       },
       selectedIndex = 0

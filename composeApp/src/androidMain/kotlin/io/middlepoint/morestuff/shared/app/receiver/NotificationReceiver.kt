@@ -7,7 +7,6 @@ import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
-import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
 import kotlinx.coroutines.Dispatchers
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
@@ -32,7 +31,12 @@ class NotificationReceiver : BroadcastReceiver(), KoinComponent {
         intent.getReplyIntentExtras()?.let {
             goAsync(Dispatchers.Default) {
                 val store: AppStore = get()
-                store.dispatchSuspend(ReminderAction.UserResponseAction(Uuid(it.scheduleId), it.type))
+                store.dispatchSuspend(
+                    NotificationAction.UserResponseAction(
+                        Uuid(it.scheduleId),
+                        it.type
+                    )
+                )
             }
         } ?: Logger.w("!!! Notification Reply missing extras !!!")
     }
