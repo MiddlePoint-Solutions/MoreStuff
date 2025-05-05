@@ -8,7 +8,7 @@ data class AppState(
   val userState: UserState = UserState(),
   val syncState: SyncState = SyncState(),
   val settings: AppSettingsState = AppSettingsState(),
-  val aiMessageLoading: Map<Uuid, Boolean> = emptyMap()
+  val aiMessageState: AiMessageState = AiMessageState(),
 )
 
 fun AppState.isReady() =

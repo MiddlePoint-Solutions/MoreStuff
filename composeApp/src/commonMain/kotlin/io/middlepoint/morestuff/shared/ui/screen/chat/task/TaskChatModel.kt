@@ -63,7 +63,7 @@ fun taskChatModel(
   var isAIEnabled by remember { mutableStateOf(initialState.isAIEnabled) }
 
   val isAILoading by store.state
-    .map { it.aiMessageLoading[taskId] ?: false }
+    .map { it.aiMessageState.loadingMap[taskId] ?: false }
     .collectAsState(initial = false)
 
 
