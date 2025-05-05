@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.utils.toDayStartUtcTimeMillis
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
@@ -15,7 +14,7 @@ import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.isOneTime
 import io.middlepoint.morestuff.shared.domain.model.core.isReminder
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
@@ -139,7 +138,7 @@ fun taskDetailsModel(
 
         is TaskDetailsEvent.ScheduleResponse -> {
           store.dispatch(
-            ReminderAction.UserResponseAction(
+            NotificationAction.UserResponseAction(
               event.scheduleId,
               event.replyType
             )

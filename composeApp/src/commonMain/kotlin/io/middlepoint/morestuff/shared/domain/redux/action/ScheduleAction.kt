@@ -26,4 +26,9 @@ sealed class ScheduleAction : Action.FeatureAction() {
 
     internal data class ScheduleCreatedAction(val schedule: Schedule, val task: Task) : ScheduleAction()
 
+  internal data class ScheduleReplyAction(
+    val scheduleId: Uuid,
+    val replyType: ReplyType,
+  ) : ScheduleAction()
+
 }

@@ -2,10 +2,11 @@ package io.middlepoint.morestuff.shared.data.middleware
 
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.*
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.RemoveScheduleNotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReminderNotificationAction
-import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReviewNotification
-import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
@@ -42,8 +43,9 @@ class NotificationMiddleware(
                 notifier.clearScheduleNotification(action.scheduleId)
             }
 
-            is ReminderAction.UserResponseAction -> {
-                notifier.clearScheduleNotification(action.scheduleId)
+            is UserResponseAction -> with(action) {
+                notifier.clearScheduleNotification(scheduleId)
+                dispatch(ScheduleAction.ScheduleReplyAction(scheduleId, replyType))
             }
 
             is TaskAction.CompleteTasksAction -> {

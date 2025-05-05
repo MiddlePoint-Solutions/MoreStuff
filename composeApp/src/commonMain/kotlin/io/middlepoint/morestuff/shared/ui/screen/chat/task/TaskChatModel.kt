@@ -15,7 +15,7 @@ import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
-import io.middlepoint.morestuff.shared.domain.redux.action.ReminderAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskMessagesFlowUseCase
@@ -161,7 +161,7 @@ fun taskChatModel(
           }
 
           is ScheduleResponse -> {
-            store.dispatch(ReminderAction.UserResponseAction(scheduleId, replyType))
+            store.dispatch(NotificationAction.UserResponseAction(scheduleId, replyType))
           }
 
           is ShareDocument -> {
