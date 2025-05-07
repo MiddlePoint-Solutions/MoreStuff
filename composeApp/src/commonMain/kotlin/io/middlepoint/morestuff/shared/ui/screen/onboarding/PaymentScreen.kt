@@ -52,7 +52,7 @@ fun PaymentScreen() {
   val onSurface = Color(0xFF1B1B21)
   val surfaceVariant = Color(0xFF46464F)
   val gradientBrush = Brush.linearGradient(
-    colors = listOf(Color(0xFF4C65FD), Color(0xFFB83EF0)),
+    colors = listOf(Color(0x574C65FD), Color(0x57B83EF0)),
     start = Offset(0f, 0f),
     end = Offset(0f, Float.POSITIVE_INFINITY)
   )
@@ -256,7 +256,7 @@ fun PaymentOptionCard(
   description: String,
   onClick: () -> Unit,
   background: Any,
-  border: BorderStroke = BorderStroke(0.dp, Color.Transparent),
+  border: BorderStroke = BorderStroke(0.dp, MaterialTheme.colorScheme.outline),
   elevation: Dp = 4.dp,
   showSaveTag: Boolean = false,
 ) {
@@ -307,7 +307,7 @@ fun PaymentOptionCard(
       modifier = Modifier
         .width(180.dp)
         .height(150.dp)
-        .shadow(elevation, shape, clip = false)
+        //.shadow(elevation, shape)
         .then(bgModifier)
         .clip(shape)
         .border(border.width, border.brush, shape)
