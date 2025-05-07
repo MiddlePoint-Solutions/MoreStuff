@@ -27,13 +27,14 @@ fun OnBoardingScreen(
   val navigation = rememberRouter {
     Pages(
       items = buildList {
-        add(OnBoarding.Payment)
+        add(SignIn)
+        //add(OnBoarding.Payment)
         add(Welcome)
         add(ChatWithYourTasks)
         if (requiresNotificationsPermission()) {
           add(NotificationPermission)
         }
-        add(SignIn)
+        //add(SignIn)
         add(SignInEmail)
         add(Ready)
       },
@@ -68,7 +69,7 @@ fun OnBoardingScreen(
 
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
       ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
-      OnBoarding.Payment -> PaymentScreen()
+      //OnBoarding.Payment -> PaymentScreen()
 
     }
   }

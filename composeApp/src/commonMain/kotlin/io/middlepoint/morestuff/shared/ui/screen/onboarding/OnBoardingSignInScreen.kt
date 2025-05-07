@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -45,6 +43,8 @@ import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.middlepoint.morestuff.shared.Platform
+import io.middlepoint.morestuff.shared.platform
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.ms_sign_in
@@ -91,6 +91,7 @@ fun OnBoardingSignInScreen(
   )
 }
 
+
 @OptIn(AuthUiExperimental::class)
 @Composable
 fun OnBoardingSignInContent(
@@ -112,70 +113,69 @@ fun OnBoardingSignInContent(
       .padding(horizontal = 10.dp)
   ) {
     Column(
-      modifier = Modifier
-        .fillMaxSize(),
+      modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.SpaceBetween,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      Spacer(modifier = Modifier.height(40.dp))
+      Spacer(modifier = Modifier.weight(1f))
 
+      Icon(
+        painter = painterResource(Res.drawable.ms_sign_in),
+        tint = Color.Unspecified,
+        contentDescription = "signIn",
+      )
+
+      Spacer(modifier = Modifier.height(32.dp))
+
+      Text(
+        text = buildAnnotatedString {
+          withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = 24.sp)) {
+            append("Organize & prioritize")
+          }
+          append("\n")
+          withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontSize = 24.sp)) {
+            append("your stuff")
+          }
+        },
+        style = MaterialTheme.typography.headlineMedium.copy(
+          color = Color.White
+        ),
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+      )
+      Spacer(modifier = Modifier.weight(1f))
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Icon(
-          painter = painterResource(Res.drawable.ms_sign_in),
-          tint = Color.Unspecified,
-          contentDescription = "signIn",
-        )
+        if (platform == Platform.Android) {
+          OutlinedButton(
+            onClick = signInWithGoogle,
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(56.dp),
+            content = { ProviderButtonContent(Google, text = "Continue with Google") },
+            colors = ButtonDefaults.outlinedButtonColors(
+              contentColor = Color.White,
+              containerColor = Color(0xFF393AC5)
+            ),
+            border = null,
+          )
+          Spacer(modifier = Modifier.height(16.dp))
+        }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-          text = buildAnnotatedString {
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-              append("Organize & prioritize")
-            }
-            append("\n")
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
-              append("your stuff")
-            }
-          },
-          style = MaterialTheme.typography.headlineMedium.copy(
-            color = Color.White
-          ),
-          textAlign = TextAlign.Center,
-          modifier = Modifier.fillMaxWidth()
-        )
-      }
-
-      Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        OutlinedButton(
-          onClick = signInWithGoogle,
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-          content = { ProviderButtonContent(Google, text = "Continue with Google") },
-          colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.White,
-            containerColor = Color(0xFF393AC5)
-          ),
-          border = null,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedButton(
-          onClick = signInWithApple,
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-          content = { ProviderButtonContent(Apple, text = "Sign in with Apple") },
-          colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.White,
-            containerColor = Color(0xFF393AC5)
-          ),
-          border = null,
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        if (platform == Platform.iOS) {
+          OutlinedButton(
+            onClick = signInWithApple,
+            modifier = Modifier
+              .fillMaxWidth()
+              .height(56.dp),
+            content = { ProviderButtonContent(Apple, text = "Sign in with Apple") },
+            colors = ButtonDefaults.outlinedButtonColors(
+              contentColor = Color.White,
+              containerColor = Color(0xFF393AC5)
+            ),
+            border = null,
+          )
+          Spacer(modifier = Modifier.height(16.dp))
+        }
 
         Row(
           modifier = Modifier.fillMaxWidth(),
@@ -197,34 +197,12 @@ fun OnBoardingSignInContent(
               contentDescription = stringResource(Res.string.sign_in_with_email),
               modifier = Modifier.padding(end = 8.dp)
             )
-            Text(stringResource(Res.string.sign_in_with_email),fontSize = 12.sp)
-          }
-
-          Spacer(modifier = Modifier.width(16.dp))
-
-          OutlinedButton(
-            onClick = { /* TODO: wallet */ },
-            colors = ButtonDefaults.outlinedButtonColors(
-              contentColor = Color.White,
-              containerColor = Color(0xFF393AC5)
-            ),
-            border = null,
-            modifier = Modifier
-              .weight(1f)
-              .height(56.dp),
-          ) {
-            Icon(
-              imageVector = Icons.Default.CurrencyBitcoin,
-              contentDescription = "Wallet",
-              modifier = Modifier.padding(end = 8.dp)
-            )
-            Text("Connect wallet", fontSize = 12.sp)
+            Text(stringResource(Res.string.sign_in_with_email), fontSize = 12.sp)
           }
         }
+
         Spacer(modifier = Modifier.height(34.dp))
 
-
-       // Box(modifier = Modifier.height(43.dp)) {}
         TextButton(
           onClick = onNext,
           modifier = Modifier
@@ -243,6 +221,7 @@ fun OnBoardingSignInContent(
           }
         )
       }
+      Spacer(modifier = Modifier.weight(0.2f))
     }
   }
 }
