@@ -296,6 +296,9 @@
     <string name="edit_message">Edit message</string>
     <string name="task_schedule_deletion_warning_singular">This task has a schedule that will also be deleted.</string>
     <string name="task_schedule_deletion_warning_plural">Some of these tasks have schedules that will also be deleted.</string>
+    <string name="api_key_title">API Key</string>
+    <string name="api_key_label">Enter API Key</string>
+    <string name="api_key_not_set">Not set</string>
 
 
     <string name="sign_in_with_email">Sign in with Email</string>
@@ -307,4 +310,5 @@
     <string name="verify">Verify</string>
     <string name="error_invalid_email">The email address is invalid or does not exist.</string>
     <string name="error_generic">An error occurred. Please try again.</string>
+    <string name="chat_whit_ai">Chat with MoreStuff AI.</string>
 </resources>

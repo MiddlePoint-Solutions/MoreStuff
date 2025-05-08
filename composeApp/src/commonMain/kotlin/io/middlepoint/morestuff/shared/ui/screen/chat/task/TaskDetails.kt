@@ -119,7 +119,7 @@ fun TaskDetails(
       modifier = Modifier
         .padding(bottom = 18.dp)
         .animateContentSize(),
-      color = MaterialTheme.colorScheme.surfaceContainerHighest
+      color = MaterialTheme.colorScheme.surfaceContainerHigh
     ) {
       Box(
         modifier = Modifier

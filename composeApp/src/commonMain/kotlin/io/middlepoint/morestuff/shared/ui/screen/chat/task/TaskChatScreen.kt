@@ -1,6 +1,9 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -121,11 +124,14 @@ import morestuff.composeapp.generated.resources.complete
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.edit_message
+import morestuff.composeapp.generated.resources.ic_ai_disabled
+import morestuff.composeapp.generated.resources.ic_ai_enabled
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -163,6 +169,7 @@ fun TaskChatScreen(
       is TaskChat -> {
 
         val model by viewModel.models.collectAsState()
+        val isAiEnabled = model.isAIEnabled
 
         val chatActions = remember {
           ChatActions(
@@ -202,14 +209,18 @@ fun TaskChatScreen(
           chatActions = chatActions,
           modifier = modifier,
           onBack = onBack,
-          sendTaskMessage = { viewModel.take(InputText(it)) },
+          sendTaskMessage = {
+            viewModel.take(InputText(it))
+            if (isAiEnabled) viewModel.take(TaskChatEvent.CreateAIMessage(it))
+          },
           imagePicked = { scope.launch { router.push(ImageImport(it)) } },
           pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
           onCreateNewScope = { title ->
             viewModel.take(TaskChatEvent.CreateNewScopeForTask(title))
             navigation.pop()
           },
-          navigateToCreateScope = navigateToCreateScope
+          navigateToCreateScope = navigateToCreateScope,
+          isAIEnabled = isAiEnabled
         )
       }
 
@@ -251,6 +262,7 @@ private fun TaskChatContent(
   logger: Logger = koinInject(),
   onCreateNewScope: (String) -> Unit = {},
   navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = {},
+  isAIEnabled: Boolean = false
 ) {
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
@@ -267,6 +279,7 @@ private fun TaskChatContent(
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
   val allScopes = model.allScopes
+  val isAILoading = model.isAILoading
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -329,6 +342,16 @@ private fun TaskChatContent(
     }
   }
 
+  val aiMessages = remember(messages) {
+    messages.filter { it.contentType == ContentType.AI_TASK_MESSAGE }
+  }
+
+  LaunchedEffect(aiMessages) {
+    logger.d { "AI Messages: ${aiMessages.size}" }
+    aiMessages.forEach { message ->
+      logger.d { "AI Message: id=${message.id}, content='${message.content}'" }
+    }
+  }
 
   val scopeName = scope.name
 
@@ -369,8 +392,8 @@ private fun TaskChatContent(
           modifier = modifier.weight(1f),
           scrollState = scrollState,
           contentPadding = contentPadding,
+          isAILoading = isAILoading,
         )
-
         AnimatedVisibility(
           visible = !task.isComplete,
           modifier = Modifier.background(Color.Transparent)
@@ -406,6 +429,8 @@ private fun TaskChatContent(
               onUpdateMessage = { content ->
                 onEvent(TaskChatEvent.UpdateMessageContent(content))
               },
+              isAIEnabled = isAIEnabled,
+              onToggleAI = { onEvent(TaskChatEvent.ActivateAI) },
               modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent),
@@ -475,7 +500,9 @@ private fun TaskChatInput(
   editingMessageId: Uuid? = null,
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
-  onUpdateMessage: (String) -> Unit = {}
+  onUpdateMessage: (String) -> Unit = {},
+  isAIEnabled: Boolean = false,
+  onToggleAI: () -> Unit = {}
 ) {
   val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
@@ -521,6 +548,7 @@ private fun TaskChatInput(
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
+            isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
@@ -531,6 +559,28 @@ private fun TaskChatInput(
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.focusRequester(focusRequester),
+            leadingContent = {
+              IconButton(
+                onClick = onToggleAI,
+              ) {
+                Crossfade(
+                  targetState = isAIEnabled,
+                  animationSpec = tween(
+                    durationMillis = 300,
+                    easing = FastOutSlowInEasing
+                  )
+                ) { aiEnabled ->
+                  Icon(
+                    painter = if (aiEnabled)
+                      painterResource(Res.drawable.ic_ai_enabled)
+                    else
+                      painterResource(Res.drawable.ic_ai_disabled),
+                    contentDescription = "Toggle AI",
+                    tint = Color.Unspecified
+                  )
+                }
+              }
+            },
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -758,7 +808,7 @@ private fun TaskTopAppBar(
 
       },
       colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
       )
     )
   }

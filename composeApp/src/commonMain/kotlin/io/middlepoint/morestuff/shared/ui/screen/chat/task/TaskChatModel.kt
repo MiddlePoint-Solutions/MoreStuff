@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,6 +60,12 @@ fun taskChatModel(
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
   var allScopes by remember { mutableStateOf(initialState.allScopes) }
+  var isAIEnabled by remember { mutableStateOf(initialState.isAIEnabled) }
+
+  val isAILoading by store.state
+    .map { it.aiMessageState.loadingMap[taskId] ?: false }
+    .collectAsState(initial = false)
+
 
   fun updateScopeAfterMove(scopeId: Uuid) {
     val newScope = allScopes.find { it.id == scopeId }
@@ -79,9 +86,10 @@ fun taskChatModel(
   LaunchedEffect(taskId) {
     getScopeByTaskIdUseCase(taskId).fold(
       { failure ->
-        logger.e { "Error loading scope for task: $failure" }
+        logger.e { "Error loading scope for task ${taskId.value}: $failure" }
       },
       { scopeDomain ->
+        logger.d { "✅ Scope loaded for task ${taskId.value}: id=${scopeDomain.id.value}, name=${scopeDomain.name}" }
         scope = scopeUiMapper.map(scopeDomain)
       }
     )
@@ -128,11 +136,22 @@ fun taskChatModel(
             )
           }
 
-          is InputText -> {
+          /*is InputText -> {
             store.dispatch(
               MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
             )
-          }
+            store.dispatch(
+              MessageAction.CreateAITaskMessageAction(taskId, content.trim())
+            )
+
+
+          }*/
+
+            is InputText -> {
+              store.dispatch(
+                MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
+              )
+            }
 
           is OpenDocument -> {
             mediaHandler.openPDF(path)
@@ -232,6 +251,17 @@ fun taskChatModel(
               logger.d { "Task moved to new scope: ${newScope.name}" }
             }
           }
+
+          is CreateAIMessage -> {
+            store.dispatch(
+              MessageAction.CreateAITaskMessageAction(taskId, prompt)
+            )
+          }
+
+          is ActivateAI -> {
+            isAIEnabled = !isAIEnabled
+            logger.d { "AI ${if (isAIEnabled) "enabled" else "disabled"} for task: $taskId" }
+          }
         }
       }
     }
@@ -243,6 +273,8 @@ fun taskChatModel(
     messages = messages,
     editingMessageId = editingMessageId,
     editingMessageContent = editingMessageContent,
-    allScopes = allScopes
+    allScopes = allScopes,
+    isAIEnabled = isAIEnabled,
+    isAILoading = isAILoading,
   )
 }

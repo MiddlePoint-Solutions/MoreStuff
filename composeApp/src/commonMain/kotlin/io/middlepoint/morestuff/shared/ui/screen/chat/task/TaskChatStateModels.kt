@@ -17,6 +17,8 @@ data class TaskChatState(
   val editingMessageId: Uuid? = null,
   val editingMessageContent: String = "",
   val allScopes: List<Scope> = listOf(),
+  val isAIEnabled: Boolean = false,
+  val isAILoading: Boolean = false,
 )
 
 @Immutable
@@ -39,4 +41,6 @@ sealed class TaskChatEvent {
   data class CreateTaskCompletionMessage(val content: String) : TaskChatEvent()
   data class MoveTaskToScope(val scopeId: Uuid) : TaskChatEvent()
   data class CreateNewScopeForTask(val title: String) : TaskChatEvent()
+  data object ActivateAI : TaskChatEvent()
+  data class CreateAIMessage(val prompt: String) : TaskChatEvent()
 }

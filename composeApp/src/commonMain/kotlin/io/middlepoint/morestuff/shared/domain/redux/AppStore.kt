@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.redux
 
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
+import io.middlepoint.morestuff.shared.domain.redux.state.reduceAiMessageState
 import io.middlepoint.morestuff.shared.domain.redux.state.reduceSettingState
 import io.middlepoint.morestuff.shared.domain.redux.state.reduceSyncState
 import io.middlepoint.morestuff.shared.domain.redux.state.reduceUserState
@@ -12,6 +13,7 @@ class AppStore(provider: MiddlewareProvider<AppState>) : SimpleStore<AppState>(
     AppState::reduceUserState,
     AppState::reduceSyncState,
     AppState::reduceSettingState,
+    AppState::reduceAiMessageState
   ),
   middleware = provider.middlewareOrder
 )

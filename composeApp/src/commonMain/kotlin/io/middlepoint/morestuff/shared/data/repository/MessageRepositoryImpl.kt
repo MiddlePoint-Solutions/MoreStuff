@@ -44,14 +44,14 @@ class MessageRepositoryImpl(
   override fun getTaskChatMessages(taskId: Uuid): List<Message> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
-      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
+      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).executeAsList()
 
   override fun getTaskChatMessagesFlow(taskId: Uuid): Flow<List<Message>> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
-      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value),
+      listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
     ).asFlow().mapToList(Dispatchers.IO)
 

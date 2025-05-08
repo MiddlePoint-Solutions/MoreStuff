@@ -23,6 +23,14 @@ import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateImageUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateImageUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.ia.StreamChatCompletionUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.ia.StreamChatCompletionUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.CheckForUrlMetadataUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.message.CheckForUrlMetadataUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.message.CreateMediaMessageUseCase
@@ -101,12 +109,18 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopesOrderUse
 import io.middlepoint.morestuff.shared.domain.usecase.scope.UpdateScopesOrderUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.CheckFirstTimeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.CheckFirstTimeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppThemeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppThemeUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCase
@@ -168,13 +182,14 @@ val domainModules
   }
 
 val useCaseModules
-  get() = buildList {
-    add(taskUseCases)
-    add(scheduleUseCases)
-    add(messageUseCases)
-    add(settingsUseCases)
-    add(scopeUseCases)
-  }
+    get() = buildList {
+        add(taskUseCases)
+        add(scheduleUseCases)
+        add(messageUseCases)
+        add(settingsUseCases)
+        add(scopeUseCases)
+        add(iaUseCases)
+    }
 
 val serviceModule = module {
   factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
@@ -276,6 +291,12 @@ val messageUseCases = module {
 
 }
 
+val iaUseCases = module {
+    factoryOf(::GenerateChatCompletionUseCaseImpl) bind GenerateChatCompletionUseCase::class
+    factoryOf(::GenerateImageUseCaseImpl) bind GenerateImageUseCase::class
+    factoryOf(::StreamChatCompletionUseCaseImpl) bind StreamChatCompletionUseCase::class
+    factoryOf(::CreateAIMessageUseCaseImpl) bind CreateAIMessageUseCase::class
+}
 
 val settingsUseCases = module {
   factoryOf(::GetAppSettingsUseCaseImpl) bind GetAppSettingsUseCase::class
@@ -283,6 +304,9 @@ val settingsUseCases = module {
   factoryOf(::SaveUserSettingUseCaseImpl) bind SaveUserSettingUseCase::class
   factoryOf(::GetAppThemeUseCaseImpl) bind GetAppThemeUseCase::class
   factoryOf(::CheckFirstTimeUseCaseImpl) bind CheckFirstTimeUseCase::class
+  factoryOf(::OpenAppSettingsUseCaseImpl) bind OpenAppSettingsUseCase::class
+  factoryOf(::GetApiKeyUseCaseImpl) bind GetApiKeyUseCase::class
+  factoryOf(::SaveApiKeyUseCaseImpl) bind SaveApiKeyUseCase::class
 }
 
 val timeManagerModule = module {

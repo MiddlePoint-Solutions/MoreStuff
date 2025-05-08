@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Translate
@@ -50,6 +52,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
@@ -89,6 +92,8 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.api_key_not_set
+import morestuff.composeapp.generated.resources.api_key_title
 import morestuff.composeapp.generated.resources.button_enable
 import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.cd_schedule_icon
@@ -151,7 +156,9 @@ fun SettingsScreen(
           showDevSettings = { router.push(Developer) },
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
-          signOut = { viewModel.take(SettingsEvent.SignOut) }
+          signOut = { viewModel.take(SettingsEvent.SignOut) },
+          openAppSettings = {viewModel.take(SettingsEvent.OpenAppSettings)},
+          setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
         )
       }
 
@@ -177,7 +184,9 @@ fun SettingsContent(
   signOut: () -> Unit,
   showLibraries: () -> Unit,
   showDevSettings: () -> Unit,
-  showScopesSettings: () -> Unit
+  showScopesSettings: () -> Unit,
+  openAppSettings: () -> Unit,
+  setApiKey: (String) -> Unit
 ) {
 
   val scrollState = rememberScrollState()
@@ -237,6 +246,16 @@ fun SettingsContent(
           )
         )
 
+        if (Platform.Android == platform) {
+          LanguageSettings(onClick = openAppSettings )
+        }
+
+        ApiKeySettings(
+          apiKey = model.apiKey,
+          onApiKeyChange = setApiKey
+        )
+
+
         if (model.devSettings) {
           SettingsMenuLink(
             title = {
@@ -270,6 +289,56 @@ fun SettingsContent(
 
 }
 
+
+@Composable
+fun ApiKeySettings(
+  apiKey: String,
+  onApiKeyChange: (String) -> Unit,
+) {
+  var showBottomSheet by remember { mutableStateOf(false) }
+
+
+  if (showBottomSheet) {
+    ApiKeyBottomSheet(
+      isVisible = true,
+      onDismiss = { showBottomSheet = false },
+      currentApiKey = apiKey,
+      onSave = onApiKeyChange
+    )
+  }
+
+
+  SettingsMenuLink(
+    title = {
+      Text(text = stringResource(Res.string.api_key_title))
+    },
+    subtitle = {
+      Text(
+        text = if (apiKey.isNotEmpty()) {
+          val visiblePart = apiKey.take(4)
+          val hiddenPart = "*".repeat(minOf(apiKey.length - 4, 8))
+          "$visiblePart$hiddenPart"
+        } else {
+          stringResource(Res.string.api_key_not_set)
+        },
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
+    },
+    onClick = { showBottomSheet = true },
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Key,
+        contentDescription = "API Key"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+  )
+}
+
+
 @Composable
 private fun SelectTheme(
   themeSelected: (Int) -> Unit,
@@ -288,7 +357,7 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
-        style = MaterialTheme.typography.titleLarge.copy(
+        style = MaterialTheme.typography.bodyLarge.copy(
           color = MaterialTheme.colorScheme.onSurface
         ),
       )
@@ -594,6 +663,23 @@ private fun ScopeSettings(onClick: () -> Unit) {
     icon = {
       Icon(
         imageVector = Icons.Default.ModeStandby,
+        contentDescription = "Scopes"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+  )
+}
+
+@Composable
+private fun LanguageSettings(onClick: () -> Unit) {
+  SettingsMenuLink(
+    title = { Text(text = "Language") },
+    onClick = onClick,
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Language,
         contentDescription = "Scopes"
       )
     },
