@@ -8,7 +8,6 @@ import com.arkivanov.decompose.router.pages.Pages
 import com.arkivanov.decompose.router.pages.selectNext
 import io.github.xxfast.decompose.router.pages.RoutedContent
 import io.github.xxfast.decompose.router.pages.rememberRouter
-import io.middlepoint.morestuff.shared.domain.nav.OnBoarding
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.ChatWithYourTasks
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.NotificationPermission
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Payment
@@ -16,8 +15,6 @@ import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Ready
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Welcome
-import io.middlepoint.morestuff.shared.requiresNotificationsPermission
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 
 @Composable
@@ -36,7 +33,6 @@ fun OnBoardingScreen(
         add(SignIn)
 //        add(Payment)
 //        add(SignInEmail)
-        add(Ready)
       },
       selectedIndex = 0
     )
@@ -58,12 +54,12 @@ fun OnBoardingScreen(
     when (screen) {
       Ready -> OnBoardingCompleteScreen(onFinish = onBoardingComplete)
       Welcome -> OnBoardingWelcomeScreen(onNext = navigation::selectNext)
-      SignIn -> OnBoardingSignInScreen(
+      SignIn -> SignInScreen(
         onNext = navigation::selectNext,
         onSignInWithEmail = { navigation.selectNext() }
       )
 
-      SignInEmail -> OnBoardingSignInEmailScreen(
+      SignInEmail -> SignInEmailScreen(
         onNext = navigation::selectNext
       )
 

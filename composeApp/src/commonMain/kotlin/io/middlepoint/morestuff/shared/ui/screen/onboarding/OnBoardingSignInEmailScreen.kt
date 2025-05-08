@@ -50,7 +50,7 @@ import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun OnBoardingSignInEmailScreen(
+fun SignInEmailScreen(
   supabase: SupabaseClient = koinInject(),
   onNext: () -> Unit,
   logger: Logger = koinInject { parametersOf("EmailSignIn") }

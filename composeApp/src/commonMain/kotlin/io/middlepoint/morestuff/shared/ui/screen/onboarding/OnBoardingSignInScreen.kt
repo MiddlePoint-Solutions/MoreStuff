@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.ButtonDefaults
@@ -20,11 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -56,7 +56,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
-fun OnBoardingSignInScreen(
+fun SignInScreen(
   supabase: SupabaseClient = koinInject(),
   onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
@@ -111,12 +111,16 @@ fun OnBoardingSignInContent(
       .background(background)
       .padding(horizontal = 10.dp)
   ) {
+
     Column(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier
+        .fillMaxSize()
+        .windowInsetsPadding(WindowInsets.safeDrawing)
+        .padding(bottom = 100.dp),
       verticalArrangement = Arrangement.SpaceBetween,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.weight(0.4f))
 
       Icon(
         painter = painterResource(Res.drawable.ms_sign_in),
@@ -143,12 +147,14 @@ fun OnBoardingSignInContent(
         modifier = Modifier.fillMaxWidth()
       )
       Spacer(modifier = Modifier.weight(1f))
+
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
         if (platform == Platform.Android) {
           OutlinedButton(
             onClick = signInWithGoogle,
             modifier = Modifier
-              .fillMaxWidth()
+              .fillMaxWidth(0.8f)
               .height(56.dp),
             content = { ProviderButtonContent(Google, text = "Continue with Google") },
             colors = ButtonDefaults.outlinedButtonColors(
@@ -164,7 +170,7 @@ fun OnBoardingSignInContent(
           OutlinedButton(
             onClick = signInWithApple,
             modifier = Modifier
-              .fillMaxWidth()
+              .fillMaxWidth(0.8f)
               .height(56.dp),
             content = { ProviderButtonContent(Apple, text = "Sign in with Apple") },
             colors = ButtonDefaults.outlinedButtonColors(
@@ -176,51 +182,25 @@ fun OnBoardingSignInContent(
           Spacer(modifier = Modifier.height(16.dp))
         }
 
-        Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-          OutlinedButton(
-            onClick = onSignInWithEmail,
-            colors = ButtonDefaults.outlinedButtonColors(
-              contentColor = Color.White,
-              containerColor = Color(0xFF393AC5)
-            ),
-            border = null,
-            modifier = Modifier
-              .weight(1f)
-              .height(56.dp),
-          ) {
-            Icon(
-              imageVector = Icons.Default.Email,
-              contentDescription = stringResource(Res.string.sign_in_with_email),
-              modifier = Modifier.padding(end = 8.dp)
-            )
-            Text(stringResource(Res.string.sign_in_with_email), fontSize = 12.sp)
-          }
-        }
-
-        Spacer(modifier = Modifier.height(34.dp))
-
-        TextButton(
-          onClick = onNext,
+        OutlinedButton(
+          onClick = onSignInWithEmail,
+          colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFF393AC5)
+          ),
+          border = null,
           modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .height(43.dp),
-          content = {
-            Text(
-              text = stringResource(Res.string.button_skip),
-              style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-              )
-            )
-          }
-        )
+            .fillMaxWidth(0.8f)
+            .height(56.dp)
+        ) {
+          Icon(
+            imageVector = Icons.Default.Email,
+            contentDescription = stringResource(Res.string.sign_in_with_email),
+            modifier = Modifier.padding(end = 8.dp)
+          )
+          Text(stringResource(Res.string.sign_in_with_email), fontSize = 12.sp)
+        }
       }
-      Spacer(modifier = Modifier.weight(0.2f))
     }
   }
 }
