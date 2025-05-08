@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.theme
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF4955B7)
@@ -64,3 +66,18 @@ val md_theme_dark_outlineVariant = Color(0xFF46464F)
 val md_theme_dark_scrim = Color(0xFF000000)
 val md_theme_dark_surface_container_high = Color(0xFF29292F)
 
+val reviewIconTint = Color(140, 152, 255)
+
+val onBoardingBrush = Brush.linearGradient(
+  colors = listOf(Color(0xFF4C65FD), Color(0xFF4338D8)),
+  start = Offset(0f, 0f),
+  end = Offset(0f, Float.POSITIVE_INFINITY)
+)
+
+val paymentBrush = Brush.linearGradient(
+  colors = listOf(Color(0x574C65FD), Color(0x57B83EF0)),
+  start = Offset(0f, 0f),
+  end = Offset(0f, Float.POSITIVE_INFINITY)
+)
+
+val paymentOnSurface = Color(0xFF1B1B21)

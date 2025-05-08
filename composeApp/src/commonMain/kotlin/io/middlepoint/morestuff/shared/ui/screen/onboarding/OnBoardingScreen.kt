@@ -11,6 +11,7 @@ import io.github.xxfast.decompose.router.pages.rememberRouter
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.ChatWithYourTasks
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.NotificationPermission
+import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Payment
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.Ready
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.OnBoarding.SignInEmail
@@ -27,15 +28,14 @@ fun OnBoardingScreen(
   val navigation = rememberRouter {
     Pages(
       items = buildList {
-
-        //add(OnBoarding.Payment)
-        add(Welcome)
-        add(ChatWithYourTasks)
-        if (requiresNotificationsPermission()) {
-          add(NotificationPermission)
-        }
+//        add(Welcome)
+//        add(ChatWithYourTasks)
+//        if (requiresNotificationsPermission()) {
+//          add(NotificationPermission)
+//        }
         add(SignIn)
-        add(SignInEmail)
+//        add(Payment)
+//        add(SignInEmail)
         add(Ready)
       },
       selectedIndex = 0
@@ -69,7 +69,7 @@ fun OnBoardingScreen(
 
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
       ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
-      //OnBoarding.Payment -> PaymentScreen()
+      Payment -> PaymentScreen()
 
     }
   }
