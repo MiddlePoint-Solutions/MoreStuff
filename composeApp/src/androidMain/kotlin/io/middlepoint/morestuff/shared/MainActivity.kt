@@ -40,10 +40,11 @@ class MainActivity : AppCompatActivity() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     enableEdgeToEdge()
     val rootRouterContext: RouterContext = defaultRouterContext()
+    val supabase = get<SupabaseClient>()
     val launchScreen = handleLaunchIntent(intent)
     FileKit.init(this)
 
-    val supabase = get<SupabaseClient>()
+
     supabase.handleDeeplinks(intent)
 
     setContent {
@@ -98,6 +99,18 @@ class MainActivity : AppCompatActivity() {
           }
 
           else -> null
+        }
+      }
+
+      Intent.ACTION_VIEW -> {
+
+        val uri = intent.data
+        Logger.d("DeepLink URI: $uri")
+
+        if (uri?.scheme == "app.morestuff" && uri.host == "login-callback") {
+          Screen.Home
+        } else {
+          null
         }
       }
 

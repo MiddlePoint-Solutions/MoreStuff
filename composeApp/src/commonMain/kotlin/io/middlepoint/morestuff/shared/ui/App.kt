@@ -59,13 +59,23 @@ fun App(screen: Screen? = null) {
         }
       }
     }
-
     LaunchedEffect(screen) {
+      if (screen != null) {
+        if (screen == Screen.Home) {
+          router.navigate { listOf(screen) }
+        } else {
+          router.navigate { listOf(Screen.Home, screen) }
+        }
+      }
+    }
+
+
+/*    LaunchedEffect(screen) {
       if (screen != null) {
         router.navigate {
           listOf(Screen.Home, screen)
         }
       }
-    }
+    }*/
   }
 }
