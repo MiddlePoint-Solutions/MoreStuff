@@ -103,8 +103,24 @@ class ShareViewController: UIViewController {
                             if let url = item as? URL {
                                 print("Received URL: \(url)")
                                 let urlString = url.absoluteString
-                                self.sharedFilePath = "\(self.docPath)/shared_url.txt"
-                                try? urlString.write(toFile: self.sharedFilePath, atomically: true, encoding: .utf8)
+                                
+                                // Check if the URL points to an image
+                                if urlString.hasSuffix(".jpg") || urlString.hasSuffix(".jpeg") || urlString.hasSuffix(".png") {
+                                    // Handle as an image
+                                    self.sharedFilePath = "\(self.docPath)/\(url.lastPathComponent)"
+                                    do {
+                                        // Download the image data and save it
+                                        let imageData = try Data(contentsOf: url)
+                                        try imageData.write(to: URL(fileURLWithPath: self.sharedFilePath))
+                                        print("Image saved at: \(self.sharedFilePath)")
+                                    } catch {
+                                        print("Error saving image: \(error.localizedDescription)")
+                                    }
+                                } else {
+                                    // Handle as a URL
+                                    self.sharedFilePath = "\(self.docPath)/shared_url.txt"
+                                    try? urlString.write(toFile: self.sharedFilePath, atomically: true, encoding: .utf8)
+                                }
                             } else if let error = error {
                                 print("Error loading URL: \(error.localizedDescription)")
                             }

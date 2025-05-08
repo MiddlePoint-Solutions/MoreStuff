@@ -108,10 +108,10 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
 
-        if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
-            navigateToTaskChat(taskId: taskId)
-            //cancelSchedule(taskId: taskId)
+        if let taskIdString = userInfo["taskId"] as? String {
+            navigateToTaskChat(taskId: taskIdString)
         }
+
         if let scheduleId = userInfo["scheduleId"] as? String {
             center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
         }
@@ -127,22 +127,23 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
            if let scheduleId = userInfo["scheduleId"] as? String {
                center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
            }
-           if let taskIdString = userInfo["taskId"] as? String, let taskId = Int(taskIdString) {
-               cancelSchedule(taskId: taskId)
+           if let taskIdString = userInfo["taskId"] as? String {
+               cancelSchedule(taskId: taskIdString)
            }
 
            completionHandler([.banner, .sound])
        }
     
-    private func navigateToTaskChat(taskId: Int) {
-            DispatchQueue.main.async {
-                self.navigationHelper.navigateToTaskChat(taskId: Int64(taskId))
-            }
-        }
-    
-    private func cancelSchedule(taskId: Int){
+    private func navigateToTaskChat(taskId: String) {
         DispatchQueue.main.async {
-            self.navigationHelper.cancelTaskSchedule(taskId: Int64(taskId))
+            self.navigationHelper.navigateToTaskChat(taskId: taskId)
+        }
+    }
+
+    
+    private func cancelSchedule(taskId: String){
+        DispatchQueue.main.async {
+            self.navigationHelper.cancelTaskSchedule(taskId: taskId)
         }
     }
 

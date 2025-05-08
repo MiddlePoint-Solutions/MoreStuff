@@ -151,6 +151,7 @@ kotlin {
       implementation(libs.filekit.dialogs.compose)
       implementation(libs.filekit.core)
       implementation(libs.filekit.coil)
+      implementation(libs.open.ai)
 
       // About
       implementation(libs.aboutLibrariesCore)

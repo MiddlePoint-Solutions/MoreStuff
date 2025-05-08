@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
@@ -16,62 +15,62 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.GetAppSettingsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class SettingsMiddleware(
-    private val getAppSettingsUseCase: GetAppSettingsUseCase,
-    private val saveUserSettingUseCase: SaveUserSettingUseCase,
-    private val devTools: DevTools
-    ) : Middleware<AppState> {
+  private val getAppSettingsUseCase: GetAppSettingsUseCase,
+  private val saveUserSettingUseCase: SaveUserSettingUseCase,
+) : Middleware<AppState> {
 
-    override fun invoke(
-        state: AppState,
-        action: Action,
-        dispatch: Dispatch,
-        next: Next<AppState>,
-        scope: CoroutineScope,
-    ): Action {
-        when (action) {
-            is InitStoreAction -> scope.launch {
-                devTools.exportJsonData(false)
-                dispatch(InitSettings(getAppSettingsUseCase()))
-            }
+  override fun invoke(
+    state: AppState,
+    action: Action,
+    dispatch: Dispatch,
+    next: Next<AppState>,
+    scope: CoroutineScope,
+  ): Action {
+    when (action) {
+      is InitStoreAction -> scope.launch {
+        dispatch(InitSettings(getAppSettingsUseCase()))
+      }
 
-            is EnableDevSettings -> scope.launch {
-                saveUserSettingUseCase(AppSetting.DevSettings, action.enable)
-            }
+      is EnableDevSettings -> scope.launch {
+        saveUserSettingUseCase(AppSetting.DevSettings, action.enable)
+      }
 
-            is SetSnoozeLimit -> scope.launch {
-                saveUserSettingUseCase(AppSetting.SnoozeLimit, action.amount)
-            }
+      is SetSnoozeLimit -> scope.launch {
+        saveUserSettingUseCase(AppSetting.SnoozeLimit, action.amount)
+      }
 
-            is SetAppTheme -> scope.launch {
-                saveUserSettingUseCase(AppSetting.Theme, action.theme.name)
-            }
+      is SetAppTheme -> scope.launch {
+        saveUserSettingUseCase(AppSetting.Theme, action.theme.name)
+      }
 
-            is OnBoardingComplete -> scope.launch {
-                saveUserSettingUseCase(AppSetting.FirstTime, false)
-                dispatch(TaskAction.CreateHintTask)
-            }
+      is OnBoardingComplete -> scope.launch {
+        saveUserSettingUseCase(AppSetting.FirstTime, false)
+        dispatch(TaskAction.CreateHintTask)
+      }
 
-            /*is SettingAction.SetReviewTimeAction -> scope.launch {
-                saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
-            }*/
+      /*is SettingAction.SetReviewTimeAction -> scope.launch {
+          saveUserSettingUseCase(AppSetting.ReviewTime, Pair(action.hour, action.minute))
+      }*/
 
-            is SettingAction.EnableReviewHint -> scope.launch {
-                saveUserSettingUseCase(AppSetting.ShowHintArrowPriority, action.enable)
-            }
+      is SettingAction.EnableReviewHint -> scope.launch {
+        saveUserSettingUseCase(AppSetting.ShowHintArrowPriority, action.enable)
+      }
 
-            is SettingAction.SetVoiceLanguage -> scope.launch {
-                saveUserSettingUseCase(AppSetting.VoiceInputLanguage, action.language.name)
-            }
+      is SettingAction.SetVoiceLanguage -> scope.launch {
+        saveUserSettingUseCase(AppSetting.VoiceInputLanguage, action.language.name)
+      }
 
-            else -> NoOp
-        }
-
-        return next(state, action, dispatch)
+      else -> NoOp
     }
+
+    return next(state, action, dispatch)
+  }
 }

@@ -168,7 +168,7 @@
 
 
 
-    <string name="sure_delete_scope">Todas las tareas dentro de este scope también serán eliminadas.</string>
+    <string name="sure_delete_scope">¿Estás seguro de que deseas eliminar el scope %s?\nTodas las tareas dentro de este scope también serán eliminadas.</string>
     <string name="add_scope">Crear nuevo Scope</string>
     <string name="save">Confirmar</string>
     <string name="edit_scope">Editar nombre del Scope </string>
@@ -279,6 +279,10 @@
     <string name="task_schedule_deletion_warning_plural">Algunas de estas tareas tienen programaciones que también serán eliminadas.</string>
 
     <string name="scope_name">Nombre del scope</string>
+    <string name="api_key_title">API Key</string>
+    <string name="api_key_label">Añade API Key</string>
+    <string name="api_key_not_set">No establecida</string>
+
     <string name="delete_scope">Eliminar Scope</string>
 
     <string name="sign_in_with_email">Iniciar sesión con Email</string>
@@ -291,4 +295,6 @@
     <string name="error_invalid_email">El email introducido no es válido o no existe.</string>
     <string name="error_generic">Ha ocurrido un error. Inténtalo de nuevo.</string>
     <string name="delete_scope">Eliminar Scope</string>
+
+    <string name="chat_whit_ai">Habla con MoreStuff IA.</string>
 </resources>
