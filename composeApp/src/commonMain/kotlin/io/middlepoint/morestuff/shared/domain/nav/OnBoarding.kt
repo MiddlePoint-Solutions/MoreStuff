@@ -23,5 +23,8 @@ sealed class OnBoarding() {
 
   @Serializable
   data object SignInEmail: OnBoarding()
+
+  @Serializable
+  data object Payment: OnBoarding()
 }
 
