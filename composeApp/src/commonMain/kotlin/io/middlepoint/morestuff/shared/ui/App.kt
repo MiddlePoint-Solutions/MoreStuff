@@ -40,7 +40,7 @@ fun App(screen: Screen? = null) {
           Box(
             modifier = Modifier
               .background(MaterialTheme.colorScheme.surfaceContainer)
-              .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
+//              .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
           ) {
             if (model.ready) {
               if (model.showOnBoarding) {

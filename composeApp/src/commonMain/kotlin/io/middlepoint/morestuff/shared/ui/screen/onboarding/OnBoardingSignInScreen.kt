@@ -19,6 +19,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.middlepoint.morestuff.shared.Platform
 import io.middlepoint.morestuff.shared.platform
+import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.ms_sign_in
@@ -100,16 +102,13 @@ fun OnBoardingSignInContent(
   onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
 ) {
-  val gradientBrush = Brush.linearGradient(
-    colors = listOf(Color(0xFF4C65FD), Color(0xFF4338D8)),
-    start = Offset(0f, 0f),
-    end = Offset(0f, Float.POSITIVE_INFINITY)
-  )
+
+  val background = remember { onBoardingBrush }
 
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(gradientBrush)
+      .background(background)
       .padding(horizontal = 10.dp)
   ) {
     Column(

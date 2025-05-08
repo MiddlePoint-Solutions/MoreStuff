@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,14 +32,21 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.App
 import org.koin.android.ext.android.get
+import org.koin.compose.KoinContext
 
 class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
-    WindowCompat.setDecorFitsSystemWindows(window, false)
-    enableEdgeToEdge()
+    if (Build.VERSION.SDK_INT < 35) {
+      Logger.d { "enableEdgeToEdge" }
+      enableEdgeToEdge()
+    } else {
+      Logger.d { "setDecorFitsSystemWindows" }
+      WindowCompat.setDecorFitsSystemWindows(window, false)
+    }
+
     val rootRouterContext: RouterContext = defaultRouterContext()
     val launchScreen = handleLaunchIntent(intent)
     FileKit.init(this)
@@ -47,27 +55,29 @@ class MainActivity : AppCompatActivity() {
     supabase.handleDeeplinks(intent)
 
     setContent {
-      CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
+      KoinContext {
+        CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
 
-        var initialScreen by remember { mutableStateOf<Screen?>(null) }
-        App(initialScreen)
+          var initialScreen by remember { mutableStateOf<Screen?>(null) }
+          App(initialScreen)
 
-        LaunchedEffect(Unit) {
-          if (initialScreen == null && launchScreen != null) {
-            initialScreen = launchScreen
-            Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
+          LaunchedEffect(Unit) {
+            if (initialScreen == null && launchScreen != null) {
+              initialScreen = launchScreen
+              Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
+            }
           }
-        }
 
-        DisposableEffect(Unit) {
-          val listener = Consumer<Intent> {
-            Logger.d("onNewIntent: $it")
-            supabase.handleDeeplinks(it)
-            initialScreen = handleLaunchIntent(it)
-            Logger.d("initialScreen: $initialScreen")
+          DisposableEffect(Unit) {
+            val listener = Consumer<Intent> {
+              Logger.d("onNewIntent: $it")
+              supabase.handleDeeplinks(it)
+              initialScreen = handleLaunchIntent(it)
+              Logger.d("initialScreen: $initialScreen")
+            }
+            addOnNewIntentListener(listener)
+            onDispose { removeOnNewIntentListener(listener) }
           }
-          addOnNewIntentListener(listener)
-          onDispose { removeOnNewIntentListener(listener) }
         }
       }
     }
