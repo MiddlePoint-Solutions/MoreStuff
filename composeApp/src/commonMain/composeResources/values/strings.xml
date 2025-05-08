@@ -301,7 +301,7 @@
     <string name="api_key_not_set">Not set</string>
 
 
-    <string name="sign_in_with_email">Sign in with Email</string>
+    <string name="sign_in_with_email">Email</string>
     <string name="enter_your_email">Enter your email</string>
     <string name="email_label">Email</string>
     <string name="continue">Continue</string>

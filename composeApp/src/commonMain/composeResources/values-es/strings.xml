@@ -285,7 +285,7 @@
 
     <string name="delete_scope">Eliminar Scope</string>
 
-    <string name="sign_in_with_email">Iniciar sesión con Email</string>
+    <string name="sign_in_with_email">Email</string>
     <string name="enter_your_email">Introduce tu email</string>
     <string name="email_label">Email</string>
     <string name="continue">Continuar</string>
