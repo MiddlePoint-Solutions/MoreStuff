@@ -10,6 +10,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
+import com.arkivanov.decompose.router.pages.selectNext
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
@@ -22,11 +23,12 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen.ImagePreview
-import io.middlepoint.morestuff.shared.domain.nav.Screen.OnBoarding
+import io.middlepoint.morestuff.shared.domain.nav.Screen.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
+import io.middlepoint.morestuff.shared.domain.nav.Screen.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
@@ -34,7 +36,8 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.logger
-import io.middlepoint.morestuff.shared.ui.screen.onboarding.OnBoardingScreen
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInEmailScreen
+import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
@@ -61,11 +64,13 @@ fun MainContent(
     ) { screen ->
       when (screen) {
 
-        OnBoarding -> OnBoardingScreen(
-          onBoardingComplete = {
-            onBoardingComplete()
-            router.replaceCurrent(Home)
-          }
+        SignIn -> SignInScreen(
+          onNext = { router.replaceCurrent(Home) },
+          onSignInWithEmail = { router.push(SignInEmail) }
+        )
+
+        SignInEmail -> SignInEmailScreen(
+          onNext = { router.replaceCurrent(Home) }
         )
 
         Home -> HomeScreen()

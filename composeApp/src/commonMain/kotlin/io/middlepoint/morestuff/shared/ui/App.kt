@@ -2,18 +2,12 @@ package io.middlepoint.morestuff.shared.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import co.touchlab.kermit.Logger
 import com.arkivanov.decompose.router.stack.navigate
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -38,13 +32,11 @@ fun App(screen: Screen? = null) {
       MoreStuffTheme {
         ProvideAppRouter(router) {
           Box(
-            modifier = Modifier
-              .background(MaterialTheme.colorScheme.surfaceContainer)
-//              .windowInsetsPadding(WindowInsets.safeDrawing.exclude(WindowInsets.ime))
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
           ) {
             if (model.ready) {
               if (model.showOnBoarding) {
-                router.navigate { listOf(Screen.OnBoarding) }
+                router.navigate { listOf(Screen.SignIn) }
               }
               MainContent(
                 shareContent = { taskId, content ->
