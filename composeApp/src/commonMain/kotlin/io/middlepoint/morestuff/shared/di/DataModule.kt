@@ -99,7 +99,7 @@ val dataModule = module {
     LlmRepositoryImpl(
       settings = get(named(SharedSettings.Encrypted)),
 
-    )
+      )
   }
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
@@ -107,7 +107,15 @@ val dataModule = module {
 
   factoryOf(::MigrationHelper)
 
-  singleOf(::DataSyncManagerImpl) bind DataSyncManager::class
+  single<DataSyncManager> {
+    DataSyncManagerImpl(
+      database = get(),
+      dataMappers = get(),
+      supabase = get(),
+      settings = get(named(SharedSettings.Encrypted)),
+      timeManager = get(),
+    )
+  }
 
 }
 
@@ -117,12 +125,13 @@ val supabaseModule = module {
       supabaseUrl = BuildConfig.SUPABASE_URL,
       supabaseKey = BuildConfig.SUPABASE_KEY
     ) {
-      if(BuildConfig.DEBUG) {
+      if (BuildConfig.DEBUG) {
         defaultLogLevel = LogLevel.DEBUG
       }
       install(Auth) {
         sessionManager = SettingsSessionManager(settings = get(named(SharedSettings.Encrypted)))
-        codeVerifierCache = SettingsCodeVerifierCache(settings = get(named(SharedSettings.Encrypted)))
+        codeVerifierCache =
+          SettingsCodeVerifierCache(settings = get(named(SharedSettings.Encrypted)))
         host = BuildConfig.APP_HOST_LOGIN
         scheme = BuildConfig.APP_SCHEME
       }
