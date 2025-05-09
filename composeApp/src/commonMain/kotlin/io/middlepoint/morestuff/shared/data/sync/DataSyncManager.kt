@@ -182,7 +182,9 @@ class DataSyncManagerImpl(
     }
   }
 
-  override suspend fun clearAll() {
+  override suspend fun resetData() {
+    lastPushTime = Instant.fromEpochMilliseconds(0)
+    lastPullTime = Instant.fromEpochMilliseconds(0)
     tasks.transaction {
       tasks.deleteAll()
       scopes.deleteAll()
