@@ -44,6 +44,10 @@ SELECT scope_id
 FROM tasks_scopes
 WHERE task_id = :taskId;
 
+deleteAll:
+DELETE FROM tasks_scopes;
+
+
 -- Triggers
 
 -- Only update the timestamp when other columns change

@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.di
 
 import MoreStuff.composeApp.BuildConfig
-import io.github.jan.supabase.annotations.SupabaseInternal
+import com.russhwolf.settings.Settings
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SettingsCodeVerifierCache
 import io.github.jan.supabase.auth.SettingsSessionManager
@@ -16,6 +16,7 @@ import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
+import io.middlepoint.morestuff.shared.data.repository.AuthRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.PriorityRepositoryImpl
@@ -25,10 +26,11 @@ import io.middlepoint.morestuff.shared.data.repository.TaskRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
 import io.middlepoint.morestuff.shared.data.repository.UserRepositoryImpl
 import io.middlepoint.morestuff.shared.data.service.DevToolsImpl
-import io.middlepoint.morestuff.shared.data.sync.DataSyncManager
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.sync.DataSyncManagerImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.repository.AuthRepository
 import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
@@ -62,29 +64,14 @@ val dataModule = module {
     )
   }
 
-  //singleOf(::DevToolsImpl) bind DevTools::class
-  singleOf(::DataMappersImpl) bind DataMappers::class
   singleOf(::MessageDataMap)
 
-  // Repositories
-  single<TaskRepository> {
-    TaskRepositoryImpl(
-      database = get(),
-      timeManager = get(),
-      mapper = get(),
-    )
-  }
-
-
-  single<MessageRepository> {
-    MessageRepositoryImpl(
-      database = get(),
-      mapper = get(),
-      timeManager = get(),
-    )
-  }
-
+  //singleOf(::DevToolsImpl) bind DevTools::class
+  singleOf(::DataMappersImpl) bind DataMappers::class
+  singleOf(::TaskRepositoryImpl) bind TaskRepository::class
+  singleOf(::MessageRepositoryImpl) bind MessageRepository::class
   singleOf(::ScheduleRepositoryImpl) bind ScheduleRepository::class
+  singleOf(::AuthRepositoryImpl) bind AuthRepository::class
 
   single<UserRepository> {
     UserRepositoryImpl(
@@ -98,8 +85,7 @@ val dataModule = module {
   single<LlmRepository> {
     LlmRepositoryImpl(
       settings = get(named(SharedSettings.Encrypted)),
-
-      )
+    )
   }
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
@@ -121,6 +107,9 @@ val dataModule = module {
 
 val supabaseModule = module {
   single {
+
+    val settings = get<Settings>(named(SharedSettings.Encrypted))
+
     createSupabaseClient(
       supabaseUrl = BuildConfig.SUPABASE_URL,
       supabaseKey = BuildConfig.SUPABASE_KEY
@@ -129,9 +118,8 @@ val supabaseModule = module {
         defaultLogLevel = LogLevel.DEBUG
       }
       install(Auth) {
-        sessionManager = SettingsSessionManager(settings = get(named(SharedSettings.Encrypted)))
-        codeVerifierCache =
-          SettingsCodeVerifierCache(settings = get(named(SharedSettings.Encrypted)))
+        sessionManager = SettingsSessionManager(settings)
+        codeVerifierCache = SettingsCodeVerifierCache(settings)
         host = BuildConfig.APP_HOST_LOGIN
         scheme = BuildConfig.APP_SCHEME
       }

@@ -1,24 +1,25 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.InitStoreAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
+import io.middlepoint.morestuff.shared.domain.repository.AuthRepository
+import io.middlepoint.morestuff.shared.domain.usecase.auth.SignOutUseCase
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class AuthMiddleware(
-  private val supabase: SupabaseClient,
+  private val authRepository: AuthRepository,
+  private val signOutUseCase: SignOutUseCase,
   private val dataMappers: DataMappers
 ) : Middleware<AppState> {
 
@@ -39,7 +40,7 @@ class AuthMiddleware(
       }
 
       is UserAction.SignOut -> {
-        scope.launch {  supabase.auth.signOut() }
+        scope.launch { signOutUseCase() }
       }
 
       else -> NoOp
@@ -49,8 +50,7 @@ class AuthMiddleware(
 
   private fun initAuthEvents(scope: CoroutineScope, dispatch: Dispatch) {
     eventsJob = scope.launch {
-      supabase.auth.currentSessionOrNull()
-      supabase.auth.sessionStatus.collect {
+      authRepository.authEvents.collect {
         when (it) {
           is SessionStatus.Authenticated -> {
             logger.d("Received new authenticated session: ${it.source}")

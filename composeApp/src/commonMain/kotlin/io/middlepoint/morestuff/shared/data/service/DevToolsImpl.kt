@@ -8,7 +8,7 @@ import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEV_SETTINGS
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.DataMigrationHelper
-import io.middlepoint.morestuff.shared.data.sync.DataSyncManager
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 

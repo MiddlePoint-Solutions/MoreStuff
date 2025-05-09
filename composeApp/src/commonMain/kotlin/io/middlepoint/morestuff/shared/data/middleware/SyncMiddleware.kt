@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.data.sync.DataSyncManager
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.enums.SyncTrigger.*
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.SyncAction.*
@@ -11,12 +11,13 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
+import io.middlepoint.morestuff.shared.domain.usecase.sync.SyncUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SyncMiddleware(
-  private val manager: DataSyncManager
+  private val syncUseCase: SyncUseCase
 ) : Middleware<AppState> {
 
   private val logger = Logger.withTag("SyncMiddleware")
@@ -41,6 +42,12 @@ class SyncMiddleware(
         dispatch(SyncTriggerAction(Auth))
       }
 
+      // TODO: implement sync on sign out
+      is UserAction.SignOut -> {
+//        syncJob?.cancel()
+//        syncJob = null
+      }
+
       is SyncTriggerAction -> {
         // TODO: check trigger and decide if sync should be performed
         // TODO: we should check when the last sync time made so we don't sync to often
@@ -57,7 +64,7 @@ class SyncMiddleware(
 
   private fun performSync(dispatch: Dispatch, scope: CoroutineScope) {
     syncJob = scope.launch {
-      manager.sync().collect { status ->
+      syncUseCase().collect { status ->
         dispatch(UpdateSyncStatusAction(status))
       }
     }

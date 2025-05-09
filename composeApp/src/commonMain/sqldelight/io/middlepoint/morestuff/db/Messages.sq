@@ -82,13 +82,17 @@ lastInsertRowId:
 SELECT last_insert_rowid();
 
 deleteMessage:
-DELETE FROM messages
+UPDATE messages
+SET deleted = 1
 WHERE id = ?;
 
 updateMessageContent:
 UPDATE messages
 SET content = ?
 WHERE id = ?;
+
+deleteAll:
+DELETE FROM messages;
 
 -- Triggers
 
