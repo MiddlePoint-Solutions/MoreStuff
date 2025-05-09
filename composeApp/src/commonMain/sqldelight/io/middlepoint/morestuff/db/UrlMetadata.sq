@@ -6,12 +6,17 @@ CREATE TABLE url_metadata (
     json_data TEXT NOT NULL,
     message_id TEXT AS Uuid NOT NULL,
     FOREIGN KEY(message_id) REFERENCES messages(id)
+        ON DELETE CASCADE
 );
 
 
 insertUrlMetadata:
 INSERT INTO url_metadata(url, json_data, message_id)
 VALUES (?, ?, ?);
+
+deleteAll:
+DELETE FROM url_metadata;
+
 
 getUrlMetadata:
 SELECT *

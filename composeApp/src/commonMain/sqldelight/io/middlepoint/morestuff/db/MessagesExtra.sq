@@ -32,6 +32,9 @@ ON CONFLICT(id) DO UPDATE
       deleted       = excluded.deleted
   WHERE excluded.updated_at > updated_at;
 
+deleteAll:
+DELETE FROM messages_extra;
+
 -- Triggers
 
 -- Only update the timestamp when other columns change

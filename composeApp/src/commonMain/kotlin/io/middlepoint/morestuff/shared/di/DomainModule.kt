@@ -17,12 +17,16 @@ import io.middlepoint.morestuff.shared.data.service.AppMessagesProviderImpl
 import io.middlepoint.morestuff.shared.data.service.HintTaskProviderImpl
 import io.middlepoint.morestuff.shared.data.service.OpenGraphFetcherImpl
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
+import io.middlepoint.morestuff.shared.data.sync.DataSyncManagerImpl
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.MiddlewareProvider
 import io.middlepoint.morestuff.shared.domain.service.AppMessageProvider
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.usecase.auth.SignOutUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.auth.SignOutUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.GenerateChatCompletionUseCase
@@ -123,6 +127,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveUserSettingUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.sync.SyncUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.sync.SyncUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.AddTasksToScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.task.ClearTaskNotificationsUseCase
@@ -178,7 +184,6 @@ val domainModules
     add(storeModule)
     add(serviceModule)
     addAll(useCaseModules)
-    add(timeManagerModule)
   }
 
 val useCaseModules
@@ -189,11 +194,14 @@ val useCaseModules
         add(settingsUseCases)
         add(scopeUseCases)
         add(iaUseCases)
+        add(miscUseCases)
     }
 
 val serviceModule = module {
   factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
   factoryOf(::OpenGraphFetcherImpl) bind OpenGraphFetcher::class
+  singleOf(::TimeManagerImpl) bind TimeManager::class
+  singleOf(::DataSyncManagerImpl) bind DataSyncManager::class
 }
 
 val storeModule = module {
@@ -258,8 +266,6 @@ val scopeUseCases = module {
   factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class
   factoryOf(::InitScopesUseCaseImpl) bind InitScopesUseCase::class
   factoryOf(::GetScopeByTaskIdUseCaseImpl) bind GetScopeByTaskIdUseCase::class
-
-
 }
 
 val scheduleUseCases = module {
@@ -309,7 +315,9 @@ val settingsUseCases = module {
   factoryOf(::SaveApiKeyUseCaseImpl) bind SaveApiKeyUseCase::class
 }
 
-val timeManagerModule = module {
-  singleOf(::TimeManagerImpl) bind TimeManager::class
+val miscUseCases = module {
+  factoryOf(::SyncUseCaseImpl) bind SyncUseCase::class
+  factoryOf(::SignOutUseCaseImpl) bind SignOutUseCase::class
 }
+
 

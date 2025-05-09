@@ -15,23 +15,16 @@ import io.middlepoint.morestuff.db.Tasks
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.domain.enums.SyncFailure
-import io.middlepoint.morestuff.shared.domain.enums.SyncStatus
 import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Error
 import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Initializing
 import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Success
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-
-interface DataSyncManager {
-  suspend fun sync(): Flow<SyncStatus>
-  suspend fun push()
-  suspend fun pull()
-}
 
 class DataSyncManagerImpl(
   database: StuffDb,
@@ -62,7 +55,7 @@ class DataSyncManagerImpl(
    * Current sync method: Push -> Pull
    * In the future we should change to use a server‐time token.
    */
-  override suspend fun sync() = flow {
+  override fun sync() = flow {
     emit(Initializing)
     try {
       push()
@@ -186,6 +179,17 @@ class DataSyncManagerImpl(
     data.maxUpdatedAt()?.let { updatedAt ->
       logger.d { "new lastPullTime: $updatedAt" }
       lastPullTime = updatedAt
+    }
+  }
+
+  override suspend fun clearAll() {
+    tasks.transaction {
+      tasks.deleteAll()
+      scopes.deleteAll()
+      messages.deleteAll()
+      tasksScopes.deleteAll()
+      schedules.deleteAll()
+      messageExtras.deleteAll()
     }
   }
 

@@ -21,3 +21,4 @@ data object ScopeAlreadyExists : Failure
 data object NoScope : Failure
 data object ApiKeyNotFound : Failure
 data class AIUnexpectedFailure(val message: String?) : Failure
+data class AuthFailure(val message: String?) : Failure
