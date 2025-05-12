@@ -65,6 +65,14 @@ class NavigationHelper: ViewModel(), KoinComponent {
         }
     }
 
+    fun navigateToHome() {
+        viewModelScope.launch {
+            logger.d { "Emitting Screen.Home" }
+            navigation.emit(Screen.Home)
+        }
+    }
+
+
 
 }
 
