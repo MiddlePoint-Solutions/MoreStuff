@@ -19,6 +19,7 @@ class NavigationHelper: ViewModel(), KoinComponent {
 
     val shareable = MutableSharedFlow<Shareable>()
     val navigation = MutableSharedFlow<Screen>()
+    val code = MutableSharedFlow<String>()
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
 
 
@@ -65,10 +66,17 @@ class NavigationHelper: ViewModel(), KoinComponent {
         }
     }
 
-    fun navigateToHome() {
+    fun navigateToHome(accessToken: String? = null) {
+        logger.d { "este es el accessToken: $accessToken" }
         viewModelScope.launch {
-            logger.d { "Emitting Screen.Home" }
-            navigation.emit(Screen.Home)
+            if (accessToken != null) {
+                logger.d { "Emitting Screen.Home with access token" }
+                code.emit(accessToken)
+                navigation.emit(Screen.Home)
+            } else {
+                logger.d { "Emitting Screen.Home without token" }
+                navigation.emit(Screen.Home)
+            }
         }
     }
 

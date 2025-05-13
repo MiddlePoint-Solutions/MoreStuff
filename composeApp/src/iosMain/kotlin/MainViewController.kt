@@ -19,51 +19,58 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
-    CompositionLocalProvider(LocalRouterContext provides routerContext) {
+  CompositionLocalProvider(LocalRouterContext provides routerContext) {
+    val navigationHelper = koinInject<NavigationHelper>()
+    val initialScreen = remember { mutableStateOf<Screen?>(null) }
+    val accessToken = remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+      navigationHelper.shareable.collect { shareable ->
+        initialScreen.value = when (shareable) {
+          is Shareable.Image -> {
+            Screen.Share(shareable, shareable.uri)
+          }
 
-        val navigationHelper = koinInject<NavigationHelper>()
-        val initialScreen = remember { mutableStateOf<Screen?>(null) }
+          is Shareable.Pdf -> {
+            Screen.Share(shareable, shareable.uri)
+          }
 
-        LaunchedEffect(Unit) {
-            navigationHelper.shareable.collect { shareable ->
-                initialScreen.value = when (shareable) {
-                    is Shareable.Image -> {
-                        Screen.Share(shareable, shareable.uri)
-                    }
+          is Shareable.Text -> {
+            Screen.Share(shareable, shareable.message)
+          }
 
-                    is Shareable.Pdf -> {
-                        Screen.Share(shareable, shareable.uri)
-                    }
-
-                    is Shareable.Text -> {
-                        Screen.Share(shareable, shareable.message)
-                    }
-
-                    else -> {
-                        null
-                    }
-                }
-            }
+          else -> {
+            null
+          }
         }
-        LaunchedEffect(Unit) {
-            navigationHelper.navigation.collect { screen ->
-                initialScreen.value = screen
-            }
-        }
-        PredictiveBackGestureOverlay(
-            backDispatcher = routerContext.backHandler as BackDispatcher,
-            backIcon = { progress, _ ->
-                /*PredictiveBackGestureIcon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    progress = progress,
-                )*/
-            },
-            modifier = Modifier.fillMaxSize(),
-        ){
-            App(screen = initialScreen.value)
-        }
-
+      }
     }
+    LaunchedEffect(Unit) {
+      navigationHelper.navigation.collect { screen ->
+        initialScreen.value = screen
+      }
+    }
+
+    LaunchedEffect(Unit) {
+      navigationHelper.code.collect { code ->
+        accessToken.value = code
+      }
+    }
+
+
+    PredictiveBackGestureOverlay(
+      backDispatcher = routerContext.backHandler as BackDispatcher,
+      backIcon = { progress, _ ->
+        /*PredictiveBackGestureIcon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            progress = progress,
+        )*/
+      },
+      modifier = Modifier.fillMaxSize(),
+    ) {
+      App(screen = initialScreen.value, accessToken = accessToken.value)
+    }
+
+  }
 }
 
 
