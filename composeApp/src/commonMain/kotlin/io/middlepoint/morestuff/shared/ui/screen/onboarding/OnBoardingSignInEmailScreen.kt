@@ -20,7 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,7 @@ import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.`continue`
@@ -47,8 +50,12 @@ import morestuff.composeapp.generated.resources.enter_code_sent_to_email
 import morestuff.composeapp.generated.resources.enter_your_email
 import morestuff.composeapp.generated.resources.error_generic
 import morestuff.composeapp.generated.resources.error_invalid_email
+import morestuff.composeapp.generated.resources.ms_sign_in
+import morestuff.composeapp.generated.resources.resend_code
+import morestuff.composeapp.generated.resources.seconds_to_resend
 import morestuff.composeapp.generated.resources.six_digit_code_label
 import morestuff.composeapp.generated.resources.verify
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -69,6 +76,11 @@ fun SignInEmailScreen(
   var otpCode by remember { mutableStateOf("") }
   var isLoading by remember { mutableStateOf(false) }
 
+  var canResendOtp by remember { mutableStateOf(false) }
+  var secondsRemaining by remember { mutableStateOf(60) }
+  var hasResentOtp by remember { mutableStateOf(false) }
+
+
   val sendOtpToEmail: (String, () -> Unit, (String) -> Unit) -> Unit = { email, onSent, onError ->
     scope.launch {
       isLoading = true
@@ -77,6 +89,8 @@ fun SignInEmailScreen(
           this.email = email
         }
         onSent()
+        secondsRemaining = 60
+        canResendOtp = false
       } catch (e: Exception) {
         logger.e(e) { "Error sending otp to email" }
         emailError = when {
@@ -113,6 +127,18 @@ fun SignInEmailScreen(
     }
   }
 
+  LaunchedEffect(isEmailSent) {
+    if (isEmailSent && !hasResentOtp) {
+      secondsRemaining = 60
+      canResendOtp = false
+      while (secondsRemaining > 0) {
+        delay(1000)
+        secondsRemaining--
+      }
+      canResendOtp = true
+    }
+  }
+
   val background = remember { onBoardingBrush }
 
   Box(
@@ -128,6 +154,12 @@ fun SignInEmailScreen(
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
+      Icon(
+        painter = painterResource(Res.drawable.ms_sign_in),
+        tint = Color.Unspecified,
+        contentDescription = "signIn",
+      )
+      Spacer(modifier = Modifier.height(32.dp))
       Text(
         text = if (!isEmailSent) stringResource(Res.string.enter_your_email)
         else stringResource(Res.string.enter_code_sent_to_email, email.text),
@@ -198,6 +230,45 @@ fun SignInEmailScreen(
           ),
           modifier = Modifier.fillMaxWidth()
         )
+
+
+        Spacer(modifier = Modifier.height(8.dp))
+        if (!hasResentOtp) {
+          if (!canResendOtp) {
+            Text(
+              text = stringResource(Res.string.seconds_to_resend).replace(
+                "%s",
+                "$secondsRemaining"
+              ),
+              color = Color.White.copy(alpha = 0.7f),
+              style = MaterialTheme.typography.bodySmall
+            )
+          } else {
+            TextButton(
+              onClick = {
+                sendOtpToEmail(
+                  email.text,
+                  {
+                    hasResentOtp = true
+                    canResendOtp = false
+                  },
+                  {}
+                )
+              },
+              enabled = !isLoading,
+              colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White,
+                containerColor = Color(0xFF393AC5),
+                disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
+              ),
+            ) {
+              Text(
+                text = stringResource(Res.string.resend_code),
+                color = Color.White
+              )
+            }
+          }
+        }
       }
 
       Spacer(modifier = Modifier.height(24.dp))
