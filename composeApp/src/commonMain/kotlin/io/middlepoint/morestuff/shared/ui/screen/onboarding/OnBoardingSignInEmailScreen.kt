@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.screen.onboarding
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -26,6 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -35,6 +38,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.OTP
+import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.`continue`
@@ -109,9 +113,12 @@ fun SignInEmailScreen(
     }
   }
 
+  val background = remember { onBoardingBrush }
+
   Box(
     modifier = Modifier
       .fillMaxSize()
+      .background(background)
       .imePadding()
   ) {
     Column(
@@ -125,7 +132,7 @@ fun SignInEmailScreen(
         text = if (!isEmailSent) stringResource(Res.string.enter_your_email)
         else stringResource(Res.string.enter_code_sent_to_email, email.text),
         style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurface
+        color = Color.White
       )
       Spacer(modifier = Modifier.height(16.dp))
 
@@ -137,12 +144,12 @@ fun SignInEmailScreen(
             emailError = null
           }
         },
-        label = { Text(stringResource(Res.string.email_label)) },
+        label = { Text(text = stringResource(Res.string.email_label), color = Color.White) },
         leadingIcon = {
           Icon(
             imageVector = Icons.Default.Email,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary
+            tint = Color.White
           )
         },
         singleLine = true,
@@ -170,12 +177,17 @@ fun SignInEmailScreen(
         OutlinedTextField(
           value = otpCode,
           onValueChange = { if (it.length <= 6) otpCode = it },
-          label = { Text(stringResource(Res.string.six_digit_code_label)) },
+          label = {
+            Text(
+              text = stringResource(Res.string.six_digit_code_label),
+              color = Color.White
+            )
+          },
           leadingIcon = {
             Icon(
               imageVector = Icons.Default.VpnKey,
               contentDescription = null,
-              tint = MaterialTheme.colorScheme.primary
+              tint = Color.White
             )
           },
           singleLine = true,
@@ -199,10 +211,15 @@ fun SignInEmailScreen(
               {}
             )
           },
+          colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFF393AC5),
+            disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
+          ),
           enabled = isValidEmail(email.text) && !isLoading,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(stringResource(Res.string.`continue`))
+          Text(text = stringResource(Res.string.`continue`), color = Color.White)
         }
       } else {
         Button(
@@ -212,10 +229,15 @@ fun SignInEmailScreen(
               otpCode
             ) { }
           },
+          colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color.White,
+            containerColor = Color(0xFF393AC5),
+            disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
+          ),
           enabled = otpCode.length == 6 && !isLoading,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(stringResource(Res.string.verify))
+          Text(text = stringResource(Res.string.verify), color = Color.White)
         }
       }
     }
