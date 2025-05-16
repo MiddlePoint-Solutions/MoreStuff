@@ -91,9 +91,7 @@ class SchedulerImpl(
             }*/
     }
 
-/*  override fun cancelSchedule(scheduleId: Uuid) {
-    TODO("Not yet implemented")
-  }*/
+
 
   override fun cancelSchedule(scheduleId: Uuid) {
     UNUserNotificationCenter.currentNotificationCenter()
@@ -145,15 +143,6 @@ class SchedulerImpl(
                   }
               }
       }*/
-
-    override fun cancelSchedule(scheduleId: Uuid) {
-        UNUserNotificationCenter.currentNotificationCenter()
-            .removePendingNotificationRequestsWithIdentifiers(
-                listOf(getScheduleWorkTag(scheduleId))
-            )
-        logger.i { "Cancelled notification with scheduleId= $scheduleId" }
-
-    }
 
     override fun cancelPlannedPriorityUpdate() {
         UNUserNotificationCenter.currentNotificationCenter()

@@ -28,6 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>morestuff</string>
+          <string>app.morestuff</string>
           <string>com.googleusercontent.apps.895634462091-qr6urlar6kjek2q0k3s7m1ctse48vgpf</string>
         </array>
       </dict>

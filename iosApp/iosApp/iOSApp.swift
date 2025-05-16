@@ -20,8 +20,18 @@ struct SwiftUIApp: App {
                 .ignoresSafeArea(edges: .all)
                 .ignoresSafeArea(.keyboard)
                 .onOpenURL { url in
+                    print("url type: \(url)")
                     
-                    handleFileURL(url, navigationHelper: navigationHelper)
+                    if url.absoluteString.contains("app.morestuff://login-callback") && url.absoluteString.contains("access_token=") {
+                        if let fragment = url.fragment {
+                            print("Fragment: \(fragment)")
+                            delegate.navigateHome(accessToken: fragment)
+                        } else {
+                            print("No fragment found in URL")
+                        }
+                    } else {
+                        handleFileURL(url, navigationHelper: navigationHelper)
+                    }
                 }
         }
     
@@ -35,6 +45,7 @@ struct SwiftUIApp: App {
     } // Compose has own keyboard handler
   }
 }
+
 
 private func handleFileURL(_ url: URL, navigationHelper: NavigationHelper) {
     let filePath: String?
@@ -144,6 +155,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     private func cancelSchedule(taskId: String){
         DispatchQueue.main.async {
             self.navigationHelper.cancelTaskSchedule(taskId: taskId)
+        }
+    }
+    
+    func navigateHome(accessToken: String? = nil) {
+        DispatchQueue.main.async {
+            print("token de acceso: \(accessToken)")
+            self.navigationHelper.navigateToHome(accessToken: accessToken)
         }
     }
 
