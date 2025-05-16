@@ -297,4 +297,7 @@
     <string name="delete_scope">Eliminar Scope</string>
 
     <string name="chat_whit_ai">Habla con MoreStuff IA.</string>
+
+    <string name="resend_code">Reenviar código</string>
+    <string name="seconds_to_resend">Podrás reenviar el código en %s segundos</string>
 </resources>
