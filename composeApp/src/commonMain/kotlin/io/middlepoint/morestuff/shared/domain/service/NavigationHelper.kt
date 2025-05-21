@@ -21,6 +21,8 @@ class NavigationHelper: ViewModel(), KoinComponent {
     val navigation = MutableSharedFlow<Screen>()
     val code = MutableSharedFlow<String>()
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
+    private val scheduler: Scheduler by inject()
+
 
 
     fun shareText(message: String) {
@@ -80,6 +82,10 @@ class NavigationHelper: ViewModel(), KoinComponent {
         }
     }
 
+    fun triggerDataSyncSchedule() {
+        logger.d { "Calling scheduleDataSyncWorker from NavigationHelper" }
+        scheduler.dataSyncWorker()
+    }
 
 
 }

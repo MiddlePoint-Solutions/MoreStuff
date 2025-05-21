@@ -110,6 +110,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                         print("Permisos de notificación denegados.")
                     }
                 }
+        navigationHelper.triggerDataSyncSchedule()
         return true
     }
 
