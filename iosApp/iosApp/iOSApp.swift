@@ -123,18 +123,18 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             options: [.authenticationRequired]
         )
 
-        // 📦 CATEGORÍA
+        
         let taskCategory = UNNotificationCategory(
             identifier: "TASK_REPLY_CATEGORY",
             actions: [snoozeAction, tomorrowAction, doneAction],
             intentIdentifiers: [],
-            options: []
+            options: [.customDismissAction]
         )
 
-        // ✅ REGISTRAR LA CATEGORÍA
+        
         center.setNotificationCategories([taskCategory])
 
-        // 🔐 PEDIR PERMISOS
+       
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             if let error = error {
                 print("Error al solicitar permisos de notificación: \(error.localizedDescription)")
@@ -169,6 +169,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             case "DONE_ACTION":
                 print("✅ Done pressed for schedule \(scheduleId)")
                 self.replyToSchedule(scheduleId: scheduleId, replyType: "DONE")
+                
+            case UNNotificationDismissActionIdentifier:
+                print("👋 Swipe to dismiss para schedule \(scheduleId)")
+                if let taskIdString = userInfo["taskId"] as? String {
+                    cancelSchedule(taskId: taskIdString)
+                }
+
 
             default:
                 if let taskIdString = userInfo["taskId"] as? String {
