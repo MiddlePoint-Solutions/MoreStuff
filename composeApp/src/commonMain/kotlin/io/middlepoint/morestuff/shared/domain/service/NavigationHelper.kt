@@ -3,12 +3,15 @@ package io.middlepoint.morestuff.shared.domain.service
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -22,6 +25,7 @@ class NavigationHelper: ViewModel(), KoinComponent {
     val code = MutableSharedFlow<String>()
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
     private val scheduler: Scheduler by inject()
+    private val store: AppStore by inject()
 
 
 
@@ -86,6 +90,16 @@ class NavigationHelper: ViewModel(), KoinComponent {
         logger.d { "Calling scheduleDataSyncWorker from NavigationHelper" }
         scheduler.dataSyncWorker()
     }
+
+
+    fun replyToSchedule(scheduleId: Uuid, replyTypeString: String) {
+        viewModelScope.launch {
+            val replyType = ReplyType.valueOf(replyTypeString.uppercase())
+            logger.d { "Dispatching ScheduleReplyAction with id: $scheduleId and type: $replyType" }
+            store.dispatch(ScheduleAction.ScheduleReplyAction(scheduleId, replyType))
+        }
+    }
+
 
 
 }

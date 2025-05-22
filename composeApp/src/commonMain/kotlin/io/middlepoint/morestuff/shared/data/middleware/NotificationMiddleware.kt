@@ -1,18 +1,19 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
-import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
-import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction
-import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.*
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.RemoveScheduleNotificationAction
 import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReminderNotificationAction
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.ShowReviewNotification
+import io.middlepoint.morestuff.shared.domain.redux.action.NotificationAction.UserResponseAction
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.service.Notifier
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.domain.usecase.task.ClearTaskNotificationsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ class NotificationMiddleware(
             }
 
             is UserResponseAction -> with(action) {
+                logger.i { "Received user response for scheduleId=$scheduleId, replyType=$replyType" }
                 notifier.clearScheduleNotification(scheduleId)
                 dispatch(ScheduleAction.ScheduleReplyAction(scheduleId, replyType))
             }

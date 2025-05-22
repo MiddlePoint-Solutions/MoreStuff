@@ -20,6 +20,8 @@ import platform.Foundation.NSDateComponents
 import platform.Foundation.dateWithTimeIntervalSinceNow
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
+import platform.UserNotifications.UNNotificationAction
+import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationRequest
 import platform.UserNotifications.UNUserNotificationCenter
 
@@ -32,6 +34,8 @@ class SchedulerImpl(
 
   init {
     notificationCenter.delegate()
+    registerNotificationCategories()
+
   }
 
   override fun scheduleAtExact(
@@ -57,6 +61,8 @@ class SchedulerImpl(
       setTitle("Reminder")
       setBody(taskTitle)
       setUserInfo(mapOf("scheduleId" to scheduleId.value, "taskId" to taskId.value))
+      setCategoryIdentifier("TASK_REPLY_CATEGORY")
+
     }
 
     val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
@@ -69,7 +75,6 @@ class SchedulerImpl(
       content = content,
       trigger = trigger
     )
-
     notificationCenter.addNotificationRequest(request) { error ->
       if (error == null) {
 
@@ -80,6 +85,38 @@ class SchedulerImpl(
     }
 
   }
+
+
+  private fun registerNotificationCategories() {
+    val snoozeAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "SNOOZE_ACTION",
+      title = "Snooze",
+      options = 0u
+    )
+
+    val tomorrowAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "TOMORROW_ACTION",
+      title = "Tomorrow",
+      options = 0u
+    )
+
+    val doneAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "DONE_ACTION",
+      title = "Done",
+      options = 0u
+    )
+
+    val reminderCategory = UNNotificationCategory.categoryWithIdentifier(
+      identifier = "TASK_REPLY_CATEGORY",
+      actions = listOf(snoozeAction, tomorrowAction, doneAction),
+      intentIdentifiers = emptyList<String>(),
+      options = 0u
+    )
+
+    UNUserNotificationCenter.currentNotificationCenter()
+      .setNotificationCategories(setOf(reminderCategory))
+  }
+
 
 
   override fun scheduleDataSyncWorker() {
