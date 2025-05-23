@@ -19,7 +19,6 @@ import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
@@ -81,7 +80,7 @@ class ScheduleRepositoryImpl(
     val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
     return scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
   }
 
   override suspend fun getActiveSchedulesForTasks(

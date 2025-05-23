@@ -72,9 +72,6 @@ SELECT COUNT(*)
 FROM scopes
 WHERE scopes.deleted = 0;
 
-lastInsertRowId:
-SELECT last_insert_rowid();
-
 deleteAll:
 DELETE FROM scopes;
 

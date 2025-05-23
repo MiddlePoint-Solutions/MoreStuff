@@ -77,6 +77,7 @@ import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.path
+import io.github.vinceglb.filekit.size
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -225,6 +226,7 @@ fun TaskChatScreen(
       }
 
       is ImageImport -> {
+        screen.imageFile.size()
         ImageImportScreen(
           imagePath = screen.imageFile.path,
           onImport = { title ->

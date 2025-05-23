@@ -61,6 +61,16 @@ kotlin {
     }
   }
 
+//  wasmJs {
+//    outputModuleName = "moreStuffCommon"
+//    browser {
+//      commonWebpackConfig {
+//        outputFileName = "moreStuffCommon.js"
+//      }
+//    }
+//    binaries.executable()
+//  }
+
   iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosSimulatorArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
@@ -140,7 +150,6 @@ kotlin {
       implementation(libs.reorderable)
       implementation(libs.coil.compose)
       implementation(libs.coil.ktor3)
-      implementation(libs.coil.ktor2)
       implementation(libs.zoomable)
       implementation(libs.kottie)
       implementation(libs.calf.permissions)
@@ -221,9 +230,12 @@ kotlin {
       implementation(libs.kotlinx.coroutines.swing)
     }
 
-    // TODO: Enable once we have support from SqlDelight
-//        wasmJsMain.dependencies {
-//        }
+//    wasmJsMain.dependencies {
+//      implementation(libs.sqldelight.driver.web)
+//      implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.1.0"))
+//      implementation(npm("sql.js", libs.versions.sqlJs.get()))
+//      implementation(devNpm("copy-webpack-plugin", libs.versions.webPackPlugin.get()))
+//    }
   }
 }
 

@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.com.google.api.services.storage.Storage.Projects
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -15,16 +16,13 @@ kotlin {
 
   @OptIn(ExperimentalWasmDsl::class)
   wasmJs {
+    outputModuleName = "moreStuffShared"
     browser {
       commonWebpackConfig {
-        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-          static = (static ?: mutableListOf()).apply {
-            // Serve sources to debug inside browser
-            add(project.projectDir.path)
-          }
-        }
+        outputFileName = "moreStuffShared.js"
       }
     }
+    binaries.executable()
   }
 
   androidTarget()

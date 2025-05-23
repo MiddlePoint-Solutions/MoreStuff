@@ -80,9 +80,6 @@ UPDATE schedules
 SET active = ?
 WHERE id = ?;
 
-lastInsertRowId:
-SELECT last_insert_rowid();
-
 deleteAll:
 DELETE FROM schedules;
 

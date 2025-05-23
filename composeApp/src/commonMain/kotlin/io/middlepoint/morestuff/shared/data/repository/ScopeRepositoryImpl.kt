@@ -12,12 +12,10 @@ import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.NoScope
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 
 class ScopeRepositoryImpl(
@@ -80,7 +78,7 @@ class ScopeRepositoryImpl(
   override fun getScopesFlow(): Flow<List<Scope>> = scopeQueries
     .selectAllScopes(mapper = dataMappers.scopeDataMapper)
     .asFlow()
-    .mapToList(Dispatchers.IO)
+    .mapToList(Dispatchers.Default)
 
   override suspend fun updateScopeName(id: Uuid, name: String): Either<Failure, Scope> =
     scopeQueries.transactionWithResult {

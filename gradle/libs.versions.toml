@@ -11,8 +11,8 @@ aboutLibrariesVersion = "11.2.1"
 kSoup = "0.3.0"
 sqliteAndroid = "3.45.0"
 
-agp = "8.8.2"
-kotlin = "2.1.0"
+agp = "8.9.3"
+kotlin = "2.1.20"
 
 android_sdk_compile = "35"
 android_sdk_target = "35"
@@ -20,20 +20,20 @@ android_sdk_min = "26"
 
 androidx-core = "1.16.0"
 kotlinx-immutable-collections = "0.3.7"
-kotlinx-coroutines = "1.10.1"
+kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.0"
 kotlinx-datetime = "0.6.2"
 kotlinx-atomicfu = "0.27.0"
-compose = "1.7.3"
+compose = "1.8.0"
 androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
 androidx-lifecycle = "2.9.0"
 kermit = "2.0.5"
-ktor = "3.1.1"
+ktor = "3.1.2"
 multiplatform-settings = "1.3.0"
 koin-bom = "4.1.0-Beta1"
-sqldelight = "2.0.2"
+sqldelight = "2.1.0"
 arrow = "2.0.1"
 buildConfig = "5.5.1"
 spotless = "6.23.3"
@@ -54,12 +54,14 @@ constraintLayout-compose = "0.4.0"
 compose-settings = "2.4.0"
 sonner = "0.3.6"
 reorderable = "2.4.3"
-zoomable = "1.6.1"
+zoomable = "1.7.0"
 kottie = "1.9.6-alpha02"
 calf = "0.7.1"
-filekit = "0.10.0-beta01"
+filekit = "0.10.0-beta04"
 supabase-bom = "3.1.3"
 openAi = "4.0.1"
+sqlJs = "1.8.0"
+webPackPlugin = "9.1.0"
 
 
 [libraries]
@@ -100,6 +102,7 @@ ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-driver-web = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
 sqldelight-sqlite-dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect", version.ref = "sqldelight" }
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
@@ -137,7 +140,6 @@ sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilCompose" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
-coil-ktor2 = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coilCompose" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
 kottie = { module = "io.github.ismai117:kottie", version.ref = "kottie" }
 calf-permissions = { module = "com.mohamedrejeb.calf:calf-permissions", version.ref = "calf" }
