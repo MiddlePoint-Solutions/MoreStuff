@@ -88,7 +88,6 @@ fun SignInScreen(
   OnBoardingSignInContent(
     signInWithGoogle = { signInWithGoogle.startFlow() },
     signInWithApple = { signInWithApple.startFlow() },
-    onNext = onNext,
     onSignInWithEmail = onSignInWithEmail
   )
 }
@@ -99,7 +98,6 @@ fun SignInScreen(
 fun OnBoardingSignInContent(
   signInWithGoogle: () -> Unit,
   signInWithApple: () -> Unit,
-  onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
 ) {
 

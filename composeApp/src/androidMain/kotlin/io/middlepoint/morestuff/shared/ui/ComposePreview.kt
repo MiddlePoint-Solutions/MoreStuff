@@ -21,7 +21,6 @@ fun PriorityItemPreview() {
         OnBoardingSignInContent(
           signInWithGoogle = {},
           signInWithApple = {},
-          onNext = {},
           onSignInWithEmail = {}
         )
     }

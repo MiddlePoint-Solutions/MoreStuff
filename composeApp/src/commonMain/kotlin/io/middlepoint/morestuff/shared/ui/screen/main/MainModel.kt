@@ -24,61 +24,61 @@ fun mainModel(
   store: AppStore = koinInject()
 ): MainState {
 
-    var currentState by remember { mutableStateOf(initialState) }
+  var currentState by remember { mutableStateOf(initialState) }
 
-    LaunchedEffect(Unit) {
-        store.state.collectLatest {
-            currentState = MainState(
-                ready = it.isReady(),
-                theme = it.settings.appTheme,
-                showOnBoarding = it.settings.isFirstTime || !it.isAuthenticated()
-            )
-        }
+  LaunchedEffect(Unit) {
+    store.state.collectLatest {
+      currentState = MainState(
+        ready = it.isReady(),
+        theme = it.settings.appTheme,
+        showOnBoarding = it.settings.isFirstTime || !it.isAuthenticated()
+      )
     }
+  }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            when (event) {
+  LaunchedEffect(Unit) {
+    events.collect { event ->
+      when (event) {
 
-                MainEvent.OnBoardingComplete -> {
-                    store.dispatch(SettingAction.OnBoardingComplete)
-                }
+        MainEvent.OnBoardingComplete -> {
+          store.dispatch(SettingAction.OnBoardingComplete)
+        }
 
-                is MainEvent.ShareContent -> with(event.content) {
-                    when (this) {
-                        is Shareable.Image -> {
-                            store.dispatch(
-                                MessageAction.CreateFileMessageAction(
-                                    event.taskId,
-                                    createKmpFile(uri),
-                                    message
-                                )
-                            )
-                        }
-
-                        is Shareable.Pdf -> {
-                            store.dispatch(
-                                MessageAction.CreatePDFMessageAction(
-                                    event.taskId,
-                                    createKmpFile(uri),
-                                    message
-                                )
-                            )
-                        }
-
-                        is Shareable.Text -> {
-                            store.dispatch(
-                                MessageAction.CreateUserTaskMessageAction(
-                                    event.taskId,
-                                    message
-                                )
-                            )
-                        }
-                    }
-                }
+        is MainEvent.ShareContent -> with(event.content) {
+          when (this) {
+            is Shareable.Image -> {
+              store.dispatch(
+                MessageAction.CreateFileMessageAction(
+                  event.taskId,
+                  createKmpFile(uri),
+                  message
+                )
+              )
             }
-        }
-    }
 
-    return currentState
+            is Shareable.Pdf -> {
+              store.dispatch(
+                MessageAction.CreatePDFMessageAction(
+                  event.taskId,
+                  createKmpFile(uri),
+                  message
+                )
+              )
+            }
+
+            is Shareable.Text -> {
+              store.dispatch(
+                MessageAction.CreateUserTaskMessageAction(
+                  event.taskId,
+                  message
+                )
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return currentState
 }
