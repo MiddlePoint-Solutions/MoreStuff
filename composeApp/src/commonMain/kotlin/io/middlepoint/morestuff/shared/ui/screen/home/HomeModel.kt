@@ -88,9 +88,9 @@ fun homeModel(
 
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
-      if(currentScopeId.value.isEmpty()) {
-        currentScopeId = it.first { scope -> scope.name == DEFAULT_SCOPE_NAME }.id
-      }
+//      if(currentScopeId.value.isEmpty()) {
+//        currentScopeId = it.first { scope -> scope.name == DEFAULT_SCOPE_NAME }.id
+//      }
       scopes = it
     }
   }

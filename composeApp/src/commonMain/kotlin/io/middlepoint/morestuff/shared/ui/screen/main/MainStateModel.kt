@@ -7,7 +7,7 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 data class MainState(
     val ready: Boolean = false,
     val theme: AppTheme = AppTheme.System,
-    val showOnBoarding: Boolean = false,
+    val isAuthenticated: Boolean = false,
 )
 
 sealed class MainEvent {
