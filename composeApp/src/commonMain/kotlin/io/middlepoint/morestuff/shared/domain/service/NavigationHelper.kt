@@ -22,7 +22,6 @@ class NavigationHelper: ViewModel(), KoinComponent {
     val code = MutableSharedFlow<String>()
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
 
-
     fun shareText(message: String) {
         viewModelScope.launch {
             logger.d { "Emitting Shareable.Text with message: $message" }

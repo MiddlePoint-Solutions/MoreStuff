@@ -7,7 +7,6 @@ import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import kotlinx.coroutines.flow.Flow
 
 interface ScopeRepository {
-    suspend fun initScopes()
     suspend fun createScope(name: String): Either<Failure, Scope>
     suspend fun deleteScope(id: Uuid): Either<Failure, Scope>
     suspend fun getScopes(): Either<Failure, List<Scope>>

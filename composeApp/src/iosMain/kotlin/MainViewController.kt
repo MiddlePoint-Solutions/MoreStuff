@@ -19,6 +19,7 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalDecomposeApi::class)
 fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
+
   CompositionLocalProvider(LocalRouterContext provides routerContext) {
     val navigationHelper = koinInject<NavigationHelper>()
     val initialScreen = remember { mutableStateOf<Screen?>(null) }
@@ -44,6 +45,7 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
         }
       }
     }
+
     LaunchedEffect(Unit) {
       navigationHelper.navigation.collect { screen ->
         initialScreen.value = screen
