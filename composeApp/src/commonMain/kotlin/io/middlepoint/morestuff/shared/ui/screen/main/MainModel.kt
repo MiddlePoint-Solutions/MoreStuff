@@ -31,7 +31,7 @@ fun mainModel(
       currentState = MainState(
         ready = it.isReady(),
         theme = it.settings.appTheme,
-        showOnBoarding = it.settings.isFirstTime || !it.isAuthenticated()
+        isAuthenticated = it.isAuthenticated()
       )
     }
   }

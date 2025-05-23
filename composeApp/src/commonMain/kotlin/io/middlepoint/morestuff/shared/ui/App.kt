@@ -47,7 +47,7 @@ fun App(screen: Screen? = null, accessToken: String? = null) {
             modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
           ) {
             if (model.ready) {
-              if (model.showOnBoarding) {
+              if (!model.isAuthenticated) {
                 router.navigate { listOf(Screen.SignIn) }
               }
               MainContent(

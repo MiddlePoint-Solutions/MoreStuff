@@ -44,12 +44,16 @@ class DataSyncManagerImpl(
   private val logger = Logger.withTag("DataSyncManager")
 
   private var lastPushTime: Instant
-    get() = Instant.fromEpochMilliseconds(settings.getLong(KEY_LAST_PUSH_TIME, 0))
-    set(value) = settings.putLong(KEY_LAST_PUSH_TIME, value.toEpochMilliseconds())
+    get() = settings.getStringOrNull(KEY_LAST_PUSH_TIME)
+      ?.let { Instant.parse(it) }
+      ?: Instant.fromEpochMilliseconds(0)
+    set(value) = settings.putString(KEY_LAST_PUSH_TIME, value.toString())
 
   private var lastPullTime: Instant
-    get() = Instant.fromEpochMilliseconds(settings.getLong(KEY_LAST_PULL_TIME, 0))
-    set(value) = settings.putLong(KEY_LAST_PULL_TIME, value.toEpochMilliseconds())
+    get() = settings.getStringOrNull(KEY_LAST_PULL_TIME)
+      ?.let { Instant.parse(it) }
+      ?: Instant.fromEpochMilliseconds(0)
+    set(value) = settings.putString(KEY_LAST_PULL_TIME, value.toString())
 
   /**
    * Current sync method: Push -> Pull
