@@ -72,9 +72,6 @@ UPDATE tasks
 SET title = ?
 WHERE id = ?;
 
-lastInsertRowId:
-SELECT last_insert_rowid();
-
 updateTaskPriorityScore:
 UPDATE tasks
 SET priority_score = :priority_score

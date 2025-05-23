@@ -21,7 +21,6 @@ import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
@@ -80,12 +79,12 @@ class TaskRepositoryImpl(
   override fun getTaskFlow(taskId: Uuid): Flow<Task> {
     val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
       .asFlow()
-      .mapToOneNotNull(Dispatchers.IO)
+      .mapToOneNotNull(Dispatchers.Default)
 
     val schedulesFlow =
       scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
 
     return combine(taskFlow, schedulesFlow) { task, schedules ->
       task.copy(schedule = schedules)
@@ -94,13 +93,13 @@ class TaskRepositoryImpl(
 
   override fun getActiveTasksFlow(): Flow<List<Task>> {
     val tasksFlow = taskQueries.selectAllActive(mapper.taskDataMapper)
-      .asFlow().mapToList(Dispatchers.IO)
+      .asFlow().mapToList(Dispatchers.Default)
     return combinedTaskFlow(tasksFlow)
   }
 
   override fun getScopeActiveTasksFlow(scopeId: Uuid): Flow<List<Task>> {
     val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDataMapper)
-      .asFlow().mapToList(Dispatchers.IO)
+      .asFlow().mapToList(Dispatchers.Default)
     return combinedTaskFlow(tasksFlow)
   }
 
@@ -111,7 +110,7 @@ class TaskRepositoryImpl(
   override fun getCompleteTasksFlow(): Flow<List<Task>> =
     taskQueries.selectAllComplete(mapper = mapper.taskDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
 
   override suspend fun getTaskAbovePriorityScore(
     priorityScore: Long,
@@ -175,12 +174,12 @@ class TaskRepositoryImpl(
 
     val tasksFlow = taskQueries.selectAllActive(mapper.taskDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
 
     val schedulesFlow =
       scheduleQueries.selectActiveSchedules(scheduleTypes, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
 
     return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
       schedules
@@ -206,7 +205,7 @@ class TaskRepositoryImpl(
         true -> taskQueries.searchActiveTasks(searchText, mapper = mapper.taskDataMapper)
         false -> taskQueries.searchTasks(searchText, mapper = mapper.taskDataMapper)
       }.asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { tasks -> tasks.sortedBy { it.isComplete } }
         .let { combinedTaskFlow(it) }
     } else {
@@ -214,7 +213,7 @@ class TaskRepositoryImpl(
         true -> taskQueries.selectAllActiveForSearch(mapper.taskDataMapper)
         false -> taskQueries.selectAllForSearch(mapper.taskDataMapper)
       }.asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { tasks -> tasks.sortedBy { it.isComplete } }
 
       return tasksFlow
@@ -284,13 +283,13 @@ class TaskRepositoryImpl(
     val schedulesFlow =
       scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { it.groupBy { schedule -> schedule.taskId } }
 
     val messagesFlow =
       messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { messages ->
           messages.groupBy { message -> message.task_id }
             .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }

@@ -22,7 +22,6 @@ import io.middlepoint.morestuff.shared.domain.repository.MessageDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 
@@ -39,7 +38,7 @@ class MessageRepositoryImpl(
   override fun getTaskMessagesFlow(taskId: Uuid): Flow<List<Message>> =
     messageQueries.selectMessageByTaskId(taskId, mapper = mapper.messageDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
 
   override fun getTaskChatMessages(taskId: Uuid): List<Message> =
     messageQueries.selectTaskMessagesByContentType(
@@ -53,7 +52,7 @@ class MessageRepositoryImpl(
       taskId,
       listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
-    ).asFlow().mapToList(Dispatchers.IO)
+    ).asFlow().mapToList(Dispatchers.Default)
 
   override suspend fun getMessage(messageId: Uuid): Either<Failure, Message> {
     val message = messageQueries.selectMessageById(

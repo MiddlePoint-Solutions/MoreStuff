@@ -109,7 +109,6 @@ fun SearchBar(
     }
   }
 
-
   val onActiveChange: (Boolean) -> Unit = { isActive ->
     if (!isActive) {
       exitSearch()
@@ -188,6 +187,21 @@ fun SearchBar(
                 )
               }
             )
+
+            // TODO: uncomment when reminders are enabled
+//            SearchFilterChip(
+//              filter = FilterType.Reminder,
+//              selectedFilter = model.filter,
+//              onFilterSelected = { selectedFilter ->
+//                focusManager.clearFocus()
+//                keyboardController?.hide()
+//                viewModel.take(
+//                  SearchEvent.SetSearchFilter(
+//                    selectedFilter
+//                  )
+//                )
+//              }
+//            )
 
             SearchFilterChip(
               filter = FilterType.Done,
