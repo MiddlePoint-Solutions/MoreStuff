@@ -102,7 +102,7 @@ fun CreateScopeBottomSheet(
     }
   ) {
     Column(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().height(150.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
@@ -126,7 +126,8 @@ fun CreateScopeBottomSheet(
 
     Row(
       modifier = Modifier
-        .fillMaxWidth(),
+        .fillMaxWidth()
+        .padding(top = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.End
     ) {
@@ -138,7 +139,7 @@ fun CreateScopeBottomSheet(
           fontSize = 18.sp,
           textAlign = TextAlign.End
         ),
-        modifier = Modifier.padding(end = 16.dp)
+        modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
       )
     }
   }
