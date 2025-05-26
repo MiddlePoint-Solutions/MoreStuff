@@ -67,7 +67,7 @@ fun UserTextInput(
   backgroundColor: Color = MaterialTheme.colorScheme.background,
   focusRequester: FocusRequester = remember { FocusRequester() },
   startWithFocus: Boolean = false,
-  isAIEnabled: Boolean = false,
+  //isAIEnabled: Boolean = false,
   inputHint: String = stringResource(Res.string.task_chat_input_hint)
 ) {
   val a11ylabel = stringResource(Res.string.textfield_desc)
@@ -84,7 +84,7 @@ fun UserTextInput(
     label = "neonOffset"
   )
 
-  val aiEnabledTransition = updateTransition(
+/*  val aiEnabledTransition = updateTransition(
     targetState = isAIEnabled,
     label = "aiEnabledTransition"
   )
@@ -97,7 +97,7 @@ fun UserTextInput(
   val borderAlpha by aiEnabledTransition.animateFloat(
     label = "borderAlpha",
     transitionSpec = { tween(300) }
-  ) { enabled -> if (enabled) 1f else 0f }
+  ) { enabled -> if (enabled) 1f else 0f }*/
 
 
   LaunchedEffect(Unit) {
@@ -106,7 +106,7 @@ fun UserTextInput(
     }
   }
 
-  val animatedBorder = if (borderAlpha > 0f) {
+/*  val animatedBorder = if (borderAlpha > 0f) {
     val animatedNeonGradient = Brush.linearGradient(
       colors = listOf(
         Color(0xFFBDC6FF).copy(alpha = borderAlpha),
@@ -117,7 +117,7 @@ fun UserTextInput(
       end = Offset(animatedOffset + 200f, 100f)
     )
     BorderStroke(borderWidth, animatedNeonGradient)
-  } else null
+  } else null*/
 
   Surface(
     modifier = modifier
@@ -126,7 +126,7 @@ fun UserTextInput(
       .animateContentSize(),
     shape = RoundedCornerShape(42),
     color = backgroundColor,
-    border = animatedBorder,
+   // border = animatedBorder,
   ) {
     Row(
       modifier = Modifier
@@ -167,19 +167,19 @@ fun UserTextInput(
         decorationBox = { innerTextField ->
           Box(
             contentAlignment = Alignment.CenterStart,
-            modifier = Modifier.padding(bottom = 6.dp, top = 6.dp)
+            modifier = Modifier.padding(bottom = 6.dp, top = 6.dp, start = 6.dp )
           ) {
             if (value.text.isEmpty()) {
-              Crossfade(targetState = isAIEnabled, animationSpec = tween(350)) { aiEnabled ->
+             // Crossfade(targetState = isAIEnabled, animationSpec = tween(350)) { aiEnabled ->
                 Text(
-                  text = if (!aiEnabled) inputHint else stringResource(Res.string.chat_whit_ai),
+                  text = /*if (!aiEnabled)*/ inputHint/* else stringResource(Res.string.chat_whit_ai)*/,
                   modifier = Modifier.align(Alignment.CenterStart),
                   style = LocalTextStyle.current.copy(
                     color = LocalContentColor.current.copy(alpha = 0.6f),
                     fontSize = 18.sp
                   )
                 )
-              }
+             // }
             }
             innerTextField()
           }
