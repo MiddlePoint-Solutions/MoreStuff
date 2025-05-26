@@ -76,7 +76,7 @@
 
 <key>BGTaskSchedulerPermittedIdentifiers</key>
 <array>
-    <string>io.middlepoint.morestuff.backgroundTask</string>
+    <string>io.middlepoint.morestuff</string>
 </array>
 
 	<key>UIBackgroundModes</key>

@@ -7,4 +7,5 @@ interface Scheduler {
     fun scheduleDataSyncWorker()
     fun cancelSchedule(scheduleId: Uuid)
     fun cancelPlannedPriorityUpdate()
+    fun dataSyncWorker()
 }

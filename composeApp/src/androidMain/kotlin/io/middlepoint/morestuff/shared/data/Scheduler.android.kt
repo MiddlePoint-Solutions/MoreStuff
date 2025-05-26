@@ -100,6 +100,10 @@ class SchedulerImpl(
         workManager.cancelAllWorkByTag(DATA_SYNC_WORK)
     }
 
+    override fun dataSyncWorker() {
+        TODO("Not yet implemented")
+    }
+
     private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_${scheduleId.value}"
 
     companion object {
