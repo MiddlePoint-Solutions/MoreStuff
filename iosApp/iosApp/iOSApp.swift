@@ -97,54 +97,16 @@ class DefaultRouterHolder : ObservableObject {
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     let holder: DefaultRouterHolder = DefaultRouterHolder()
     let navigationHelper: NavigationHelper = NavigationHelper()
+    let notificationConfigurator = NotificationConfigurator()
+
     
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
         let center = UNUserNotificationCenter.current()
-        center.delegate = self
-
-    
-        let snoozeAction = UNNotificationAction(
-            identifier: "SNOOZE_ACTION",
-            title: "Snooze",
-            options: []
-        )
-
-        let tomorrowAction = UNNotificationAction(
-            identifier: "TOMORROW_ACTION",
-            title: "Tomorrow",
-            options: []
-        )
-
-        let doneAction = UNNotificationAction(
-            identifier: "DONE_ACTION",
-            title: "Done",
-            options: [.authenticationRequired]
-        )
-
+            center.delegate = self
         
-        let taskCategory = UNNotificationCategory(
-            identifier: "TASK_REPLY_CATEGORY",
-            actions: [snoozeAction, tomorrowAction, doneAction],
-            intentIdentifiers: [],
-            options: [.customDismissAction]
-        )
-
-        
-        center.setNotificationCategories([taskCategory])
-
-       
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-            if let error = error {
-                print("Error al solicitar permisos de notificación: \(error.localizedDescription)")
-            } else if granted {
-                print("Permisos de notificación concedidos.")
-            } else {
-                print("Permisos de notificación denegados.")
-            }
-        }
-
+        notificationConfigurator.configureNotifications()
         navigationHelper.triggerDataSyncSchedule()
         return true
     }
