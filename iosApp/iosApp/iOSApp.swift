@@ -97,21 +97,20 @@ class DefaultRouterHolder : ObservableObject {
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     let holder: DefaultRouterHolder = DefaultRouterHolder()
     let navigationHelper: NavigationHelper = NavigationHelper()
+    let notificationConfigurator = NotificationConfigurator()
+
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        
         let center = UNUserNotificationCenter.current()
-                center.delegate = self
-                center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
-                    if let error = error {
-                        print("Error al solicitar permisos de notificación: \(error.localizedDescription)")
-                    } else if granted {
-                        print("Permisos de notificación concedidos.")
-                    } else {
-                        print("Permisos de notificación denegados.")
-                    }
-                }
+            center.delegate = self
+        
+        notificationConfigurator.configureNotifications()
+        navigationHelper.triggerDataSyncSchedule()
         return true
     }
+
 
 
     func userNotificationCenter(_ center: UNUserNotificationCenter,
@@ -119,16 +118,39 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
 
-        if let taskIdString = userInfo["taskId"] as? String {
-            navigateToTaskChat(taskId: taskIdString)
-        }
-
         if let scheduleId = userInfo["scheduleId"] as? String {
+            switch response.actionIdentifier {
+            case "SNOOZE_ACTION":
+                print("🔁 Snooze pressed for schedule \(scheduleId)")
+                self.replyToSchedule(scheduleId: scheduleId, replyType: "SNOOZE")
+
+            case "TOMORROW_ACTION":
+                print("📅 Tomorrow pressed for schedule \(scheduleId)")
+                self.replyToSchedule(scheduleId: scheduleId, replyType: "TOMORROW")
+
+            case "DONE_ACTION":
+                print("✅ Done pressed for schedule \(scheduleId)")
+                self.replyToSchedule(scheduleId: scheduleId, replyType: "DONE")
+                
+            case UNNotificationDismissActionIdentifier:
+                print("👋 Swipe to dismiss para schedule \(scheduleId)")
+                if let taskIdString = userInfo["taskId"] as? String {
+                    cancelSchedule(taskId: taskIdString)
+                }
+
+
+            default:
+                if let taskIdString = userInfo["taskId"] as? String {
+                    navigateToTaskChat(taskId: taskIdString)
+                }
+            }
+
             center.removePendingNotificationRequests(withIdentifiers: ["SCHEDULE_\(scheduleId)"])
         }
 
         completionHandler()
     }
+
     
        func userNotificationCenter(_ center: UNUserNotificationCenter,
                                    willPresent notification: UNNotification,
@@ -164,6 +186,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             self.navigationHelper.navigateToHome(accessToken: accessToken)
         }
     }
+    
+    private func replyToSchedule(scheduleId: String, replyType: String) {
+        DispatchQueue.main.async {
+            self.navigationHelper.replyToSchedule(
+                scheduleId: scheduleId,
+                replyTypeString: replyType
+            )
+        }
+    }
+
 
     
    

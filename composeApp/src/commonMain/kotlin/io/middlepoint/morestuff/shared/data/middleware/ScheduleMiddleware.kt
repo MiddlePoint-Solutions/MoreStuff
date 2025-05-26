@@ -22,11 +22,13 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
 import io.middlepoint.morestuff.shared.domain.redux.store.Next
 import io.middlepoint.morestuff.shared.domain.redux.store.NoOp
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateOneTimeScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CreateScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.GetScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleAtTimeUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleUserReplyUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.ScheduleWorkUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.SetScheduleFulfilledUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
@@ -41,7 +43,8 @@ class ScheduleMiddleware(
   private val createOneTimeScheduleUseCase: CreateOneTimeScheduleUseCase,
   private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase,
   private val setScheduleFulfilledUseCase: SetScheduleFulfilledUseCase,
-  private val getTaskUseCase: GetTaskUseCase
+  private val getTaskUseCase: GetTaskUseCase,
+  private val scheduleUserReplyUseCase: ScheduleUserReplyUseCase
 ) : Middleware<AppState> {
 
   val timeManager: TimeManager = TimeManagerImpl()
@@ -88,8 +91,26 @@ class ScheduleMiddleware(
       }
 
       is ScheduleAction.ScheduleReplyAction -> {
-        scheduleUserReply(scope, action.scheduleId, action.replyType, dispatch)
+        logger.i { "⏳ ScheduleReplyAction: scheduleId=${action.scheduleId}, replyType=${action.replyType}" }
+
+        scope.launch {
+          val result = scheduleUserReplyUseCase(action.scheduleId, action.replyType)
+
+          result.onRight { actionResult ->
+            if (actionResult != null) {
+              logger.i { "🚀 Ejecutando acción resultante del use case: $actionResult" }
+              dispatch(actionResult)
+            } else {
+              logger.i { "⚠️ No se generó ninguna acción (null)" }
+            }
+          }
+
+          result.onLeft { failure ->
+            logger.e { "❌ Error al ejecutar ScheduleUserReplyUseCase: $failure" }
+          }
+        }
       }
+
 
       is ScheduleCreatedAction -> {
         scope.launch {

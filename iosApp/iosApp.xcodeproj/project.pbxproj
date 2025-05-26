@@ -10,6 +10,7 @@
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		5D11336F2DE46E740040AB6B /* NotificationConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D11336E2DE46E710040AB6B /* NotificationConfigurator.swift */; };
 		5D7E06EB2CF7633000479A35 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D7E06EA2CF7633000479A35 /* Extensions.swift */; };
 		5D7E07062CF765A000479A35 /* MoreStuffShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5D7E06FC2CF765A000479A35 /* MoreStuffShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
@@ -46,6 +47,7 @@
 		1D3B18588DF0672077A53825 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		38ACC1D97BD8F4823C681232 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
+		5D11336E2DE46E710040AB6B /* NotificationConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationConfigurator.swift; sourceTree = "<group>"; };
 		5D7E06EA2CF7633000479A35 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		5D7E06FC2CF765A000479A35 /* MoreStuffShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MoreStuffShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D7E07112CF76BE300479A35 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 		7555FF7D242A565900829871 /* iosApp */ = {
 			isa = PBXGroup;
 			children = (
+				5D11336E2DE46E710040AB6B /* NotificationConfigurator.swift */,
 				5D7E07112CF76BE300479A35 /* iosApp.entitlements */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
 				7555FF82242A565900829871 /* ContentView.swift */,
@@ -324,6 +327,7 @@
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				5D7E06EB2CF7633000479A35 /* Extensions.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				5D11336F2DE46E740040AB6B /* NotificationConfigurator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
