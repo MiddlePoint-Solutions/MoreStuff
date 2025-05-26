@@ -590,7 +590,18 @@ private fun TaskChatInput(
                 modifier = Modifier.fillMaxWidth()
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                  this@Row.AnimatedVisibility(
+                  SendIcon(onClick = {
+                    if (editingMessageId != null) {
+                      onUpdateMessage(userInputValue.text)
+                      onCancelEdit()
+                    } else {
+                      sendTaskMessage(userInputValue.text)
+                      userInputValue = TextFieldValue("")
+                      isTextEmpty.value = true
+                      showSendIcon.value = false
+                    }
+                  })
+                  /*this@Row.AnimatedVisibility(
                     visible = isTextEmpty.value && editingMessageId == null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
@@ -603,9 +614,9 @@ private fun TaskChatInput(
                         contentDescription = stringResource(Res.string.cd_select_images)
                       )
                     }
-                  }
+                  }*/
 
-                  this@Row.AnimatedVisibility(
+                 /* this@Row.AnimatedVisibility(
                     visible = !isTextEmpty.value || editingMessageId != null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
@@ -621,7 +632,7 @@ private fun TaskChatInput(
                         showSendIcon.value = false
                       }
                     })
-                  }
+                  }*/
                 }
               }
 
