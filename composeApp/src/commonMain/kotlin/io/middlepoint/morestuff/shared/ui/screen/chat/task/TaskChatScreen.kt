@@ -431,7 +431,7 @@ private fun TaskChatContent(
               onUpdateMessage = { content ->
                 onEvent(TaskChatEvent.UpdateMessageContent(content))
               },
-              isAIEnabled = isAIEnabled,
+              //isAIEnabled = isAIEnabled,
               onToggleAI = { onEvent(TaskChatEvent.ActivateAI) },
               modifier = Modifier
                 .fillMaxWidth()
@@ -503,7 +503,7 @@ private fun TaskChatInput(
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
   onUpdateMessage: (String) -> Unit = {},
-  isAIEnabled: Boolean = false,
+  //isAIEnabled: Boolean = false,
   onToggleAI: () -> Unit = {}
 ) {
   val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
@@ -550,7 +550,7 @@ private fun TaskChatInput(
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
-            isAIEnabled = isAIEnabled,
+            //isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
@@ -561,7 +561,7 @@ private fun TaskChatInput(
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.focusRequester(focusRequester),
-            leadingContent = {
+         /*   leadingContent = {
               IconButton(
                 onClick = onToggleAI,
               ) {
@@ -582,7 +582,7 @@ private fun TaskChatInput(
                   )
                 }
               }
-            },
+            },*/
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -590,7 +590,18 @@ private fun TaskChatInput(
                 modifier = Modifier.fillMaxWidth()
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                  this@Row.AnimatedVisibility(
+                  SendIcon(onClick = {
+                    if (editingMessageId != null) {
+                      onUpdateMessage(userInputValue.text)
+                      onCancelEdit()
+                    } else {
+                      sendTaskMessage(userInputValue.text)
+                      userInputValue = TextFieldValue("")
+                      isTextEmpty.value = true
+                      showSendIcon.value = false
+                    }
+                  })
+                  /*this@Row.AnimatedVisibility(
                     visible = isTextEmpty.value && editingMessageId == null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
@@ -603,9 +614,9 @@ private fun TaskChatInput(
                         contentDescription = stringResource(Res.string.cd_select_images)
                       )
                     }
-                  }
+                  }*/
 
-                  this@Row.AnimatedVisibility(
+                 /* this@Row.AnimatedVisibility(
                     visible = !isTextEmpty.value || editingMessageId != null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
@@ -621,7 +632,7 @@ private fun TaskChatInput(
                         showSendIcon.value = false
                       }
                     })
-                  }
+                  }*/
                 }
               }
 

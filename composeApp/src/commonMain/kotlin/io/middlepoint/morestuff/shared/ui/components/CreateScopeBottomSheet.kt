@@ -1,14 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -86,15 +84,9 @@ fun CreateScopeBottomSheet(
         modifier = Modifier
           .fillMaxWidth()
           .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
       ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Box(
-          modifier = Modifier.weight(1f),
-          contentAlignment = Alignment.Center
-        ) {
-          BottomSheetDefaults.DragHandle()
-        }
         TextButton(
           onClick = {
             if (scopeTitle.isNotBlank()) {
@@ -110,7 +102,7 @@ fun CreateScopeBottomSheet(
     }
   ) {
     Column(
-      modifier = Modifier.fillMaxWidth(),
+      modifier = Modifier.fillMaxWidth().height(150.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
@@ -134,7 +126,8 @@ fun CreateScopeBottomSheet(
 
     Row(
       modifier = Modifier
-        .fillMaxWidth(),
+        .fillMaxWidth()
+        .padding(top = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.End
     ) {
@@ -146,7 +139,7 @@ fun CreateScopeBottomSheet(
           fontSize = 18.sp,
           textAlign = TextAlign.End
         ),
-        modifier = Modifier.padding(end = 16.dp)
+        modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
       )
     }
   }

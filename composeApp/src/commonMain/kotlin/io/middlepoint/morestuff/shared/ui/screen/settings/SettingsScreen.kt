@@ -250,10 +250,10 @@ fun SettingsContent(
           LanguageSettings(onClick = openAppSettings )
         }
 
-        ApiKeySettings(
+     /*   ApiKeySettings(
           apiKey = model.apiKey,
           onApiKeyChange = setApiKey
-        )
+        )*/
 
 
         if (model.devSettings) {
