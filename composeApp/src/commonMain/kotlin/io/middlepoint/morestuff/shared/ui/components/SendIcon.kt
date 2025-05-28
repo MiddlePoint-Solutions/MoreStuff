@@ -8,9 +8,10 @@ import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.Composable
 
 @Composable
-fun SendIcon(onClick: () -> Unit) {
+fun SendIcon(onClick: () -> Unit, enabled: Boolean) {
     IconButton(
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null)
     }

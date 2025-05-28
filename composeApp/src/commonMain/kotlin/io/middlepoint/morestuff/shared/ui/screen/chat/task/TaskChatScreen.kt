@@ -561,28 +561,28 @@ private fun TaskChatInput(
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.focusRequester(focusRequester),
-         /*   leadingContent = {
-              IconButton(
-                onClick = onToggleAI,
-              ) {
-                Crossfade(
-                  targetState = isAIEnabled,
-                  animationSpec = tween(
-                    durationMillis = 300,
-                    easing = FastOutSlowInEasing
-                  )
-                ) { aiEnabled ->
-                  Icon(
-                    painter = if (aiEnabled)
-                      painterResource(Res.drawable.ic_ai_enabled)
-                    else
-                      painterResource(Res.drawable.ic_ai_disabled),
-                    contentDescription = "Toggle AI",
-                    tint = Color.Unspecified
-                  )
-                }
-              }
-            },*/
+            /*   leadingContent = {
+                 IconButton(
+                   onClick = onToggleAI,
+                 ) {
+                   Crossfade(
+                     targetState = isAIEnabled,
+                     animationSpec = tween(
+                       durationMillis = 300,
+                       easing = FastOutSlowInEasing
+                     )
+                   ) { aiEnabled ->
+                     Icon(
+                       painter = if (aiEnabled)
+                         painterResource(Res.drawable.ic_ai_enabled)
+                       else
+                         painterResource(Res.drawable.ic_ai_disabled),
+                       contentDescription = "Toggle AI",
+                       tint = Color.Unspecified
+                     )
+                   }
+                 }
+               },*/
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -590,17 +590,20 @@ private fun TaskChatInput(
                 modifier = Modifier.fillMaxWidth()
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                  SendIcon(onClick = {
-                    if (editingMessageId != null) {
-                      onUpdateMessage(userInputValue.text)
-                      onCancelEdit()
-                    } else {
-                      sendTaskMessage(userInputValue.text)
-                      userInputValue = TextFieldValue("")
-                      isTextEmpty.value = true
-                      showSendIcon.value = false
-                    }
-                  })
+                  SendIcon(
+                    onClick = {
+                      if (editingMessageId != null) {
+                        onUpdateMessage(userInputValue.text)
+                        onCancelEdit()
+                      } else {
+                        sendTaskMessage(userInputValue.text)
+                        userInputValue = TextFieldValue("")
+                        isTextEmpty.value = true
+                        showSendIcon.value = false
+                      }
+                    },
+                    enabled = userInputValue.text.isNotBlank()
+                  )
                   /*this@Row.AnimatedVisibility(
                     visible = isTextEmpty.value && editingMessageId == null,
                     enter = fadeIn() + scaleIn(),
@@ -616,23 +619,23 @@ private fun TaskChatInput(
                     }
                   }*/
 
-                 /* this@Row.AnimatedVisibility(
-                    visible = !isTextEmpty.value || editingMessageId != null,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                  ) {
-                    SendIcon(onClick = {
-                      if (editingMessageId != null) {
-                        onUpdateMessage(userInputValue.text)
-                        onCancelEdit()
-                      } else {
-                        sendTaskMessage(userInputValue.text)
-                        userInputValue = TextFieldValue("")
-                        isTextEmpty.value = true
-                        showSendIcon.value = false
-                      }
-                    })
-                  }*/
+                  /* this@Row.AnimatedVisibility(
+                     visible = !isTextEmpty.value || editingMessageId != null,
+                     enter = fadeIn() + scaleIn(),
+                     exit = fadeOut() + scaleOut()
+                   ) {
+                     SendIcon(onClick = {
+                       if (editingMessageId != null) {
+                         onUpdateMessage(userInputValue.text)
+                         onCancelEdit()
+                       } else {
+                         sendTaskMessage(userInputValue.text)
+                         userInputValue = TextFieldValue("")
+                         isTextEmpty.value = true
+                         showSendIcon.value = false
+                       }
+                     })
+                   }*/
                 }
               }
 
@@ -640,19 +643,21 @@ private fun TaskChatInput(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false }
               ) {
-                DropdownMenuItem(onClick = {
-                  pickImage()
-                  showMenu = false
-                },
+                DropdownMenuItem(
+                  onClick = {
+                    pickImage()
+                    showMenu = false
+                  },
                   text = {
                     Text(
                       text = stringResource(Res.string.select_image)
                     )
                   })
-                DropdownMenuItem(onClick = {
-                  pickPdf()
-                  showMenu = false
-                },
+                DropdownMenuItem(
+                  onClick = {
+                    pickPdf()
+                    showMenu = false
+                  },
                   text = {
                     Text(
                       text = stringResource(Res.string.select_pdf)
