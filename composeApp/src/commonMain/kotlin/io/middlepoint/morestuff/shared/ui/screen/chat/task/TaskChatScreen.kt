@@ -1,13 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -76,8 +68,6 @@ import com.arkivanov.decompose.router.stack.push
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.path
-import io.github.vinceglb.filekit.size
 import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.Router
 import io.github.xxfast.decompose.router.stack.rememberRouter
@@ -118,21 +108,17 @@ import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_more_options
 import morestuff.composeapp.generated.resources.cd_navigate_back
-import morestuff.composeapp.generated.resources.cd_select_images
 import morestuff.composeapp.generated.resources.cd_task_done_icon
 import morestuff.composeapp.generated.resources.cd_undo
 import morestuff.composeapp.generated.resources.complete
 import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.edit_message
-import morestuff.composeapp.generated.resources.ic_ai_disabled
-import morestuff.composeapp.generated.resources.ic_ai_enabled
 import morestuff.composeapp.generated.resources.restore
 import morestuff.composeapp.generated.resources.select_image
 import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
-import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -226,9 +212,8 @@ fun TaskChatScreen(
       }
 
       is ImageImport -> {
-        screen.imageFile.size()
         ImageImportScreen(
-          imagePath = screen.imageFile.path,
+          image = screen.imageFile,
           onImport = { title ->
             viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
             router.pop()

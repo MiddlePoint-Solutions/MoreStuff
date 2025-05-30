@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
-import org.gradle.internal.declarativedsl.parsing.main
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -17,32 +18,13 @@ plugins {
 }
 
 object Env {
-  const val Dev = "debug"
-  const val Staging = "staging"
-  const val Release = "release"
+  const val DEV = "debug"
+  const val STAGING = "staging"
+  const val RELEASE = "release"
 }
 
 kotlin {
   jvmToolchain(20)
-
-  // TODO: once we have support for SqlDelight
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        moduleName = "composeApp"
-//        browser {
-//            commonWebpackConfig {
-//                outputFileName = "composeApp.js"
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        // Serve sources to debug inside browser
-//                        add(project.projectDir.path)
-//                    }
-//                }
-//            }
-//        }
-//        binaries.executable()
-//    }
-
   androidTarget()
 
   // spotless:off
@@ -61,15 +43,23 @@ kotlin {
     }
   }
 
-//  wasmJs {
-//    outputModuleName = "moreStuffCommon"
-//    browser {
-//      commonWebpackConfig {
-//        outputFileName = "moreStuffCommon.js"
-//      }
-//    }
-//    binaries.executable()
-//  }
+  @OptIn(ExperimentalWasmDsl::class)
+  wasmJs {
+    outputModuleName = "composeApp"
+    browser {
+      commonWebpackConfig {
+        outputFileName = "composeApp.js"
+        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+          static = (static ?: mutableListOf()).apply {
+            // Serve sources to debug inside browser
+            add(project.rootDir.path)
+            add(project.projectDir.path)
+          }
+        }
+      }
+    }
+    binaries.executable()
+  }
 
   iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
@@ -99,10 +89,7 @@ kotlin {
   }
 
   sourceSets {
-    val desktopMain by getting
-
     commonMain.dependencies {
-      implementation(projects.shared)
       implementation(libs.kotlinx.coroutines)
 
       implementation(compose.foundation)
@@ -181,29 +168,44 @@ kotlin {
       implementation(libs.multiplatform.settings.test)
     }
 
-    androidMain.dependencies {
-      implementation(libs.androidx.activity.compose)
-      implementation(libs.androidx.appcompat)
-      implementation(libs.androidx.core)
-      implementation(libs.androidx.exifinterface)
+    val webMain by creating {
+      dependsOn(commonMain.get())
+    }
 
-      api(compose.preview)
-      api(compose.uiTooling)
-      implementation(libs.androidx.security.crypto)
-      implementation(libs.sqldelight.driver.android)
-      implementation(libs.ktor.client.okhttp)
-      implementation(libs.androidx.test)
-      implementation(libs.androidx.lifecycle.viewmodel)
-      api(libs.koin.android)
-      implementation(libs.sqliteAndroid)
-      implementation(libs.preferenceKtx)
-      api(libs.workKtx)
+    val nonWebMain by creating {
+      dependsOn(commonMain.get())
+    }
 
-      // Firebase
-      implementation(project.dependencies.platform(libs.firebaseBom))
-      implementation(libs.firebaseCrashlytics)
-      implementation(libs.firebaseAnalytics)
-      implementation(libs.googleServices)
+    val nativeMain by getting {
+      dependsOn(nonWebMain)
+    }
+
+    androidMain {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(libs.androidx.activity.compose)
+        implementation(libs.androidx.appcompat)
+        implementation(libs.androidx.core)
+        implementation(libs.androidx.exifinterface)
+
+        api(compose.preview)
+        api(compose.uiTooling)
+        implementation(libs.androidx.security.crypto)
+        implementation(libs.sqldelight.driver.android)
+        implementation(libs.ktor.client.okhttp)
+        implementation(libs.androidx.test)
+        implementation(libs.androidx.lifecycle.viewmodel)
+        api(libs.koin.android)
+        implementation(libs.sqliteAndroid)
+        implementation(libs.preferenceKtx)
+        api(libs.workKtx)
+
+        // Firebase
+        implementation(project.dependencies.platform(libs.firebaseBom))
+        implementation(libs.firebaseCrashlytics)
+        implementation(libs.firebaseAnalytics)
+        implementation(libs.googleServices)
+      }
     }
 
     val androidUnitTest by getting {
@@ -223,19 +225,25 @@ kotlin {
       implementation(libs.ktor.client.darwin)
     }
 
-    desktopMain.dependencies {
-      implementation(compose.desktop.currentOs)
-      implementation(libs.sqldelight.driver.desktop)
-      implementation(libs.ktor.client.java)
-      implementation(libs.kotlinx.coroutines.swing)
+    val desktopMain by getting {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(compose.desktop.currentOs)
+        implementation(libs.sqldelight.driver.desktop)
+        implementation(libs.ktor.client.java)
+        implementation(libs.kotlinx.coroutines.swing)
+      }
     }
 
-//    wasmJsMain.dependencies {
-//      implementation(libs.sqldelight.driver.web)
-//      implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.1.0"))
-//      implementation(npm("sql.js", libs.versions.sqlJs.get()))
-//      implementation(devNpm("copy-webpack-plugin", libs.versions.webPackPlugin.get()))
-//    }
+    wasmJsMain {
+      dependsOn(webMain)
+      dependencies {
+        implementation(libs.sqldelight.driver.web)
+        implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.1.0"))
+        implementation(npm("sql.js", libs.versions.sqlJs.get()))
+        implementation(devNpm("copy-webpack-plugin", libs.versions.webPackPlugin.get()))
+      }
+    }
   }
 }
 
@@ -311,14 +319,14 @@ android {
   }
 
   signingConfigs {
-    getByName(Env.Dev) {
+    getByName(Env.DEV) {
       storeFile = file("./debug.keystore")
       storePassword = "android"
       keyAlias = "AndroidDebugKey"
       keyPassword = "android"
     }
 
-    create(Env.Staging) {
+    create(Env.STAGING) {
       storeFile = file("./staging.keystore")
       storePassword = "StageKey"
       keyAlias = "staging"
@@ -328,7 +336,7 @@ android {
 
   buildTypes {
 
-    getByName(Env.Release) {
+    getByName(Env.RELEASE) {
       isMinifyEnabled = true
       isShrinkResources = true
       proguardFiles(
@@ -346,12 +354,12 @@ android {
       )
     }
 
-    create(Env.Staging) {
-      initWith(getByName(Env.Release))
+    create(Env.STAGING) {
+      initWith(getByName(Env.RELEASE))
       applicationIdSuffix = ".staging"
       versionNameSuffix = "-staging"
-      signingConfig = signingConfigs.getByName(Env.Staging)
-      matchingFallbacks += listOf(Env.Release, Env.Dev)
+      signingConfig = signingConfigs.getByName(Env.STAGING)
+      matchingFallbacks += listOf(Env.RELEASE, Env.DEV)
       isDebuggable = false
     }
   }
@@ -384,6 +392,7 @@ sqldelight {
   databases {
     create("StuffDb") {
       packageName.set("io.middlepoint.morestuff.db")
+      generateAsync.set(true)
       dialect(libs.sqldelight.sqlite.dialect)
       schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
       verifyMigrations.set(true)

@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.StorageManager
 import io.middlepoint.morestuff.shared.data.sync.ScheduleSync
 import io.middlepoint.morestuff.shared.data.sync.ScopeSync
 import io.middlepoint.morestuff.shared.data.sync.Sync
@@ -9,6 +8,7 @@ import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.model.core.Task
+import io.middlepoint.morestuff.shared.platform.StorageManager
 
 typealias DataMapper<I, O> = (I) -> O
 

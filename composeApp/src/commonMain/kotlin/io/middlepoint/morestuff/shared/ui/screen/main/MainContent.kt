@@ -10,26 +10,24 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.fade
 import com.arkivanov.decompose.extensions.compose.stack.animation.plus
 import com.arkivanov.decompose.extensions.compose.stack.animation.slide
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.pages.selectNext
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.router.stack.replaceCurrent
-import io.github.vinceglb.filekit.path
 import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen.ImagePreview
-import io.middlepoint.morestuff.shared.domain.nav.Screen.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
+import io.middlepoint.morestuff.shared.domain.nav.Screen.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.Screen.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
+import io.middlepoint.morestuff.shared.platform.createKmpFile
 import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
@@ -95,7 +93,7 @@ fun MainContent(
           val imageFile = remember { createKmpFile(screen.imageUri) }
           logger.d { " shareable imageFile: $imageFile" }
           ImageImportScreen(
-            imagePath = imageFile.path,
+            image = imageFile,
             onImport = { message ->
               val shareableImage = Shareable.Image(screen.imageUri, message)
               logger.d { "shareableImage: $shareableImage" }

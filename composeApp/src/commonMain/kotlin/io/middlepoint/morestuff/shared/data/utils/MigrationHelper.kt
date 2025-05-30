@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.raise.either
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.readString
-import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
@@ -14,6 +13,7 @@ import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyTask
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
+import io.middlepoint.morestuff.shared.platform.MediaHandler
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 

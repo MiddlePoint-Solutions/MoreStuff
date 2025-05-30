@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.data.sync
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
 import io.github.jan.supabase.SupabaseClient
@@ -83,32 +84,32 @@ class DataSyncManagerImpl(
       val tasksSync = tasks.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.taskSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       val scopesSync = scopes.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.scopeSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       val messagesSync = messages.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.messageSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       val tasksScopesSync = tasksScopes.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.taskScopeSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       val messageExtraSync = messageExtras.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.messageExtraSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       val schedulesSync = schedules.selectAllUpdates(
         updated_at = fromTime,
         mapper = dataMappers.scheduleSyncMapper
-      ).executeAsList()
+      ).awaitAsList()
 
       SyncData(
         tasks = tasksSync,
@@ -169,12 +170,12 @@ class DataSyncManagerImpl(
     if (data.containsChanges()) {
       val localData = data.toLocalData()
       tasks.transactionWithResult {
-        localData.tasks.forEach(tasks::upsertTask)
-        localData.scopes.forEach(scopes::upsertScope)
-        localData.messages.forEach(messages::upsertMessage)
-        localData.tasksScopes.forEach(tasksScopes::upsert)
-        localData.messageExtras.forEach(messageExtras::upsertMessageExtra)
-        localData.schedules.forEach(schedules::upsertSchedule)
+        localData.tasks.forEach { tasks.upsertTask(it) }
+        localData.scopes.forEach { scopes.upsertScope(it) }
+        localData.messages.forEach { messages.upsertMessage(it) }
+        localData.tasksScopes.forEach { tasksScopes.upsert(it) }
+        localData.messageExtras.forEach { messageExtras.upsertMessageExtra(it) }
+        localData.schedules.forEach { schedules.upsertSchedule(it) }
       }
     }
 

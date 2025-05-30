@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import io.middlepoint.morestuff.shared.formatString
+import io.middlepoint.morestuff.shared.platform.formatString
 import io.middlepoint.morestuff.shared.ui.components.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
 import morestuff.composeapp.generated.resources.Res

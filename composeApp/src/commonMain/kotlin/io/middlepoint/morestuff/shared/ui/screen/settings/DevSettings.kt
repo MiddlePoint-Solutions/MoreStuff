@@ -30,7 +30,6 @@ import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
-import io.github.vinceglb.filekit.absoluteFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.DevTools
@@ -84,7 +83,7 @@ fun DevSettings(
   ) { files ->
     files?.let {
       scope.launch {
-        devTools.importJsonData(it.absoluteFile()).let {
+        devTools.importJsonData(it).let {
           Logger.d { "Data migration successful!" }
         }
       }

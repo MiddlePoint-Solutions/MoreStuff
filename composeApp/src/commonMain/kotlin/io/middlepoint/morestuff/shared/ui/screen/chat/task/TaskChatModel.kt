@@ -8,9 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import co.touchlab.kermit.Logger
-import io.middlepoint.morestuff.shared.ClipboardHelper
-import io.middlepoint.morestuff.shared.MediaHandler
-import io.middlepoint.morestuff.shared.ShareHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
@@ -24,6 +21,9 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.CreateScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
+import io.middlepoint.morestuff.shared.platform.ClipboardHelper
+import io.middlepoint.morestuff.shared.platform.MediaHandler
+import io.middlepoint.morestuff.shared.platform.ShareHelper
 import io.middlepoint.morestuff.shared.ui.model.map.MessageUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.ScopeUiMapper
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper

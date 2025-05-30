@@ -44,8 +44,8 @@ import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.middlepoint.morestuff.shared.Platform
-import io.middlepoint.morestuff.shared.platform
+import io.middlepoint.morestuff.shared.platform.Platform
+import io.middlepoint.morestuff.shared.platform.platform
 import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_skip

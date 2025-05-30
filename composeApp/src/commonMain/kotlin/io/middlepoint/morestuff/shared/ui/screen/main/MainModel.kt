@@ -6,13 +6,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
 import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.redux.state.isAuthenticated
 import io.middlepoint.morestuff.shared.domain.redux.state.isReady
+import io.middlepoint.morestuff.shared.platform.createKmpFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject

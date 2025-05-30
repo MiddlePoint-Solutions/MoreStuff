@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.settings
 
 import arrow.core.Either
-import io.middlepoint.morestuff.shared.AppSettingsHandler
+import io.middlepoint.morestuff.shared.platform.AppSettingsHandler
 
 
 interface OpenAppSettingsUseCase {

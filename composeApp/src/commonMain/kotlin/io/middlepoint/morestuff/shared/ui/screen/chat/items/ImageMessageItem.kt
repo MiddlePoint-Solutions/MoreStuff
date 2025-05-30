@@ -83,16 +83,3 @@ fun ImageMessageItem(
     }
   }
 }
-
-
-/*
-fun createImageLoader(context: PlatformContext): ImageLoader {
-  return ImageLoader.Builder(context)
-    .components {
-      add(getPlatformFetcherFactory())
-      //add(KmpFileFetcher.Factory())
-    }
-    .crossfade(true)
-    //.logger(DebugLogger()) // Útil para depuración, puedes eliminar en producción
-    .build()
-}*/

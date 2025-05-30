@@ -75,7 +75,6 @@ import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
-import io.middlepoint.morestuff.shared.Platform
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen
@@ -83,8 +82,9 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
-import io.middlepoint.morestuff.shared.formatString
-import io.middlepoint.morestuff.shared.platform
+import io.middlepoint.morestuff.shared.platform.Platform
+import io.middlepoint.morestuff.shared.platform.formatString
+import io.middlepoint.morestuff.shared.platform.platform
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
