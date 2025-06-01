@@ -78,7 +78,7 @@ DELETE FROM scopes;
 -- Triggers
 
 -- Only update the timestamp when other columns change
-CREATE TRIGGER scopes_updated_at
+CREATE TRIGGER IF NOT EXISTS scopes_updated_at
 AFTER UPDATE ON scopes
 FOR EACH ROW
 WHEN new.updated_at = old.updated_at

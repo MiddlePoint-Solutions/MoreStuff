@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS tasks(
     completed_at INTEGER AS Instant,
     completed_timezone TEXT,
     title TEXT NOT NULL,
-    priority_score INTEGER NOT NULL,
+    priority_score INTEGER NOT NULL DEFAULT 0,
     deleted INTEGER AS Boolean NOT NULL DEFAULT 0
 );
 
@@ -158,7 +158,7 @@ DELETE FROM tasks;
 -- Triggers
 
 -- Only update the timestamp when other columns change
-CREATE TRIGGER tasks_updated_at
+CREATE TRIGGER IF NOT EXISTS tasks_updated_at
 AFTER UPDATE ON tasks
 FOR EACH ROW
 WHEN new.updated_at = old.updated_at

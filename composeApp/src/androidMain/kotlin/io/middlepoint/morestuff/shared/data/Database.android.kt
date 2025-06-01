@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.data
 
 import android.content.Context
+import androidx.sqlite.db.SupportSQLiteDatabase
 import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
@@ -15,11 +16,17 @@ actual class DriverFactory(
 ) {
 
   actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
+    val syncSchema = schema.synchronous()
     return AndroidSqliteDriver(
-      schema.synchronous(),
+      syncSchema,
       context,
       Constants.DATABASE_NAME,
-      factory = RequerySQLiteOpenHelperFactory()
+      factory = RequerySQLiteOpenHelperFactory(),
+      callback = object : AndroidSqliteDriver.Callback(syncSchema) {
+        override fun onConfigure(db: SupportSQLiteDatabase) {
+          db.setForeignKeyConstraintsEnabled(true)
+        }
+      }
     )
   }
 }

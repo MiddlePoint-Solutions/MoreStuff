@@ -38,7 +38,7 @@ DELETE FROM messages_extra;
 -- Triggers
 
 -- Only update the timestamp when other columns change
-CREATE TRIGGER messages_extra_updated_at
+CREATE TRIGGER IF NOT EXISTS messages_extra_updated_at
 AFTER UPDATE ON messages_extra
 FOR EACH ROW
 WHEN new.updated_at = old.updated_at

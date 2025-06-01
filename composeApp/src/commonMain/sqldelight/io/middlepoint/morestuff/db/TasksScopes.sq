@@ -51,7 +51,7 @@ DELETE FROM tasks_scopes;
 -- Triggers
 
 -- Only update the timestamp when other columns change
-CREATE TRIGGER tasks_scopes_updated_at
+CREATE TRIGGER IF NOT EXISTS tasks_scopes_updated_at
 AFTER UPDATE ON tasks_scopes
 FOR EACH ROW
 WHEN new.updated_at = old.updated_at
