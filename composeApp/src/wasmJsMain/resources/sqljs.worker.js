@@ -1,9 +1,10 @@
-import initSqlJs from "sql.js";
+importScripts("sqlite3.js");
 
 let db = null;
 async function createDatabase() {
-  let SQL = await initSqlJs({ locateFile: file => '/sql-wasm.wasm' });
-  db = new SQL.Database();
+  const sqlite3 = await sqlite3InitModule();
+//  let SQL = await initSqlJs({ locateFile: file => '/sql-wasm.wasm' });
+  db = new sqlite3.oo1.DB("file:database.db?vfs=opfs", "c");
 }
 
 function onModuleReady() {

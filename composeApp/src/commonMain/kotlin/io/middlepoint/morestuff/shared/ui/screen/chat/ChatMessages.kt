@@ -77,13 +77,6 @@ fun Messages(
   val enableAutoScroll = isAutoScrollingEnabled(messages.size, itemsCount, scrollState)
   itemsCount = messages.size
 
-  LaunchedEffect(messages) {
-    logger.d { "Messages in Messages component: ${messages.size}" }
-    messages.forEach { message ->
-      logger.d { "Message in component: id=${message.id}, type=${message.contentType}, content='${message.content}'" }
-    }
-  }
-
   ProvideUserInteractionEnabled(userInteractionEnabled) {
 
     Box(modifier = modifier) {

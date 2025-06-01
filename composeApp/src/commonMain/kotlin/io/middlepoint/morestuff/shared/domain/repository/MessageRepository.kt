@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface MessageRepository {
 
   suspend fun getMessage(messageId: Uuid): Either<Failure, Message>
-  fun getTaskChatMessages(taskId: Uuid): List<Message>
+  suspend fun getTaskChatMessages(taskId: Uuid): List<Message>
   fun getTaskMessagesFlow(taskId: Uuid): Flow<List<Message>>
   fun getTaskChatMessagesFlow(taskId: Uuid): Flow<List<Message>>
   suspend fun createMessage(

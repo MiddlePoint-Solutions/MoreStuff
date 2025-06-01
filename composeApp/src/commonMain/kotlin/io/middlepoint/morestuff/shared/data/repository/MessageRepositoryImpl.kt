@@ -1,6 +1,9 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
@@ -40,12 +43,12 @@ class MessageRepositoryImpl(
       .asFlow()
       .mapToList(Dispatchers.Default)
 
-  override fun getTaskChatMessages(taskId: Uuid): List<Message> =
+  override suspend fun getTaskChatMessages(taskId: Uuid): List<Message> =
     messageQueries.selectTaskMessagesByContentType(
       taskId,
       listOf(ContentType.TASK_MESSAGE.value, ContentType.APP_TASK_MESSAGE.value, ContentType.AI_TASK_MESSAGE.value),
       mapper = mapper.messageDataMapper
-    ).executeAsList()
+    ).awaitAsList()
 
   override fun getTaskChatMessagesFlow(taskId: Uuid): Flow<List<Message>> =
     messageQueries.selectTaskMessagesByContentType(
@@ -58,7 +61,7 @@ class MessageRepositoryImpl(
     val message = messageQueries.selectMessageById(
       id = messageId,
       mapper = mapper.messageDataMapper
-    ).executeAsOneOrNull()
+    ).awaitAsOneOrNull()
     return when (message) {
       null -> MessageDoesNotExist.left()
       else -> message.right()
@@ -100,7 +103,7 @@ class MessageRepositoryImpl(
     messageQueries.selectMessageById(
       id = messageData.id,
       mapper = mapper.messageDataMapper
-    ).executeAsOne().right()
+    ).awaitAsOne().right()
   }
 
   override suspend fun insertUrlMetadata(
@@ -120,7 +123,7 @@ class MessageRepositoryImpl(
     val message = messageQueries.selectMessageById(
       id = messageId,
       mapper = mapper.messageDataMapper
-    ).executeAsOneOrNull()
+    ).awaitAsOneOrNull()
 
     val imagePath = message?.messageExtra?.url
     imagePath?.let {

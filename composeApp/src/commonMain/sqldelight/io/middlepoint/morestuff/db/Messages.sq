@@ -3,7 +3,7 @@ import kotlin.Boolean;
 import kotlin.Int;
 import kotlinx.datetime.Instant;
 
-CREATE TABLE messages(
+CREATE TABLE IF NOT EXISTS messages(
     id TEXT AS Uuid NOT NULL PRIMARY KEY,
     task_id TEXT AS Uuid NOT NULL,
     schedule_id TEXT AS Uuid,

@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import arrow.core.Either
 import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.shared.domain.model.Failure
@@ -16,14 +18,14 @@ class PriorityRepositoryImpl(
     private val taskQueries = database.tasksQueries
 
     override suspend fun getHighestPriorityScore(): Long = taskQueries
-        .selectHighestPriorityScore().executeAsOne().max ?: 0
+        .selectHighestPriorityScore().awaitAsOne().max ?: 0
 
     override suspend fun getLowestPriorityScore(): Long = taskQueries
-        .selectLowestPriorityScore().executeAsOne().min ?: 0
+        .selectLowestPriorityScore().awaitAsOne().min ?: 0
 
     override suspend fun increaseTaskPriorityScore(taskId: Uuid): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
-            when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+            when (val taskDb = taskQueries.selectTaskById(id = taskId).awaitAsOneOrNull()) {
                 null -> Either.Left(TaskDoesNotExist)
                 else -> {
                     val newPriorityScore = taskDb.priority_score + 1
@@ -36,7 +38,7 @@ class PriorityRepositoryImpl(
 
     override suspend fun decreaseTaskPriorityScore(taskId: Uuid): Either<Failure, Long> {
         return taskQueries.transactionWithResult {
-            when (val taskDb = taskQueries.selectTaskById(id = taskId).executeAsOneOrNull()) {
+            when (val taskDb = taskQueries.selectTaskById(id = taskId).awaitAsOneOrNull()) {
                 null -> Either.Left(TaskDoesNotExist)
                 else -> {
                     val newPriorityScore = taskDb.priority_score - 1

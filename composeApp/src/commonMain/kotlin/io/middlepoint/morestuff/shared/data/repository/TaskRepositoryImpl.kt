@@ -1,5 +1,8 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneNotNull
@@ -15,10 +18,10 @@ import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
-import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -61,19 +64,19 @@ class TaskRepositoryImpl(
       )
       taskScopeQueries.insert(tasksScopesItem)
 
-      taskQueries.selectTaskById(data.id, mapper = mapper.taskDataMapper).executeAsOne()
+      taskQueries.selectTaskById(data.id, mapper = mapper.taskDataMapper).awaitAsOne()
     }
   }
 
   override suspend fun getTask(taskId: Uuid): Either<Failure, Task> =
     taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
-      .executeAsOneOrNull()?.right() ?: TaskDoesNotExist.left()
+      .awaitAsOneOrNull()?.right() ?: TaskDoesNotExist.left()
 
   override suspend fun getAllTasks(): List<Task> =
-    taskQueries.selectAll(mapper = mapper.taskDataMapper).executeAsList()
+    taskQueries.selectAll(mapper = mapper.taskDataMapper).awaitAsList()
 
   override suspend fun getActiveTasks(): List<Task> {
-    return taskQueries.selectAllActive(mapper = mapper.taskDataMapper).executeAsList()
+    return taskQueries.selectAllActive(mapper = mapper.taskDataMapper).awaitAsList()
   }
 
   override fun getTaskFlow(taskId: Uuid): Flow<Task> {
@@ -104,7 +107,7 @@ class TaskRepositoryImpl(
   }
 
   override suspend fun getScopeActiveTasks(scopeId: Uuid): List<Task> {
-    return taskQueries.selectTasksByScopeId(scopeId, mapper.taskDataMapper).executeAsList()
+    return taskQueries.selectTasksByScopeId(scopeId, mapper.taskDataMapper).awaitAsList()
   }
 
   override fun getCompleteTasksFlow(): Flow<List<Task>> =
@@ -116,12 +119,12 @@ class TaskRepositoryImpl(
     priorityScore: Long,
   ): Either<Failure, Task> = taskQueries.transactionWithResult {
     val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapper.taskDataMapper)
-      .executeAsOneOrNull()
+      .awaitAsOneOrNull()
 
     task?.let {
       val schedules =
         scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDataMapper)
-          .executeAsList()
+          .awaitAsList()
       task.copy(schedule = schedules).right()
     } ?: TaskDoesNotExist.left()
   }
@@ -130,12 +133,12 @@ class TaskRepositoryImpl(
     taskQueries.transactionWithResult {
       val task =
         taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDataMapper)
-          .executeAsOneOrNull()
+          .awaitAsOneOrNull()
 
       task?.let {
         val schedules =
           scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDataMapper)
-            .executeAsList()
+            .awaitAsList()
         task.copy(schedule = schedules).right()
       } ?: TaskDoesNotExist.left()
     }
@@ -247,7 +250,7 @@ class TaskRepositoryImpl(
   }
 
   override suspend fun countActiveTasks(): Either<Failure, Int> =
-    taskQueries.countActiveTasks().executeAsOne().toInt().right()
+    taskQueries.countActiveTasks().awaitAsOne().toInt().right()
 
 
   override suspend fun insertTasksIntoScope(taskIds: List<Uuid>, scopeId: Uuid) {
@@ -312,12 +315,12 @@ class TaskRepositoryImpl(
       val tasks = mutableListOf<Task>()
 
       for (taskId in taskIds) {
-        val task = taskQueries.selectTaskById(taskId, mapper.taskDataMapper).executeAsOneOrNull()
+        val task = taskQueries.selectTaskById(taskId, mapper.taskDataMapper).awaitAsOneOrNull()
           ?: continue
 
         val schedules = scheduleQueries
           .selectActiveSchedulesByTaskId(taskId, mapper.scheduleDataMapper)
-          .executeAsList()
+          .awaitAsList()
 
         tasks.add(task.copy(schedule = schedules))
       }

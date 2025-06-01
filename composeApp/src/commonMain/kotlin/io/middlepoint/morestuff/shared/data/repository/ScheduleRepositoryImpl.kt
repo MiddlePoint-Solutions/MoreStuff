@@ -1,6 +1,9 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
@@ -13,10 +16,10 @@ import io.middlepoint.morestuff.shared.data.mapper.ScheduleData
 import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Failure
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
-import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -55,24 +58,24 @@ class ScheduleRepositoryImpl(
     scheduleQueries.insertSchedule(data)
     scheduleQueries
       .selectScheduleById(data.id, mapper.scheduleDataMapper)
-      .executeAsOne().right()
+      .awaitAsOne().right()
   }
 
   override suspend fun getSchedule(scheduleId: Uuid): Either<Failure, Schedule> =
     scheduleQueries.selectScheduleById(scheduleId, mapper.scheduleDataMapper)
-      .executeAsOneOrNull()
+      .awaitAsOneOrNull()
       ?.right() ?: ScheduleDoesNotExist.left()
 
   override suspend fun getSchedules(scheduleIds: List<Uuid>): Either<Failure, List<Schedule>> =
     scheduleQueries.selectSchedulesById(scheduleIds, mapper.scheduleDataMapper)
-      .executeAsList()
+      .awaitAsList()
       .right()
 
   override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
     val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
     return scheduleQueries
       .selectActiveSchedules(allScheduleTypes, mapper.scheduleDataMapper)
-      .executeAsList()
+      .awaitAsList()
       .right()
   }
 
@@ -91,7 +94,7 @@ class ScheduleRepositoryImpl(
       taskIds,
       scheduleType,
       mapper = mapper.scheduleDataMapper
-    ).executeAsList().right()
+    ).awaitAsList().right()
 
   override suspend fun setScheduleFulfilled(scheduleId: Uuid): Either<Failure, Boolean> {
     scheduleQueries.updateScheduleActive(false, scheduleId)

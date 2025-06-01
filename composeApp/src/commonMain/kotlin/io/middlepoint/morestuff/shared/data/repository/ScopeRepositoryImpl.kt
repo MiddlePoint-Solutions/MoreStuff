@@ -1,5 +1,8 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
@@ -41,10 +44,10 @@ class ScopeRepositoryImpl(
 
   override suspend fun createScope(name: String): Either<Failure, Scope> = either {
     scopeQueries.transactionWithResult {
-      val count = scopeQueries.countScopes().executeAsOne().toInt()
+      val count = scopeQueries.countScopes().awaitAsOne().toInt()
       val scopeData = createScopeData(name, count)
       scopeQueries.createScope(scopeData)
-      scopeQueries.selectScope(scopeData.id, dataMappers.scopeDataMapper).executeAsOne()
+      scopeQueries.selectScope(scopeData.id, dataMappers.scopeDataMapper).awaitAsOne()
     }
   }
 
@@ -54,13 +57,13 @@ class ScopeRepositoryImpl(
       val deleted = scopeQueries.selectScope(
         id = id,
         mapper = dataMappers.scopeDataMapper
-      ).executeAsOne()
+      ).awaitAsOne()
 
       scopeQueries.deleteScope(id)
 
       scopeQueries
         .selectAllScopes()
-        .executeAsList()
+        .awaitAsList()
         .forEachIndexed { index, scope ->
           scopeQueries.updateScopeOrder(
             scopeId = scope.id,
@@ -72,7 +75,7 @@ class ScopeRepositoryImpl(
 
   override suspend fun getScopes(): Either<Failure, List<Scope>> = scopeQueries
     .selectAllScopes(mapper = dataMappers.scopeDataMapper)
-    .executeAsList()
+    .awaitAsList()
     .right()
 
   override fun getScopesFlow(): Flow<List<Scope>> = scopeQueries
@@ -85,7 +88,7 @@ class ScopeRepositoryImpl(
       scopeQueries.updateScopeName(name, id)
       scopeQueries
         .selectScope(id, dataMappers.scopeDataMapper)
-        .executeAsOne()
+        .awaitAsOne()
         .right()
     }
 
@@ -99,7 +102,7 @@ class ScopeRepositoryImpl(
 
       scopeQueries
         .selectAllScopes()
-        .executeAsList()
+        .awaitAsList()
         .map { if (it.id == id) it.copy(scope_order = order) else it }
         .sortedBy { it.scope_order }
         .onEachIndexed { index, scope ->
@@ -111,7 +114,7 @@ class ScopeRepositoryImpl(
 
 
       scopeQueries.selectScope(id, dataMappers.scopeDataMapper)
-        .executeAsOne()
+        .awaitAsOne()
         .right()
     }
 
@@ -129,10 +132,10 @@ class ScopeRepositoryImpl(
   override suspend fun getScopeByTaskId(taskId: Uuid): Either<Failure, Scope> {
     val scopeId = taskScopeQueries
       .selectScopeIdForTask(taskId)
-      .executeAsOneOrNull() ?: return Either.Left(NoScope)
+      .awaitAsOneOrNull() ?: return Either.Left(NoScope)
     return scopeQueries
       .selectScope(scopeId, dataMappers.scopeDataMapper)
-      .executeAsOneOrNull()
+      .awaitAsOneOrNull()
       ?.right() ?: Either.Left(NoScope)
   }
 }

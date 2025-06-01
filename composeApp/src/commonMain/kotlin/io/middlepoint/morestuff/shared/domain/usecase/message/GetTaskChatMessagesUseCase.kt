@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.flowOf
 
 interface GetTaskChatMessagesUseCase {
   operator fun invoke(taskId: Uuid): GetTaskChatMessagesUseCase
-  fun asList(): List<Message>
+  suspend fun asList(): List<Message>
   fun asFlow(): Flow<List<Message>>
 }
 
@@ -23,8 +23,7 @@ class GetTaskChatMessagesUseCaseImpl(
     return this
   }
 
-  override fun asList(): List<Message> =
-    taskId?.let(messageRepository::getTaskChatMessages) ?: listOf()
+  override suspend fun asList(): List<Message> = messageRepository.getTaskChatMessages(taskId!!)
 
   override fun asFlow(): Flow<List<Message>> =
     taskId?.let(messageRepository::getTaskChatMessagesFlow) ?: flowOf()

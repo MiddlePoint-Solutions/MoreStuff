@@ -3,7 +3,7 @@ import kotlin.Boolean;
 import kotlin.Int;
 import kotlinx.datetime.Instant;
 
-CREATE TABLE scopes (
+CREATE TABLE IF NOT EXISTS scopes (
     id TEXT AS Uuid NOT NULL PRIMARY KEY,
     scope_name TEXT NOT NULL,
     scope_order INTEGER AS Int NOT NULL,

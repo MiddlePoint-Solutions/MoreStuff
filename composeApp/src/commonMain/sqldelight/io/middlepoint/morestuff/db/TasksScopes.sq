@@ -2,7 +2,7 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid;
 import kotlin.Boolean;
 import kotlinx.datetime.Instant;
 
-CREATE TABLE tasks_scopes (
+CREATE TABLE IF NOT EXISTS tasks_scopes (
     task_id TEXT AS Uuid NOT NULL PRIMARY KEY,
     scope_id TEXT AS Uuid NOT NULL,
     created_at INTEGER AS Instant NOT NULL,
