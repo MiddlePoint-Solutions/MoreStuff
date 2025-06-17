@@ -8,7 +8,6 @@ struct SwiftUIApp: App {
     
     init() {
         StartSdkKt.startSdk(navigationHelper: navigationHelper)
-        
     }
     
     var defaultRouterContext: RouterContext { delegate.holder.defaultRouterContext }

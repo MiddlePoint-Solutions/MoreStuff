@@ -51,6 +51,7 @@ import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.logger
+import io.middlepoint.morestuff.shared.platform.sentryCapture
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
@@ -458,13 +459,22 @@ private fun HomeContent(
       exit = scaleOut() + fadeOut()
     ) {
       FloatingActionButton(
-        onClick = { onEvent(ShowTaskInput) },
+//        onClick = { onEvent(ShowTaskInput) },
+        onClick = { captureError() },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(Icons.Default.Add, contentDescription = null)
       }
     }
+  }
+}
+
+fun captureError() {
+  try {
+    throw Exception("This is a test.")
+  } catch (e: Exception) {
+    sentryCapture(e)
   }
 }
 

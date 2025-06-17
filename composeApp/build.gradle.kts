@@ -16,6 +16,7 @@ plugins {
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.aboutLibrariesPlugin)
+  //alias(libs.plugins.sentry).apply(false) // Enable when support or noop is added for wasmJs
 }
 
 object Env {
@@ -80,6 +81,13 @@ kotlin {
     ios.deploymentTarget = "16.0"
 //    podfile = project.file("../iosApp/Podfile")
     name = "ComposeApp"
+
+    pod("Sentry") {
+      // Check the version compatibility table for the correct version
+      version = "8.36.0"
+      linkOnly = true
+      extraOpts += listOf("-compiler-option", "-fmodules")
+    }
 
     framework {
       baseName = "ComposeApp"
@@ -175,6 +183,9 @@ kotlin {
 
     val nonWebMain by creating {
       dependsOn(commonMain.get())
+      dependencies {
+        implementation(libs.sentry)
+      }
     }
 
     val nativeMain by getting {
@@ -201,10 +212,6 @@ kotlin {
         implementation(libs.preferenceKtx)
         api(libs.workKtx)
 
-        // Firebase
-        implementation(project.dependencies.platform(libs.firebaseBom))
-        implementation(libs.firebaseCrashlytics)
-        implementation(libs.firebaseAnalytics)
         implementation(libs.googleServices)
       }
     }

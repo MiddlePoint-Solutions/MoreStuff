@@ -15,6 +15,7 @@ plugins {
   alias(libs.plugins.sqldelight).apply(false)
   alias(libs.plugins.spotless).apply(false)
   alias(libs.plugins.aboutLibrariesPlugin).apply(false)
+  alias(libs.plugins.sentry).apply(false)
 }
 
 allprojects {
