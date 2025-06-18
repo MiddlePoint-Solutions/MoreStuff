@@ -64,7 +64,7 @@ fun OnBoardingScreen(
       )
 
       NotificationPermission -> OnBoardingNotificationPermissionScreen(onNext = navigation::selectNext)
-      ChatWithYourTasks -> OnBoardingTaskChatScreen(onNext = navigation::selectNext)
+      ChatWithYourTasks -> TODO("Removed because of lottie animation")
       Payment -> PaymentScreen()
 
     }

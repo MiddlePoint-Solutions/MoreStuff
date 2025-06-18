@@ -29,15 +29,6 @@ kotlin {
   jvmToolchain(20)
   androidTarget()
 
-  // spotless:off
-  val iOSBinaryFlags =
-    listOf(
-      "-linker-option", "-framework", "-linker-option", "Metal",
-      "-linker-option", "-framework", "-linker-option", "CoreText",
-      "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-    )
-  // spotless:on
-
   jvm("desktop") {
 //    main()
     mainRun {
@@ -63,6 +54,15 @@ kotlin {
     binaries.executable()
   }
 
+  // spotless:off
+  val iOSBinaryFlags =
+    listOf(
+      "-linker-option", "-framework", "-linker-option", "Metal",
+      "-linker-option", "-framework", "-linker-option", "CoreText",
+      "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+    )
+  // spotless:on
+
   iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosSimulatorArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
@@ -79,12 +79,11 @@ kotlin {
     homepage = "Link to the Shared Module homepage"
     version = "1.0"
     ios.deploymentTarget = "16.0"
-//    podfile = project.file("../iosApp/Podfile")
+    podfile = project.file("../iosApp/Podfile")
     name = "ComposeApp"
 
     pod("Sentry") {
-      // Check the version compatibility table for the correct version
-      version = "8.36.0"
+      version = "8.49.0"
       linkOnly = true
       extraOpts += listOf("-compiler-option", "-fmodules")
     }
@@ -147,7 +146,6 @@ kotlin {
       implementation(libs.coil.compose)
       implementation(libs.coil.ktor3)
       implementation(libs.zoomable)
-      implementation(libs.kottie)
       implementation(libs.calf.permissions)
       implementation(libs.calf.filepicker)
       implementation(libs.calf.filepicker.coil)
@@ -188,10 +186,6 @@ kotlin {
       }
     }
 
-    val nativeMain by getting {
-      dependsOn(nonWebMain)
-    }
-
     androidMain {
       dependsOn(nonWebMain)
       dependencies {
@@ -227,11 +221,16 @@ kotlin {
       }
     }
 
-    iosMain.dependencies {
-      implementation(compose.foundation)
-      implementation(libs.sqldelight.driver.native)
-      implementation(libs.ktor.client.darwin)
+    iosMain {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(compose.foundation)
+        implementation(libs.sqldelight.driver.native)
+        implementation(libs.ktor.client.darwin)
+      }
     }
+
+
 
     val desktopMain by getting {
       dependsOn(nonWebMain)

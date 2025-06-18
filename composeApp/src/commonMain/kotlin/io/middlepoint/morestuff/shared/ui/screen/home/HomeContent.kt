@@ -459,22 +459,13 @@ private fun HomeContent(
       exit = scaleOut() + fadeOut()
     ) {
       FloatingActionButton(
-//        onClick = { onEvent(ShowTaskInput) },
-        onClick = { captureError() },
+        onClick = { onEvent(ShowTaskInput) },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {
         Icon(Icons.Default.Add, contentDescription = null)
       }
     }
-  }
-}
-
-fun captureError() {
-  try {
-    throw Exception("This is a test.")
-  } catch (e: Exception) {
-    sentryCapture(e)
   }
 }
 

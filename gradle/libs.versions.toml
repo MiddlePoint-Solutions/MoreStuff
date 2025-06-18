@@ -55,7 +55,6 @@ compose-settings = "2.4.0"
 sonner = "0.3.6"
 reorderable = "2.4.3"
 zoomable = "1.7.0"
-kottie = "1.9.6-alpha02"
 calf = "0.7.1"
 filekit = "0.10.0-beta04"
 supabase-bom = "3.1.3"
@@ -142,7 +141,6 @@ reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reo
 coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilCompose" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
-kottie = { module = "io.github.ismai117:kottie", version.ref = "kottie" }
 calf-permissions = { module = "com.mohamedrejeb.calf:calf-permissions", version.ref = "calf" }
 calf-filepicker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calf" }
 calf-filepicker-coil = { module = "com.mohamedrejeb.calf:calf-file-picker-coil", version.ref = "calf" }

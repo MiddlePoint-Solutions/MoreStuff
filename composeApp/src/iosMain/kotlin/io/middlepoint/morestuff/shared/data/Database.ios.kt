@@ -9,14 +9,10 @@ import io.middlepoint.morestuff.android.data.Constants
 import io.middlepoint.morestuff.db.StuffDb
 
 actual class DriverFactory {
-  actual fun createDriver(): SqlDriver {
-    return NativeSqliteDriver(StuffDb.Schema, Constants.DATABASE_NAME)
-  }
 
-  actual suspend fun provideDbDriver(
-    schema: SqlSchema<QueryResult.AsyncValue<Unit>>
-  ): SqlDriver {
+  actual fun provideDbDriver(schema: SqlSchema<QueryResult.AsyncValue<Unit>>): SqlDriver {
     return NativeSqliteDriver(StuffDb.Schema.synchronous(), Constants.DATABASE_NAME)
   }
+
 }
 
