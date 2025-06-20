@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
+import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
@@ -33,6 +34,7 @@ class PriorityMiddleware(
     private val updateTaskReviewPriorityUseCase: UpdateTaskReviewPriorityUseCase,
     private val updateTaskPriorityScoreUseCase: UpdateTaskPriorityScoreUseCase,
     private val updatePlannedTasksPriorityUseCase: UpdatePlannedTasksPriorityUseCase,
+    private val devTools: DevTools
 ) : Middleware<AppState> {
 
     override fun invoke(
@@ -53,6 +55,7 @@ class PriorityMiddleware(
             }
 
             is UpdatePlannedPriorityAction -> scope.launch {
+                devTools.exportJsonData(false)
                 updatePlannedTasksPriorityUseCase()
             }
 

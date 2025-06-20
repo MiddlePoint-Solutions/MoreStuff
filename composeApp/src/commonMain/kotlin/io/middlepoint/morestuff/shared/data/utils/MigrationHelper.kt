@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.data.utils
 
 import arrow.core.getOrElse
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
@@ -18,7 +19,11 @@ data class DataMigration(
   val tasks: List<TaskDomain>,
   val scopes: List<ScopeDomain>,
   val messages: List<Message>,
-)
+) {
+  fun infoString(): String {
+    return "DataMigration(items=${items.size}, tasks=${tasks.size}, scopes=${scopes.size}, messages=${messages.size})"
+  }
+}
 
 @Serializable
 data class MigrationItem(
@@ -34,7 +39,7 @@ class MigrationHelper(
   val mediaHandler: MediaHandler,
 ) {
 
-  suspend fun export() {
+  suspend fun export(share: Boolean = false) {
     // get all the tasks
     val tasks = taskRepository.getAllTasks()
     // get scopes
@@ -81,13 +86,18 @@ class MigrationHelper(
       messages = taskMessagesMap.values.flatten()
     )
 
+    Logger.apply { setTag("MigrationHelper") }.d(dataMigration.infoString())
+
     val jsonData = Json.encodeToString(dataMigration)
-    val path = mediaHandler.saveJsonToFile(jsonData, "migration_test")
+    val path = mediaHandler.saveJsonToFile(jsonData, "migration_json")
 
-    path?.let {
-      mediaHandler.shareFile(it)
+    Logger.apply { setTag("MigrationHelper") }.d("Success ${!path.isNullOrBlank()}")
+
+    if (share) {
+      path?.let {
+        mediaHandler.shareFile(it)
+      }
     }
-
   }
 
 }

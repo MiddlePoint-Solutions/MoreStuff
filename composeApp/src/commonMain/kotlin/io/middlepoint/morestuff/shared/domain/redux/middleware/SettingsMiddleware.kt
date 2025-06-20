@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.middleware
 
+import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
 import io.middlepoint.morestuff.shared.domain.redux.AppState
 import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 class SettingsMiddleware(
     private val getAppSettingsUseCase: GetAppSettingsUseCase,
     private val saveUserSettingUseCase: SaveUserSettingUseCase,
+    private val devTools: DevTools
     ) : Middleware<AppState> {
 
     override fun invoke(
@@ -32,6 +34,7 @@ class SettingsMiddleware(
     ): Action {
         when (action) {
             is InitStoreAction -> scope.launch {
+                devTools.exportJsonData(false)
                 dispatch(InitSettings(getAppSettingsUseCase()))
             }
 

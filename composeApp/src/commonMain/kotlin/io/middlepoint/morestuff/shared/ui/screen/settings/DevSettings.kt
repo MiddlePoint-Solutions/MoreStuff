@@ -165,7 +165,7 @@ fun DevSettings(
 
     SettingsMenuLink(
       title = { Text(text = "Export JSON data") },
-      onClick = { scope.launch { devTools.exportJsonData() } },
+      onClick = { scope.launch { devTools.exportJsonData(true) } },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
