@@ -57,7 +57,9 @@ class DevToolsImpl(
 
   override suspend fun importMigrationData(): Boolean {
     return settings.getStringOrNull(MIGRATION_KEY)?.let {
-      importJsonData(PlatformFile(it))
+      getMigrationDataFile()?.let { file ->
+        importJsonData(file)
+      }
     } ?: false
   }
 
@@ -73,8 +75,12 @@ class DevToolsImpl(
     dataSyncManager.pull()
   }
 
+
   companion object {
     private const val MIGRATION_KEY = "MIGRATION_KEY"
   }
 }
+
+expect fun getMigrationDataFile(): PlatformFile?
+
 
