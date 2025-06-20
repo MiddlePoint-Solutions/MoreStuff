@@ -8,6 +8,6 @@ interface DevTools {
     suspend fun exportDatabase(uri: String)
     suspend fun importDatabase(uri: String)
 
-    suspend fun exportJsonData()
+    suspend fun exportJsonData(share: Boolean)
     suspend fun importJsonData(uri: String)
 }

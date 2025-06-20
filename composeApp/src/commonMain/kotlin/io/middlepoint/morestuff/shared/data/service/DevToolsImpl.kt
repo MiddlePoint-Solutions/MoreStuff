@@ -43,8 +43,9 @@ class DevToolsImpl(
         }
     }
 
-    override suspend fun exportJsonData() {
-        migrationHelper.export()
+    override suspend fun exportJsonData(share: Boolean) {
+        Logger.d("exportJsonData, share: $share")
+        migrationHelper.export(share)
     }
 
     override suspend fun importJsonData(uri: String) {
