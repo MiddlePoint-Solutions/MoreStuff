@@ -30,6 +30,8 @@ import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.DevTools
@@ -77,6 +79,8 @@ fun DevSettings(
 ) {
 
   val scope = rememberCoroutineScope()
+
+  val test = PlatformFile("")
 
   val singleImagePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.File("json"),

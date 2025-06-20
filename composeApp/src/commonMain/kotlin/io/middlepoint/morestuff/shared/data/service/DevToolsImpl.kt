@@ -13,54 +13,68 @@ import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.platform.DataMigrationHelper
 
 class DevToolsImpl(
-    private val settings: Settings,
-    private val notifier: Notifier,
-    private val dataMigration: DataMigrationHelper,
-    private val migrationHelper: MigrationHelper,
-    private val dataSyncManager: DataSyncManager
+  private val settings: Settings,
+  private val notifier: Notifier,
+  private val dataMigration: DataMigrationHelper,
+  private val migrationHelper: MigrationHelper,
+  private val dataSyncManager: DataSyncManager
 ) : DevTools {
 
-    override var showDebugMessages: Boolean
-        get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
-        set(value) {
-            settings.putBoolean(KEY_DEBUG_MESSAGES, value)
-        }
-    override var showDevSettings: Boolean
-        get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
-        set(value) {
-            settings.putBoolean(KEY_DEV_SETTINGS, value)
-        }
-
-    override fun testReviewNotification() {
-        notifier.showReviewNotification()
+  override var showDebugMessages: Boolean
+    get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
+    set(value) {
+      settings.putBoolean(KEY_DEBUG_MESSAGES, value)
+    }
+  override var showDevSettings: Boolean
+    get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
+    set(value) {
+      settings.putBoolean(KEY_DEV_SETTINGS, value)
     }
 
-    override suspend fun exportDatabase(uri: String) {
-        dataMigration.exportDatabase(uri).also {
-            Logger.d("exportData, finished: $it")
-        }
-    }
+  override fun testReviewNotification() {
+    notifier.showReviewNotification()
+  }
 
-    override suspend fun importDatabase(uri: String) {
-        dataMigration.importDatabase(uri).also {
-            Logger.d("importData, finished: $it")
-        }
+  override suspend fun exportDatabase(uri: String) {
+    dataMigration.exportDatabase(uri).also {
+      Logger.d("exportData, finished: $it")
     }
+  }
 
-    override suspend fun exportJsonData() {
-        migrationHelper.export()
+  override suspend fun importDatabase(uri: String) {
+    dataMigration.importDatabase(uri).also {
+      Logger.d("importData, finished: $it")
     }
+  }
 
-    override suspend fun importJsonData(jsonFile: PlatformFile): Boolean {
-        return migrationHelper.import(jsonFile).getOrElse { false }
-    }
+  override suspend fun exportJsonData() {
+    migrationHelper.export()
+  }
 
-    override suspend fun testDataPush() {
-        dataSyncManager.push()
-    }
+  override suspend fun importJsonData(jsonFile: PlatformFile): Boolean {
+    return migrationHelper.import(jsonFile).getOrElse { false }
+  }
 
-    override suspend fun testDataPull() {
-        dataSyncManager.pull()
-    }
+  override suspend fun importMigrationData(): Boolean {
+    return settings.getStringOrNull(MIGRATION_KEY)?.let {
+      importJsonData(PlatformFile(it))
+    } ?: false
+  }
+
+  override fun removeMigrationData() {
+    settings.remove(MIGRATION_KEY)
+  }
+
+  override suspend fun testDataPush() {
+    dataSyncManager.push()
+  }
+
+  override suspend fun testDataPull() {
+    dataSyncManager.pull()
+  }
+
+  companion object {
+    private const val MIGRATION_KEY = "MIGRATION_KEY"
+  }
 }
 

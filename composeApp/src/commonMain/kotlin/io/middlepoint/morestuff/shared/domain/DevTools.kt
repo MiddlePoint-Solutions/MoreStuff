@@ -12,6 +12,8 @@ interface DevTools {
 
     suspend fun exportJsonData()
     suspend fun importJsonData(jsonFile: PlatformFile): Boolean
+    suspend fun importMigrationData(): Boolean
+    fun removeMigrationData()
 
     suspend fun testDataPush()
     suspend fun testDataPull()

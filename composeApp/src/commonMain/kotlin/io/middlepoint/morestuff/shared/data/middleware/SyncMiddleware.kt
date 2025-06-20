@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.shared.data.middleware
 
 import co.touchlab.kermit.Logger
+import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.enums.SyncStatus
 import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.enums.SyncTrigger.*
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
@@ -17,7 +19,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SyncMiddleware(
-  private val syncUseCase: SyncUseCase
+  private val syncUseCase: SyncUseCase,
+  private val devTools: DevTools,
 ) : Middleware<AppState> {
 
   private val logger = Logger.withTag("SyncMiddleware")
@@ -52,7 +55,23 @@ class SyncMiddleware(
         // TODO: check trigger and decide if sync should be performed
         // TODO: we should check when the last sync time made so we don't sync to often
         if (syncJob == null || syncJob?.isActive == false) {
-          performSync(dispatch, scope)
+
+          syncJob = scope.launch {
+            // TODO: remove in later versions
+            if (action.trigger == Auth) {
+              devTools.importMigrationData()
+            }
+
+            syncUseCase().collect { status ->
+
+              // TODO: remove in later versions
+              if(action.trigger == Auth && status is SyncStatus.Success) {
+                devTools.removeMigrationData()
+              }
+
+              dispatch(UpdateSyncStatusAction(status))
+            }
+          }
         }
       }
 
@@ -60,14 +79,6 @@ class SyncMiddleware(
     }
 
     return next(state, action, dispatch)
-  }
-
-  private fun performSync(dispatch: Dispatch, scope: CoroutineScope) {
-    syncJob = scope.launch {
-      syncUseCase().collect { status ->
-        dispatch(UpdateSyncStatusAction(status))
-      }
-    }
   }
 
 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDateTime
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 
 object Constants {
@@ -211,22 +212,23 @@ class MediaHandlerImpl(
     }
   }
 
-  override suspend fun saveJsonToFile(jsonString: String, fileName: String): String? = withContext(Dispatchers.IO) {
-    try {
-      val jsonFileName = "$fileName.json"
-      val storageDir = getAppSpecificStorageDir(KEY_FILES_DIRECTORY)
-      val jsonFile = File(storageDir, jsonFileName)
+  override suspend fun saveJsonToFile(jsonString: String, fileName: String): String? =
+    withContext(Dispatchers.IO) {
+      try {
+        val jsonFileName = "$fileName.json"
+        val storageDir = getAppSpecificStorageDir(KEY_FILES_DIRECTORY)
+        val jsonFile = File(storageDir, jsonFileName)
 
-      FileOutputStream(jsonFile).use { outputStream ->
-        outputStream.write(jsonString.toByteArray())
+        FileOutputStream(jsonFile).use { outputStream ->
+          outputStream.write(jsonString.toByteArray())
+        }
+
+        jsonFile.absolutePath
+      } catch (e: Exception) {
+        logger.e("Error saving JSON file: $e")
+        null
       }
-
-      jsonFile.absolutePath
-    } catch (e: Exception) {
-      logger.e("Error saving JSON file: $e")
-      null
     }
-  }
 
   override fun shareFile(path: String) {
     logger.d("share - File path: $path")

@@ -7,6 +7,7 @@ import io.github.vinceglb.filekit.readString
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyMessage
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyScope
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyTask
@@ -23,7 +24,11 @@ data class DataMigration(
   val tasks: List<LegacyTask>,
   val scopes: List<LegacyScope>,
   val messages: List<LegacyMessage>,
-)
+) {
+  fun infoString(): String {
+    return "DataMigration(items=${items.size}, tasks=${tasks.size}, scopes=${scopes.size}, messages=${messages.size})"
+  }
+}
 
 @Serializable
 data class MigrationItem(
