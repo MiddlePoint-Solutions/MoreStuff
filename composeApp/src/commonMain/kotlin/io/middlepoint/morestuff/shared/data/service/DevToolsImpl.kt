@@ -10,46 +10,52 @@ import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 
 class DevToolsImpl(
-    private val settings: Settings,
-    private val notifier: Notifier,
-    private val dataMigration: DataMigrationHelper,
-    private val migrationHelper: MigrationHelper,
+  private val settings: Settings,
+  private val notifier: Notifier,
+  private val dataMigration: DataMigrationHelper,
+  private val migrationHelper: MigrationHelper,
 ) : DevTools {
 
-    override var showDebugMessages: Boolean
-        get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
-        set(value) {
-            settings.putBoolean(KEY_DEBUG_MESSAGES, value)
-        }
-    override var showDevSettings: Boolean
-        get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
-        set(value) {
-            settings.putBoolean(KEY_DEV_SETTINGS, value)
-        }
-
-    override fun testReviewNotification() {
-        notifier.showReviewNotification()
+  override var showDebugMessages: Boolean
+    get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
+    set(value) {
+      settings.putBoolean(KEY_DEBUG_MESSAGES, value)
+    }
+  override var showDevSettings: Boolean
+    get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
+    set(value) {
+      settings.putBoolean(KEY_DEV_SETTINGS, value)
     }
 
-    override suspend fun exportDatabase(uri: String) {
-        dataMigration.exportDatabase(uri).also {
-            Logger.d("exportData, finished: $it")
-        }
-    }
+  override fun testReviewNotification() {
+    notifier.showReviewNotification()
+  }
 
-    override suspend fun importDatabase(uri: String) {
-        dataMigration.importDatabase(uri).also {
-            Logger.d("importData, finished: $it")
-        }
+  override suspend fun exportDatabase(uri: String) {
+    dataMigration.exportDatabase(uri).also {
+      Logger.d("exportData, finished: $it")
     }
+  }
 
-    override suspend fun exportJsonData(share: Boolean) {
-        Logger.d("exportJsonData, share: $share")
-        migrationHelper.export(share)
+  override suspend fun importDatabase(uri: String) {
+    dataMigration.importDatabase(uri).also {
+      Logger.d("importData, finished: $it")
     }
+  }
 
-    override suspend fun importJsonData(uri: String) {
-        TODO("Not yet implemented")
+  override suspend fun exportJsonData(share: Boolean) {
+    Logger.d("exportJsonData, share: $share")
+    migrationHelper.export(share)?.let {
+      settings.putString(MIGRATION_KEY, it)
     }
+  }
+
+  override suspend fun importJsonData(uri: String) {
+    TODO("Not yet implemented")
+  }
+
+  companion object {
+    private const val MIGRATION_KEY = "MIGRATION_KEY"
+  }
 }
 
