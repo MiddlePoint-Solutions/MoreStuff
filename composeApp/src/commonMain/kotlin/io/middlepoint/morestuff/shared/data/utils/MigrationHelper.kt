@@ -39,7 +39,7 @@ class MigrationHelper(
   val mediaHandler: MediaHandler,
 ) {
 
-  suspend fun export(share: Boolean = false) {
+  suspend fun export(share: Boolean = false): String? {
     // get all the tasks
     val tasks = taskRepository.getAllTasks()
     // get scopes
@@ -98,6 +98,8 @@ class MigrationHelper(
         mediaHandler.shareFile(it)
       }
     }
+
+    return path
   }
 
 }
