@@ -56,15 +56,16 @@ class DevToolsImpl(
   }
 
   override suspend fun importMigrationData(): Boolean {
-    return settings.getStringOrNull(MIGRATION_KEY)?.let {
-      getMigrationDataFile()?.let { file ->
-        importJsonData(file)
-      }
+    if (settings.getBoolean(MIGRATION_COMPLETE_KEY, false)) {
+      return false
+    }
+    return getMigrationDataFile()?.let { file ->
+      importJsonData(file)
     } ?: false
   }
 
   override fun removeMigrationData() {
-    settings.remove(MIGRATION_KEY)
+    settings.putBoolean(MIGRATION_COMPLETE_KEY, true)
   }
 
   override suspend fun testDataPush() {
@@ -77,7 +78,7 @@ class DevToolsImpl(
 
 
   companion object {
-    private const val MIGRATION_KEY = "MIGRATION_KEY"
+    private const val MIGRATION_COMPLETE_KEY = "MIGRATION_COMPLETE_KEY"
   }
 }
 
