@@ -20,6 +20,7 @@ object Constants {
 
     // Developer keys
     const val KEY_DEBUG_MESSAGES = "key_show_debug_message"
+    const val KEY_MIGRATION_COMPLETE = "MIGRATION_COMPLETE_KEY"
     const val KEY_REMINDER_DEBUGGING_SWITCH_ENABLED = "key_enable_reminder_debugging"
     const val KEY_REMINDER_DEBUGGING_TIME = "key_reminder_debugging_time"
 

@@ -6,6 +6,7 @@ import com.russhwolf.settings.Settings
 import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEV_SETTINGS
+import io.middlepoint.morestuff.android.data.Constants.KEY_MIGRATION_COMPLETE
 import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
@@ -29,6 +30,12 @@ class DevToolsImpl(
     get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
     set(value) {
       settings.putBoolean(KEY_DEV_SETTINGS, value)
+    }
+
+  override var importDataComplete: Boolean
+    get() = settings.getBoolean(KEY_MIGRATION_COMPLETE, false)
+    set(value) {
+      settings.putBoolean(KEY_MIGRATION_COMPLETE, value)
     }
 
   override fun testReviewNotification() {
@@ -56,16 +63,14 @@ class DevToolsImpl(
   }
 
   override suspend fun importMigrationData(): Boolean {
-    if (settings.getBoolean(MIGRATION_COMPLETE_KEY, false)) {
+    if (importDataComplete) {
       return false
     }
     return getMigrationDataFile()?.let { file ->
-      importJsonData(file)
+      importJsonData(file).also {
+        importDataComplete = it
+      }
     } ?: false
-  }
-
-  override fun removeMigrationData() {
-    settings.putBoolean(MIGRATION_COMPLETE_KEY, true)
   }
 
   override suspend fun testDataPush() {
@@ -78,7 +83,6 @@ class DevToolsImpl(
 
 
   companion object {
-    private const val MIGRATION_COMPLETE_KEY = "MIGRATION_COMPLETE_KEY"
   }
 }
 

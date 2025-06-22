@@ -45,28 +45,17 @@ class SyncMiddleware(
         dispatch(SyncTriggerAction(Auth))
       }
 
-      // TODO: implement sync on sign out
-      is UserAction.SignOut -> {
-//        syncJob?.cancel()
-//        syncJob = null
-      }
-
       is SyncTriggerAction -> {
         // TODO: check trigger and decide if sync should be performed
         // TODO: we should check when the last sync time made so we don't sync to often
         if (syncJob == null || syncJob?.isActive == false) {
 
           syncJob = scope.launch {
-            // TODO: remove in later versions
-            if (action.trigger == Auth) {
-              devTools.importMigrationData()
-            }
-
             syncUseCase().collect { status ->
 
               // TODO: remove in later versions
-              if(action.trigger == Auth && status is SyncStatus.Success) {
-                devTools.removeMigrationData()
+              if (action.trigger == Auth && status is SyncStatus.Success) {
+                devTools.importMigrationData()
               }
 
               dispatch(UpdateSyncStatusAction(status))
