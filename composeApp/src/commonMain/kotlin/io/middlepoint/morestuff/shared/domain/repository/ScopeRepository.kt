@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ScopeRepository {
     suspend fun createScope(name: String): Either<Failure, Scope>
+    suspend fun getOrCreateScope(name: String): Either<Failure, Scope>
     suspend fun deleteScope(id: Uuid): Either<Failure, Scope>
     suspend fun getScopes(): Either<Failure, List<Scope>>
     fun getScopesFlow(): Flow<List<Scope>>

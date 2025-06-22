@@ -26,6 +26,7 @@ import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
 class MessageRepositoryImpl(
@@ -72,10 +73,11 @@ class MessageRepositoryImpl(
     taskId: Uuid,
     scheduleId: Uuid?,
     contentType: Int,
+    legacyCreatedAt: String?,
     messageExtra: MessageExtra?,
     content: String,
   ): Either<Failure, Message> = messageQueries.transactionWithResult {
-    val createdAt = timeManager.nowUtcInstant
+    val createdAt = (legacyCreatedAt?.let(Instant::parse) ?: timeManager.nowUtcInstant)
     val messageData = MessageData(
       id = Uuid.generate(),
       task_id = taskId,

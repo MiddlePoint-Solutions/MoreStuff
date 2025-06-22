@@ -33,7 +33,7 @@ class CreateMessageUseCaseImplTest {
       messageRepository.createMessage(
         any(),
         any(),
-        contentType.value,
+        contentType.value,,
         messageExtra,
         title
       )

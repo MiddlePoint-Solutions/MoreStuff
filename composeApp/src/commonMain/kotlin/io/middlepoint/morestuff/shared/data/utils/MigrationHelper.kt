@@ -7,7 +7,6 @@ import io.github.vinceglb.filekit.readString
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyMessage
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyScope
 import io.middlepoint.morestuff.shared.domain.model.core.legacy.LegacyTask
@@ -102,7 +101,7 @@ class MigrationHelper(
 
     val newScopesMap = buildMap {
       dataMigration.scopes.sortedBy { it.order }.forEach { scope ->
-        scopeRepository.createScope(scope.name).onRight { newScope ->
+        scopeRepository.getOrCreateScope(scope.name).onRight { newScope ->
           put(scope.id, newScope.id)
         }
       }
@@ -124,6 +123,7 @@ class MigrationHelper(
           newTask.id,
           null,
           message.contentType.value,
+          message.createTime,
           message.messageData?.let { data ->
             MessageExtra(
               id = Uuid.generate(),

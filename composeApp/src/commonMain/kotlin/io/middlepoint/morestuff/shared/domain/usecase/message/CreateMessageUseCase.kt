@@ -9,31 +9,38 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 
 interface CreateMessageUseCase {
-    suspend operator fun invoke(
-      taskId: Uuid,
-      title: String,
-      contentType: ContentType,
-      messageExtra: MessageExtra?,
-      scheduleId: Uuid?,
-    ): Either<Failure, Message>
+  suspend operator fun invoke(
+    taskId: Uuid,
+    title: String,
+    contentType: ContentType,
+    messageExtra: MessageExtra?,
+    scheduleId: Uuid?,
+  ): Either<Failure, Message>
 }
 
 class CreateMessageUseCaseImpl(
-    private val messageRepository: MessageRepository,
-    private val checkForUrlMetadataUseCase: CheckForUrlMetadataUseCase
+  private val messageRepository: MessageRepository,
+  private val checkForUrlMetadataUseCase: CheckForUrlMetadataUseCase
 ) : CreateMessageUseCase {
 
-    override suspend fun invoke(
-      taskId: Uuid,
-      title: String,
-      contentType: ContentType,
-      messageExtra: MessageExtra?,
-      scheduleId: Uuid?,
-    ): Either<Failure, Message> {
-        return messageRepository.createMessage(taskId, scheduleId, contentType.value,messageExtra, title)
-            .onRight {
-              checkForUrlMetadataUseCase(title, it.id)
-            }
-    }
+  override suspend fun invoke(
+    taskId: Uuid,
+    title: String,
+    contentType: ContentType,
+    messageExtra: MessageExtra?,
+    scheduleId: Uuid?,
+  ): Either<Failure, Message> {
+    return messageRepository.createMessage(
+      taskId,
+      scheduleId,
+      contentType.value,
+      null,
+      messageExtra,
+      title
+    )
+      .onRight {
+        checkForUrlMetadataUseCase(title, it.id)
+      }
+  }
 }
 
