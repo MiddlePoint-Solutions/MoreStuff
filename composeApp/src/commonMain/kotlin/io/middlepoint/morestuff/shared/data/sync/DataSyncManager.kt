@@ -134,7 +134,7 @@ class DataSyncManagerImpl(
     }
 
     data.maxUpdatedAt()?.let {
-      logger.d { "new lastPullTime: $it" }
+      logger.d { "new lastPushTime: $it" }
       lastPushTime = it
     }
 
