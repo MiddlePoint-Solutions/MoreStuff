@@ -24,9 +24,9 @@ class CreateNewTaskUseCaseImpl(
     override suspend fun invoke(params: TaskParams): Task = with(params) {
         val priorityScore = getDefaultPriorityScoreUseCase(priority)
         taskRepository.createTask(
-            title = title,
-            scopeId = scopeId,
-            priorityScore = priorityScore
+          title = title,
+          scopeId = scopeId,
+          priorityScore = priorityScore
         )
     }
 } 

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 
 class TaskRepositoryImpl(
@@ -45,6 +46,8 @@ class TaskRepositoryImpl(
     title: String,
     scopeId: Uuid,
     priorityScore: Long,
+    completedAt: Instant?,
+    completedTimezone: String?,
   ): Task {
     return taskQueries.transactionWithResult {
 
@@ -52,6 +55,8 @@ class TaskRepositoryImpl(
         title = title,
         createdAt = timeManager.nowUtcInstant,
         priorityScore = priorityScore,
+        completedAt = completedAt,
+        completedTimezone = completedTimezone
       )
       taskQueries.insertTask(data)
 
@@ -63,7 +68,6 @@ class TaskRepositoryImpl(
         deleted = false
       )
       taskScopeQueries.insert(tasksScopesItem)
-
       taskQueries.selectTaskById(data.id, mapper = mapper.taskDataMapper).awaitAsOne()
     }
   }
@@ -233,13 +237,15 @@ class TaskRepositoryImpl(
     title: String,
     createdAt: Instant,
     priorityScore: Long,
+    completedAt: Instant? = null,
+    completedTimezone: String? = null,
   ) = TaskData(
     id = Uuid.generate(),
     title = title,
     created_at = createdAt,
     updated_at = createdAt,
-    completed_at = null,
-    completed_timezone = null,
+    completed_at = completedAt,
+    completed_timezone = completedTimezone,
     priority_score = priorityScore,
     deleted = false
   )

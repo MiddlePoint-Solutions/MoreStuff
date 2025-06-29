@@ -14,6 +14,8 @@ import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.repository.ScopeRepository
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.platform.MediaHandler
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -112,7 +114,14 @@ class MigrationHelper(
       val migrationItem = dataMigration.items.first { it.taskId == oldTask.id }
 
       val newTaskScopeId = newScopesMap.getValue(migrationItem.scopeId)
-      val newTask = taskRepository.createTask(oldTask.title, newTaskScopeId, oldTask.priorityScore)
+
+      val newTask = taskRepository.createTask(
+        title = oldTask.title,
+        scopeId = newTaskScopeId,
+        priorityScore = oldTask.priorityScore,
+        completedAt = oldTask.completeTime?.let(Instant::parse),
+        completedTimezone = oldTask.completeTime?.let { TimeZone.currentSystemDefault().id }
+      )
 
       dataMigration.messages.filter {
         migrationItem.messageIds.contains(it.id)

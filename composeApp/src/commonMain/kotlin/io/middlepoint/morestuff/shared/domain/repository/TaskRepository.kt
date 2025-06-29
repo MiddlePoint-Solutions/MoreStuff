@@ -8,6 +8,7 @@ import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.Instant
 
 interface TaskRepository {
 
@@ -15,6 +16,8 @@ interface TaskRepository {
         title: String,
         scopeId: Uuid,
         priorityScore: Long,
+        completedAt: Instant? = null,
+        completedTimezone: String? = null,
     ): Task
 
     suspend fun getTask(taskId: Uuid): Either<Failure, Task>
