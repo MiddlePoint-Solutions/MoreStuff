@@ -45,29 +45,29 @@ class UserRepositoryImpl(
     @Suppress("UNCHECKED_CAST")
     override fun <T, R> getAppSetting(setting: AppSetting<T>): R =
         when (setting) {
-            FirstTime -> getSetting(setting, setting.defaultValue as Boolean)
-            Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
-            SnoozeLimit -> getSetting(setting, setting.defaultValue as Int)
-            DevSettings -> getSetting(setting, setting.defaultValue as Boolean)
-            ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>)
-            ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean)
-            VoiceInputLanguage -> Language.valueOf(settings.getString(setting.settingKey, (setting.defaultValue as Language).name))
-        } as R
+            FirstTime -> getSetting(setting, setting.defaultValue as Boolean) as R
+            Theme -> AppTheme.valueOf(getSetting(Theme, AppTheme.System.name)) as R
+            SnoozeLimit -> getSetting(setting, setting.defaultValue as Int) as R
+            DevSettings -> getSetting(setting, setting.defaultValue as Boolean) as R
+            ReviewTime -> getSetting(setting, setting.defaultValue as Pair<Int, Int>) as R
+            ShowHintArrowPriority -> getSetting(setting, setting.defaultValue as Boolean) as R
+            VoiceInputLanguage -> Language.valueOf(settings.getString(setting.settingKey, (setting.defaultValue as Language).name)) as R
+        }
 
     override fun getAppTheme(): AppTheme =
         AppTheme.valueOf(getSetting(Theme, AppTheme.System.name))
 
     private inline fun <reified T> getSetting(setting: AppSetting<*>, defaultValue: T): T =
         when (setting) {
-            FirstTime -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
-            Theme -> settings.getString(setting.settingKey, defaultValue as String)
-            SnoozeLimit -> settings.getInt(setting.settingKey, defaultValue as Int)
-            DevSettings -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
+            FirstTime -> settings.getBoolean(setting.settingKey, defaultValue as Boolean) as T
+            Theme -> settings.getString(setting.settingKey, defaultValue as String) as T
+            SnoozeLimit -> settings.getInt(setting.settingKey, defaultValue as Int) as T
+            DevSettings -> settings.getBoolean(setting.settingKey, defaultValue as Boolean) as T
             is ReviewTime -> {
                 val timeStr = settings.getString(setting.settingKey, setting.defaultValue.toString())
-                timeStr.toPairInt() ?: setting.defaultValue
+                timeStr.toPairInt() ?: setting.defaultValue as T
             }
-            ShowHintArrowPriority -> settings.getBoolean(setting.settingKey, defaultValue as Boolean)
+            ShowHintArrowPriority -> settings.getBoolean(setting.settingKey, defaultValue as Boolean) as T
             VoiceInputLanguage -> {
                 val languageName = settings.getString(setting.settingKey, (defaultValue as Language).name)
                 Language.valueOf(languageName)
