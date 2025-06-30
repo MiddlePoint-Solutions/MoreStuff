@@ -67,6 +67,7 @@ fun createScheduleForTest(
   scheduleTimeUtc: String = "",
   timeZone: String = "",
   active: Boolean = true,
+  deleted: Boolean = false,
   scheduleType: ScheduleType
 ): Schedule {
   return Schedule(
@@ -77,6 +78,7 @@ fun createScheduleForTest(
     scheduleTimeUtc,
     timeZone,
     active,
+    deleted,
     scheduleType
   )
 }
@@ -89,6 +91,7 @@ fun createScheduleUseCaseTest(
   scheduleTimeUtc: String = "",
   timeZone: String = TimeZone.currentSystemDefault().id,
   active: Boolean = true,
+  deleted: Boolean = false,
   scheduleType: ScheduleType = ScheduleType.OneTime
 ): Schedule {
   return Schedule(
@@ -99,6 +102,7 @@ fun createScheduleUseCaseTest(
     scheduleTimeUtc,
     timeZone,
     active,
+    deleted,
     scheduleType
   )
     .copy(
