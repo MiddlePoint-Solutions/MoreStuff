@@ -34,7 +34,6 @@ sealed class SettingAction : Action.FeatureAction() {
     //data class SetReviewTimeAction(val hour: Int, val minute: Int) : SettingAction()
     data class EnableReviewHint(val enable: Boolean) : SettingAction()
     data class SetVoiceLanguage(val language: Language) : SettingAction()
-
 }
 
 fun AppState.reduceSettingState(action: Action): AppState {
