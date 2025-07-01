@@ -16,6 +16,7 @@ import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.Schedu
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction.ToggleReminderScheduleAction
 import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
 import io.middlepoint.morestuff.shared.domain.redux.store.Dispatch
@@ -58,8 +59,8 @@ class ScheduleMiddleware(
   ): Action {
     when (action) {
 
-      is SettingAction.InitSettings -> scope.launch {
-        scheduleWorkUseCase(/*action.settings*/)
+      is UserAction.Authenticated -> scope.launch {
+        scheduleWorkUseCase() // TODO: test that the sync is triggered
       }
 
       is TaskAction.TaskCreatedAction -> scope.launch {

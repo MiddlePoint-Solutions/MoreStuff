@@ -12,14 +12,16 @@ import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.platform.DataMigrationHelper
+import org.koin.compose.koinInject
 
 class DevToolsImpl(
   private val settings: Settings,
   private val notifier: Notifier,
   private val dataMigration: DataMigrationHelper,
   private val migrationHelper: MigrationHelper,
-  private val dataSyncManager: DataSyncManager
 ) : DevTools {
+
+  private val logger = Logger.withTag("DevTools")
 
   override var showDebugMessages: Boolean
     get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
@@ -63,29 +65,27 @@ class DevToolsImpl(
   }
 
   override suspend fun importMigrationData(): Boolean {
+    logger.d("importMigrationData, data already imported: $importDataComplete")
     if (importDataComplete) {
       return false
     }
     return getMigrationDataFile()?.let { file ->
       importJsonData(file).also {
+        logger.d("importMigrationData, migration data imported successfully: $it")
         importDataComplete = it
       }
     } ?: false
   }
 
-  override suspend fun testDataPush() {
-    dataSyncManager.push()
-  }
-
-  override suspend fun testDataPull() {
-    dataSyncManager.pull()
-  }
-
-
-  companion object {
+  override suspend fun migrationComplete() {
+    if(importDataComplete) {
+      logger.d("migrationComplete, deleting json migration file")
+      deleteMigrationDataFile()
+    }
   }
 }
 
 expect fun getMigrationDataFile(): PlatformFile?
+expect suspend fun deleteMigrationDataFile()
 
 

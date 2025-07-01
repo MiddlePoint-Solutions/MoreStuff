@@ -15,6 +15,7 @@ import io.middlepoint.morestuff.db.StuffDb
 import io.middlepoint.morestuff.db.Tasks
 import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.enums.SyncFailure
 import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Error
 import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Initializing
@@ -33,6 +34,7 @@ class DataSyncManagerImpl(
   private val supabase: SupabaseClient,
   private val settings: Settings,
   private val timeManager: TimeManager,
+  private val devTools: DevTools,
 ) : DataSyncManager {
 
   private val tasks = database.tasksQueries
@@ -65,10 +67,19 @@ class DataSyncManagerImpl(
     try {
       push()
       pull()
+      performDataMigrationIfNeeded()
       emit(Success(timeManager.nowUtcInstant))
     } catch (e: Throwable) {
       logger.e("Sync Exception", e)
       emit(Error(SyncFailure(e.toString())))
+    }
+  }
+
+  private suspend fun performDataMigrationIfNeeded() {
+    if (devTools.importMigrationData()) { // TODO: remove in next release version
+      push()
+      pull()
+      devTools.migrationComplete()
     }
   }
 

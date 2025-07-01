@@ -54,16 +54,6 @@ val dataModule = module {
 
   single<StuffDb> { createDatabase(get()) }
 
-  single<DevTools> {
-    DevToolsImpl(
-      settings = get(named(SharedSettings.Unencrypted)),
-      notifier = get(),
-      dataMigration = get(),
-      migrationHelper = get(),
-      dataSyncManager = get(),
-    )
-  }
-
   singleOf(::MessageDataMap)
 
   //singleOf(::DevToolsImpl) bind DevTools::class
@@ -100,6 +90,16 @@ val dataModule = module {
       supabase = get(),
       settings = get(named(SharedSettings.Encrypted)),
       timeManager = get(),
+      devTools = get()
+    )
+  }
+
+  factory<DevTools> {
+    DevToolsImpl(
+      settings = get(named(SharedSettings.Unencrypted)),
+      notifier = get(),
+      dataMigration = get(),
+      migrationHelper = get(),
     )
   }
 

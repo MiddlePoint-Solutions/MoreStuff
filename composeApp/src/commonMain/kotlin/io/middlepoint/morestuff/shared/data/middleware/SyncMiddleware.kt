@@ -20,10 +20,7 @@ import kotlinx.coroutines.launch
 
 class SyncMiddleware(
   private val syncUseCase: SyncUseCase,
-  private val devTools: DevTools,
 ) : Middleware<AppState> {
-
-  private val logger = Logger.withTag("SyncMiddleware")
 
   private var syncJob: Job? = null
 
@@ -46,19 +43,15 @@ class SyncMiddleware(
       }
 
       is SyncTriggerAction -> {
-        // TODO: check trigger and decide if sync should be performed
-        // TODO: we should check when the last sync time made so we don't sync to often
-        if (syncJob == null || syncJob?.isActive == false) {
+        if (state.userState.user != null) {
+          // TODO: check trigger and decide if sync should be performed
+          // TODO: we should check when the last sync time made so we don't sync to often
+          if (syncJob == null || syncJob?.isActive == false) {
 
-          syncJob = scope.launch {
-            syncUseCase().collect { status ->
-
-              // TODO: remove in later versions
-              if (action.trigger == Auth && status is SyncStatus.Success) {
-                devTools.importMigrationData()
+            syncJob = scope.launch {
+              syncUseCase().collect { status ->
+                dispatch(UpdateSyncStatusAction(status))
               }
-
-              dispatch(UpdateSyncStatusAction(status))
             }
           }
         }

@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.data.utils
 
 import arrow.core.Either
 import arrow.core.raise.either
+import co.touchlab.kermit.Logger
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.readString
 import io.middlepoint.morestuff.shared.domain.model.Failure
@@ -44,6 +45,8 @@ class MigrationHelper(
   val scopeRepository: ScopeRepository,
   val mediaHandler: MediaHandler,
 ) {
+
+  private val logger = Logger.withTag("MigrationHelper")
 
   suspend fun export() {
     // get all the tasks
@@ -97,8 +100,11 @@ class MigrationHelper(
   }
 
   suspend fun import(jsonFile: PlatformFile): Either<Failure, Boolean> = either {
-    
+
     val jsonContent = jsonFile.readString()
+
+    logger.d(jsonContent)
+
     val dataMigration = Json.decodeFromString<DataMigration>(jsonContent)
 
     val newScopesMap = buildMap {
@@ -145,7 +151,6 @@ class MigrationHelper(
         )
       }
     }
-
     true
   }
 

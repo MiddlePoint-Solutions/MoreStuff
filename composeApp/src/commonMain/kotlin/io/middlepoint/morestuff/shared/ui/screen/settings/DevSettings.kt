@@ -147,18 +147,6 @@ fun DevSettings(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
     )
-
-    SettingsMenuLink(
-      title = { Text(text = "Test data sync push") },
-      onClick = { scope.launch { devTools.testDataPush() } },
-    )
-
-    SettingsMenuLink(
-      title = { Text(text = "Test data sync pull") },
-      onClick = { scope.launch { devTools.testDataPull() } },
-    )
-
-
 //        SettingsMenuLink(
 //            title = { Text(text = stringResource(Res.string.export_database)) },
 //            onClick = { exportData = true },
