@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS tasks_scopes (
     created_at INTEGER AS Instant NOT NULL,
     updated_at INTEGER AS Instant NOT NULL,
     deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
-    FOREIGN KEY(task_id) REFERENCES tasks(id),
-    FOREIGN KEY(scope_id) REFERENCES scopes(id)
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+    FOREIGN KEY(scope_id) REFERENCES scopes(id) ON DELETE CASCADE
 );
 
 selectAllUpdates:

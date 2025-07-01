@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS url_metadata (
     url TEXT NOT NULL,
     json_data TEXT NOT NULL,
     message_id TEXT AS Uuid NOT NULL,
-    FOREIGN KEY(message_id) REFERENCES messages(id)
-        ON DELETE CASCADE
+    FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
 );
 
 

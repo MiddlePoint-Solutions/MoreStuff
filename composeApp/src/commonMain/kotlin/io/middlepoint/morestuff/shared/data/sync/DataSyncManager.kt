@@ -190,13 +190,12 @@ class DataSyncManagerImpl(
   override suspend fun resetData() {
     lastPushTime = Instant.fromEpochMilliseconds(0)
     lastPullTime = Instant.fromEpochMilliseconds(0)
-    var deleted = tasks.deleteAll()
-    deleted += scopes.deleteAll()
-    deleted += messages.deleteAll()
-    deleted += tasksScopes.deleteAll()
-    deleted += schedules.deleteAll()
-    deleted += messageExtras.deleteAll()
-    logger.d { "resetData, items deleted: $deleted" }
+    settings.clear()
+    tasks.transaction {
+      var deleted = tasks.deleteAll()
+      deleted += scopes.deleteAll()
+      logger.d { "resetData, items deleted: $deleted" }
+    }
   }
 
   private fun SyncData.toLocalData() = LocalData(

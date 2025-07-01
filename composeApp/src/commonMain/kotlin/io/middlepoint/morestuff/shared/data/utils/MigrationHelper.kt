@@ -97,7 +97,7 @@ class MigrationHelper(
   }
 
   suspend fun import(jsonFile: PlatformFile): Either<Failure, Boolean> = either {
-
+    
     val jsonContent = jsonFile.readString()
     val dataMigration = Json.decodeFromString<DataMigration>(jsonContent)
 

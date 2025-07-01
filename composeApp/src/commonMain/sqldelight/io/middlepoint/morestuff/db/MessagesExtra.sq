@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS messages_extra (
     updated_at INTEGER AS Instant NOT NULL,
     data_type TEXT NOT NULL,
     deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
-    FOREIGN KEY(message_id) REFERENCES messages(id)
+    FOREIGN KEY(message_id) REFERENCES messages(id) ON DELETE CASCADE
 );
 
 selectAllUpdates:
