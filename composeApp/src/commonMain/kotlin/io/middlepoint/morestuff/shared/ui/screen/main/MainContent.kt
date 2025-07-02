@@ -47,7 +47,6 @@ import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 @Composable
 fun MainContent(
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
-  onBoardingComplete: () -> Unit,
 ) {
   CompositionLocalProvider(
     LocalScreenSize provides getScreenSizeInfo(),
@@ -58,7 +57,7 @@ fun MainContent(
     RoutedContent(
       router = router,
       modifier = Modifier.fillMaxSize(),
-      animation = stackAnimation(slide() + fade())
+      animation = stackAnimation(slide())
     ) { screen ->
       when (screen) {
 

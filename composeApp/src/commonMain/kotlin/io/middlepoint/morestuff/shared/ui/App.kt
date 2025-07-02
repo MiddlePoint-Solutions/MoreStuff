@@ -53,9 +53,6 @@ fun App(screen: Screen? = null, accessToken: String? = null) {
               MainContent(
                 shareContent = { taskId, content ->
                   viewModel.take(MainEvent.ShareContent(taskId, content))
-                },
-                onBoardingComplete = {
-                  viewModel.take(MainEvent.OnBoardingComplete)
                 }
               )
             }
