@@ -1,9 +1,11 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.android.utils.Environment
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
 import org.jetbrains.compose.internal.de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
   alias(libs.plugins.android.application)
@@ -231,7 +233,6 @@ kotlin {
     }
 
 
-
     val desktopMain by getting {
       dependsOn(nonWebMain)
       dependencies {
@@ -272,22 +273,30 @@ buildConfig {
     value = provider { (property("app.morestuff.debug") as String).toBoolean() }
   )
 
-
   // Supabase configs
 
   buildConfigField(
     name = "SUPABASE_URL",
-    value = provider { localProperties.getProperty("SUPABASE_URL") }
+    value = provider {
+      localProperties.getPropertyOrNull("SUPABASE_URL")
+        ?: System.getenv("SUPABASE_URL")
+    }
   )
 
   buildConfigField(
     name = "SUPABASE_KEY",
-    value = provider { localProperties.getProperty("SUPABASE_KEY") }
+    value = provider {
+      localProperties.getPropertyOrNull("SUPABASE_KEY")
+        ?: System.getenv("SUPABASE_KEY")
+    }
   )
 
   buildConfigField(
     name = "GOOGLE_SERVER_CLIENT_ID",
-    value = provider { localProperties.getProperty("GOOGLE_SERVER_CLIENT_ID") }
+    value = provider {
+      localProperties.getPropertyOrNull("GOOGLE_SERVER_CLIENT_ID")
+        ?: System.getenv("GOOGLE_SERVER_CLIENT_ID")
+    }
   )
 
   // Deeplinks
@@ -303,6 +312,7 @@ buildConfig {
   )
 
 }
+
 
 android {
   namespace = "io.middlepoint.morestuff.android"
@@ -452,3 +462,9 @@ val sqliteUnzip = tasks.register("sqliteUnzip", Copy::class.java) {
 tasks.named("wasmJsProcessResources").configure {
   dependsOn(sqliteUnzip)
 }
+
+// Extensions
+
+fun Properties.getPropertyOrNull(key: String): String? =
+  getProperty(key)?.takeIf { it.isNotBlank() }
+
