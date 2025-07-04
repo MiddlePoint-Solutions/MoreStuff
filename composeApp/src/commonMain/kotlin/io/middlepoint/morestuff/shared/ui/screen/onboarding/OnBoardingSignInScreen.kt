@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -26,11 +28,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +54,11 @@ import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.ms_sign_in
+import morestuff.composeapp.generated.resources.privacy_policy_link_text
 import morestuff.composeapp.generated.resources.sign_in_with_email
+import morestuff.composeapp.generated.resources.terms_of_service_link_text
+import morestuff.composeapp.generated.resources.terms_privacy_and_text
+import morestuff.composeapp.generated.resources.terms_privacy_prefix_text
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -198,8 +206,73 @@ fun OnBoardingSignInContent(
           )
           Text(stringResource(Res.string.sign_in_with_email), fontSize = 12.sp)
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TermsAndPrivacyText()
       }
     }
   }
 }
+
+
+@Composable
+fun TermsAndPrivacyText(
+  modifier: Modifier = Modifier,
+  textColor: Color = Color.White, // Default text color
+  linkColor: Color = Color.White // Link color, often same as text or slightly different
+) {
+  val uriHandler = LocalUriHandler.current
+
+  val termsOfServiceText = stringResource(Res.string.terms_of_service_link_text) // "terms of service"
+  val privacyPolicyText = stringResource(Res.string.privacy_policy_link_text) // "privacy policy"
+
+  val annotatedString = buildAnnotatedString {
+    // Start with the base style for the entire text
+    withStyle(style = SpanStyle(color = textColor, fontSize = 12.sp)) {
+      append(stringResource(Res.string.terms_privacy_prefix_text))
+      append("\n")// "By continuing you agree to our "
+    }
+
+    // Add "terms of service" as a clickable link
+    pushStringAnnotation(tag = "URL", annotation = "https://morestuff.app/terms-of-service")
+    withStyle(style = SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline, fontSize = 12.sp)) {
+      append(termsOfServiceText)
+    }
+    pop() // Pop the URL annotation
+
+    withStyle(style = SpanStyle(color = textColor, fontSize = 12.sp)) {
+      append(stringResource(Res.string.terms_privacy_and_text)) // " and "
+    }
+
+    // Add "privacy policy" as a clickable link
+    pushStringAnnotation(tag = "URL", annotation = "https://morestuff.app/privacy-policy")
+    withStyle(style = SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline, fontSize = 12.sp)) {
+      append(privacyPolicyText)
+    }
+    pop() // Pop the URL annotation
+  }
+
+  ClickableText(
+    text = annotatedString,
+    onClick = { offset ->
+      annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+        .firstOrNull()?.let { annotation ->
+          uriHandler.openUri(annotation.item)
+        }
+    },
+    modifier = modifier.fillMaxWidth().padding(horizontal = 20.dp), // Adjust padding as needed
+    style = LocalTextStyle.current.copy(textAlign = TextAlign.Center) // Center the text
+  )
+}
+
+// You'll need to add these strings to your commonMain/resources/values/strings.xml
+/*
+<resources>
+    <string name="terms_privacy_prefix_text">By continuing you agree to our </string>
+    <string name="terms_of_service_link_text">terms of service</string>
+    <string name="terms_privacy_and_text"> and </string>
+    <string name="privacy_policy_link_text">privacy policy</string>
+</resources>
+*/
 

@@ -234,6 +234,11 @@
     <string name="onboarding_signin_title">Sign in</string>
     <string name="onboarding_signin_subtitle">Save your stuff in the cloud </string>
 
+    <string name="terms_privacy_prefix_text">By continuing you agree to our </string>
+    <string name="terms_of_service_link_text">terms of service</string>
+    <string name="terms_privacy_and_text"> and </string>
+    <string name="privacy_policy_link_text">privacy policy</string>
+
     <!-- Hint tasks and messages  -->
     <string name="hint_task_1">Welcome to MoreStuff 🤗</string>
     <string name="hint_task_1_message_1">Here you can chat with your tasks</string>
