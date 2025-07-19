@@ -81,3 +81,4 @@ val paymentBrush = Brush.linearGradient(
 )
 
 val paymentOnSurface = Color(0xFF1B1B21)
+val onBoardingButton = Color(0xFF393AC5)

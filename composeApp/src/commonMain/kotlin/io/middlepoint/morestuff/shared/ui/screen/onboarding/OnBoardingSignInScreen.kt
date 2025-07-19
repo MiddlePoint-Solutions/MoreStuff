@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +21,12 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -51,8 +47,8 @@ import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.middlepoint.morestuff.shared.platform.Platform
 import io.middlepoint.morestuff.shared.platform.platform
 import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
+import io.middlepoint.morestuff.shared.ui.theme.onBoardingButton
 import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.ms_sign_in
 import morestuff.composeapp.generated.resources.privacy_policy_link_text
 import morestuff.composeapp.generated.resources.sign_in_with_email
@@ -109,12 +105,10 @@ fun OnBoardingSignInContent(
   onSignInWithEmail: () -> Unit
 ) {
 
-  val background = remember { onBoardingBrush }
-
   Box(
     modifier = Modifier
       .fillMaxSize()
-      .background(background)
+      .background(onBoardingBrush)
       .padding(horizontal = 10.dp)
   ) {
 
@@ -165,7 +159,7 @@ fun OnBoardingSignInContent(
             content = { ProviderButtonContent(Google, text = "Continue with Google") },
             colors = ButtonDefaults.outlinedButtonColors(
               contentColor = Color.White,
-              containerColor = Color(0xFF393AC5)
+              containerColor = onBoardingButton
             ),
             border = null,
           )
@@ -181,24 +175,14 @@ fun OnBoardingSignInContent(
             content = { ProviderButtonContent(Apple, text = "Sign in with Apple") },
             colors = ButtonDefaults.outlinedButtonColors(
               contentColor = Color.White,
-              containerColor = Color(0xFF393AC5)
+              containerColor = onBoardingButton
             ),
             border = null,
           )
           Spacer(modifier = Modifier.height(16.dp))
         }
 
-        OutlinedButton(
-          onClick = onSignInWithEmail,
-          colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.White,
-            containerColor = Color(0xFF393AC5)
-          ),
-          border = null,
-          modifier = Modifier
-            .fillMaxWidth(0.8f)
-            .height(56.dp)
-        ) {
+        OnBoardingButton(onClick = onSignInWithEmail) {
           Icon(
             imageVector = Icons.Default.Email,
             contentDescription = stringResource(Res.string.sign_in_with_email),
@@ -224,7 +208,8 @@ fun TermsAndPrivacyText(
 ) {
   val uriHandler = LocalUriHandler.current
 
-  val termsOfServiceText = stringResource(Res.string.terms_of_service_link_text) // "terms of service"
+  val termsOfServiceText =
+    stringResource(Res.string.terms_of_service_link_text) // "terms of service"
   val privacyPolicyText = stringResource(Res.string.privacy_policy_link_text) // "privacy policy"
 
   val annotatedString = buildAnnotatedString {
@@ -236,7 +221,13 @@ fun TermsAndPrivacyText(
 
     // Add "terms of service" as a clickable link
     pushStringAnnotation(tag = "URL", annotation = "https://morestuff.app/terms-of-service")
-    withStyle(style = SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline, fontSize = 12.sp)) {
+    withStyle(
+      style = SpanStyle(
+        color = linkColor,
+        textDecoration = TextDecoration.Underline,
+        fontSize = 12.sp
+      )
+    ) {
       append(termsOfServiceText)
     }
     pop() // Pop the URL annotation
@@ -247,7 +238,13 @@ fun TermsAndPrivacyText(
 
     // Add "privacy policy" as a clickable link
     pushStringAnnotation(tag = "URL", annotation = "https://morestuff.app/privacy-policy")
-    withStyle(style = SpanStyle(color = linkColor, textDecoration = TextDecoration.Underline, fontSize = 12.sp)) {
+    withStyle(
+      style = SpanStyle(
+        color = linkColor,
+        textDecoration = TextDecoration.Underline,
+        fontSize = 12.sp
+      )
+    ) {
       append(privacyPolicyText)
     }
     pop() // Pop the URL annotation

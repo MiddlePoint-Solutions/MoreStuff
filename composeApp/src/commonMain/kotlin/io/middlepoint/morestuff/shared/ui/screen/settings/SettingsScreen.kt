@@ -230,22 +230,6 @@ fun SettingsContent(
 
         ScopeSettings(onClick = showScopesSettings)
 
-        SettingsMenuLink(
-          title = {
-            Text(text = "Sign out")
-          },
-          icon = {
-            Icon(
-              imageVector = Icons.AutoMirrored.Filled.Logout,
-              contentDescription = ""
-            )
-          },
-          onClick = signOut,
-          colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-          )
-        )
-
         if (Platform.Android == platform) {
           LanguageSettings(onClick = openAppSettings )
         }
@@ -275,6 +259,22 @@ fun SettingsContent(
         }
       }
 
+      SettingsMenuLink(
+        title = {
+          Text(text = "Sign out")
+        },
+        icon = {
+          Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = ""
+          )
+        },
+        onClick = signOut,
+        colors = ListItemDefaults.colors(
+          containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+      )
+
       About(
         devSettingsEnabled = model.devSettings,
         enableDevSettings = enableDevSettings,
@@ -284,9 +284,7 @@ fun SettingsContent(
         }
       )
     }
-
   }
-
 }
 
 
@@ -418,18 +416,18 @@ private fun About(
           .padding(top = 8.dp),
         horizontalArrangement = Arrangement.Center
       ) {
-        IconButton(
-          onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
-        ) {
-          Icon(
-            imageVector = vectorResource(Res.drawable.ic_discord),
-            contentDescription = "Discord Icon",
-            modifier = Modifier.size(36.dp),
-            tint = MaterialTheme.colorScheme.onSurface
-          )
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
+//        IconButton(
+//          onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
+//        ) {
+//          Icon(
+//            imageVector = vectorResource(Res.drawable.ic_discord),
+//            contentDescription = "Discord Icon",
+//            modifier = Modifier.size(36.dp),
+//            tint = MaterialTheme.colorScheme.onSurface
+//          )
+//        }
+//
+//        Spacer(modifier = Modifier.width(16.dp))
 
         IconButton(
           onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },

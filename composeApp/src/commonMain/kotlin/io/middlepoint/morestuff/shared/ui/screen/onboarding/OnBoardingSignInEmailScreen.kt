@@ -20,8 +20,11 @@ import androidx.compose.material.icons.filled.VpnKey
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Label
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
@@ -44,6 +48,7 @@ import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.middlepoint.morestuff.shared.ui.theme.onBoardingBrush
+import io.middlepoint.morestuff.shared.ui.theme.onBoardingButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -60,6 +65,7 @@ import morestuff.composeapp.generated.resources.six_digit_code_label
 import morestuff.composeapp.generated.resources.verify
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -165,7 +171,6 @@ fun SignInEmailScreen(
         tint = Color.Unspecified,
         contentDescription = "signIn",
       )
-      //Spacer(modifier = Modifier.height(32.dp))
       Spacer(modifier = Modifier.weight(0.6f))
       Text(
         text = if (!isEmailSent) stringResource(Res.string.enter_your_email)
@@ -183,14 +188,7 @@ fun SignInEmailScreen(
             emailError = null
           }
         },
-        label = { Text(text = stringResource(Res.string.email_label), color = Color.White) },
-        leadingIcon = {
-          Icon(
-            imageVector = Icons.Default.Email,
-            contentDescription = null,
-            tint = Color.White
-          )
-        },
+        label = { Text(text = stringResource(Res.string.email_label)) },
         singleLine = true,
         shape = MaterialTheme.shapes.large,
         keyboardOptions = KeyboardOptions(
@@ -199,7 +197,16 @@ fun SignInEmailScreen(
         ),
         modifier = Modifier.fillMaxWidth(),
         isError = emailError != null,
-        enabled = !isEmailSent
+        enabled = !isEmailSent,
+        colors = OutlinedTextFieldDefaults.colors(
+          focusedBorderColor = Color.White,
+          unfocusedBorderColor = Color.White,
+          cursorColor = Color.White,
+          focusedTextColor = Color.White,
+          unfocusedTextColor = Color.White,
+          focusedLabelColor = Color.White,
+          unfocusedLabelColor = Color.White,
+        )
       )
 
       if (emailError != null) {
@@ -264,14 +271,11 @@ fun SignInEmailScreen(
               },
               enabled = !isLoading,
               colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color.White,
-                containerColor = Color(0xFF393AC5),
-                disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
+                contentColor = Color.White
               ),
             ) {
               Text(
-                text = stringResource(Res.string.resend_code),
-                color = Color.White
+                text = stringResource(Res.string.resend_code)
               )
             }
           }
@@ -281,7 +285,7 @@ fun SignInEmailScreen(
       Spacer(modifier = Modifier.height(24.dp))
 
       if (!isEmailSent) {
-        Button(
+        OnBoardingButton(
           onClick = {
             sendOtpToEmail(
               email.text,
@@ -289,33 +293,23 @@ fun SignInEmailScreen(
               {}
             )
           },
-          colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.White,
-            containerColor = Color(0xFF393AC5),
-            disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
-          ),
           enabled = isValidEmail(email.text) && !isLoading,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(text = stringResource(Res.string.`continue`), color = Color.White)
+          Text(text = stringResource(Res.string.`continue`))
         }
       } else {
-        Button(
+        OnBoardingButton(
           onClick = {
             verifyOtp(
               email.text,
               otpCode
             ) { }
           },
-          colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Color.White,
-            containerColor = Color(0xFF393AC5),
-            disabledContainerColor = Color(0xFF393AC5).copy(alpha = 0.5f)
-          ),
           enabled = otpCode.length == 6 && !isLoading,
           modifier = Modifier.fillMaxWidth()
         ) {
-          Text(text = stringResource(Res.string.verify), color = Color.White)
+          Text(text = stringResource(Res.string.verify))
         }
       }
     }
@@ -323,7 +317,13 @@ fun SignInEmailScreen(
 
 }
 
-fun isValidEmail(email: String): Boolean {
+private fun isValidEmail(email: String): Boolean {
   return Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
     .matches(email)
+}
+
+@Preview
+@Composable
+fun SignInEmailScreenPreview() {
+  SignInEmailScreen(onNext = {})
 }

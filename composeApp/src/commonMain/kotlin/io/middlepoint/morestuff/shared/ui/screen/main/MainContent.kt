@@ -67,7 +67,7 @@ fun MainContent(
         )
 
         SignInEmail -> SignInEmailScreen(
-          onNext = { router.replaceCurrent(Home) }
+          onNext = { router.replaceAll(Home) }
         )
 
         Home -> HomeScreen()

@@ -307,8 +307,8 @@
 
 
     <string name="sign_in_with_email">Email</string>
-    <string name="enter_your_email">Enter your email</string>
-    <string name="email_label">Email</string>
+    <string name="enter_your_email">Sign in with your email</string>
+    <string name="email_label">Email Address</string>
     <string name="continue">Continue</string>
     <string name="enter_code_sent_to_email">Enter the code sent to %1$s</string>
     <string name="six_digit_code_label">6-digit code</string>
