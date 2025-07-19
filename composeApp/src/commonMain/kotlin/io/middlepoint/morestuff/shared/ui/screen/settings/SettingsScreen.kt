@@ -257,23 +257,25 @@ fun SettingsContent(
             )
           )
         }
+
+        SettingsMenuLink(
+          title = {
+            Text(text = "Sign out")
+          },
+          icon = {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.Logout,
+              contentDescription = ""
+            )
+          },
+          onClick = signOut,
+          colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+          )
+        )
       }
 
-      SettingsMenuLink(
-        title = {
-          Text(text = "Sign out")
-        },
-        icon = {
-          Icon(
-            imageVector = Icons.AutoMirrored.Filled.Logout,
-            contentDescription = ""
-          )
-        },
-        onClick = signOut,
-        colors = ListItemDefaults.colors(
-          containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
-      )
+
 
       About(
         devSettingsEnabled = model.devSettings,
