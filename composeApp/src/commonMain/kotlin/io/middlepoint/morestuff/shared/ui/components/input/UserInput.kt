@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun UserInput(
@@ -16,7 +18,6 @@ fun UserInput(
     Column(
         modifier = modifier
             .imePadding()
-            .statusBarsPadding()
             .navigationBarsPadding()
     ) {
         priorityContent()
@@ -24,10 +25,10 @@ fun UserInput(
     }
 }
 
-//@Preview
-//@Composable
-//fun UserInputPreview() {
-//    MoreStuffTheme {
-//        UserInput()
-//    }
-//}
+@Preview
+@Composable
+fun UserInputPreview() {
+    MoreStuffTheme {
+        UserInput()
+    }
+}

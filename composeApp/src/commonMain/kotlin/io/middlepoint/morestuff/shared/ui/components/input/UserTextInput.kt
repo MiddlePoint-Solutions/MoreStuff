@@ -11,6 +11,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -47,11 +48,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.ui.extension.clearFocusOnKeyboardDismiss
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.chat_whit_ai
 import morestuff.composeapp.generated.resources.task_chat_input_hint
 import morestuff.composeapp.generated.resources.textfield_desc
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
 val LocalBoxWeight = compositionLocalOf { 0.12f }
@@ -198,19 +201,13 @@ fun UserTextInput(
   }
 }
 
-
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark"
-//)
-//@Preview(
-//    uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light"
-//)
-//@Composable
-//private fun Preview() {
-//    MoreStuffTheme {
-//        UserTextInput(
-//            value = TextFieldValue(text = ""),
-//            onValueChange = {},
-//        )
-//    }
-//}
+@Preview()
+@Composable
+private fun Preview() {
+    MoreStuffTheme {
+        UserTextInput(
+            value = TextFieldValue(text = ""),
+            onValueChange = {},
+        )
+    }
+}

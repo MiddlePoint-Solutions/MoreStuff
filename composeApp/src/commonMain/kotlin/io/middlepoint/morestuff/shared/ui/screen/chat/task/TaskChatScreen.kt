@@ -353,7 +353,6 @@ private fun TaskChatContent(
         onLabelClick = { showScopeSelection = true }
       )
     },
-    modifier = modifier.navigationBarsPadding(),
     containerColor = Color.Transparent,
   ) { scaffoldPadding ->
     Box(
@@ -624,31 +623,31 @@ private fun TaskChatInput(
                 }
               }
 
-              DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-              ) {
-                DropdownMenuItem(
-                  onClick = {
-                    pickImage()
-                    showMenu = false
-                  },
-                  text = {
-                    Text(
-                      text = stringResource(Res.string.select_image)
-                    )
-                  })
-                DropdownMenuItem(
-                  onClick = {
-                    pickPdf()
-                    showMenu = false
-                  },
-                  text = {
-                    Text(
-                      text = stringResource(Res.string.select_pdf)
-                    )
-                  })
-              }
+//              DropdownMenu(
+//                expanded = showMenu,
+//                onDismissRequest = { showMenu = false }
+//              ) {
+//                DropdownMenuItem(
+//                  onClick = {
+//                    pickImage()
+//                    showMenu = false
+//                  },
+//                  text = {
+//                    Text(
+//                      text = stringResource(Res.string.select_image)
+//                    )
+//                  })
+//                DropdownMenuItem(
+//                  onClick = {
+//                    pickPdf()
+//                    showMenu = false
+//                  },
+//                  text = {
+//                    Text(
+//                      text = stringResource(Res.string.select_pdf)
+//                    )
+//                  })
+//              }
               /*VoiceToTextInput(
                 onUpdateValue = {
                   userInputValue = userInputValue.copy(text = it)
