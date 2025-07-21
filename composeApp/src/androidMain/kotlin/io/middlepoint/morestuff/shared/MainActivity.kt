@@ -38,20 +38,12 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-
-    if (Build.VERSION.SDK_INT < 35) {
-      Logger.d { "enableEdgeToEdge" }
-      enableEdgeToEdge()
-    } else {
-      Logger.d { "setDecorFitsSystemWindows" }
-      WindowCompat.setDecorFitsSystemWindows(window, false)
-    }
+    enableEdgeToEdge()
 
     val rootRouterContext: RouterContext = defaultRouterContext()
     val supabase = get<SupabaseClient>()
     val launchScreen = handleLaunchIntent(intent)
     FileKit.init(this)
-
 
     supabase.handleDeeplinks(intent)
 
