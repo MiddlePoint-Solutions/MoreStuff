@@ -740,6 +740,7 @@ private fun TaskTopAppBar(
       actions = {
         Surface(
           onClick = onLabelClick,
+          enabled = !isComplete,
           color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
           shape = RoundedCornerShape(16.dp),
 
