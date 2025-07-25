@@ -5,6 +5,7 @@ import app.cash.sqldelight.adapter.primitive.IntColumnAdapter
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
+import io.middlepoint.morestuff.db.Activities
 import io.middlepoint.morestuff.db.Messages
 import io.middlepoint.morestuff.db.Messages_extra
 import io.middlepoint.morestuff.db.Schedules
@@ -24,6 +25,10 @@ expect class DriverFactory {
 
 fun createDatabase(driverFactory: DriverFactory) = StuffDb(
   driver = driverFactory.provideDbDriver(StuffDb.Schema),
+  activitiesAdapter = Activities.Adapter(
+    idAdapter = UuidColumnAdapter,
+    created_atAdapter = InstantColumnAdapter,
+  ),
   tasksAdapter = Tasks.Adapter(
     idAdapter = UuidColumnAdapter,
     updated_atAdapter = InstantColumnAdapter,
@@ -66,5 +71,5 @@ fun createDatabase(driverFactory: DriverFactory) = StuffDb(
     scope_orderAdapter = IntColumnAdapter,
     updated_atAdapter = InstantColumnAdapter,
     created_atAdapter = InstantColumnAdapter,
-  )
+  ),
 )

@@ -4,7 +4,7 @@ import kotlinx.datetime.Instant;
 CREATE TABLE activities (
   id TEXT AS Uuid NOT NULL PRIMARY KEY,
   sentence TEXT NOT NULL,
-  createdAt INTEGER AS Instant NOT NULL,
+  created_at INTEGER AS Instant NOT NULL,
   data TEXT NOT NULL
 );
 

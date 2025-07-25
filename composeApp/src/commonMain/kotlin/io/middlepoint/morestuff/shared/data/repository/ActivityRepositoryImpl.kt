@@ -14,7 +14,7 @@ class ActivityRepositoryImpl(
       Activities(
         id = activity.id,
         sentence = activity.sentence,
-        createdAt = activity.createdAt,
+        created_at = activity.createdAt,
         data_ = activity.data
       )
     )
