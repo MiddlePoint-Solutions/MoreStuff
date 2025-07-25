@@ -478,43 +478,45 @@ private fun About(
         Text(
           text = "V${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
           style = MaterialTheme.typography.bodySmall,
-          modifier = Modifier.clickable {
-            scope.launch {
-              if (!devSettingsEnabled) {
-                if (!showDevCounter) {
-                  initialClickCounter++
-                  if (initialClickCounter >= 3) {
-                    showDevCounter = true
-                  }
-                } else {
-                  if (devSettingsCounter > 0) {
-                    val message = getString(
-                      Res.string.click_s_to_enable_developer_settings,
-                      devSettingsCounter.toString()
-                    )
-                    devSettingsCounter -= 1
-                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-                  } else {
-                    enableDevSettings()
-                    val message = getString(
-                      Res.string.developer_settings_enabled,
-                      devSettingsCounter.toString()
-                    )
-                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-                    showDevCounter = false
-                    initialClickCounter = 0
-                    devSettingsCounter = 6
-                  }
-                }
-              } else {
-                val message = getString(
-                  Res.string.dev_settings_already_enabled,
-                  devSettingsCounter.toString()
-                )
-                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-              }
-            }
-          }
+          // TODO: enable when needed
+//          modifier = Modifier
+//            .clickable {
+//            scope.launch {
+//              if (!devSettingsEnabled) {
+//                if (!showDevCounter) {
+//                  initialClickCounter++
+//                  if (initialClickCounter >= 3) {
+//                    showDevCounter = true
+//                  }
+//                } else {
+//                  if (devSettingsCounter > 0) {
+//                    val message = getString(
+//                      Res.string.click_s_to_enable_developer_settings,
+//                      devSettingsCounter.toString()
+//                    )
+//                    devSettingsCounter -= 1
+//                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//                  } else {
+//                    enableDevSettings()
+//                    val message = getString(
+//                      Res.string.developer_settings_enabled,
+//                      devSettingsCounter.toString()
+//                    )
+//                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//                    showDevCounter = false
+//                    initialClickCounter = 0
+//                    devSettingsCounter = 6
+//                  }
+//                }
+//              } else {
+//                val message = getString(
+//                  Res.string.dev_settings_already_enabled,
+//                  devSettingsCounter.toString()
+//                )
+//                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//              }
+//            }
+//          }
         )
       }
     }
