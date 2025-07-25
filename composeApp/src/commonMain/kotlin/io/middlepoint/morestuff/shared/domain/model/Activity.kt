@@ -1,12 +1,11 @@
 package io.middlepoint.morestuff.shared.domain.model
 
-import io.middlepoint.morestuff.shared.data.utils.generate
-import kotlinx.datetime.Clock
+import io.middlepoint.morestuff.shared.domain.enums.ActivityType
 import kotlinx.datetime.Instant
 
 data class Activity(
-  val id: Uuid = Uuid.generate(),
+  val id: Uuid,
   val sentence: String,
-  val createdAt: Instant = Clock.System.now(),
-  val data: String
+  val createdAt: Instant,
+  val data: ActivityType
 )
