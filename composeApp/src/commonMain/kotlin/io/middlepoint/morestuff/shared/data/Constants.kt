@@ -27,6 +27,7 @@ object Constants {
 
     const val DISCORD_INVITE_LINK = "https://discord.gg/pe2dwe52SX"
     const val TELEGRAM_INVITE_LINK = "https://t.me/+hzE7jInTlSRiOGVk"
+    const val REDDIT_INVITE_LINK = "https://www.reddit.com/r/MoreStuffApp/"
 
     const val PRIVACY_POLICY_LINK = "https://bit.ly/3P4Sd3I"
 

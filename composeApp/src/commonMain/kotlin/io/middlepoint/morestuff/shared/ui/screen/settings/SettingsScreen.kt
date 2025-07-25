@@ -74,6 +74,7 @@ import io.github.xxfast.decompose.router.stack.RoutedContent
 import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
+import io.middlepoint.morestuff.android.data.Constants.REDDIT_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
@@ -103,6 +104,7 @@ import morestuff.composeapp.generated.resources.dev_settings_already_enabled
 import morestuff.composeapp.generated.resources.developer_settings
 import morestuff.composeapp.generated.resources.developer_settings_enabled
 import morestuff.composeapp.generated.resources.ic_discord
+import morestuff.composeapp.generated.resources.ic_reddit
 import morestuff.composeapp.generated.resources.ic_schedule
 import morestuff.composeapp.generated.resources.ic_telegram
 import morestuff.composeapp.generated.resources.join_community
@@ -157,7 +159,7 @@ fun SettingsScreen(
           showScopesSettings = { router.push(Scopes) },
           showLibraries = { router.push(AboutLibraries) },
           signOut = { viewModel.take(SettingsEvent.SignOut) },
-          openAppSettings = {viewModel.take(SettingsEvent.OpenAppSettings)},
+          openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
           setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
         )
       }
@@ -231,13 +233,13 @@ fun SettingsContent(
         ScopeSettings(onClick = showScopesSettings)
 
         if (Platform.Android == platform) {
-          LanguageSettings(onClick = openAppSettings )
+          LanguageSettings(onClick = openAppSettings)
         }
 
-     /*   ApiKeySettings(
-          apiKey = model.apiKey,
-          onApiKeyChange = setApiKey
-        )*/
+        /*   ApiKeySettings(
+             apiKey = model.apiKey,
+             onApiKeyChange = setApiKey
+           )*/
 
 
         if (model.devSettings) {
@@ -376,7 +378,7 @@ private fun SelectTheme(
     },
     closeDialogDelay = 0,
 
-  )
+    )
 }
 
 
@@ -416,20 +418,21 @@ private fun About(
         modifier = Modifier
           .fillMaxWidth()
           .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
       ) {
-//        IconButton(
-//          onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
-//        ) {
-//          Icon(
-//            imageVector = vectorResource(Res.drawable.ic_discord),
-//            contentDescription = "Discord Icon",
-//            modifier = Modifier.size(36.dp),
-//            tint = MaterialTheme.colorScheme.onSurface
-//          )
-//        }
-//
-//        Spacer(modifier = Modifier.width(16.dp))
+        IconButton(
+          onClick = { uriHandler.openUri(REDDIT_INVITE_LINK) }
+        ) {
+          Icon(
+            imageVector = vectorResource(Res.drawable.ic_reddit),
+            contentDescription = "Reddit Icon",
+            modifier = Modifier.size(36.dp),
+            tint = MaterialTheme.colorScheme.onSurface
+          )
+        }
+
+        Spacer(modifier = Modifier.width(24.dp))
 
         IconButton(
           onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
