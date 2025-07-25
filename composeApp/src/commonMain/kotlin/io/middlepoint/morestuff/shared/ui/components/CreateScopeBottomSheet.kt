@@ -1,6 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -102,7 +103,7 @@ fun CreateScopeBottomSheet(
     }
   ) {
     Column(
-      modifier = Modifier.fillMaxWidth().height(150.dp),
+      modifier = Modifier.fillMaxWidth(),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Center
     ) {
@@ -118,11 +119,16 @@ fun CreateScopeBottomSheet(
       )
     }
 
-    ScopeTitleEditor(
-      title = scopeTitle,
-      onTitleChange = { title -> scopeTitle = title },
-      modifier = Modifier.focusRequester(focusRequester)
-    )
+    Box(
+      modifier = Modifier.height(150.dp),
+      contentAlignment = Alignment.Center,
+    ) {
+      ScopeTitleEditor(
+        title = scopeTitle,
+        onTitleChange = { title -> scopeTitle = title },
+        modifier = Modifier.focusRequester(focusRequester)
+      )
+    }
 
     Row(
       modifier = Modifier
