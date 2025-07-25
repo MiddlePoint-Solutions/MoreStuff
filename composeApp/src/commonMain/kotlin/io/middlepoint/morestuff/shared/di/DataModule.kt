@@ -16,6 +16,7 @@ import io.middlepoint.morestuff.shared.data.createDatabase
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.shared.data.mapper.DataMappersImpl
 import io.middlepoint.morestuff.shared.data.mapper.MessageDataMap
+import io.middlepoint.morestuff.shared.data.repository.ActivityRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.AuthRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.LlmRepositoryImpl
 import io.middlepoint.morestuff.shared.data.repository.MessageRepositoryImpl
@@ -30,6 +31,7 @@ import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.sync.DataSyncManagerImpl
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.repository.ActivityRepository
 import io.middlepoint.morestuff.shared.domain.repository.AuthRepository
 import io.middlepoint.morestuff.shared.domain.repository.LlmRepository
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
@@ -79,6 +81,7 @@ val dataModule = module {
   }
 
   singleOf(::PriorityRepositoryImpl) bind PriorityRepository::class
+  singleOf(::ActivityRepositoryImpl) bind ActivityRepository::class
   singleOf(::TimeFormatterImpl) bind TimeFormatter::class
 
   factoryOf(::MigrationHelper)

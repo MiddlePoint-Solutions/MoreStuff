@@ -5,6 +5,7 @@ import io.middlepoint.morestuff.shared.domain.redux.state.AppState
 
 class MiddlewareProviderImpl(
   logger: LoggerMiddleware,
+  activityMiddleware: ActivityMiddleware,
   devMiddleware: DevMiddleware,
   errorMiddleware: ErrorMiddleware,
   authMiddleware: AuthMiddleware,
@@ -19,6 +20,7 @@ class MiddlewareProviderImpl(
 ) : MiddlewareProvider<AppState> {
 
   override val middlewareOrder = listOf(
+    activityMiddleware,
     logger,
     devMiddleware,
     errorMiddleware,

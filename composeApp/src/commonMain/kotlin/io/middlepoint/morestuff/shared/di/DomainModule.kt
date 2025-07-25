@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.di
 
+import io.middlepoint.morestuff.shared.data.middleware.ActivityMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.AuthMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.DevMiddleware
 import io.middlepoint.morestuff.shared.data.middleware.ErrorMiddleware
@@ -25,6 +26,8 @@ import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.service.HintTaskProvider
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.domain.usecase.activity.LogActivityUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.activity.LogActivityUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.auth.SignOutUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.auth.SignOutUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.ia.CreateAIMessageUseCase
@@ -190,15 +193,20 @@ val domainModules
   }
 
 val useCaseModules
-    get() = buildList {
-        add(taskUseCases)
-        add(scheduleUseCases)
-        add(messageUseCases)
-        add(settingsUseCases)
-        add(scopeUseCases)
-        add(iaUseCases)
-        add(miscUseCases)
-    }
+  get() = buildList {
+    add(taskUseCases)
+    add(scheduleUseCases)
+    add(messageUseCases)
+    add(settingsUseCases)
+    add(scopeUseCases)
+    add(iaUseCases)
+    add(miscUseCases)
+    add(activityUseCases)
+  }
+
+val activityUseCases = module {
+  factoryOf(::LogActivityUseCaseImpl) bind LogActivityUseCase::class
+}
 
 val serviceModule = module {
   factoryOf(::AppMessagesProviderImpl) bind AppMessageProvider::class
@@ -211,6 +219,7 @@ val storeModule = module {
   singleOf(::AppStore) { createdAtStart() }
   factoryOf(::MiddlewareProviderImpl) bind MiddlewareProvider::class
   factoryOf(::LoggerMiddleware)
+  factoryOf(::ActivityMiddleware)
   factoryOf(::TaskMiddleware)
   factoryOf(::ScheduleMiddleware)
   factoryOf(::MessageMiddleware)
@@ -302,10 +311,10 @@ val messageUseCases = module {
 }
 
 val iaUseCases = module {
-    factoryOf(::GenerateChatCompletionUseCaseImpl) bind GenerateChatCompletionUseCase::class
-    factoryOf(::GenerateImageUseCaseImpl) bind GenerateImageUseCase::class
-    factoryOf(::StreamChatCompletionUseCaseImpl) bind StreamChatCompletionUseCase::class
-    factoryOf(::CreateAIMessageUseCaseImpl) bind CreateAIMessageUseCase::class
+  factoryOf(::GenerateChatCompletionUseCaseImpl) bind GenerateChatCompletionUseCase::class
+  factoryOf(::GenerateImageUseCaseImpl) bind GenerateImageUseCase::class
+  factoryOf(::StreamChatCompletionUseCaseImpl) bind StreamChatCompletionUseCase::class
+  factoryOf(::CreateAIMessageUseCaseImpl) bind CreateAIMessageUseCase::class
 }
 
 val settingsUseCases = module {
