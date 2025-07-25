@@ -13,22 +13,27 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class SetTaskCompleteImplTest {
-    @Test
-    fun `invoke should return true when task is set as completed`() {
-        val taskId = listOf(Uuid.generate())
-        val taskRepository: TaskRepository = mockk()
-        val setTaskCompleteUseCase = SetTaskCompleteImpl(taskRepository)
+  @Test
+  fun `invoke should return true when task is set as completed`() {
+    val taskId = listOf(Uuid.generate())
+    val taskRepository: TaskRepository = mockk()
+    val setTaskCompleteUseCase = SetTaskCompleteImpl(
+      taskRepository,
+      mockk(),
+      mockk(),
+      mockk()
+    )
 
-        coEvery { taskRepository.updateTasksComplete(taskId, true) } returns Either.Right(
-            true
-        )
+    coEvery { taskRepository.updateTasksComplete(taskId, true) } returns Either.Right(
+      true
+    )
 
-        runBlocking {
-            val result = setTaskCompleteUseCase.invoke(taskId, true)
-            coVerify { taskRepository.updateTasksComplete(taskId, true) }
-            assertTrue(result is Either.Right)
-            result.map { assertTrue(it) }
-        }
+    runBlocking {
+      val result = setTaskCompleteUseCase.invoke(taskId, true)
+      coVerify { taskRepository.updateTasksComplete(taskId, true) }
+      assertTrue(result is Either.Right)
+      result.map { assertTrue(it) }
     }
+  }
 }
 

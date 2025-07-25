@@ -104,6 +104,8 @@ import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.DeleteScopeUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopeByTaskIdUseCaseImpl
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesByNameUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesByNameUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesFlowUseCaseImpl
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
@@ -262,6 +264,7 @@ val scopeUseCases = module {
   factoryOf(::CreateScopeUseCaseImpl) bind CreateScopeUseCase::class
   factoryOf(::DeleteScopeUseCaseImpl) bind DeleteScopeUseCase::class
   factoryOf(::GetScopesUseCaseImpl) bind GetScopesUseCase::class
+  factoryOf(::GetScopesByNameUseCaseImpl) bind GetScopesByNameUseCase::class
   factoryOf(::UpdateScopeNameUseCaseImpl) bind UpdateScopeNameUseCase::class
   factoryOf(::UpdateScopesOrderUseCaseImpl) bind UpdateScopesOrderUseCase::class
   factoryOf(::GetScopesFlowUseCaseImpl) bind GetScopesFlowUseCase::class

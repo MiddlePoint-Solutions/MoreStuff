@@ -6,8 +6,6 @@ import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
-import arrow.core.flatMap
-import arrow.core.flatten
 import arrow.core.raise.either
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
@@ -56,7 +54,8 @@ class ScopeRepositoryImpl(
   override suspend fun getOrCreateScope(name: String): Either<Failure, Scope> {
     return scopeQueries
       .selectScopeByName(name, dataMappers.scopeDataMapper)
-      .awaitAsOneOrNull()
+      .awaitAsList()
+      .firstOrNull()
       ?.right()
       ?: createScope(name)
   }
@@ -147,5 +146,12 @@ class ScopeRepositoryImpl(
       .selectScope(scopeId, dataMappers.scopeDataMapper)
       .awaitAsOneOrNull()
       ?.right() ?: Either.Left(NoScope)
+  }
+
+  override suspend fun getScopesByName(name: String): Either<Failure, List<Scope>> {
+    return scopeQueries
+      .selectScopeByName(name, dataMappers.scopeDataMapper)
+      .awaitAsList()
+      .right()
   }
 }

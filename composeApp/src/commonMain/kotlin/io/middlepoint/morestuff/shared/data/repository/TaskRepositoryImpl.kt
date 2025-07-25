@@ -19,6 +19,7 @@ import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
 import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
@@ -38,6 +39,7 @@ class TaskRepositoryImpl(
 ) : TaskRepository {
 
   private val taskQueries = database.tasksQueries
+  private val scopeQueries = database.scopesQueries
   private val scheduleQueries = database.schedulesQueries
   private val messageQueries = database.messagesQueries
   private val taskScopeQueries = database.tasksScopesQueries

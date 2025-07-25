@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -115,8 +114,6 @@ import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
-import morestuff.composeapp.generated.resources.select_image
-import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
