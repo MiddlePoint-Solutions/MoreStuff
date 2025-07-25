@@ -166,13 +166,13 @@ fun PriorityItem(
 
     val badgesAlpha by animateFloatAsState(
       targetValue = if (isSelected || isReorderModeActive) 0f else 1f,
-      animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
+      animationSpec = tween(durationMillis = 300, easing = EaseInOutCubic),
       label = "BadgesAlphaAnimation"
     )
 
     val toggleAlpha by animateFloatAsState(
       targetValue = if (isSelected || isReorderModeActive) 1f else 0f,
-      animationSpec = tween(durationMillis = 500, easing = EaseInOutCubic),
+      animationSpec = tween(durationMillis = 300, easing = EaseInOutCubic),
       label = "ToggleAlphaAnimation"
     )
 
