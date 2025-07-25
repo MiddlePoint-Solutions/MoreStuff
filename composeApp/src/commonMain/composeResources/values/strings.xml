@@ -295,9 +295,6 @@
     <string name="month_november">November</string>
     <string name="month_december">December</string>
 
-
-
-
     <string name="edit_message">Edit message</string>
     <string name="task_schedule_deletion_warning_singular">This task has a schedule that will also be deleted.</string>
     <string name="task_schedule_deletion_warning_plural">Some of these tasks have schedules that will also be deleted.</string>
@@ -320,4 +317,12 @@
 
     <string name="resend_code">Resend code</string>
     <string name="seconds_to_resend">You can resend the code in %s seconds</string>
+
+    <!--  Dialogs & Bottom sheet  -->
+
+    <string name="sign_out_title">Sign out</string>"
+    <string name="sign_out_message">Do you want to sign out?</string>"
+
+
+
 </resources>

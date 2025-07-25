@@ -299,4 +299,7 @@
 
     <string name="resend_code">Reenviar código</string>
     <string name="seconds_to_resend">Podrás reenviar el código en %s segundos</string>
+
+    <string name="sign_out_title">Cerrar sesión</string>
+    <string name="sign_out_message">¿Quieres cerrar sesión?</string>
 </resources>

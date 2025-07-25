@@ -36,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -86,9 +87,11 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
 import io.middlepoint.morestuff.shared.platform.Platform
 import io.middlepoint.morestuff.shared.platform.formatString
 import io.middlepoint.morestuff.shared.platform.platform
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
@@ -97,9 +100,12 @@ import morestuff.composeapp.generated.resources.api_key_not_set
 import morestuff.composeapp.generated.resources.api_key_title
 import morestuff.composeapp.generated.resources.button_enable
 import morestuff.composeapp.generated.resources.button_skip
+import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.cd_select_theme
 import morestuff.composeapp.generated.resources.click_s_to_enable_developer_settings
+import morestuff.composeapp.generated.resources.confirm_delete
+import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.dev_settings_already_enabled
 import morestuff.composeapp.generated.resources.developer_settings
 import morestuff.composeapp.generated.resources.developer_settings_enabled
@@ -124,6 +130,8 @@ import morestuff.composeapp.generated.resources.select_language
 import morestuff.composeapp.generated.resources.select_theme
 import morestuff.composeapp.generated.resources.set_review_time
 import morestuff.composeapp.generated.resources.settings
+import morestuff.composeapp.generated.resources.sign_out_message
+import morestuff.composeapp.generated.resources.sign_out_title
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
@@ -176,6 +184,7 @@ fun SettingsScreen(
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsContent(
   onBack: () -> Unit,
@@ -260,6 +269,9 @@ fun SettingsContent(
           )
         }
 
+        var showSignOutBottomSheet by remember { mutableStateOf(false) }
+        val signOutSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
         SettingsMenuLink(
           title = {
             Text(text = "Sign out")
@@ -270,14 +282,28 @@ fun SettingsContent(
               contentDescription = ""
             )
           },
-          onClick = signOut,
+          onClick = { showSignOutBottomSheet = true },
           colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainer
           )
         )
+
+        if (showSignOutBottomSheet) {
+
+          DeleteBottomSheet(
+            sheetState = signOutSheetState,
+            onDismissRequest = { showSignOutBottomSheet = false },
+            title = stringResource(Res.string.sign_out_title),
+            message = stringResource(Res.string.sign_out_message),
+            confirmButtonText = stringResource(Res.string.sign_out_title),
+            dismissButtonText = stringResource(Res.string.cancel),
+            onConfirm = {
+              signOut()
+              showSignOutBottomSheet = false
+            },
+          )
+        }
       }
-
-
 
       About(
         devSettingsEnabled = model.devSettings,
@@ -299,7 +325,6 @@ fun ApiKeySettings(
 ) {
   var showBottomSheet by remember { mutableStateOf(false) }
 
-
   if (showBottomSheet) {
     ApiKeyBottomSheet(
       isVisible = true,
@@ -308,7 +333,6 @@ fun ApiKeySettings(
       onSave = onApiKeyChange
     )
   }
-
 
   SettingsMenuLink(
     title = {
