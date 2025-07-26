@@ -8,7 +8,3 @@ actual fun initializeSentry() {
     options.debug = false
   }
 }
-
-actual fun sentryCapture(throwable: Throwable) {
-  Sentry.captureException(throwable)
-}

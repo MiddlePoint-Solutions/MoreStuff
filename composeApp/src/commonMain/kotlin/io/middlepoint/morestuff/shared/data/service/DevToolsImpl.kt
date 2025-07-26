@@ -78,7 +78,7 @@ class DevToolsImpl(
   }
 
   override suspend fun migrationComplete() {
-    if(importDataComplete) {
+    if (importDataComplete) {
       logger.d("migrationComplete, deleting json migration file")
       deleteMigrationDataFile()
     }

@@ -3,6 +3,8 @@ package io.middlepoint.morestuff.shared.data.middleware
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.data.service.getMigrationDataFile
+import io.middlepoint.morestuff.shared.domain.DevTools
 import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
 import io.middlepoint.morestuff.shared.domain.redux.state.AppState
@@ -36,6 +38,7 @@ class AuthMiddleware(
 
     when (action) {
       is InitStoreAction -> {
+        dispatch(UserAction.SetOldUser(getMigrationDataFile() != null)) // TODO: remove in future
         initAuthEvents(scope, dispatch)
       }
 

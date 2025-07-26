@@ -31,7 +31,8 @@ fun mainModel(
       currentState = MainState(
         ready = it.isReady(),
         theme = it.settings.appTheme,
-        isAuthenticated = it.isAuthenticated()
+        isAuthenticated = it.isAuthenticated(),
+        showOldUserMessage = it.userState.isOldUser
       )
     }
   }

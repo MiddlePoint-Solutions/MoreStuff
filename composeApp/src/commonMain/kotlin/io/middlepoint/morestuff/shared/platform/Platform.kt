@@ -30,5 +30,4 @@ expect fun createKmpFile(path: String): PlatformFile
 
 // Web / NonWeb platforms
 expect fun initializeSentry()
-expect fun sentryCapture(throwable: Throwable)
 

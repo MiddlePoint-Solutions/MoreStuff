@@ -63,7 +63,8 @@ fun MainContent(
     ) { screen ->
       when (screen) {
 
-        SignIn -> SignInScreen(
+        is SignIn -> SignInScreen(
+          isOldUser = screen.isOldUser,
           onNext = { router.replaceCurrent(Home) },
           onSignInWithEmail = { router.push(SignInEmail) }
         )

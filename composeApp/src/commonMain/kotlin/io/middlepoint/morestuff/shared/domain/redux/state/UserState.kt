@@ -8,7 +8,8 @@ import io.middlepoint.morestuff.shared.domain.redux.store.Action
 
 data class UserState(
   val status: Status = Status.Loading,
-  val user: User? = null
+  val user: User? = null,
+  val isOldUser: Boolean = false,
 )
 
 fun AppState.reduceUserState(action: Action): AppState {
@@ -28,6 +29,10 @@ fun UserState.reduce(action: UserAction): UserState {
     is NotAuthenticated -> copy(
       status = Status.Ready,
       user = null
+    )
+
+    is SetOldUser -> copy(
+      isOldUser = action.isOldUser
     )
 
     SignOut -> this

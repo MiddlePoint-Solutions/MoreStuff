@@ -110,7 +110,7 @@ fun DevSettings(
     )
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_onboarding)) },
-      onClick = { navigation.replaceAll(Screen.SignIn) },
+      onClick = {  },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )

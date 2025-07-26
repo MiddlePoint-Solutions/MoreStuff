@@ -12,7 +12,7 @@ class MoreStuffApp : Application(), Configuration.Provider {
 
   override fun onCreate() {
     super.onCreate()
-    INSTANCE = this
+//    INSTANCE = this
     initializeSentry()
   }
 

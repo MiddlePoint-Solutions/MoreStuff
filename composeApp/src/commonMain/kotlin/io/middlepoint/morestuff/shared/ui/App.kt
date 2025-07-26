@@ -25,7 +25,10 @@ import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 
 @Composable
-fun App(screen: Screen? = null, accessToken: String? = null) {
+fun App(
+  screen: Screen? = null,
+  accessToken: String? = null // TODO: this is super ugly
+) {
   KoinContext {
     val router: Router<Screen> = rememberRouter { listOf(Screen.Home) }
     val viewModel = koinInjectOnRoute(MainViewModel::class)
@@ -48,7 +51,7 @@ fun App(screen: Screen? = null, accessToken: String? = null) {
           ) {
             if (model.ready) {
               if (!model.isAuthenticated) {
-                router.navigate { listOf(Screen.SignIn) }
+                router.navigate { listOf(Screen.SignIn(model.showOldUserMessage)) }
               }
               MainContent(
                 shareContent = { taskId, content ->
