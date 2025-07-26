@@ -1,8 +1,10 @@
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.ExperimentalDecomposeApi
@@ -22,18 +24,19 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
 
   CompositionLocalProvider(LocalRouterContext provides routerContext) {
     val navigationHelper = koinInject<NavigationHelper>()
-    val initialScreen = remember { mutableStateOf<Screen?>(null) }
+    var initialScreen by remember { mutableStateOf<Screen?>(null) }
     val accessToken = remember { mutableStateOf<String?>(null) }
+
     LaunchedEffect(Unit) {
       navigationHelper.shareable.collect { shareable ->
-        initialScreen.value = when (shareable) {
-          is Shareable.Image -> {
-            Screen.Share(shareable, shareable.uri)
-          }
-
-          is Shareable.Pdf -> {
-            Screen.Share(shareable, shareable.uri)
-          }
+        initialScreen = when (shareable) {
+//          is Shareable.Image -> {
+//            Screen.Share(shareable, shareable.uri)
+//          }
+//
+//          is Shareable.Pdf -> {
+//            Screen.Share(shareable, shareable.uri)
+//          }
 
           is Shareable.Text -> {
             Screen.Share(shareable, shareable.message)
@@ -48,7 +51,7 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
 
     LaunchedEffect(Unit) {
       navigationHelper.navigation.collect { screen ->
-        initialScreen.value = screen
+        initialScreen = screen
       }
     }
 
@@ -57,7 +60,6 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
         accessToken.value = code
       }
     }
-
 
     PredictiveBackGestureOverlay(
       backDispatcher = routerContext.backHandler as BackDispatcher,
@@ -69,14 +71,8 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
       },
       modifier = Modifier.fillMaxSize(),
     ) {
-      App(screen = initialScreen.value, accessToken = accessToken.value)
+      App(screen = initialScreen, accessToken = accessToken.value)
     }
 
   }
 }
-
-
-
-
-
-
