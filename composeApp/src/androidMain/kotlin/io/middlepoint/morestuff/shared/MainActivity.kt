@@ -88,17 +88,18 @@ class MainActivity : AppCompatActivity() {
             }
           }
 
-          intent.type?.startsWith("image/") == true -> {
-            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
-            }
-          }
-
-          "application/pdf" == intent.type -> {
-            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
-              Screen.Share(Shareable.Pdf(it.toString(), ""), it.toString())
-            }
-          }
+          // TODO: enable after supporting files
+//          intent.type?.startsWith("image/") == true -> {
+//            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+//              Screen.Share(Shareable.Image(it.toString(), ""), it.toString())
+//            }
+//          }
+//
+//          "application/pdf" == intent.type -> {
+//            intent.getParcelableExtraCompat(Intent.EXTRA_STREAM, Uri::class.java)?.let {
+//              Screen.Share(Shareable.Pdf(it.toString(), ""), it.toString())
+//            }
+//          }
 
           else -> null
         }
