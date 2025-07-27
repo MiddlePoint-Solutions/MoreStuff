@@ -55,18 +55,16 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.backhandler.BackCallback
-import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.keyboardAsState
-import io.middlepoint.morestuff.shared.ui.extension.checkRegister
 import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 
@@ -78,8 +76,7 @@ fun TaskDetails(
   onTitleLineCount: (Int) -> Unit
 ) {
 
-  val viewModel = koinInjectOnRoute(
-    type = TaskDetailsViewModel::class,
+  val viewModel = koinViewModel<TaskDetailsViewModel>(
     key = "TaskChat${taskId.value}",
     parameters = { parametersOf(taskId) }
   )
@@ -95,22 +92,6 @@ fun TaskDetails(
     if (!isKeyboardOpen) {
       focusManager.clearFocus()
       isEditing = false
-    }
-  }
-
-  val backCallback = remember {
-    BackCallback {
-      focusManager.clearFocus()
-      isEditing = false
-    }
-  }
-
-  val backHandler = LocalRouterContext.current.backHandler
-  LaunchedEffect(isEditing) {
-    if (isEditing) {
-      backHandler.checkRegister(backCallback)
-    } else {
-      backHandler.checkUnregister(backCallback)
     }
   }
 

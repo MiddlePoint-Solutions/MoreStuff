@@ -21,15 +21,16 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.handleDeeplinks
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
-import io.github.xxfast.decompose.router.LocalRouterContext
-import io.github.xxfast.decompose.router.RouterContext
-import io.github.xxfast.decompose.router.defaultRouterContext
 import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.nav.Home
+import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.nav.Share
+import io.middlepoint.morestuff.shared.domain.nav.TaskChat
 import io.middlepoint.morestuff.shared.ui.App
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
@@ -40,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
 
-    val rootRouterContext: RouterContext = defaultRouterContext()
     val supabase = get<SupabaseClient>()
     val launchScreen = handleLaunchIntent(intent)
     FileKit.init(this)
@@ -49,28 +49,25 @@ class MainActivity : AppCompatActivity() {
 
     setContent {
       KoinContext {
-        CompositionLocalProvider(LocalRouterContext provides rootRouterContext) {
+        var initialScreen by remember { mutableStateOf<Screen?>(null) }
+        App(initialScreen)
 
-          var initialScreen by remember { mutableStateOf<Screen?>(null) }
-          App(initialScreen)
-
-          LaunchedEffect(Unit) {
-            if (initialScreen == null && launchScreen != null) {
-              initialScreen = launchScreen
-              Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
-            }
+        LaunchedEffect(Unit) {
+          if (initialScreen == null && launchScreen != null) {
+            initialScreen = launchScreen
+            Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
           }
+        }
 
-          DisposableEffect(Unit) {
-            val listener = Consumer<Intent> {
-              Logger.d("onNewIntent: $it")
-              supabase.handleDeeplinks(it)
-              initialScreen = handleLaunchIntent(it)
-              Logger.d("initialScreen: $initialScreen")
-            }
-            addOnNewIntentListener(listener)
-            onDispose { removeOnNewIntentListener(listener) }
+        DisposableEffect(Unit) {
+          val listener = Consumer<Intent> {
+            Logger.d("onNewIntent: $it")
+            supabase.handleDeeplinks(it)
+            initialScreen = handleLaunchIntent(it)
+            Logger.d("initialScreen: $initialScreen")
           }
+          addOnNewIntentListener(listener)
+          onDispose { removeOnNewIntentListener(listener) }
         }
       }
     }
@@ -84,7 +81,7 @@ class MainActivity : AppCompatActivity() {
         when {
           "text/plain" == intent.type -> {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-              Screen.Share(Shareable.Text(it), it)
+              Share(Shareable.Text(it), it)
             }
           }
 
@@ -111,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         Logger.d("DeepLink URI: $uri")
 
         if (uri?.scheme == "app.morestuff" && uri.host == "login-callback") {
-          Screen.Home
+          Home
         } else {
           null
         }
@@ -119,13 +116,13 @@ class MainActivity : AppCompatActivity() {
 
       ACTION_NOTIFICATION_REMINDER -> {
         intent.getStringExtra(EXTRA_TASK_ID)?.let {
-          Screen.TaskChat(Uuid(it))
+          TaskChat(Uuid(it))
         }
       }
 
       ACTION_NOTIFICATION_REVIEW -> {
         intent.getStringExtra(EXTRA_SCOPE_ID)?.let {
-          Screen.Review(Uuid(it))
+          Review(Uuid(it))
         }
       }
 

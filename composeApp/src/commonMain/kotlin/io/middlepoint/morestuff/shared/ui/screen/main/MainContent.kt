@@ -1,36 +1,25 @@
 package io.middlepoint.morestuff.shared.ui.screen.main
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import com.arkivanov.decompose.DelicateDecomposeApi
-import com.arkivanov.decompose.extensions.compose.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.decompose.router.stack.replaceAll
-import com.arkivanov.decompose.router.stack.replaceCurrent
-import io.github.xxfast.decompose.router.stack.RoutedContent
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.nav.Screen.CreateScope
-import io.middlepoint.morestuff.shared.domain.nav.Screen.Home
-import io.middlepoint.morestuff.shared.domain.nav.Screen.ImagePreview
-import io.middlepoint.morestuff.shared.domain.nav.Screen.Review
-import io.middlepoint.morestuff.shared.domain.nav.Screen.Scopes
-import io.middlepoint.morestuff.shared.domain.nav.Screen.Settings
-import io.middlepoint.morestuff.shared.domain.nav.Screen.Share
-import io.middlepoint.morestuff.shared.domain.nav.Screen.SignIn
-import io.middlepoint.morestuff.shared.domain.nav.Screen.SignInEmail
-import io.middlepoint.morestuff.shared.domain.nav.Screen.TaskChat
+import io.middlepoint.morestuff.shared.domain.nav.CreateScope
+import io.middlepoint.morestuff.shared.domain.nav.Home
+import io.middlepoint.morestuff.shared.domain.nav.ImagePreview
+import io.middlepoint.morestuff.shared.domain.nav.Review
+import io.middlepoint.morestuff.shared.domain.nav.Scopes
+import io.middlepoint.morestuff.shared.domain.nav.Settings
+import io.middlepoint.morestuff.shared.domain.nav.Share
+import io.middlepoint.morestuff.shared.domain.nav.SignIn
+import io.middlepoint.morestuff.shared.domain.nav.SignInEmail
+import io.middlepoint.morestuff.shared.domain.nav.TaskChat
 import io.middlepoint.morestuff.shared.platform.createKmpFile
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatScreen
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
@@ -45,80 +34,98 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 
-@OptIn(DelicateDecomposeApi::class)
 @Composable
 fun MainContent(
+  navController: NavHostController,
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
 ) {
   CompositionLocalProvider(
     LocalScreenSize provides getScreenSizeInfo(),
   ) {
-
-    val router = LocalAppRouter.current
-
-    RoutedContent(
-      router = router,
-      modifier = Modifier.fillMaxSize(),
-      animation = stackAnimation(slide())
-    ) { screen ->
-      when (screen) {
-
-        is SignIn -> SignInScreen(
+    NavHost(
+      navController = navController,
+      startDestination = Home,
+    ) {
+      composable<SignIn> { backStackEntry ->
+        val screen = backStackEntry.toRoute<SignIn>()
+        SignInScreen(
           isOldUser = screen.isOldUser,
-          onNext = { router.replaceCurrent(Home) },
-          onSignInWithEmail = { router.push(SignInEmail) }
+          onNext = { navController.navigate(Home) },
+          onSignInWithEmail = { navController.navigate(SignInEmail) }
         )
+      }
 
-        SignInEmail -> SignInEmailScreen(
-          onNext = { router.replaceAll(Home) }
+      composable<SignInEmail> {
+        SignInEmailScreen(
+          onNext = { navController.navigate(Home) }
         )
+      }
 
-        Home -> HomeScreen()
+      composable<Home> {
+        HomeScreen(
+          navigateToSettings = { navController.navigate(Settings) },
+          navigateToTaskChat = { taskId -> navController.navigate(TaskChat(taskId)) }
+        )
+      }
 
-        is Review -> ReviewScreen(onBack = router::pop, initialScopeId = screen.scopeId)
+      composable<Review> { backStackEntry ->
+        val screen = backStackEntry.toRoute<Review>()
+        ReviewScreen(onBack = { navController.popBackStack() }, initialScopeId = screen.scopeId)
+      }
 
-        Settings -> SettingsScreen(onBack = router::pop)
+      composable<Settings> {
+        SettingsScreen(onBack = { navController.popBackStack() })
+      }
 
-        Scopes -> ScopesScreen(onBack = router::pop)
+      composable<Scopes> {
+        ScopesScreen(onBack = { navController.popBackStack() })
+      }
 
-        is CreateScope -> CreateScopeScreen(
-          onBack = router::pop,
+      composable<CreateScope> { backStackEntry ->
+        val screen = backStackEntry.toRoute<CreateScope>()
+        CreateScopeScreen(
+          onBack = { navController.popBackStack() },
           onSaveScope = screen.onSave
         )
+      }
 
-        is TaskChat -> TaskChatScreen(
+      composable<TaskChat> { backStackEntry ->
+        val screen = backStackEntry.toRoute<TaskChat>()
+        TaskChatScreen(
           taskId = screen.taskId,
-          onBack = router::pop,
+          onBack = { navController.popBackStack() },
         )
+      }
 
-        is ImagePreview -> {
-          val imageFile = remember { createKmpFile(screen.imageUri) }
-          logger.d { " shareable imageFile: $imageFile" }
-          ImageImportScreen(
-            image = imageFile,
-            onImport = { message ->
-              val shareableImage = Shareable.Image(screen.imageUri, message)
-              logger.d { "shareableImage: $shareableImage" }
-              shareContent(screen.taskId, shareableImage)
-              router.replaceAll(Home, TaskChat(screen.taskId))
-            },
-            onBack = router::pop
-          )
-        }
-
-        is Share -> {
-          ShareScreen(
-            onBack = router::pop,
-            shareable = screen.shareable,
-          ) { taskId, shareable ->
-            if (shareable is Shareable.Image) {
-              router.push(ImagePreview(shareable.uri, taskId))
-            } else {
-              router.replaceCurrent(
-                TaskChat(taskId),
-                onComplete = { shareContent(taskId, shareable) }
-              )
+      composable<ImagePreview> { backStackEntry ->
+        val screen = backStackEntry.toRoute<ImagePreview>()
+        val imageFile = remember { createKmpFile(screen.imageUri) }
+        logger.d { " shareable imageFile: $imageFile" }
+        ImageImportScreen(
+          image = imageFile,
+          onImport = { message ->
+            val shareableImage = Shareable.Image(screen.imageUri, message)
+            logger.d { "shareableImage: $shareableImage" }
+            shareContent(screen.taskId, shareableImage)
+            navController.navigate(TaskChat(screen.taskId)) {
+              popUpTo(Home)
             }
+          },
+          onBack = { navController.popBackStack() }
+        )
+      }
+
+      composable<Share> { backStackEntry ->
+        val screen = backStackEntry.toRoute<Share>()
+        ShareScreen(
+          onBack = { navController.popBackStack() },
+          shareable = screen.shareable,
+        ) { taskId, shareable ->
+          if (shareable is Shareable.Image) {
+            navController.navigate(ImagePreview(shareable.uri, taskId))
+          } else {
+            navController.navigate(TaskChat(taskId))
+            shareContent(taskId, shareable)
           }
         }
       }

@@ -50,25 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
-import io.middlepoint.morestuff.shared.domain.model.core.Scope
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Root
-import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.CreateScope
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.DeleteScope
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.ReorderScopes
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.channels.Channel
@@ -88,6 +70,9 @@ import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun ScopesScreen(

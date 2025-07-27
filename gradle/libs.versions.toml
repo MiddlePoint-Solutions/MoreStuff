@@ -12,7 +12,7 @@ kSoup = "0.3.0"
 sqliteAndroid = "3.49.0"
 
 agp = "8.11.1"
-kotlin = "2.1.21-RC2"
+kotlin = "2.1.21-RC"
 
 android_sdk_compile = "35"
 android_sdk_target = "35"
@@ -24,11 +24,12 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.0"
 kotlinx-datetime = "0.6.2"
 kotlinx-atomicfu = "0.27.0"
-compose = "1.8.0"
+compose = "1.8.2"
 androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
 androidx-lifecycle = "2.9.0"
+androidx-navigation = "2.9.0-beta04"
 kermit = "2.0.5"
 ktor = "3.1.2"
 multiplatform-settings = "1.3.0"
@@ -87,6 +88,7 @@ androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-cor
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 androidx-test = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 
 # Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

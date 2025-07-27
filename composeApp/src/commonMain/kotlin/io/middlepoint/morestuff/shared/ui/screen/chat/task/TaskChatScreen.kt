@@ -57,50 +57,33 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import com.arkivanov.decompose.extensions.compose.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.scale
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.Router
-import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
+import io.middlepoint.morestuff.shared.domain.nav.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeSelectionBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -118,6 +101,7 @@ import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -127,106 +111,103 @@ fun TaskChatScreen(
   modifier: Modifier = Modifier,
 ) {
 
-  val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
-  val navigation = LocalAppRouter.current
+  val navController = rememberNavController()
   val scope = rememberCoroutineScope()
 
-  val viewModel = koinInjectOnRoute(
-    type = TaskChatViewModel::class,
+  val viewModel = koinViewModel<TaskChatViewModel>(
     parameters = { parametersOf(taskId) }
   )
 
-  val navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = { onScopeCreated ->
-    val createScopeScreen = Screen.CreateScope { title ->
-      onScopeCreated(title)
-      navigation.pop()
+  // TODO:
+//  val navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = { onScopeCreated ->
+//    val createScopeScreen = CreateScope { title ->
+//      onScopeCreated(title)
+//    }
+//    navigation.push(createScopeScreen)
+//  }
+
+  NavHost(
+    navController = navController,
+    startDestination = ChatScreen.TaskChat
+  ) {
+    composable<ChatScreen.TaskChat> {
+
+      val model by viewModel.models.collectAsState()
+      val isAiEnabled = model.isAIEnabled
+
+      val chatActions = remember {
+        ChatActions(
+          scheduleAction = { scheduleId, replyType ->
+            viewModel.take(ScheduleResponse(scheduleId, replyType))
+          },
+          copyMessage = { viewModel.take(CopyText(it.content)) },
+          deleteMessage = { viewModel.take(DeleteMessage(it)) },
+          onImageSelected = {
+            val path = it.messageExtra?.url ?: ""
+            val title = it.content
+            navController.navigate(ChatScreen.ImagePreview(path, title))
+          },
+          onPdfSelected = {
+            val path = it.messageExtra?.url ?: ""
+            viewModel.take(OpenDocument(path))
+          },
+          shareImage = { viewModel.take(ShareImage(it)) },
+          sharePdf = { viewModel.take(ShareDocument(it)) },
+          shareMessage = { viewModel.take(ShareMessage(it)) },
+          setEditingMessage = { messageId ->
+            viewModel.take(SetEditingMessage(messageId))
+          },
+          updateMessageContent = { content ->
+            viewModel.take(UpdateMessageContent(content))
+          },
+          isMessageBeingEdited = { messageId ->
+            model.editingMessageId == messageId
+          }
+        )
+      }
+
+
+      TaskChatContent(
+        model = model,
+        onEvent = viewModel::take,
+        chatActions = chatActions,
+        modifier = modifier,
+        onBack = onBack,
+        sendTaskMessage = {
+          viewModel.take(InputText(it))
+          if (isAiEnabled) viewModel.take(CreateAIMessage(it))
+        },
+        imagePicked = { scope.launch { navController.navigate(ChatScreen.ImageImport(it)) } },
+        pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
+        onCreateNewScope = { title ->
+          viewModel.take(CreateNewScopeForTask(title))
+          navController.popBackStack()
+        },
+//        navigateToCreateScope = navigateToCreateScope,
+        isAIEnabled = isAiEnabled
+      )
     }
-    navigation.push(createScopeScreen)
-  }
 
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(scale() + fade()),
-  ) { screen ->
+    composable<ChatScreen.ImageImport> { backStackEntry ->
+      val screen = backStackEntry.toRoute<ChatScreen.ImageImport>()
+      ImageImportScreen(
+        image = screen.imageFile,
+        onImport = { title ->
+          viewModel.take(InputUserMedia(screen.imageFile, title))
+          navController.popBackStack()
+        },
+        onBack = { navController.popBackStack() }
+      )
+    }
 
-    when (screen) {
-      is TaskChat -> {
-
-        val model by viewModel.models.collectAsState()
-        val isAiEnabled = model.isAIEnabled
-
-        val chatActions = remember {
-          ChatActions(
-            scheduleAction = { scheduleId, replyType ->
-              viewModel.take(ScheduleResponse(scheduleId, replyType))
-            },
-            copyMessage = { viewModel.take(CopyText(it.content)) },
-            deleteMessage = { viewModel.take(DeleteMessage(it)) },
-            onImageSelected = {
-              val path = it.messageExtra?.url ?: ""
-              val title = it.content
-              router.push(ImagePreview(path, title))
-            },
-            onPdfSelected = {
-              val path = it.messageExtra?.url ?: ""
-              viewModel.take(OpenDocument(path))
-            },
-            shareImage = { viewModel.take(ShareImage(it)) },
-            sharePdf = { viewModel.take(ShareDocument(it)) },
-            shareMessage = { viewModel.take(ShareMessage(it)) },
-            setEditingMessage = { messageId ->
-              viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
-            },
-            updateMessageContent = { content ->
-              viewModel.take(TaskChatEvent.UpdateMessageContent(content))
-            },
-            isMessageBeingEdited = { messageId ->
-              model.editingMessageId == messageId
-            }
-          )
-        }
-
-
-        TaskChatContent(
-          model = model,
-          onEvent = viewModel::take,
-          chatActions = chatActions,
-          modifier = modifier,
-          onBack = onBack,
-          sendTaskMessage = {
-            viewModel.take(InputText(it))
-            if (isAiEnabled) viewModel.take(TaskChatEvent.CreateAIMessage(it))
-          },
-          imagePicked = { scope.launch { router.push(ImageImport(it)) } },
-          pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
-          onCreateNewScope = { title ->
-            viewModel.take(TaskChatEvent.CreateNewScopeForTask(title))
-            navigation.pop()
-          },
-          navigateToCreateScope = navigateToCreateScope,
-          isAIEnabled = isAiEnabled
-        )
-      }
-
-      is ImageImport -> {
-        ImageImportScreen(
-          image = screen.imageFile,
-          onImport = { title ->
-            viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
-            router.pop()
-          },
-          onBack = router::pop
-        )
-      }
-
-      is ImagePreview -> {
-        ImagePreviewScreen(
-          imagePath = screen.imagePath,
-          onBack = router::pop,
-          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-          title = screen.title,
-        )
-      }
+    composable<ChatScreen.ImagePreview> { backStackEntry ->
+      val screen = backStackEntry.toRoute<ChatScreen.ImagePreview>()
+      ImagePreviewScreen(
+        imagePath = screen.imagePath,
+        onBack = { navController.popBackStack() },
+        onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+        title = screen.title,
+      )
     }
   }
 }
@@ -306,7 +287,7 @@ private fun TaskChatContent(
         if (!alreadyPosted) {
           delay(500)
           onEvent(
-            TaskChatEvent.CreateTaskCompletionMessage(
+            CreateTaskCompletionMessage(
               content = completionMessage
             )
           )
@@ -390,7 +371,7 @@ private fun TaskChatContent(
             ) {
               EditingMessageReference(
                 message = editingMessage,
-                onCancelEdit = { onEvent(TaskChatEvent.CancelEditingMessage) }
+                onCancelEdit = { onEvent(CancelEditingMessage) }
               )
             }
             Spacer(modifier.height(8.dp))
@@ -407,13 +388,13 @@ private fun TaskChatContent(
               editingMessageId = editingMessageId,
               editingContent = editingMessageContent,
               onCancelEdit = {
-                onEvent(TaskChatEvent.CancelEditingMessage)
+                onEvent(CancelEditingMessage)
               },
               onUpdateMessage = { content ->
-                onEvent(TaskChatEvent.UpdateMessageContent(content))
+                onEvent(UpdateMessageContent(content))
               },
               //isAIEnabled = isAIEnabled,
-              onToggleAI = { onEvent(TaskChatEvent.ActivateAI) },
+              onToggleAI = { onEvent(ActivateAI) },
               modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent),
@@ -464,7 +445,7 @@ private fun TaskChatContent(
       scopes = allScopes,
       sheetState = scopeSheetState,
       addSelectedTasksToScope = { scopeId ->
-        onEvent(TaskChatEvent.MoveTaskToScope(scopeId))
+        onEvent(MoveTaskToScope(scopeId))
       },
       createNewScope = {
         navigateToCreateScope(onCreateNewScope)

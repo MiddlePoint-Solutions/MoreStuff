@@ -1,5 +1,4 @@
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,8 +9,6 @@ import androidx.compose.ui.window.ComposeUIViewController
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback.PredictiveBackGestureOverlay
 import com.arkivanov.essenty.backhandler.BackDispatcher
-import io.github.xxfast.decompose.router.LocalRouterContext
-import io.github.xxfast.decompose.router.RouterContext
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.service.NavigationHelper
@@ -20,9 +17,7 @@ import org.koin.compose.koinInject
 
 
 @OptIn(ExperimentalDecomposeApi::class)
-fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
-
-  CompositionLocalProvider(LocalRouterContext provides routerContext) {
+fun MainViewController() = ComposeUIViewController {
     val navigationHelper = koinInject<NavigationHelper>()
     var initialScreen by remember { mutableStateOf<Screen?>(null) }
     val accessToken = remember { mutableStateOf<String?>(null) }
@@ -61,18 +56,5 @@ fun MainViewController(routerContext: RouterContext) = ComposeUIViewController {
       }
     }
 
-    PredictiveBackGestureOverlay(
-      backDispatcher = routerContext.backHandler as BackDispatcher,
-      backIcon = { progress, _ ->
-        /*PredictiveBackGestureIcon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            progress = progress,
-        )*/
-      },
-      modifier = Modifier.fillMaxSize(),
-    ) {
-      App(screen = initialScreen, accessToken = accessToken.value)
-    }
-
-  }
+    App(screen = initialScreen, accessToken = accessToken.value)
 }

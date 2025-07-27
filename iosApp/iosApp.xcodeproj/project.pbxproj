@@ -194,6 +194,7 @@
 				1D87480FE426699D5F184282 /* Frameworks */,
 				5D7E070B2CF765A000479A35 /* Embed Foundation Extensions */,
 				9E646D8E9354FA64EB5843E3 /* [CP] Embed Pods Frameworks */,
+				A11B15CE6450E6D98E4E087F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -277,6 +278,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MoreStuff/Pods-MoreStuff-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A11B15CE6450E6D98E4E087F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MoreStuff/Pods-MoreStuff-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MoreStuff/Pods-MoreStuff-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MoreStuff/Pods-MoreStuff-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FAEF61A46545EE50B6B70F73 /* [CP] Check Pods Manifest.lock */ = {

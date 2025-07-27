@@ -44,41 +44,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.essenty.backhandler.BackCallback
-import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
-import io.middlepoint.morestuff.shared.ui.extension.checkRegister
-import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.show
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearPlanPriority
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.HideTaskInput
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.SetPlanPriority
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -89,16 +85,19 @@ import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+  navigateToSettings: () -> Unit,
+  navigateToTaskChat: (Uuid) -> Unit,
+) {
 
-  val homeState = koinInjectOnRoute(HomeViewModel::class)
+  val homeState = koinViewModel<HomeViewModel>()
 
   val coroutineScope = rememberCoroutineScope()
-  val navigation = LocalAppRouter.current
   val snackbarHostState = remember { SnackbarHostState() }
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
 
@@ -122,7 +121,7 @@ fun HomeScreen() {
         username = model.username,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         selectedTaskCount = model.selectedTasks.size,
-        settingsSelected = { navigation.push(Screen.Settings) },
+        settingsSelected = navigateToSettings,
         searchAction = { isSearchActive = true },
         clearTaskSelection = {
           homeState.take(ResetHomeState)
@@ -144,9 +143,10 @@ fun HomeScreen() {
             showCreateScopeSheet = true
           },
           onTaskComplete = { taskId ->
-            homeState.take(HomeEvent.CompleteTask(taskId))
+            homeState.take(CompleteTask(taskId))
           },
-          onReorderingChanged = { isReordering -> isReorderingActive = isReordering }
+          onReorderingChanged = { isReordering -> isReorderingActive = isReordering },
+          navigateToTaskChat = navigateToTaskChat
         )
       }
     },
@@ -214,7 +214,7 @@ fun HomeScreen() {
   ) {
     SearchBar(
       onSearchClose = { isSearchActive = false },
-      showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+      showTaskChat = navigateToTaskChat,
       modifier = Modifier.fillMaxWidth()
     )
   }
@@ -231,11 +231,12 @@ fun HomeScreen() {
       sheetState = showScopeSelectionSheetState,
       addSelectedTasksToScope = { homeState.take(MoveSelectedTasksToScope(it)) },
       createNewScope = {
-        val createScopeScreen = Screen.CreateScope {
-          homeState.take(CreateScopeForSelectedTasks(it))
-          navigation.pop()
-        }
-        navigation.push(createScopeScreen)
+//        val createScopeScreen = CreateScope {
+//          homeState.take(CreateScopeForSelectedTasks(it))
+//          navigation.pop()
+//        }
+//        navigation.push(createScopeScreen)
+        showCreateScopeSheet = true
       }
     )
   }
@@ -267,9 +268,9 @@ private fun HomeContent(
   onTaskComplete: (Uuid) -> Unit,
   modifier: Modifier = Modifier,
   onReorderingChanged: (Boolean) -> Unit,
+  navigateToTaskChat: (Uuid) -> Unit
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val navigation = LocalAppRouter.current
 
   val selectedTasks = model.selectedTasks
   val taskInputActive = model.taskInputActive
@@ -299,23 +300,6 @@ private fun HomeContent(
       pagerState.animateScrollToPage(newSize - 1)
     }
     previousScopesSize.value = newSize
-  }
-
-
-  val backCallback = remember {
-    BackCallback {
-      onEvent(ResetHomeState)
-      onEvent(HomeEvent.HideTaskInput)
-    }
-  }
-
-  val backHandler = LocalRouterContext.current.backHandler
-  LaunchedEffect(model) {
-    if (selectedTasks.isNotEmpty() || taskInputActive) {
-      backHandler.checkRegister(backCallback)
-    } else {
-      backHandler.checkUnregister(backCallback)
-    }
   }
 
   Box(
@@ -357,7 +341,7 @@ private fun HomeContent(
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
-                onEvent(HomeEvent.CreateTaskWithSchedule(text))
+                onEvent(CreateTaskWithSchedule(text))
               } else {
                 onEvent(CreateTask(text))
               }
@@ -367,12 +351,12 @@ private fun HomeContent(
           },
           onCancel = {
             onEvent(ResetHomeState)
-            onEvent(HomeEvent.HideTaskInput)
+            onEvent(HideTaskInput)
           },
-          onDateChange = { onEvent(HomeEvent.UpdatePlanDate(it)) },
-          onTimeChange = { h, m -> onEvent(HomeEvent.UpdatePlanTime(h, m)) },
-          onSetPriority = { onEvent(HomeEvent.SetPlanPriority) },
-          onClearSetPriority = { onEvent(HomeEvent.ClearPlanPriority) },
+          onDateChange = { onEvent(UpdatePlanDate(it)) },
+          onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) },
+          onSetPriority = { onEvent(SetPlanPriority) },
+          onClearSetPriority = { onEvent(ClearPlanPriority) },
           schedule = schedule,
         )
       }
@@ -388,8 +372,7 @@ private fun HomeContent(
 
         val scope = model.scopes[page]
 
-        val scopeViewModel = koinInjectOnRoute(
-          type = ScopeTasksViewModel::class,
+        val scopeViewModel = koinViewModel<ScopeTasksViewModel>(
           key = "Scope${scope.id.value}",
           parameters = { parametersOf(scope.id) }
         )
@@ -411,7 +394,7 @@ private fun HomeContent(
                     val task = tasksModel.tasks.find { it.id == taskId }
                     onEvent(ToggleTaskSelection(taskId, task))
                   } else {
-                    navigation.push(Screen.TaskChat(taskId))
+                    navigateToTaskChat(taskId)
                   }
                 },
                 onItemLongClick = { taskId ->
@@ -421,7 +404,6 @@ private fun HomeContent(
                 listState = states[page],
                 enabled = !taskInputActive,
                 onReorder = { updatedTasks ->
-                  logger.d { "Reordering tasks..." }
                   scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
                 },
                 isReordering = model.reorderingScopes[scope.id] ?: false,

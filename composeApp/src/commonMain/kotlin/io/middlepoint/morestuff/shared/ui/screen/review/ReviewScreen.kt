@@ -82,8 +82,6 @@ import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.DeleteTa
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ItemSwipe
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.LoadScope
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ToggleReviewHint
-import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.Undo
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -113,6 +111,7 @@ import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @NonRestartableComposable
@@ -137,10 +136,9 @@ fun ReviewContent(
   currentScopeId: Uuid,
 ) {
 
-  val viewModel = koinInjectOnRoute(
-    ReviewViewModel::class,
+  val viewModel = koinViewModel<ReviewViewModel>{
     parametersOf(currentScopeId)
-  )
+  }
 
   val model by viewModel.models.collectAsState()
 
@@ -334,8 +332,6 @@ private fun PriorityReviewTopBar(
   scopeSelectorContent: @Composable () -> Unit
 ) {
 
-  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
-
   val coroutineScope = rememberCoroutineScope()
   var showMenu by remember { mutableStateOf(false) }
 
@@ -463,7 +459,7 @@ private fun ReviewSwipeControls(
           lastItemSwiped()?.let { item ->
             scope.launch {
               item.second.undo()
-              modelAction(Undo(item.first))
+              modelAction(ReviewViewEvent.Undo(item.first))
             }
           }
         },

@@ -6,7 +6,9 @@ import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.nav.TaskChat
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
@@ -52,7 +54,7 @@ class NavigationHelper: ViewModel(), KoinComponent {
     fun navigateToTaskChat(taskId: Uuid) {
         viewModelScope.launch {
             logger.d { "Emitting Screen to navigate to: $taskId" }
-            navigation.emit(Screen.TaskChat(taskId))
+            navigation.emit(TaskChat(taskId))
           cancelActiveScheduleUseCase(listOf(taskId))
         }
     }
@@ -77,10 +79,10 @@ class NavigationHelper: ViewModel(), KoinComponent {
             if (accessToken != null) {
                 logger.d { "Emitting Screen.Home with access token" }
                 code.emit(accessToken)
-                navigation.emit(Screen.Home)
+                navigation.emit(Home)
             } else {
                 logger.d { "Emitting Screen.Home without token" }
-                navigation.emit(Screen.Home)
+                navigation.emit(Home)
             }
         }
     }

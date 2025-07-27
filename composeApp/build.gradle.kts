@@ -93,7 +93,6 @@ kotlin {
     framework {
       baseName = "ComposeApp"
       isStatic = true
-      export(libs.decompose.router)
       linkerOpts("-lsqlite3")
     }
   }
@@ -129,7 +128,8 @@ kotlin {
       implementation(libs.koin.core)
       implementation(libs.koin.compose)
       implementation(libs.koin.compose.viewmodel)
-      api(libs.decompose.router)
+      implementation(libs.androidx.navigation.compose)
+//      api(libs.decompose.router)
 
       // You will probably need to also bring in decompose and essenty
       implementation(libs.decompose)
