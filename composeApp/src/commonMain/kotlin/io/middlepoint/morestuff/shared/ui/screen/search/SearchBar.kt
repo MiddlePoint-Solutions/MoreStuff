@@ -49,10 +49,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.middlepoint.morestuff.shared.domain.enums.FilterType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -80,7 +80,7 @@ fun SearchBar(
   modifier: Modifier = Modifier,
 ) {
 
-  val viewModel = koinInjectOnRoute(SearchViewModel::class)
+  val viewModel = viewModel<SearchViewModel>()
 
   val model by viewModel.models.collectAsState()
   var isSearchActive by rememberSaveable { mutableStateOf(false) }

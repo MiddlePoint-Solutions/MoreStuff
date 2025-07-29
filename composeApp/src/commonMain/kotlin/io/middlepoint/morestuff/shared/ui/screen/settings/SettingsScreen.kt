@@ -59,11 +59,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.alorma.compose.settings.ui.SettingsMenuLink
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
 import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
@@ -71,15 +70,11 @@ import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
 import io.middlepoint.morestuff.android.data.Constants.REDDIT_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
@@ -91,7 +86,6 @@ import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
@@ -103,13 +97,7 @@ import morestuff.composeapp.generated.resources.button_skip
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.cd_select_theme
-import morestuff.composeapp.generated.resources.click_s_to_enable_developer_settings
-import morestuff.composeapp.generated.resources.confirm_delete
-import morestuff.composeapp.generated.resources.delete
-import morestuff.composeapp.generated.resources.dev_settings_already_enabled
 import morestuff.composeapp.generated.resources.developer_settings
-import morestuff.composeapp.generated.resources.developer_settings_enabled
-import morestuff.composeapp.generated.resources.ic_discord
 import morestuff.composeapp.generated.resources.ic_reddit
 import morestuff.composeapp.generated.resources.ic_schedule
 import morestuff.composeapp.generated.resources.ic_telegram
@@ -136,7 +124,7 @@ import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import kotlin.time.Duration.Companion.milliseconds
+import org.koin.compose.koinInject
 
 
 @Composable
@@ -144,42 +132,45 @@ fun SettingsScreen(
   onBack: () -> Unit,
 ) {
 
-  val router = rememberRouter<SettingScreen> { listOf(Root) }
-  val viewModel = koinInjectOnRoute(SettingsViewModel::class)
+  val navController = rememberNavController()
+  val viewModel = koinInject<SettingsViewModel>()
 
   val model by viewModel.models.collectAsState()
 
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(slide()),
-  ) { screen ->
+  NavHost(
+    navController = navController,
+    startDestination = Root
+  ) {
+    composable<Root> {
+      SettingsContent(
+        // TODO: pass ViewModel::take and a router lambda to reduce the number of properties.
+        onBack = onBack,
+        model = model,
+        selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
+        selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
+        enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
+        showDevSettings = { navController.navigate(Developer) },
+        showScopesSettings = { navController.navigate(Scopes) },
+        showLibraries = { navController.navigate(AboutLibraries) },
+        signOut = { viewModel.take(SettingsEvent.SignOut) },
+        openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
+        setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
+      )
+    }
 
-    when (screen) {
-      Root -> {
-        SettingsContent(
-          // TODO: pass ViewModel::take and a router lambda to reduce the number of properties.
-          onBack = onBack,
-          model = model,
-          selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-          selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
-          showDevSettings = { router.push(Developer) },
-          showScopesSettings = { router.push(Scopes) },
-          showLibraries = { router.push(AboutLibraries) },
-          signOut = { viewModel.take(SettingsEvent.SignOut) },
-          openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
-          setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
-        )
-      }
-
-      Developer -> DevSettingsScreen(
-        onBack = router::pop,
+    composable<Developer> {
+      DevSettingsScreen(
+        onBack = { navController.popBackStack() },
         onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) }
       )
+    }
 
-      Scopes -> ScopesScreen(onBack = router::pop)
+    composable<Scopes> {
+      ScopesScreen(onBack = { navController.popBackStack() })
+    }
 
-      AboutLibraries -> AboutLibrariesScreen(onBack = router::pop)
+    composable<AboutLibraries> {
+      AboutLibrariesScreen(onBack = { navController.popBackStack() })
     }
   }
 }

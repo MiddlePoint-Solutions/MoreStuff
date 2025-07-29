@@ -9,13 +9,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.nav.CreateScope
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.Scopes
 import io.middlepoint.morestuff.shared.domain.nav.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Share
+import io.middlepoint.morestuff.shared.domain.nav.ShareableNavType
 import io.middlepoint.morestuff.shared.domain.nav.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.TaskChat
@@ -33,6 +33,7 @@ import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
+import kotlin.reflect.typeOf
 
 @Composable
 fun MainContent(
@@ -64,13 +65,16 @@ fun MainContent(
       composable<Home> {
         HomeScreen(
           navigateToSettings = { navController.navigate(Settings) },
-          navigateToTaskChat = { taskId -> navController.navigate(TaskChat(taskId)) }
+          navigateToTaskChat = { taskId -> navController.navigate(TaskChat(taskId.value)) }
         )
       }
 
       composable<Review> { backStackEntry ->
         val screen = backStackEntry.toRoute<Review>()
-        ReviewScreen(onBack = { navController.popBackStack() }, initialScopeId = screen.scopeId)
+        ReviewScreen(
+          onBack = { navController.popBackStack() },
+          initialScopeId = Uuid(screen.scopeId)
+        )
       }
 
       composable<Settings> {
@@ -81,18 +85,19 @@ fun MainContent(
         ScopesScreen(onBack = { navController.popBackStack() })
       }
 
-      composable<CreateScope> { backStackEntry ->
-        val screen = backStackEntry.toRoute<CreateScope>()
-        CreateScopeScreen(
-          onBack = { navController.popBackStack() },
-          onSaveScope = screen.onSave
-        )
-      }
+//      composable<CreateScope> { backStackEntry ->
+//        val screen = backStackEntry.toRoute<CreateScope>()
+//        CreateScopeScreen(
+//          onBack = { navController.popBackStack() },
+//          onSaveScope = screen.onSave
+//        )
+//      }
 
       composable<TaskChat> { backStackEntry ->
         val screen = backStackEntry.toRoute<TaskChat>()
+
         TaskChatScreen(
-          taskId = screen.taskId,
+          taskId = Uuid(screen.taskId),
           onBack = { navController.popBackStack() },
         )
       }
@@ -106,7 +111,7 @@ fun MainContent(
           onImport = { message ->
             val shareableImage = Shareable.Image(screen.imageUri, message)
             logger.d { "shareableImage: $shareableImage" }
-            shareContent(screen.taskId, shareableImage)
+            shareContent(Uuid(screen.taskId), shareableImage)
             navController.navigate(TaskChat(screen.taskId)) {
               popUpTo(Home)
             }
@@ -115,16 +120,18 @@ fun MainContent(
         )
       }
 
-      composable<Share> { backStackEntry ->
+      composable<Share>(
+        typeMap = mapOf(typeOf<Shareable>() to ShareableNavType)
+      ) { backStackEntry ->
         val screen = backStackEntry.toRoute<Share>()
         ShareScreen(
           onBack = { navController.popBackStack() },
           shareable = screen.shareable,
         ) { taskId, shareable ->
           if (shareable is Shareable.Image) {
-            navController.navigate(ImagePreview(shareable.uri, taskId))
+            navController.navigate(ImagePreview(shareable.uri, taskId.value))
           } else {
-            navController.navigate(TaskChat(taskId))
+            navController.navigate(TaskChat(taskId.value))
             shareContent(taskId, shareable)
           }
         }

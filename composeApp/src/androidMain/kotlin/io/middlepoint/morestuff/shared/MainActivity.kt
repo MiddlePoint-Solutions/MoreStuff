@@ -116,13 +116,13 @@ class MainActivity : AppCompatActivity() {
 
       ACTION_NOTIFICATION_REMINDER -> {
         intent.getStringExtra(EXTRA_TASK_ID)?.let {
-          TaskChat(Uuid(it))
+          TaskChat(it)
         }
       }
 
       ACTION_NOTIFICATION_REVIEW -> {
         intent.getStringExtra(EXTRA_SCOPE_ID)?.let {
-          Review(Uuid(it))
+          Review(it)
         }
       }
 

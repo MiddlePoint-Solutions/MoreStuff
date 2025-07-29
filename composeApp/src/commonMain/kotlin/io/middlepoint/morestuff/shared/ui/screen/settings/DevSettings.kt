@@ -40,7 +40,6 @@ import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
@@ -80,7 +79,7 @@ fun DevSettings(
 
   val scope = rememberCoroutineScope()
 
-  val test = PlatformFile("")
+//  val test = PlatformFile("")
 
   val singleImagePickerLauncher = rememberFilePickerLauncher(
     type = FileKitType.File("json"),
@@ -94,7 +93,7 @@ fun DevSettings(
     }
   }
 
-  val navigation = LocalAppRouter.current
+//  val navigation = LocalAppRouter.current
   Column {
     DisableDeveloperSettings(
       state = rememberAppSettingState(
@@ -126,7 +125,7 @@ fun DevSettings(
 
     SettingsMenuLink(
       title = { Text(text = "Review Screen") },
-      onClick = { navigation.push(Screen.Review(Uuid("test"))) },
+      onClick = { /*navigation.push(Screen.Review(Uuid("test")))*/ },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )

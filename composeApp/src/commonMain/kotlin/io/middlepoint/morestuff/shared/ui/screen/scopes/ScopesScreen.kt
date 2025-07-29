@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.ui.screen.scopes
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -50,6 +49,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
+import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
@@ -68,49 +75,49 @@ import morestuff.composeapp.generated.resources.edit_scope
 import morestuff.composeapp.generated.resources.sure_delete_scope
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 
 @Composable
 fun ScopesScreen(
   onBack: () -> Unit,
-  initialScreen: ScopeScreen = Root,
 ) {
 
-  val router = rememberRouter { listOf(initialScreen) }
-  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
+  val viewModel = koinInject<ScopesViewModel>()
   val model by viewModel.models.collectAsState()
+  val navController = rememberNavController()
 
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(slide())
-  ) { screen ->
-    when (screen) {
-      Root -> ScopesContent(
+  NavHost(
+    navController = navController,
+    startDestination = ScopeScreen.Root
+  ) {
+    composable<ScopeScreen.Root> {
+      ScopesContent(
         model = model,
         onBack = onBack,
-        onCreateScope = { router.push(Create) },
-        onEditScope = { scope -> router.push(Edit(scope)) },
+        onCreateScope = { navController.navigate(ScopeScreen.Create) },
+        onEditScope = { scope -> navController.navigate(ScopeScreen.Edit(scope)) },
         onEvent = viewModel::take
       )
-
-      Create -> CreateScopeScreen(
-        onBack = router::pop,
+    }
+    composable<ScopeScreen.Create> {
+      CreateScopeScreen(
+        onBack = { navController.popBackStack() },
         onSaveScope = { title ->
-          viewModel.take(CreateScope(title))
-          router.pop()
+          viewModel.take(ScopesUiEvent.CreateScope(title))
+          navController.popBackStack()
         }
       )
-
-      is Edit -> EditScopeScreen(
+    }
+    composable<ScopeScreen.Edit> {backStackEntry ->
+      val screen = backStackEntry.toRoute<ScopeScreen.Edit>()
+      EditScopeScreen(
         scope = screen.scope,
-        onBack = router::pop,
+        onBack = { navController.popBackStack() },
         onSaveScope = { title ->
           viewModel.take(UpdateScopeName(screen.scope.id, title))
-          router.pop()
+          navController.popBackStack()
         }
       )
     }
@@ -211,7 +218,7 @@ fun ScopesContent(
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
-        onEvent(DeleteScope(scope.id))
+        onEvent(ScopesUiEvent.DeleteScope(scope.id))
         showDeleteBottomSheet = false
       }
     )
@@ -260,7 +267,7 @@ private fun OrderedScopesList(
 
   LaunchedEffect(scopes) {
     if (scopes != model.scopes) {
-      onEvent(ReorderScopes(scopes))
+      onEvent(ScopesUiEvent.ReorderScopes(scopes))
     }
   }
 

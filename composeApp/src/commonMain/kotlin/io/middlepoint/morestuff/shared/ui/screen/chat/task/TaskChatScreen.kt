@@ -62,16 +62,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
-import io.middlepoint.morestuff.shared.domain.nav.CreateScope
-import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
@@ -128,9 +124,9 @@ fun TaskChatScreen(
 
   NavHost(
     navController = navController,
-    startDestination = ChatScreen.TaskChat
+    startDestination = ChatScreen.Chat
   ) {
-    composable<ChatScreen.TaskChat> {
+    composable<ChatScreen.Chat> {
 
       val model by viewModel.models.collectAsState()
       val isAiEnabled = model.isAIEnabled
@@ -145,7 +141,7 @@ fun TaskChatScreen(
           onImageSelected = {
             val path = it.messageExtra?.url ?: ""
             val title = it.content
-            navController.navigate(ChatScreen.ImagePreview(path, title))
+            navController.navigate(ChatScreen.Preview(path, title))
           },
           onPdfSelected = {
             val path = it.messageExtra?.url ?: ""
@@ -166,7 +162,6 @@ fun TaskChatScreen(
         )
       }
 
-
       TaskChatContent(
         model = model,
         onEvent = viewModel::take,
@@ -177,7 +172,7 @@ fun TaskChatScreen(
           viewModel.take(InputText(it))
           if (isAiEnabled) viewModel.take(CreateAIMessage(it))
         },
-        imagePicked = { scope.launch { navController.navigate(ChatScreen.ImageImport(it)) } },
+        imagePicked = { scope.launch { navController.navigate(ChatScreen.Import(it)) } },
         pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
         onCreateNewScope = { title ->
           viewModel.take(CreateNewScopeForTask(title))
@@ -188,8 +183,8 @@ fun TaskChatScreen(
       )
     }
 
-    composable<ChatScreen.ImageImport> { backStackEntry ->
-      val screen = backStackEntry.toRoute<ChatScreen.ImageImport>()
+    composable<ChatScreen.Import> { backStackEntry ->
+      val screen = backStackEntry.toRoute<ChatScreen.Import>()
       ImageImportScreen(
         image = screen.imageFile,
         onImport = { title ->
@@ -200,8 +195,8 @@ fun TaskChatScreen(
       )
     }
 
-    composable<ChatScreen.ImagePreview> { backStackEntry ->
-      val screen = backStackEntry.toRoute<ChatScreen.ImagePreview>()
+    composable<ChatScreen.Preview> { backStackEntry ->
+      val screen = backStackEntry.toRoute<ChatScreen.Preview>()
       ImagePreviewScreen(
         imagePath = screen.imagePath,
         onBack = { navController.popBackStack() },

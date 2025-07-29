@@ -57,22 +57,17 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.arkivanov.essenty.backhandler.BackCallback
-import io.github.xxfast.decompose.router.LocalRouterContext
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
 import io.middlepoint.morestuff.shared.ui.components.TaskProfile
-import io.middlepoint.morestuff.shared.ui.extension.checkRegister
-import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeTabs
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
@@ -88,7 +83,9 @@ import morestuff.composeapp.generated.resources.create_new_chat
 import morestuff.composeapp.generated.resources.search
 import morestuff.composeapp.generated.resources.select_chat
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.named
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,7 +97,7 @@ fun ShareScreen(
 
   var isSearchActive by remember { mutableStateOf(false) }
 
-  val viewModel = koinInjectOnRoute(ShareViewModel::class, parameters = {
+  val viewModel: ShareViewModel = koinInject(parameters = {
     parametersOf(shareable)
   })
   val state by viewModel.models.collectAsState()
@@ -248,21 +245,6 @@ private fun ShareContent(
       }
   }
 
-  val backCallback = remember {
-    BackCallback {
-      onEvent(ShareEvent.ResetShareState)
-    }
-  }
-
-  val backHandler = LocalRouterContext.current.backHandler
-  LaunchedEffect(model) {
-    if (taskInputActive) {
-      backHandler.checkRegister(backCallback)
-    } else {
-      backHandler.checkUnregister(backCallback)
-    }
-  }
-
   Column(
     modifier = modifier
   ) {
@@ -323,9 +305,8 @@ private fun ShareContent(
 
       val scope = model.scopes[page]
 
-      val scopeViewModel = koinInjectOnRoute(
-        type = ScopeTasksViewModel::class,
-        key = "Scope${scope.id.value}",
+      val scopeViewModel: ScopeTasksViewModel = koinInject(
+        qualifier = named("Scope${scope.id.value}"),
         parameters = { parametersOf(scope.id) }
       )
 

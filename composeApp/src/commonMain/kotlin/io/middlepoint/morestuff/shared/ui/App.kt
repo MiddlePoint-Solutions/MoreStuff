@@ -45,24 +45,28 @@ fun App(
         Box(
           modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
+
           if (model.ready) {
-            if (!model.isAuthenticated) {
-              navController.navigate(SignIn(model.showOldUserMessage).toString())
-            }
             MainContent(
               navController = navController,
               shareContent = { taskId, content ->
                 viewModel.take(MainEvent.ShareContent(taskId, content))
               }
             )
+
+            if (!model.isAuthenticated) {
+              navController.navigate(SignIn(model.showOldUserMessage))
+            }
           }
         }
       }
     }
+
     LaunchedEffect(screen) {
       if (screen != null) {
         navController.navigate(screen.toString())
       }
     }
+
   }
 }
