@@ -251,9 +251,7 @@ fun homeModel(
           val selected = selectedTasks.toList()
           selectedTasks = listOf()
           createScopeUseCase(event.title).onRight { scope ->
-            store.dispatch(
-              TaskAction.UpdateTasksToScopeAction(selected, scope.id)
-            )
+            store.dispatch(TaskAction.UpdateTasksToScopeAction(selected, scope.id))
             val notification = NotificationState.TaskMovedToScope(scope.name)
             launch { notifications.emit(notification) }
           }

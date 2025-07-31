@@ -53,6 +53,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import io.middlepoint.morestuff.shared.data.utils.toUuid
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
@@ -92,15 +93,19 @@ fun ScopesScreen(
     navController = navController,
     startDestination = ScopeScreen.Root
   ) {
+
     composable<ScopeScreen.Root> {
       ScopesContent(
         model = model,
         onBack = onBack,
         onCreateScope = { navController.navigate(ScopeScreen.Create) },
-        onEditScope = { scope -> navController.navigate(ScopeScreen.Edit(scope)) },
+        onEditScope = { scope ->
+          navController.navigate(ScopeScreen.Edit(scope.id.value))
+        },
         onEvent = viewModel::take
       )
     }
+
     composable<ScopeScreen.Create> {
       CreateScopeScreen(
         onBack = { navController.popBackStack() },
@@ -110,17 +115,19 @@ fun ScopesScreen(
         }
       )
     }
-    composable<ScopeScreen.Edit> {backStackEntry ->
+
+    composable<ScopeScreen.Edit> { backStackEntry ->
       val screen = backStackEntry.toRoute<ScopeScreen.Edit>()
       EditScopeScreen(
-        scope = screen.scope,
+        scope = model.scopes.first { it.id.value == screen.scopeId },
         onBack = { navController.popBackStack() },
         onSaveScope = { title ->
-          viewModel.take(UpdateScopeName(screen.scope.id, title))
+          viewModel.take(UpdateScopeName(screen.scopeId.toUuid(), title))
           navController.popBackStack()
         }
       )
     }
+
   }
 }
 
@@ -330,10 +337,11 @@ private fun OrderedScopesList(
                   expanded = menuVisibility[scope.id] == true,
                   onDismissRequest = { menuVisibility[scope.id] = false }
                 ) {
-                  DropdownMenuItem(onClick = {
-                    onEditScope(scope)
-                    menuVisibility[scope.id] = false
-                  },
+                  DropdownMenuItem(
+                    onClick = {
+                      onEditScope(scope)
+                      menuVisibility[scope.id] = false
+                    },
                     text = { Text(text = stringResource(Res.string.edit_scope)) },
                     leadingIcon = {
                       Icon(
@@ -342,10 +350,11 @@ private fun OrderedScopesList(
                       )
                     }
                   )
-                  DropdownMenuItem(onClick = {
-                    onDeleteScope(scope)
-                    menuVisibility[scope.id] = false
-                  },
+                  DropdownMenuItem(
+                    onClick = {
+                      onDeleteScope(scope)
+                      menuVisibility[scope.id] = false
+                    },
                     text = { Text(text = stringResource(Res.string.delete)) },
                     leadingIcon = {
                       Icon(

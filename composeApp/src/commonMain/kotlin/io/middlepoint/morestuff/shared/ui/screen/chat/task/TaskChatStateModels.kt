@@ -16,7 +16,7 @@ data class TaskChatState(
   val messages: List<MessageUiModel> = listOf(),
   val editingMessageId: Uuid? = null,
   val editingMessageContent: String = "",
-  val allScopes: List<Scope> = listOf(),
+  val scopes: List<Scope> = listOf(),
   val isAIEnabled: Boolean = false,
   val isAILoading: Boolean = false,
 )

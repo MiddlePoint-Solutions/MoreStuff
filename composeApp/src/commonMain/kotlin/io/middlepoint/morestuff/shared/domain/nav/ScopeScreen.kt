@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
-import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,5 +11,5 @@ sealed class ScopeScreen {
   data object Create : ScopeScreen()
 
   @Serializable
-  data class Edit(val scope: Scope) : ScopeScreen()
+  data class Edit(val scopeId: String) : ScopeScreen()
 }

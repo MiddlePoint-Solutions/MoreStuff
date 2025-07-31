@@ -59,21 +59,12 @@ fun taskChatModel(
   var messages by remember { mutableStateOf(initialState.messages) }
   var editingMessageId by remember { mutableStateOf(initialState.editingMessageId) }
   var editingMessageContent by remember { mutableStateOf(initialState.editingMessageContent) }
-  var allScopes by remember { mutableStateOf(initialState.allScopes) }
+  var scopes by remember { mutableStateOf(initialState.scopes) }
   var isAIEnabled by remember { mutableStateOf(initialState.isAIEnabled) }
 
   val isAILoading by store.state
     .map { it.aiMessageState.loadingMap[taskId] ?: false }
     .collectAsState(initial = false)
-
-
-  fun updateScopeAfterMove(scopeId: Uuid) {
-    val newScope = allScopes.find { it.id == scopeId }
-    newScope?.let {
-      scope = scopeUiMapper.map(it)
-      logger.d { "Scope updated to: ${it.name}" }
-    }
-  }
 
   LaunchedEffect(Unit) {
     getTaskFlow(taskId)
@@ -98,7 +89,7 @@ fun taskChatModel(
   LaunchedEffect(Unit) {
     getScopesFlowUseCase().collect {
       logger.d { "Scopes updated: ${it.size} scopes received" }
-      allScopes = it
+      scopes = it
     }
   }
 
@@ -147,11 +138,11 @@ fun taskChatModel(
 
           }*/
 
-            is InputText -> {
-              store.dispatch(
-                MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
-              )
-            }
+          is InputText -> {
+            store.dispatch(
+              MessageAction.CreateUserTaskMessageAction(taskId, content.trim())
+            )
+          }
 
           is OpenDocument -> {
             mediaHandler.openPDF(path)
@@ -237,13 +228,12 @@ fun taskChatModel(
             store.dispatch(
               TaskAction.UpdateTasksToScopeAction(listOf(taskId), scopeId)
             )
-            updateScopeAfterMove(scopeId)
-            val scopeTitle = allScopes.firstOrNull { it.id == scopeId }?.name ?: ""
-            logger.d { "Task moved to scope: $scopeTitle" }
+            scope = scopeUiMapper.map(scopes.first { it.id == scopeId })
           }
 
           is CreateNewScopeForTask -> {
             createScopeUseCase(title).onRight { newScope ->
+              scope = scopeUiMapper.map(newScope)
               store.dispatch(
                 TaskAction.UpdateTasksToScopeAction(listOf(taskId), newScope.id)
               )
@@ -273,7 +263,7 @@ fun taskChatModel(
     messages = messages,
     editingMessageId = editingMessageId,
     editingMessageContent = editingMessageContent,
-    allScopes = allScopes,
+    scopes = scopes,
     isAIEnabled = isAIEnabled,
     isAILoading = isAILoading,
   )

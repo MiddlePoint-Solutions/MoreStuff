@@ -11,6 +11,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.predictiveback
 import com.arkivanov.essenty.backhandler.BackDispatcher
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.domain.nav.Share
 import io.middlepoint.morestuff.shared.domain.service.NavigationHelper
 import io.middlepoint.morestuff.shared.ui.App
 import org.koin.compose.koinInject
@@ -34,7 +35,7 @@ fun MainViewController() = ComposeUIViewController {
 //          }
 
           is Shareable.Text -> {
-            Screen.Share(shareable, shareable.message)
+            Share(shareable, shareable.message)
           }
 
           else -> {

@@ -1,6 +1,10 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.task
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -68,6 +72,7 @@ import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
+import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
@@ -78,8 +83,9 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeSelectionBottomSheet
-import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
+import io.middlepoint.morestuff.shared.ui.utils.defaultEnterTransition
+import io.middlepoint.morestuff.shared.ui.utils.defaultExitTransition
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -114,17 +120,11 @@ fun TaskChatScreen(
     parameters = { parametersOf(taskId) }
   )
 
-  // TODO:
-//  val navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = { onScopeCreated ->
-//    val createScopeScreen = CreateScope { title ->
-//      onScopeCreated(title)
-//    }
-//    navigation.push(createScopeScreen)
-//  }
-
   NavHost(
     navController = navController,
-    startDestination = ChatScreen.Chat
+    startDestination = ChatScreen.Chat,
+    enterTransition = { defaultEnterTransition() },
+    exitTransition = { defaultExitTransition() }
   ) {
     composable<ChatScreen.Chat> {
 
@@ -174,26 +174,21 @@ fun TaskChatScreen(
         },
         imagePicked = { scope.launch { navController.navigate(ChatScreen.Import(it)) } },
         pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
-        onCreateNewScope = { title ->
-          viewModel.take(CreateNewScopeForTask(title))
-          navController.popBackStack()
-        },
-//        navigateToCreateScope = navigateToCreateScope,
         isAIEnabled = isAiEnabled
       )
     }
 
-    composable<ChatScreen.Import> { backStackEntry ->
-      val screen = backStackEntry.toRoute<ChatScreen.Import>()
-      ImageImportScreen(
-        image = screen.imageFile,
-        onImport = { title ->
-          viewModel.take(InputUserMedia(screen.imageFile, title))
-          navController.popBackStack()
-        },
-        onBack = { navController.popBackStack() }
-      )
-    }
+//    composable<ChatScreen.Import> { backStackEntry ->
+//      val screen = backStackEntry.toRoute<ChatScreen.Import>()
+//      ImageImportScreen(
+//        image = screen.imageFile,
+//        onImport = { title ->
+//          viewModel.take(InputUserMedia(screen.imageFile, title))
+//          navController.popBackStack()
+//        },
+//        onBack = { navController.popBackStack() }
+//      )
+//    }
 
     composable<ChatScreen.Preview> { backStackEntry ->
       val screen = backStackEntry.toRoute<ChatScreen.Preview>()
@@ -210,7 +205,7 @@ fun TaskChatScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TaskChatContent(
+fun TaskChatContent(
   model: TaskChatState,
   chatActions: ChatActions,
   onEvent: (TaskChatEvent) -> Unit,
@@ -220,8 +215,6 @@ private fun TaskChatContent(
   imagePicked: (PlatformFile) -> Unit = {},
   pdfPicked: (PlatformFile) -> Unit = {},
   logger: Logger = koinInject(),
-  onCreateNewScope: (String) -> Unit = {},
-  navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = {},
   isAIEnabled: Boolean = false
 ) {
   val coroutineScope = rememberCoroutineScope()
@@ -232,13 +225,15 @@ private fun TaskChatContent(
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
   var showScopeSelection by remember { mutableStateOf(false) }
 
+  var showCreateScopeSheet by remember { mutableStateOf(false) }
+  val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val task = model.task
   val scope = model.scope
   val messages = model.messages
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
-  val allScopes = model.allScopes
+  val allScopes = model.scopes
   val isAILoading = model.isAILoading
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
@@ -380,6 +375,7 @@ private fun TaskChatContent(
               },
               pickImage = { singleImagePickerLauncher.launch() },
               pickPdf = { singleFilePickerLauncher.launch() },
+              enabled = !showCreateScopeSheet,
               editingMessageId = editingMessageId,
               editingContent = editingMessageContent,
               onCancelEdit = {
@@ -443,7 +439,26 @@ private fun TaskChatContent(
         onEvent(MoveTaskToScope(scopeId))
       },
       createNewScope = {
-        navigateToCreateScope(onCreateNewScope)
+        showCreateScopeSheet = true
+      }
+    )
+  }
+
+  if (showCreateScopeSheet) {
+    CreateScopeBottomSheet(
+      sheetState = createScopeSheetState,
+      onDismissRequest = {
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
+      },
+      onConfirm = { scopeName ->
+        onEvent(CreateNewScopeForTask(scopeName))
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
       }
     )
   }
@@ -456,6 +471,7 @@ private fun TaskChatInput(
   pickImage: () -> Unit,
   pickPdf: () -> Unit,
   modifier: Modifier = Modifier,
+  enabled: Boolean = true,
   editingMessageId: Uuid? = null,
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
@@ -502,6 +518,7 @@ private fun TaskChatInput(
   ) {
     UserInput(
       modifier = Modifier.align(Alignment.BottomCenter),
+      enablePadding = enabled,
       textContent = {
         val weight = if (isTextEmpty.value) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {

@@ -26,6 +26,7 @@ fun App(
   screen: Screen? = null,
   accessToken: String? = null // TODO: this is super ugly
 ) {
+
   KoinContext {
     val navController = rememberNavController()
     val viewModel = koinInject<MainViewModel>()
