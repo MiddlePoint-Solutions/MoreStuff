@@ -1,5 +1,9 @@
 package io.middlepoint.morestuff.shared.ui.screen.main
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -66,6 +70,10 @@ fun MainContent(
     NavHost(
       navController = navController,
       startDestination = Home,
+      enterTransition = { slideInHorizontally { it } + fadeIn() },
+      exitTransition = { slideOutHorizontally { -it } + fadeOut() },
+      popEnterTransition = { slideInHorizontally { -it / 2 } + fadeIn() },
+      popExitTransition = { slideOutHorizontally { it / 2 } + fadeOut() }
     ) {
       composable<SignIn> { backStackEntry ->
         val screen = backStackEntry.toRoute<SignIn>()

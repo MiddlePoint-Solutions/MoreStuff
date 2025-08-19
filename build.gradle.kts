@@ -13,14 +13,14 @@ plugins {
   alias(libs.plugins.buildConfig).apply(false)
   alias(libs.plugins.kotlinx.serialization).apply(false)
   alias(libs.plugins.sqldelight).apply(false)
-  alias(libs.plugins.spotless).apply(false)
   alias(libs.plugins.aboutLibrariesPlugin).apply(false)
   alias(libs.plugins.sentry).apply(false)
+  alias(libs.plugins.spotless)
 }
 
 allprojects {
   apply(plugin = rootProject.libs.plugins.spotless.get().pluginId)
-  configure<SpotlessExtension> {
+  spotless {
     kotlin {
       ktfmt(libs.versions.ktfmt.get()).googleStyle()
       target("src/**/*.kt")
