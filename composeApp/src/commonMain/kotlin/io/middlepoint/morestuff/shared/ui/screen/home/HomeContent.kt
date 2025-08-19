@@ -345,6 +345,12 @@ private fun HomeContent(
         enter = expandVertically(),
         exit = shrinkVertically(),
       ) {
+
+        BackHandler {
+          onEvent(ResetHomeState)
+          onEvent(HideTaskInput)
+        }
+
         InputItem(
           onDone = { text ->
             coroutineScope.launch {
