@@ -13,14 +13,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import io.middlepoint.morestuff.shared.data.utils.toUuid
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.Review
+import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.Scopes
+import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
+import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
+import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.Settings
 import io.middlepoint.morestuff.shared.domain.nav.Share
 import io.middlepoint.morestuff.shared.domain.nav.ShareableNavType
@@ -50,11 +56,21 @@ import io.middlepoint.morestuff.shared.ui.screen.image.logger
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInEmailScreen
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInScreen
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewScreen
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
-import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.CreateScopeScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.EditScopeScreen
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesContent
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
+import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesViewModel
+import io.middlepoint.morestuff.shared.ui.screen.settings.AboutLibrariesScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.DevSettingsScreen
+import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsContent
+import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsEvent
+import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
 import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.reflect.typeOf
@@ -105,12 +121,91 @@ fun MainContent(
         )
       }
 
-      composable<Settings> {
-        SettingsScreen(onBack = { navController.popBackStack() })
+      navigation<Settings>(Root) {
+
+        composable<Root> {
+
+          val viewModel = koinInject<SettingsViewModel>()
+          val model by viewModel.models.collectAsState()
+
+          SettingsContent(
+            // TODO: pass ViewModel::take and a router lambda to reduce the number of properties.
+            onBack = { navController.popBackStack() },
+            model = model,
+            selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
+            selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
+            enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
+            showDevSettings = { navController.navigate(Developer) },
+            showScopesSettings = { navController.navigate(Scopes) },
+            showLibraries = { navController.navigate(AboutLibraries) },
+            signOut = { viewModel.take(SettingsEvent.SignOut) },
+            openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
+            setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
+          )
+        }
+
+        composable<Developer> {
+
+          val viewModel = koinInject<SettingsViewModel>()
+
+          DevSettingsScreen(
+            onBack = { navController.popBackStack() },
+            onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) }
+          )
+        }
+
+        composable<AboutLibraries> {
+          AboutLibrariesScreen(onBack = { navController.popBackStack() })
+        }
       }
 
-      composable<Scopes> {
-        ScopesScreen(onBack = { navController.popBackStack() })
+      navigation<Scopes>(ScopeScreen.Root) {
+
+        composable<ScopeScreen.Root> {
+
+          val viewModel = koinInject<ScopesViewModel>()
+          val model by viewModel.models.collectAsState()
+
+          ScopesContent(
+            model = model,
+            onBack = { navController.popBackStack() },
+            onCreateScope = { navController.navigate(ScopeScreen.Create) },
+            onEditScope = { scope ->
+              navController.navigate(ScopeScreen.Edit(scope.id.value))
+            },
+            onEvent = viewModel::take
+          )
+        }
+
+        composable<ScopeScreen.Create> {
+
+          val viewModel = koinInject<ScopesViewModel>()
+
+          CreateScopeScreen(
+            onBack = { navController.popBackStack() },
+            onSaveScope = { title ->
+              viewModel.take(ScopesUiEvent.CreateScope(title))
+              navController.popBackStack()
+            }
+          )
+        }
+
+        composable<ScopeScreen.Edit> { backStackEntry ->
+
+          val viewModel = koinInject<ScopesViewModel>()
+          val model by viewModel.models.collectAsState()
+
+          val screen = backStackEntry.toRoute<ScopeScreen.Edit>()
+          EditScopeScreen(
+            scope = model.scopes.first { it.id.value == screen.scopeId },
+            onBack = { navController.popBackStack() },
+            onSaveScope = { title ->
+              viewModel.take(UpdateScopeName(screen.scopeId.toUuid(), title))
+              navController.popBackStack()
+            }
+          )
+        }
+
       }
 
 //      composable<CreateScope> { backStackEntry ->

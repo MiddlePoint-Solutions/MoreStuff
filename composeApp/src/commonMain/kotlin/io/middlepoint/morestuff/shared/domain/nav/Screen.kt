@@ -11,9 +11,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-sealed class Screen {
-
-}
+sealed class Screen
 
 @Serializable
 data class SignIn(val isOldUser: Boolean = false) : Screen()

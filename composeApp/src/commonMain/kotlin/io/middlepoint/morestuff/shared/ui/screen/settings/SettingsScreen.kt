@@ -40,7 +40,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,9 +58,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
@@ -75,10 +71,6 @@ import io.middlepoint.morestuff.android.data.Constants.REDDIT_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
 import io.middlepoint.morestuff.shared.platform.Platform
 import io.middlepoint.morestuff.shared.platform.formatString
 import io.middlepoint.morestuff.shared.platform.platform
@@ -86,7 +78,6 @@ import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
@@ -124,56 +115,6 @@ import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.koinInject
-
-
-@Composable
-fun SettingsScreen(
-  onBack: () -> Unit,
-) {
-
-  val navController = rememberNavController()
-  val viewModel = koinInject<SettingsViewModel>()
-
-  val model by viewModel.models.collectAsState()
-
-  NavHost(
-    navController = navController,
-    startDestination = Root
-  ) {
-    composable<Root> {
-      SettingsContent(
-        // TODO: pass ViewModel::take and a router lambda to reduce the number of properties.
-        onBack = onBack,
-        model = model,
-        selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-        selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-        enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
-        showDevSettings = { navController.navigate(Developer) },
-        showScopesSettings = { navController.navigate(Scopes) },
-        showLibraries = { navController.navigate(AboutLibraries) },
-        signOut = { viewModel.take(SettingsEvent.SignOut) },
-        openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
-        setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
-      )
-    }
-
-    composable<Developer> {
-      DevSettingsScreen(
-        onBack = { navController.popBackStack() },
-        onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) }
-      )
-    }
-
-    composable<Scopes> {
-      ScopesScreen(onBack = { navController.popBackStack() })
-    }
-
-    composable<AboutLibraries> {
-      AboutLibrariesScreen(onBack = { navController.popBackStack() })
-    }
-  }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

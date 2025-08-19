@@ -41,6 +41,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
@@ -54,6 +55,7 @@ import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.show
+import io.middlepoint.morestuff.shared.ui.platform.BackHandler
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearPlanPriority
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
@@ -90,7 +92,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
   navigateToSettings: () -> Unit,
@@ -115,6 +117,10 @@ fun HomeScreen(
   val model by homeState.models.collectAsState()
   var isReorderingActive by remember { mutableStateOf(false) }
 
+  BackHandler(isReorderingActive) {
+    homeState.take(ResetHomeState)
+    isReorderingActive = false
+  }
 
   MoreStuffHomeScaffold(
     snackbarHostState = snackbarHostState,

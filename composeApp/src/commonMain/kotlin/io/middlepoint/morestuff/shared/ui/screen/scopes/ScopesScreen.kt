@@ -38,7 +38,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,16 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import io.middlepoint.morestuff.shared.data.utils.toUuid
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.channels.Channel
@@ -76,60 +68,8 @@ import morestuff.composeapp.generated.resources.edit_scope
 import morestuff.composeapp.generated.resources.sure_delete_scope
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
-
-@Composable
-fun ScopesScreen(
-  onBack: () -> Unit,
-) {
-
-  val viewModel = koinInject<ScopesViewModel>()
-  val model by viewModel.models.collectAsState()
-  val navController = rememberNavController()
-
-  NavHost(
-    navController = navController,
-    startDestination = ScopeScreen.Root
-  ) {
-
-    composable<ScopeScreen.Root> {
-      ScopesContent(
-        model = model,
-        onBack = onBack,
-        onCreateScope = { navController.navigate(ScopeScreen.Create) },
-        onEditScope = { scope ->
-          navController.navigate(ScopeScreen.Edit(scope.id.value))
-        },
-        onEvent = viewModel::take
-      )
-    }
-
-    composable<ScopeScreen.Create> {
-      CreateScopeScreen(
-        onBack = { navController.popBackStack() },
-        onSaveScope = { title ->
-          viewModel.take(ScopesUiEvent.CreateScope(title))
-          navController.popBackStack()
-        }
-      )
-    }
-
-    composable<ScopeScreen.Edit> { backStackEntry ->
-      val screen = backStackEntry.toRoute<ScopeScreen.Edit>()
-      EditScopeScreen(
-        scope = model.scopes.first { it.id.value == screen.scopeId },
-        onBack = { navController.popBackStack() },
-        onSaveScope = { title ->
-          viewModel.take(UpdateScopeName(screen.scopeId.toUuid(), title))
-          navController.popBackStack()
-        }
-      )
-    }
-
-  }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
