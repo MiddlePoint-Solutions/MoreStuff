@@ -20,16 +20,16 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.SearchTasksUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.TaskParams
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.CreateNewTask
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.CreateTaskWithSchedule
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ResetShareState
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ScopeSelected
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.SetPlanPriority
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ShowTaskInput
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdatePlanDate
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdatePlanTime
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.ClearSearchQuery
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.CreateNewTask
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.CreateTaskWithSchedule
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.ResetShareState
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.SetPlanPriority
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.ShowTaskInput
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.UpdatePlanDate
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.UpdatePlanTime
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.UpdateSearchQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -44,9 +44,9 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @Composable
-fun shareModel(
-  initialState: ShareModel,
-  events: Flow<ShareEvent>,
+fun importModel(
+  initialState: ImportModel,
+  events: Flow<ImportEvent>,
   store: AppStore = koinInject(),
   getScopesFlowUseCase: GetScopesFlowUseCase = koinInject(),
   searchTasksUseCase: SearchTasksUseCase = koinInject(),
@@ -54,7 +54,7 @@ fun shareModel(
   taskUiMapper: TaskUiMapper = koinInject(),
   timeManager: TimeManager = koinInject(),
   timeFormatter: TimeFormatter = koinInject(),
-): ShareModel {
+): ImportModel {
 
   var state by remember(initialState) { mutableStateOf(initialState) }
   val searchQueryFlow = remember { MutableStateFlow("") }
@@ -139,7 +139,7 @@ fun shareModel(
           )
         }
 
-        is ShareEvent.ClearPlanPriority -> {
+        is ImportEvent.ClearPlanPriority -> {
           state = state.copy(
             planTime = null
           )

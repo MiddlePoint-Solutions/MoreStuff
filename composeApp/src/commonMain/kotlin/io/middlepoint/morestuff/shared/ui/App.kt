@@ -6,10 +6,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.nav.SignIn
 import io.middlepoint.morestuff.shared.ui.local.ProvideAppTheme
@@ -24,11 +28,11 @@ import org.koin.compose.koinInject
 @Composable
 fun App(
   screen: Screen? = null,
-  accessToken: String? = null // TODO: this is super ugly
+  accessToken: String? = null, // TODO: this is super ugly
+  logger: Logger = Logger.withTag("App")
 ) {
 
   KoinContext {
-    val navController = rememberNavController()
     val viewModel = koinInject<MainViewModel>()
     val model by viewModel.models.collectAsState()
     val supabase: SupabaseClient = koinInject()
@@ -46,28 +50,37 @@ fun App(
         Box(
           modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
+          val navController = rememberNavController()
 
           if (model.ready) {
+
+            val startDestination by remember(model) {
+              derivedStateOf {
+                if (model.isAuthenticated) {
+                  Home
+                } else {
+                  SignIn(model.showOldUserMessage)
+                }
+              }
+            }
+
             MainContent(
               navController = navController,
+              startDestination = startDestination,
               shareContent = { taskId, content ->
                 viewModel.take(MainEvent.ShareContent(taskId, content))
               }
             )
 
-            if (!model.isAuthenticated) {
-              navController.navigate(SignIn(model.showOldUserMessage))
+            LaunchedEffect(screen) {
+              if (model.isAuthenticated && screen != null) {
+                logger.d { "Navigating to $screen: ${navController.graph.nodes}" }
+                navController.navigate(screen)
+              }
             }
           }
         }
       }
     }
-
-    LaunchedEffect(screen) {
-      if (screen != null) {
-        navController.navigate(screen.toString())
-      }
-    }
-
   }
 }

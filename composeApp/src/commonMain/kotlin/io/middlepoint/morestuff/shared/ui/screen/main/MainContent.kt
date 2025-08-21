@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.main
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -13,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navOptions
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import io.middlepoint.morestuff.shared.data.utils.toUuid
@@ -21,9 +24,11 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.ImagePreview
+import io.middlepoint.morestuff.shared.domain.nav.Import
 import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.nav.Scopes
+import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
@@ -67,7 +72,7 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.DevSettingsScreen
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsContent
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsEvent
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareScreen
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -78,31 +83,49 @@ import kotlin.reflect.typeOf
 @Composable
 fun MainContent(
   navController: NavHostController,
+  startDestination: Screen,
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
 ) {
+
   CompositionLocalProvider(
     LocalScreenSize provides getScreenSizeInfo(),
   ) {
+
     NavHost(
       navController = navController,
-      startDestination = Home,
+      startDestination = startDestination,
       enterTransition = { slideInHorizontally { it } + fadeIn() },
-      exitTransition = { slideOutHorizontally { -it } + fadeOut() },
+      exitTransition = {
+        slideOutHorizontally { -it } +
+                fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
+      },
       popEnterTransition = { slideInHorizontally { -it / 2 } + fadeIn() },
       popExitTransition = { slideOutHorizontally { it / 2 } + fadeOut() }
     ) {
-      composable<SignIn> { backStackEntry ->
+
+      composable<SignIn>(
+        enterTransition = { fadeIn() },
+        exitTransition = { fadeOut() },
+      ) { backStackEntry ->
         val screen = backStackEntry.toRoute<SignIn>()
         SignInScreen(
           isOldUser = screen.isOldUser,
-          onNext = { navController.navigate(Home) },
+          onNext = {
+            navController.navigate(Home) {
+              popUpTo(startDestination) { inclusive = true }
+            }
+          },
           onSignInWithEmail = { navController.navigate(SignInEmail) }
         )
       }
 
       composable<SignInEmail> {
         SignInEmailScreen(
-          onNext = { navController.navigate(Home) }
+          onNext = {
+            navController.navigate(Home) {
+              popUpTo(startDestination) { inclusive = true }
+            }
+          }
         )
       }
 
@@ -323,7 +346,7 @@ fun MainContent(
         typeMap = mapOf(typeOf<Shareable>() to ShareableNavType)
       ) { backStackEntry ->
         val screen = backStackEntry.toRoute<Share>()
-        ShareScreen(
+        ImportScreen(
           onBack = { navController.popBackStack() },
           shareable = screen.shareable,
         ) { taskId, shareable ->
@@ -335,6 +358,31 @@ fun MainContent(
           }
         }
       }
+
+      composable<Import.Text> { backStackEntry ->
+        val screen = backStackEntry.toRoute<Import.Text>()
+        ImportScreen(
+          onBack = { navController.popBackStack() },
+          shareable = Shareable.Text(screen.message),
+        ) { taskId, shareable ->
+          shareContent(taskId, shareable)
+          navController.navigate(
+            route = TaskChat(taskId.value),
+            navOptions = navOptions { popUpTo(Home) }
+          )
+        }
+      }
+
+      composable<Import.Image> { backStackEntry ->
+        val screen = backStackEntry.toRoute<Import.Image>()
+        ImportScreen(
+          onBack = { navController.popBackStack() },
+          shareable = Shareable.Image(screen.uri, ""),
+        ) { taskId, shareable ->
+          navController.navigate(ImagePreview(screen.uri, taskId.value))
+        }
+      }
+
     }
   }
 }

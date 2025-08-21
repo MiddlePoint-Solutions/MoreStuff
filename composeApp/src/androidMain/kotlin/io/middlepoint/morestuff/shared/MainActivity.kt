@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
@@ -27,6 +28,7 @@ import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Compani
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Home
+import io.middlepoint.morestuff.shared.domain.nav.Import
 import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.domain.nav.Share
@@ -38,6 +40,8 @@ import org.koin.compose.KoinContext
 class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    val splashScreen = installSplashScreen()
+
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
 
@@ -81,7 +85,8 @@ class MainActivity : AppCompatActivity() {
         when {
           "text/plain" == intent.type -> {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-              Share(Shareable.Text(it), it)
+//              Share(Shareable.Text(it))
+              Import.Text(it)
             }
           }
 
@@ -103,10 +108,8 @@ class MainActivity : AppCompatActivity() {
       }
 
       Intent.ACTION_VIEW -> {
-
         val uri = intent.data
         Logger.d("DeepLink URI: $uri")
-
         if (uri?.scheme == "app.morestuff" && uri.host == "login-callback") {
           Home
         } else {

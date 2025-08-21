@@ -1,12 +1,10 @@
 package io.middlepoint.morestuff.shared.domain.nav
 
-import androidx.core.bundle.Bundle
 import androidx.navigation.NavType
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
 import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -20,7 +18,7 @@ data class SignIn(val isOldUser: Boolean = false) : Screen()
 data object SignInEmail : Screen()
 
 @Serializable
-object Home : Screen()
+data object Home : Screen()
 
 @Serializable
 data class Review(val scopeId: String) : Screen()
@@ -32,7 +30,7 @@ data object Settings : Screen()
 data class TaskChat(val taskId: String) : Screen()
 
 @Serializable
-data class Share(val shareable: Shareable, val content: String) : Screen()
+data class Share(val shareable: Shareable) : Screen()
 
 @Serializable
 data class ImagePreview(val imageUri: String, val taskId: String) : Screen()
@@ -40,8 +38,17 @@ data class ImagePreview(val imageUri: String, val taskId: String) : Screen()
 @Serializable
 data object Scopes : Screen()
 
-//@Serializable
-//data class CreateScope(val onSave: (String) -> Unit) : Screen()
+@Serializable
+sealed class Import: Screen() {
+  @Serializable
+  data class Text(val message: String) : Import()
+
+  @Serializable
+  data class Image(val uri: String) : Import()
+
+  @Serializable
+  data class Document(val uri: String) : Import()
+}
 
 
 data object ShareableNavType : NavType<Shareable>(isNullableAllowed = false) {
@@ -63,5 +70,4 @@ data object ShareableNavType : NavType<Shareable>(isNullableAllowed = false) {
   override fun parseValue(value: String): Shareable {
     return Json.decodeFromString(value)
   }
-
 }

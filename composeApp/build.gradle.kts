@@ -209,6 +209,7 @@ kotlin {
         api(libs.workKtx)
 
         implementation(libs.googleServices)
+        implementation(libs.androidx.splash)
       }
     }
 

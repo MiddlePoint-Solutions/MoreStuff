@@ -68,8 +68,8 @@ import io.middlepoint.morestuff.shared.ui.screen.home.ScopeTabs
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.ClearSearchQuery
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareEvent.UpdateSearchQuery
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.ClearSearchQuery
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportEvent.UpdateSearchQuery
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onCompletion
@@ -89,7 +89,7 @@ import org.koin.core.qualifier.named
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShareScreen(
+fun ImportScreen(
   onBack: () -> Unit,
   shareable: Shareable,
   shareToExistingTask: (taskId: Uuid, shareable: Shareable) -> Unit,
@@ -97,7 +97,7 @@ fun ShareScreen(
 
   var isSearchActive by remember { mutableStateOf(false) }
 
-  val viewModel: ShareViewModel = koinInject(parameters = {
+  val viewModel: ImportViewModel = koinInject(parameters = {
     parametersOf(shareable)
   })
   val state by viewModel.models.collectAsState()
@@ -219,8 +219,8 @@ fun ShareScreen(
 
 @Composable
 private fun ShareContent(
-  model: ShareModel,
-  onEvent: (ShareEvent) -> Unit,
+  model: ImportModel,
+  onEvent: (ImportEvent) -> Unit,
   shareToTask: (taskId: Uuid) -> Unit,
   modifier: Modifier = Modifier,
 ) {
@@ -241,7 +241,7 @@ private fun ShareContent(
           launch { states[currentScopePage].animateScrollToItem(0) }
           currentScopePage = page
         }
-        onEvent(ShareEvent.ScopeSelected(scopes[page].id))
+        onEvent(ImportEvent.ScopeSelected(scopes[page].id))
       }
   }
 
@@ -276,21 +276,21 @@ private fun ShareContent(
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
-                onEvent(ShareEvent.CreateTaskWithSchedule(text))
+                onEvent(ImportEvent.CreateTaskWithSchedule(text))
               } else {
-                onEvent(ShareEvent.CreateNewTask(text))
+                onEvent(ImportEvent.CreateNewTask(text))
               }
             }
           },
-          onCancel = { onEvent(ShareEvent.ResetShareState) },
-          onDateChange = { onEvent(ShareEvent.UpdatePlanDate(it)) },
-          onTimeChange = { h, m -> onEvent(ShareEvent.UpdatePlanTime(h, m)) },
-          onSetPriority = {onEvent(ShareEvent.SetPlanPriority)},
-          onClearSetPriority = {onEvent(ShareEvent.ClearPlanPriority)},
+          onCancel = { onEvent(ImportEvent.ResetShareState) },
+          onDateChange = { onEvent(ImportEvent.UpdatePlanDate(it)) },
+          onTimeChange = { h, m -> onEvent(ImportEvent.UpdatePlanTime(h, m)) },
+          onSetPriority = {onEvent(ImportEvent.SetPlanPriority)},
+          onClearSetPriority = {onEvent(ImportEvent.ClearPlanPriority)},
           schedule = schedule,
         )
       } else {
-        CreateNewTaskItem { onEvent(ShareEvent.ShowTaskInput) }
+        CreateNewTaskItem { onEvent(ImportEvent.ShowTaskInput) }
       }
     }
 
@@ -300,13 +300,12 @@ private fun ShareContent(
         .graphicsLayer {
           alpha = if (taskInputActive) 0.5f else 1f
         },
-      key = { model.scopes[it].id }
+      key = { model.scopes[it].id.value }
     ) { page ->
 
       val scope = model.scopes[page]
 
       val scopeViewModel: ScopeTasksViewModel = koinInject(
-        qualifier = named("Scope${scope.id.value}"),
         parameters = { parametersOf(scope.id) }
       )
 
@@ -315,7 +314,7 @@ private fun ShareContent(
       when (val tasksModel = scopeTasks) {
         is ScopeTasksModels.Data -> {
           if (tasksModel.tasks.isEmpty()) {
-            EmptyScopeContent { onEvent(ShareEvent.ShowTaskInput) }
+            EmptyScopeContent { onEvent(ImportEvent.ShowTaskInput) }
           } else {
             ScopeContent(
               tasks = tasksModel.tasks,

@@ -6,7 +6,7 @@ import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 
-data class ShareModel(
+data class ImportModel(
   val shareable: Shareable,
   val currentScopeId: Uuid? = null,
   val taskInputActive: Boolean = false,
@@ -18,16 +18,16 @@ data class ShareModel(
   val planTime: ScheduleUiModel? = null,
 )
 
-sealed class ShareEvent {
-    data object ResetShareState: ShareEvent()
-    data object ShowTaskInput: ShareEvent()
-    data object ClearSearchQuery : ShareEvent()
-    data class UpdateSearchQuery(val query: String) : ShareEvent()
-    data class ScopeSelected(val scopeId: Uuid) : ShareEvent()
-    data class CreateNewTask(val title: String) : ShareEvent()
-    data class CreateTaskWithSchedule(val title: String) : ShareEvent()
-    data class UpdatePlanTime(val hour: Int, val minute: Int) : ShareEvent()
-    data class UpdatePlanDate(val dateMillis: Long) : ShareEvent()
-    data object SetPlanPriority : ShareEvent()
-    data object ClearPlanPriority : ShareEvent()
+sealed class ImportEvent {
+    data object ResetShareState: ImportEvent()
+    data object ShowTaskInput: ImportEvent()
+    data object ClearSearchQuery : ImportEvent()
+    data class UpdateSearchQuery(val query: String) : ImportEvent()
+    data class ScopeSelected(val scopeId: Uuid) : ImportEvent()
+    data class CreateNewTask(val title: String) : ImportEvent()
+    data class CreateTaskWithSchedule(val title: String) : ImportEvent()
+    data class UpdatePlanTime(val hour: Int, val minute: Int) : ImportEvent()
+    data class UpdatePlanDate(val dateMillis: Long) : ImportEvent()
+    data object SetPlanPriority : ImportEvent()
+    data object ClearPlanPriority : ImportEvent()
 }

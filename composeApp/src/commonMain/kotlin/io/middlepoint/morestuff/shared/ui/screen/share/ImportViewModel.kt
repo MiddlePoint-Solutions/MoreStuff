@@ -5,12 +5,12 @@ import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow
 
-class ShareViewModel(shareable: Shareable) : MoleculeViewModel<ShareEvent, ShareModel>() {
+class ImportViewModel(shareable: Shareable) : MoleculeViewModel<ImportEvent, ImportModel>() {
 
-  override val initialState: ShareModel = ShareModel(shareable)
+  override val initialState: ImportModel = ImportModel(shareable)
 
   @Composable
-  override fun models(events: SharedFlow<ShareEvent>): ShareModel {
-    return shareModel(initialState, events)
+  override fun models(events: SharedFlow<ImportEvent>): ImportModel {
+    return importModel(initialState, events)
   }
 }

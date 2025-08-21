@@ -15,7 +15,7 @@ import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchViewModel
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
-import io.middlepoint.morestuff.shared.ui.screen.share.ShareViewModel
+import io.middlepoint.morestuff.shared.ui.screen.share.ImportViewModel
 import org.koin.core.module.dsl.*
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
@@ -31,7 +31,7 @@ val presentationModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::ScopeTasksViewModel)
 
-    viewModelOf(::ShareViewModel)
+    viewModelOf(::ImportViewModel)
     viewModelOf(::SearchViewModel)
     viewModelOf(::VoiceToTextViewModel)
     viewModelOf(::ScopesViewModel)
