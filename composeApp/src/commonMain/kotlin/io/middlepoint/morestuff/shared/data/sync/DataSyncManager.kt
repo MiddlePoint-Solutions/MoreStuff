@@ -155,6 +155,7 @@ class DataSyncManagerImpl(
     append("Tasks: ${data.tasks.count()}")
     appendLine()
     append("Scopes: ${data.scopes.count()}")
+//    append("Scopes: ${data.scopes}")
     appendLine()
     append("TasksScopes: ${data.tasksScopes.count()}")
     appendLine()

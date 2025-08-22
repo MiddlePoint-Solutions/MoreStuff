@@ -8,6 +8,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -173,7 +174,7 @@ fun MainContent(
 
         animatedComposable<ScopeScreen.Root> {
 
-          val viewModel = koinInject<ScopesViewModel>()
+          val viewModel = viewModel<ScopesViewModel>()
           val model by viewModel.models.collectAsState()
 
           ScopesContent(
@@ -189,7 +190,7 @@ fun MainContent(
 
         animatedComposable<ScopeScreen.Create> {
 
-          val viewModel = koinInject<ScopesViewModel>()
+          val viewModel = viewModel<ScopesViewModel>()
 
           CreateScopeScreen(
             onBack = { navController.popBackStack() },
@@ -202,7 +203,7 @@ fun MainContent(
 
         animatedComposable<ScopeScreen.Edit> { backStackEntry ->
 
-          val viewModel = koinInject<ScopesViewModel>()
+          val viewModel = viewModel<ScopesViewModel>()
           val model by viewModel.models.collectAsState()
 
           val screen = backStackEntry.toRoute<ScopeScreen.Edit>()
