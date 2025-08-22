@@ -156,11 +156,11 @@ fun OnBoardingSignInContent(
 
         if (platform == Platform.Android) {
 
-          if (!isOldUser) {
-
+          if (isOldUser) {
             Text(
               "Existing user?\nMoreStuff is entering its next phase!\nYour data is safe and will be synced to the cloud.",
-              color = Color.White
+              color = Color.White,
+              textAlign = TextAlign.Center,
             )
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -30,9 +30,6 @@ data object Settings : Screen()
 data class TaskChat(val taskId: String) : Screen()
 
 @Serializable
-data class Share(val shareable: Shareable) : Screen()
-
-@Serializable
 data class ImagePreview(val imageUri: String, val taskId: String) : Screen()
 
 @Serializable

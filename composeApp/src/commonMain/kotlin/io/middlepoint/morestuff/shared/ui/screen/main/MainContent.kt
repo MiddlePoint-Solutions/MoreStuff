@@ -1,11 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.screen.main
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -33,12 +29,11 @@ import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
 import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.nav.Settings
-import io.middlepoint.morestuff.shared.domain.nav.Share
-import io.middlepoint.morestuff.shared.domain.nav.ShareableNavType
 import io.middlepoint.morestuff.shared.domain.nav.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.TaskChat
 import io.middlepoint.morestuff.shared.platform.createKmpFile
+import io.middlepoint.morestuff.shared.ui.extension.animatedComposable
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatContent
@@ -78,7 +73,6 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
-import kotlin.reflect.typeOf
 
 @Composable
 fun MainContent(
@@ -93,14 +87,7 @@ fun MainContent(
 
     NavHost(
       navController = navController,
-      startDestination = startDestination,
-      enterTransition = { slideInHorizontally { it } + fadeIn() },
-      exitTransition = {
-        slideOutHorizontally { -it } +
-                fadeOut(spring(stiffness = Spring.StiffnessMediumLow))
-      },
-      popEnterTransition = { slideInHorizontally { -it / 2 } + fadeIn() },
-      popExitTransition = { slideOutHorizontally { it / 2 } + fadeOut() }
+      startDestination = startDestination
     ) {
 
       composable<SignIn>(
@@ -119,7 +106,7 @@ fun MainContent(
         )
       }
 
-      composable<SignInEmail> {
+      animatedComposable<SignInEmail> {
         SignInEmailScreen(
           onNext = {
             navController.navigate(Home) {
@@ -146,7 +133,7 @@ fun MainContent(
 
       navigation<Settings>(Root) {
 
-        composable<Root> {
+        animatedComposable<Root> {
 
           val viewModel = koinInject<SettingsViewModel>()
           val model by viewModel.models.collectAsState()
@@ -167,7 +154,7 @@ fun MainContent(
           )
         }
 
-        composable<Developer> {
+        animatedComposable<Developer> {
 
           val viewModel = koinInject<SettingsViewModel>()
 
@@ -177,14 +164,14 @@ fun MainContent(
           )
         }
 
-        composable<AboutLibraries> {
+        animatedComposable<AboutLibraries> {
           AboutLibrariesScreen(onBack = { navController.popBackStack() })
         }
       }
 
       navigation<Scopes>(ScopeScreen.Root) {
 
-        composable<ScopeScreen.Root> {
+        animatedComposable<ScopeScreen.Root> {
 
           val viewModel = koinInject<ScopesViewModel>()
           val model by viewModel.models.collectAsState()
@@ -200,7 +187,7 @@ fun MainContent(
           )
         }
 
-        composable<ScopeScreen.Create> {
+        animatedComposable<ScopeScreen.Create> {
 
           val viewModel = koinInject<ScopesViewModel>()
 
@@ -213,7 +200,7 @@ fun MainContent(
           )
         }
 
-        composable<ScopeScreen.Edit> { backStackEntry ->
+        animatedComposable<ScopeScreen.Edit> { backStackEntry ->
 
           val viewModel = koinInject<ScopesViewModel>()
           val model by viewModel.models.collectAsState()
@@ -240,7 +227,7 @@ fun MainContent(
 //      }
 
       // TODO:
-      composable<TaskChat> { backStackEntry ->
+      animatedComposable<TaskChat> { backStackEntry ->
 
         val screen = backStackEntry.toRoute<ChatScreen.Chat>()
 
@@ -342,23 +329,6 @@ fun MainContent(
         )
       }
 
-      composable<Share>(
-        typeMap = mapOf(typeOf<Shareable>() to ShareableNavType)
-      ) { backStackEntry ->
-        val screen = backStackEntry.toRoute<Share>()
-        ImportScreen(
-          onBack = { navController.popBackStack() },
-          shareable = screen.shareable,
-        ) { taskId, shareable ->
-          if (shareable is Shareable.Image) {
-            navController.navigate(ImagePreview(shareable.uri, taskId.value))
-          } else {
-            navController.navigate(TaskChat(taskId.value))
-            shareContent(taskId, shareable)
-          }
-        }
-      }
-
       composable<Import.Text> { backStackEntry ->
         val screen = backStackEntry.toRoute<Import.Text>()
         ImportScreen(
@@ -386,3 +356,4 @@ fun MainContent(
     }
   }
 }
+

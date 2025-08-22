@@ -1,13 +1,10 @@
 package io.middlepoint.morestuff.shared
 
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,22 +13,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
-import androidx.core.view.WindowCompat
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.handleDeeplinks
 import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
-import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
-import io.middlepoint.morestuff.shared.domain.model.Shareable
-import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Import
 import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.nav.Share
 import io.middlepoint.morestuff.shared.domain.nav.TaskChat
 import io.middlepoint.morestuff.shared.ui.App
 import org.koin.android.ext.android.get
@@ -44,11 +36,10 @@ class MainActivity : AppCompatActivity() {
 
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
+    FileKit.init(this)
 
     val supabase = get<SupabaseClient>()
     val launchScreen = handleLaunchIntent(intent)
-    FileKit.init(this)
-
     supabase.handleDeeplinks(intent)
 
     setContent {
