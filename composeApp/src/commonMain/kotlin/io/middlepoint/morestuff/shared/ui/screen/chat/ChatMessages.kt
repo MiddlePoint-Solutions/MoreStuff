@@ -112,12 +112,12 @@ fun Messages(
 
             when (item.contentType) {
               ContentType.TASK_MESSAGE,
-              ContentType.USER_NEW_TASK -> UserChatItem(
+              ContentType.USER_TASK -> UserChatItem(
                 message = item,
                 actions = actions,
               )
 
-              ContentType.CONFIRM_NEW_TASK,
+              ContentType.CONFIRM_TASK,
               ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
               ContentType.AI_TASK_MESSAGE -> {
                 logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }

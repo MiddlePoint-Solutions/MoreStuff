@@ -261,8 +261,6 @@ fun TaskChatContent(
   }
 
   val completionMessage = stringResource(Res.string.task_chat_complete_message)
-
-
   val prevIsComplete = remember { mutableStateOf(task.isComplete) }
 
   LaunchedEffect(task.isComplete) {

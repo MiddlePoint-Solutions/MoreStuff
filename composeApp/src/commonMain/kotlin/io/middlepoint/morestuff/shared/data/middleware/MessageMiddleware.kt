@@ -118,11 +118,10 @@ class MessageMiddleware(
                 createMessageUseCase(
                     action.task.id,
                     title = action.task.title,
-                    contentType = ContentType.USER_NEW_TASK,
+                    contentType = ContentType.USER_TASK,
                     messageExtra = null,
                     scheduleId = null
                 )
-                createTaskConfirmationMessageUseCase(action.task.id, action.priority)
             }
 
             is MessageAction.UpdateMessageContentAction -> scope.launch {

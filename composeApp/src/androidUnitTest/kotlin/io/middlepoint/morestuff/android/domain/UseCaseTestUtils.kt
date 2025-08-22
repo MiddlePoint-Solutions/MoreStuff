@@ -124,7 +124,7 @@ fun createMessageForTest(
   id: Uuid = Uuid.generate(),
   taskId: Uuid = Uuid.generate(),
   scheduleId: Uuid = Uuid.generate(),
-  contentType: ContentType = ContentType.CONFIRM_NEW_TASK,
+  contentType: ContentType = ContentType.CONFIRM_TASK,
   content: String = "",
   openGraphResult: OpenGraphResult = OpenGraphResult(),
   messageExtra: MessageExtra = MessageExtra(

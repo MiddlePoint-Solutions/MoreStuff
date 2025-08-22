@@ -25,7 +25,7 @@ class CreateMessageUseCaseImplTest {
     val taskId = Uuid("1")
     val scheduleId = Uuid("1")
     val title = "Test Message"
-    val contentType = ContentType.CONFIRM_NEW_TASK
+    val contentType = ContentType.CONFIRM_TASK
     val messageExtra: MessageExtra? = null
     val expectedMessage = createMessageForTest()
 

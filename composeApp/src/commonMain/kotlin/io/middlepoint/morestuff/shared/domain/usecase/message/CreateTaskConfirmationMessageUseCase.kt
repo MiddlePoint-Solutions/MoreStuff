@@ -25,7 +25,7 @@ class CreateTaskConfirmationMessageUseCaseImpl(
         createMessageUseCase(
             taskId,
             title = confirmTitle,
-            contentType = ContentType.CONFIRM_NEW_TASK,
+            contentType = ContentType.CONFIRM_TASK,
             messageExtra = null,
             scheduleId = null
         )

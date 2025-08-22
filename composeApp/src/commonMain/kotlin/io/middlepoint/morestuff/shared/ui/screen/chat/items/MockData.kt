@@ -56,7 +56,7 @@ object MockData {
       id = Uuid("id"),
       taskId = Uuid("taskId"),
       scheduleId = null,
-      contentType = ContentType.USER_NEW_TASK,
+      contentType = ContentType.USER_TASK,
       createdAt = Clock.System.now(),
       updatedAt = Clock.System.now(),
       content = "Hello there!",

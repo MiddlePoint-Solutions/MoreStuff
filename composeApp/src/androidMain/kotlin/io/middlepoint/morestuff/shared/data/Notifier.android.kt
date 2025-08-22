@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.data
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -24,9 +23,7 @@ import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
 import io.middlepoint.morestuff.shared.app.receiver.createReplyIntent
-import io.middlepoint.morestuff.shared.app.receiver.random
 import io.middlepoint.morestuff.shared.app.receiver.randomRequestCode
-import io.middlepoint.morestuff.shared.data.utils.inEpochMilliseconds
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType.DONE
@@ -238,7 +235,7 @@ class NotifierImpl(
 
   private fun getMessagePerson(messageType: ContentType): Person {
     return when (messageType) {
-      ContentType.CONFIRM_NEW_TASK,
+      ContentType.CONFIRM_TASK,
       ContentType.TASK_REMINDER -> appPerson
 
       else -> userPerson
