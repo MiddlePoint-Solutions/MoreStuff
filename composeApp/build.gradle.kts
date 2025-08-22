@@ -300,6 +300,14 @@ buildConfig {
     }
   )
 
+  buildConfigField(
+    name = "SENTRY_DSN",
+    value = provider {
+      localProperties.getPropertyOrNull("SENTRY_DSN")
+        ?: System.getenv("SENTRY_DSN")
+    }
+  )
+
   // Deeplinks
 
   buildConfigField(

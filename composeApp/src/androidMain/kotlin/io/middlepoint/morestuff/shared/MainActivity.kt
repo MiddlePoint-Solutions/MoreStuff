@@ -20,7 +20,6 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
-import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Import
 import io.middlepoint.morestuff.shared.domain.nav.Review
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -38,9 +37,7 @@ class MainActivity : AppCompatActivity() {
     enableEdgeToEdge()
     FileKit.init(this)
 
-    val supabase = get<SupabaseClient>()
     val launchScreen = handleLaunchIntent(intent)
-    supabase.handleDeeplinks(intent)
 
     setContent {
       KoinContext {
@@ -57,7 +54,6 @@ class MainActivity : AppCompatActivity() {
         DisposableEffect(Unit) {
           val listener = Consumer<Intent> {
             Logger.d("onNewIntent: $it")
-            supabase.handleDeeplinks(it)
             initialScreen = handleLaunchIntent(it)
             Logger.d("initialScreen: $initialScreen")
           }
@@ -76,7 +72,6 @@ class MainActivity : AppCompatActivity() {
         when {
           "text/plain" == intent.type -> {
             intent.getStringExtra(Intent.EXTRA_TEXT)?.let {
-//              Share(Shareable.Text(it))
               Import.Text(it)
             }
           }
@@ -102,10 +97,13 @@ class MainActivity : AppCompatActivity() {
         val uri = intent.data
         Logger.d("DeepLink URI: $uri")
         if (uri?.scheme == "app.morestuff" && uri.host == "login-callback") {
-          Home
-        } else {
-          null
+          try {
+            get<SupabaseClient>().handleDeeplinks(intent)
+          } catch (e: IllegalArgumentException) {
+            Logger.e("handleDeeplinks error", e)
+          }
         }
+        null
       }
 
       ACTION_NOTIFICATION_REMINDER -> {
