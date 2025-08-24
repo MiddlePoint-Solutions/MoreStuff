@@ -10,12 +10,11 @@ struct SwiftUIApp: App {
         StartSdkKt.startSdk(navigationHelper: navigationHelper)
     }
     
-    var defaultRouterContext: RouterContext { delegate.holder.defaultRouterContext }
     var navigationHelper: NavigationHelper { delegate.navigationHelper }
     
     var body: some Scene {
         WindowGroup {
-            HomeView(routerContext: defaultRouterContext)
+            HomeView()
                 .ignoresSafeArea(edges: .all)
                 .ignoresSafeArea(.keyboard)
                 .onOpenURL { url in
@@ -33,15 +32,6 @@ struct SwiftUIApp: App {
                     }
                 }
         }
-    
-    .onChange(of: scenePhase) { newPhase in
-        switch newPhase {
-        case .background: defaultRouterContext.stop()
-        case .inactive: defaultRouterContext.pause()
-        case .active: defaultRouterContext.resume()
-        @unknown default: break
-        }
-    } // Compose has own keyboard handler
   }
 }
 
@@ -84,20 +74,9 @@ private func handleFileURL(_ url: URL, navigationHelper: NavigationHelper) {
 }
 
 
-class DefaultRouterHolder : ObservableObject {
-  let defaultRouterContext: RouterContext = DefaultRouterContextKt.defaultRouterContext()
-
-  deinit {
-    // Destroy the root component before it is deallocated
-    defaultRouterContext.destroy()
-  }
-}
-
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
-    let holder: DefaultRouterHolder = DefaultRouterHolder()
     let navigationHelper: NavigationHelper = NavigationHelper()
     let notificationConfigurator = NotificationConfigurator()
-
     
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
@@ -194,20 +173,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             )
         }
     }
-
-
-    
-   
-
 }
 
-
-
 struct HomeView: UIViewControllerRepresentable {
-  let routerContext: RouterContext
 
   func makeUIViewController(context: Context) -> UIViewController {
-    return MainViewControllerKt.MainViewController(routerContext: routerContext)
+    return MainViewControllerKt.MainViewController()
   }
 
   func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
