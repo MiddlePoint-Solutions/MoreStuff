@@ -271,7 +271,9 @@ buildConfig {
 
   buildConfigField(
     name = "DEBUG",
-    value = provider { (property("app.morestuff.debug") as String).toBoolean() }
+    value = provider {
+      localProperties.getPropertyOrNull("DEBUG")?.toBoolean() ?: false
+    }
   )
 
   // Supabase configs
@@ -279,28 +281,28 @@ buildConfig {
   buildConfigField(
     name = "SUPABASE_URL",
     value = provider {
-      getPropertyOrThrow("SUPABASE_URL")
+      getPropertyOrThrow(localProperties, "SUPABASE_URL")
     }
   )
 
   buildConfigField(
     name = "SUPABASE_KEY",
     value = provider {
-      getPropertyOrThrow("SUPABASE_KEY")
+      getPropertyOrThrow(localProperties, "SUPABASE_KEY")
     }
   )
 
   buildConfigField(
     name = "GOOGLE_SERVER_CLIENT_ID",
     value = provider {
-      getPropertyOrThrow("GOOGLE_SERVER_CLIENT_ID")
+      getPropertyOrThrow(localProperties, "GOOGLE_SERVER_CLIENT_ID")
     }
   )
 
   buildConfigField(
     name = "SENTRY_DSN",
     value = provider {
-      getPropertyOrThrow("SENTRY_DSN")
+      getPropertyOrThrow(localProperties, "SENTRY_DSN")
     }
   )
 
@@ -473,8 +475,8 @@ tasks.named("wasmJsProcessResources").configure {
 fun Properties.getPropertyOrNull(key: String): String? =
   getProperty(key)?.takeIf { it.isNotBlank() }
 
-fun getPropertyOrThrow(key: String): String =
-  gradleLocalProperties(rootDir, providers).getPropertyOrNull(key)
+fun getPropertyOrThrow(properties: Properties, key: String): String =
+  properties.getPropertyOrNull(key)
     ?: System.getenv(key)?.takeIf { it.isNotBlank() }
     ?: error("$key not found!")
 

@@ -8,10 +8,12 @@
 sdk.dir=
 kotlin.apple.cocoapods.bin=
 
+DEBUG=true
+
 SUPABASE_URL=
 SUPABASE_KEY=
 GOOGLE_SERVER_CLIENT_ID=
 
-SENTRY_AUTH_TOKEN=
+SENTRY_DSN=
 
 
