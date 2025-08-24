@@ -71,6 +71,8 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
 import io.middlepoint.morestuff.shared.ui.screen.share.ImportScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 import kotlinx.coroutines.launch
+import org.koin.compose.currentKoinScope
+import org.koin.compose.getKoin
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -81,6 +83,8 @@ fun MainContent(
   startDestination: Screen,
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
 ) {
+
+  val koin = getKoin()
 
   CompositionLocalProvider(
     LocalScreenSize provides getScreenSizeInfo(),
@@ -136,7 +140,12 @@ fun MainContent(
 
         animatedComposable<Root> {
 
-          val viewModel = koinInject<SettingsViewModel>()
+          val viewModel = viewModel {
+            SettingsViewModel(
+              store = koin.get(),
+              getApiKeyUseCase = koin.get()
+            )
+          }
           val model by viewModel.models.collectAsState()
 
           SettingsContent(
@@ -174,7 +183,7 @@ fun MainContent(
 
         animatedComposable<ScopeScreen.Root> {
 
-          val viewModel = viewModel<ScopesViewModel>()
+          val viewModel = viewModel { ScopesViewModel() }
           val model by viewModel.models.collectAsState()
 
           ScopesContent(
