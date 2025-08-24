@@ -11,6 +11,7 @@
 local.properties
 iosApp/Podfile.lock
 iosApp/Pods/
+iosApp/build/
 iosApp/iosApp.xcworkspace/
 /.kotlin/
 /supabase/
