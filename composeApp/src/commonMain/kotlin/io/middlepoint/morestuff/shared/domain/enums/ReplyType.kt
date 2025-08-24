@@ -7,7 +7,7 @@ enum class ReplyType(val value: Int) {
     DONE(300);
 
     companion object {
-        fun withValue(value: Int) = run { values().first { it.value == value } }
+        fun withValue(value: Int) = run { entries.first { it.value == value } }
     }
 }
 

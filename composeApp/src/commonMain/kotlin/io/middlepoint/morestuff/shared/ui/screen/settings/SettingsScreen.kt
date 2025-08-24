@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DeveloperBoard
+import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.ModeStandby
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Translate
@@ -33,10 +36,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -49,16 +52,13 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.alorma.compose.settings.ui.SettingsMenuLink
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import com.dokar.sonner.Toaster
 import com.dokar.sonner.rememberToasterState
 import com.mohamedrejeb.calf.permissions.ExperimentalPermissionsApi
@@ -66,37 +66,30 @@ import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.isGranted
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import com.mohamedrejeb.calf.permissions.shouldShowRationale
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.android.data.Constants.DISCORD_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.PRIVACY_POLICY_LINK
+import io.middlepoint.morestuff.android.data.Constants.REDDIT_INVITE_LINK
 import io.middlepoint.morestuff.android.data.Constants.TELEGRAM_INVITE_LINK
-import io.middlepoint.morestuff.shared.Platform
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.AboutLibraries
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Developer
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Root
-import io.middlepoint.morestuff.shared.domain.nav.SettingScreen.Scopes
-import io.middlepoint.morestuff.shared.formatString
-import io.middlepoint.morestuff.shared.platform
+import io.middlepoint.morestuff.shared.platform.Platform
+import io.middlepoint.morestuff.shared.platform.formatString
+import io.middlepoint.morestuff.shared.platform.platform
+import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.priority.PriorityTimePicker
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesScreen
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.api_key_not_set
+import morestuff.composeapp.generated.resources.api_key_title
 import morestuff.composeapp.generated.resources.button_enable
 import morestuff.composeapp.generated.resources.button_skip
+import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.cd_select_theme
-import morestuff.composeapp.generated.resources.click_s_to_enable_developer_settings
-import morestuff.composeapp.generated.resources.dev_settings_already_enabled
 import morestuff.composeapp.generated.resources.developer_settings
-import morestuff.composeapp.generated.resources.developer_settings_enabled
-import morestuff.composeapp.generated.resources.ic_discord
+import morestuff.composeapp.generated.resources.ic_reddit
 import morestuff.composeapp.generated.resources.ic_schedule
 import morestuff.composeapp.generated.resources.ic_telegram
 import morestuff.composeapp.generated.resources.join_community
@@ -116,72 +109,27 @@ import morestuff.composeapp.generated.resources.select_language
 import morestuff.composeapp.generated.resources.select_theme
 import morestuff.composeapp.generated.resources.set_review_time
 import morestuff.composeapp.generated.resources.settings
+import morestuff.composeapp.generated.resources.sign_out_message
+import morestuff.composeapp.generated.resources.sign_out_title
 import morestuff.composeapp.generated.resources.title_scopes
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import kotlin.time.Duration.Companion.milliseconds
 
-
-@Composable
-fun SettingsScreen(
-  onBack: () -> Unit,
-) {
-
-  val router = rememberRouter<SettingScreen> { listOf(Root) }
-  val viewModel = koinInjectOnRoute(SettingsViewModel::class)
-
-  val model by viewModel.models.collectAsState()
-
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(slide()),
-  ) { screen ->
-
-    when (screen) {
-      Root -> {
-        SettingsContent(
-          onBack = onBack,
-          model = model,
-          selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
-          /* setReviewTime = { hour, minute ->
-             viewModel.take(
-               SettingsEvent.SetReviewTime(
-                 hour,
-                 minute
-               )
-             )
-           },*/
-          selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
-          enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
-          showDevSettings = { router.push(Developer) },
-          showScopesSettings = { router.push(Scopes) },
-          showLibraries = { router.push(AboutLibraries) },
-        )
-      }
-
-      Developer -> DevSettingsScreen(
-        onBack = router::pop,
-        onDevSettingsDisabled = { viewModel.take(SettingsEvent.EnableDevSettings(false)) })
-
-      Scopes -> ScopesScreen(onBack = router::pop)
-
-      AboutLibraries -> AboutLibrariesScreen(onBack = router::pop)
-    }
-  }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsContent(
   onBack: () -> Unit,
   model: SettingsState,
   selectAppTheme: (Int) -> Unit,
-  //setReviewTime: (Int, Int) -> Unit,
   selectLanguage: (Int) -> Unit,
   enableDevSettings: () -> Unit,
+  signOut: () -> Unit,
   showLibraries: () -> Unit,
   showDevSettings: () -> Unit,
-  showScopesSettings: () -> Unit
+  showScopesSettings: () -> Unit,
+  openAppSettings: () -> Unit,
+  setApiKey: (String) -> Unit
 ) {
 
   val scrollState = rememberScrollState()
@@ -218,21 +166,22 @@ fun SettingsContent(
           defaultValue = { model.appTheme.ordinal }
         )
 
-        /* ReviewTimeSelector(
-           valueChanged = setReviewTime,
-           defaultValue = model.reviewTime,
-         )*/
-        /*SelectLanguage(
-          languageSelected = selectLanguage,
-          defaultValue = { model.inputVoiceLanguage.ordinal }
-        )*/
-
         if (Platform.iOS == platform) {
           NotificationPermissionButton()
         }
 
 
         ScopeSettings(onClick = showScopesSettings)
+
+        if (Platform.Android == platform) {
+          LanguageSettings(onClick = openAppSettings)
+        }
+
+        /*   ApiKeySettings(
+             apiKey = model.apiKey,
+             onApiKeyChange = setApiKey
+           )*/
+
 
         if (model.devSettings) {
           SettingsMenuLink(
@@ -251,6 +200,41 @@ fun SettingsContent(
             )
           )
         }
+
+        var showSignOutBottomSheet by remember { mutableStateOf(false) }
+        val signOutSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+        SettingsMenuLink(
+          title = {
+            Text(text = "Sign out")
+          },
+          icon = {
+            Icon(
+              imageVector = Icons.AutoMirrored.Filled.Logout,
+              contentDescription = ""
+            )
+          },
+          onClick = { showSignOutBottomSheet = true },
+          colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+          )
+        )
+
+        if (showSignOutBottomSheet) {
+
+          DeleteBottomSheet(
+            sheetState = signOutSheetState,
+            onDismissRequest = { showSignOutBottomSheet = false },
+            title = stringResource(Res.string.sign_out_title),
+            message = stringResource(Res.string.sign_out_message),
+            confirmButtonText = stringResource(Res.string.sign_out_title),
+            dismissButtonText = stringResource(Res.string.cancel),
+            onConfirm = {
+              signOut()
+              showSignOutBottomSheet = false
+            },
+          )
+        }
       }
 
       About(
@@ -262,10 +246,56 @@ fun SettingsContent(
         }
       )
     }
+  }
+}
 
+
+@Composable
+fun ApiKeySettings(
+  apiKey: String,
+  onApiKeyChange: (String) -> Unit,
+) {
+  var showBottomSheet by remember { mutableStateOf(false) }
+
+  if (showBottomSheet) {
+    ApiKeyBottomSheet(
+      isVisible = true,
+      onDismiss = { showBottomSheet = false },
+      currentApiKey = apiKey,
+      onSave = onApiKeyChange
+    )
   }
 
+  SettingsMenuLink(
+    title = {
+      Text(text = stringResource(Res.string.api_key_title))
+    },
+    subtitle = {
+      Text(
+        text = if (apiKey.isNotEmpty()) {
+          val visiblePart = apiKey.take(4)
+          val hiddenPart = "*".repeat(minOf(apiKey.length - 4, 8))
+          "$visiblePart$hiddenPart"
+        } else {
+          stringResource(Res.string.api_key_not_set)
+        },
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+      )
+    },
+    onClick = { showBottomSheet = true },
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Key,
+        contentDescription = "API Key"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+  )
 }
+
 
 @Composable
 private fun SelectTheme(
@@ -285,7 +315,7 @@ private fun SelectTheme(
     title = {
       Text(
         text = stringResource(Res.string.select_theme),
-        style = MaterialTheme.typography.titleLarge.copy(
+        style = MaterialTheme.typography.bodyLarge.copy(
           color = MaterialTheme.colorScheme.onSurface
         ),
       )
@@ -304,7 +334,7 @@ private fun SelectTheme(
     },
     closeDialogDelay = 0,
 
-  )
+    )
 }
 
 
@@ -344,20 +374,21 @@ private fun About(
         modifier = Modifier
           .fillMaxWidth()
           .padding(top = 8.dp),
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
       ) {
         IconButton(
-          onClick = { uriHandler.openUri(DISCORD_INVITE_LINK) }
+          onClick = { uriHandler.openUri(REDDIT_INVITE_LINK) }
         ) {
           Icon(
-            imageVector = vectorResource(Res.drawable.ic_discord),
-            contentDescription = "Discord Icon",
+            imageVector = vectorResource(Res.drawable.ic_reddit),
+            contentDescription = "Reddit Icon",
             modifier = Modifier.size(36.dp),
             tint = MaterialTheme.colorScheme.onSurface
           )
         }
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(24.dp))
 
         IconButton(
           onClick = { uriHandler.openUri(TELEGRAM_INVITE_LINK) },
@@ -403,43 +434,45 @@ private fun About(
         Text(
           text = "V${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
           style = MaterialTheme.typography.bodySmall,
-          modifier = Modifier.clickable {
-            scope.launch {
-              if (!devSettingsEnabled) {
-                if (!showDevCounter) {
-                  initialClickCounter++
-                  if (initialClickCounter >= 3) {
-                    showDevCounter = true
-                  }
-                } else {
-                  if (devSettingsCounter > 0) {
-                    val message = getString(
-                      Res.string.click_s_to_enable_developer_settings,
-                      devSettingsCounter.toString()
-                    )
-                    devSettingsCounter -= 1
-                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-                  } else {
-                    enableDevSettings()
-                    val message = getString(
-                      Res.string.developer_settings_enabled,
-                      devSettingsCounter.toString()
-                    )
-                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-                    showDevCounter = false
-                    initialClickCounter = 0
-                    devSettingsCounter = 6
-                  }
-                }
-              } else {
-                val message = getString(
-                  Res.string.dev_settings_already_enabled,
-                  devSettingsCounter.toString()
-                )
-                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
-              }
-            }
-          }
+          // TODO: enable when needed
+//          modifier = Modifier
+//            .clickable {
+//            scope.launch {
+//              if (!devSettingsEnabled) {
+//                if (!showDevCounter) {
+//                  initialClickCounter++
+//                  if (initialClickCounter >= 3) {
+//                    showDevCounter = true
+//                  }
+//                } else {
+//                  if (devSettingsCounter > 0) {
+//                    val message = getString(
+//                      Res.string.click_s_to_enable_developer_settings,
+//                      devSettingsCounter.toString()
+//                    )
+//                    devSettingsCounter -= 1
+//                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//                  } else {
+//                    enableDevSettings()
+//                    val message = getString(
+//                      Res.string.developer_settings_enabled,
+//                      devSettingsCounter.toString()
+//                    )
+//                    toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//                    showDevCounter = false
+//                    initialClickCounter = 0
+//                    devSettingsCounter = 6
+//                  }
+//                }
+//              } else {
+//                val message = getString(
+//                  Res.string.dev_settings_already_enabled,
+//                  devSettingsCounter.toString()
+//                )
+//                toaster.show(message, id = "DevSettings", duration = 400.milliseconds)
+//              }
+//            }
+//          }
         )
       }
     }
@@ -448,11 +481,6 @@ private fun About(
   Toaster(
     state = toaster
   )
-}
-
-@Composable
-private fun showToast() {
-
 }
 
 @Composable
@@ -596,6 +624,23 @@ private fun ScopeSettings(onClick: () -> Unit) {
     icon = {
       Icon(
         imageVector = Icons.Default.ModeStandby,
+        contentDescription = "Scopes"
+      )
+    },
+    colors = ListItemDefaults.colors(
+      containerColor = MaterialTheme.colorScheme.surfaceContainer
+    )
+  )
+}
+
+@Composable
+private fun LanguageSettings(onClick: () -> Unit) {
+  SettingsMenuLink(
+    title = { Text(text = "Language") },
+    onClick = onClick,
+    icon = {
+      Icon(
+        imageVector = Icons.Default.Language,
         contentDescription = "Scopes"
       )
     },

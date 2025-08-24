@@ -2,38 +2,70 @@
 
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.data.sync.Sync
+import io.middlepoint.morestuff.shared.data.sync.TaskSync
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Task
+import kotlinx.datetime.Instant
 
-typealias TaskDb = io.middlepoint.morestuff.db.Task
-typealias TaskDataMapper = (
-    id: Long,
-    uuid: String,
-    create_time: String,
-    complete_time: String?,
-    title: String,
-    priority_score: Long,
-    task_type: TaskType,
-) -> TaskDomain
+typealias TaskDataMapper<R> = (
+  id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  completed_at: Instant?,
+  completed_timezone: String?,
+  title: String,
+  priority_score: Long,
+  deleted: Boolean
+) -> R
 
-fun makeTaskDbMapper(): TaskDataMapper = ::mapTaskDb
+fun makeTaskDataMapper(): TaskDataMapper<Task> = ::mapTaskData
+fun makeTaskSyncMapper(): TaskDataMapper<Sync<TaskSync>> = ::mapTaskSync
 
-fun mapTaskDb(
-    id: Long,
-    uuid: String,
-    create_time: String,
-    complete_time: String?,
-    title: String,
-    priority_score: Long,
-    task_type: TaskType,
-): TaskDomain {
-    return TaskDomain(
-        id = id,
-        uuid = uuid,
-        createTime = create_time,
-        completeTime = complete_time,
-        title = title,
-        priorityScore = priority_score,
-        taskType = task_type
-    )
-}
+fun mapTaskData(
+  id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  completed_at: Instant?,
+  completed_timezone: String?,
+  title: String,
+  priority_score: Long,
+  deleted: Boolean
+) = Task(
+  id = id,
+  createdAt = created_at.toString(),
+  completedAt = completed_at?.toString(),
+  updatedAt = updated_at.toString(),
+  timezone = completed_timezone,
+  title = title,
+  priorityScore = priority_score,
+  deleted = deleted
+)
+
+fun mapTaskSync(
+  id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  completed_at: Instant?,
+  completed_timezone: String?,
+  title: String,
+  priority_score: Long,
+  deleted: Boolean
+) = Sync(
+  id = id,
+  createdAt = created_at,
+  updatedAt = updated_at,
+  deleted = deleted,
+  data = TaskSync(
+    id,
+    created_at,
+    updated_at,
+    completed_at,
+    completed_timezone,
+    title,
+    priority_score,
+    deleted
+  )
+)
+
+

@@ -1,23 +1,21 @@
 package io.middlepoint.morestuff.shared.domain.model.core
 
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
-import io.middlepoint.morestuff.shared.domain.model.MessageData
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Message(
-  val id: Long = 0,
-  val taskId: Long = 0,
-  val scheduleId: Long = 0,
+  val id: Uuid,
+  val taskId: Uuid,
+  val scheduleId: Uuid?,
+  val createdAt: Instant,
+  val updatedAt: Instant,
   val contentType: ContentType,
-  val createTime: String,
-  val seenTime: String? = null,
   val content: String,
-  val replyType: ReplyType? = null,
-  val replyContent: String? = null,
-  val replyTime: String? = null,
+  val deleted: Boolean,
   val openGraphResult: OpenGraphResult? = null,
-  val messageData: MessageData? = null
+  val messageExtra: MessageExtra? = null
 )

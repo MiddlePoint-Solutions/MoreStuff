@@ -1,35 +1,42 @@
 package io.middlepoint.morestuff.shared.ui.components.input
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun UserInput(
-    modifier: Modifier = Modifier,
-    priorityContent: @Composable () -> Unit = {},
-    textContent: @Composable () -> Unit = {},
+  modifier: Modifier = Modifier,
+  enablePadding: Boolean = true,
+  priorityContent: @Composable () -> Unit = {},
+  textContent: @Composable () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier
-            .imePadding()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        priorityContent()
-        textContent()
-    }
+
+  Column(
+    modifier = modifier.then(
+      if (enablePadding) {
+        Modifier
+          .imePadding()
+          .navigationBarsPadding()
+      } else {
+        Modifier
+      }
+    )
+  ) {
+    priorityContent()
+    textContent()
+  }
 }
 
-//@Preview
-//@Composable
-//fun UserInputPreview() {
-//    MoreStuffTheme {
-//        UserInput()
-//    }
-//}
+@Preview
+@Composable
+fun UserInputPreview() {
+  MoreStuffTheme {
+    UserInput()
+  }
+}

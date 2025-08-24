@@ -1,0 +1,107 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
+import kotlin.Int;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE IF NOT EXISTS messages(
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    task_id TEXT AS Uuid NOT NULL,
+    schedule_id TEXT AS Uuid,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    content_type INTEGER AS Int NOT NULL,
+    content TEXT NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
+
+selectAllUpdates:
+SELECT *
+FROM messages
+WHERE updated_at > ?;
+
+selectMessageById:
+SELECT messages.*, url_metadata.json_data, messages_extra.id AS messages_extra_id ,messages_extra.url,messages_extra.created_at,messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE messages.id = ?;
+
+selectMessageByTaskId:
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.url, messages_extra.created_at, messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE task_id = ? AND messages.deleted = 0
+ORDER BY messages.created_at DESC;
+
+selectTaskMessagesByContentType:
+SELECT messages.*, url_metadata.json_data, messages_extra.id ,messages_extra.url, messages_extra.created_at, messages_extra.data_type
+FROM messages
+LEFT JOIN url_metadata ON messages.id = url_metadata.message_id
+LEFT JOIN messages_extra ON messages.id = messages_extra.message_id
+WHERE messages.task_id = ? AND messages.content_type IN ? AND messages.deleted = 0
+ORDER BY messages.created_at DESC;
+
+selectFirstTaskMessageWithType:
+WITH LatestMessage AS (
+    SELECT task_id, MAX(created_at) AS latest_time
+    FROM messages
+    WHERE content_type = ? AND deleted = 0
+    GROUP BY task_id
+)
+SELECT m.*
+FROM messages AS m
+JOIN LatestMessage AS lm ON m.task_id = lm.task_id AND m.created_at = lm.latest_time
+ORDER BY m.created_at DESC;
+
+insertMessage:
+INSERT INTO messages
+VALUES ?;
+
+upsertMessage:
+INSERT INTO messages
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET content      = excluded.content,
+      content_type = excluded.content_type,
+      updated_at   = excluded.updated_at,
+      deleted      = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
+
+countMessages:
+SELECT count(*) FROM messages;
+
+pageMessages:
+SELECT *
+FROM messages
+ORDER BY id DESC
+LIMIT :limit OFFSET :offset;
+
+deleteMessage:
+UPDATE messages
+SET deleted = 1
+WHERE id = ?;
+
+updateMessageContent:
+UPDATE messages
+SET content = ?
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM messages;
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER IF NOT EXISTS messages_updated_at
+AFTER UPDATE ON messages
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE messages
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;
+
+

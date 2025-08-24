@@ -2,16 +2,16 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
 import io.github.vinceglb.filekit.PlatformFile
-import io.middlepoint.morestuff.shared.MediaHandler
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
+import io.middlepoint.morestuff.shared.platform.MediaHandler
 
 interface SaveMediaUseCase {
     suspend operator fun invoke(media: PlatformFile): Either<String, String>
 }
 
 class SaveMediaUseCaseImpl(
-  private val mediaHandler: MediaHandler,
-  private val timeManager: TimeManager,
+    private val mediaHandler: MediaHandler,
+    private val timeManager: TimeManager,
 ) : SaveMediaUseCase {
 
     override suspend fun invoke(media: PlatformFile): Either<String, String> {

@@ -1,6 +1,11 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.android.utils.Environment
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.compose.internal.de.undercouch.gradle.tasks.download.Download
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
   alias(libs.plugins.android.application)
@@ -13,65 +18,43 @@ plugins {
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.aboutLibrariesPlugin)
+  //alias(libs.plugins.sentry).apply(false) // Enable when support or noop is added for wasmJs
 }
 
 object Env {
-  const val Dev = "debug"
-  const val Staging = "staging"
-  const val Release = "release"
-}
-
-val projectVersionName = project.findProperty("buildConfig.versionName") as String
-val projectVersionCode = (project.findProperty("buildConfig.versionCode") as String?)?.toInt()
-
-
-buildConfig {
-  buildConfigField(
-    name = "DEBUG",
-    provider {
-      (property("buildConfig.debug") as String).toBoolean()
-    }
-  )
-
-  buildConfigField(
-    name = "VERSION_NAME",
-    provider {
-      property("buildConfig.versionName") as? String
-        ?: error("buildConfig.versionName undefined!")
-    }
-  )
-
-  buildConfigField(
-    name = "VERSION_CODE",
-    provider {
-      (property("buildConfig.versionCode") as? String)?.toInt()
-        ?: error("buildConfig.versionCode undefined!")
-    }
-  )
+  const val DEV = "debug"
+  const val STAGING = "staging"
+  const val RELEASE = "release"
 }
 
 kotlin {
   jvmToolchain(20)
-
-  // TODO: once we have support for SqlDelight & Arrow
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//        moduleName = "composeApp"
-//        browser {
-//            commonWebpackConfig {
-//                outputFileName = "composeApp.js"
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        // Serve sources to debug inside browser
-//                        add(project.projectDir.path)
-//                    }
-//                }
-//            }
-//        }
-//        binaries.executable()
-//    }
-
   androidTarget()
+
+  jvm("desktop") {
+//    main()
+    mainRun {
+      mainClass.set("MainKt")
+    }
+  }
+
+  @OptIn(ExperimentalWasmDsl::class)
+  wasmJs {
+    outputModuleName = "composeApp"
+    browser {
+      commonWebpackConfig {
+        outputFileName = "composeApp.js"
+        devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+          static = (static ?: mutableListOf()).apply {
+            // Serve sources to debug inside browser
+            add(project.rootDir.path)
+            add(project.projectDir.path)
+          }
+        }
+      }
+    }
+    binaries.executable()
+  }
 
   // spotless:off
   val iOSBinaryFlags =
@@ -82,15 +65,12 @@ kotlin {
     )
   // spotless:on
 
-  jvm("desktop")
-
   iosX64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
   iosSimulatorArm64 { binaries.forEach { it.freeCompilerArgs += iOSBinaryFlags } }
 
   applyDefaultHierarchyTemplate()
 
-  @OptIn(ExperimentalKotlinGradlePluginApi::class)
   compilerOptions {
     // Common compiler options applied to all Kotlin source sets
     freeCompilerArgs.add("-Xexpect-actual-classes")
@@ -101,22 +81,25 @@ kotlin {
     homepage = "Link to the Shared Module homepage"
     version = "1.0"
     ios.deploymentTarget = "16.0"
-//    podfile = project.file("../iosApp/Podfile")
+    podfile = project.file("../iosApp/Podfile")
     name = "ComposeApp"
+
+    pod("Sentry") {
+      version = "8.49.0"
+      linkOnly = true
+      extraOpts += listOf("-compiler-option", "-fmodules")
+    }
 
     framework {
       baseName = "ComposeApp"
       isStatic = true
-      export(libs.decompose.router)
       linkerOpts("-lsqlite3")
     }
   }
 
   sourceSets {
-    val desktopMain by getting
-
     commonMain.dependencies {
-      implementation(projects.shared)
+      implementation(libs.kotlinx.coroutines)
 
       implementation(compose.foundation)
       implementation(compose.material3)
@@ -130,7 +113,7 @@ kotlin {
       implementation(libs.stately.isolate)
       implementation(libs.stately.iso.collections)
       implementation(libs.ktor.core)
-      implementation(libs.ktor.client.cio)
+      //implementation(libs.ktor.client.cio)
       implementation(libs.ktor.client.logging)
       implementation(libs.ktor.client.content.negotiation)
       implementation(libs.ktor.serialization.kotlinx.json)
@@ -145,7 +128,8 @@ kotlin {
       implementation(libs.koin.core)
       implementation(libs.koin.compose)
       implementation(libs.koin.compose.viewmodel)
-      api(libs.decompose.router)
+      implementation(libs.androidx.navigation.compose)
+//      api(libs.decompose.router)
 
       // You will probably need to also bring in decompose and essenty
       implementation(libs.decompose)
@@ -163,9 +147,7 @@ kotlin {
       implementation(libs.reorderable)
       implementation(libs.coil.compose)
       implementation(libs.coil.ktor3)
-      implementation(libs.coil.ktor2)
       implementation(libs.zoomable)
-      implementation(libs.kottie)
       implementation(libs.calf.permissions)
       implementation(libs.calf.filepicker)
       implementation(libs.calf.filepicker.coil)
@@ -174,10 +156,18 @@ kotlin {
       implementation(libs.filekit.dialogs.compose)
       implementation(libs.filekit.core)
       implementation(libs.filekit.coil)
+      implementation(libs.open.ai)
 
       // About
       implementation(libs.aboutLibrariesCore)
       implementation(libs.aboutLibrariesCompose)
+
+      // Supabase
+      implementation(project.dependencies.platform(libs.supabase.bom))
+      implementation(libs.supabase.auth)
+      implementation(libs.supabase.postgres)
+      implementation(libs.supabase.compose.auth)
+      implementation(libs.supabase.compose.auth.ui)
     }
 
     commonTest.dependencies {
@@ -187,29 +177,40 @@ kotlin {
       implementation(libs.multiplatform.settings.test)
     }
 
-    androidMain.dependencies {
-      implementation(libs.androidx.activity.compose)
-      implementation(libs.androidx.appcompat)
-      implementation(libs.androidx.core)
-      implementation(libs.androidx.exifinterface)
+    val webMain by creating {
+      dependsOn(commonMain.get())
+    }
 
-      api(compose.preview)
-      api(compose.uiTooling)
-      implementation(libs.androidx.security.crypto)
-      implementation(libs.sqldelight.driver.android)
-      implementation(libs.ktor.client.okhttp)
-      implementation(libs.androidx.test)
-      implementation(libs.androidx.lifecycle.viewmodel)
-      api(libs.koin.android)
-      implementation(libs.sqliteAndroid)
-      implementation(libs.preferenceKtx)
-      api(libs.workKtx)
+    val nonWebMain by creating {
+      dependsOn(commonMain.get())
+      dependencies {
+        implementation(libs.sentry)
+      }
+    }
 
-      // Firebase
-      implementation(project.dependencies.platform(libs.firebaseBom))
-      implementation(libs.firebaseCrashlytics)
-      implementation(libs.firebaseAnalytics)
-      implementation(libs.googleServices)
+    androidMain {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(libs.androidx.activity.compose)
+        implementation(libs.androidx.appcompat)
+        implementation(libs.androidx.core)
+        implementation(libs.androidx.exifinterface)
+
+        api(compose.preview)
+        api(compose.uiTooling)
+        implementation(libs.androidx.security.crypto)
+        implementation(libs.sqldelight.driver.android)
+        implementation(libs.ktor.client.okhttp)
+        implementation(libs.androidx.test)
+        implementation(libs.androidx.lifecycle.viewmodel)
+        api(libs.koin.android)
+        implementation(libs.sqliteAndroid)
+        implementation(libs.preferenceKtx)
+        api(libs.workKtx)
+
+        implementation(libs.googleServices)
+        implementation(libs.androidx.splash)
+      }
     }
 
     val androidUnitTest by getting {
@@ -223,23 +224,104 @@ kotlin {
       }
     }
 
-    iosMain.dependencies {
-      implementation(compose.foundation)
-      implementation(libs.sqldelight.driver.native)
-      implementation(libs.ktor.client.darwin)
+    iosMain {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(compose.foundation)
+        implementation(libs.sqldelight.driver.native)
+        implementation(libs.ktor.client.darwin)
+      }
     }
 
-    desktopMain.dependencies {
-      implementation(compose.desktop.currentOs)
-      implementation(libs.sqldelight.driver.desktop)
-      implementation(libs.kotlinx.coroutines.swing)
+
+    val desktopMain by getting {
+      dependsOn(nonWebMain)
+      dependencies {
+        implementation(compose.desktop.currentOs)
+        implementation(libs.sqldelight.driver.desktop)
+        implementation(libs.ktor.client.java)
+        implementation(libs.kotlinx.coroutines.swing)
+      }
     }
 
-    // TODO: Enable once we have support from SqlDelight & Arrow
-//        wasmJsMain.dependencies {
-//        }
+    wasmJsMain {
+      dependsOn(webMain)
+      dependencies {
+        implementation(libs.sqldelight.driver.web)
+        implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.1.0"))
+        implementation(npm("sql.js", libs.versions.sqlJs.get()))
+        implementation(devNpm("copy-webpack-plugin", libs.versions.webPackPlugin.get()))
+      }
+      resources.srcDir(layout.buildDirectory.dir("sqlite"))
+    }
   }
 }
+
+val projectVersionName = project.findProperty("app.morestuff.versionName") as? String
+  ?: error("versionName undefined!")
+val projectVersionCode = (project.findProperty("app.morestuff.versionCode") as? String)?.toInt()
+  ?: error("versionCode undefined!")
+
+buildConfig {
+
+  val localProperties = gradleLocalProperties(rootDir, providers)
+
+  buildConfigField(name = "VERSION_NAME", value = projectVersionName)
+  buildConfigField(name = "VERSION_CODE", value = projectVersionCode)
+
+  buildConfigField(
+    name = "DEBUG",
+    value = provider { (property("app.morestuff.debug") as String).toBoolean() }
+  )
+
+  // Supabase configs
+
+  buildConfigField(
+    name = "SUPABASE_URL",
+    value = provider {
+      localProperties.getPropertyOrNull("SUPABASE_URL")
+        ?: System.getenv("SUPABASE_URL")
+    }
+  )
+
+  buildConfigField(
+    name = "SUPABASE_KEY",
+    value = provider {
+      localProperties.getPropertyOrNull("SUPABASE_KEY")
+        ?: System.getenv("SUPABASE_KEY")
+    }
+  )
+
+  buildConfigField(
+    name = "GOOGLE_SERVER_CLIENT_ID",
+    value = provider {
+      localProperties.getPropertyOrNull("GOOGLE_SERVER_CLIENT_ID")
+        ?: System.getenv("GOOGLE_SERVER_CLIENT_ID")
+    }
+  )
+
+  buildConfigField(
+    name = "SENTRY_DSN",
+    value = provider {
+      localProperties.getPropertyOrNull("SENTRY_DSN")
+        ?: System.getenv("SENTRY_DSN")
+    }
+  )
+
+  // Deeplinks
+
+  buildConfigField(
+    name = "APP_SCHEME",
+    value = provider { property("app.morestuff.scheme") as String }
+  )
+
+  buildConfigField(
+    name = "APP_HOST_LOGIN",
+    value = provider { property("app.morestuff.host.login") as String }
+  )
+
+}
+
 
 android {
   namespace = "io.middlepoint.morestuff.android"
@@ -259,13 +341,29 @@ android {
     }
   }
 
+  applicationVariants.all {
+    val variant = this
+    variant.outputs
+      .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+      .forEach { output ->
+        output.outputFileName = "MoreStuff-${variant.versionName}.apk"
+      }
+  }
+
   androidResources {
     generateLocaleConfig = true
   }
 
   signingConfigs {
-    create(Env.Staging) {
-      storeFile = file("./stage_key")
+    getByName(Env.DEV) {
+      storeFile = file("./debug.keystore")
+      storePassword = "android"
+      keyAlias = "AndroidDebugKey"
+      keyPassword = "android"
+    }
+
+    create(Env.STAGING) {
+      storeFile = file("./staging.keystore")
       storePassword = "StageKey"
       keyAlias = "staging"
       keyPassword = "StageKey"
@@ -274,7 +372,7 @@ android {
 
   buildTypes {
 
-    getByName(Env.Release) {
+    getByName(Env.RELEASE) {
       isMinifyEnabled = true
       isShrinkResources = true
       proguardFiles(
@@ -292,12 +390,12 @@ android {
       )
     }
 
-    create(Env.Staging) {
-      initWith(getByName(Env.Release))
+    create(Env.STAGING) {
+      initWith(getByName(Env.RELEASE))
       applicationIdSuffix = ".staging"
       versionNameSuffix = "-staging"
-      signingConfig = signingConfigs.getByName(Env.Staging)
-      matchingFallbacks += listOf(Env.Release, Env.Dev)
+      signingConfig = signingConfigs.getByName(Env.STAGING)
+      matchingFallbacks += listOf(Env.RELEASE, Env.DEV)
       isDebuggable = false
     }
   }
@@ -330,6 +428,7 @@ sqldelight {
   databases {
     create("StuffDb") {
       packageName.set("io.middlepoint.morestuff.db")
+      generateAsync.set(true)
       dialect(libs.sqldelight.sqlite.dialect)
       schemaOutputDirectory.set(file("src/commonMain/sqldelight/databases"))
       verifyMigrations.set(true)
@@ -345,3 +444,36 @@ configure<AboutLibrariesExtension> {
 tasks.withType(KotlinCompile::class.java) {
   dependsOn("exportLibraryDefinitions")
 }
+
+// See https://sqlite.org/download.html for the latest wasm build version
+val sqlite = 3500000
+
+val sqliteDownload = tasks.register("sqliteDownload", Download::class.java) {
+  src("https://sqlite.org/2025/sqlite-wasm-$sqlite.zip")
+  dest(layout.buildDirectory.dir("tmp"))
+  onlyIfModified(true)
+}
+
+val sqliteUnzip = tasks.register("sqliteUnzip", Copy::class.java) {
+  dependsOn(sqliteDownload)
+  from(zipTree(layout.buildDirectory.dir("tmp/sqlite-wasm-$sqlite.zip"))) {
+    include("sqlite-wasm-$sqlite/jswasm/**")
+    exclude("**/*worker1*")
+
+    eachFile {
+      relativePath = RelativePath(true, *relativePath.segments.drop(2).toTypedArray())
+    }
+  }
+  into(layout.buildDirectory.dir("sqlite"))
+  includeEmptyDirs = false
+}
+
+tasks.named("wasmJsProcessResources").configure {
+  dependsOn(sqliteUnzip)
+}
+
+// Extensions
+
+fun Properties.getPropertyOrNull(key: String): String? =
+  getProperty(key)?.takeIf { it.isNotBlank() }
+

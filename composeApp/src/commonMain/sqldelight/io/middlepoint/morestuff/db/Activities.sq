@@ -1,0 +1,13 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE activities (
+  id TEXT AS Uuid NOT NULL PRIMARY KEY,
+  sentence TEXT NOT NULL,
+  created_at INTEGER AS Instant NOT NULL,
+  data TEXT NOT NULL
+);
+
+insert:
+INSERT INTO activities
+VALUES ?;

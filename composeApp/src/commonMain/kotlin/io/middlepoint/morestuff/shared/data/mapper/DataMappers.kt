@@ -1,39 +1,77 @@
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.StorageManager
+import io.middlepoint.morestuff.shared.data.sync.ScheduleSync
+import io.middlepoint.morestuff.shared.data.sync.ScopeSync
+import io.middlepoint.morestuff.shared.data.sync.Sync
+import io.middlepoint.morestuff.shared.data.sync.TaskRelationSync
+import io.middlepoint.morestuff.shared.data.sync.TaskSync
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
+import io.middlepoint.morestuff.shared.domain.model.core.Task
+import io.middlepoint.morestuff.shared.platform.StorageManager
 
+typealias DataMapper<I, O> = (I) -> O
+
+inline fun <I, O> mapList(input: List<I>, mapListItem: (I) -> O): List<O> {
+  return input.map { mapListItem(it) }
+}
+
+inline fun <I, O> mapNullInputList(input: List<I>?, mapListItem: (I) -> O): List<O> {
+  return input?.map { mapListItem(it) } ?: emptyList()
+}
+
+inline fun <I, O> mapNullOutputList(input: List<I>, mapListItem: (I) -> O): List<O>? {
+  return if (input.isEmpty()) null else input.map { mapListItem(it) }
+}
 
 interface DataMappers {
-    val messageDataMapper: MessageDataMapper
-    val messageDbMapper: MessageDbMapper
-    val scheduleDbMapper: ScheduleDbMapper
-    val scheduleDomainMapper: ScheduleDomainMapper
-    val taskDbMapper: TaskDataMapper
-    val scopeDbMapper: ScopeDataMapper
+  val userDataMapper: UserDataMapper
+  val messageDataMapper: MessageDataMapper
+  val messageSyncMapper: MessageSyncMapper
+  val messageExtraSyncMapper: MessageExtraSyncMapper
+  val scheduleDataMapper: ScheduleDataMapper<Schedule>
+  val scheduleSyncMapper: ScheduleDataMapper<TaskRelationSync<ScheduleSync>>
+  val taskDataMapper: TaskDataMapper<Task>
+  val taskSyncMapper: TaskDataMapper<Sync<TaskSync>>
+  val taskScopeSyncMapper: TaskScopeSyncMapper
+  val scopeDataMapper: ScopeDataMapper<Scope>
+  val scopeSyncMapper: ScopeDataMapper<Sync<ScopeSync>>
 }
 
 class DataMappersImpl(
-    private val storageManager: StorageManager,
-    private val messageDataMap: MessageDataMap
+  private val storageManager: StorageManager,
 ) : DataMappers {
 
-    override val messageDataMapper: MessageDataMapper
-        get() = messageDataMap
+  override val userDataMapper: UserDataMapper
+    get() = makeUserDataMapper()
 
-    override val messageDbMapper: MessageDbMapper
-        get() = makeMessageDbMapper()
+  override val messageDataMapper: MessageDataMapper
+    get() = makeMessageDataMap(storageManager::getAppStoragePathToSavedFile)
 
-    override val scheduleDbMapper: ScheduleDbMapper
-        get() = makeScheduleDbMapper()
+  override val messageSyncMapper: MessageSyncMapper
+    get() = makeMessageSyncMapper()
 
-    override val scheduleDomainMapper: ScheduleDomainMapper
-        get() = makeScheduleDomainMapper()
+  override val messageExtraSyncMapper: MessageExtraSyncMapper
+    get() = makeMessageExtraSyncMapper()
 
-    override val taskDbMapper: TaskDataMapper
-        get() = makeTaskDbMapper()
+  override val scheduleDataMapper: ScheduleDataMapper<Schedule>
+    get() = makeScheduleDataMapper()
 
-    override val scopeDbMapper: ScopeDataMapper
-        get() = makeScopeDbMapper()
+  override val scheduleSyncMapper: ScheduleDataMapper<TaskRelationSync<ScheduleSync>>
+    get() = makeScheduleSyncMapper()
 
+  override val taskDataMapper: TaskDataMapper<Task>
+    get() = makeTaskDataMapper()
+
+  override val taskSyncMapper: TaskDataMapper<Sync<TaskSync>>
+    get() = makeTaskSyncMapper()
+
+  override val taskScopeSyncMapper: TaskScopeSyncMapper
+    get() = makeTaskScopeSyncMapper()
+
+  override val scopeDataMapper: ScopeDataMapper<Scope>
+    get() = makeScopeDataMapper()
+
+  override val scopeSyncMapper: ScopeDataMapper<Sync<ScopeSync>>
+    get() = makeScopeSyncMapper()
 }
-

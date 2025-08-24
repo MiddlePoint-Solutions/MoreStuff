@@ -2,81 +2,68 @@
 
 package io.middlepoint.morestuff.shared.data.mapper
 
-import io.middlepoint.morestuff.shared.MediaFolder
-import io.middlepoint.morestuff.shared.StorageManager
 import io.middlepoint.morestuff.shared.data.utils.let4
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
-import io.middlepoint.morestuff.shared.domain.enums.MessageDataType
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.enums.MessageExtraType
 import io.middlepoint.morestuff.shared.domain.model.core.Message
-import io.middlepoint.morestuff.shared.domain.model.MessageData
+import io.middlepoint.morestuff.shared.domain.model.core.MessageExtra
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.platform.MediaFolder
+import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 
-typealias MessageDbMapper = (
-  id: Long,
-  task_id: Long,
-  schedule_id: Long,
-  create_time: String,
-  seen_time: String?,
-  content_type: Int,
-  content: String,
-  reply_type: Int?,
-  reply_content: String?,
-  reply_time: String?,
-) -> Message
-
 typealias MessageDataMapper = (
-  id: Long,
-  taskId: Long,
-  scheduleId: Long,
-  createTime: String,
-  seenTime: String?,
+  id: Uuid,
+  taskId: Uuid,
+  scheduleId: Uuid?,
+  created_at: Instant,
+  updated_at: Instant,
   contentType: Int,
   content: String,
-  replyType: Int?,
-  replyContent: String?,
-  replyTime: String?,
+  deleted: Boolean,
   json_data: String?,
-  message_data_id: Long?,
-  message_data_file_path: String?,
-  message_data_creation_time: String?,
+  message_data_id: Uuid?,
+  message_data_url: String?,
+  message_data_creation_time: Instant?,
   message_data_type: String?,
 ) -> Message
 
+fun makeMessageDataMap(
+  pathToSavedFile: (MediaFolder, String) -> String
+) : MessageDataMapper = MessageDataMap(pathToSavedFile)
+
 data class MessageDataMap(
-  private val storageManager: StorageManager
-) : MessageDataMapper {
+  private val pathToSavedFile: (MediaFolder, String) -> String
+) : MessageDataMapper{
   override fun invoke(
-    id: Long,
-    taskId: Long,
-    scheduleId: Long,
-    createTime: String,
-    seenTime: String?,
+    id: Uuid,
+    taskId: Uuid,
+    scheduleId: Uuid?,
+    created_at: Instant,
+    updated_at: Instant,
     contentType: Int,
     content: String,
-    replyType: Int?,
-    replyContent: String?,
-    replyTime: String?,
+    deleted: Boolean,
     json_data: String?,
-    message_data_id: Long?,
-    message_data_file_path: String?,
-    message_data_creation_time: String?,
+    message_data_id: Uuid?,
+    message_data_url: String?,
+    message_data_creation_time: Instant?,
     message_data_type: String?
   ): Message {
 
     val openGraphResult = json_data?.let { Json.decodeFromString<OpenGraphResult>(it) }
 
-    val messageData = let4(
+    val messageExtra = let4(
       message_data_id,
-      message_data_file_path,
+      message_data_url,
       message_data_creation_time,
-      message_data_type?.let { MessageDataType.valueOf(it) },
+      message_data_type?.let { MessageExtraType.valueOf(it) },
     ) { dataId, dataPath, dataCreationTime, dataType ->
-      MessageData(
+      MessageExtra(
         id = dataId,
-        filePath = storageManager.getAppStoragePathToSavedFile(dataType.toMediaFolder(), dataPath),
-        creationTime = dataCreationTime,
+        url = pathToSavedFile(dataType.toMediaFolder(), dataPath),
+        creationTime = dataCreationTime.toString(),
         messageType = dataType
       )
     }
@@ -85,59 +72,21 @@ data class MessageDataMap(
       id = id,
       taskId = taskId,
       scheduleId = scheduleId,
+      createdAt = created_at,
+      updatedAt = updated_at,
       contentType = ContentType.withValue(contentType),
-      createTime = createTime,
-      seenTime = seenTime,
       content = content,
-      replyType = replyType?.let { ReplyType.withValue(it) },
-      replyContent = replyContent,
-      replyTime = replyTime,
+      deleted = deleted,
       openGraphResult = openGraphResult,
-      messageData = messageData
+      messageExtra = messageExtra
     )
   }
 }
 
-private fun MessageDataType.toMediaFolder() : MediaFolder = when(this) {
-  MessageDataType.Image -> MediaFolder.Images
-  MessageDataType.Video -> TODO()
-  MessageDataType.Audio -> TODO()
-  MessageDataType.Pdf -> MediaFolder.Files
+private fun MessageExtraType.toMediaFolder() : MediaFolder = when(this) {
+  MessageExtraType.Image -> MediaFolder.Images
+  MessageExtraType.Video -> TODO()
+  MessageExtraType.Audio -> TODO()
+  MessageExtraType.Pdf -> MediaFolder.Files
 }
-
-fun makeMessageDbMapper(): MessageDbMapper = ::mapMessageDb
-
-fun mapMessageDb(
-  id: Long,
-  task_id: Long,
-  schedule_id: Long,
-  create_time: String,
-  seen_time: String?,
-  content_type: Int,
-  content: String,
-  reply_type: Int?,
-  reply_content: String?,
-  reply_time: String?,
-): Message {
-  return Message(
-    id = id,
-    taskId = task_id,
-    scheduleId = schedule_id,
-    contentType = ContentType.withValue(content_type),
-    createTime = create_time,
-    seenTime = seen_time,
-    content = content,
-    replyType = reply_type?.let { ReplyType.withValue(it) },
-    replyContent = reply_content,
-    replyTime = reply_time,
-    openGraphResult = null,
-    messageData = null
-  )
-}
-
-
-
-
-
-
 

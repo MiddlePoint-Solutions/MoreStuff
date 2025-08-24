@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.service
 
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 
 class NotifierImpl : Notifier {
@@ -7,15 +8,7 @@ class NotifierImpl : Notifier {
         TODO("Not yet implemented")
     }
 
-    override fun showReminderNotifications(messages: List<Message>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun showReminderNotificationReply(scheduleId: Long, messages: List<Message>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun clearScheduleNotification(scheduleId: Long) {
+    override fun clearScheduleNotification(scheduleId: Uuid) {
         TODO("Not yet implemented")
     }
 

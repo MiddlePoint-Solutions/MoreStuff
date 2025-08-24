@@ -15,10 +15,11 @@ dependencyResolutionManagement {
         mavenLocal()
         mavenCentral()
         maven("https://jitpack.io")
+        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
 }
 
 include(":composeApp")
-include(":shared")
+//include(":shared")
 //include(":app:android")
 include(":iosApp")

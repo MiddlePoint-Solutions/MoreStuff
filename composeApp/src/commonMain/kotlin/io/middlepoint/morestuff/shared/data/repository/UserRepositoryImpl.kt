@@ -3,10 +3,16 @@ package io.middlepoint.morestuff.shared.data.repository
 import com.russhwolf.settings.Settings
 import io.middlepoint.morestuff.shared.data.settingKey
 import io.middlepoint.morestuff.shared.domain.enums.AppSetting
-import io.middlepoint.morestuff.shared.domain.enums.AppSetting.*
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.DevSettings
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.FirstTime
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ReviewTime
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.ShowHintArrowPriority
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.SnoozeLimit
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.Theme
+import io.middlepoint.morestuff.shared.domain.enums.AppSetting.VoiceInputLanguage
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.domain.redux.state.AppSettings
+import io.middlepoint.morestuff.shared.domain.model.AppSettings
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository
 
 
@@ -22,7 +28,7 @@ class UserRepositoryImpl(
             snoozeLimit = getSetting(SnoozeLimit, snoozeLimit),
             //reviewTime = getSetting(ReviewTime, reviewTime),
             enableReviewHint = getSetting(ShowHintArrowPriority, enableReviewHint),
-            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage)
+            voiceInputLanguage = getSetting(VoiceInputLanguage, voiceInputLanguage),
         )
     }
 
@@ -39,6 +45,7 @@ class UserRepositoryImpl(
             )
             ShowHintArrowPriority -> settings.putBoolean(setting.settingKey, settingValue as Boolean)
             is VoiceInputLanguage -> settings.putString(setting.settingKey, settingValue as String)
+
         }
     }
 

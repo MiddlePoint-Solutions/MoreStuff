@@ -5,11 +5,12 @@ import arrow.core.flatMap
 import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.model.Failure
 import io.middlepoint.morestuff.shared.domain.model.Priority
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.UpdateTaskPriorityScoreUseCase
 
 interface UpdateTaskReviewPriorityUseCase {
-    suspend operator fun invoke(taskId: Long, actionType: ReviewActionType): Either<Failure, Long>
+    suspend operator fun invoke(taskId: Uuid, actionType: ReviewActionType): Either<Failure, Long>
 }
 
 class UpdateTaskReviewPriorityUseCaseImpl(
@@ -21,7 +22,7 @@ class UpdateTaskReviewPriorityUseCaseImpl(
 ) : UpdateTaskReviewPriorityUseCase {
 
     override suspend fun invoke(
-        taskId: Long,
+        taskId: Uuid,
         actionType: ReviewActionType,
     ): Either<Failure, Long> = when (actionType) {
         ReviewActionType.Now -> {

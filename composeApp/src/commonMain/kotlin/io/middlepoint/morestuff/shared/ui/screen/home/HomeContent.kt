@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -21,6 +22,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
@@ -30,7 +32,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,45 +40,43 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import com.arkivanov.essenty.backhandler.BackCallback
-import io.github.xxfast.decompose.router.LocalRouterContext
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.service.logger
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.EmptyScopeContent
 import io.middlepoint.morestuff.shared.ui.components.HomeTopBar
 import io.middlepoint.morestuff.shared.ui.components.InputItem
 import io.middlepoint.morestuff.shared.ui.components.MoreStuffHomeScaffold
-import io.middlepoint.morestuff.shared.ui.extension.checkRegister
-import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.NotificationState
 import io.middlepoint.morestuff.shared.ui.model.show
+import io.middlepoint.morestuff.shared.ui.platform.BackHandler
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ClearPlanPriority
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CompleteTask
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScope
-import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateScopeForSelectedTasks
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTask
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.CreateTaskWithSchedule
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.DeleteSelectedTasks
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.HideTaskInput
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.MoveSelectedTasksToScope
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ResetHomeState
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ScopeSelected
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.SetPlanPriority
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ShowTaskInput
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleScopeReordering
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.ToggleTaskSelection
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanDate
+import io.middlepoint.morestuff.shared.ui.screen.home.HomeEvent.UpdatePlanTime
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeContent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksEvent
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksModels
 import io.middlepoint.morestuff.shared.ui.screen.schedule.ScopeTasksViewModel
 import io.middlepoint.morestuff.shared.ui.screen.search.SearchBar
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -88,16 +87,19 @@ import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+  navigateToSettings: () -> Unit,
+  navigateToTaskChat: (Uuid) -> Unit,
+) {
 
-  val homePresenter = koinInjectOnRoute(HomePresenter::class)
+  val homeState = koinViewModel<HomeViewModel>()
 
   val coroutineScope = rememberCoroutineScope()
-  val navigation = LocalAppRouter.current
   val snackbarHostState = remember { SnackbarHostState() }
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
 
@@ -110,62 +112,60 @@ fun HomeScreen() {
   var showCreateScopeSheet by remember { mutableStateOf(false) }
   val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+  val model by homeState.models.collectAsState()
+  var isReorderingActive by remember { mutableStateOf(false) }
 
-  val model by homePresenter.models.collectAsState()
-  val pendingCompletionTasks = remember { mutableStateMapOf<Long, Job>() }
-  var isReorderingActive = remember { mutableStateOf(false) }
-
+  BackHandler(isReorderingActive) {
+    homeState.take(ResetHomeState)
+    isReorderingActive = false
+  }
 
   MoreStuffHomeScaffold(
     snackbarHostState = snackbarHostState,
     topBar = {
       HomeTopBar(
+        username = model.username,
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         selectedTaskCount = model.selectedTasks.size,
-        reviewSelected = { navigation.push(Screen.Review(model.currentScopeId)) },
-        settingsSelected = { navigation.push(Screen.Settings) },
+        settingsSelected = navigateToSettings,
         searchAction = { isSearchActive = true },
         clearTaskSelection = {
-          homePresenter.take(ResetHomeState)
-          isReorderingActive.value = false
+          homeState.take(ResetHomeState)
+          isReorderingActive = false
         },
-        completeSelectedTasks = { homePresenter.take(CompleteSelectedTasks) },
+        completeSelectedTasks = { homeState.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteBottomSheet = true },
         selectScope = { showScopeSelection = true },
-        isReorderingActive = isReorderingActive.value
+        isReorderingActive = isReorderingActive
       )
     },
     content = {
       if (model.scopes.isNotEmpty()) {
         HomeContent(
           model = model,
-          onEvent = homePresenter::take,
+          onEvent = homeState::take,
           modifier = Modifier.padding(it),
           createNewScope = {
             showCreateScopeSheet = true
-            /* val createScopeScreen = Screen.CreateScope {
-               homePresenter.take(CreateScope(it))
-               navigation.pop()
-             }
-             navigation.push(createScopeScreen)*/
           },
           onTaskComplete = { taskId ->
-            homePresenter.take(HomeEvent.CompleteTask(taskId))
+            homeState.take(CompleteTask(taskId))
           },
-          onReorderingChanged = { isReordering -> isReorderingActive.value = isReordering }
+          onReorderingChanged = { isReordering -> isReorderingActive = isReordering },
+          navigateToTaskChat = navigateToTaskChat
         )
       }
     },
   )
 
   LaunchedEffect(Unit) {
-    homePresenter.notifications.collectLatest { notification ->
+    homeState.notifications.collectLatest { notification ->
       notification.show(snackbarHostState).let { result ->
         if (result == SnackbarResult.ActionPerformed) {
           launch {
             notification.action()
             if (notification is NotificationState.Complete) {
-              homePresenter.take(ResetHomeState)
+              homeState.take(ResetHomeState)
             }
           }
         }
@@ -206,7 +206,7 @@ fun HomeScreen() {
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
-        homePresenter.take(DeleteSelectedTasks)
+        homeState.take(DeleteSelectedTasks)
         showDeleteBottomSheet = false
       },
       extraInfo = taskHasSchedule
@@ -220,7 +220,7 @@ fun HomeScreen() {
   ) {
     SearchBar(
       onSearchClose = { isSearchActive = false },
-      showTaskChat = { navigation.push(Screen.TaskChat(it)) },
+      showTaskChat = navigateToTaskChat,
       modifier = Modifier.fillMaxWidth()
     )
   }
@@ -235,16 +235,13 @@ fun HomeScreen() {
       },
       scopes = model.scopes,
       sheetState = showScopeSelectionSheetState,
-      addSelectedTasksToScope = { homePresenter.take(MoveSelectedTasksToScope(it)) },
+      addSelectedTasksToScope = { homeState.take(MoveSelectedTasksToScope(it)) },
       createNewScope = {
-        val createScopeScreen = Screen.CreateScope {
-          homePresenter.take(CreateScopeForSelectedTasks(it))
-          navigation.pop()
-        }
-        navigation.push(createScopeScreen)
+        showCreateScopeSheet = true
       }
     )
   }
+
   if (showCreateScopeSheet) {
     CreateScopeBottomSheet(
       sheetState = createScopeSheetState,
@@ -255,7 +252,11 @@ fun HomeScreen() {
         }
       },
       onConfirm = { scopeName ->
-        homePresenter.take(CreateScope(scopeName))
+        if (model.selectedTasks.isNotEmpty()) {
+          homeState.take(HomeEvent.CreateScopeForSelectedTasks(scopeName))
+        } else {
+          homeState.take(CreateScope(scopeName))
+        }
         coroutineScope.launch {
           createScopeSheetState.hide()
           showCreateScopeSheet = false
@@ -270,12 +271,12 @@ private fun HomeContent(
   model: HomeState,
   onEvent: (HomeEvent) -> Unit,
   createNewScope: () -> Unit,
-  onTaskComplete: (Long) -> Unit,
+  onTaskComplete: (Uuid) -> Unit,
   modifier: Modifier = Modifier,
   onReorderingChanged: (Boolean) -> Unit,
+  navigateToTaskChat: (Uuid) -> Unit
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val navigation = LocalAppRouter.current
 
   val selectedTasks = model.selectedTasks
   val taskInputActive = model.taskInputActive
@@ -286,7 +287,6 @@ private fun HomeContent(
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
   val schedule = model.planTime
-
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -307,23 +307,6 @@ private fun HomeContent(
     previousScopesSize.value = newSize
   }
 
-
-  val backCallback = remember {
-    BackCallback {
-      onEvent(ResetHomeState)
-      onEvent(HomeEvent.HideTaskInput)
-    }
-  }
-
-  val backHandler = LocalRouterContext.current.backHandler
-  LaunchedEffect(model) {
-    if (selectedTasks.isNotEmpty() || taskInputActive) {
-      backHandler.checkRegister(backCallback)
-    } else {
-      backHandler.checkUnregister(backCallback)
-    }
-  }
-
   Box(
     modifier = modifier.fillMaxSize()
   ) {
@@ -342,7 +325,16 @@ private fun HomeContent(
             }
           },
           containerColor = MaterialTheme.colorScheme.surfaceContainer,
-          createNewScope = createNewScope
+          createNewScope = createNewScope,
+          isCreateScopeVisible = model.selectedTasks.isEmpty()
+        )
+      }
+
+      if (model.syncInProgress) {
+        LinearProgressIndicator(
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(2.dp)
         )
       }
 
@@ -351,11 +343,17 @@ private fun HomeContent(
         enter = expandVertically(),
         exit = shrinkVertically(),
       ) {
+
+        BackHandler {
+          onEvent(ResetHomeState)
+          onEvent(HideTaskInput)
+        }
+
         InputItem(
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
-                onEvent(HomeEvent.CreateTaskWithSchedule(text))
+                onEvent(CreateTaskWithSchedule(text))
               } else {
                 onEvent(CreateTask(text))
               }
@@ -365,12 +363,12 @@ private fun HomeContent(
           },
           onCancel = {
             onEvent(ResetHomeState)
-            onEvent(HomeEvent.HideTaskInput)
+            onEvent(HideTaskInput)
           },
-          onDateChange = { onEvent(HomeEvent.UpdatePlanDate(it)) },
-          onTimeChange = { h, m -> onEvent(HomeEvent.UpdatePlanTime(h, m)) },
-          onSetPriority = { onEvent(HomeEvent.SetPlanPriority) },
-          onClearSetPriority = { onEvent(HomeEvent.ClearPlanPriority) },
+          onDateChange = { onEvent(UpdatePlanDate(it)) },
+          onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) },
+          onSetPriority = { onEvent(SetPlanPriority) },
+          onClearSetPriority = { onEvent(ClearPlanPriority) },
           schedule = schedule,
         )
       }
@@ -381,14 +379,13 @@ private fun HomeContent(
           .graphicsLayer {
             alpha = if (taskInputActive) 0.4f else 1f
           },
-        key = { model.scopes[it].id }
+        key = { model.scopes[it].id.value }
       ) { page ->
 
         val scope = model.scopes[page]
 
-        val scopeViewModel = koinInjectOnRoute(
-          type = ScopeTasksViewModel::class,
-          key = "Scope${scope.id}",
+        val scopeViewModel = koinViewModel<ScopeTasksViewModel>(
+          key = "Scope${scope.id.value}",
           parameters = { parametersOf(scope.id) }
         )
 
@@ -409,7 +406,7 @@ private fun HomeContent(
                     val task = tasksModel.tasks.find { it.id == taskId }
                     onEvent(ToggleTaskSelection(taskId, task))
                   } else {
-                    navigation.push(Screen.TaskChat(taskId))
+                    navigateToTaskChat(taskId)
                   }
                 },
                 onItemLongClick = { taskId ->
@@ -419,7 +416,6 @@ private fun HomeContent(
                 listState = states[page],
                 enabled = !taskInputActive,
                 onReorder = { updatedTasks ->
-                  logger.d { "Reordering tasks..." }
                   scopeViewModel.take(ScopeTasksEvent.ReorderTasks(updatedTasks))
                 },
                 isReordering = model.reorderingScopes[scope.id] ?: false,

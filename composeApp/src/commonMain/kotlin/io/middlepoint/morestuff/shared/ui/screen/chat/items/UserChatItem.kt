@@ -39,7 +39,7 @@ fun UserChatItem(
   actions: ChatActions,
 ) {
   val isNewUserTask by remember {
-    derivedStateOf { message.contentType == ContentType.USER_NEW_TASK }
+    derivedStateOf { message.contentType == ContentType.USER_TASK }
   }
 
   var showMenu by remember { mutableStateOf(false) }
@@ -105,7 +105,7 @@ fun UserChatItem(
 
       when (messageType) {
         MessageType.Pdf -> {
-          message.messageData?.filePath?.let { filePath ->
+          message.messageExtra?.url?.let { filePath ->
             PDFMessageItem(
               pdfPath = filePath,
               message = message,

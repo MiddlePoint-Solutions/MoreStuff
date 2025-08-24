@@ -1,6 +1,8 @@
 package io.middlepoint.morestuff.android.domain.usecase.message
 
 import io.middlepoint.morestuff.android.domain.createMessageForTest
+import io.middlepoint.morestuff.shared.data.utils.generate
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.middlepoint.morestuff.shared.domain.usecase.message.GetTaskChatMessagesUseCaseImpl
 import io.mockk.coEvery
@@ -18,12 +20,10 @@ class GetTaskChatMessagesUseCaseImplTest {
     fun `invoke should return messages for given taskId`() = runBlocking {
 
         val messageRepository = mockk<MessageRepository>()
-        val taskId = 1L
+        val taskId = Uuid.generate()
 
-        val message1 =
-          createMessageForTest(id = 1, taskId = taskId)
-        val message2 =
-          createMessageForTest(id = 2, taskId = taskId)
+        val message1 = createMessageForTest(taskId = taskId)
+        val message2 = createMessageForTest(taskId = taskId)
 
         coEvery { messageRepository.getTaskChatMessagesFlow(taskId) } returns flow {
             emit(listOf(message1, message2))

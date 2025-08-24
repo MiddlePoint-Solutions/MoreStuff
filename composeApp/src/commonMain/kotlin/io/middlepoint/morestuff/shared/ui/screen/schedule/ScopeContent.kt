@@ -1,12 +1,15 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -16,8 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
-import io.middlepoint.morestuff.shared.ui.compose.simpleVerticalScrollbar
+import io.middlepoint.morestuff.shared.ui.extension.simpleVerticalScrollbar
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -31,10 +36,10 @@ fun ScopeContent(
   tasks: List<TaskUiModel>,
   modifier: Modifier = Modifier,
   listState: LazyListState = rememberLazyListState(),
-  selectedTasks: List<Long> = listOf(),
-  onItemClick: (taskId: Long) -> Unit = {},
-  onItemLongClick: (taskId: Long) -> Unit = {},
-  onTaskComplete: (taskId: Long) -> Unit = {},
+  selectedTasks: List<Uuid> = listOf(),
+  onItemClick: (taskId: Uuid) -> Unit = {},
+  onItemLongClick: (taskId: Uuid) -> Unit = {},
+  onTaskComplete: (taskId: Uuid) -> Unit = {},
   onReorder: (updatedTasks: List<TaskUiModel>) -> Unit,
   enabled: Boolean = true,
   isReordering: Boolean,
@@ -92,7 +97,7 @@ fun ScopeContent(
   ) {
     itemsIndexed(
       items = reorderList,
-      key = { _, task -> task.id }
+      key = { _, task -> task.id.value }
     ) { index, item ->
 
       val isLast by remember(index) {
@@ -106,7 +111,7 @@ fun ScopeContent(
       val scope = rememberCoroutineScope()
       var isVisible by remember { mutableStateOf(true) }
 
-      ReorderableItem(reorderableState, key = item.id) {
+      ReorderableItem(reorderableState, key = item.id.value) {
         PriorityItem(
           task = item,
           isSelected = selected,
@@ -128,11 +133,7 @@ fun ScopeContent(
             }
           },
           handleModifier = if (isReordering) Modifier.draggableHandle(true) else Modifier,
-          modifier = Modifier.animateItem(
-            fadeInSpec = spring(stiffness = Spring.StiffnessMedium),
-            fadeOutSpec = spring(stiffness = Spring.StiffnessMedium),
-            placementSpec = spring(stiffness = Spring.DampingRatioHighBouncy)
-          ),
+
           onTaskComplete = {
             isVisible = false
             scope.launch {
@@ -142,7 +143,20 @@ fun ScopeContent(
           },
           enabled = enabled,
         )
+
+        Row(
+          modifier = Modifier.fillParentMaxWidth(),
+          horizontalArrangement = Arrangement.End
+        ) {
+          HorizontalDivider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 0.7.dp,
+            color = MaterialTheme.colorScheme.outlineVariant
+          )
+        }
       }
+
+
     }
   }
 

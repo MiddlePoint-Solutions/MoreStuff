@@ -1,5 +1,7 @@
 package io.middlepoint.morestuff.shared.ui.theme
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val md_theme_light_primary = Color(0xFF4955B7)
@@ -23,7 +25,7 @@ val md_theme_light_background = Color(0xFFFFFBFF)
 val md_theme_light_onBackground = Color(0xFF1B1B1F)
 val md_theme_light_surface = Color(0xFFFCF8FD)
 val md_theme_light_onSurface = Color(0xFF1B1B1F)
-val md_theme_light_surfaceVariant = Color(0xFFE4E1E6)
+val md_theme_light_surfaceVariant = Color(0xFFE3E1EC)
 val md_theme_light_onSurfaceVariant = Color(0xFF46464F)
 val md_theme_light_inverseSurface = Color(0xFF303034)
 val md_theme_light_inverseOnSurface = Color(0xFFF3F0F4)
@@ -31,6 +33,7 @@ val md_theme_light_inversePrimary = Color(0xFFBDC2FF)
 val md_theme_light_surfaceTint = Color(0xFF4955B7)
 val md_theme_light_outlineVariant = Color(0xFFC7C5D0)
 val md_theme_light_scrim = Color(0xFF000000)
+val md_theme_light_surface_container_high = Color(0xFFEAE7EF)
 
 val md_theme_dark_primary = Color(0xFFBDC2FF)
 val md_theme_dark_onPrimary = Color(0xFF142187)
@@ -53,11 +56,29 @@ val md_theme_dark_background = Color(0xFF1B1B1F)
 val md_theme_dark_onBackground = Color(0xFFE4E1E6)
 val md_theme_dark_surface = Color(0xFF131316)
 val md_theme_dark_onSurface = Color(0xFFC8C5CA)
-val md_theme_dark_surfaceVariant = Color(0xFF353438)
+val md_theme_dark_surfaceVariant = Color(0xFF46464F)
 val md_theme_dark_onSurfaceVariant = Color(0xFFC7C5D0)
 val md_theme_dark_inverseSurface = Color(0xFFE4E1E6)
 val md_theme_dark_inverseOnSurface = Color(0xFF1B1B1F)
-val md_theme_dark_inversePrimary = Color(0xFF4955B7)
+val md_theme_dark_inversePrimary = Color(0xFF545A92 )
 val md_theme_dark_surfaceTint = Color(0xFFBDC2FF)
 val md_theme_dark_outlineVariant = Color(0xFF46464F)
 val md_theme_dark_scrim = Color(0xFF000000)
+val md_theme_dark_surface_container_high = Color(0xFF29292F)
+
+val reviewIconTint = Color(140, 152, 255)
+
+val onBoardingBrush = Brush.linearGradient(
+  colors = listOf(Color(0xFF4C65FD), Color(0xFF4338D8)),
+  start = Offset(0f, 0f),
+  end = Offset(0f, Float.POSITIVE_INFINITY)
+)
+
+val paymentBrush = Brush.linearGradient(
+  colors = listOf(Color(0x574C65FD), Color(0x57B83EF0)),
+  start = Offset(0f, 0f),
+  end = Offset(0f, Float.POSITIVE_INFINITY)
+)
+
+val paymentOnSurface = Color(0xFF1B1B21)
+val onBoardingButton = Color(0xFF393AC5)

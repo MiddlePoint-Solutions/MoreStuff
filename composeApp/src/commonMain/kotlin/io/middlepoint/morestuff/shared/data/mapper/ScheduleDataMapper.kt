@@ -2,62 +2,77 @@
 
 package io.middlepoint.morestuff.shared.data.mapper
 
+import io.middlepoint.morestuff.shared.data.sync.ScheduleSync
+import io.middlepoint.morestuff.shared.data.sync.Sync
+import io.middlepoint.morestuff.shared.data.sync.TaskRelationSync
+import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
+import kotlinx.datetime.Instant
 
-typealias ScheduleData = io.middlepoint.morestuff.db.Schedule
-typealias ScheduleDomainMapper = (ScheduleDomain) -> ScheduleData
+typealias ScheduleDataMapper<R> = (
+  id: Uuid,
+  task_id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  scheduled_at: Instant,
+  timezone: String,
+  active: Boolean,
+  schedule_type: ScheduleType,
+  deleted: Boolean,
+) -> R
 
-typealias ScheduleDbMapper = (
-    id: Long,
-    task_id: Long,
-    create_time: String,
-    schedule_time_local: String?,
-    schedule_time_utc: String?,
-    timezone: String,
-    active: Boolean,
-    schedule_type: ScheduleType
-) -> ScheduleDomain
+fun makeScheduleDataMapper(): ScheduleDataMapper<Schedule> = ::mapScheduleData
+fun makeScheduleSyncMapper(): ScheduleDataMapper<TaskRelationSync<ScheduleSync>> = ::mapScheduleSync
 
-fun makeScheduleDbMapper(): ScheduleDbMapper = ::mapScheduleDb
+fun mapScheduleData(
+  id: Uuid,
+  task_id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  scheduled_at: Instant,
+  timezone: String,
+  active: Boolean,
+  schedule_type: ScheduleType,
+  deleted: Boolean,
+): Schedule = Schedule(
+  id = id,
+  taskId = task_id,
+  createdAt = created_at.toString(),
+  updatedAt = updated_at.toString(),
+  scheduledAt = scheduled_at.toString(),
+  timezone = timezone,
+  active = active,
+  scheduleType = schedule_type,
+  deleted = deleted
+)
 
-fun makeScheduleDomainMapper(): ScheduleDomainMapper = { schedule ->
-    mapScheduleDomain(schedule)
-}
-
-fun mapScheduleDb(
-    id: Long,
-    task_id: Long,
-    create_time: String,
-    schedule_time_local: String?,
-    schedule_time_utc: String?,
-    timezone: String,
-    active: Boolean,
-    schedule_type: ScheduleType
-): ScheduleDomain {
-    return ScheduleDomain(
-        id = id,
-        taskId = task_id,
-        createTime = create_time,
-        scheduleLocalTime = schedule_time_local,
-        scheduleUtcTime = schedule_time_utc,
-        timezone = timezone,
-        active = active,
-        scheduleType = schedule_type
-    )
-}
-
-fun mapScheduleDomain(input: ScheduleDomain): ScheduleData {
-    return with(input) {
-        ScheduleData(
-            id = input.id,
-            task_id = taskId,
-            create_time = createTime,
-            schedule_time_local = scheduleLocalTime,
-            schedule_time_utc = scheduleUtcTime,
-            timezone = timezone,
-            active = active,
-            schedule_type = scheduleType
-        )
-    }
-}
+fun mapScheduleSync(
+  id: Uuid,
+  task_id: Uuid,
+  created_at: Instant,
+  updated_at: Instant,
+  scheduled_at: Instant,
+  timezone: String,
+  active: Boolean,
+  schedule_type: ScheduleType,
+  deleted: Boolean,
+) = TaskRelationSync(
+  id = id,
+  taskId = task_id,
+  createdAt = created_at,
+  updatedAt = updated_at,
+  deleted = deleted,
+  data = ScheduleSync(
+    id,
+    task_id,
+    created_at,
+    updated_at,
+    scheduled_at,
+    timezone,
+    active,
+    schedule_type,
+    deleted
+  )
+)

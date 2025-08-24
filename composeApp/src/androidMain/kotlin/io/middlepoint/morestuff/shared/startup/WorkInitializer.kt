@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.startup.Initializer
 import androidx.work.Configuration
 import androidx.work.WorkManager
+import io.middlepoint.morestuff.shared.MoreStuffApp
 
 class WorkInitializer : Initializer<Unit>, Configuration.Provider {
 
     override fun create(context: Context) {
+        MoreStuffApp.INSTANCE = context as MoreStuffApp
         WorkManager.initialize(context, workManagerConfiguration)
     }
 

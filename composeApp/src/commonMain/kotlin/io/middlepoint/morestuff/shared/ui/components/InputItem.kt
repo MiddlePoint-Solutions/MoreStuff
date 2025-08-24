@@ -234,7 +234,6 @@ fun ScheduleSelectorRow(
   onUpdateInputValue: (String) -> Unit = {},
   onDone: (String) -> Unit = {},
   inputText: String = "",
-
   ) {
   var isVisible by remember { mutableStateOf(schedule != null) }
   var showDatePickerDialog by remember { mutableStateOf(false) }

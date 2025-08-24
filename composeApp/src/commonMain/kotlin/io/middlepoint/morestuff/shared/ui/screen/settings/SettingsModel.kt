@@ -9,14 +9,22 @@ import androidx.compose.runtime.setValue
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.enums.Language
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.UserAction
+import io.middlepoint.morestuff.shared.domain.usecase.settings.GetApiKeyUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.OpenAppSettingsUseCase
+import io.middlepoint.morestuff.shared.domain.usecase.settings.SaveApiKeyUseCase
 import kotlinx.coroutines.flow.Flow
+import org.koin.compose.koinInject
 
 @Composable
 fun settingsModel(
-  initialState: SettingsState,
-  events: Flow<SettingsEvent>,
-  store: AppStore
+    initialState: SettingsState,
+    events: Flow<SettingsEvent>,
+    openAppSettingsUseCase: OpenAppSettingsUseCase = koinInject(),
+    saveApiKeyUseCase: SaveApiKeyUseCase = koinInject(),
+    getApiKeyUseCase: GetApiKeyUseCase = koinInject(),
+    store: AppStore
 ): SettingsState {
     var state by remember { mutableStateOf(initialState) }
 
@@ -35,13 +43,31 @@ fun settingsModel(
                     store.dispatch(SettingAction.EnableDevSettings(event.enable))
                     state.copy(devSettings = event.enable)
                 }
-                /*is SettingsEvent.SetReviewTime -> {
-                    store.dispatch(SettingAction.SetReviewTimeAction(event.hour, event.minute))
-                    state.copy(reviewTime = Pair(event.hour, event.minute))
-                }*/
                 is SettingsEvent.SelectLanguage -> {
                     store.dispatch(SettingAction.SetVoiceLanguage(Language[event.index]))
                     state.copy(inputVoiceLanguage = Language[event.index])
+                }
+                is SettingsEvent.SetApiKey -> {
+                    saveApiKeyUseCase(event.apiKey)
+                    state.copy(apiKey = event.apiKey)
+                }
+                is SettingsEvent.GetApiKey -> {
+                    try {
+                        val apiKey = getApiKeyUseCase()
+                        state.copy(apiKey = apiKey)
+                    } catch (e: IllegalStateException) {
+                        state
+                    }
+                }
+
+                SettingsEvent.SignOut -> {
+                    store.dispatch(UserAction.SignOut)
+                    state
+                }
+
+                SettingsEvent.OpenAppSettings -> {
+                    openAppSettingsUseCase()
+                    state
                 }
             }
         }

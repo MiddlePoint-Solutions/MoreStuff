@@ -6,4 +6,6 @@
     <string name="schedule_reply_snooze">Snooze</string>
     <string name="schedule_reply_later">Later</string>
     <string name="schedule_reply_done">Done</string>
+
+    <string name="app_host">morestuff.app</string>
 </resources>

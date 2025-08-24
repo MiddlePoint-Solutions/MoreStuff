@@ -1,63 +1,69 @@
 [versions]
 turbine = "1.0.0"
 coilCompose = "3.1.0"
-firebaseBom = "33.9.0"
+firebaseBom = "33.13.0"
 googleServices = "4.4.2"
 koinTest = "3.5.6"
-workKtx = "2.10.0"
+workKtx = "2.10.1"
 preferenceKtx = "1.2.1"
 firebaseCrashlyticsPlugin = "3.0.3"
 aboutLibrariesVersion = "11.2.1"
 kSoup = "0.3.0"
-sqliteAndroid = "3.45.0"
+sqliteAndroid = "3.49.0"
 
-agp = "8.8.1"
-kotlin = "2.1.0"
+agp = "8.11.1"
+kotlin = "2.2.10"
 
 android_sdk_compile = "35"
-android_sdk_target = "34"
+android_sdk_target = "35"
 android_sdk_min = "26"
 
-androidx-core = "1.15.0"
+androidx-core = "1.16.0"
 kotlinx-immutable-collections = "0.3.7"
-kotlinx-coroutines = "1.9.0"
-kotlinx-serialization = "1.7.3"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.8.0"
 kotlinx-datetime = "0.6.2"
-kotlinx-atomicfu = "0.26.0"
-compose = "1.7.3"
-androidx-activity-compose = "1.10.0"
+kotlinx-atomicfu = "0.27.0"
+compose = "1.8.2"
+androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
-androidx-lifecycle = "2.8.7"
-kermit = "2.0.3"
-ktor = "3.1.1"
-multiplatform-settings = "1.1.1"
-koin-bom = "4.1.0-Beta1"
-sqldelight = "2.0.2"
+androidx-lifecycle = "2.9.0"
+androidx-navigation = "2.9.0-beta04"
+kermit = "2.0.5"
+ktor = "3.1.2"
+multiplatform-settings = "1.3.0"
+koin-bom = "4.0.4"
+sqldelight = "2.1.0"
 arrow = "2.0.1"
 buildConfig = "5.5.1"
 spotless = "6.23.3"
 ktfmt = "0.44"
-stately = "2.0.6"
+stately = "2.1.0"
 mockk-common = "1.12.5"
 mockk = "1.13.8"
-junit5 = "5.10.2"
-junit-platform-commons = "1.10.2"
+junit5 = "5.11.3"
+junit-platform-commons = "1.11.3"
 security-crypto = "1.0.0"
 store5 = "5.0.0"
-decompose-router = "0.9.0"
+decompose-router = "0.10.0-SNAPSHOT"
 decompose = "3.2.2"
 essenty = "2.0.0"
 molecule = "2.0.0"
-exifinterfaceVersion = "1.3.7"
+exifinterfaceVersion = "1.4.1"
 constraintLayout-compose = "0.4.0"
 compose-settings = "2.4.0"
 sonner = "0.3.6"
 reorderable = "2.4.3"
-zoomable = "1.6.1"
-kottie = "1.9.6-alpha02"
+zoomable = "1.7.0"
 calf = "0.7.1"
-filekit = "0.10.0-beta01"
+filekit = "0.10.0-beta04"
+supabase-bom = "3.1.3"
+openAi = "4.0.1"
+sqlJs = "1.8.0"
+webPackPlugin = "9.1.0"
+sentry = "0.12.0"
+splash-screen ="1.0.0"
 
 
 [libraries]
@@ -83,6 +89,9 @@ androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-cor
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 androidx-test = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+androidx-splash = { module = "androidx.core:core-splashscreen", version.ref = "splash-screen" }
+
 
 # Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -92,11 +101,13 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # SqlDelight
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
+sqldelight-driver-web = { module = "app.cash.sqldelight:web-worker-driver", version.ref = "sqldelight" }
 sqldelight-sqlite-dialect = { module = "app.cash.sqldelight:sqlite-3-35-dialect", version.ref = "sqldelight" }
 sqldelight-coroutines-extensions = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-primitive-adapters = { module = "app.cash.sqldelight:primitive-adapters", version.ref = "sqldelight" }
@@ -107,6 +118,13 @@ koin-compose = { module = "io.insert-koin:koin-compose" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
+
+# Supabase
+supabase-bom = { module = "io.github.jan-tennert.supabase:bom", version.ref = "supabase-bom" }
+supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
+supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
+supabase-compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth" }
+supabase-compose-auth-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui" }
 
 # Misc
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
@@ -127,9 +145,7 @@ sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coilCompose" }
 coil-ktor3 = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coilCompose" }
-coil-ktor2 = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coilCompose" }
 zoomable = { module = "com.mxalbert.zoomable:zoomable", version.ref = "zoomable" }
-kottie = { module = "io.github.ismai117:kottie", version.ref = "kottie" }
 calf-permissions = { module = "com.mohamedrejeb.calf:calf-permissions", version.ref = "calf" }
 calf-filepicker = { module = "com.mohamedrejeb.calf:calf-file-picker", version.ref = "calf" }
 calf-filepicker-coil = { module = "com.mohamedrejeb.calf:calf-file-picker-coil", version.ref = "calf" }
@@ -139,7 +155,8 @@ filekit-dialogs = { module = "io.github.vinceglb:filekit-dialogs", version.ref =
 filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 filekit-coil = { module = "io.github.vinceglb:filekit-coil", version.ref = "filekit" }
-
+open-ai = { module = "com.aallam.openai:openai-client", version.ref = "openAi" }
+sentry = { module = "io.sentry:sentry-kotlin-multiplatform", version.ref = "sentry" }
 
 # Testing
 mockk-common = { module = "io.mockk:mockk-common", version.ref = "mockk-common" }
@@ -155,8 +172,6 @@ aboutLibrariesCompose = { module = "com.mikepenz:aboutlibraries-compose-m3", ver
 preferenceKtx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 
 firebaseBom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
-firebaseCrashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
-firebaseAnalytics = { module = "com.google.firebase:firebase-analytics-ktx" }
 googleServices = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 koinTest = { module = "io.insert-koin:koin-test", version.ref = "koinTest" }
 koinTestJunit = { module = "io.insert-koin:koin-test-junit5", version.ref = "koinTest" }
@@ -184,6 +199,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+sentry = { id = "io.sentry.kotlin.multiplatform.gradle", version.ref = "sentry" }
 
 [bundles]
 

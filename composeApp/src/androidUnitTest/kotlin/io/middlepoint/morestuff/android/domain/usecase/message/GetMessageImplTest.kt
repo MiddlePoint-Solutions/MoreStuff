@@ -2,6 +2,7 @@ package io.middlepoint.morestuff.shared.domain.usecase.message
 
 import arrow.core.Either
 import io.middlepoint.morestuff.android.domain.createMessageForTest
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.MessageRepository
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -18,10 +19,10 @@ class GetMessageImplTest{
 
 
         val message = createMessageForTest()
-        coEvery { messageRepository.getMessage(1L) } returns Either.Right(message)
+        coEvery { messageRepository.getMessage(Uuid("1")) } returns Either.Right(message)
 
         runBlocking{
-            val result = getMessage.invoke(1L)
+            val result = getMessage(Uuid("1"))
             assertEquals(Either.Right(message), result)
         }
     }

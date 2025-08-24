@@ -11,8 +11,5 @@ sealed class SettingScreen {
   data object Developer : SettingScreen()
 
   @Serializable
-  data object Scopes : SettingScreen()
-
-  @Serializable
   data object AboutLibraries : SettingScreen()
 }

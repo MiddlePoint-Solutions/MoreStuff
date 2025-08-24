@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetScopeActiveTasksFlowUseCase
@@ -20,7 +21,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun scopeTasksModel(
-  scopeId: Long,
+  scopeId: Uuid,
   events: SharedFlow<ScopeTasksEvent>,
   getScopeActiveTasksFlowUseCase: GetScopeActiveTasksFlowUseCase = koinInject(),
   cancelActiveScheduleUseCase: CancelActiveScheduleUseCase = koinInject(),
@@ -41,11 +42,7 @@ fun scopeTasksModel(
     events.collect { event ->
       when (event) {
         is ScopeTasksEvent.ReorderTasks -> {
-          logger.d { "Reordering tasks..." }
-          reorderTaskUseCase(event.updatedTasks).fold(
-            { failure -> logger.e { "Error reordering tasks: $failure" } },
-            { logger.d { "Tasks reordered successfully" } }
-          )
+          reorderTaskUseCase(event.updatedTasks)
         }
 
       }

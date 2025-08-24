@@ -1,7 +1,10 @@
-package io.middlepoint.morestuff.shared.domain.usecase.task
+package io.middlepoint.morestuff.android.domain.usecase.task
 
 import arrow.core.Either
+import io.middlepoint.morestuff.shared.data.utils.generate
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.PriorityRepository
+import io.middlepoint.morestuff.shared.domain.usecase.task.ReorderTaskUseCaseImpl
 import io.middlepoint.morestuff.shared.ui.model.TaskUiModel
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -36,9 +39,9 @@ class ReorderTaskNewUseCaseImplTest {
 
     @Test
     fun `when task list is not empty, should reorder tasks based on highest priority`() = runBlocking {
-        val task1 = TaskUiModel(id = 1, title = "Task 1", priorityScore = 10)
-        val task2 = TaskUiModel(id = 2, title = "Task 2", priorityScore = 8)
-        val task3 = TaskUiModel(id = 3, title = "Task 3", priorityScore = 5)
+        val task1 = TaskUiModel(id = Uuid.generate(), title = "Task 1", priorityScore = 10)
+        val task2 = TaskUiModel(id = Uuid.generate(), title = "Task 2", priorityScore = 8)
+        val task3 = TaskUiModel(id = Uuid.generate(), title = "Task 3", priorityScore = 5)
         val updatedTasks = listOf(task1, task2, task3)
 
         coEvery { priorityRepository.getHighestPriorityScore() } returns 100L

@@ -1,13 +1,18 @@
 package io.middlepoint.morestuff.shared.data.service
 
+import arrow.core.getOrElse
 import co.touchlab.kermit.Logger
 import com.russhwolf.settings.Settings
+import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEBUG_MESSAGES
 import io.middlepoint.morestuff.android.data.Constants.KEY_DEV_SETTINGS
+import io.middlepoint.morestuff.android.data.Constants.KEY_MIGRATION_COMPLETE
 import io.middlepoint.morestuff.shared.domain.DevTools
-import io.middlepoint.morestuff.shared.DataMigrationHelper
+import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.data.utils.MigrationHelper
 import io.middlepoint.morestuff.shared.domain.service.Notifier
+import io.middlepoint.morestuff.shared.platform.DataMigrationHelper
+import org.koin.compose.koinInject
 
 class DevToolsImpl(
   private val settings: Settings,
@@ -15,6 +20,8 @@ class DevToolsImpl(
   private val dataMigration: DataMigrationHelper,
   private val migrationHelper: MigrationHelper,
 ) : DevTools {
+
+  private val logger = Logger.withTag("DevTools")
 
   override var showDebugMessages: Boolean
     get() = settings.getBoolean(KEY_DEBUG_MESSAGES, false)
@@ -25,6 +32,12 @@ class DevToolsImpl(
     get() = settings.getBoolean(KEY_DEV_SETTINGS, false)
     set(value) {
       settings.putBoolean(KEY_DEV_SETTINGS, value)
+    }
+
+  override var importDataComplete: Boolean
+    get() = settings.getBoolean(KEY_MIGRATION_COMPLETE, false)
+    set(value) {
+      settings.putBoolean(KEY_MIGRATION_COMPLETE, value)
     }
 
   override fun testReviewNotification() {
@@ -43,19 +56,36 @@ class DevToolsImpl(
     }
   }
 
-  override suspend fun exportJsonData(share: Boolean) {
-    Logger.d("exportJsonData, share: $share")
-    migrationHelper.export(share)?.let {
-      settings.putString(MIGRATION_KEY, it)
+  override suspend fun exportJsonData() {
+    migrationHelper.export()
+  }
+
+  override suspend fun importJsonData(jsonFile: PlatformFile): Boolean {
+    return migrationHelper.import(jsonFile).getOrElse { false }
+  }
+
+  override suspend fun importMigrationData(): Boolean {
+    logger.d("importMigrationData, data already imported: $importDataComplete")
+    if (importDataComplete) {
+      return false
+    }
+    return getMigrationDataFile()?.let { file ->
+      importJsonData(file).also {
+        logger.d("importMigrationData, migration data imported successfully: $it")
+        importDataComplete = it
+      }
+    } ?: false
+  }
+
+  override suspend fun migrationComplete() {
+    if (importDataComplete) {
+      logger.d("migrationComplete, deleting json migration file")
+      deleteMigrationDataFile()
     }
   }
-
-  override suspend fun importJsonData(uri: String) {
-    TODO("Not yet implemented")
-  }
-
-  companion object {
-    private const val MIGRATION_KEY = "MIGRATION_KEY"
-  }
 }
+
+expect fun getMigrationDataFile(): PlatformFile?
+expect suspend fun deleteMigrationDataFile()
+
 

@@ -8,10 +8,11 @@ actual fun formatString(format: String, vararg args: Any): String {
 }
 
 actual fun requiresNotificationsPermission(): Boolean {
-  TODO("Not yet implemented")
+  // TODO: this needs to be handled
+  return false
 }
 
 actual val platform: Platform
-  get() = TODO("Not yet implemented")
+  get() = Platform.Desktop
 
 actual fun createKmpFile(path: String): PlatformFile = PlatformFile(File(path))

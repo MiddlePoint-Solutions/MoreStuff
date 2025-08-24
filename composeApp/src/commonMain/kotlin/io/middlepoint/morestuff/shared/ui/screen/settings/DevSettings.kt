@@ -24,17 +24,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
+import io.github.vinceglb.filekit.FileKit
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import io.middlepoint.morestuff.shared.domain.DevTools
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.Screen
 import io.middlepoint.morestuff.shared.ui.components.AppSettingValueState
 import io.middlepoint.morestuff.shared.ui.components.SettingsTopBar
 import io.middlepoint.morestuff.shared.ui.components.rememberAppSettingState
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.debug_messages
@@ -63,7 +68,6 @@ fun DevSettingsScreen(
       DevSettings(onBack = onBack, onDevSettingsDisabled = onDevSettingsDisabled)
     }
   }
-
 }
 
 @Composable
@@ -75,59 +79,22 @@ fun DevSettings(
 
   val scope = rememberCoroutineScope()
 
-  // TODO: Import / export database
-//    var exportData by remember { mutableStateOf(false) }
-//    if (exportData) {
-//        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "application/octet-stream"
-//            putExtra(Intent.EXTRA_TITLE, "morestuff.db")
-//        }
-//        val launcher = rememberLauncherForActivityResult(
-//            contract = ActivityResultContracts.StartActivityForResult()
-//        ) { result: ActivityResult ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.also { uri ->
-//                    scope.launch {
-//                        devTools.exportData(uri.toString())
-//                    }
-//                }
-//            }
-//            exportData = false
-//        }
-//
-//        LaunchedEffect(Unit) {
-//            launcher.launch(intent)
-//        }
-//    }
-//
-//    var importData by remember { mutableStateOf(false) }
-//    if (importData) {
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "application/octet-stream"
-//        }
-//        val launcher = rememberLauncherForActivityResult(
-//            contract = ActivityResultContracts.StartActivityForResult()
-//        ) { result: ActivityResult ->
-//            if (result.resultCode == Activity.RESULT_OK) {
-//                result.data?.data?.also { uri ->
-//                    scope.launch {
-//                        devTools.importData(uri.toString())
-//                    }
-//                }
-//            }
-//            importData = false
-//        }
-//
-//        LaunchedEffect(Unit) {
-//            launcher.launch(intent)
-//        }
-//    }
+//  val test = PlatformFile("")
 
+  val singleImagePickerLauncher = rememberFilePickerLauncher(
+    type = FileKitType.File("json"),
+  ) { files ->
+    files?.let {
+      scope.launch {
+        devTools.importJsonData(it).let {
+          Logger.d { "Data migration successful!" }
+        }
+      }
+    }
+  }
 
-  val navigation = LocalAppRouter.current
-  Column(modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)) {
+//  val navigation = LocalAppRouter.current
+  Column {
     DisableDeveloperSettings(
       state = rememberAppSettingState(
         defaultValue = { devTools.showDevSettings },
@@ -142,7 +109,7 @@ fun DevSettings(
     )
     SettingsMenuLink(
       title = { Text(text = stringResource(Res.string.test_onboarding)) },
-      onClick = { navigation.replaceAll(Screen.OnBoarding) },
+      onClick = {  },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
@@ -155,9 +122,10 @@ fun DevSettings(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
     )
+
     SettingsMenuLink(
       title = { Text(text = "Review Screen") },
-      onClick = { navigation.push(Screen.Review(1)) },
+      onClick = { /*navigation.push(Screen.Review(Uuid("test")))*/ },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
@@ -165,12 +133,19 @@ fun DevSettings(
 
     SettingsMenuLink(
       title = { Text(text = "Export JSON data") },
-      onClick = { scope.launch { devTools.exportJsonData(true) } },
+      onClick = { scope.launch { devTools.exportJsonData() } },
       colors = ListItemDefaults.colors(
         containerColor = MaterialTheme.colorScheme.surfaceContainer
       )
     )
 
+    SettingsMenuLink(
+      title = { Text(text = "Import JSON data") },
+      onClick = { scope.launch { singleImagePickerLauncher.launch() } },
+      colors = ListItemDefaults.colors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainer
+      )
+    )
 //        SettingsMenuLink(
 //            title = { Text(text = stringResource(Res.string.export_database)) },
 //            onClick = { exportData = true },
@@ -198,10 +173,10 @@ private fun DebugMessageSwitch(
 
   Row(
     modifier = Modifier
+      .fillMaxWidth()
       .background(
         MaterialTheme.colorScheme.surfaceContainer
       )
-      .fillMaxWidth()
       .height(IntrinsicSize.Min),
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -237,6 +212,9 @@ private fun DisableDeveloperSettings(
   Row(
     modifier = Modifier
       .fillMaxWidth()
+      .background(
+        MaterialTheme.colorScheme.surfaceContainer
+      )
       .height(IntrinsicSize.Min),
     verticalAlignment = Alignment.CenterVertically
   ) {

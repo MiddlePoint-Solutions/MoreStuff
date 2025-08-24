@@ -6,11 +6,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import io.middlepoint.morestuff.shared.createKmpFile
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.MessageAction
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.MessageAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.state.isAuthenticated
+import io.middlepoint.morestuff.shared.domain.redux.state.isReady
+import io.middlepoint.morestuff.shared.platform.createKmpFile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
@@ -22,61 +24,62 @@ fun mainModel(
   store: AppStore = koinInject()
 ): MainState {
 
-    var currentState by remember { mutableStateOf(initialState) }
+  var currentState by remember { mutableStateOf(initialState) }
 
-    LaunchedEffect(Unit) {
-        store.state.collectLatest {
-            currentState = MainState(
-                ready = true,
-                theme = it.settings.appTheme,
-                showOnBoarding = it.settings.isFirstTime
-            )
-        }
+  LaunchedEffect(Unit) {
+    store.state.collectLatest {
+      currentState = MainState(
+        ready = it.isReady(),
+        theme = it.settings.appTheme,
+        isAuthenticated = it.isAuthenticated(),
+        showOldUserMessage = it.userState.isOldUser
+      )
     }
+  }
 
-    LaunchedEffect(Unit) {
-        events.collect { event ->
-            when (event) {
+  LaunchedEffect(Unit) {
+    events.collect { event ->
+      when (event) {
 
-                MainEvent.OnBoardingComplete -> {
-                    store.dispatch(SettingAction.OnBoardingComplete)
-                }
+        MainEvent.OnBoardingComplete -> {
+          store.dispatch(SettingAction.OnBoardingComplete)
+        }
 
-                is MainEvent.ShareContent -> with(event.content) {
-                    when (this) {
-                        is Shareable.Image -> {
-                            store.dispatch(
-                                MessageAction.CreateFileMessageAction(
-                                    event.taskId,
-                                    createKmpFile(uri),
-                                    message
-                                )
-                            )
-                        }
-
-                        is Shareable.Pdf -> {
-                            store.dispatch(
-                                MessageAction.CreatePDFMessageAction(
-                                    event.taskId,
-                                    createKmpFile(uri),
-                                    message
-                                )
-                            )
-                        }
-
-                        is Shareable.Text -> {
-                            store.dispatch(
-                                MessageAction.CreateUserTaskMessageAction(
-                                    event.taskId,
-                                    message
-                                )
-                            )
-                        }
-                    }
-                }
+        is MainEvent.ShareContent -> with(event.content) {
+          when (this) {
+            is Shareable.Image -> {
+              store.dispatch(
+                MessageAction.CreateFileMessageAction(
+                  event.taskId,
+                  createKmpFile(uri),
+                  message
+                )
+              )
             }
-        }
-    }
 
-    return currentState
+            is Shareable.Pdf -> {
+              store.dispatch(
+                MessageAction.CreatePDFMessageAction(
+                  event.taskId,
+                  createKmpFile(uri),
+                  message
+                )
+              )
+            }
+
+            is Shareable.Text -> {
+              store.dispatch(
+                MessageAction.CreateUserTaskMessageAction(
+                  event.taskId,
+                  message
+                )
+              )
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return currentState
 }
