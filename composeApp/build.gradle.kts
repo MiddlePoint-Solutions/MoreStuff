@@ -279,32 +279,28 @@ buildConfig {
   buildConfigField(
     name = "SUPABASE_URL",
     value = provider {
-      localProperties.getPropertyOrNull("SUPABASE_URL")
-        ?: System.getenv("SUPABASE_URL")
+      getPropertyOrThrow("SUPABASE_URL")
     }
   )
 
   buildConfigField(
     name = "SUPABASE_KEY",
     value = provider {
-      localProperties.getPropertyOrNull("SUPABASE_KEY")
-        ?: System.getenv("SUPABASE_KEY")
+      getPropertyOrThrow("SUPABASE_KEY")
     }
   )
 
   buildConfigField(
     name = "GOOGLE_SERVER_CLIENT_ID",
     value = provider {
-      localProperties.getPropertyOrNull("GOOGLE_SERVER_CLIENT_ID")
-        ?: System.getenv("GOOGLE_SERVER_CLIENT_ID")
+      getPropertyOrThrow("GOOGLE_SERVER_CLIENT_ID")
     }
   )
 
   buildConfigField(
     name = "SENTRY_DSN",
     value = provider {
-      localProperties.getPropertyOrNull("SENTRY_DSN")
-        ?: System.getenv("SENTRY_DSN")
+      getPropertyOrThrow("SENTRY_DSN")
     }
   )
 
@@ -476,4 +472,10 @@ tasks.named("wasmJsProcessResources").configure {
 
 fun Properties.getPropertyOrNull(key: String): String? =
   getProperty(key)?.takeIf { it.isNotBlank() }
+
+fun getPropertyOrThrow(key: String): String =
+  gradleLocalProperties(rootDir, providers).getPropertyOrNull(key)
+    ?: System.getenv(key)?.takeIf { it.isNotBlank() }
+    ?: error("$key not found!")
+
 

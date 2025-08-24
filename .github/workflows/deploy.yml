@@ -9,11 +9,6 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
 
     steps:
       - uses: actions/checkout@v3
@@ -29,6 +24,11 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: Assemble Release Bundle
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          GOOGLE_SERVER_CLIENT_ID: ${{ secrets.GOOGLE_SERVER_CLIENT_ID }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         run: |
           ./gradlew bundleRelease
 
