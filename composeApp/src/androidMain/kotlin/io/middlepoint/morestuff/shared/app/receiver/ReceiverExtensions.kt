@@ -10,6 +10,7 @@ import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.app.extensions.getParcelableExtraCompat
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.KEY_REPLY_EXTRA
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -39,7 +40,7 @@ fun BroadcastReceiver.goAsync(
 
 fun NotificationReceiver.Companion.createReplyIntent(
   context: Context,
-  scheduleId: Long,
+  scheduleId: Uuid,
   type: ReplyType
 ): PendingIntent =
   Intent(context, NotificationReceiver::class.java)
@@ -78,14 +79,14 @@ fun NotificationReceiver.Companion.createCancelReviewPendingIntent(
   PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
 )
 
-fun Intent.setReplayIntentExtras(scheduleId: Long, type: ReplyType) =
-  putExtra(KEY_REPLY_EXTRA, ReplyIntentExtras(scheduleId, type))
+fun Intent.setReplayIntentExtras(scheduleId: Uuid, type: ReplyType) =
+  putExtra(KEY_REPLY_EXTRA, ReplyIntentExtras(scheduleId.value, type))
 
 fun Intent.getReplyIntentExtras(): ReplyIntentExtras? =
   getParcelableExtraCompat(KEY_REPLY_EXTRA, ReplyIntentExtras::class.java)
 
 @Parcelize
 data class ReplyIntentExtras(
-  val scheduleId: Long,
+  val scheduleId: String,
   val type: ReplyType
 ) : Parcelable

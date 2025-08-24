@@ -1,12 +1,14 @@
 package io.middlepoint.morestuff.shared.ui.screen.scopes
 
 import androidx.compose.runtime.Immutable
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 
 
 @Immutable
 data class ScopesState(
-  val scopes: List<ScopeDomain> = listOf()
+  val stuffScope: Scope? = null,
+  val scopes: List<Scope> = listOf()
 )
 
 
@@ -14,10 +16,10 @@ data class ScopesState(
 sealed class ScopesUiEvent {
   data class CreateScope(
     val name: String,
-    val taskIds: List<Long> = listOf()
+    val taskIds: List<Uuid> = listOf()
   ) : ScopesUiEvent()
 
-  data class DeleteScope(val scopeId: Long) : ScopesUiEvent()
-  data class UpdateScopeName(val scopeId: Long, val newName: String) : ScopesUiEvent()
-  data class ReorderScopes(val scopes: List<ScopeDomain>) : ScopesUiEvent()
+  data class DeleteScope(val scopeId: Uuid) : ScopesUiEvent()
+  data class UpdateScopeName(val scopeId: Uuid, val newName: String) : ScopesUiEvent()
+  data class ReorderScopes(val scopes: List<Scope>) : ScopesUiEvent()
 }

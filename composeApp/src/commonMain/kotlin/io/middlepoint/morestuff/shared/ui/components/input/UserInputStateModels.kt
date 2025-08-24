@@ -1,13 +1,13 @@
 package io.middlepoint.morestuff.shared.ui.components.input
 
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.model.PriorityUiModel
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 
 data class UserInputState(
   val messages: List<MessageUiModel> = listOf(),
-  val scopes: List<ScopeDomain> = listOf(),
+  val scopes: List<Scope> = listOf(),
   val priority: PriorityUiModel = PriorityUiModel.Now,
   val planTime: ScheduleUiModel? = null,
   val lastCreatedTaskId: Long? = null,

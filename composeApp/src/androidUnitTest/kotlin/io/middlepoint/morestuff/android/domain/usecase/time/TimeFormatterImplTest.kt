@@ -1,8 +1,8 @@
 package io.middlepoint.morestuff.android.domain.usecase.time
 
 
-import io.middlepoint.morestuff.shared.TimeUtils
 import io.middlepoint.morestuff.shared.data.repository.TimeFormatterImpl
+import io.middlepoint.morestuff.shared.platform.TimeUtils
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.datetime.TimeZone

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.usecase.settings
 
-import io.middlepoint.morestuff.shared.domain.redux.state.AppSettings
+import io.middlepoint.morestuff.shared.domain.model.AppSettings
 import io.middlepoint.morestuff.shared.domain.repository.UserRepository
 
 interface GetAppSettingsUseCase {

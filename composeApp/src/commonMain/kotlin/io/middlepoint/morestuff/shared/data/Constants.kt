@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.android.data
 
 object Constants {
 
-    const val DATABASE_NAME = "morestuff.db"
+    const val DATABASE_NAME = "morestuff_data.db"
 
     // User keys
     const val KEY_DEV_SETTINGS = "key_enable_dev_settings"
@@ -13,16 +13,25 @@ object Constants {
     const val KEY_REVIEW_TIME = "key_review_time"
     const val KEY_REVIEW_HINT = "key_review_hint"
     const val KEY_LANGUAGE_INPUT = "key_language_input"
+    const val UNENCRYPTED_SETTINGS_NAME = "APP_SETTINGS"
+    const val ENCRYPTED_SETTINGS_NAME = "ENCRYPTED_SETTINGS"
+    const val KEY_API_KEY = "key_api_key"
 
 
     // Developer keys
     const val KEY_DEBUG_MESSAGES = "key_show_debug_message"
+    const val KEY_MIGRATION_COMPLETE = "MIGRATION_COMPLETE_KEY"
     const val KEY_REMINDER_DEBUGGING_SWITCH_ENABLED = "key_enable_reminder_debugging"
     const val KEY_REMINDER_DEBUGGING_TIME = "key_reminder_debugging_time"
 
 
     const val DISCORD_INVITE_LINK = "https://discord.gg/pe2dwe52SX"
     const val TELEGRAM_INVITE_LINK = "https://t.me/+hzE7jInTlSRiOGVk"
+    const val REDDIT_INVITE_LINK = "https://www.reddit.com/r/MoreStuffApp/"
 
     const val PRIVACY_POLICY_LINK = "https://bit.ly/3P4Sd3I"
+
+
+    const val IA_MODEL_OPEN_AI = "gpt-4o-mini"
+    const val IA_MODEL_DEEPSEEK = "deepseek-chat"
 }

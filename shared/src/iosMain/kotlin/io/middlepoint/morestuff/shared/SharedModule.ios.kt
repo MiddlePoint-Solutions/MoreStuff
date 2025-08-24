@@ -14,4 +14,5 @@ actual val sharedModule: Module
         factoryOf(::ShareHelperImpl) bind ShareHelper::class
         factoryOf(::DataMigrationHelperImpl) bind DataMigrationHelper::class
         factoryOf(::MediaHandlerImpl) bind MediaHandler::class
+        factoryOf(::IosAppSettingsHandlerImpl) bind AppSettingsHandler::class
     }

@@ -1,0 +1,97 @@
+import io.middlepoint.morestuff.shared.domain.enums.ScheduleType;
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE IF NOT EXISTS schedules(
+    id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    task_id TEXT AS Uuid NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    scheduled_at INTEGER AS Instant NOT NULL,
+    timezone TEXT NOT NULL,
+    active INTEGER AS Boolean NOT NULL DEFAULT 1,
+    schedule_type TEXT AS ScheduleType NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
+    );
+
+selectAllUpdates:
+SELECT *
+FROM schedules
+WHERE updated_at > ?;
+
+selectScheduleById:
+SELECT *
+FROM schedules
+WHERE id = ?;
+
+selectSchedulesById:
+SELECT *
+FROM schedules
+WHERE id IN :schedule_ids;
+
+selectSchedulesByTaskId:
+SELECT *
+FROM schedules
+WHERE task_id = ?;
+
+selectActiveScheduleByTaskId:
+SELECT *
+FROM schedules
+WHERE task_id IN :task_ids
+AND active = 1
+AND schedule_type IN :schedule_types
+ORDER BY id DESC;
+
+selectActiveSchedules:
+SELECT *
+FROM schedules
+WHERE active = 1 AND schedule_type IN :schedule_types
+ORDER BY scheduled_at;
+
+selectActiveSchedulesByTaskId:
+SELECT schedules.*
+FROM schedules
+WHERE active = 1 AND task_id = :task_id
+ORDER BY scheduled_at;
+
+countTaskSchedulesByTime:
+SELECT COUNT(*)
+FROM schedules
+WHERE task_id = :task_id
+AND scheduled_at BETWEEN :start AND :end;
+
+insertSchedule:
+INSERT INTO schedules
+VALUES ?;
+
+upsertSchedule:
+INSERT INTO schedules
+VALUES ?
+ON CONFLICT(id) DO UPDATE
+  SET active     = excluded.active,
+      updated_at = excluded.updated_at,
+      deleted    = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
+
+updateScheduleActive:
+UPDATE schedules
+SET active = ?
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM schedules;
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER IF NOT EXISTS schedules_updated_at
+AFTER UPDATE ON schedules
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE schedules
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE id = old.id;
+END;

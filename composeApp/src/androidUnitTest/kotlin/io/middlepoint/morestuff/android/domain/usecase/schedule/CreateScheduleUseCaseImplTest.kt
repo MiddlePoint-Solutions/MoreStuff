@@ -5,6 +5,7 @@ import arrow.core.right
 import io.middlepoint.morestuff.shared.data.service.TimeManagerImpl
 import io.middlepoint.morestuff.android.domain.createScheduleUseCaseTest
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -18,43 +19,49 @@ import org.junit.jupiter.api.Test
 
 
 class CreateScheduleUseCaseImplTest {
-    private val scheduleRepository = mockk<ScheduleRepository>()
-    private val timeManager = TimeManagerImpl()
-    private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>(relaxed = true)
+  private val scheduleRepository = mockk<ScheduleRepository>(relaxed = true)
+  private val timeManager = TimeManagerImpl()
+  private val cancelActiveScheduleUseCase = mockk<CancelActiveScheduleUseCase>(relaxed = true)
 
-    private val createTime =
-        Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
+  private val createTime =
+    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).toString()
 
-    private val createScheduleUseCaseImpl = CreateScheduleUseCaseImpl(
-        scheduleRepository,
-        timeManager,
-        cancelActiveScheduleUseCase
+  private val createScheduleUseCaseImpl = CreateScheduleUseCaseImpl(
+    scheduleRepository,
+    cancelActiveScheduleUseCase
+  )
+
+  @Test
+  fun `creates schedule`() = runBlocking {
+    val taskId = Uuid("1")
+    val localTime = timeManager.nowLocalDateTime
+    val schedule = createScheduleUseCaseTest(
+      createTime = createTime,
+      scheduleTimeLocal = localTime.toString(),
+      scheduleTimeUtc = timeManager.nowUtcInstantString,
+      timeZone = TimeZone.currentSystemDefault().id
     )
 
-    @Test
-    fun `creates schedule`() = runBlocking {
-        val taskId = 1L
-        val localTime = timeManager.nowLocalDateTime
-        val schedule = createScheduleUseCaseTest(
-          createTime = createTime,
-          scheduleTimeLocal = localTime.toString(),
-          scheduleTimeUtc = timeManager.nowUtcInstantString,
-          timeZone = TimeZone.currentSystemDefault().id
-        )
+    coEvery { cancelActiveScheduleUseCase(any(), any()) } coAnswers { listOf(schedule).right() }
 
-        coEvery { cancelActiveScheduleUseCase(any(), any()) } coAnswers { listOf(schedule).right() }
-
-        coEvery { scheduleRepository.createSchedule(any()) } coAnswers {
-            Either.Right(schedule)
-        }
-
-        val result = createScheduleUseCaseImpl.invoke(taskId, ScheduleType.OneTime, localTime)
-        Assertions.assertEquals(Either.Right(schedule.copy(id = 1)), result)
-
-        coVerify {
-            cancelActiveScheduleUseCase(any(), any())
-            scheduleRepository.createSchedule(any())
-        }
-
+    coEvery {
+      scheduleRepository.createSchedule(
+        taskId,
+        ScheduleType.OneTime,
+        localTime
+      )
+    } coAnswers {
+      Either.Right(schedule)
     }
+
+    createScheduleUseCaseImpl.invoke(taskId, ScheduleType.OneTime, localTime).onRight {
+      Assertions.assertEquals(schedule, it)
+    }
+
+    coVerify {
+      cancelActiveScheduleUseCase(any(), any())
+      scheduleRepository.createSchedule(any(), any(), any())
+    }
+
+  }
 }

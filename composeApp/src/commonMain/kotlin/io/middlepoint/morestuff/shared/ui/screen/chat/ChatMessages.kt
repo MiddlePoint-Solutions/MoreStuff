@@ -40,9 +40,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.service.logger
 import io.middlepoint.morestuff.shared.ui.local.ProvideUserInteractionEnabled
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItem
+import io.middlepoint.morestuff.shared.ui.screen.chat.items.AppChatItemLoading
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.TaskReminderItem
 import io.middlepoint.morestuff.shared.ui.screen.chat.items.UserChatItem
 import kotlinx.coroutines.launch
@@ -67,6 +69,8 @@ fun Messages(
   actions: ChatActions = ChatActions(),
   userInteractionEnabled: Boolean = true,
   contentPadding: PaddingValues = PaddingValues(0.dp),
+  isAILoading: Boolean = false,
+
 ) {
   val scope = rememberCoroutineScope()
   var itemsCount by remember { mutableIntStateOf(0) }
@@ -85,9 +89,14 @@ fun Messages(
         state = scrollState,
         contentPadding = contentPadding
       ) {
+        if (isAILoading) {
+          item(key = "ai_loading") {
+            AppChatItemLoading()
+          }
+        }
         itemsIndexed(
           items = messages,
-          key = { _, item -> item.id },
+          key = { _, item -> item.id.value },
           contentType = { _, item -> item.contentType }
         ) { index, item ->
 
@@ -103,18 +112,22 @@ fun Messages(
 
             when (item.contentType) {
               ContentType.TASK_MESSAGE,
-              ContentType.USER_NEW_TASK -> UserChatItem(
+              ContentType.USER_TASK -> UserChatItem(
                 message = item,
                 actions = actions,
               )
 
-              ContentType.CONFIRM_NEW_TASK,
+              ContentType.CONFIRM_TASK,
               ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
-
+              ContentType.AI_TASK_MESSAGE -> {
+                logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
+                AppChatItem(item, actions)
+              }
               ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
             }
           }
         }
+
       }
 
       if (enableAutoScroll) {
@@ -180,7 +193,6 @@ private fun DateTimeItem(item: MessageUiModel) {
     )
   }
 }
-
 
 private enum class Visibility {
   VISIBLE,

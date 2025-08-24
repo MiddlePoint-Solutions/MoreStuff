@@ -52,6 +52,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.rememberAsyncImagePainter
 import com.mohamedrejeb.calf.io.KmpFile
 import com.mohamedrejeb.calf.picker.coil.KmpFileFetcher
+import io.github.vinceglb.filekit.PlatformFile
 import io.middlepoint.morestuff.shared.ui.components.NavigateBackIconButton
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_send
@@ -67,7 +68,7 @@ val logger = Logger.withTag("imageImport")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImageImportScreen(
-  imagePath: String,
+  image: PlatformFile,
   onImport: (String) -> Unit,
   onBack: () -> Unit,
 ) {
@@ -106,11 +107,11 @@ fun ImageImportScreen(
       logger.d { "imageLoader: $imageLoader" }
 
 
-      logger.d { "image path: $imagePath" }
+      logger.d { "image path: $image" }
 
       Image(
         painter = rememberAsyncImagePainter(
-          model = imagePath,
+          model = image,
           imageLoader = imageLoader
         ),
         contentDescription = "Selected Image",

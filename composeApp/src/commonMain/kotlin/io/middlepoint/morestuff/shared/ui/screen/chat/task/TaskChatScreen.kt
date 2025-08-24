@@ -3,8 +3,8 @@ package io.middlepoint.morestuff.shared.ui.screen.chat.task
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -63,57 +61,37 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import co.touchlab.kermit.Logger
-import com.arkivanov.decompose.extensions.compose.stack.animation.fade
-import com.arkivanov.decompose.extensions.compose.stack.animation.plus
-import com.arkivanov.decompose.extensions.compose.stack.animation.scale
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.dialogs.FileKitType
 import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
-import io.github.vinceglb.filekit.path
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.Router
-import io.github.xxfast.decompose.router.stack.rememberRouter
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImageImport
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.ImagePreview
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen.TaskChat
-import io.middlepoint.morestuff.shared.domain.nav.Screen
+import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.SendIcon
 import io.middlepoint.morestuff.shared.ui.components.input.LocalBoxWeight
 import io.middlepoint.morestuff.shared.ui.components.input.UserInput
 import io.middlepoint.morestuff.shared.ui.components.input.UserTextInput
-import io.middlepoint.morestuff.shared.ui.local.LocalAppRouter
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
 import io.middlepoint.morestuff.shared.ui.screen.chat.Messages
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.CopyText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.DeleteTask
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.InputText
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.OpenDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ScheduleResponse
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareDocument
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareImage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ShareMessage
-import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.ToggleTaskComplete
+import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.*
 import io.middlepoint.morestuff.shared.ui.screen.home.ScopeSelectionBottomSheet
-import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
+import io.middlepoint.morestuff.shared.ui.utils.defaultEnterTransition
+import io.middlepoint.morestuff.shared.ui.utils.defaultExitTransition
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.cd_more_options
 import morestuff.composeapp.generated.resources.cd_navigate_back
-import morestuff.composeapp.generated.resources.cd_select_images
 import morestuff.composeapp.generated.resources.cd_task_done_icon
 import morestuff.composeapp.generated.resources.cd_undo
 import morestuff.composeapp.generated.resources.complete
@@ -121,116 +99,105 @@ import morestuff.composeapp.generated.resources.confirm_delete
 import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.edit_message
 import morestuff.composeapp.generated.resources.restore
-import morestuff.composeapp.generated.resources.select_image
-import morestuff.composeapp.generated.resources.select_pdf
 import morestuff.composeapp.generated.resources.task_chat_complete_message
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TaskChatScreen(
-  taskId: Long,
+  taskId: Uuid,
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
 ) {
 
-  val router: Router<ChatScreen> = rememberRouter { listOf(TaskChat) }
-  val navigation = LocalAppRouter.current
+  val navController = rememberNavController()
   val scope = rememberCoroutineScope()
 
-  val viewModel = koinInjectOnRoute(
-    type = TaskChatPresenter::class,
+  val viewModel = koinViewModel<TaskChatViewModel>(
     parameters = { parametersOf(taskId) }
   )
 
-  val navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = { onScopeCreated ->
-    val createScopeScreen = Screen.CreateScope { title ->
-      onScopeCreated(title)
-      navigation.pop()
+  NavHost(
+    navController = navController,
+    startDestination = ChatScreen.Chat,
+    enterTransition = { defaultEnterTransition() },
+    exitTransition = { defaultExitTransition() }
+  ) {
+    composable<ChatScreen.Chat> {
+
+      val model by viewModel.models.collectAsState()
+      val isAiEnabled = model.isAIEnabled
+
+      val chatActions = remember {
+        ChatActions(
+          scheduleAction = { scheduleId, replyType ->
+            viewModel.take(ScheduleResponse(scheduleId, replyType))
+          },
+          copyMessage = { viewModel.take(CopyText(it.content)) },
+          deleteMessage = { viewModel.take(DeleteMessage(it)) },
+          onImageSelected = {
+            val path = it.messageExtra?.url ?: ""
+            val title = it.content
+            navController.navigate(ChatScreen.Preview(path, title))
+          },
+          onPdfSelected = {
+            val path = it.messageExtra?.url ?: ""
+            viewModel.take(OpenDocument(path))
+          },
+          shareImage = { viewModel.take(ShareImage(it)) },
+          sharePdf = { viewModel.take(ShareDocument(it)) },
+          shareMessage = { viewModel.take(ShareMessage(it)) },
+          setEditingMessage = { messageId ->
+            viewModel.take(SetEditingMessage(messageId))
+          },
+          updateMessageContent = { content ->
+            viewModel.take(UpdateMessageContent(content))
+          },
+          isMessageBeingEdited = { messageId ->
+            model.editingMessageId == messageId
+          }
+        )
+      }
+
+      TaskChatContent(
+        model = model,
+        onEvent = viewModel::take,
+        chatActions = chatActions,
+        modifier = modifier,
+        onBack = onBack,
+        sendTaskMessage = {
+          viewModel.take(InputText(it))
+          if (isAiEnabled) viewModel.take(CreateAIMessage(it))
+        },
+        imagePicked = { scope.launch { navController.navigate(ChatScreen.Import(it)) } },
+        pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
+        isAIEnabled = isAiEnabled
+      )
     }
-    navigation.push(createScopeScreen)
-  }
 
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(scale() + fade()),
-  ) { screen ->
+//    composable<ChatScreen.Import> { backStackEntry ->
+//      val screen = backStackEntry.toRoute<ChatScreen.Import>()
+//      ImageImportScreen(
+//        image = screen.imageFile,
+//        onImport = { title ->
+//          viewModel.take(InputUserMedia(screen.imageFile, title))
+//          navController.popBackStack()
+//        },
+//        onBack = { navController.popBackStack() }
+//      )
+//    }
 
-    when (screen) {
-      is TaskChat -> {
-
-        val model by viewModel.models.collectAsState()
-
-        val chatActions = remember {
-          ChatActions(
-            scheduleAction = { scheduleId, replyType ->
-              viewModel.take(ScheduleResponse(scheduleId, replyType))
-            },
-            copyMessage = { viewModel.take(CopyText(it.content)) },
-            deleteMessage = { viewModel.take(DeleteMessage(it)) },
-            onImageSelected = {
-              val path = it.messageData?.filePath ?: ""
-              val title = it.content
-              router.push(ImagePreview(path, title))
-            },
-            onPdfSelected = {
-              val path = it.messageData?.filePath ?: ""
-              viewModel.take(OpenDocument(path))
-            },
-            shareImage = { viewModel.take(ShareImage(it)) },
-            sharePdf = { viewModel.take(ShareDocument(it)) },
-            shareMessage = { viewModel.take(ShareMessage(it)) },
-            setEditingMessage = { messageId ->
-              viewModel.take(TaskChatEvent.SetEditingMessage(messageId))
-            },
-            updateMessageContent = { content ->
-              viewModel.take(TaskChatEvent.UpdateMessageContent(content))
-            },
-            isMessageBeingEdited = { messageId ->
-              model.editingMessageId == messageId
-            }
-          )
-        }
-
-
-        TaskChatContent(
-          model = model,
-          onEvent = viewModel::take,
-          chatActions = chatActions,
-          modifier = modifier,
-          onBack = onBack,
-          sendTaskMessage = { viewModel.take(InputText(it)) },
-          imagePicked = { scope.launch { router.push(ImageImport(it)) } },
-          pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
-          onCreateNewScope = { title ->
-            viewModel.take(TaskChatEvent.CreateNewScopeForTask(title))
-            navigation.pop()
-          },
-          navigateToCreateScope = navigateToCreateScope
-        )
-      }
-
-      is ImageImport -> {
-        ImageImportScreen(
-          imagePath = screen.imageFile.path,
-          onImport = { title ->
-            viewModel.take(TaskChatEvent.InputUserMedia(screen.imageFile, title))
-            router.pop()
-          },
-          onBack = router::pop
-        )
-      }
-
-      is ImagePreview -> {
-        ImagePreviewScreen(
-          imagePath = screen.imagePath,
-          onBack = router::pop,
-          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-          title = screen.title,
-        )
-      }
+    composable<ChatScreen.Preview> { backStackEntry ->
+      val screen = backStackEntry.toRoute<ChatScreen.Preview>()
+      ImagePreviewScreen(
+        imagePath = screen.imagePath,
+        onBack = { navController.popBackStack() },
+        onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+        title = screen.title,
+      )
     }
   }
 }
@@ -238,7 +205,7 @@ fun TaskChatScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TaskChatContent(
+fun TaskChatContent(
   model: TaskChatState,
   chatActions: ChatActions,
   onEvent: (TaskChatEvent) -> Unit,
@@ -248,8 +215,7 @@ private fun TaskChatContent(
   imagePicked: (PlatformFile) -> Unit = {},
   pdfPicked: (PlatformFile) -> Unit = {},
   logger: Logger = koinInject(),
-  onCreateNewScope: (String) -> Unit = {},
-  navigateToCreateScope: (onScopeCreated: (String) -> Unit) -> Unit = {},
+  isAIEnabled: Boolean = false
 ) {
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
@@ -259,13 +225,16 @@ private fun TaskChatContent(
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
   var showScopeSelection by remember { mutableStateOf(false) }
 
+  var showCreateScopeSheet by remember { mutableStateOf(false) }
+  val createScopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val task = model.task
   val scope = model.scope
   val messages = model.messages
   val editingMessageId = model.editingMessageId
   val editingMessageContent = model.editingMessageContent
-  val allScopes = model.allScopes
+  val allScopes = model.scopes
+  val isAILoading = model.isAILoading
   val focusManager = LocalFocusManager.current
   var titleLineCount by remember { mutableStateOf(0) }
 
@@ -292,8 +261,6 @@ private fun TaskChatContent(
   }
 
   val completionMessage = stringResource(Res.string.task_chat_complete_message)
-
-
   val prevIsComplete = remember { mutableStateOf(task.isComplete) }
 
   LaunchedEffect(task.isComplete) {
@@ -308,7 +275,7 @@ private fun TaskChatContent(
         if (!alreadyPosted) {
           delay(500)
           onEvent(
-            TaskChatEvent.CreateTaskCompletionMessage(
+            CreateTaskCompletionMessage(
               content = completionMessage
             )
           )
@@ -328,6 +295,16 @@ private fun TaskChatContent(
     }
   }
 
+  val aiMessages = remember(messages) {
+    messages.filter { it.contentType == ContentType.AI_TASK_MESSAGE }
+  }
+
+  LaunchedEffect(aiMessages) {
+    logger.d { "AI Messages: ${aiMessages.size}" }
+    aiMessages.forEach { message ->
+      logger.d { "AI Message: id=${message.id}, content='${message.content}'" }
+    }
+  }
 
   val scopeName = scope.name
 
@@ -342,7 +319,6 @@ private fun TaskChatContent(
         onLabelClick = { showScopeSelection = true }
       )
     },
-    modifier = modifier.navigationBarsPadding(),
     containerColor = Color.Transparent,
   ) { scaffoldPadding ->
     Box(
@@ -368,8 +344,8 @@ private fun TaskChatContent(
           modifier = modifier.weight(1f),
           scrollState = scrollState,
           contentPadding = contentPadding,
+          isAILoading = isAILoading,
         )
-
         AnimatedVisibility(
           visible = !task.isComplete,
           modifier = Modifier.background(Color.Transparent)
@@ -383,7 +359,7 @@ private fun TaskChatContent(
             ) {
               EditingMessageReference(
                 message = editingMessage,
-                onCancelEdit = { onEvent(TaskChatEvent.SetEditingMessage(-1)) }
+                onCancelEdit = { onEvent(CancelEditingMessage) }
               )
             }
             Spacer(modifier.height(8.dp))
@@ -397,14 +373,17 @@ private fun TaskChatContent(
               },
               pickImage = { singleImagePickerLauncher.launch() },
               pickPdf = { singleFilePickerLauncher.launch() },
+              enabled = !showCreateScopeSheet,
               editingMessageId = editingMessageId,
               editingContent = editingMessageContent,
               onCancelEdit = {
-                onEvent(TaskChatEvent.SetEditingMessage(-1))
+                onEvent(CancelEditingMessage)
               },
               onUpdateMessage = { content ->
-                onEvent(TaskChatEvent.UpdateMessageContent(content))
+                onEvent(UpdateMessageContent(content))
               },
+              //isAIEnabled = isAIEnabled,
+              onToggleAI = { onEvent(ActivateAI) },
               modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent),
@@ -455,10 +434,29 @@ private fun TaskChatContent(
       scopes = allScopes,
       sheetState = scopeSheetState,
       addSelectedTasksToScope = { scopeId ->
-        onEvent(TaskChatEvent.MoveTaskToScope(scopeId))
+        onEvent(MoveTaskToScope(scopeId))
       },
       createNewScope = {
-        navigateToCreateScope(onCreateNewScope)
+        showCreateScopeSheet = true
+      }
+    )
+  }
+
+  if (showCreateScopeSheet) {
+    CreateScopeBottomSheet(
+      sheetState = createScopeSheetState,
+      onDismissRequest = {
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
+      },
+      onConfirm = { scopeName ->
+        onEvent(CreateNewScopeForTask(scopeName))
+        coroutineScope.launch {
+          createScopeSheetState.hide()
+          showCreateScopeSheet = false
+        }
       }
     )
   }
@@ -471,10 +469,13 @@ private fun TaskChatInput(
   pickImage: () -> Unit,
   pickPdf: () -> Unit,
   modifier: Modifier = Modifier,
-  editingMessageId: Long? = null,
+  enabled: Boolean = true,
+  editingMessageId: Uuid? = null,
   editingContent: String = "",
   onCancelEdit: () -> Unit = {},
-  onUpdateMessage: (String) -> Unit = {}
+  onUpdateMessage: (String) -> Unit = {},
+  //isAIEnabled: Boolean = false,
+  onToggleAI: () -> Unit = {}
 ) {
   val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
@@ -487,7 +488,7 @@ private fun TaskChatInput(
     inputs = arrayOf(editingMessageId, editingContent)
   ) {
     mutableStateOf(
-      if (editingMessageId != null && editingMessageId > 0)
+      if (editingMessageId != null)
         TextFieldValue(editingContent, TextRange(editingContent.length))
       else
         TextFieldValue("")
@@ -495,7 +496,7 @@ private fun TaskChatInput(
   }
 
   LaunchedEffect(editingMessageId, editingContent) {
-    if (editingMessageId != null && editingMessageId > 0) {
+    if (editingMessageId != null) {
       userInputValue = TextFieldValue(editingContent, TextRange(editingContent.length))
       isTextEmpty.value = editingContent.isEmpty()
       showSendIcon.value = !isTextEmpty.value
@@ -515,21 +516,45 @@ private fun TaskChatInput(
   ) {
     UserInput(
       modifier = Modifier.align(Alignment.BottomCenter),
+      enablePadding = enabled,
       textContent = {
         val weight = if (isTextEmpty.value) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
+            //isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
               isTextEmpty.value = it.text.isBlank()
               showSendIcon.value = !isTextEmpty.value
-              if (editingMessageId != null && editingMessageId > 0) {
+              if (editingMessageId != null) {
                 onUpdateMessage(it.text)
               }
             },
             backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.focusRequester(focusRequester),
+            /*   leadingContent = {
+                 IconButton(
+                   onClick = onToggleAI,
+                 ) {
+                   Crossfade(
+                     targetState = isAIEnabled,
+                     animationSpec = tween(
+                       durationMillis = 300,
+                       easing = FastOutSlowInEasing
+                     )
+                   ) { aiEnabled ->
+                     Icon(
+                       painter = if (aiEnabled)
+                         painterResource(Res.drawable.ic_ai_enabled)
+                       else
+                         painterResource(Res.drawable.ic_ai_disabled),
+                       contentDescription = "Toggle AI",
+                       tint = Color.Unspecified
+                     )
+                   }
+                 }
+               },*/
             actionsContent = {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -537,8 +562,22 @@ private fun TaskChatInput(
                 modifier = Modifier.fillMaxWidth()
               ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                  this@Row.AnimatedVisibility(
-                    visible = isTextEmpty.value && (editingMessageId == null || editingMessageId <= 0),
+                  SendIcon(
+                    onClick = {
+                      if (editingMessageId != null) {
+                        onUpdateMessage(userInputValue.text)
+                        onCancelEdit()
+                      } else {
+                        sendTaskMessage(userInputValue.text)
+                        userInputValue = TextFieldValue("")
+                        isTextEmpty.value = true
+                        showSendIcon.value = false
+                      }
+                    },
+                    enabled = userInputValue.text.isNotBlank()
+                  )
+                  /*this@Row.AnimatedVisibility(
+                    visible = isTextEmpty.value && editingMessageId == null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                   ) {
@@ -550,51 +589,53 @@ private fun TaskChatInput(
                         contentDescription = stringResource(Res.string.cd_select_images)
                       )
                     }
-                  }
+                  }*/
 
-                  this@Row.AnimatedVisibility(
-                    visible = !isTextEmpty.value || (editingMessageId != null && editingMessageId > 0),
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                  ) {
-                    SendIcon(onClick = {
-                      if (editingMessageId != null && editingMessageId > 0) {
-                        onUpdateMessage(userInputValue.text)
-                        onCancelEdit()
-                      } else {
-                        sendTaskMessage(userInputValue.text)
-                        userInputValue = TextFieldValue("")
-                        isTextEmpty.value = true
-                        showSendIcon.value = false
-                      }
-                    })
-                  }
+                  /* this@Row.AnimatedVisibility(
+                     visible = !isTextEmpty.value || editingMessageId != null,
+                     enter = fadeIn() + scaleIn(),
+                     exit = fadeOut() + scaleOut()
+                   ) {
+                     SendIcon(onClick = {
+                       if (editingMessageId != null) {
+                         onUpdateMessage(userInputValue.text)
+                         onCancelEdit()
+                       } else {
+                         sendTaskMessage(userInputValue.text)
+                         userInputValue = TextFieldValue("")
+                         isTextEmpty.value = true
+                         showSendIcon.value = false
+                       }
+                     })
+                   }*/
                 }
               }
 
-              DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-              ) {
-                DropdownMenuItem(onClick = {
-                  pickImage()
-                  showMenu = false
-                },
-                  text = {
-                    Text(
-                      text = stringResource(Res.string.select_image)
-                    )
-                  })
-                DropdownMenuItem(onClick = {
-                  pickPdf()
-                  showMenu = false
-                },
-                  text = {
-                    Text(
-                      text = stringResource(Res.string.select_pdf)
-                    )
-                  })
-              }
+//              DropdownMenu(
+//                expanded = showMenu,
+//                onDismissRequest = { showMenu = false }
+//              ) {
+//                DropdownMenuItem(
+//                  onClick = {
+//                    pickImage()
+//                    showMenu = false
+//                  },
+//                  text = {
+//                    Text(
+//                      text = stringResource(Res.string.select_image)
+//                    )
+//                  })
+//                DropdownMenuItem(
+//                  onClick = {
+//                    pickPdf()
+//                    showMenu = false
+//                  },
+//                  text = {
+//                    Text(
+//                      text = stringResource(Res.string.select_pdf)
+//                    )
+//                  })
+//              }
               /*VoiceToTextInput(
                 onUpdateValue = {
                   userInputValue = userInputValue.copy(text = it)
@@ -687,6 +728,7 @@ private fun TaskTopAppBar(
       actions = {
         Surface(
           onClick = onLabelClick,
+          enabled = !isComplete,
           color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.12F),
           shape = RoundedCornerShape(16.dp),
 
@@ -757,7 +799,7 @@ private fun TaskTopAppBar(
 
       },
       colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
       )
     )
   }

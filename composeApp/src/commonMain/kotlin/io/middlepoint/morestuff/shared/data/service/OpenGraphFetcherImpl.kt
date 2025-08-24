@@ -1,19 +1,17 @@
 package io.middlepoint.morestuff.shared.data.service
 
+//import io.ktor.client.engine.cio.CIO
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlHandler
 import com.mohamedrejeb.ksoup.html.parser.KsoupHtmlParser
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
-import io.middlepoint.morestuff.shared.ui.utils.HttpClientProvider
 import io.middlepoint.morestuff.shared.domain.model.OpenGraphResult
 import io.middlepoint.morestuff.shared.domain.service.OpenGraphFetcher
+import io.middlepoint.morestuff.shared.ui.utils.HttpClientProvider
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
 
@@ -21,7 +19,7 @@ class OpenGraphFetcherImpl : OpenGraphFetcher {
   private val httpClientProvider = HttpClientProvider()
 
   override suspend fun fetchOpenGraphMetadata(inputUrl: String): OpenGraphResult? =
-    withContext(Dispatchers.IO) {
+    withContext(Dispatchers.Default) {
       val client = httpClientProvider.createHttpClient(followRedirects = true)
 
       try {

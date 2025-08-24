@@ -1,10 +1,9 @@
 package io.middlepoint.morestuff.shared.domain.usecase.task
 
+import io.middlepoint.morestuff.android.domain.DEFAULT_SCOPE
 import io.middlepoint.morestuff.android.domain.createTaskForTest
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Priority
-import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
 import io.middlepoint.morestuff.shared.domain.usecase.priority.GetDefaultPriorityScoreUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -22,9 +21,9 @@ class CreateNewTaskUseCaseTest {
 
     @Test
     fun `create new task use case`() = runBlocking {
-        val taskParams = TaskParams("title", Priority.Now(), TaskType.User, defaultScope.id)
+        val taskParams = TaskParams("title", Priority.Now(), DEFAULT_SCOPE.id)
         val task = createTaskForTest()
-        coEvery { taskRepository.createTask(any(), any(), any(), any()) } returns task
+        coEvery { taskRepository.createTask(any(), any(), any()) } returns task
         coEvery { getDefaultPriorityScoreUseCase(taskParams.priority) } returns 0
         val result = useCase.invoke(taskParams)
         assertEquals(task, result)

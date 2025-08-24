@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
 import io.middlepoint.morestuff.shared.ui.components.ScopeCarousel
 import io.middlepoint.morestuff.shared.ui.components.TaskCard
@@ -81,8 +82,6 @@ import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.DeleteTa
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ItemSwipe
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.LoadScope
 import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.ToggleReviewHint
-import io.middlepoint.morestuff.shared.ui.screen.review.ReviewViewEvent.Undo
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.reviewIconTint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -112,18 +111,20 @@ import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @NonRestartableComposable
 @Composable
 fun ReviewScreen(
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
-  currentScopeId: Long,
+  initialScopeId: Uuid,
 ) {
   ReviewContent(
     onBack = onBack,
     modifier = modifier,
-    currentScopeId = currentScopeId
+    currentScopeId = initialScopeId
   )
 }
 
@@ -132,10 +133,13 @@ fun ReviewScreen(
 fun ReviewContent(
   onBack: () -> Unit,
   modifier: Modifier = Modifier,
-  currentScopeId: Long,
+  currentScopeId: Uuid,
 ) {
 
-  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
+  val viewModel = koinViewModel<ReviewViewModel>{
+    parametersOf(currentScopeId)
+  }
+
   val model by viewModel.models.collectAsState()
 
   val scope = rememberCoroutineScope()
@@ -167,6 +171,7 @@ fun ReviewContent(
             navigateUp = onBack,
             showReviewHelpScreen = { showReviewHelpScreen = true },
             isReviewHintActive = model.reviewHintEnabled,
+            onEvent = viewModel::take,
             modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
           ) {
             ScopeCarousel(
@@ -323,10 +328,9 @@ private fun PriorityReviewTopBar(
   isReviewHintActive: Boolean,
   modifier: Modifier = Modifier,
   navigateUp: () -> Unit = {},
+  onEvent: (ReviewViewEvent) -> Unit,
   scopeSelectorContent: @Composable () -> Unit
 ) {
-
-  val viewModel = koinInjectOnRoute(ReviewViewModel::class)
 
   val coroutineScope = rememberCoroutineScope()
   var showMenu by remember { mutableStateOf(false) }
@@ -364,12 +368,13 @@ private fun PriorityReviewTopBar(
           expanded = showMenu,
           onDismissRequest = { showMenu = false }
         ) {
-          DropdownMenuItem(onClick = {
-            coroutineScope.launch {
-              viewModel.take(ToggleReviewHint)
-              showMenu = false
-            }
-          },
+          DropdownMenuItem(
+            onClick = {
+              coroutineScope.launch {
+                onEvent(ToggleReviewHint)
+                showMenu = false
+              }
+            },
             text = {
               Text(
                 text = if (isReviewHintActive) {
@@ -454,7 +459,7 @@ private fun ReviewSwipeControls(
           lastItemSwiped()?.let { item ->
             scope.launch {
               item.second.undo()
-              modelAction(Undo(item.first))
+              modelAction(ReviewViewEvent.Undo(item.first))
             }
           }
         },

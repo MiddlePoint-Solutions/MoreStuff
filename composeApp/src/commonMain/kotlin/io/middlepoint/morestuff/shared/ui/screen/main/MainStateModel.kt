@@ -2,14 +2,16 @@ package io.middlepoint.morestuff.shared.ui.screen.main
 
 import io.middlepoint.morestuff.shared.domain.enums.AppTheme
 import io.middlepoint.morestuff.shared.domain.model.Shareable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 
 data class MainState(
     val ready: Boolean = false,
     val theme: AppTheme = AppTheme.System,
-    val showOnBoarding: Boolean = false,
+    val isAuthenticated: Boolean = false,
+    val showOldUserMessage: Boolean = false,
 )
 
 sealed class MainEvent {
     data object OnBoardingComplete : MainEvent()
-    data class ShareContent(val taskId: Long, val content: Shareable) : MainEvent()
+    data class ShareContent(val taskId: Uuid, val content: Shareable) : MainEvent()
 }

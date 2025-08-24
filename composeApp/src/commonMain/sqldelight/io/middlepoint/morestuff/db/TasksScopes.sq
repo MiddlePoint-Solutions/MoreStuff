@@ -1,0 +1,62 @@
+import io.middlepoint.morestuff.shared.domain.model.Uuid;
+import kotlin.Boolean;
+import kotlinx.datetime.Instant;
+
+CREATE TABLE IF NOT EXISTS tasks_scopes (
+    task_id TEXT AS Uuid NOT NULL PRIMARY KEY,
+    scope_id TEXT AS Uuid NOT NULL,
+    created_at INTEGER AS Instant NOT NULL,
+    updated_at INTEGER AS Instant NOT NULL,
+    deleted INTEGER AS Boolean NOT NULL DEFAULT 0,
+    FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+    FOREIGN KEY(scope_id) REFERENCES scopes(id) ON DELETE CASCADE
+);
+
+selectAllUpdates:
+SELECT *
+FROM tasks_scopes
+WHERE updated_at > ?;
+
+insert:
+INSERT OR IGNORE INTO tasks_scopes
+VALUES ?;
+
+upsert:
+INSERT INTO tasks_scopes
+VALUES ?
+ON CONFLICT(task_id) DO UPDATE
+  SET scope_id       = excluded.scope_id,
+      updated_at     = excluded.updated_at,
+      deleted        = excluded.deleted
+  WHERE excluded.updated_at > updated_at;
+
+update:
+UPDATE tasks_scopes
+SET scope_id = :scope_id
+WHERE task_id IN :task_ids;
+
+remove:
+DELETE FROM tasks_scopes
+WHERE task_id IN :task_id AND scope_id = :scope_id;
+
+selectScopeIdForTask:
+SELECT scope_id
+FROM tasks_scopes
+WHERE task_id = :taskId;
+
+deleteAll:
+DELETE FROM tasks_scopes;
+
+
+-- Triggers
+
+-- Only update the timestamp when other columns change
+CREATE TRIGGER IF NOT EXISTS tasks_scopes_updated_at
+AFTER UPDATE ON tasks_scopes
+FOR EACH ROW
+WHEN new.updated_at = old.updated_at
+BEGIN
+  UPDATE tasks_scopes
+  SET updated_at = unixepoch('subsec') * 1000
+  WHERE task_id = old.task_id;
+END;

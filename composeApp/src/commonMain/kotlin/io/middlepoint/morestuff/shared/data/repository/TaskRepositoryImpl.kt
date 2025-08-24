@@ -1,5 +1,8 @@
 package io.middlepoint.morestuff.shared.data.repository
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneNotNull
@@ -8,23 +11,26 @@ import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
 import io.middlepoint.morestuff.db.StuffDb
+import io.middlepoint.morestuff.db.Tasks_scopes
 import io.middlepoint.morestuff.shared.data.mapper.DataMappers
-import io.middlepoint.morestuff.shared.data.mapper.TaskDb
+import io.middlepoint.morestuff.shared.data.mapper.TaskData
+import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
-import io.middlepoint.morestuff.shared.domain.enums.TaskType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.TaskDomain
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.DEFAULT_SCOPE_NAME
+import io.middlepoint.morestuff.shared.domain.model.core.Task
 import io.middlepoint.morestuff.shared.domain.repository.TaskDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.TaskRepository
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import io.middlepoint.morestuff.shared.generateUUID
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Instant
 
 class TaskRepositoryImpl(
   database: StuffDb,
@@ -32,164 +38,157 @@ class TaskRepositoryImpl(
   private val timeManager: TimeManager,
 ) : TaskRepository {
 
-  private val taskQueries = database.taskQueries
-  private val scheduleQueries = database.scheduleQueries
-  private val messageQueries = database.messageQueries
-  private val taskScopeQueries = database.taskScopeQueries
-  private val lastInsertedRowId get() = taskQueries.lastInsertRowId().executeAsOne()
+  private val taskQueries = database.tasksQueries
+  private val scopeQueries = database.scopesQueries
+  private val scheduleQueries = database.schedulesQueries
+  private val messageQueries = database.messagesQueries
+  private val taskScopeQueries = database.tasksScopesQueries
 
   override suspend fun createTask(
     title: String,
+    scopeId: Uuid,
     priorityScore: Long,
-    taskType: TaskType,
-    scopeId: Long?,
-  ): TaskDomain {
+    completedAt: Instant?,
+    completedTimezone: String?,
+  ): Task {
     return taskQueries.transactionWithResult {
+
       val data = createTaskData(
         title = title,
+        createdAt = timeManager.nowUtcInstant,
         priorityScore = priorityScore,
-        taskType = taskType
+        completedAt = completedAt,
+        completedTimezone = completedTimezone
       )
       taskQueries.insertTask(data)
-      val taskId = lastInsertedRowId
 
-      scopeId?.let {
-        taskScopeQueries.insert(taskId, it)
-      }
-
-      taskQueries.selectTaskById(taskId, mapper = mapper.taskDbMapper).executeAsOne()
+      val tasksScopesItem = Tasks_scopes(
+        task_id = data.id,
+        scope_id = scopeId,
+        created_at = data.created_at,
+        updated_at = data.updated_at,
+        deleted = false
+      )
+      taskScopeQueries.insert(tasksScopesItem)
+      taskQueries.selectTaskById(data.id, mapper = mapper.taskDataMapper).awaitAsOne()
     }
   }
 
-  override suspend fun getTask(taskId: Long): Either<Failure, TaskDomain> =
-    getTaskFlow(taskId).firstOrNull()?.right() ?: TaskDoesNotExist.left()
+  override suspend fun getTask(taskId: Uuid): Either<Failure, Task> =
+    taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
+      .awaitAsOneOrNull()?.right() ?: TaskDoesNotExist.left()
 
-  override suspend fun getAllTasks(): List<TaskDomain> =
-    taskQueries.selectAll(mapper.taskDbMapper).executeAsList()
+  override suspend fun getAllTasks(): List<Task> =
+    taskQueries.selectAll(mapper = mapper.taskDataMapper).awaitAsList()
 
-  override suspend fun getActiveTasks(): List<TaskDomain> {
-    return taskQueries.selectAllActive(mapper.taskDbMapper).executeAsList()
+  override suspend fun getActiveTasks(): List<Task> {
+    return taskQueries.selectAllActive(mapper = mapper.taskDataMapper).awaitAsList()
   }
 
-  override fun getTaskFlow(taskId: Long): Flow<TaskDomain> {
-    val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDbMapper)
+  override fun getTaskFlow(taskId: Uuid): Flow<Task> {
+    val taskFlow = taskQueries.selectTaskById(taskId, mapper.taskDataMapper)
       .asFlow()
-      .mapToOneNotNull(Dispatchers.IO)
+      .mapToOneNotNull(Dispatchers.Default)
 
     val schedulesFlow =
-      scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
+      scheduleQueries.selectActiveSchedulesByTaskId(taskId, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
 
     return combine(taskFlow, schedulesFlow) { task, schedules ->
       task.copy(schedule = schedules)
     }
   }
 
-  override fun getActiveTasksFlow(): Flow<List<TaskDomain>> {
-    val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
-      .asFlow().mapToList(Dispatchers.IO)
+  override fun getActiveTasksFlow(): Flow<List<Task>> {
+    val tasksFlow = taskQueries.selectAllActive(mapper.taskDataMapper)
+      .asFlow().mapToList(Dispatchers.Default)
     return combinedTaskFlow(tasksFlow)
   }
 
-  override fun getScopeActiveTasksFlow(scopeId: Long): Flow<List<TaskDomain>> {
-    val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDbMapper)
-      .asFlow().mapToList(Dispatchers.IO)
+  override fun getScopeActiveTasksFlow(scopeId: Uuid): Flow<List<Task>> {
+    val tasksFlow = taskQueries.selectTasksByScopeId(scopeId, mapper.taskDataMapper)
+      .asFlow().mapToList(Dispatchers.Default)
     return combinedTaskFlow(tasksFlow)
   }
 
-  override fun getCompleteTasksFlow(): Flow<List<TaskDomain>> =
-    taskQueries.selectAllComplete(mapper = mapper.taskDbMapper)
+  override suspend fun getScopeActiveTasks(scopeId: Uuid): List<Task> {
+    return taskQueries.selectTasksByScopeId(scopeId, mapper.taskDataMapper).awaitAsList()
+  }
+
+  override fun getCompleteTasksFlow(): Flow<List<Task>> =
+    taskQueries.selectAllComplete(mapper = mapper.taskDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
 
   override suspend fun getTaskAbovePriorityScore(
     priorityScore: Long,
-  ): Either<Failure, TaskDomain> = taskQueries.transactionWithResult {
-    val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapper.taskDbMapper)
-      .executeAsOneOrNull()
+  ): Either<Failure, Task> = taskQueries.transactionWithResult {
+    val task = taskQueries.selectAbovePriorityScore(priorityScore, mapper = mapper.taskDataMapper)
+      .awaitAsOneOrNull()
 
     task?.let {
       val schedules =
-        scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
-          .executeAsList()
+        scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDataMapper)
+          .awaitAsList()
       task.copy(schedule = schedules).right()
     } ?: TaskDoesNotExist.left()
   }
 
-  override suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, TaskDomain> =
+  override suspend fun getTaskBelowPriorityScore(priorityScore: Long): Either<Failure, Task> =
     taskQueries.transactionWithResult {
       val task =
-        taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDbMapper)
-          .executeAsOneOrNull()
+        taskQueries.selectBelowPriorityScore(priorityScore, mapper = mapper.taskDataMapper)
+          .awaitAsOneOrNull()
 
       task?.let {
         val schedules =
-          scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDbMapper)
-            .executeAsList()
+          scheduleQueries.selectActiveSchedulesByTaskId(it.id, mapper.scheduleDataMapper)
+            .awaitAsList()
         task.copy(schedule = schedules).right()
       } ?: TaskDoesNotExist.left()
     }
 
   override suspend fun updateTasksComplete(
-    taskIds: List<Long>,
+    taskIds: List<Uuid>,
     complete: Boolean,
-  ): Either<Failure, Boolean> {
-    val time = when (complete) {
-      true -> timeManager.nowUtcInstantString
-      false -> null
+  ): Either<Failure, Boolean> = taskQueries.transactionWithResult {
+    if (complete) {
+      taskQueries.updateTaskComplete(
+        task_ids = taskIds,
+        completed_time = timeManager.nowUtcInstant,
+        timezone = timeManager.currentTimeZone.id
+      )
+    } else {
+      taskQueries.updateTaskComplete(
+        task_ids = taskIds,
+        completed_time = null,
+        timezone = null
+      )
     }
-
-    return taskQueries.transactionWithResult {
-      taskQueries.updateTaskComplete(time, taskIds)
-      Right(true)
-    }
+    Right(true)
   }
 
   override suspend fun updateTaskTitle(
-    taskId: Long,
+    taskId: Uuid,
     title: String,
   ): Either<Failure, Boolean> {
     taskQueries.updateTaskTitle(title, taskId)
     return Right(true)
   }
 
-  override suspend fun getTasksWithoutSchedule(
-    scopeId: Long
-  ): Either<Failure, List<TaskDomain>> {
-    val tasksWithoutSchedule = taskQueries.getActiveTaskWithoutScheduleByScopeId(
-      scope_id = scopeId,
-      schedule_types = listOf(ScheduleType.OneTime),
-      mapper = mapper.taskDbMapper
-    ).executeAsList()
-
-    val firstTaskMessagesWithType =
-      messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
-        .executeAsList()
-        .map { it.task_id }
-        .toSet()
-
-    val tasksWithExtraDetails = tasksWithoutSchedule.map { task ->
-      task.copy(
-        extraDetails = firstTaskMessagesWithType.contains(task.id)
-      )
-    }
-    return tasksWithExtraDetails.right()
-  }
-
-
   override suspend fun getTasksWithSchedule(
     scheduleTypes: List<ScheduleType>,
-  ): Either<Failure, List<TaskDomain>> {
+  ): Either<Failure, List<Task>> {
 
-    val tasksFlow = taskQueries.selectAllActive(mapper.taskDbMapper)
+    val tasksFlow = taskQueries.selectAllActive(mapper.taskDataMapper)
       .asFlow()
-      .mapToList(Dispatchers.IO)
+      .mapToList(Dispatchers.Default)
 
     val schedulesFlow =
-      scheduleQueries.selectActiveSchedules(scheduleTypes, mapper.scheduleDbMapper)
+      scheduleQueries.selectActiveSchedules(scheduleTypes, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
 
     return tasksFlow.combine(schedulesFlow) { tasks, schedules ->
       schedules
@@ -206,24 +205,24 @@ class TaskRepositoryImpl(
     }.firstOrNull()?.right() ?: TaskDoesNotExist.left()
   }
 
-  override fun searchTasks(searchText: String, activeOnly: Boolean): Flow<List<TaskDomain>> {
+  override fun searchTasks(searchText: String, activeOnly: Boolean): Flow<List<Task>> {
     val isCyrillic = searchText.any { char ->
       char.code in 0x0400..0x04FF
     }
     if (searchText.isEmpty() || !isCyrillic) {
       return when (activeOnly) {
-        true -> taskQueries.searchActiveTasks(searchText, mapper = mapper.taskDbMapper)
-        false -> taskQueries.searchTasks(searchText, mapper = mapper.taskDbMapper)
+        true -> taskQueries.searchActiveTasks(searchText, mapper = mapper.taskDataMapper)
+        false -> taskQueries.searchTasks(searchText, mapper = mapper.taskDataMapper)
       }.asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { tasks -> tasks.sortedBy { it.isComplete } }
         .let { combinedTaskFlow(it) }
     } else {
       val tasksFlow = when (activeOnly) {
-        true -> taskQueries.selectAllActiveForSearch(mapper.taskDbMapper)
-        false -> taskQueries.selectAllForSearch(mapper.taskDbMapper)
+        true -> taskQueries.selectAllActiveForSearch(mapper.taskDataMapper)
+        false -> taskQueries.selectAllForSearch(mapper.taskDataMapper)
       }.asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { tasks -> tasks.sortedBy { it.isComplete } }
 
       return tasksFlow
@@ -238,52 +237,70 @@ class TaskRepositoryImpl(
 
   private fun createTaskData(
     title: String,
+    createdAt: Instant,
     priorityScore: Long,
-    taskType: TaskType,
-  ) = TaskDb(
-    id = 0,
-    uuid = generateUUID(),
+    completedAt: Instant? = null,
+    completedTimezone: String? = null,
+  ) = TaskData(
+    id = Uuid.generate(),
     title = title,
-    create_time = timeManager.getCreateTime(),
-    complete_time = null,
+    created_at = createdAt,
+    updated_at = createdAt,
+    completed_at = completedAt,
+    completed_timezone = completedTimezone,
     priority_score = priorityScore,
-    task_type = taskType
+    deleted = false
   )
 
-  override suspend fun deleteTasks(taskIds: List<Long>): Either<Failure, Boolean> {
+  override suspend fun deleteTasks(taskIds: List<Uuid>): Either<Failure, Boolean> {
     taskQueries.deleteTask(taskIds)
     return Right(true)
   }
 
   override suspend fun countActiveTasks(): Either<Failure, Int> =
-    taskQueries.countActiveTasks().executeAsOne().toInt().right()
+    taskQueries.countActiveTasks().awaitAsOne().toInt().right()
 
 
-  override suspend fun insertTasksIntoScope(taskIds: List<Long>, scopeId: Long) {
+  override suspend fun insertTasksIntoScope(taskIds: List<Uuid>, scopeId: Uuid) {
     taskScopeQueries.transaction {
-      taskIds.forEach { taskScopeQueries.insert(it, scopeId) }
+      val tasksScope = taskIds.map { createTasksScopeData(it, scopeId) }
+      tasksScope.forEach { taskScopeQueries.insert(it) }
     }
   }
 
-  override suspend fun removeTasksFromScope(taskIds: List<Long>, scopeId: Long) {
+  private fun createTasksScopeData(
+    it: Uuid,
+    scopeId: Uuid
+  ): Tasks_scopes {
+    val createdAt = timeManager.nowUtcInstant
+    return Tasks_scopes(
+      task_id = it,
+      scope_id = scopeId,
+      created_at = createdAt,
+      updated_at = createdAt,
+      deleted = false
+    )
+  }
+
+  override suspend fun removeTasksFromScope(taskIds: List<Uuid>, scopeId: Uuid) {
     taskScopeQueries.remove(taskIds, scopeId)
   }
 
-  override suspend fun updateTasksScope(taskIds: List<Long>, scopeId: Long) {
+  override suspend fun updateTasksScope(taskIds: List<Uuid>, scopeId: Uuid) {
     taskScopeQueries.update(scope_id = scopeId, task_ids = taskIds)
   }
 
-  private fun combinedTaskFlow(tasksFlow: Flow<List<TaskDomain>>): Flow<List<TaskDomain>> {
+  private fun combinedTaskFlow(tasksFlow: Flow<List<Task>>): Flow<List<Task>> {
     val schedulesFlow =
-      scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDbMapper)
+      scheduleQueries.selectActiveSchedules(ScheduleType.entries, mapper.scheduleDataMapper)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { it.groupBy { schedule -> schedule.taskId } }
 
     val messagesFlow =
       messageQueries.selectFirstTaskMessageWithType(ContentType.TASK_MESSAGE.value)
         .asFlow()
-        .mapToList(Dispatchers.IO)
+        .mapToList(Dispatchers.Default)
         .map { messages ->
           messages.groupBy { message -> message.task_id }
             .mapValues { (_, messagesForTask) -> messagesForTask.firstOrNull() }
@@ -299,19 +316,19 @@ class TaskRepositoryImpl(
     }
   }
 
-  override suspend fun getTasksByIds(taskIds: List<Long>): Either<Failure, List<TaskDomain>> {
+  override suspend fun getTasksByIds(taskIds: List<Uuid>): Either<Failure, List<Task>> {
     if (taskIds.isEmpty()) return Either.Right(listOf())
 
     return taskQueries.transactionWithResult {
-      val tasks = mutableListOf<TaskDomain>()
+      val tasks = mutableListOf<Task>()
 
       for (taskId in taskIds) {
-        val task = taskQueries.selectTaskById(taskId, mapper.taskDbMapper).executeAsOneOrNull()
+        val task = taskQueries.selectTaskById(taskId, mapper.taskDataMapper).awaitAsOneOrNull()
           ?: continue
 
         val schedules = scheduleQueries
-          .selectActiveSchedulesByTaskId(taskId, mapper.scheduleDbMapper)
-          .executeAsList()
+          .selectActiveSchedulesByTaskId(taskId, mapper.scheduleDataMapper)
+          .awaitAsList()
 
         tasks.add(task.copy(schedule = schedules))
       }

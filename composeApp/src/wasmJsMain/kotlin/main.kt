@@ -1,11 +1,13 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.ComposeViewport
+import androidx.compose.ui.window.CanvasBasedWindow
+import io.middlepoint.morestuff.shared.di.initKoin
 import io.middlepoint.morestuff.shared.ui.App
-import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-  ComposeViewport(document.body!!) {
+  initKoin()
+
+  CanvasBasedWindow("MoreStuff", canvasElementId = "MoreStuffCanvas") {
     App()
   }
 }

@@ -1,11 +1,12 @@
 package io.middlepoint.morestuff.shared.ui.screen.schedule
 
 import androidx.compose.runtime.Composable
+import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.MoleculeViewModel
 import kotlinx.coroutines.flow.SharedFlow
 
 class ScopeTasksViewModel(
-    private val scopeId: Long,
+    private val scopeId: Uuid,
 ) : MoleculeViewModel<ScopeTasksEvent, ScopeTasksModels>() {
 
     override val initialState: ScopeTasksModels = ScopeTasksModels.Loading

@@ -51,7 +51,6 @@ import com.mohamedrejeb.calf.permissions.Permission
 import com.mohamedrejeb.calf.permissions.PermissionStatus
 import com.mohamedrejeb.calf.permissions.rememberPermissionState
 import io.middlepoint.morestuff.shared.domain.enums.Language
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cancel
 import morestuff.composeapp.generated.resources.record_audio_permission_description
@@ -59,6 +58,7 @@ import morestuff.composeapp.generated.resources.record_audio_permission_title
 import morestuff.composeapp.generated.resources.request_permission
 import morestuff.composeapp.generated.resources.voice_to_text_listening
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 
 @Composable
@@ -70,7 +70,7 @@ fun VoiceToTextInput(
   isHomeScreen: Boolean = false,
 ) {
 
-  val viewModel = koinInjectOnRoute(VoiceToTextViewModel::class)
+  val viewModel = koinInject<VoiceToTextViewModel>()
   val recordingState by viewModel.models.collectAsState()
 
   LaunchedEffect(recordingState.isListening) {

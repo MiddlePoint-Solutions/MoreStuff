@@ -1,9 +1,11 @@
 package io.middlepoint.morestuff.shared.domain.service
 
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+
 interface Scheduler {
-    fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String, taskId: Long)
-    fun schedulePlannedPriorityWorker()
-   // fun scheduleReviewWorker(hour: Int, minute: Int)
-    fun cancelSchedule(scheduleId: Long)
+    fun scheduleAtExact(scheduleId: Uuid, scheduleTime: String, taskTitle: String, taskId: Uuid)
+    fun scheduleDataSyncWorker()
+    fun cancelSchedule(scheduleId: Uuid)
     fun cancelPlannedPriorityUpdate()
+    fun dataSyncWorker()
 }

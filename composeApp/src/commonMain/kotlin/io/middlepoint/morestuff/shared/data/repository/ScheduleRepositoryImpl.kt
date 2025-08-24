@@ -1,116 +1,104 @@
 package io.middlepoint.morestuff.shared.data.repository
 
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import arrow.core.Either
 import arrow.core.Either.Right
 import arrow.core.left
 import arrow.core.right
-import io.middlepoint.morestuff.shared.data.mapper.DataMappers
 import io.middlepoint.morestuff.db.StuffDb
-import io.middlepoint.morestuff.shared.data.mapper.mapScheduleDomain
+import io.middlepoint.morestuff.shared.data.mapper.DataMappers
+import io.middlepoint.morestuff.shared.data.mapper.ScheduleData
+import io.middlepoint.morestuff.shared.data.utils.generate
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Failure
-import io.middlepoint.morestuff.shared.domain.model.core.ScheduleDomain
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Schedule
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleDoesNotExist
 import io.middlepoint.morestuff.shared.domain.repository.ScheduleRepository
+import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toInstant
 
 class ScheduleRepositoryImpl(
-    database: StuffDb,
-    private val mapper: DataMappers,
+  database: StuffDb,
+  private val mapper: DataMappers,
+  private val timeManager: TimeManager,
 ) : ScheduleRepository {
 
-    private val scheduleQueries = database.scheduleQueries
-    private val lastInsertId: Long get() = scheduleQueries.lastInsertRowId().executeAsOne()
+  private val scheduleQueries = database.schedulesQueries
 
-    override suspend fun createSchedule(
-      schedule: ScheduleDomain,
-    ): Either<Failure, ScheduleDomain> = scheduleQueries.transactionWithResult {
-        val data = mapScheduleDomain(schedule)
-        scheduleQueries.insertSchedule(data)
-        schedule.copy(id = lastInsertId).right()
-    }
+  override suspend fun createSchedule(
+    taskId: Uuid,
+    scheduleType: ScheduleType,
+    localDateTime: LocalDateTime,
+  ): Either<Failure, Schedule> = scheduleQueries.transactionWithResult {
 
-    override suspend fun getSchedule(scheduleId: Long): Either<Failure, ScheduleDomain> =
-        scheduleQueries.selectScheduleById(scheduleId, mapper.scheduleDbMapper)
-            .executeAsOneOrNull()
-            ?.right() ?: ScheduleDoesNotExist.left()
+    val createdAt = timeManager.nowUtcInstant
+    val timezone = timeManager.currentTimeZone
 
-    override suspend fun getSchedules(scheduleIds: List<Long>): Either<Failure, List<ScheduleDomain>> =
-        scheduleQueries.selectSchedulesById(scheduleIds, mapper.scheduleDbMapper)
-            .executeAsList()
-            .right()
+    val data = ScheduleData(
+      id = Uuid.generate(),
+      task_id = taskId,
+      created_at = createdAt,
+      updated_at = createdAt,
+      scheduled_at = localDateTime.toInstant(timezone),
+      timezone = timezone.id,
+      active = true,
+      schedule_type = scheduleType,
+      deleted = false
+    )
 
-    override suspend fun getActiveSchedules(): Either<Failure, List<ScheduleDomain>> {
-        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        return scheduleQueries
-            .selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
-            .executeAsList()
-            .right()
-    }
+    scheduleQueries.insertSchedule(data)
+    scheduleQueries
+      .selectScheduleById(data.id, mapper.scheduleDataMapper)
+      .awaitAsOne().right()
+  }
 
-    override fun getActiveSchedulesFlow(): Flow<List<ScheduleDomain>> {
-        val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
-        return scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDbMapper)
-            .asFlow()
-            .mapToList(Dispatchers.IO)
-    }
+  override suspend fun getSchedule(scheduleId: Uuid): Either<Failure, Schedule> =
+    scheduleQueries.selectScheduleById(scheduleId, mapper.scheduleDataMapper)
+      .awaitAsOneOrNull()
+      ?.right() ?: ScheduleDoesNotExist.left()
 
-    override suspend fun getActiveSchedulesByTime(
-        startTime: String,
-        endTime: String,
-    ): Either<Failure, List<ScheduleDomain>> =
-        getActiveSchedulesByTimeFlow(startTime, endTime).firstOrNull()
-            ?.right() ?: ScheduleDoesNotExist.left()
+  override suspend fun getSchedules(scheduleIds: List<Uuid>): Either<Failure, List<Schedule>> =
+    scheduleQueries.selectSchedulesById(scheduleIds, mapper.scheduleDataMapper)
+      .awaitAsList()
+      .right()
 
-    override fun getActiveSchedulesByTimeFlow(
-        startTime: String,
-        endTime: String
-    ): Flow<List<ScheduleDomain>> = scheduleQueries
-        .selectActiveSchedulesFromStartToEndTime(startTime, endTime, mapper.scheduleDbMapper)
-        .asFlow()
-        .mapToList(Dispatchers.IO)
+  override suspend fun getActiveSchedules(): Either<Failure, List<Schedule>> {
+    val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
+    return scheduleQueries
+      .selectActiveSchedules(allScheduleTypes, mapper.scheduleDataMapper)
+      .awaitAsList()
+      .right()
+  }
 
-    override suspend fun getActiveSchedulesForTasks(
-        taskIds: List<Long>,
-        scheduleType: List<ScheduleType>
-    ): Either<Failure, List<ScheduleDomain>> =
-        scheduleQueries.selectActiveScheduleByTaskId(
-            taskIds,
-            scheduleType,
-            mapper = mapper.scheduleDbMapper
-        ).executeAsList().right()
+  override fun getActiveSchedulesFlow(): Flow<List<Schedule>> {
+    val allScheduleTypes = listOf(ScheduleType.OneTime, ScheduleType.Reminder)
+    return scheduleQueries.selectActiveSchedules(allScheduleTypes, mapper.scheduleDataMapper)
+      .asFlow()
+      .mapToList(Dispatchers.Default)
+  }
 
-    override fun getActiveSchedulesForTaskFlow(
-        taskIds: List<Long>,
-        scheduleType: List<ScheduleType>
-    ): Flow<List<ScheduleDomain>> =
-        scheduleQueries.selectActiveScheduleByTaskId(
-            taskIds,
-            scheduleType,
-            mapper = mapper.scheduleDbMapper
-        )
-            .asFlow()
-            .mapToList(Dispatchers.IO)
+  override suspend fun getActiveSchedulesForTasks(
+    taskIds: List<Uuid>,
+    scheduleType: List<ScheduleType>
+  ): Either<Failure, List<Schedule>> =
+    scheduleQueries.selectActiveScheduleByTaskId(
+      taskIds,
+      scheduleType,
+      mapper = mapper.scheduleDataMapper
+    ).awaitAsList().right()
 
-    override suspend fun setScheduleFulfilled(scheduleId: Long): Either<Failure, Long> {
-        scheduleQueries.updateScheduleActive(false, scheduleId)
-        return Right(scheduleId)
-    }
-
-    override suspend fun countTodayTaskSchedules(
-        taskId: Long,
-        startTime: String,
-        endTime: String,
-    ): Either<Failure, Int> {
-        val limit =
-            scheduleQueries.countTaskSchedulesByTime(taskId, startTime, endTime).executeAsOne()
-        return Right(limit.toInt())
-    }
+  override suspend fun setScheduleFulfilled(scheduleId: Uuid): Either<Failure, Boolean> {
+    scheduleQueries.updateScheduleActive(false, scheduleId)
+    return Right(true)
+  }
 
 }

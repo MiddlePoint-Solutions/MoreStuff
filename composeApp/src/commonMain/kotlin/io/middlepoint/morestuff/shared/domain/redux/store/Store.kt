@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.redux.store
 
-import io.middlepoint.morestuff.shared.domain.redux.middleware.Middleware
+import io.middlepoint.morestuff.shared.domain.redux.Middleware
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*

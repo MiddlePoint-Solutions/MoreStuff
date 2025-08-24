@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.repository
 
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
@@ -11,8 +12,18 @@ interface TimeFormatter {
     timeZone: TimeZone = TimeZone.currentSystemDefault()
   ): String
 
+  fun formatDisplayDayMonth(
+    instant: Instant,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
+
   fun formatDisplayTime(
     timeString: String,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+  ): String
+
+  fun formatDisplayTime(
+    instant: Instant,
     timeZone: TimeZone = TimeZone.currentSystemDefault()
   ): String
 

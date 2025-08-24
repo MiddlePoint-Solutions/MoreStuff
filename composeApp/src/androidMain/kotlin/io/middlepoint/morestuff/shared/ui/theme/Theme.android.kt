@@ -31,12 +31,7 @@ actual fun MoreStuffTheme(content: @Composable () -> Unit) {
   }
 
   val colorScheme = when {
-    isDarkTheme && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicDarkColorScheme(
-      LocalContext.current
-    )
-
     isDarkTheme -> DarkColors
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> dynamicLightColorScheme(LocalContext.current)
     else -> LightColors
   }
 

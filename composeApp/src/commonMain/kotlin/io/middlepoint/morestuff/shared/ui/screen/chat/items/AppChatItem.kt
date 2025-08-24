@@ -4,30 +4,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
-import morestuff.composeapp.generated.resources.Res
-import morestuff.composeapp.generated.resources.chat_action_today
-import morestuff.composeapp.generated.resources.chat_action_tomorrow
-import morestuff.composeapp.generated.resources.done
-import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun AppChatItem(
@@ -82,42 +72,11 @@ fun AppChatItem(
     }
 }
 
+
 @Composable
 fun TaskReminderItem(message: MessageUiModel, actions: ChatActions) {
     Column {
         AppChatItem(message, actions)
-        if (message.replyType == null) {
-            Row(modifier = Modifier.padding(start = 15.dp, bottom = 8.dp)) {
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.SNOOZE)
-                }) {
-                    Text(text = stringResource(Res.string.chat_action_today))
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.TOMORROW)
-                }) {
-                    Text(text = stringResource(Res.string.chat_action_tomorrow))
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-
-                Button(onClick = {
-                    actions.scheduleAction(message.scheduleId, ReplyType.DONE)
-                }) {
-                    Text(text = stringResource(Res.string.done))
-                }
-            }
-        } else if (message.replyContent.isNullOrBlank().not()) {
-            Surface(
-                shape = RoundedCornerShape(corner = CornerSize(8.dp)),
-                contentColor = contentColorFor(MaterialTheme.colorScheme.secondaryContainer)
-            ) {
-                Text(modifier = Modifier.padding(8.dp), text = message.replyContent ?: "")
-            }
-        }
     }
 }
 

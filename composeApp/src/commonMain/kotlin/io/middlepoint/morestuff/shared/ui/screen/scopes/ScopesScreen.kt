@@ -1,6 +1,5 @@
 package io.middlepoint.morestuff.shared.ui.screen.scopes
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,7 +38,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -50,24 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.arkivanov.decompose.extensions.compose.stack.animation.slide
-import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
-import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
-import io.github.xxfast.decompose.router.stack.RoutedContent
-import io.github.xxfast.decompose.router.stack.rememberRouter
-import io.middlepoint.morestuff.shared.domain.model.core.ScopeDomain
-import io.middlepoint.morestuff.shared.domain.model.core.defaultScope
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Create
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Edit
-import io.middlepoint.morestuff.shared.domain.nav.ScopeScreen.Root
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.model.core.Scope
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.CreateScope
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.DeleteScope
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.ReorderScopes
-import io.middlepoint.morestuff.shared.ui.screen.scopes.ScopesUiEvent.UpdateScopeName
-import io.middlepoint.morestuff.shared.ui.screen.settings.koinInjectOnRoute
 import io.middlepoint.morestuff.shared.ui.theme.md_theme_light_error
 import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import kotlinx.coroutines.channels.Channel
@@ -88,60 +71,17 @@ import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-@Composable
-fun ScopesScreen(
-  onBack: () -> Unit,
-  initialScreen: ScopeScreen = Root,
-) {
-
-  val router = rememberRouter { listOf(initialScreen) }
-  val viewModel = koinInjectOnRoute(ScopesViewModel::class)
-  val model by viewModel.models.collectAsState()
-
-  RoutedContent(
-    router = router,
-    animation = stackAnimation(slide())
-  ) { screen ->
-    when (screen) {
-      Root -> ScopesContent(
-        model = model,
-        onBack = onBack,
-        onCreateScope = { router.push(Create) },
-        onEditScope = { scope -> router.push(Edit(scope)) },
-        onEvent = viewModel::take
-      )
-
-      Create -> CreateScopeScreen(
-        onBack = router::pop,
-        onSaveScope = { title ->
-          viewModel.take(CreateScope(title))
-          router.pop()
-        }
-      )
-
-      is Edit -> EditScopeScreen(
-        scope = screen.scope,
-        onBack = router::pop,
-        onSaveScope = { title ->
-          viewModel.take(UpdateScopeName(screen.scope.id, title))
-          router.pop()
-        }
-      )
-    }
-  }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScopesContent(
   model: ScopesState,
   onBack: () -> Unit,
   onCreateScope: () -> Unit,
-  onEditScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit,
 ) {
 
-  var selectedScope by remember { mutableStateOf<ScopeDomain?>(null) }
+  var selectedScope by remember { mutableStateOf<Scope?>(null) }
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
@@ -225,26 +165,25 @@ fun ScopesContent(
       confirmButtonText = stringResource(Res.string.delete),
       dismissButtonText = stringResource(Res.string.cancel),
       onConfirm = {
-        onEvent(DeleteScope(scope.id))
+        onEvent(ScopesUiEvent.DeleteScope(scope.id))
         showDeleteBottomSheet = false
       }
     )
   }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun OrderedScopesList(
   model: ScopesState,
-  onEditScope: (ScopeDomain) -> Unit,
-  onDeleteScope: (ScopeDomain) -> Unit,
+  onEditScope: (Scope) -> Unit,
+  onDeleteScope: (Scope) -> Unit,
   onEvent: (ScopesUiEvent) -> Unit
 ) {
 
   var scopes by remember(model.scopes) { mutableStateOf(model.scopes) }
 
   val menuVisibility = remember(scopes) {
-    mutableStateMapOf<Long, Boolean>().apply {
+    mutableStateMapOf<Uuid, Boolean>().apply {
       scopes.forEach { scope ->
         put(scope.id, false)
       }
@@ -275,7 +214,7 @@ private fun OrderedScopesList(
 
   LaunchedEffect(scopes) {
     if (scopes != model.scopes) {
-      onEvent(ReorderScopes(scopes))
+      onEvent(ScopesUiEvent.ReorderScopes(scopes))
     }
   }
 
@@ -299,9 +238,9 @@ private fun OrderedScopesList(
     ) {
       itemsIndexed(
         items = scopes,
-        key = { _, scope -> scope.id }
+        key = { _, scope -> scope.id.value }
       ) { _, scope ->
-        ReorderableItem(reorderState, key = scope.id) {
+        ReorderableItem(reorderState, key = scope.id.value) {
           Column(
             modifier = Modifier.background(
               color = MaterialTheme.colorScheme.surfaceContainerElevation
@@ -323,7 +262,7 @@ private fun OrderedScopesList(
                 Text(text = scope.name)
               },
               trailingContent = {
-                if (scope.id != defaultScope.id) {
+                if (scope.id != model.stuffScope?.id) {
                   IconButton(onClick = {
                     menuVisibility[scope.id] = !menuVisibility[scope.id]!!
                   }) {
@@ -338,10 +277,11 @@ private fun OrderedScopesList(
                   expanded = menuVisibility[scope.id] == true,
                   onDismissRequest = { menuVisibility[scope.id] = false }
                 ) {
-                  DropdownMenuItem(onClick = {
-                    onEditScope(scope)
-                    menuVisibility[scope.id] = false
-                  },
+                  DropdownMenuItem(
+                    onClick = {
+                      onEditScope(scope)
+                      menuVisibility[scope.id] = false
+                    },
                     text = { Text(text = stringResource(Res.string.edit_scope)) },
                     leadingIcon = {
                       Icon(
@@ -350,10 +290,11 @@ private fun OrderedScopesList(
                       )
                     }
                   )
-                  DropdownMenuItem(onClick = {
-                    onDeleteScope(scope)
-                    menuVisibility[scope.id] = false
-                  },
+                  DropdownMenuItem(
+                    onClick = {
+                      onDeleteScope(scope)
+                      menuVisibility[scope.id] = false
+                    },
                     text = { Text(text = stringResource(Res.string.delete)) },
                     leadingIcon = {
                       Icon(

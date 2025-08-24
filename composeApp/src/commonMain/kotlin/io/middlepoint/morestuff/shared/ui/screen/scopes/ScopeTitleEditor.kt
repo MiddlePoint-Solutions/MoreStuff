@@ -9,15 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ScopeTitleEditor(
@@ -25,9 +22,17 @@ fun ScopeTitleEditor(
     onTitleChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+
+    val fontSize = when (title.length) {
+        in 0..9 -> 55.sp
+        in 10..12 -> 50.sp
+        else -> 50.sp
+    }
+
     CompositionLocalProvider(
         LocalTextStyle provides MaterialTheme.typography.displayLarge.copy(
             color = MaterialTheme.colorScheme.onSurface,
+            fontSize = fontSize,
             textAlign = TextAlign.Center
         ),
         LocalContentColor provides MaterialTheme.colorScheme.onSurface
@@ -35,8 +40,8 @@ fun ScopeTitleEditor(
         BasicTextField(
             value = title,
             onValueChange = {
-                val input = it.trim()
-                if (input.length <= 9) {
+                val input = it
+                if (input.length <= 12) {
                     onTitleChange(input)
                 }
             },

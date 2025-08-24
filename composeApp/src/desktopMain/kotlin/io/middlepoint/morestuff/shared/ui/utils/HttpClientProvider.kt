@@ -1,7 +1,6 @@
 package io.middlepoint.morestuff.shared.ui.utils
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.UserAgent
 import io.ktor.client.plugins.logging.LogLevel
@@ -11,7 +10,7 @@ import io.ktor.client.plugins.logging.Logging
 
 actual class HttpClientProvider {
     actual fun createHttpClient(followRedirects: Boolean): HttpClient {
-        return HttpClient(CIO) {
+        return HttpClient {
             expectSuccess = true
             this.followRedirects = followRedirects
 

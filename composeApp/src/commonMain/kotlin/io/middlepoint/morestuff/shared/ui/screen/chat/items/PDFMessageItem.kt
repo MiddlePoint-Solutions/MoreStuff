@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mohamedrejeb.calf.core.LocalPlatformContext
 import io.github.vinceglb.filekit.nameWithoutExtension
-import io.middlepoint.morestuff.shared.createKmpFile
+import io.middlepoint.morestuff.shared.platform.createKmpFile
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.error

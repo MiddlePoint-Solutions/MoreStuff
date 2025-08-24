@@ -10,19 +10,24 @@ import io.middlepoint.morestuff.shared.domain.service.Notifier
 import io.middlepoint.morestuff.shared.domain.service.NotifierImpl
 import io.middlepoint.morestuff.shared.domain.service.Scheduler
 import io.middlepoint.morestuff.shared.domain.service.SchedulerImpl
+import io.middlepoint.morestuff.shared.ui.utils.SharedFunctionsHandler
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
 actual val platformModule: Module = module {
-    factory { Logger.withTag(it.getOrNull() ?: "MoreStuff-iOS") }
+
+    factory { Logger.withTag(it.getOrNull() ?: "MoreStuff-wasmJs") }
     factoryOf(::DriverFactory)
 
     factoryOf(::VoiceToTextParserImpl) bind VoiceToTextParser::class
     singleOf(::SchedulerImpl) bind Scheduler::class
     singleOf(::NotifierImpl) bind Notifier::class
+    factoryOf(::SharedFunctionsHandler)
 
-    single<Settings> { StorageSettings() }
+    factory<Settings>(named(SharedSettings.Encrypted)) { StorageSettings() }
+    factory<Settings>(named(SharedSettings.Unencrypted)) { StorageSettings() }
 }

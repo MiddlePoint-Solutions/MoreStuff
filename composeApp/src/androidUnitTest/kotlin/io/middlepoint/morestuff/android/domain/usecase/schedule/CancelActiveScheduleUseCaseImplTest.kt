@@ -9,33 +9,35 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class CancelActiveScheduleUseCaseImplTest {
-    private val scheduler = mockk<Scheduler>()
-    private val getActiveSchedule = mockk<GetActiveSchedulesUseCase>(relaxed = true)
-    private val setScheduleFulfilled = mockk<SetScheduleFulfilledUseCase>(relaxed = true)
-    private val cancelActiveScheduleUseCaseImpl = CancelActiveScheduleUseCaseImpl(
-        scheduler,
-        getActiveSchedule,
-        setScheduleFulfilled
+  private val scheduler = mockk<Scheduler>()
+  private val getActiveSchedule = mockk<GetActiveSchedulesUseCase>(relaxed = true)
+  private val setScheduleFulfilled = mockk<SetScheduleFulfilledUseCase>(relaxed = true)
+  private val cancelActiveScheduleUseCaseImpl = CancelActiveScheduleUseCaseImpl(
+    scheduler,
+    getActiveSchedule,
+    setScheduleFulfilled
+  )
+
+
+  @Test
+  fun `cancels schedule`() = runBlocking {
+    val schedule = createScheduleForTest(
+      scheduleType = ScheduleType.OneTime
     )
 
+    coEvery {
+      getActiveSchedule(
+        listOf(schedule.taskId),
+        listOf(ScheduleType.OneTime)
+      )
+    } returns Either.Right(
+      listOf(schedule)
+    )
+    coEvery { scheduler.cancelSchedule(schedule.id) } just Runs
 
-    @Test
-    fun `cancels schedule`() = runBlocking {
-        val taskId = listOf(1L)
-        val scheduleId = 2L
-        val schedules = listOf(
-          createScheduleForTest(
-            scheduleId,
-            scheduleType = ScheduleType.OneTime
-          )
-        )
+    cancelActiveScheduleUseCaseImpl(listOf(schedule.taskId), listOf(ScheduleType.OneTime))
 
-        coEvery { getActiveSchedule(taskId, listOf(ScheduleType.OneTime)) } returns Either.Right(schedules)
-        coEvery { scheduler.cancelSchedule(2) } just Runs
-
-        cancelActiveScheduleUseCaseImpl(taskId, listOf(ScheduleType.OneTime))
-
-        coVerify { setScheduleFulfilled(scheduleId) }
-        coVerify { scheduler.cancelSchedule(scheduleId) }
-    }
+    coVerify { setScheduleFulfilled(schedule.id) }
+    coVerify { scheduler.cancelSchedule(schedule.id) }
+  }
 }

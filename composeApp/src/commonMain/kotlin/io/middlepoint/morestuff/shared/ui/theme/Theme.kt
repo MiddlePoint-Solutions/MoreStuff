@@ -42,6 +42,7 @@ val LightColors = lightColorScheme(
     surfaceTint = md_theme_light_surfaceTint,
     outlineVariant = md_theme_light_outlineVariant,
     scrim = md_theme_light_scrim,
+    surfaceContainerHigh = md_theme_light_surface_container_high,
 )
 
 
@@ -75,6 +76,7 @@ val DarkColors = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
+    surfaceContainerHigh = md_theme_dark_surface_container_high,
 )
 
 val ColorScheme.surfaceContainerElevation: Color
@@ -84,4 +86,6 @@ val ColorScheme.surfaceContainerElevation: Color
 val ColorScheme.divider: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(7.dp)
+
+
 

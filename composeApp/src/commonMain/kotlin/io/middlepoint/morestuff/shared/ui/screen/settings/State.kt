@@ -10,13 +10,17 @@ data class SettingsState(
   val snoozeLimit: Int = 0,
   val devSettings: Boolean = false,
   //val reviewTime: Pair<Int, Int> = Pair(9, 0),
-  val inputVoiceLanguage: Language = Language.Device
+  val inputVoiceLanguage: Language = Language.Device,
+  val apiKey: String = ""
 )
 
 sealed class SettingsEvent {
   data class ChangeSnoozeLimit(val limit: Int) : SettingsEvent()
   data class SelectAppTheme(val index: Int) : SettingsEvent()
   data class EnableDevSettings(val enable: Boolean = true) : SettingsEvent()
-  //data class SetReviewTime(val hour: Int, val minute: Int) : SettingsEvent()
   data class SelectLanguage(val index: Int) : SettingsEvent()
+  data object SignOut: SettingsEvent()
+  data object OpenAppSettings : SettingsEvent()
+  data class SetApiKey(val apiKey: String) : SettingsEvent()
+  data object GetApiKey : SettingsEvent()
 }

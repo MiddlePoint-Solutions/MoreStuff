@@ -2,156 +2,246 @@ package io.middlepoint.morestuff.shared.domain.service
 
 
 import co.touchlab.kermit.Logger
-import kotlinx.datetime.LocalDateTime
+import io.middlepoint.morestuff.shared.domain.model.Uuid
+import io.middlepoint.morestuff.shared.domain.redux.AppStore
+import io.middlepoint.morestuff.shared.domain.redux.action.SyncAction
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import platform.BackgroundTasks.BGAppRefreshTaskRequest
+import platform.BackgroundTasks.BGTaskScheduler
+import platform.Foundation.NSDate
 import platform.Foundation.NSDateComponents
+import platform.Foundation.dateWithTimeIntervalSinceNow
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
+import platform.UserNotifications.UNNotificationAction
+import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationRequest
-import platform.UserNotifications.UNTimeIntervalNotificationTrigger
 import platform.UserNotifications.UNUserNotificationCenter
-import kotlin.time.Duration.Companion.days
 
 class SchedulerImpl(
   private val timeManager: TimeManager,
-) : Scheduler {
-   private val logger = Logger.withTag("SchedulerImpl")
-    private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
+) : Scheduler, KoinComponent {
+  private val logger = Logger.withTag("SchedulerImpl")
+  private val notificationCenter = UNUserNotificationCenter.currentNotificationCenter()
+  private val store: AppStore by inject()
 
+  init {
+    notificationCenter.delegate()
+    registerNotificationCategories()
 
-    init {
-        notificationCenter.delegate()
+  }
+
+  override fun scheduleAtExact(
+    scheduleId: Uuid,
+    scheduleTime: String,
+    taskTitle: String,
+    taskId: Uuid
+  ) {
+    logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
+
+    val localDateTime = Instant.parse(scheduleTime).toLocalDateTime(TimeZone.currentSystemDefault())
+
+    val triggerDate = NSDateComponents().apply {
+      setYear(localDateTime.year.toLong())
+      setMonth(localDateTime.monthNumber.toLong())
+      setDay(localDateTime.dayOfMonth.toLong())
+      setHour(localDateTime.hour.toLong())
+      setMinute(localDateTime.minute.toLong())
+      setSecond(localDateTime.second.toLong())
     }
 
-    override fun scheduleAtExact(scheduleId: Long, scheduleTime: String, taskTitle: String, taskId: Long) {
-        logger.i { "Scheduling notification with scheduleId=$scheduleId at $scheduleTime" }
+    val content = UNMutableNotificationContent().apply {
+      setTitle("Reminder")
+      setBody(taskTitle)
+      setUserInfo(mapOf("scheduleId" to scheduleId.value, "taskId" to taskId.value))
+      setCategoryIdentifier("TASK_REPLY_CATEGORY")
 
-        val localDateTime = LocalDateTime.parse(scheduleTime)
-        val triggerDate = NSDateComponents().apply {
-            setYear(localDateTime.year.toLong())
-            setMonth(localDateTime.monthNumber.toLong())
-            setDay(localDateTime.dayOfMonth.toLong())
-            setHour(localDateTime.hour.toLong())
-            setMinute(localDateTime.minute.toLong())
-            setSecond(localDateTime.second.toLong())
+    }
+
+    val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
+      dateComponents = triggerDate,
+      repeats = false
+    )
+
+    val request = UNNotificationRequest.requestWithIdentifier(
+      identifier = getScheduleWorkTag(scheduleId),
+      content = content,
+      trigger = trigger
+    )
+    notificationCenter.addNotificationRequest(request) { error ->
+      if (error == null) {
+
+        logger.i { "Successfully scheduled notification for scheduleId=$scheduleId" }
+      } else {
+        logger.e { "Error scheduling notification: ${'$'}{error.localizedDescription}" }
+      }
+    }
+
+  }
+
+
+  private fun registerNotificationCategories() {
+    val snoozeAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "SNOOZE_ACTION",
+      title = "Snooze",
+      options = 0u
+    )
+
+    val tomorrowAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "TOMORROW_ACTION",
+      title = "Tomorrow",
+      options = 0u
+    )
+
+    val doneAction = UNNotificationAction.actionWithIdentifier(
+      identifier = "DONE_ACTION",
+      title = "Done",
+      options = 0u
+    )
+
+    val reminderCategory = UNNotificationCategory.categoryWithIdentifier(
+      identifier = "TASK_REPLY_CATEGORY",
+      actions = listOf(snoozeAction, tomorrowAction, doneAction),
+      intentIdentifiers = emptyList<String>(),
+      options = 0u
+    )
+
+    UNUserNotificationCenter.currentNotificationCenter()
+      .setNotificationCategories(setOf(reminderCategory))
+  }
+
+
+
+  override fun scheduleDataSyncWorker() {
+/*    BGTaskScheduler.sharedScheduler.registerForTaskWithIdentifier(
+      identifier = "io.middlepoint.morestuff",
+      usingQueue = null,
+      launchHandler = { task ->
+        logger.d(" Tarea de sincronización ejecutándose en segundo plano")
+
+        registerBackgroundTaskHandler()
+        MainScope().launch {
+          try {
+            store.dispatchSuspend(SyncAction.SyncIntervalAction)
+            task?.setTaskCompletedWithSuccess(true)
+          } catch (e: Exception) {
+            logger.d("Error al sincronizar datos: ${e.message}")
+            task?.setTaskCompletedWithSuccess(false)
+          }
         }
+      }
+    )*/
+  }
+  override fun dataSyncWorker() {
+    BGTaskScheduler.sharedScheduler.registerForTaskWithIdentifier(
+      identifier = "io.middlepoint.morestuff",
+      usingQueue = null,
+      launchHandler = { task ->
+        logger.d(" Tarea de sincronización ejecutándose en segundo plano")
 
-        val content = UNMutableNotificationContent().apply {
-            setTitle("Reminder")
-            setBody(taskTitle)
-            setUserInfo(mapOf("scheduleId" to scheduleId.toString(), "taskId" to taskId.toString()))
+        registerBackgroundTaskHandler()
+        MainScope().launch {
+          try {
+            store.dispatchSuspend(SyncAction.SyncIntervalAction)
+            task?.setTaskCompletedWithSuccess(true)
+          } catch (e: Exception) {
+            logger.d("Error al sincronizar datos: ${e.message}")
+            task?.setTaskCompletedWithSuccess(false)
+          }
         }
+      }
+    )
+  }
 
-        val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
-            dateComponents = triggerDate,
-            repeats = false
-        )
-
-        val request = UNNotificationRequest.requestWithIdentifier(
-            identifier = getScheduleWorkTag(scheduleId),
-            content = content,
-            trigger = trigger
-        )
-
-        notificationCenter.addNotificationRequest(request) { error ->
-            if (error == null) {
-
-                logger.i { "Successfully scheduled notification for scheduleId=$scheduleId" }
-            } else {
-                logger.e { "Error scheduling notification: ${'$'}{error.localizedDescription}" }
-            }
-        }
-
+  @OptIn(ExperimentalForeignApi::class)
+  fun registerBackgroundTaskHandler() {
+    val request = BGAppRefreshTaskRequest("io.middlepoint.morestuff").apply {
+      earliestBeginDate = NSDate.dateWithTimeIntervalSinceNow(15 * 60.0)
     }
 
-
-    override fun schedulePlannedPriorityWorker() {
-    /*    val content = UNMutableNotificationContent()
-        content.setTitle("Planned Priority Update")
-        content.setBody("Executing planned priority update.")
-
-
-        val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(
-            timeInterval = 1.days.inWholeSeconds.toDouble(),
-            repeats = true
-        )
-        val request = UNNotificationRequest.requestWithIdentifier(
-            identifier = PLANNED_PRIORITY_WORK,
-            content = content,
-            trigger = trigger
-        )
-
-        UNUserNotificationCenter.currentNotificationCenter()
-            .addNotificationRequest(request) { error ->
-                error?.let {
-                    println("Error scheduling planned priority worker: ${it.localizedDescription}")
-                }
-            }*/
+    try {
+      val success = BGTaskScheduler.sharedScheduler.submitTaskRequest(request, null)
+      if (success) {
+        logger.d("Tarea de sincronización periódica registrada correctamente")
+      } else {
+        logger.d("Error al registrar la tarea de sincronización periódica")
+      }
+    } catch (e: Exception) {
+      logger.d("Error al registrar la tarea: ${e.message}")
     }
-
-/*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
-        val currentTime = timeManager.nowLocalDateTime
-        val scheduleTime =
-            if (currentTime.hour > hour || (currentTime.hour == hour && currentTime.minute >= minute)) {
-                timeManager.tomorrowLocalDateTime(hour, minute)
-            } else {
-                timeManager.todayLocalDateTime(hour, minute)
-            }
-
-        val triggerDate = NSDateComponents().apply {
-            setYear(scheduleTime.year.toLong())
-            setMonth(scheduleTime.monthNumber.toLong())
-            setDay(scheduleTime.dayOfMonth.toLong())
-            setHour(scheduleTime.hour.toLong())
-            setMinute(scheduleTime.minute.toLong())
-        }
+  }
 
 
-        val content = UNMutableNotificationContent()
-        content.setTitle("Review Reminder")
-        content.setBody("It's time for your scheduled review.")
+  override fun cancelSchedule(scheduleId: Uuid) {
+    UNUserNotificationCenter.currentNotificationCenter()
+      .removePendingNotificationRequestsWithIdentifiers(
+        listOf(getScheduleWorkTag(scheduleId))
+      )
+    logger.i { "Cancelled notification with scheduleId= $scheduleId" }
+  }
+
+  /*    override fun scheduleReviewWorker(hour: Int, minute: Int) {
+          val currentTime = timeManager.nowLocalDateTime
+          val scheduleTime =
+              if (currentTime.hour > hour || (currentTime.hour == hour && currentTime.minute >= minute)) {
+                  timeManager.tomorrowLocalDateTime(hour, minute)
+              } else {
+                  timeManager.todayLocalDateTime(hour, minute)
+              }
+
+          val triggerDate = NSDateComponents().apply {
+              setYear(scheduleTime.year.toLong())
+              setMonth(scheduleTime.monthNumber.toLong())
+              setDay(scheduleTime.dayOfMonth.toLong())
+              setHour(scheduleTime.hour.toLong())
+              setMinute(scheduleTime.minute.toLong())
+          }
 
 
-        val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
-            dateComponents = triggerDate,
-            repeats = false
-        )
-
-        val request = UNNotificationRequest.requestWithIdentifier(
-            identifier = PRIORITY_REVIEW_WORK,
-            content = content,
-            trigger = trigger
-        )
+          val content = UNMutableNotificationContent()
+          content.setTitle("Review Reminder")
+          content.setBody("It's time for your scheduled review.")
 
 
-        UNUserNotificationCenter.currentNotificationCenter()
-            .addNotificationRequest(request) { error ->
-                error?.let {
-                    println("Error scheduling review worker: ${it.localizedDescription}")
-                }
-            }
-    }*/
+          val trigger = UNCalendarNotificationTrigger.triggerWithDateMatchingComponents(
+              dateComponents = triggerDate,
+              repeats = false
+          )
 
-    override fun cancelSchedule(scheduleId: Long) {
-        UNUserNotificationCenter.currentNotificationCenter()
-            .removePendingNotificationRequestsWithIdentifiers(
-                listOf(getScheduleWorkTag(scheduleId))
-            )
-        logger.i { "Cancelled notification with scheduleId= $scheduleId" }
+          val request = UNNotificationRequest.requestWithIdentifier(
+              identifier = PRIORITY_REVIEW_WORK,
+              content = content,
+              trigger = trigger
+          )
 
-    }
 
-    override fun cancelPlannedPriorityUpdate() {
-        UNUserNotificationCenter.currentNotificationCenter()
-            .removePendingNotificationRequestsWithIdentifiers(
-                listOf(PLANNED_PRIORITY_WORK)
-            )
-    }
+          UNUserNotificationCenter.currentNotificationCenter()
+              .addNotificationRequest(request) { error ->
+                  error?.let {
+                      println("Error scheduling review worker: ${it.localizedDescription}")
+                  }
+              }
+      }*/
 
-  private fun getScheduleWorkTag(scheduleId: Long) = "SCHEDULE_$scheduleId"
+  override fun cancelPlannedPriorityUpdate() {
+    UNUserNotificationCenter.currentNotificationCenter()
+      .removePendingNotificationRequestsWithIdentifiers(
+        listOf(PLANNED_PRIORITY_WORK)
+      )
+  }
 
-    companion object {
-        private const val PLANNED_PRIORITY_WORK = "SmartReminder"
-        private const val PRIORITY_REVIEW_WORK = "PriorityReview"
-    }
+  private fun getScheduleWorkTag(scheduleId: Uuid) = "SCHEDULE_$scheduleId"
+
+  companion object {
+    private const val PLANNED_PRIORITY_WORK = "SmartReminder"
+    private const val PRIORITY_REVIEW_WORK = "PriorityReview"
+  }
 }
 

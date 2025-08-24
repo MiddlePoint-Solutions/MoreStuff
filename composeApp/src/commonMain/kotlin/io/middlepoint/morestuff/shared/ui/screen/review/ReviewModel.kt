@@ -7,12 +7,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import arrow.core.Either
 import io.middlepoint.morestuff.shared.domain.enums.ReviewActionType
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
-import io.middlepoint.morestuff.shared.domain.redux.middleware.PriorityAction
-import io.middlepoint.morestuff.shared.domain.redux.middleware.TaskAction
-import io.middlepoint.morestuff.shared.domain.redux.state.SettingAction
+import io.middlepoint.morestuff.shared.domain.redux.action.PriorityAction
+import io.middlepoint.morestuff.shared.domain.redux.action.TaskAction
+import io.middlepoint.morestuff.shared.domain.redux.action.SettingAction
 import io.middlepoint.morestuff.shared.domain.usecase.scope.GetScopesUseCase
 import io.middlepoint.morestuff.shared.domain.usecase.task.GetReviewTasksUseCase
 import io.middlepoint.morestuff.shared.ui.model.map.ReviewTasksMapper
