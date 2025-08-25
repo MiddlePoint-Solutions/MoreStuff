@@ -121,12 +121,23 @@ class MigrationHelper(
 
       val newTaskScopeId = newScopesMap.getValue(migrationItem.scopeId)
 
+      val currentTimeZoneId = TimeZone.currentSystemDefault().id
+
+      val completeTimeInstant = oldTask.completeTime?.let {
+        try {
+          Instant.parse(it)
+        } catch (e: Exception) {
+          logger.w("Error parsing $it, fixing...")
+          Instant.parse(it.replaceAfterLast(".", "00Z"))
+        }
+      }
+
       val newTask = taskRepository.createTask(
         title = oldTask.title,
         scopeId = newTaskScopeId,
         priorityScore = oldTask.priorityScore,
-        completedAt = oldTask.completeTime?.let(Instant::parse),
-        completedTimezone = oldTask.completeTime?.let { TimeZone.currentSystemDefault().id }
+        completedAt = completeTimeInstant,
+        completedTimezone = oldTask.completeTime?.let { currentTimeZoneId }
       )
 
       dataMigration.messages.filter {
