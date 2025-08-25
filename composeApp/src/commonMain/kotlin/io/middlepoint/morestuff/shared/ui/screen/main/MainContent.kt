@@ -71,11 +71,7 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
 import io.middlepoint.morestuff.shared.ui.screen.share.ImportScreen
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 import kotlinx.coroutines.launch
-import org.koin.compose.currentKoinScope
 import org.koin.compose.getKoin
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @Composable
 fun MainContent(
@@ -166,7 +162,12 @@ fun MainContent(
 
         animatedComposable<Developer> {
 
-          val viewModel = koinInject<SettingsViewModel>()
+          val viewModel = viewModel {
+            SettingsViewModel(
+              store = koin.get(),
+              getApiKeyUseCase = koin.get()
+            )
+          }
 
           DevSettingsScreen(
             onBack = { navController.popBackStack() },
@@ -243,9 +244,11 @@ fun MainContent(
 
         val scope = rememberCoroutineScope()
 
-        val viewModel = koinViewModel<TaskChatViewModel>(
-          parameters = { parametersOf(Uuid(screen.taskId)) }
-        )
+        val viewModel = viewModel {
+          TaskChatViewModel(
+            taskId = Uuid(screen.taskId)
+          )
+        }
 
         val model by viewModel.models.collectAsState()
         val isAiEnabled = model.isAIEnabled

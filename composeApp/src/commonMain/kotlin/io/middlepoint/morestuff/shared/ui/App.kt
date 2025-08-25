@@ -29,7 +29,6 @@ import org.koin.compose.koinInject
 fun App(
   screen: Screen? = null,
   accessToken: String? = null, // TODO: this is super ugly
-  logger: Logger = Logger.withTag("App")
 ) {
 
   KoinContext {
@@ -74,7 +73,6 @@ fun App(
 
             LaunchedEffect(screen) {
               if (model.isAuthenticated && screen != null) {
-                logger.d { "Navigating to $screen: ${navController.graph.nodes}" }
                 navController.navigate(screen)
               }
             }
