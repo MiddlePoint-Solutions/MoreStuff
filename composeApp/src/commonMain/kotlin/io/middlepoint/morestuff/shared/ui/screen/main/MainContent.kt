@@ -95,7 +95,7 @@ fun MainContent(
 
       composable<SignIn>(
         enterTransition = { fadeIn() },
-        exitTransition = { fadeOut() },
+        exitTransition = { null },
       ) { backStackEntry ->
         val screen = backStackEntry.toRoute<SignIn>()
         SignInScreen(

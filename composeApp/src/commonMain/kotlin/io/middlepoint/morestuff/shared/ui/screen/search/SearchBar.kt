@@ -80,7 +80,7 @@ fun SearchBar(
   modifier: Modifier = Modifier,
 ) {
 
-  val viewModel = viewModel<SearchViewModel>()
+  val viewModel = viewModel { SearchViewModel() }
 
   val model by viewModel.models.collectAsState()
   var isSearchActive by rememberSaveable { mutableStateOf(false) }
@@ -128,7 +128,7 @@ fun SearchBar(
         focusManager.clearFocus()
         keyboardController?.hide()
       }
-  ){
+  ) {
     SearchBar(
       inputField = {
         SearchBarDefaults.InputField(
