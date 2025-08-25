@@ -18,7 +18,6 @@ import androidx.navigation.toRoute
 import io.middlepoint.morestuff.shared.data.utils.toUuid
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.nav.ChatScreen
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.ImagePreview
 import io.middlepoint.morestuff.shared.domain.nav.Import
@@ -33,6 +32,8 @@ import io.middlepoint.morestuff.shared.domain.nav.Settings
 import io.middlepoint.morestuff.shared.domain.nav.SignIn
 import io.middlepoint.morestuff.shared.domain.nav.SignInEmail
 import io.middlepoint.morestuff.shared.domain.nav.TaskChat
+import io.middlepoint.morestuff.shared.domain.nav.TaskChatImageImport
+import io.middlepoint.morestuff.shared.domain.nav.TaskChatImagePreview
 import io.middlepoint.morestuff.shared.platform.createKmpFile
 import io.middlepoint.morestuff.shared.ui.extension.animatedComposable
 import io.middlepoint.morestuff.shared.ui.local.LocalScreenSize
@@ -53,6 +54,7 @@ import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatEvent.UpdateM
 import io.middlepoint.morestuff.shared.ui.screen.chat.task.TaskChatViewModel
 import io.middlepoint.morestuff.shared.ui.screen.home.HomeScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.ImageImportScreen
+import io.middlepoint.morestuff.shared.ui.screen.image.ImagePreviewScreen
 import io.middlepoint.morestuff.shared.ui.screen.image.logger
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInEmailScreen
 import io.middlepoint.morestuff.shared.ui.screen.onboarding.SignInScreen
@@ -237,14 +239,16 @@ fun MainContent(
 //        )
 //      }
 
-      // TODO:
+
       animatedComposable<TaskChat> { backStackEntry ->
 
-        val screen = backStackEntry.toRoute<ChatScreen.Chat>()
+        val screen = backStackEntry.toRoute<TaskChat>()
 
         val scope = rememberCoroutineScope()
 
-        val viewModel = viewModel {
+        val viewModel = viewModel(
+          key = "TaskChat-${screen.taskId}",
+        ) {
           TaskChatViewModel(
             taskId = Uuid(screen.taskId)
           )
@@ -264,7 +268,7 @@ fun MainContent(
             onImageSelected = {
               val path = it.messageExtra?.url ?: ""
               val title = it.content
-              navController.navigate(ChatScreen.Preview(path, title))
+              navController.navigate(TaskChatImagePreview(screen.taskId, path, title))
             },
             onPdfSelected = {
               val path = it.messageExtra?.url ?: ""
@@ -294,7 +298,7 @@ fun MainContent(
             viewModel.take(InputText(it))
             if (isAiEnabled) viewModel.take(CreateAIMessage(it))
           },
-          imagePicked = { scope.launch { navController.navigate(ChatScreen.Import(it)) } },
+          imagePicked = { scope.launch { navController.navigate(TaskChatImageImport(it.toString())) } },
           pdfPicked = { viewModel.take(InputDocument(it, title = "")) },
           isAIEnabled = isAiEnabled
         )
@@ -312,17 +316,25 @@ fun MainContent(
 //        onBack = { navController.popBackStack() }
 //      )
 //    }
-      // TODO:
-//        composable<ChatScreen.Preview> { backStackEntry ->
-//          val screen = backStackEntry.toRoute<ChatScreen.Preview>()
-//
-//          ImagePreviewScreen(
-//            imagePath = screen.imagePath,
-//            onBack = { navController.popBackStack() },
-//            onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
-//            title = screen.title,
-//          )
-//        }
+
+      composable<TaskChatImagePreview> { backStackEntry ->
+        val screen = backStackEntry.toRoute<TaskChatImagePreview>()
+
+        val viewModel = viewModel(
+          key = "TaskChat-${screen.taskId}",
+        ) {
+          TaskChatViewModel(
+            taskId = Uuid(screen.taskId)
+          )
+        }
+
+        ImagePreviewScreen(
+          imagePath = screen.imagePath,
+          onBack = { navController.popBackStack() },
+          onSendImage = { viewModel.take(ShareImage(screen.imagePath)) },
+          title = screen.title,
+        )
+      }
 
       composable<ImagePreview> { backStackEntry ->
         val screen = backStackEntry.toRoute<ImagePreview>()

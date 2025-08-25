@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.middlepoint.morestuff.android.ui.review.swipeable.ExperimentalSwipeableCardApi
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.ConfirmDeleteDialog
@@ -111,8 +112,6 @@ import morestuff.composeapp.generated.resources.show_hint_arrow_priority
 import morestuff.composeapp.generated.resources.sure_delete_task
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 @NonRestartableComposable
 @Composable
@@ -136,9 +135,7 @@ fun ReviewContent(
   currentScopeId: Uuid,
 ) {
 
-  val viewModel = koinViewModel<ReviewViewModel>{
-    parametersOf(currentScopeId)
-  }
+  val viewModel = viewModel { ReviewViewModel(currentScopeId) }
 
   val model by viewModel.models.collectAsState()
 

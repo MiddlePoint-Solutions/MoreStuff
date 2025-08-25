@@ -55,17 +55,14 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.keyboardAsState
-import io.middlepoint.morestuff.shared.ui.extension.checkUnregister
 import morestuff.composeapp.generated.resources.Res
 import morestuff.composeapp.generated.resources.cd_schedule_icon
 import morestuff.composeapp.generated.resources.ic_schedule
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.vectorResource
-import org.koin.compose.koinInject
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 
 
 @Composable
@@ -76,10 +73,11 @@ fun TaskDetails(
   onTitleLineCount: (Int) -> Unit
 ) {
 
-  val viewModel = koinViewModel<TaskDetailsViewModel>(
-    key = "TaskChat${taskId.value}",
-    parameters = { parametersOf(taskId) }
-  )
+  val viewModel = viewModel(
+    key = "TaskChatDetails-${taskId.value}",
+  ) {
+    TaskDetailsViewModel(taskId)
+  }
 
   val model by viewModel.models.collectAsState()
   val task = model.task

@@ -27,9 +27,6 @@ data class Review(val scopeId: String) : Screen()
 data object Settings : Screen()
 
 @Serializable
-data class TaskChat(val taskId: String) : Screen()
-
-@Serializable
 data class ImagePreview(val imageUri: String, val taskId: String) : Screen()
 
 @Serializable
@@ -46,6 +43,16 @@ sealed class Import: Screen() {
   @Serializable
   data class Document(val uri: String) : Import()
 }
+
+@Serializable
+data class TaskChat(val taskId: String) : Screen()
+
+// TODO: change argument to file path string and construct PlatformFile from it
+@Serializable
+data class TaskChatImageImport(val uri: String) : Screen()
+
+@Serializable
+data class TaskChatImagePreview(val taskId: String, val imagePath: String, val title: String) : Screen()
 
 
 data object ShareableNavType : NavType<Shareable>(isNullableAllowed = false) {

@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
@@ -87,8 +88,7 @@ import morestuff.composeapp.generated.resources.delete
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_plural
 import morestuff.composeapp.generated.resources.task_schedule_deletion_warning_singular
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import org.koin.mp.KoinPlatform
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -97,7 +97,9 @@ fun HomeScreen(
   navigateToTaskChat: (Uuid) -> Unit,
 ) {
 
-  val homeState = koinViewModel<HomeViewModel>()
+  val homeState = viewModel {
+    HomeViewModel(appPresenter = KoinPlatform.getKoin().get())
+  }
 
   val coroutineScope = rememberCoroutineScope()
   val snackbarHostState = remember { SnackbarHostState() }
@@ -384,10 +386,9 @@ private fun HomeContent(
 
         val scope = model.scopes[page]
 
-        val scopeViewModel = koinViewModel<ScopeTasksViewModel>(
-          key = "Scope${scope.id.value}",
-          parameters = { parametersOf(scope.id) }
-        )
+        val scopeViewModel = viewModel(
+          key = "Scope-${scope.id.value}",
+        ) { ScopeTasksViewModel(scope.id) }
 
         val scopeTasks by scopeViewModel.models.collectAsState()
 
