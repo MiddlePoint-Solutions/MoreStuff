@@ -478,6 +478,7 @@ fun Properties.getPropertyOrNull(key: String): String? =
 fun getPropertyOrThrow(properties: Properties, key: String): String =
   properties.getPropertyOrNull(key)
     ?: System.getenv(key)?.takeIf { it.isNotBlank() }
+    ?: providers.environmentVariable(key).orNull
     ?: error("$key not found!")
 
 
