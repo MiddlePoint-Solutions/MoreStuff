@@ -257,10 +257,15 @@ kotlin {
   }
 }
 
-val projectVersionName = project.findProperty("app.morestuff.versionName") as? String
-  ?: error("versionName undefined!")
-val projectVersionCode = (project.findProperty("app.morestuff.versionCode") as? String)?.toInt()
-  ?: error("versionCode undefined!")
+val projectVersionName =
+  providers.gradleProperty("VERSION_NAME").orNull
+    ?: project.findProperty("app.morestuff.versionName") as? String
+    ?: error("versionName undefined!")
+
+val projectVersionCode =
+  providers.gradleProperty("VERSION_CODE").orNull?.toInt()
+    ?: (project.findProperty("app.morestuff.versionCode") as? String)?.toInt()
+    ?: error("versionCode undefined!")
 
 buildConfig {
 
