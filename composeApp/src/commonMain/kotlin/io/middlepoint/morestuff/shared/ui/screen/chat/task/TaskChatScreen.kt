@@ -215,7 +215,7 @@ fun TaskChatContent(
         onLabelClick = { showScopeSelection = true }
       )
     },
-    containerColor = Color.Transparent,
+    containerColor = MaterialTheme.colorScheme.surfaceContainer,
   ) { scaffoldPadding ->
     Box(
       modifier = Modifier
