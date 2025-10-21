@@ -107,6 +107,7 @@ kotlin {
       implementation(libs.compose.ui.util)
       implementation(compose.components.resources)
       implementation(compose.components.uiToolingPreview)
+      implementation(libs.compose.material3.adaptive)
 
       implementation(compose.materialIconsExtended)
       implementation(libs.bundles.kotlinx)

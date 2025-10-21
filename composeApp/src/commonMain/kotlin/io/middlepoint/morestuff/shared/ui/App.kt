@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -22,7 +21,6 @@ import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.utils.handleDeeplinkFragment
-import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 
 @Composable
@@ -31,50 +29,48 @@ fun App(
   accessToken: String? = null, // TODO: this is super ugly
 ) {
 
-  KoinContext {
-    val viewModel = koinInject<MainViewModel>()
-    val model by viewModel.models.collectAsState()
-    val supabase: SupabaseClient = koinInject()
+  val viewModel = koinInject<MainViewModel>()
+  val model by viewModel.models.collectAsState()
+  val supabase: SupabaseClient = koinInject()
 
-    LaunchedEffect(accessToken) {
-      if (!accessToken.isNullOrBlank()) {
-        supabase.handleDeeplinkFragment(accessToken) { session ->
-          viewModel.take(MainEvent.OnBoardingComplete)
-        }
+  LaunchedEffect(accessToken) {
+    if (!accessToken.isNullOrBlank()) {
+      supabase.handleDeeplinkFragment(accessToken) { session ->
+        viewModel.take(MainEvent.OnBoardingComplete)
       }
     }
+  }
 
-    ProvideAppTheme(model.theme) {
-      MoreStuffTheme {
-        Box(
-          modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
-        ) {
-          val navController = rememberNavController()
+  ProvideAppTheme(model.theme) {
+    MoreStuffTheme {
+      Box(
+        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+      ) {
+        val navController = rememberNavController()
 
-          if (model.ready) {
+        if (model.ready) {
 
-            val startDestination by remember(model) {
-              derivedStateOf {
-                if (model.isAuthenticated) {
-                  Home
-                } else {
-                  SignIn(model.showOldUserMessage)
-                }
+          val startDestination by remember(model) {
+            derivedStateOf {
+              if (model.isAuthenticated) {
+                Home
+              } else {
+                SignIn(model.showOldUserMessage)
               }
             }
+          }
 
-            MainContent(
-              navController = navController,
-              startDestination = startDestination,
-              shareContent = { taskId, content ->
-                viewModel.take(MainEvent.ShareContent(taskId, content))
-              }
-            )
+          MainContent(
+            navController = navController,
+            startDestination = startDestination,
+            shareContent = { taskId, content ->
+              viewModel.take(MainEvent.ShareContent(taskId, content))
+            }
+          )
 
-            LaunchedEffect(screen) {
-              if (model.isAuthenticated && screen != null) {
-                navController.navigate(screen)
-              }
+          LaunchedEffect(screen) {
+            if (model.isAuthenticated && screen != null) {
+              navController.navigate(screen)
             }
           }
         }

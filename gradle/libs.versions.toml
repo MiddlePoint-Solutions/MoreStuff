@@ -66,6 +66,7 @@ sqlJs = "1.8.0"
 webPackPlugin = "9.1.0"
 sentry = "0.12.0"
 splash-screen ="1.0.0"
+compose-material3-adaptive="1.2.0-alpha06"
 
 
 [libraries]
@@ -82,6 +83,7 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "k
 
 # Compose
 compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
+compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "compose-material3-adaptive" }
 
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
