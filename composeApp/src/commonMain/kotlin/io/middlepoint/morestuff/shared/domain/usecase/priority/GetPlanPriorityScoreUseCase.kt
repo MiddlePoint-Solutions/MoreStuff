@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.usecase.priority
 
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toInstant
 import kotlin.math.max

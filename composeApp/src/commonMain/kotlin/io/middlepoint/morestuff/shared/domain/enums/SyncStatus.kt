@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.enums
 
 import io.middlepoint.morestuff.shared.domain.model.FeatureFailure
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 sealed class SyncStatus {
   data object Initializing : SyncStatus()

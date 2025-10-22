@@ -1,7 +1,7 @@
 package io.middlepoint.morestuff.shared.domain.service
 
 import io.middlepoint.morestuff.shared.domain.enums.RelativeDateDisplay
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 

@@ -9,7 +9,7 @@ import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.enums.ScheduleType
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Schedule
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 typealias ScheduleDataMapper<R> = (
   id: Uuid,

@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.model
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class User(
     val id: String,

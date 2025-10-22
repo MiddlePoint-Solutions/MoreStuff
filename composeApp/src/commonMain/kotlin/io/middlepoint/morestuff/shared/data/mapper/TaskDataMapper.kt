@@ -6,7 +6,7 @@ import io.middlepoint.morestuff.shared.data.sync.Sync
 import io.middlepoint.morestuff.shared.data.sync.TaskSync
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Task
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 typealias TaskDataMapper<R> = (
   id: Uuid,

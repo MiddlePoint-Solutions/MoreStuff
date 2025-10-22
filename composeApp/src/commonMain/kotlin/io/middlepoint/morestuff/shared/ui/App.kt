@@ -2,15 +2,28 @@ package io.middlepoint.morestuff.shared.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import io.github.jan.supabase.SupabaseClient
@@ -23,8 +36,13 @@ import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
 import io.middlepoint.morestuff.shared.ui.utils.handleDeeplinkFragment
+import morestuff.composeapp.generated.resources.Res
+import morestuff.composeapp.generated.resources.start
+import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun App(
   screen: Screen? = null,
@@ -44,40 +62,74 @@ fun App(
     }
   }
 
+  val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>()
+
+
   ProvideAppTheme(model.theme) {
     MoreStuffTheme {
-      Box(
-        modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+
+      var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.CHAT) }
+      NavigationSuiteScaffold(
+        navigationSuiteItems = {
+          AppDestinations.entries.forEach {
+            item(
+              icon = {
+                Icon(
+                  it.icon,
+                  contentDescription = stringResource(it.contentDescription)
+                )
+              },
+              label = { Text(stringResource(it.label)) },
+              selected = it == currentDestination,
+              onClick = { currentDestination = it }
+            )
+          }
+        }
       ) {
-        val navController = rememberNavController()
+        // TODO: Destination content.
 
-        if (model.ready) {
+        Box(
+          modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
+        ) {
+          val navController = rememberNavController()
 
-          val startDestination by remember(model) {
-            derivedStateOf {
-              if (model.isAuthenticated) {
-                Home
-              } else {
-                SignIn
+          if (model.ready) {
+
+            val startDestination by remember(model) {
+              derivedStateOf {
+                if (model.isAuthenticated) {
+                  Home
+                } else {
+                  SignIn
+                }
               }
             }
-          }
 
-          MainContent(
-            navController = navController,
-            startDestination = startDestination,
-            shareContent = { taskId, content ->
-              viewModel.take(MainEvent.ShareContent(taskId, content))
-            }
-          )
+            MainContent(
+              navController = navController,
+              startDestination = startDestination,
+              shareContent = { taskId, content ->
+                viewModel.take(MainEvent.ShareContent(taskId, content))
+              }
+            )
 
-          LaunchedEffect(screen) {
-            if (model.isAuthenticated && screen != null) {
-              navController.navigate(screen)
+            LaunchedEffect(screen) {
+              if (model.isAuthenticated && screen != null) {
+                navController.navigate(screen)
+              }
             }
           }
         }
       }
     }
   }
+}
+
+enum class AppDestinations(
+  val label: StringResource,
+  val icon: ImageVector,
+  val contentDescription: StringResource
+) {
+  CHAT(Res.string.start, Icons.Default.Home, Res.string.start),
+  TASKS(Res.string.start, Icons.AutoMirrored.Filled.List, Res.string.start),
 }

@@ -23,7 +23,7 @@ import io.middlepoint.morestuff.shared.domain.enums.SyncStatus.Success
 import io.middlepoint.morestuff.shared.domain.service.DataSyncManager
 import io.middlepoint.morestuff.shared.domain.service.TimeManager
 import kotlinx.coroutines.flow.flow
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -47,15 +47,25 @@ class DataSyncManagerImpl(
   private val logger = Logger.withTag("DataSyncManager")
 
   private var lastPushTime: Instant
-    get() = settings.getStringOrNull(KEY_LAST_PUSH_TIME)
-      ?.let { Instant.parse(it) }
-      ?: Instant.fromEpochMilliseconds(0)
+    get() = try {
+      settings.getStringOrNull(KEY_LAST_PUSH_TIME)
+        ?.let { Instant.parse(it) }
+        ?: Instant.fromEpochMilliseconds(0)
+    } catch (e: Exception) {
+      logger.e("Error getting last push time", e)
+      Instant.fromEpochMilliseconds(0)
+    }
     set(value) = settings.putString(KEY_LAST_PUSH_TIME, value.toString())
 
   private var lastPullTime: Instant
-    get() = settings.getStringOrNull(KEY_LAST_PULL_TIME)
-      ?.let { Instant.parse(it) }
-      ?: Instant.fromEpochMilliseconds(0)
+    get() = try {
+      settings.getStringOrNull(KEY_LAST_PULL_TIME)
+        ?.let { Instant.parse(it) }
+        ?: Instant.fromEpochMilliseconds(0)
+    } catch (e: Exception) {
+      logger.e("Error getting last pull time", e)
+      Instant.fromEpochMilliseconds(0)
+    }
     set(value) = settings.putString(KEY_LAST_PULL_TIME, value.toString())
 
   /**

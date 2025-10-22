@@ -5,7 +5,7 @@ import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Message
 import io.middlepoint.morestuff.shared.ui.model.MessageUiModel
 import io.middlepoint.morestuff.shared.ui.screen.chat.ChatActions
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 object MockData {
 

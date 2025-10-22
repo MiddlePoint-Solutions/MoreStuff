@@ -10,7 +10,7 @@ import io.github.jan.supabase.auth.user.UserSession
 @OptIn(SupabaseInternal::class)
 suspend fun SupabaseClient.handleDeeplinkFragment(
   fragmentOrUrl: String,
-  onSessionSuccess: (UserSession) -> Unit = {}
+  onSessionSuccess: (UserSession?) -> Unit = {}
 ) {
   when (auth.config.flowType) {
     FlowType.IMPLICIT -> {

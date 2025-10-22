@@ -74,6 +74,7 @@ kotlin {
   compilerOptions {
     // Common compiler options applied to all Kotlin source sets
     freeCompilerArgs.add("-Xexpect-actual-classes")
+    freeCompilerArgs.add("-opt-in=kotlin.time.ExperimentalTime")
   }
 
   cocoapods {
@@ -103,11 +104,15 @@ kotlin {
 
       implementation(compose.foundation)
       implementation(compose.material3)
+      implementation(compose.material3AdaptiveNavigationSuite)
       implementation(compose.ui)
       implementation(libs.compose.ui.util)
       implementation(compose.components.resources)
       implementation(compose.components.uiToolingPreview)
       implementation(libs.compose.material3.adaptive)
+      implementation(libs.compose.material3.adaptive.layout)
+      implementation(libs.compose.material3.adaptive.navigation)
+//      implementation(libs.compose.material3.adaptive.navigation.suite)
 
       implementation(compose.materialIconsExtended)
       implementation(libs.bundles.kotlinx)
