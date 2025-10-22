@@ -8,7 +8,6 @@ data class MainState(
     val ready: Boolean = false,
     val theme: AppTheme = AppTheme.System,
     val isAuthenticated: Boolean = false,
-    val showOldUserMessage: Boolean = false,
 )
 
 sealed class MainEvent {

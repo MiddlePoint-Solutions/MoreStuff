@@ -38,7 +38,6 @@ class AuthMiddleware(
 
     when (action) {
       is InitStoreAction -> {
-        dispatch(UserAction.SetOldUser(getMigrationDataFile() != null)) // TODO: remove in future
         initAuthEvents(scope, dispatch)
       }
 

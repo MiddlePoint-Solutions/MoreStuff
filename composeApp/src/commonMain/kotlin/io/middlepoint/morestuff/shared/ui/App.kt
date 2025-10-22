@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -11,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
 import io.github.jan.supabase.SupabaseClient
 import io.middlepoint.morestuff.shared.domain.nav.Home
 import io.middlepoint.morestuff.shared.domain.nav.Screen
@@ -26,6 +28,7 @@ import org.koin.compose.koinInject
 @Composable
 fun App(
   screen: Screen? = null,
+  windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo(true).windowSizeClass,
   accessToken: String? = null, // TODO: this is super ugly
 ) {
 
@@ -55,7 +58,7 @@ fun App(
               if (model.isAuthenticated) {
                 Home
               } else {
-                SignIn(model.showOldUserMessage)
+                SignIn
               }
             }
           }

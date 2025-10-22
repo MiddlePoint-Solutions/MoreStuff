@@ -97,9 +97,7 @@ fun MainContent(
         enterTransition = { fadeIn() },
         exitTransition = { null },
       ) { backStackEntry ->
-        val screen = backStackEntry.toRoute<SignIn>()
         SignInScreen(
-          isOldUser = screen.isOldUser,
           onNext = {
             navController.navigate(Home) {
               popUpTo(startDestination) { inclusive = true }
