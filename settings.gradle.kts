@@ -15,7 +15,8 @@ dependencyResolutionManagement {
         mavenLocal()
         mavenCentral()
         maven("https://jitpack.io")
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        // TODO: remove later
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 

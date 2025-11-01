@@ -1,4 +1,4 @@
-package io.middlepoint.morestuff.shared.domain.nav
+package io.middlepoint.morestuff.shared.domain.navigation
 
 import kotlinx.serialization.Serializable
 

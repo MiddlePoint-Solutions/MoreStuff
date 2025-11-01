@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,11 +26,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.compose.rememberNavController
 import androidx.window.core.layout.WindowSizeClass
 import io.github.jan.supabase.SupabaseClient
-import io.middlepoint.morestuff.shared.domain.nav.Home
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.nav.SignIn
+import io.middlepoint.morestuff.shared.domain.navigation.Home
+import io.middlepoint.morestuff.shared.domain.navigation.AppRoute
+import io.middlepoint.morestuff.shared.domain.navigation.SignIn
 import io.middlepoint.morestuff.shared.ui.local.ProvideAppTheme
-import io.middlepoint.morestuff.shared.ui.screen.main.MainContent
+import io.middlepoint.morestuff.shared.ui.screen.main.MoreStuffNavHost
 import io.middlepoint.morestuff.shared.ui.screen.main.MainEvent
 import io.middlepoint.morestuff.shared.ui.screen.main.MainViewModel
 import io.middlepoint.morestuff.shared.ui.theme.MoreStuffTheme
@@ -45,7 +44,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun App(
-  screen: Screen? = null,
+  appRoute: AppRoute? = null,
   windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo(true).windowSizeClass,
   accessToken: String? = null, // TODO: this is super ugly
 ) {
@@ -63,7 +62,6 @@ fun App(
   }
 
   val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>()
-
 
   ProvideAppTheme(model.theme) {
     MoreStuffTheme {
@@ -91,6 +89,8 @@ fun App(
         Box(
           modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
+
+          // TODO: this needs to be replaced with NavBackStack?
           val navController = rememberNavController()
 
           if (model.ready) {
@@ -105,17 +105,16 @@ fun App(
               }
             }
 
-            MainContent(
-              navController = navController,
+            MoreStuffNavHost(
               startDestination = startDestination,
               shareContent = { taskId, content ->
                 viewModel.take(MainEvent.ShareContent(taskId, content))
               }
             )
 
-            LaunchedEffect(screen) {
-              if (model.isAuthenticated && screen != null) {
-                navController.navigate(screen)
+            LaunchedEffect(appRoute) {
+              if (model.isAuthenticated && appRoute != null) {
+                navController.navigate(appRoute)
               }
             }
           }

@@ -112,6 +112,9 @@ kotlin {
       implementation(libs.compose.material3.adaptive)
       implementation(libs.compose.material3.adaptive.layout)
       implementation(libs.compose.material3.adaptive.navigation)
+//      implementation(libs.compose.material3.adaptive.navigation3)
+      implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+      implementation(libs.androidx.navigation3.ui)
 //      implementation(libs.compose.material3.adaptive.navigation.suite)
 
       implementation(compose.materialIconsExtended)

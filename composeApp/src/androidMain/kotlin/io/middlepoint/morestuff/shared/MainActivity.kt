@@ -20,10 +20,10 @@ import io.github.vinceglb.filekit.FileKit
 import io.github.vinceglb.filekit.dialogs.init
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REMINDER
 import io.middlepoint.morestuff.shared.app.receiver.NotificationReceiver.Companion.ACTION_NOTIFICATION_REVIEW
-import io.middlepoint.morestuff.shared.domain.nav.Import
-import io.middlepoint.morestuff.shared.domain.nav.Review
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.nav.TaskChat
+import io.middlepoint.morestuff.shared.domain.navigation.Import
+import io.middlepoint.morestuff.shared.domain.navigation.Review
+import io.middlepoint.morestuff.shared.domain.navigation.AppRoute
+import io.middlepoint.morestuff.shared.domain.navigation.TaskChat
 import io.middlepoint.morestuff.shared.ui.App
 import org.koin.android.ext.android.get
 import org.koin.compose.KoinContext
@@ -41,12 +41,12 @@ class MainActivity : AppCompatActivity() {
 
     setContent {
       KoinContext {
-        var initialScreen by remember { mutableStateOf<Screen?>(null) }
-        App(initialScreen)
+        var initialAppRoute by remember { mutableStateOf<AppRoute?>(null) }
+        App(initialAppRoute)
 
         LaunchedEffect(Unit) {
-          if (initialScreen == null && launchScreen != null) {
-            initialScreen = launchScreen
+          if (initialAppRoute == null && launchScreen != null) {
+            initialAppRoute = launchScreen
             Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
           }
         }
@@ -54,8 +54,8 @@ class MainActivity : AppCompatActivity() {
         DisposableEffect(Unit) {
           val listener = Consumer<Intent> {
             Logger.d("onNewIntent: $it")
-            initialScreen = handleLaunchIntent(it)
-            Logger.d("initialScreen: $initialScreen")
+            initialAppRoute = handleLaunchIntent(it)
+            Logger.d("initialScreen: $initialAppRoute")
           }
           addOnNewIntentListener(listener)
           onDispose { removeOnNewIntentListener(listener) }

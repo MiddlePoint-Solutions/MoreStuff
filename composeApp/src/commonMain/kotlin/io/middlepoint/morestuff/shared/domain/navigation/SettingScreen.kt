@@ -1,9 +1,9 @@
-package io.middlepoint.morestuff.shared.domain.nav
+package io.middlepoint.morestuff.shared.domain.navigation
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class SettingScreen {
+sealed class SettingScreen: AppRoute {
   @Serializable
   data object Root : SettingScreen()
 
