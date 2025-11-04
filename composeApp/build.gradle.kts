@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.android.utils.Environment
 import com.mikepenz.aboutlibraries.plugin.AboutLibrariesExtension
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.internal.de.undercouch.gradle.tasks.download.Download
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
@@ -18,6 +19,7 @@ plugins {
   alias(libs.plugins.buildConfig)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.aboutLibrariesPlugin)
+  alias(libs.plugins.hotReload)
   //alias(libs.plugins.sentry).apply(false) // Enable when support or noop is added for wasmJs
 }
 
@@ -111,8 +113,7 @@ kotlin {
       implementation(compose.components.uiToolingPreview)
       implementation(libs.compose.material3.adaptive)
       implementation(libs.compose.material3.adaptive.layout)
-      implementation(libs.compose.material3.adaptive.navigation)
-//      implementation(libs.compose.material3.adaptive.navigation3)
+      implementation(libs.compose.material3.adaptive.navigation3)
       implementation(libs.androidx.lifecycle.viewmodel.navigation3)
       implementation(libs.androidx.navigation3.ui)
 //      implementation(libs.compose.material3.adaptive.navigation.suite)
@@ -132,21 +133,17 @@ kotlin {
 
       api(libs.arrow.core)
       api(libs.kermit)
+      api(libs.constraintLayout.compose)
 
       implementation(project.dependencies.platform(libs.koin.bom))
       implementation(libs.koin.core)
       implementation(libs.koin.compose)
       implementation(libs.koin.compose.viewmodel)
       implementation(libs.androidx.navigation.compose)
-//      api(libs.decompose.router)
 
-      // You will probably need to also bring in decompose and essenty
-      implementation(libs.decompose)
-      implementation(libs.decompose.compose.multiplatform)
       implementation(libs.molecule.runtime)
 
       implementation(libs.kSoup)
-      api(libs.constraintLayout.compose)
 
       implementation(libs.composeSettings.ui)
       implementation(libs.composeSettings.ui.extended)
@@ -177,6 +174,8 @@ kotlin {
       implementation(libs.supabase.postgres)
       implementation(libs.supabase.compose.auth)
       implementation(libs.supabase.compose.auth.ui)
+
+
     }
 
     commonTest.dependencies {
@@ -434,6 +433,18 @@ android {
   }
 
   testOptions { unitTests.all { it.useJUnitPlatform() } }
+}
+
+compose.desktop {
+  application {
+    mainClass = "MainKt"
+
+    nativeDistributions {
+      targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+      packageName = "MoreStuff"
+      packageVersion = "1.0.0"
+    }
+  }
 }
 
 sqldelight {

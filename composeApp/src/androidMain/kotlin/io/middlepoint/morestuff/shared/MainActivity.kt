@@ -40,30 +40,27 @@ class MainActivity : AppCompatActivity() {
     val launchScreen = handleLaunchIntent(intent)
 
     setContent {
-      KoinContext {
-        var initialAppRoute by remember { mutableStateOf<AppRoute?>(null) }
-        App(initialAppRoute)
+      var initialAppRoute by remember { mutableStateOf<AppRoute?>(null) }
+      App(initialAppRoute)
 
-        LaunchedEffect(Unit) {
-          if (initialAppRoute == null && launchScreen != null) {
-            initialAppRoute = launchScreen
-            Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
-          }
+      LaunchedEffect(Unit) {
+        if (initialAppRoute == null && launchScreen != null) {
+          initialAppRoute = launchScreen
+          Logger.d("Initial screen set from onNewIntent launchScreen: $launchScreen")
         }
+      }
 
-        DisposableEffect(Unit) {
-          val listener = Consumer<Intent> {
-            Logger.d("onNewIntent: $it")
-            initialAppRoute = handleLaunchIntent(it)
-            Logger.d("initialScreen: $initialAppRoute")
-          }
-          addOnNewIntentListener(listener)
-          onDispose { removeOnNewIntentListener(listener) }
+      DisposableEffect(Unit) {
+        val listener = Consumer<Intent> {
+          Logger.d("onNewIntent: $it")
+          initialAppRoute = handleLaunchIntent(it)
+          Logger.d("initialScreen: $initialAppRoute")
         }
+        addOnNewIntentListener(listener)
+        onDispose { removeOnNewIntentListener(listener) }
       }
     }
   }
-
 
   private fun handleLaunchIntent(intent: Intent) =
     when (intent.action) {

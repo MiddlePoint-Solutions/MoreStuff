@@ -3,12 +3,23 @@ package io.middlepoint.morestuff.shared.ui.screen.main
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
+import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
+import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.EntryProviderScope
@@ -26,9 +37,6 @@ import io.middlepoint.morestuff.shared.domain.navigation.Import
 import io.middlepoint.morestuff.shared.domain.navigation.Review
 import io.middlepoint.morestuff.shared.domain.navigation.ScopeScreen
 import io.middlepoint.morestuff.shared.domain.navigation.Scopes
-import io.middlepoint.morestuff.shared.domain.navigation.SettingScreen.AboutLibraries
-import io.middlepoint.morestuff.shared.domain.navigation.SettingScreen.Developer
-import io.middlepoint.morestuff.shared.domain.navigation.SettingScreen.Root
 import io.middlepoint.morestuff.shared.domain.navigation.Settings
 import io.middlepoint.morestuff.shared.domain.navigation.SignIn
 import io.middlepoint.morestuff.shared.domain.navigation.SignInEmail
@@ -78,8 +86,9 @@ import org.koin.compose.getKoin
 import org.koin.core.Koin
 
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun MoreStuffNavHost(
+fun MoreStuffNavRoutes(
   startDestination: AppRoute,
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
 ) {
@@ -88,12 +97,26 @@ fun MoreStuffNavHost(
 
   val appBackStack = rememberNavBackStack<AppRoute>(startDestination)
 
+  LaunchedEffect(startDestination) {
+    if (appBackStack.first() != startDestination) {
+      appBackStack.add(startDestination)
+    }
+  }
+
+  val windowAdaptiveInfo = currentWindowAdaptiveInfo()
+  val directive = remember(windowAdaptiveInfo) {
+    calculatePaneScaffoldDirective(windowAdaptiveInfo)
+      .copy(horizontalPartitionSpacerSize = 0.dp)
+  }
+  val listDetailStrategy = rememberListDetailSceneStrategy<AppRoute>(directive = directive)
+
   CompositionLocalProvider(
     LocalScreenSize provides getScreenSizeInfo(),
   ) {
 
     NavDisplay(
       backStack = appBackStack,
+      sceneStrategy = listDetailStrategy,
       entryProvider = entryProvider {
         screens(appBackStack, koin, shareContent)
       },
@@ -120,6 +143,7 @@ fun MoreStuffNavHost(
   }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 private fun EntryProviderScope<AppRoute>.screens(
   backStack: NavBackStack<AppRoute>,
   koin: Koin,
@@ -177,10 +201,21 @@ private fun EntryProviderScope<AppRoute>.screens(
   //     navigateToTaskChat = { taskId -> navController.navigate(TaskChat(taskId.value)) }
   //   )
   // }
-  entry<Home> {
+  entry<Home>(
+    metadata = ListDetailSceneStrategy.listPane(
+      detailPlaceholder = {
+        Box(modifier = Modifier.fillMaxSize()) {
+          Text("Select chat to view details")
+        }
+      }
+    )
+  ) {
     HomeScreen(
-      navigateToSettings = { backStack.add(Settings) },
-      navigateToTaskChat = { taskId -> backStack.add(TaskChat(taskId.value)) }
+      navigateToSettings = { backStack.add(Settings.Root) },
+      navigateToTaskChat = { taskId ->
+        backStack.clear()
+        backStack.addAll(listOf(Home, TaskChat(taskId.value)))
+      }
     )
   }
 
@@ -239,7 +274,7 @@ private fun EntryProviderScope<AppRoute>.screens(
   //     AboutLibrariesScreen(onBack = { navController.popBackStack() })
   //   }
   // }
-  entry<Root> {
+  entry<Settings.Root> {
     val viewModel = viewModel {
       SettingsViewModel(
         store = koin.get(),
@@ -254,16 +289,16 @@ private fun EntryProviderScope<AppRoute>.screens(
       selectAppTheme = { index -> viewModel.take(SettingsEvent.SelectAppTheme(index)) },
       selectLanguage = { index -> viewModel.take(SettingsEvent.SelectLanguage(index)) },
       enableDevSettings = { viewModel.take(SettingsEvent.EnableDevSettings(true)) },
-      showDevSettings = { backStack.add(Developer) },
+      showDevSettings = { backStack.add(Settings.Developer) },
       showScopesSettings = { backStack.add(Scopes) },
-      showLibraries = { backStack.add(AboutLibraries) },
+      showLibraries = { backStack.add(Settings.AboutLibraries) },
       signOut = { viewModel.take(SettingsEvent.SignOut) },
       openAppSettings = { viewModel.take(SettingsEvent.OpenAppSettings) },
       setApiKey = { apiKey -> viewModel.take(SettingsEvent.SetApiKey(apiKey)) }
     )
   }
 
-  entry<Developer> {
+  entry<Settings.Developer> {
     val viewModel = viewModel {
       SettingsViewModel(
         store = koin.get(),
@@ -277,7 +312,7 @@ private fun EntryProviderScope<AppRoute>.screens(
     )
   }
 
-  entry<AboutLibraries> {
+  entry<Settings.AboutLibraries> {
     AboutLibrariesScreen(onBack = { backStack.removeLastOrNull() })
   }
 
@@ -416,7 +451,9 @@ private fun EntryProviderScope<AppRoute>.screens(
   //     isAIEnabled = isAiEnabled
   //   )
   // }
-  entry<TaskChat> { screen ->
+  entry<TaskChat>(
+    metadata = ListDetailSceneStrategy.detailPane()
+  ) { screen ->
     val scope = rememberCoroutineScope()
 
     val viewModel = viewModel(

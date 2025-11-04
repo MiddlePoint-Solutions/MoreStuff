@@ -3,6 +3,7 @@ package io.middlepoint.morestuff.shared.ui
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.cash.molecule.RecompositionMode
 import app.cash.molecule.RecompositionMode.Immediate
 import app.cash.molecule.launchMolecule
 import kotlinx.coroutines.CoroutineScope
@@ -26,11 +27,10 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
   private val events = MutableSharedFlow<Event>(extraBufferCapacity = 20)
 
   // TODO: the model is only active when state is collected. This also means that events will not be collected either.
-  val models: StateFlow<Model> by lazy {
+  val models: StateFlow<Model> by lazy(LazyThreadSafetyMode.NONE) {
     scope.launchMolecule(mode = Immediate) {
       models(events)
-    }.onEach(::onSaveState)
-      .stateIn(scope, SharingStarted.Lazily, initialState)
+    }
   }
 
   fun take(event: Event) {
@@ -38,12 +38,6 @@ abstract class MoleculeViewModel<Event, Model> : ViewModel() {
       events.emit(event)
     }
   }
-
-  /*  fun take(event: Event) {
-      if (!events.tryEmit(event)) {
-        error("Event buffer overflow.")
-      }
-    }*/
 
   @Composable
   protected abstract fun models(events: SharedFlow<Event>): Model

@@ -25,7 +25,16 @@ data object Home : AppRoute
 data class Review(val scopeId: String) : AppRoute
 
 @Serializable
-data object Settings : AppRoute
+sealed class Settings : AppRoute {
+  @Serializable
+  data object Root : Settings()
+
+  @Serializable
+  data object Developer : Settings()
+
+  @Serializable
+  data object AboutLibraries : Settings()
+}
 
 @Serializable
 data class ImagePreview(val imageUri: String, val taskId: String) : AppRoute
@@ -44,6 +53,8 @@ sealed interface Import : AppRoute {
   @Serializable
   data class Document(val uri: String) : Import
 }
+
+
 
 @Serializable
 data class TaskChat(val taskId: String) : AppRoute
