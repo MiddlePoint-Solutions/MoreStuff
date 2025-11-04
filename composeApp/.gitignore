@@ -3,3 +3,4 @@
 /composeApp.podspec
 /release/
 /staging/
+*.db
