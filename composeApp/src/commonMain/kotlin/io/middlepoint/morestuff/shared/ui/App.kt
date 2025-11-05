@@ -4,8 +4,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteColors
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldValue
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScope
@@ -81,11 +84,16 @@ fun App(
           current = currentDestination,
           onChange = { currentDestination = it }
         ),
+        navigationSuiteColors = NavigationSuiteDefaults.colors(
+          navigationBarContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+          navigationDrawerContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+          shortNavigationBarContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+          navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ),
         state = navigationSuiteState
       ) {
-        Surface(
-//          modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
-        ) {
+
+        Surface {
 
           if (model.ready) {
             val startDestination by remember(model) {

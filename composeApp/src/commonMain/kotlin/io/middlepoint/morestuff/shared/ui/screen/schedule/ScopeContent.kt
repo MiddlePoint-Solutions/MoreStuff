@@ -19,6 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.PriorityItem
@@ -48,6 +56,7 @@ fun ScopeContent(
 ) {
 
   var reorderList by remember(tasks) { mutableStateOf(tasks) }
+  val focusManager = LocalFocusManager.current
 
   fun updateList(from: Int, to: Int) {
     val newList = reorderList.toMutableList().apply {
@@ -91,7 +100,29 @@ fun ScopeContent(
   LazyColumn(
     modifier = modifier
       .fillMaxSize()
-      .simpleVerticalScrollbar(listState),
+      .simpleVerticalScrollbar(listState)
+      .onPreviewKeyEvent {
+        when (it.type) {
+          KeyEventType.KeyUp if it.key == Key.Tab -> {
+            focusManager.moveFocus(FocusDirection.Down)
+            true
+          }
+
+          KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+            focusManager.moveFocus(FocusDirection.Down)
+            true
+          }
+
+          KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
+            focusManager.moveFocus(FocusDirection.Up)
+            true
+          }
+
+          else -> {
+            false
+          }
+        }
+      },
     state = listState,
     userScrollEnabled = enabled
   ) {

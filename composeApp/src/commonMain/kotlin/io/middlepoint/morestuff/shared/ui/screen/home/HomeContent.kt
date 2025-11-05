@@ -43,9 +43,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
@@ -278,7 +286,11 @@ private fun HomeContent(
   onReorderingChanged: (Boolean) -> Unit,
   navigateToTaskChat: (Uuid) -> Unit
 ) {
+
   val coroutineScope = rememberCoroutineScope()
+  val focusManager = LocalFocusManager.current
+
+  val logger = remember { Logger.withTag("HomeContent") }
 
   val selectedTasks = model.selectedTasks
   val taskInputActive = model.taskInputActive
@@ -328,6 +340,36 @@ private fun HomeContent(
           },
           containerColor = MaterialTheme.colorScheme.surfaceContainer,
           createNewScope = createNewScope,
+          modifier = Modifier.onPreviewKeyEvent {
+
+            logger.d { "onPreviewKeyEvent: $it" }
+            when (it.type) {
+
+              KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+                focusManager.moveFocus(FocusDirection.Down)
+                true
+              }
+
+              KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
+                focusManager.moveFocus(FocusDirection.Up)
+                true
+              }
+
+              KeyEventType.KeyUp if it.key == Key.DirectionRight -> {
+                focusManager.moveFocus(FocusDirection.Right)
+                true
+              }
+
+              KeyEventType.KeyUp if it.key == Key.DirectionLeft -> {
+                focusManager.moveFocus(FocusDirection.Left)
+                true
+              }
+
+              else -> {
+                false
+              }
+            }
+          },
           isCreateScopeVisible = model.selectedTasks.isEmpty()
         )
       }
@@ -348,7 +390,6 @@ private fun HomeContent(
 
         BackHandler {
           onEvent(ResetHomeState)
-          onEvent(HideTaskInput)
         }
 
         InputItem(

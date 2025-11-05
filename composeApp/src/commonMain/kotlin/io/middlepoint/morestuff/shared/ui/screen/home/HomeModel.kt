@@ -165,6 +165,7 @@ fun homeModel(
         ResetHomeState -> {
           selectedTasks = listOf()
           reorderingScopes = emptyMap()
+          taskInputActive = false
         }
 
         HideTaskInput -> {

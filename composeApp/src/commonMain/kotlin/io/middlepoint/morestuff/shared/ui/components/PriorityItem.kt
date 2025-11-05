@@ -14,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -41,8 +42,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -76,6 +83,7 @@ fun PriorityItem(
   var isCompleted by remember { mutableStateOf(task.isComplete) }
   val interactionSource = remember { MutableInteractionSource() }
 
+
   Box(
     modifier = Modifier
       .fillMaxWidth()
@@ -99,14 +107,15 @@ fun PriorityItem(
         .padding(start = 8.dp),
       verticalAlignment = Alignment.CenterVertically,
     ) {
-      if(!isInSearch){
-        ToggleTaskAsDone(
+
+      if (!isInSearch) {
+        ToggleTaskComplete(
           selectedToComplete = isCompleted,
           onClick = {
             isCompleted = !isCompleted
             onTaskComplete(isCompleted)
-
           },
+          modifier = Modifier.onPreviewKeyEvent { false },
           enabled = enabled
         )
       }
@@ -160,9 +169,7 @@ fun PriorityItem(
           textDecoration = if (isCompleted) TextDecoration.LineThrough else TextDecoration.None
         )
       )
-
     }
-
 
     val badgesAlpha by animateFloatAsState(
       targetValue = if (isSelected || isReorderModeActive) 0f else 1f,
@@ -234,11 +241,11 @@ fun PriorityItem(
 
 
 @Composable
-fun ToggleTaskAsDone(
+fun ToggleTaskComplete(
   selectedToComplete: Boolean,
   onClick: () -> Unit,
+  modifier: Modifier = Modifier,
   enabled: Boolean = true,
-  modifier: Modifier = Modifier
 ) {
   Box(
     contentAlignment = Alignment.Center,

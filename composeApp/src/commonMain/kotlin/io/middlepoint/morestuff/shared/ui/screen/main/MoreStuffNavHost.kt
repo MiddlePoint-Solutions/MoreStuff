@@ -5,6 +5,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -18,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -80,6 +83,7 @@ import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsContent
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsEvent
 import io.middlepoint.morestuff.shared.ui.screen.settings.SettingsViewModel
 import io.middlepoint.morestuff.shared.ui.screen.share.ImportScreen
+import io.middlepoint.morestuff.shared.ui.theme.surfaceContainerElevation
 import io.middlepoint.morestuff.shared.ui.utils.getScreenSizeInfo
 import kotlinx.coroutines.launch
 import org.koin.compose.getKoin
@@ -150,21 +154,6 @@ private fun EntryProviderScope<AppRoute>.screens(
   shareContent: (taskId: Uuid, content: Shareable) -> Unit,
 ) {
 
-
-  // navigation2 — keep for reference
-  // composable<SignIn>(
-  //   enterTransition = { fadeIn() },
-  //   exitTransition = { null },
-  // ) { backStackEntry ->
-  //   SignInScreen(
-  //     onNext = {
-  //       navController.navigate(Home) {
-  //         popUpTo(startDestination) { inclusive = true }
-  //       }
-  //     },
-  //     onSignInWithEmail = { navController.navigate(SignInEmail) }
-  //   )
-  // }
   entry<SignIn> {
     SignInScreen(
       onNext = {
@@ -175,16 +164,6 @@ private fun EntryProviderScope<AppRoute>.screens(
     )
   }
 
-  // navigation2 — keep for reference
-  // animatedComposable<SignInEmail> {
-  //   SignInEmailScreen(
-  //     onNext = {
-  //       navController.navigate(Home) {
-  //         popUpTo(startDestination) { inclusive = true }
-  //       }
-  //     }
-  //   )
-  // }
   entry<SignInEmail> {
     SignInEmailScreen(
       onNext = {
@@ -194,18 +173,18 @@ private fun EntryProviderScope<AppRoute>.screens(
     )
   }
 
-  // navigation2 — keep for reference
-  // composable<Home> {
-  //   HomeScreen(
-  //     navigateToSettings = { navController.navigate(Settings) },
-  //     navigateToTaskChat = { taskId -> navController.navigate(TaskChat(taskId.value)) }
-  //   )
-  // }
   entry<Home>(
     metadata = ListDetailSceneStrategy.listPane(
       detailPlaceholder = {
-        Box(modifier = Modifier.fillMaxSize()) {
-          Text("Select chat to view details")
+        Surface(
+          color = MaterialTheme.colorScheme.surfaceContainer
+        ) {
+          Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+          ) {
+            Text("Select chat to view details")
+          }
         }
       }
     )

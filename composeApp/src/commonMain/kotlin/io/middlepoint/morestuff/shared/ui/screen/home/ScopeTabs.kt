@@ -30,94 +30,96 @@ import io.middlepoint.morestuff.shared.ui.utils.containsEmoji
 
 @Composable
 fun ScopeTabs(
-    currentPage: Int,
-    scopes: List<Scope>,
-    onScopeSelected: (index: Int, scope: Scope) -> Unit,
-    containerColor: Color,
-    createNewScope: () -> Unit,
-    isCreateScopeVisible: Boolean = true
+  currentPage: Int,
+  scopes: List<Scope>,
+  onScopeSelected: (index: Int, scope: Scope) -> Unit,
+  containerColor: Color,
+  createNewScope: () -> Unit,
+  modifier: Modifier = Modifier,
+  isCreateScopeVisible: Boolean = true
 ) {
-    val selectedTabColor = MaterialTheme.colorScheme.primary
-    val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+  val selectedTabColor = MaterialTheme.colorScheme.primary
+  val unselectedTabColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
 
-    CustomScrollableTabRow(
-        selectedTabIndex = currentPage,
-        minItemWidth = 18.dp,
-        edgePadding = 18.dp,
-        containerColor = containerColor,
-        indicator = { tabPositions ->
-            tabPositions.getOrNull(currentPage)?.let {
-                CustomIndicator(
-                    modifier = Modifier.tabIndicatorOffset(
-                        currentTabPosition = it,
-                    ),
-                    color = selectedTabColor,
-                    height = 4.dp,
-                    cornerRadius = 12.dp
-                )
+  CustomScrollableTabRow(
+    selectedTabIndex = currentPage,
+    modifier = modifier,
+    minItemWidth = 18.dp,
+    edgePadding = 18.dp,
+    containerColor = containerColor,
+    indicator = { tabPositions ->
+      tabPositions.getOrNull(currentPage)?.let {
+        CustomIndicator(
+          modifier = Modifier.tabIndicatorOffset(
+            currentTabPosition = it,
+          ),
+          color = selectedTabColor,
+          height = 4.dp,
+          cornerRadius = 12.dp
+        )
+      }
+    },
+    divider = { }
+  ) {
+    scopes.forEachIndexed { index, scope ->
+      Tab(
+        selected = index == currentPage,
+        onClick = { onScopeSelected(index, scope) },
+        modifier = Modifier.background(
+          color = containerColor,
+          shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+        ),
+        text = {
+
+          val size = remember(index, scope) {
+            if (scope.name.length == 1 && containsEmoji(scope.name)) {
+              18.sp
+            } else {
+              15.sp
             }
-        },
-        divider = { }
-    ) {
-        scopes.forEachIndexed { index, scope ->
-            Tab(
-                selected = index == currentPage,
-                onClick = { onScopeSelected(index, scope) },
-                modifier = Modifier.background(
-                    color = containerColor,
-                    shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                ),
-                text = {
+          }
 
-                    val size = remember(index, scope) {
-                        if (scope.name.length == 1 && containsEmoji(scope.name)) {
-                            18.sp
-                        } else {
-                            15.sp
-                        }
-                    }
-
-                    Text(
-                        text = scope.name,
-                        style = TextStyle(
-                            fontSize = size,
-                            fontWeight = FontWeight.Medium,
-                        ),
-                        color = if (index == currentPage) selectedTabColor else unselectedTabColor
-                    )
-                }
-            )
+          Text(
+            text = scope.name,
+            style = TextStyle(
+              fontSize = size,
+              fontWeight = FontWeight.Medium,
+            ),
+            color = if (index == currentPage) selectedTabColor else unselectedTabColor
+          )
         }
-        if(isCreateScopeVisible){
-            IconButton(
-                onClick = { createNewScope() },
-                modifier = Modifier.padding(start = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Scope",
-                    tint = unselectedTabColor,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
+      )
     }
+    if (isCreateScopeVisible) {
+      IconButton(
+        onClick = { createNewScope() },
+        modifier = Modifier.padding(start = 8.dp)
+      ) {
+        Icon(
+          imageVector = Icons.Default.Add,
+          contentDescription = "Add Scope",
+          tint = unselectedTabColor,
+          modifier = Modifier.size(20.dp)
+        )
+      }
+    }
+
+  }
 }
 
 @Composable
 private fun CustomIndicator(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
-    width: Dp = 17.dp,
-    height: Dp = 3.dp,
-    cornerRadius: Dp = 10.dp,
+  modifier: Modifier = Modifier,
+  color: Color = MaterialTheme.colorScheme.primary,
+  width: Dp = 17.dp,
+  height: Dp = 3.dp,
+  cornerRadius: Dp = 10.dp,
 ) {
-    Box(
-        modifier
-            .height(height)
-            .clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius))
-            .background(color = color)
-    )
+  Box(
+    modifier
+      .height(height)
+      .clip(RoundedCornerShape(topStart = cornerRadius, topEnd = cornerRadius))
+      .background(color = color)
+  )
 }
 
