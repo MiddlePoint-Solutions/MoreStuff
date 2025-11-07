@@ -103,6 +103,7 @@ import org.koin.mp.KoinPlatform
 fun HomeScreen(
   navigateToSettings: () -> Unit,
   navigateToTaskChat: (Uuid) -> Unit,
+  modifier: Modifier = Modifier
 ) {
 
   val homeState = viewModel {
@@ -131,6 +132,7 @@ fun HomeScreen(
   }
 
   MoreStuffHomeScaffold(
+    modifier = modifier,
     snackbarHostState = snackbarHostState,
     topBar = {
       HomeTopBar(

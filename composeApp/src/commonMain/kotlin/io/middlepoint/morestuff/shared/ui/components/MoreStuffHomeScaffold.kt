@@ -18,9 +18,11 @@ import androidx.compose.ui.Modifier
 fun MoreStuffHomeScaffold(
   snackbarHostState: SnackbarHostState,
   content: @Composable (PaddingValues) -> Unit,
+  modifier: Modifier = Modifier,
   topBar: @Composable () -> Unit = {},
 ) {
   Scaffold(
+    modifier = modifier,
     containerColor = MaterialTheme.colorScheme.surfaceContainer,
     snackbarHost = {
       SnackbarHost(hostState = snackbarHostState) { data ->
@@ -33,7 +35,7 @@ fun MoreStuffHomeScaffold(
               snackbarData = data,
               containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
               contentColor = MaterialTheme.colorScheme.onSurface,
-              actionColor =  MaterialTheme.colorScheme.onSurface
+              actionColor = MaterialTheme.colorScheme.onSurface
             )
           }
         )

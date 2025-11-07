@@ -10,6 +10,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.layout.AnimatedPaneOverrideScope
+import androidx.compose.material3.adaptive.layout.AnimatedPaneScope
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
 import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
@@ -110,7 +112,10 @@ fun MoreStuffNavRoutes(
   val windowAdaptiveInfo = currentWindowAdaptiveInfo()
   val directive = remember(windowAdaptiveInfo) {
     calculatePaneScaffoldDirective(windowAdaptiveInfo)
-      .copy(horizontalPartitionSpacerSize = 0.dp)
+      .copy(
+        horizontalPartitionSpacerSize = 0.dp,
+        defaultPanePreferredWidth = 520.dp
+      )
   }
   val listDetailStrategy = rememberListDetailSceneStrategy<AppRoute>(directive = directive)
 
@@ -189,6 +194,9 @@ private fun EntryProviderScope<AppRoute>.screens(
       }
     )
   ) {
+
+    AnimatedPaneScope
+
     HomeScreen(
       navigateToSettings = { backStack.add(Settings.Root) },
       navigateToTaskChat = { taskId ->
