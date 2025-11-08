@@ -110,11 +110,13 @@ fun TaskChatContent(
   sendTaskMessage: (String) -> Unit = {},
   imagePicked: (PlatformFile) -> Unit = {},
   pdfPicked: (PlatformFile) -> Unit = {},
-  logger: Logger = koinInject(),
   isAIEnabled: Boolean = false
 ) {
+
+  val logger: Logger = koinInject()
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
+
 
   val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -165,7 +167,7 @@ fun TaskChatContent(
       if (task.isComplete && task.completeTime.isNotEmpty()) {
         val alreadyPosted = messages.any { msg ->
           msg.contentType == ContentType.APP_TASK_MESSAGE &&
-              msg.content.startsWith(completionMessage)
+                  msg.content.startsWith(completionMessage)
         }
 
         if (!alreadyPosted) {
@@ -181,7 +183,7 @@ fun TaskChatContent(
         messages
           .filter { msg ->
             msg.contentType == ContentType.APP_TASK_MESSAGE &&
-                msg.content.startsWith(completionMessage)
+                    msg.content.startsWith(completionMessage)
           }
           .forEach { msg ->
             onEvent(DeleteMessage(msg))
@@ -220,10 +222,11 @@ fun TaskChatContent(
     Box(
       modifier = Modifier
         .fillMaxSize()
-        .clickable(
-          indication = null,
-          interactionSource = remember { MutableInteractionSource() }
-        ) { focusManager.clearFocus() }
+        // TODO: is this needed for mobile?
+//        .clickable(
+//          indication = null,
+//          interactionSource = remember { MutableInteractionSource() }
+//        ) { focusManager.clearFocus() }
         .padding(top = scaffoldPadding.calculateTopPadding())
     ) {
       Column(
@@ -373,9 +376,9 @@ private fun TaskChatInput(
   //isAIEnabled: Boolean = false,
   onToggleAI: () -> Unit = {}
 ) {
-  val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
+  var isTextEmpty by remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
-  val showSendIcon = remember { mutableStateOf(editingContent.isNotEmpty()) }
+  var showSendIcon by remember { mutableStateOf(editingContent.isNotEmpty()) }
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -394,14 +397,14 @@ private fun TaskChatInput(
   LaunchedEffect(editingMessageId, editingContent) {
     if (editingMessageId != null) {
       userInputValue = TextFieldValue(editingContent, TextRange(editingContent.length))
-      isTextEmpty.value = editingContent.isEmpty()
-      showSendIcon.value = !isTextEmpty.value
+      isTextEmpty = editingContent.isEmpty()
+      showSendIcon = !isTextEmpty
       focusRequester.requestFocus()
       keyboardController?.show()
     } else {
       userInputValue = TextFieldValue("")
-      isTextEmpty.value = true
-      showSendIcon.value = false
+      isTextEmpty = true
+      showSendIcon = false
     }
   }
 
@@ -414,15 +417,15 @@ private fun TaskChatInput(
       modifier = Modifier.align(Alignment.BottomCenter),
       enablePadding = enabled,
       textContent = {
-        val weight = if (isTextEmpty.value) 0.30f else 0.12f
+        val weight = if (isTextEmpty) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
             //isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
-              isTextEmpty.value = it.text.isBlank()
-              showSendIcon.value = !isTextEmpty.value
+              isTextEmpty = it.text.isBlank()
+              showSendIcon = !isTextEmpty
               if (editingMessageId != null) {
                 onUpdateMessage(it.text)
               }
@@ -466,8 +469,8 @@ private fun TaskChatInput(
                       } else {
                         sendTaskMessage(userInputValue.text)
                         userInputValue = TextFieldValue("")
-                        isTextEmpty.value = true
-                        showSendIcon.value = false
+                        isTextEmpty = true
+                        showSendIcon = false
                       }
                     },
                     enabled = userInputValue.text.isNotBlank()
