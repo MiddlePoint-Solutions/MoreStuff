@@ -229,13 +229,6 @@ fun PriorityItem(
         }
       }
     }
-    HorizontalDivider(
-      modifier = Modifier
-        .align(Alignment.BottomCenter)
-        .fillMaxWidth(),
-      thickness = 0.7.dp,
-      color = MaterialTheme.colorScheme.outlineVariant
-    )
   }
 }
 

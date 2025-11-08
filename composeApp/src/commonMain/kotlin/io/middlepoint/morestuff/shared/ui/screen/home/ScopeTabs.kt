@@ -14,9 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +39,7 @@ fun ScopeTabs(
   onScopeSelected: (index: Int, scope: Scope) -> Unit,
   containerColor: Color,
   createNewScope: () -> Unit,
+  focusRequesters: List<FocusRequester>? = null,
   modifier: Modifier = Modifier,
   isCreateScopeVisible: Boolean = true
 ) {
@@ -43,7 +48,14 @@ fun ScopeTabs(
 
   CustomScrollableTabRow(
     selectedTabIndex = currentPage,
-    modifier = modifier,
+    modifier = modifier
+      .onFocusChanged { focusState ->
+        if (focusState.isFocused) {
+          focusRequesters?.let {
+            it[currentPage].requestFocus()
+          }
+        }
+      },
     minItemWidth = 18.dp,
     edgePadding = 18.dp,
     containerColor = containerColor,
@@ -65,10 +77,18 @@ fun ScopeTabs(
       Tab(
         selected = index == currentPage,
         onClick = { onScopeSelected(index, scope) },
-        modifier = Modifier.background(
-          color = containerColor,
-          shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-        ),
+        modifier = Modifier
+          .then(focusRequesters?.let {
+            Modifier.focusRequester(it[index])
+          } ?: Modifier)
+          .background(
+            color = containerColor,
+            shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+          ).onFocusChanged { focusState ->
+            if (focusState.isFocused) {
+              onScopeSelected(index, scope)
+            }
+          },
         text = {
 
           val size = remember(index, scope) {

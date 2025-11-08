@@ -62,7 +62,7 @@ fun CustomScrollableTabRow(
     tabs: @Composable @UiComposable () -> Unit
 ) {
     Surface(
-        modifier = modifier,
+//        modifier = modifier,
         color = containerColor,
         contentColor = contentColor
     ) {
@@ -75,7 +75,7 @@ fun CustomScrollableTabRow(
             )
         }
         SubcomposeLayout(
-            Modifier.fillMaxWidth()
+          modifier.fillMaxWidth()
                 .wrapContentSize(align = Alignment.CenterStart)
                 .horizontalScroll(scrollState)
                 .selectableGroup()

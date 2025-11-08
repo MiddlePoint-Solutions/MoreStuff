@@ -59,6 +59,7 @@ fun HomeTopBar(
   deleteSelectedTasks: () -> Unit,
   selectScope: () -> Unit,
   isReorderingActive: Boolean,
+  modifier: Modifier = Modifier
 ) {
 
   val taskSelectionActive = remember(selectedTaskCount, isReorderingActive) {
@@ -102,6 +103,7 @@ fun HomeTopBar(
         }
       }
     },
+    modifier = modifier,
     actions = {
       if (taskSelectionActive) {
         taskSelectionItems(

@@ -194,9 +194,6 @@ private fun EntryProviderScope<AppRoute>.screens(
       }
     )
   ) {
-
-    AnimatedPaneScope
-
     HomeScreen(
       navigateToSettings = { backStack.add(Settings.Root) },
       navigateToTaskChat = { taskId ->

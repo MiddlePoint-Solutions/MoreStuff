@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRestorer
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -148,7 +154,8 @@ fun HomeScreen(
         completeSelectedTasks = { homeState.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteBottomSheet = true },
         selectScope = { showScopeSelection = true },
-        isReorderingActive = isReorderingActive
+        isReorderingActive = isReorderingActive,
+        modifier = Modifier.focusProperties { canFocus = false }
       )
     },
     content = {
@@ -302,7 +309,12 @@ private fun HomeContent(
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
-  val schedule = model.planTime
+
+
+  val focusRequesters = remember(model.scopes.size) {
+    List(model.scopes.size) { FocusRequester() }
+  }
+
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -342,36 +354,33 @@ private fun HomeContent(
           },
           containerColor = MaterialTheme.colorScheme.surfaceContainer,
           createNewScope = createNewScope,
-          modifier = Modifier.onPreviewKeyEvent {
+          focusRequesters = focusRequesters,
+          modifier = Modifier
+            .focusRestorer(focusRequesters[pagerState.currentPage])
+            .onPreviewKeyEvent {
+              logger.d { "onPreviewKeyEvent: $it" }
+              when (it.type) {
 
-            logger.d { "onPreviewKeyEvent: $it" }
-            when (it.type) {
+                KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+                  focusManager.moveFocus(FocusDirection.Down)
+                  true
+                }
 
-              KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
-                focusManager.moveFocus(FocusDirection.Down)
-                true
+                KeyEventType.KeyUp if it.key == Key.DirectionRight -> {
+                  focusManager.moveFocus(FocusDirection.Right)
+                  true
+                }
+
+                KeyEventType.KeyUp if it.key == Key.DirectionLeft -> {
+                  focusManager.moveFocus(FocusDirection.Left)
+                  true
+                }
+
+                else -> {
+                  false
+                }
               }
-
-              KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
-                focusManager.moveFocus(FocusDirection.Up)
-                true
-              }
-
-              KeyEventType.KeyUp if it.key == Key.DirectionRight -> {
-                focusManager.moveFocus(FocusDirection.Right)
-                true
-              }
-
-              KeyEventType.KeyUp if it.key == Key.DirectionLeft -> {
-                focusManager.moveFocus(FocusDirection.Left)
-                true
-              }
-
-              else -> {
-                false
-              }
-            }
-          },
+            },
           isCreateScopeVisible = model.selectedTasks.isEmpty()
         )
       }
@@ -414,7 +423,7 @@ private fun HomeContent(
           onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) },
           onSetPriority = { onEvent(SetPlanPriority) },
           onClearSetPriority = { onEvent(ClearPlanPriority) },
-          schedule = schedule,
+          schedule = model.planTime,
         )
       }
 
@@ -423,7 +432,18 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
             alpha = if (taskInputActive) 0.4f else 1f
-          },
+          }
+//          .onPreviewKeyEvent {
+//            when (it.type) {
+//              KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
+//                focusRequesters[pagerState.currentPage].requestFocus()
+//                true
+//              }
+//
+//              else -> false
+//            }
+//          }
+        ,
         key = { model.scopes[it].id.value }
       ) { page ->
 
