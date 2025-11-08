@@ -100,29 +100,7 @@ fun ScopeContent(
   LazyColumn(
     modifier = modifier
       .fillMaxSize()
-      .simpleVerticalScrollbar(listState)
-      .onPreviewKeyEvent {
-        when (it.type) {
-          KeyEventType.KeyUp if it.key == Key.Tab -> {
-            focusManager.moveFocus(FocusDirection.Down)
-            true
-          }
-
-          KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
-            focusManager.moveFocus(FocusDirection.Down)
-            true
-          }
-
-          KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
-            focusManager.moveFocus(FocusDirection.Up)
-            true
-          }
-
-          else -> {
-            false
-          }
-        }
-      },
+      .simpleVerticalScrollbar(listState),
     state = listState,
     userScrollEnabled = enabled
   ) {

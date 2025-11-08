@@ -51,6 +51,7 @@ fun App(
   val supabase: SupabaseClient = koinInject()
 
   var currentDestination by rememberSaveable { mutableStateOf(AppDestination.CHAT) }
+
   val navigationSuiteState = rememberNavigationSuiteScaffoldState(
     initialValue = if (model.isAuthenticated) {
       NavigationSuiteScaffoldValue.Visible

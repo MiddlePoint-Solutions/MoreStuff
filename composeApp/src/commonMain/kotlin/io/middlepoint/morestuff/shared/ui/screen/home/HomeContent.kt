@@ -424,6 +424,7 @@ private fun HomeContent(
               } else {
                 onEvent(CreateTask(text))
               }
+              inputValue = inputValue.copy(text = "")
               delay(200)
               // TODO: this should move up and out
               states[pagerState.currentPage].animateScrollToItem(index = 0)
@@ -443,11 +444,19 @@ private fun HomeContent(
                   } else {
                     onEvent(CreateTask(inputValue.text))
                   }
+                  inputValue = inputValue.copy(text = "")
                   delay(200)
                   // TODO: this should move up and out
                   states[pagerState.currentPage].animateScrollToItem(index = 0)
                 }
+                true
+              }
 
+              KeyEventType.KeyUp if it.key == Key.Escape -> {
+                if (taskInputActive) {
+                  onEvent(HideTaskInput)
+                }
+                focusManager.moveFocus(FocusDirection.Previous)
                 true
               }
 
@@ -498,6 +507,33 @@ private fun HomeContent(
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
+                modifier = Modifier.onPreviewKeyEvent {
+                  when (it.type) {
+                    KeyEventType.KeyUp if it.key == Key.Tab -> {
+                      focusManager.moveFocus(FocusDirection.Down)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+                      focusManager.moveFocus(FocusDirection.Down)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
+                      focusManager.moveFocus(FocusDirection.Up)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.Escape -> {
+                      focusRequesters[pagerState.currentPage].requestFocus()
+                      true
+                    }
+
+                    else -> {
+                      false
+                    }
+                  }
+                },
                 selectedTasks = selectedTasks,
                 onItemClick = { taskId ->
                   if (taskInputActive) {

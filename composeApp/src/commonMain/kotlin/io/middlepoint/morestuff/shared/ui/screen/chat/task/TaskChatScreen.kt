@@ -126,7 +126,6 @@ fun TaskChatContent(
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
-
   val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   val scopeSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
