@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,15 +47,15 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRestorer
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isMetaPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import co.touchlab.kermit.Logger
@@ -124,6 +123,8 @@ fun HomeScreen(
   val showScopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+  // TODO: this should be moved into the model
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
   var showCreateScopeSheet by remember { mutableStateOf(false) }
@@ -170,6 +171,7 @@ fun HomeScreen(
           onTaskComplete = { taskId ->
             homeState.take(CompleteTask(taskId))
           },
+          deleteSelectedTasks = { showDeleteBottomSheet = true },
           onReorderingChanged = { isReordering -> isReorderingActive = isReordering },
           navigateToTaskChat = navigateToTaskChat
         )
@@ -293,7 +295,8 @@ private fun HomeContent(
   onTaskComplete: (Uuid) -> Unit,
   modifier: Modifier = Modifier,
   onReorderingChanged: (Boolean) -> Unit,
-  navigateToTaskChat: (Uuid) -> Unit
+  navigateToTaskChat: (Uuid) -> Unit,
+  deleteSelectedTasks: () -> Unit
 ) {
 
   val coroutineScope = rememberCoroutineScope()
@@ -310,11 +313,13 @@ private fun HomeContent(
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
 
-
   val focusRequesters = remember(model.scopes.size) {
     List(model.scopes.size) { FocusRequester() }
   }
 
+  var inputValue by rememberSaveable(
+    stateSaver = TextFieldValue.Saver,
+  ) { mutableStateOf(TextFieldValue(text = "")) }
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -361,6 +366,11 @@ private fun HomeContent(
               logger.d { "onPreviewKeyEvent: $it" }
               when (it.type) {
 
+                KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.N -> {
+                  onEvent(ShowTaskInput)
+                  false
+                }
+
                 KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
                   focusManager.moveFocus(FocusDirection.Down)
                   true
@@ -404,6 +414,8 @@ private fun HomeContent(
         }
 
         InputItem(
+          value = inputValue,
+          onValueChange = { inputValue = it },
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
@@ -412,12 +424,34 @@ private fun HomeContent(
                 onEvent(CreateTask(text))
               }
               delay(200)
+              // TODO: this should move up and out
               states[pagerState.currentPage].animateScrollToItem(index = 0)
             }
           },
           onCancel = {
             onEvent(ResetHomeState)
             onEvent(HideTaskInput)
+          },
+          modifier = Modifier.onPreviewKeyEvent {
+            when (it.type) {
+              KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.Enter -> {
+                focusManager.moveFocus(FocusDirection.Previous)
+                coroutineScope.launch {
+                  if (model.planTime != null) {
+                    onEvent(CreateTaskWithSchedule(inputValue.text))
+                  } else {
+                    onEvent(CreateTask(inputValue.text))
+                  }
+                  delay(200)
+                  // TODO: this should move up and out
+                  states[pagerState.currentPage].animateScrollToItem(index = 0)
+                }
+
+                true
+              }
+
+              else -> false
+            }
           },
           onDateChange = { onEvent(UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) },
@@ -432,18 +466,19 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
             alpha = if (taskInputActive) 0.4f else 1f
-          }
-//          .onPreviewKeyEvent {
-//            when (it.type) {
-//              KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
-//                focusRequesters[pagerState.currentPage].requestFocus()
-//                true
-//              }
-//
-//              else -> false
-//            }
-//          }
-        ,
+          }.onPreviewKeyEvent {
+            when (it.type) {
+              KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.Backspace -> {
+                if (selectedTasks.isNotEmpty()) {
+                  deleteSelectedTasks() // TODO: after this the focus is reset.
+                }
+                false
+              }
+
+              else -> false
+            }
+
+          },
         key = { model.scopes[it].id.value }
       ) { page ->
 
@@ -507,6 +542,7 @@ private fun HomeContent(
       }
     }
 
+    // TODO: we don't need this for Desktop
     AnimatedVisibility(
       visible = !taskInputActive,
       modifier = Modifier

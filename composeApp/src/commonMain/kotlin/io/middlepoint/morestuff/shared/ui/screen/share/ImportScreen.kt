@@ -47,6 +47,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -55,6 +56,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.model.Shareable
@@ -234,6 +236,10 @@ private fun ShareContent(
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val schedule = model.planTime
 
+  var inputValue by rememberSaveable(
+    stateSaver = TextFieldValue.Saver,
+  ) { mutableStateOf(TextFieldValue(text = "")) }
+
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
       .collect { page ->
@@ -273,6 +279,8 @@ private fun ShareContent(
     ) { active ->
       if (active) {
         InputItem(
+          value = inputValue,
+          onValueChange = { inputValue = it },
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
@@ -285,8 +293,8 @@ private fun ShareContent(
           onCancel = { onEvent(ImportEvent.ResetShareState) },
           onDateChange = { onEvent(ImportEvent.UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(ImportEvent.UpdatePlanTime(h, m)) },
-          onSetPriority = {onEvent(ImportEvent.SetPlanPriority)},
-          onClearSetPriority = {onEvent(ImportEvent.ClearPlanPriority)},
+          onSetPriority = { onEvent(ImportEvent.SetPlanPriority) },
+          onClearSetPriority = { onEvent(ImportEvent.ClearPlanPriority) },
           schedule = schedule,
         )
       } else {
@@ -325,7 +333,7 @@ private fun ShareContent(
               isReordering = false,
               onToggleReordering = {},
 
-            )
+              )
           }
         }
 
