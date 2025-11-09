@@ -118,6 +118,8 @@ kotlin {
       implementation(libs.androidx.navigation3.ui)
 //      implementation(libs.compose.material3.adaptive.navigation.suite)
 
+      implementation(libs.platformtools.core)
+
       implementation(compose.materialIconsExtended)
       implementation(libs.bundles.kotlinx)
       implementation(libs.stately.isolate)
@@ -245,7 +247,11 @@ kotlin {
     val desktopMain by getting {
       dependsOn(nonWebMain)
       dependencies {
-        implementation(compose.desktop.currentOs)
+        implementation(libs.jewel.int.ui.standalone)
+        implementation(libs.jewel.int.ui.decorated.window)
+        implementation(compose.desktop.currentOs) {
+          exclude(group = "org.jetbrains.compose.material")
+        }
         implementation(libs.sqldelight.driver.desktop)
         implementation(libs.ktor.client.java)
         implementation(libs.kotlinx.coroutines.swing)

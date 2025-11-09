@@ -1,4 +1,6 @@
 [versions]
+jewelIntUiStandaloneVersion = "0.31.0-253.28086.58"
+platformtoolsCoreVersion = "0.7.4"
 turbine = "1.0.0"
 coilCompose = "3.1.0"
 firebaseBom = "33.13.0"
@@ -71,6 +73,8 @@ hotReload = "1.0.0-rc02"
 
 [libraries]
 # Kotlin
+jewel-int-ui-decorated-window = { module = "org.jetbrains.jewel:jewel-int-ui-decorated-window", version.ref = "jewelIntUiStandaloneVersion" }
+jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewelIntUiStandaloneVersion" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -109,6 +113,8 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # SqlDelight
+platformtools-core = { module = "io.github.kdroidfilter:platformtools.core", version.ref = "platformtoolsCoreVersion" }
+platformtools-darkmodedetector = { module = "io.github.kdroidfilter:platformtools.darkmodedetector", version.ref = "platformtoolsCoreVersion" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
