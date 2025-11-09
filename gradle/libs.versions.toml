@@ -73,8 +73,6 @@ hotReload = "1.0.0-rc02"
 
 [libraries]
 # Kotlin
-jewel-int-ui-decorated-window = { module = "org.jetbrains.jewel:jewel-int-ui-decorated-window", version.ref = "jewelIntUiStandaloneVersion" }
-jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewelIntUiStandaloneVersion" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5", version.ref = "kotlin" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
@@ -136,6 +134,10 @@ supabase-postgres = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth" }
 supabase-compose-auth-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui" }
+
+# Jewel
+jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewelIntUiStandaloneVersion" }
+jewel-int-ui-decorated-window = { module = "org.jetbrains.jewel:jewel-int-ui-decorated-window", version.ref = "jewelIntUiStandaloneVersion" }
 
 # Misc
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }

@@ -53,20 +53,8 @@ fun App(
   var currentDestination by rememberSaveable { mutableStateOf(AppDestination.CHAT) }
 
   val navigationSuiteState = rememberNavigationSuiteScaffoldState(
-    initialValue = if (model.isAuthenticated) {
-      NavigationSuiteScaffoldValue.Visible
-    } else {
-      NavigationSuiteScaffoldValue.Hidden
-    }
+    initialValue = NavigationSuiteScaffoldValue.Hidden
   )
-
-  LaunchedEffect(model, appRoute) {
-    if (model.isAuthenticated) {
-      navigationSuiteState.show()
-    } else {
-      navigationSuiteState.hide()
-    }
-  }
 
   // TODO: change this
   LaunchedEffect(accessToken) {
