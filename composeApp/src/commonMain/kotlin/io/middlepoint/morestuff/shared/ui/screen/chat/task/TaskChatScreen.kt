@@ -240,6 +240,7 @@ fun TaskChatContent(
       Column(
         modifier = Modifier.fillMaxSize()
       ) {
+
         val contentPadding = if (titleLineCount > 1)
           PaddingValues(top = 74.dp, bottom = 20.dp)
         else

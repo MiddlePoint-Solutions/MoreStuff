@@ -5,6 +5,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -29,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -78,7 +81,13 @@ fun Messages(
 
   ProvideUserInteractionEnabled(userInteractionEnabled) {
 
-    Box(modifier = modifier) {
+    BoxWithConstraints(
+      modifier = modifier.fillMaxSize()
+    ) {
+
+      val itemMaxWidth by remember(maxWidth) {
+        mutableStateOf(maxWidth * 0.8f)
+      }
 
       LazyColumn(
         reverseLayout = true,
@@ -104,26 +113,27 @@ fun Messages(
             item.formattedTime != nextMessage?.formattedTime
           }
 
-          Column(modifier.padding(top = 8.dp)) {
-            if (isLastMessageOfDay) {
-              DateTimeItem(item)
+          if (isLastMessageOfDay) {
+            DateTimeItem(item)
+          }
+
+          when (item.contentType) {
+            ContentType.TASK_MESSAGE,
+            ContentType.USER_TASK -> UserChatItem(
+              message = item,
+              actions = actions,
+              modifier = Modifier.widthIn(max = itemMaxWidth)
+            )
+
+            ContentType.CONFIRM_TASK,
+            ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
+
+            ContentType.AI_TASK_MESSAGE -> {
+              logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
+              AppChatItem(item, actions)
             }
 
-            when (item.contentType) {
-              ContentType.TASK_MESSAGE,
-              ContentType.USER_TASK -> UserChatItem(
-                message = item,
-                actions = actions,
-              )
-
-              ContentType.CONFIRM_TASK,
-              ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
-              ContentType.AI_TASK_MESSAGE -> {
-                logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
-                AppChatItem(item, actions)
-              }
-              ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
-            }
+            ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
           }
         }
 
@@ -148,7 +158,7 @@ fun Messages(
       val jumpToBottomButtonEnabled by remember {
         derivedStateOf {
           (scrollState.firstVisibleItemIndex != 0 ||
-              scrollState.firstVisibleItemScrollOffset > jumpThreshold)
+                  scrollState.firstVisibleItemScrollOffset > jumpThreshold)
         }
       }
 
