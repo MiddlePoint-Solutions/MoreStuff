@@ -113,27 +113,30 @@ fun Messages(
             item.formattedTime != nextMessage?.formattedTime
           }
 
-          if (isLastMessageOfDay) {
-            DateTimeItem(item)
-          }
+          Column {
 
-          when (item.contentType) {
-            ContentType.TASK_MESSAGE,
-            ContentType.USER_TASK -> UserChatItem(
-              message = item,
-              actions = actions,
-              modifier = Modifier.widthIn(max = itemMaxWidth)
-            )
-
-            ContentType.CONFIRM_TASK,
-            ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
-
-            ContentType.AI_TASK_MESSAGE -> {
-              logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
-              AppChatItem(item, actions)
+            if (isLastMessageOfDay) {
+              DateTimeItem(item)
             }
 
-            ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
+            when (item.contentType) {
+              ContentType.TASK_MESSAGE,
+              ContentType.USER_TASK -> UserChatItem(
+                message = item,
+                actions = actions,
+                modifier = Modifier.widthIn(max = itemMaxWidth)
+              )
+
+              ContentType.CONFIRM_TASK,
+              ContentType.APP_TASK_MESSAGE -> AppChatItem(item, actions)
+
+              ContentType.AI_TASK_MESSAGE -> {
+                logger.d { "Rendering message: ${item.contentType}, ID=${item.id}" }
+                AppChatItem(item, actions)
+              }
+
+              ContentType.TASK_REMINDER -> TaskReminderItem(item, actions)
+            }
           }
         }
 
