@@ -32,7 +32,6 @@ fun mainModel(
         ready = it.isReady(),
         theme = it.settings.appTheme,
         isAuthenticated = it.isAuthenticated(),
-        showOldUserMessage = it.userState.isOldUser
       )
     }
   }

@@ -4,7 +4,7 @@ import androidx.compose.ui.text.intl.Locale
 import io.middlepoint.morestuff.shared.domain.enums.MonthNamesLocalized
 import io.middlepoint.morestuff.shared.domain.repository.TimeFormatter
 import io.middlepoint.morestuff.shared.platform.TimeUtils
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.LocalTime

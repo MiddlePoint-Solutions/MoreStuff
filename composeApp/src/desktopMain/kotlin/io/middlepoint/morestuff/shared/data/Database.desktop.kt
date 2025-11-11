@@ -1,5 +1,6 @@
 package io.middlepoint.morestuff.shared.data
 
+import app.cash.sqldelight.async.coroutines.synchronous
 import app.cash.sqldelight.db.QueryResult
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.db.SqlSchema
@@ -18,7 +19,7 @@ actual class DriverFactory : CoroutineScope {
   actual fun provideDbDriver(
     schema: SqlSchema<QueryResult.AsyncValue<Unit>>
   ): SqlDriver {
-    return JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+    return JdbcSqliteDriver("jdbc:sqlite:test.db", schema = StuffDb.Schema.synchronous())
       .also { launch { schema.create(it).await() } }
   }
 }

@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,9 +49,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -110,9 +119,10 @@ fun TaskChatContent(
   sendTaskMessage: (String) -> Unit = {},
   imagePicked: (PlatformFile) -> Unit = {},
   pdfPicked: (PlatformFile) -> Unit = {},
-  logger: Logger = koinInject(),
   isAIEnabled: Boolean = false
 ) {
+
+  val logger: Logger = koinInject()
   val coroutineScope = rememberCoroutineScope()
   val scrollState = rememberLazyListState()
 
@@ -165,7 +175,7 @@ fun TaskChatContent(
       if (task.isComplete && task.completeTime.isNotEmpty()) {
         val alreadyPosted = messages.any { msg ->
           msg.contentType == ContentType.APP_TASK_MESSAGE &&
-              msg.content.startsWith(completionMessage)
+                  msg.content.startsWith(completionMessage)
         }
 
         if (!alreadyPosted) {
@@ -181,7 +191,7 @@ fun TaskChatContent(
         messages
           .filter { msg ->
             msg.contentType == ContentType.APP_TASK_MESSAGE &&
-                msg.content.startsWith(completionMessage)
+                    msg.content.startsWith(completionMessage)
           }
           .forEach { msg ->
             onEvent(DeleteMessage(msg))
@@ -220,15 +230,17 @@ fun TaskChatContent(
     Box(
       modifier = Modifier
         .fillMaxSize()
-        .clickable(
-          indication = null,
-          interactionSource = remember { MutableInteractionSource() }
-        ) { focusManager.clearFocus() }
+        // TODO: is this needed for mobile?
+//        .clickable(
+//          indication = null,
+//          interactionSource = remember { MutableInteractionSource() }
+//        ) { focusManager.clearFocus() }
         .padding(top = scaffoldPadding.calculateTopPadding())
     ) {
       Column(
         modifier = Modifier.fillMaxSize()
       ) {
+
         val contentPadding = if (titleLineCount > 1)
           PaddingValues(top = 74.dp, bottom = 20.dp)
         else
@@ -237,7 +249,9 @@ fun TaskChatContent(
         Messages(
           messages = messages,
           actions = chatActions,
-          modifier = modifier.weight(1f),
+          modifier = modifier
+            .weight(1f)
+            .focusProperties { canFocus = false },
           scrollState = scrollState,
           contentPadding = contentPadding,
           isAILoading = isAILoading,
@@ -373,9 +387,9 @@ private fun TaskChatInput(
   //isAIEnabled: Boolean = false,
   onToggleAI: () -> Unit = {}
 ) {
-  val isTextEmpty = remember { mutableStateOf(editingContent.isEmpty()) }
+  var isTextEmpty by remember { mutableStateOf(editingContent.isEmpty()) }
   val isRecording = remember { mutableStateOf(false) }
-  val showSendIcon = remember { mutableStateOf(editingContent.isNotEmpty()) }
+  var showSendIcon by remember { mutableStateOf(editingContent.isNotEmpty()) }
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -394,35 +408,55 @@ private fun TaskChatInput(
   LaunchedEffect(editingMessageId, editingContent) {
     if (editingMessageId != null) {
       userInputValue = TextFieldValue(editingContent, TextRange(editingContent.length))
-      isTextEmpty.value = editingContent.isEmpty()
-      showSendIcon.value = !isTextEmpty.value
+      isTextEmpty = editingContent.isEmpty()
+      showSendIcon = !isTextEmpty
       focusRequester.requestFocus()
       keyboardController?.show()
     } else {
       userInputValue = TextFieldValue("")
-      isTextEmpty.value = true
-      showSendIcon.value = false
+      isTextEmpty = true
+      showSendIcon = false
     }
   }
 
   var showMenu by remember { mutableStateOf(false) }
 
+  val focusManager = LocalFocusManager.current
+
   Box(
     modifier = modifier
   ) {
     UserInput(
-      modifier = Modifier.align(Alignment.BottomCenter),
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .onPreviewKeyEvent {
+          when (it.type) {
+            KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.Enter -> {
+              sendTaskMessage(userInputValue.text)
+              userInputValue = TextFieldValue("")
+              isTextEmpty = true
+              true
+            }
+
+            KeyEventType.KeyUp if it.key == Key.Escape -> {
+              focusManager.moveFocus(FocusDirection.Previous)
+              true
+            }
+
+            else -> false
+          }
+        },
       enablePadding = enabled,
       textContent = {
-        val weight = if (isTextEmpty.value) 0.30f else 0.12f
+        val weight = if (isTextEmpty) 0.30f else 0.12f
         CompositionLocalProvider(LocalBoxWeight provides weight) {
           UserTextInput(
             value = userInputValue,
             //isAIEnabled = isAIEnabled,
             onValueChange = {
               userInputValue = it
-              isTextEmpty.value = it.text.isBlank()
-              showSendIcon.value = !isTextEmpty.value
+              isTextEmpty = it.text.isBlank()
+              showSendIcon = !isTextEmpty
               if (editingMessageId != null) {
                 onUpdateMessage(it.text)
               }
@@ -466,8 +500,8 @@ private fun TaskChatInput(
                       } else {
                         sendTaskMessage(userInputValue.text)
                         userInputValue = TextFieldValue("")
-                        isTextEmpty.value = true
-                        showSendIcon.value = false
+                        isTextEmpty = true
+                        showSendIcon = false
                       }
                     },
                     enabled = userInputValue.text.isNotBlank()
@@ -608,11 +642,15 @@ private fun TaskTopAppBar(
   onDelete: () -> Unit,
   onToggleComplete: () -> Unit,
   labelText: String,
-  onLabelClick: () -> Unit
+  onLabelClick: () -> Unit,
+  modifier: Modifier = Modifier
 ) {
   Surface {
     TopAppBar(
       title = { },
+      modifier = modifier
+        .focusable(false)
+        .focusProperties { canFocus = false },
       navigationIcon = {
         IconButton(onClick = onBack) {
           Icon(

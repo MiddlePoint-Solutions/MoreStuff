@@ -2,7 +2,7 @@ package io.middlepoint.morestuff.shared.data.adapter
 
 import app.cash.sqldelight.ColumnAdapter
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 object InstantColumnAdapter : ColumnAdapter<Instant, Long> {
   override fun decode(databaseValue: Long): Instant {

@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,9 +44,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.ui.components.CreateScopeBottomSheet
 import io.middlepoint.morestuff.shared.ui.components.DeleteBottomSheet
@@ -95,6 +109,7 @@ import org.koin.mp.KoinPlatform
 fun HomeScreen(
   navigateToSettings: () -> Unit,
   navigateToTaskChat: (Uuid) -> Unit,
+  modifier: Modifier = Modifier
 ) {
 
   val homeState = viewModel {
@@ -109,6 +124,8 @@ fun HomeScreen(
   val showScopeSelectionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   val deleteSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+  // TODO: this should be moved into the model
   var showDeleteBottomSheet by remember { mutableStateOf(false) }
 
   var showCreateScopeSheet by remember { mutableStateOf(false) }
@@ -123,6 +140,7 @@ fun HomeScreen(
   }
 
   MoreStuffHomeScaffold(
+    modifier = modifier,
     snackbarHostState = snackbarHostState,
     topBar = {
       HomeTopBar(
@@ -138,7 +156,8 @@ fun HomeScreen(
         completeSelectedTasks = { homeState.take(CompleteSelectedTasks) },
         deleteSelectedTasks = { showDeleteBottomSheet = true },
         selectScope = { showScopeSelection = true },
-        isReorderingActive = isReorderingActive
+        isReorderingActive = isReorderingActive,
+        modifier = Modifier.focusProperties { canFocus = false }
       )
     },
     content = {
@@ -153,6 +172,7 @@ fun HomeScreen(
           onTaskComplete = { taskId ->
             homeState.take(CompleteTask(taskId))
           },
+          deleteSelectedTasks = { showDeleteBottomSheet = true },
           onReorderingChanged = { isReordering -> isReorderingActive = isReordering },
           navigateToTaskChat = navigateToTaskChat
         )
@@ -276,9 +296,14 @@ private fun HomeContent(
   onTaskComplete: (Uuid) -> Unit,
   modifier: Modifier = Modifier,
   onReorderingChanged: (Boolean) -> Unit,
-  navigateToTaskChat: (Uuid) -> Unit
+  navigateToTaskChat: (Uuid) -> Unit,
+  deleteSelectedTasks: () -> Unit
 ) {
+
   val coroutineScope = rememberCoroutineScope()
+  val focusManager = LocalFocusManager.current
+
+  val logger = remember { Logger.withTag("HomeContent") }
 
   val selectedTasks = model.selectedTasks
   val taskInputActive = model.taskInputActive
@@ -288,7 +313,14 @@ private fun HomeContent(
   var currentScopePage by remember { mutableIntStateOf(pagerState.currentPage) }
   val scopes by rememberUpdatedState(newValue = model.scopes)
   val previousScopesSize = remember { mutableStateOf(model.scopes.size) }
-  val schedule = model.planTime
+
+  val focusRequesters = remember(model.scopes.size) {
+    List(model.scopes.size) { FocusRequester() }
+  }
+
+  var inputValue by rememberSaveable(
+    stateSaver = TextFieldValue.Saver,
+  ) { mutableStateOf(TextFieldValue(text = "")) }
 
   LaunchedEffect(Unit) {
     snapshotFlow { pagerState.currentPage }
@@ -328,6 +360,38 @@ private fun HomeContent(
           },
           containerColor = MaterialTheme.colorScheme.surfaceContainer,
           createNewScope = createNewScope,
+          focusRequesters = focusRequesters,
+          modifier = Modifier
+            .focusRestorer(focusRequesters[pagerState.currentPage])
+            .onPreviewKeyEvent {
+              logger.d { "onPreviewKeyEvent: $it" }
+              when (it.type) {
+
+                KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.N -> {
+                  onEvent(ShowTaskInput)
+                  false
+                }
+
+                KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+                  focusManager.moveFocus(FocusDirection.Down)
+                  true
+                }
+
+                KeyEventType.KeyUp if it.key == Key.DirectionRight -> {
+                  focusManager.moveFocus(FocusDirection.Right)
+                  true
+                }
+
+                KeyEventType.KeyUp if it.key == Key.DirectionLeft -> {
+                  focusManager.moveFocus(FocusDirection.Left)
+                  true
+                }
+
+                else -> {
+                  false
+                }
+              }
+            },
           isCreateScopeVisible = model.selectedTasks.isEmpty()
         )
       }
@@ -348,10 +412,11 @@ private fun HomeContent(
 
         BackHandler {
           onEvent(ResetHomeState)
-          onEvent(HideTaskInput)
         }
 
         InputItem(
+          value = inputValue,
+          onValueChange = { inputValue = it },
           onDone = { text ->
             coroutineScope.launch {
               if (model.planTime != null) {
@@ -359,7 +424,9 @@ private fun HomeContent(
               } else {
                 onEvent(CreateTask(text))
               }
+              inputValue = inputValue.copy(text = "")
               delay(200)
+              // TODO: this should move up and out
               states[pagerState.currentPage].animateScrollToItem(index = 0)
             }
           },
@@ -367,11 +434,40 @@ private fun HomeContent(
             onEvent(ResetHomeState)
             onEvent(HideTaskInput)
           },
+          modifier = Modifier.onPreviewKeyEvent {
+            when (it.type) {
+              KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.Enter -> {
+                focusManager.moveFocus(FocusDirection.Previous)
+                coroutineScope.launch {
+                  if (model.planTime != null) {
+                    onEvent(CreateTaskWithSchedule(inputValue.text))
+                  } else {
+                    onEvent(CreateTask(inputValue.text))
+                  }
+                  inputValue = inputValue.copy(text = "")
+                  delay(200)
+                  // TODO: this should move up and out
+                  states[pagerState.currentPage].animateScrollToItem(index = 0)
+                }
+                true
+              }
+
+              KeyEventType.KeyUp if it.key == Key.Escape -> {
+                if (taskInputActive) {
+                  onEvent(HideTaskInput)
+                }
+                focusManager.moveFocus(FocusDirection.Previous)
+                true
+              }
+
+              else -> false
+            }
+          },
           onDateChange = { onEvent(UpdatePlanDate(it)) },
           onTimeChange = { h, m -> onEvent(UpdatePlanTime(h, m)) },
           onSetPriority = { onEvent(SetPlanPriority) },
           onClearSetPriority = { onEvent(ClearPlanPriority) },
-          schedule = schedule,
+          schedule = model.planTime,
         )
       }
 
@@ -380,6 +476,18 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize()
           .graphicsLayer {
             alpha = if (taskInputActive) 0.4f else 1f
+          }.onPreviewKeyEvent {
+            when (it.type) {
+              KeyEventType.KeyUp if it.isMetaPressed && it.key == Key.Backspace -> {
+                if (selectedTasks.isNotEmpty()) {
+                  deleteSelectedTasks() // TODO: after this the focus is reset.
+                }
+                false
+              }
+
+              else -> false
+            }
+
           },
         key = { model.scopes[it].id.value }
       ) { page ->
@@ -399,6 +507,33 @@ private fun HomeContent(
             } else {
               ScopeContent(
                 tasks = tasksModel.tasks,
+                modifier = Modifier.onPreviewKeyEvent {
+                  when (it.type) {
+                    KeyEventType.KeyUp if it.key == Key.Tab -> {
+                      focusManager.moveFocus(FocusDirection.Down)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.DirectionDown -> {
+                      focusManager.moveFocus(FocusDirection.Down)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.DirectionUp -> {
+                      focusManager.moveFocus(FocusDirection.Up)
+                      true
+                    }
+
+                    KeyEventType.KeyUp if it.key == Key.Escape -> {
+                      focusRequesters[pagerState.currentPage].requestFocus()
+                      true
+                    }
+
+                    else -> {
+                      false
+                    }
+                  }
+                },
                 selectedTasks = selectedTasks,
                 onItemClick = { taskId ->
                   if (taskInputActive) {
@@ -444,6 +579,7 @@ private fun HomeContent(
       }
     }
 
+    // TODO: we don't need this for Desktop
     AnimatedVisibility(
       visible = !taskInputActive,
       modifier = Modifier
@@ -454,6 +590,7 @@ private fun HomeContent(
     ) {
       FloatingActionButton(
         onClick = { onEvent(ShowTaskInput) },
+        modifier = Modifier.focusProperties { canFocus = false },
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary,
       ) {

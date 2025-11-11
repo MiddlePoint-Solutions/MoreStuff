@@ -1,6 +1,7 @@
-package io.middlepoint.morestuff.shared.domain.nav
+package io.middlepoint.morestuff.shared.domain.navigation
 
 import androidx.navigation.NavType
+import androidx.navigation3.runtime.NavKey
 import androidx.savedstate.SavedState
 import androidx.savedstate.read
 import androidx.savedstate.write
@@ -9,50 +10,62 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 @Serializable
-sealed class Screen
+sealed interface AppRoute : NavKey
 
 @Serializable
-data class SignIn(val isOldUser: Boolean = false) : Screen()
+data object SignIn : AppRoute
 
 @Serializable
-data object SignInEmail : Screen()
+data object SignInEmail : AppRoute
 
 @Serializable
-data object Home : Screen()
+data object Home : AppRoute
 
 @Serializable
-data class Review(val scopeId: String) : Screen()
+data class Review(val scopeId: String) : AppRoute
 
 @Serializable
-data object Settings : Screen()
-
-@Serializable
-data class ImagePreview(val imageUri: String, val taskId: String) : Screen()
-
-@Serializable
-data object Scopes : Screen()
-
-@Serializable
-sealed class Import: Screen() {
+sealed class Settings : AppRoute {
   @Serializable
-  data class Text(val message: String) : Import()
+  data object Root : Settings()
 
   @Serializable
-  data class Image(val uri: String) : Import()
+  data object Developer : Settings()
 
   @Serializable
-  data class Document(val uri: String) : Import()
+  data object AboutLibraries : Settings()
 }
 
 @Serializable
-data class TaskChat(val taskId: String) : Screen()
+data class ImagePreview(val imageUri: String, val taskId: String) : AppRoute
+
+@Serializable
+data object Scopes : AppRoute
+
+@Serializable
+sealed interface Import : AppRoute {
+  @Serializable
+  data class Text(val message: String) : Import
+
+  @Serializable
+  data class Image(val uri: String) : Import
+
+  @Serializable
+  data class Document(val uri: String) : Import
+}
+
+
+
+@Serializable
+data class TaskChat(val taskId: String) : AppRoute
 
 // TODO: change argument to file path string and construct PlatformFile from it
 @Serializable
-data class TaskChatImageImport(val uri: String) : Screen()
+data class TaskChatImageImport(val uri: String) : AppRoute
 
 @Serializable
-data class TaskChatImagePreview(val taskId: String, val imagePath: String, val title: String) : Screen()
+data class TaskChatImagePreview(val taskId: String, val imagePath: String, val title: String) :
+  AppRoute
 
 
 data object ShareableNavType : NavType<Shareable>(isNullableAllowed = false) {

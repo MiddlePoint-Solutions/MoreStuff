@@ -6,9 +6,9 @@ import co.touchlab.kermit.Logger
 import io.middlepoint.morestuff.shared.domain.enums.ReplyType
 import io.middlepoint.morestuff.shared.domain.model.Shareable
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import io.middlepoint.morestuff.shared.domain.nav.Home
-import io.middlepoint.morestuff.shared.domain.nav.Screen
-import io.middlepoint.morestuff.shared.domain.nav.TaskChat
+import io.middlepoint.morestuff.shared.domain.navigation.Home
+import io.middlepoint.morestuff.shared.domain.navigation.AppRoute
+import io.middlepoint.morestuff.shared.domain.navigation.TaskChat
 import io.middlepoint.morestuff.shared.domain.redux.AppStore
 import io.middlepoint.morestuff.shared.domain.redux.action.ScheduleAction
 import io.middlepoint.morestuff.shared.domain.usecase.schedule.CancelActiveScheduleUseCase
@@ -23,7 +23,7 @@ val logger = Logger.withTag("NavigationHelper")
 class NavigationHelper: ViewModel(), KoinComponent {
 
     val shareable = MutableSharedFlow<Shareable>()
-    val navigation = MutableSharedFlow<Screen>()
+    val navigation = MutableSharedFlow<AppRoute>()
     val code = MutableSharedFlow<String>()
     private val cancelActiveScheduleUseCase: CancelActiveScheduleUseCase by inject()
     private val scheduler: Scheduler by inject()

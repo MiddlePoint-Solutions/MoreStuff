@@ -1,9 +1,10 @@
-package io.middlepoint.morestuff.shared.domain.nav
+package io.middlepoint.morestuff.shared.domain.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ScopeScreen {
+sealed class ScopeScreen : AppRoute {
   @Serializable
   data object Root : ScopeScreen()
 

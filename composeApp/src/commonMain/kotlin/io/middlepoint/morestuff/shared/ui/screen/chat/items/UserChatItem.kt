@@ -1,11 +1,17 @@
 package io.middlepoint.morestuff.shared.ui.screen.chat.items
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Start
@@ -19,7 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.enums.ContentType
 import io.middlepoint.morestuff.shared.domain.enums.MessageType
@@ -37,6 +46,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun UserChatItem(
   message: MessageUiModel,
   actions: ChatActions,
+  modifier: Modifier = Modifier
 ) {
   val isNewUserTask by remember {
     derivedStateOf { message.contentType == ContentType.USER_TASK }
@@ -58,75 +68,82 @@ fun UserChatItem(
     }
   }
 
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .padding(start = 45.dp, end = 5.dp, bottom = 4.dp),
-    horizontalArrangement = Arrangement.End
+  Box(
+    modifier = Modifier.fillMaxWidth(),
+    contentAlignment = Alignment.TopEnd
   ) {
-    if (isNewUserTask) {
-      FilledIconButton(onClick = { actions.taskChatAction(message.taskId) }) {
-        Icon(
-          imageVector = Icons.Default.Start,
-          contentDescription = ""
-        )
-      }
-    }
-
-    Surface(
-      shape = RoundedCornerShape(
-        topStart = 14.dp,
-        topEnd = 14.dp,
-        bottomEnd = 5.dp,
-        bottomStart = 14.dp
-      ),
-      color = MaterialTheme.colorScheme.inversePrimary,
-      modifier = Modifier
-        .combinedClickable(
-          enabled = LocalUserInteractionEnabled.current && !isEditing,
-          onClick = {
-            when (messageType) {
-              MessageType.Text -> showMenu = true
-              MessageType.Image -> actions.onImageSelected(message)
-              MessageType.Pdf -> actions.onPdfSelected(message)
-            }
-          },
-          onLongClick = { showMenu = true }
-        )
+    Row(
+      modifier = modifier
+        .padding(start = 45.dp, end = 12.dp, bottom = 4.dp),
+      horizontalArrangement = Arrangement.End
     ) {
-      if (!isEditing) {
-        UserMessageContextMenu(
-          message,
-          showMenu = showMenu,
-          actions = actions,
-          onDismissRequest = { showMenu = false },
-        )
+      if (isNewUserTask) {
+        FilledIconButton(onClick = { actions.taskChatAction(message.taskId) }) {
+          Icon(
+            imageVector = Icons.Default.Start,
+            contentDescription = ""
+          )
+        }
       }
 
-      when (messageType) {
-        MessageType.Pdf -> {
-          message.messageExtra?.url?.let { filePath ->
-            PDFMessageItem(
-              pdfPath = filePath,
+      Surface(
+        shape = userMessageShape(),
+        color = MaterialTheme.colorScheme.inversePrimary,
+        modifier = Modifier
+          .combinedClickable(
+            enabled = LocalUserInteractionEnabled.current && !isEditing,
+            onClick = {
+              when (messageType) {
+                MessageType.Text -> showMenu = true
+                MessageType.Image -> actions.onImageSelected(message)
+                MessageType.Pdf -> actions.onPdfSelected(message)
+              }
+            },
+            onLongClick = { showMenu = true },
+            onDoubleClick = { showMenu = true },
+          ).clipToBounds()
+      ) {
+        if (!isEditing) {
+          UserMessageContextMenu(
+            message,
+            showMenu = showMenu,
+            actions = actions,
+            onDismissRequest = { showMenu = false },
+          )
+        }
+
+        when (messageType) {
+          MessageType.Pdf -> {
+            message.messageExtra?.url?.let { filePath ->
+              PDFMessageItem(
+                pdfPath = filePath,
+                message = message,
+              )
+            }
+          }
+
+          MessageType.Image -> {
+            ImageMessageItem(message = message)
+          }
+
+          else -> {
+            TextMessageItem(
               message = message,
+              onNonLinkClick = { showMenu = true },
             )
           }
-        }
-
-        MessageType.Image -> {
-          ImageMessageItem(message = message)
-        }
-
-        else -> {
-          TextMessageItem(
-            message = message,
-            onNonLinkClick = { showMenu = true },
-          )
         }
       }
     }
   }
 }
+
+private fun userMessageShape(): RoundedCornerShape = RoundedCornerShape(
+  topStart = 14.dp,
+  topEnd = 14.dp,
+  bottomEnd = 5.dp,
+  bottomStart = 14.dp
+)
 
 
 @Preview

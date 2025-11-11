@@ -7,7 +7,7 @@ import io.middlepoint.morestuff.shared.domain.redux.action.SyncAction.SyncInterv
 import io.middlepoint.morestuff.shared.domain.redux.action.SyncAction.SyncTriggerAction
 import io.middlepoint.morestuff.shared.domain.redux.action.SyncAction.UpdateSyncStatusAction
 import io.middlepoint.morestuff.shared.domain.redux.store.Action
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class SyncState(
   val status: SyncStatus? = null,

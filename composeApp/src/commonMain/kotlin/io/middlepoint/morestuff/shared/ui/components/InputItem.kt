@@ -48,7 +48,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +57,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -89,6 +89,8 @@ import org.jetbrains.compose.resources.vectorResource
 
 @Composable
 fun InputItem(
+  value: TextFieldValue,
+  onValueChange: (TextFieldValue) -> Unit,
   modifier: Modifier = Modifier,
   onDone: (String) -> Unit = {},
   onCancel: () -> Unit = {},
@@ -98,18 +100,14 @@ fun InputItem(
   onClearSetPriority: () -> Unit,
   schedule: ScheduleUiModel?,
 ) {
-  var inputValue by rememberSaveable(
-    stateSaver = TextFieldValue.Saver,
-    key = "inputValue"
-  ) { mutableStateOf(TextFieldValue(text = "")) }
 
   val focusRequester = remember { FocusRequester() }
   val keyboardController = LocalSoftwareKeyboardController.current
 
   LaunchedEffect(Unit) { focusRequester.requestFocus() }
 
-  LaunchedEffect(inputValue) {
-    if (inputValue.text.isEmpty()) {
+  LaunchedEffect(value) {
+    if (value.text.isEmpty()) {
       focusRequester.requestFocus()
       keyboardController?.show()
     }
@@ -126,8 +124,8 @@ fun InputItem(
         horizontalArrangement = Arrangement.Start
       ) {
         BasicTextField(
-          value = inputValue,
-          onValueChange = { inputValue = it },
+          value = value,
+          onValueChange = onValueChange,
           modifier = Modifier
             .weight(1f)
             .clearFocusOnKeyboardDismiss()
@@ -139,7 +137,7 @@ fun InputItem(
           ),
           keyboardActions = KeyboardActions(
             onDone = {
-              val trimmedText = inputValue.text.trim()
+              val trimmedText = value.text.trim()
               if (trimmedText.isNotEmpty()) {
                 onDone(trimmedText)
               }
@@ -154,7 +152,7 @@ fun InputItem(
           ),
           decorationBox = { innerTextField ->
             Box(modifier = Modifier.padding(vertical = 6.dp)) {
-              if (inputValue.text.isEmpty()) {
+              if (value.text.isEmpty()) {
                 Text(
                   text = stringResource(Res.string.main_input_hint),
                   style = LocalTextStyle.current.copy(
@@ -204,20 +202,22 @@ fun InputItem(
         keyboardController?.show()
       },
       onUpdateInputValue = { newText ->
-        inputValue = TextFieldValue(
-          text = newText,
-          selection = androidx.compose.ui.text.TextRange(newText.length)
+        onValueChange(
+          TextFieldValue(
+            text = newText,
+            selection = TextRange(newText.length)
+          )
         )
         focusRequester.requestFocus()
         keyboardController?.show()
       },
       onDone = {
-        val trimmedText = inputValue.text.trim()
+        val trimmedText = value.text.trim()
         if (trimmedText.isNotEmpty()) {
           onDone(trimmedText)
         }
       },
-      inputText = inputValue.text,
+      inputText = value.text,
     )
   }
 }
@@ -234,7 +234,7 @@ fun ScheduleSelectorRow(
   onUpdateInputValue: (String) -> Unit = {},
   onDone: (String) -> Unit = {},
   inputText: String = "",
-  ) {
+) {
   var isVisible by remember { mutableStateOf(schedule != null) }
   var showDatePickerDialog by remember { mutableStateOf(false) }
   var showTimePickerDialog by remember { mutableStateOf(false) }
@@ -356,15 +356,15 @@ fun ScheduleSelectorRow(
         AnimatedVisibility(
           visible = isVisible,
           enter = fadeIn(animationSpec = tween(300)) +
-              expandHorizontally(
-                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                expandFrom = Alignment.Start
-              ),
+                  expandHorizontally(
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    expandFrom = Alignment.Start
+                  ),
           exit = fadeOut(animationSpec = tween(300)) +
-              shrinkHorizontally(
-                animationSpec = tween(400, easing = FastOutSlowInEasing),
-                shrinkTowards = Alignment.Start
-              ),
+                  shrinkHorizontally(
+                    animationSpec = tween(400, easing = FastOutSlowInEasing),
+                    shrinkTowards = Alignment.Start
+                  ),
           modifier = Modifier.padding(end = 6.dp)
         ) {
           SubcomposeLayout { constraints ->

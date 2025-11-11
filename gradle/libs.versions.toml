@@ -1,4 +1,6 @@
 [versions]
+jewelIntUiStandaloneVersion = "0.31.0-253.28086.58"
+platformtoolsCoreVersion = "0.7.4"
 turbine = "1.0.0"
 coilCompose = "3.1.0"
 firebaseBom = "33.13.0"
@@ -6,7 +8,6 @@ googleServices = "4.4.2"
 koinTest = "3.5.6"
 workKtx = "2.10.1"
 preferenceKtx = "1.2.1"
-firebaseCrashlyticsPlugin = "3.0.3"
 aboutLibrariesVersion = "11.2.1"
 kSoup = "0.3.0"
 sqliteAndroid = "3.49.0"
@@ -14,23 +15,24 @@ sqliteAndroid = "3.49.0"
 agp = "8.13.0"
 kotlin = "2.2.10"
 
-android_sdk_compile = "35"
-android_sdk_target = "35"
+android_sdk_compile = "36"
+android_sdk_target = "36"
 android_sdk_min = "26"
+ktfmt = "0.44"
 
 androidx-core = "1.16.0"
 kotlinx-immutable-collections = "0.3.7"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.0"
-kotlinx-datetime = "0.6.2"
+kotlinx-datetime = "0.7.1"
 kotlinx-atomicfu = "0.27.0"
-compose = "1.9.0-beta03"
+compose = "1.10.0-beta01"
 androidx-activity-compose = "1.10.1"
 androidx-appcompat = "1.7.0"
 androidx-test = "1.6.1"
 
 koin-bom = "4.1.0"
-androidx-lifecycle = "2.9.1"
+androidx-lifecycle = "2.10.0-alpha03"
 androidx-navigation = "2.9.0"
 kermit = "2.0.5"
 ktor = "3.1.2"
@@ -40,18 +42,13 @@ sqldelight = "2.1.0"
 arrow = "2.0.1"
 buildConfig = "5.5.1"
 spotless = "6.23.3"
-ktfmt = "0.44"
 stately = "2.1.0"
 mockk-common = "1.12.5"
 mockk = "1.13.8"
 junit5 = "5.11.3"
 junit-platform-commons = "1.11.3"
 security-crypto = "1.0.0"
-store5 = "5.0.0"
-decompose-router = "0.10.0-SNAPSHOT"
-decompose = "3.2.2"
-essenty = "2.0.0"
-molecule = "2.0.0"
+molecule = "2.2.0"
 exifinterfaceVersion = "1.4.1"
 constraintLayout-compose = "0.4.0"
 compose-settings = "2.4.0"
@@ -60,12 +57,18 @@ reorderable = "2.4.3"
 zoomable = "1.7.0"
 calf = "0.7.1"
 filekit = "0.10.0-beta04"
-supabase-bom = "3.1.3"
+supabase-bom = "3.2.5"
 openAi = "4.0.1"
 sqlJs = "1.8.0"
 webPackPlugin = "9.1.0"
 sentry = "0.12.0"
 splash-screen ="1.0.0"
+compose-material3-adaptive="1.2.0-alpha05"
+
+navigation3="1.0.0-alpha04"
+adaptive-navigation3="1.3.0-alpha01"
+
+hotReload = "1.0.0-rc02"
 
 
 [libraries]
@@ -82,17 +85,20 @@ kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "k
 
 # Compose
 compose-ui-util = { module = "org.jetbrains.compose.ui:ui-util", version.ref = "compose" }
+compose-material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adaptive", version.ref = "adaptive-navigation3" }
+compose-material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "adaptive-navigation3" }
+compose-material3-adaptive-navigation3 = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation3", version.ref = "adaptive-navigation3" }
 
-# Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 androidx-test = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "androidx-lifecycle" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+androidx-navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-splash = { module = "androidx.core:core-splashscreen", version.ref = "splash-screen" }
-
 
 # Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -105,6 +111,8 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 
 # SqlDelight
+platformtools-core = { module = "io.github.kdroidfilter:platformtools.core", version.ref = "platformtoolsCoreVersion" }
+platformtools-darkmodedetector = { module = "io.github.kdroidfilter:platformtools.darkmodedetector", version.ref = "platformtoolsCoreVersion" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelight-driver-desktop = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }
@@ -127,6 +135,10 @@ supabase-auth = { module = "io.github.jan-tennert.supabase:auth-kt" }
 supabase-compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth" }
 supabase-compose-auth-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui" }
 
+# Jewel
+jewel-int-ui-standalone = { module = "org.jetbrains.jewel:jewel-int-ui-standalone", version.ref = "jewelIntUiStandaloneVersion" }
+jewel-int-ui-decorated-window = { module = "org.jetbrains.jewel:jewel-int-ui-decorated-window", version.ref = "jewelIntUiStandaloneVersion" }
+
 # Misc
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
@@ -135,9 +147,6 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 stately-isolate = { module = "co.touchlab:stately-isolate", version.ref = "stately" }
 stately-iso-collections = { module = "co.touchlab:stately-iso-collections", version.ref = "stately" }
-decompose-router = { module = "io.github.xxfast:decompose-router", version.ref = "decompose-router" }
-decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-compose-multiplatform = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 molecule-runtime = { module = "app.cash.molecule:molecule-runtime", version.ref = "molecule" }
 composeSettings-ui = { group = "com.github.alorma.compose-settings", name = "ui-tiles", version.ref = "compose-settings" }
 composeSettings-ui-extended = { group = "com.github.alorma.compose-settings", name = "ui-tiles-extended", version.ref = "compose-settings" }
@@ -185,10 +194,7 @@ androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterfa
 # END OLD
 
 [plugins]
-googleServicesPlugin = { id = "com.google.gms.google-services", version.ref = "googleServices" }
-crashlyticsPlugin = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
 aboutLibrariesPlugin = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibrariesVersion" }
-
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -201,6 +207,7 @@ sqldelight = { id = "app.cash.sqldelight", version.ref = "sqldelight" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 sentry = { id = "io.sentry.kotlin.multiplatform.gradle", version.ref = "sentry" }
+hotReload = { id = "org.jetbrains.compose.hot-reload", version.ref = "hotReload" }
 
 [bundles]
 

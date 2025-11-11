@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import io.middlepoint.morestuff.shared.domain.model.Uuid
 import io.middlepoint.morestuff.shared.domain.model.core.Scope
@@ -68,37 +70,11 @@ private fun ScopeSelection(
 ) {
   Column {
     Row(
-      modifier = Modifier
-        .fillMaxWidth()
-        ,
+      modifier = Modifier.fillMaxWidth(),
       verticalAlignment = Alignment.CenterVertically
     ) {
-      Box(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 16.dp),
-      ) {
-        Text(
-          text = stringResource(Res.string.choose_scope),
-          color = MaterialTheme.colorScheme.primary,
-          style = MaterialTheme.typography.headlineSmall,
-          modifier = Modifier.align(Alignment.Center)
-        )
-
-        IconButton(
-          onClick = createNewScope,
-          modifier = Modifier.align(Alignment.CenterEnd)
-        ) {
-          Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = stringResource(Res.string.cd_add_new_scope),
-            tint = MaterialTheme.colorScheme.primary
-          )
-        }
-      }
-
+      ScopeSelectionTitle(createNewScope)
     }
-
 
     LazyColumn {
       items(
@@ -107,12 +83,47 @@ private fun ScopeSelection(
       ) { scope ->
         ListItem(
           modifier = Modifier.clickable { onScopeSelected(scope.id) },
-          headlineContent = { Text(scope.name) },
-          colors = androidx.compose.material3.ListItemDefaults.colors(
+          headlineContent = {
+            Text(
+              scope.name,
+              modifier = Modifier.fillMaxWidth(),
+              textAlign = TextAlign.Center
+            )
+          },
+          colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerElevation
           )
         )
       }
+    }
+  }
+}
+
+@Composable
+private fun ScopeSelectionTitle(
+  createNewScope: () -> Unit
+) {
+  Box(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 16.dp),
+  ) {
+    Text(
+      text = stringResource(Res.string.choose_scope),
+      color = MaterialTheme.colorScheme.primary,
+      style = MaterialTheme.typography.headlineSmall,
+      modifier = Modifier.align(Alignment.Center)
+    )
+
+    IconButton(
+      onClick = createNewScope,
+      modifier = Modifier.align(Alignment.CenterEnd)
+    ) {
+      Icon(
+        imageVector = Icons.Filled.Add,
+        contentDescription = stringResource(Res.string.cd_add_new_scope),
+        tint = MaterialTheme.colorScheme.primary
+      )
     }
   }
 }

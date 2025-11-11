@@ -1,6 +1,6 @@
 package io.middlepoint.morestuff.shared.domain.repository
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone

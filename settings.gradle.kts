@@ -15,11 +15,14 @@ dependencyResolutionManagement {
         mavenLocal()
         mavenCentral()
         maven("https://jitpack.io")
-        maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        // TODO: remove later
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 include(":composeApp")
-//include(":shared")
-//include(":app:android")
 include(":iosApp")

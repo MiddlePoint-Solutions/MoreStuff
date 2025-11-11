@@ -7,7 +7,7 @@ import io.middlepoint.morestuff.shared.data.sync.MessageRelationSync
 import io.middlepoint.morestuff.shared.data.sync.MessageSync
 import io.middlepoint.morestuff.shared.data.sync.Sync
 import io.middlepoint.morestuff.shared.domain.model.Uuid
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 typealias MessageExtraSyncMapper = (
   id: Uuid,

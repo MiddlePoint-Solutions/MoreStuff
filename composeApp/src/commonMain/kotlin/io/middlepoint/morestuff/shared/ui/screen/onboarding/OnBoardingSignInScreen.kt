@@ -63,7 +63,6 @@ import org.koin.compose.koinInject
 @Composable
 fun SignInScreen(
   supabase: SupabaseClient = koinInject(),
-  isOldUser: Boolean,
   onNext: () -> Unit,
   onSignInWithEmail: () -> Unit
 ) {
@@ -92,7 +91,6 @@ fun SignInScreen(
   )
 
   OnBoardingSignInContent(
-    isOldUser = isOldUser,
     signInWithGoogle = { signInWithGoogle.startFlow() },
     signInWithApple = { signInWithApple.startFlow() },
     onSignInWithEmail = onSignInWithEmail
@@ -103,7 +101,6 @@ fun SignInScreen(
 @OptIn(AuthUiExperimental::class)
 @Composable
 fun OnBoardingSignInContent(
-  isOldUser: Boolean,
   signInWithGoogle: () -> Unit,
   signInWithApple: () -> Unit,
   onSignInWithEmail: () -> Unit
@@ -155,16 +152,6 @@ fun OnBoardingSignInContent(
       Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
         if (platform == Platform.Android) {
-
-          if (isOldUser) {
-            Text(
-              "Existing user?\nMoreStuff is entering its next phase!\nYour data is safe and will be synced to the cloud.",
-              color = Color.White,
-              textAlign = TextAlign.Center,
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-          }
 
           OutlinedButton(
             onClick = signInWithGoogle,

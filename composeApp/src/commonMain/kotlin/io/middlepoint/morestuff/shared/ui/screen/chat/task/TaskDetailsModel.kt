@@ -23,7 +23,7 @@ import io.middlepoint.morestuff.shared.domain.usecase.task.GetTaskFlowUseCase
 import io.middlepoint.morestuff.shared.ui.model.ScheduleUiModel
 import io.middlepoint.morestuff.shared.ui.model.map.TaskUiMapper
 import kotlinx.coroutines.flow.Flow
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
